@@ -347,8 +347,10 @@
   --text-7xl--letter-spacing: -0.032em;
 
   /* The three measures every layout is allowed to be. `Container` maps its
-     `size` prop straight onto these. */
-  --container-prose: 44rem;
+     `size` prop straight onto these. Named `narrow` rather than `prose` on
+     purpose — `max-w-prose` is a Tailwind built-in, and shadowing it would
+     silently change any code that reached for the built-in meaning. */
+  --container-narrow: 44rem;
   --container-content: 72rem;
   --container-wide: 88rem;
 
@@ -368,6 +370,108 @@
   --ease-entrance: cubic-bezier(0.05, 0.7, 0.1, 1);
   --ease-exit: cubic-bezier(0.3, 0, 0.8, 0.15);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/*
+ * Animations, in a plain `@theme` rather than `@theme inline`. Not inline is the
+ * point: the utility emits `animation: var(--animate-…)`, so the nested
+ * `var(--duration-base)` resolves where it is used and the reduced-motion
+ * override above still reaches it. Inlining would freeze the duration at build
+ * time and quietly opt these out of the accessibility handling.
+ *
+ * The `--radix-*` vars are measurements Radix writes onto the element at runtime;
+ * they are what let a panel of unknown height animate at all.
+ */
+@theme {
+  --animate-accordion-down: accordion-down var(--duration-base)
+    var(--ease-standard);
+  --animate-accordion-up: accordion-up var(--duration-base) var(--ease-standard);
+  --animate-marquee: marquee var(--duration-marquee, 40s) linear infinite;
+  --animate-pop-in: pop-in var(--duration-fast) var(--ease-entrance);
+  --animate-fade-out: fade-out var(--duration-fast) var(--ease-exit) forwards;
+  --animate-slide-in-right: slide-in-right var(--duration-base)
+    var(--ease-entrance);
+  --animate-slide-out-right: slide-out-right var(--duration-fast)
+    var(--ease-exit) forwards;
+  --animate-fade-in: fade-in var(--duration-base) var(--ease-standard);
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-out-right {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
 }
 
 /* ── reduced motion ───────────────────────────────────────────────────────── */

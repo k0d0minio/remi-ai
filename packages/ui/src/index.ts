@@ -1,23 +1,45 @@
 /**
- * The public surface of @remi/ui.
+ * @remi/ui — the CLIENT surface.
  *
- * Everything exported here is a client component — tsup stamps a "use client"
- * banner on this entry (tsup.config.ts). A barrel export is a public-API
- * commitment: export a symbol only once an app imports it, and delete the line
- * when its last consumer goes (CONVENTIONS.md → "Keeping the codebase lean").
+ * Everything exported here is a client component: tsup stamps a "use client"
+ * banner on this entry (tsup.config.ts), so a server component that imports from
+ * it turns that subtree into a client boundary.
+ *
+ * A primitive belongs here only if it needs a hook, an event handler, or a
+ * browser API. Everything presentational lives in "@remi/ui/server", which is
+ * built without the banner and renders on the server — check there first.
+ *
+ * A barrel export is a public-API commitment: export a symbol only once an app
+ * imports it, and delete the line when its last consumer goes (CONVENTIONS.md →
+ * "Keeping the codebase lean").
  *
  * `cn()` is deliberately NOT re-exported here — it lives on the server-safe
  * "@remi/ui/utils" subpath.
  */
 
-export { Badge, badgeVariants } from "./components/badge";
-export { Button, buttonVariants } from "./components/button";
 export {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./components/card";
-export { Typography } from "./components/typography";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./components/accordion";
+export { Avatar, AvatarFallback, AvatarImage } from "./components/avatar";
+export { Button, buttonVariants } from "./components/button";
+export { Checkbox } from "./components/checkbox";
+export {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "./components/sheet";
+export { Switch } from "./components/switch";
+export { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/tabs";
+export {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./components/tooltip";
