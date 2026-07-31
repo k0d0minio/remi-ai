@@ -10,17 +10,17 @@ An agent's context window is expensive and non-deterministic. Any step that is f
 same inputs, same outputs, every time — is cheaper, faster and more reliable as a script. The
 pipeline pushes exactly those steps out, and keeps the agent for the parts that need judgement.
 
-| Work                                   | Owner                     | Why                                             |
-| -------------------------------------- | ------------------------- | ----------------------------------------------- |
-| Format                                 | Husky pre-commit          | Zero judgement; must happen before the diff exists |
-| Lint, typecheck                        | CI (`quality.yaml`)       | Zero judgement; a full-repo sweep costs a session nothing in CI |
-| Build                                  | The Vercel preview        | The preview has to build anyway — reuse it       |
-| Resolving a run into the working tree  | `resolve-run.sh`          | Deterministic; the failure mode (fabricating a run) is expensive |
-| Opening the run's PR                   | `new-run.sh`              | A fixed body projection from `spec.md`           |
-| Projecting labels                      | `project-labels.sh` + CI  | A pure function of the spec header and which outputs exist |
-| Checking the spec's structure          | `validate-spec.sh`        | Header fields and checkbox shape are mechanical  |
-| Sending the ship note                  | `send-ship-note.sh`       | The draft is the email; nothing to decide        |
-| Writing the spec, the code, the reviews| The agent                 | Judgement — this is the whole point              |
+| Work                                    | Owner                    | Why                                                              |
+| --------------------------------------- | ------------------------ | ---------------------------------------------------------------- |
+| Format                                  | Husky pre-commit         | Zero judgement; must happen before the diff exists               |
+| Lint, typecheck                         | CI (`quality.yaml`)      | Zero judgement; a full-repo sweep costs a session nothing in CI  |
+| Build                                   | The Vercel preview       | The preview has to build anyway — reuse it                       |
+| Resolving a run into the working tree   | `resolve-run.sh`         | Deterministic; the failure mode (fabricating a run) is expensive |
+| Opening the run's PR                    | `new-run.sh`             | A fixed body projection from `spec.md`                           |
+| Projecting labels                       | `project-labels.sh` + CI | A pure function of the spec header and which outputs exist       |
+| Checking the spec's structure           | `validate-spec.sh`       | Header fields and checkbox shape are mechanical                  |
+| Sending the ship note                   | `send-ship-note.sh`      | The draft is the email; nothing to decide                        |
+| Writing the spec, the code, the reviews | The agent                | Judgement — this is the whole point                              |
 
 ## 1 · Blocking local checks
 

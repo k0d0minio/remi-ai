@@ -18,12 +18,12 @@ in one person's head.
 
 ## App configuration
 
-| Variable                    | Purpose                                          | Where set | Public? |
-| --------------------------- | ------------------------------------------------ | --------- | ------- |
-| `APP_URL`                   | Absolute base URL of the app doing the reading    | Vercel    | no      |
-| `NEXT_PUBLIC_APP_URL`       | Same, where the browser needs it (links, share)   | Vercel    | yes     |
-| `NEXT_PUBLIC_MARKETING_URL` | Public site URL — cross-app links                 | Vercel    | yes     |
-| `NEXT_PUBLIC_DOCS_URL`      | Docs site URL — cross-app links                   | Vercel    | yes     |
+| Variable                    | Purpose                                         | Where set | Public? |
+| --------------------------- | ----------------------------------------------- | --------- | ------- |
+| `APP_URL`                   | Absolute base URL of the app doing the reading  | Vercel    | no      |
+| `NEXT_PUBLIC_APP_URL`       | Same, where the browser needs it (links, share) | Vercel    | yes     |
+| `NEXT_PUBLIC_MARKETING_URL` | Public site URL — cross-app links               | Vercel    | yes     |
+| `NEXT_PUBLIC_DOCS_URL`      | Docs site URL — cross-app links                 | Vercel    | yes     |
 
 ## Storage
 
@@ -31,24 +31,24 @@ No database vendor is committed yet — `@remi/services` defines the seam and an
 against it (`packages/services/AGENTS.md`). These are the names reserved for it; fill in the rows
 when the adapter lands.
 
-| Variable       | Purpose                        | Where set | Public? |
-| -------------- | ------------------------------ | --------- | ------- |
-| `DATABASE_URL` | Connection string              | both      | no      |
+| Variable       | Purpose           | Where set | Public? |
+| -------------- | ----------------- | --------- | ------- |
+| `DATABASE_URL` | Connection string | both      | no      |
 
 ## Auth
 
 No auth vendor is committed yet.
 
-| Variable      | Purpose                                   | Where set | Public? |
-| ------------- | ----------------------------------------- | --------- | ------- |
-| `AUTH_SECRET` | Session/token signing secret              | Vercel    | no      |
+| Variable      | Purpose                      | Where set | Public? |
+| ------------- | ---------------------------- | --------- | ------- |
+| `AUTH_SECRET` | Session/token signing secret | Vercel    | no      |
 
 ## Email
 
-| Variable         | Purpose                                                        | Where set | Public? |
-| ---------------- | -------------------------------------------------------------- | --------- | ------- |
-| `EMAIL_FROM`     | Default from-address for outbound email                        | Vercel    | no      |
-| `RESEND_API_KEY` | Resend API key — needed once a real `Mailer` is registered      | Vercel    | no      |
+| Variable         | Purpose                                                    | Where set | Public? |
+| ---------------- | ---------------------------------------------------------- | --------- | ------- |
+| `EMAIL_FROM`     | Default from-address for outbound email                    | Vercel    | no      |
+| `RESEND_API_KEY` | Resend API key — needed once a real `Mailer` is registered | Vercel    | no      |
 
 Until a `Mailer` is registered, `@remi/services/email` falls back to `consoleMailer`: it logs and
 sends nothing. That is deliberate — a preview deploy without credentials is loud, not silently
@@ -56,10 +56,10 @@ dropping mail.
 
 ## AI
 
-| Variable             | Purpose                                                | Where set | Public? |
-| -------------------- | ------------------------------------------------------ | --------- | ------- |
-| `ANTHROPIC_API_KEY`  | Direct Anthropic API access                            | both      | no      |
-| `AI_GATEWAY_API_KEY` | Vercel AI Gateway key, if routing through the gateway  | Vercel    | no      |
+| Variable             | Purpose                                               | Where set | Public? |
+| -------------------- | ----------------------------------------------------- | --------- | ------- |
+| `ANTHROPIC_API_KEY`  | Direct Anthropic API access                           | both      | no      |
+| `AI_GATEWAY_API_KEY` | Vercel AI Gateway key, if routing through the gateway | Vercel    | no      |
 
 Model ids are **not** environment variables — they live in `packages/services/src/ai/index.ts`
 behind three role names (`fast` / `balanced` / `deep`), so an upgrade is one edit rather than a
@@ -67,21 +67,21 @@ config change in five places.
 
 ## Analytics
 
-| Variable                      | Purpose                     | Where set | Public? |
-| ----------------------------- | --------------------------- | --------- | ------- |
-| `NEXT_PUBLIC_ANALYTICS_KEY`   | Product analytics key       | Vercel    | yes     |
+| Variable                    | Purpose               | Where set | Public? |
+| --------------------------- | --------------------- | --------- | ------- |
+| `NEXT_PUBLIC_ANALYTICS_KEY` | Product analytics key | Vercel    | yes     |
 
 ## Pipeline & CI (GitHub Actions)
 
-| Variable              | Purpose                                                                             | Where set | Public? |
-| --------------------- | ----------------------------------------------------------------------------------- | --------- | ------- |
-| `GITHUB_TOKEN`        | Injected automatically by Actions — do **not** add it                               | Actions   | no      |
-| `GH_TOKEN`            | Local alternative for the pipeline scripts (`resolve-run.sh`, `new-run.sh`)          | local     | no      |
-| `GITHUB_REPO`         | Optional `owner/repo` override for the pipeline scripts. Default: `k0d0minio/remi-ai` | local     | no      |
-| `TURBO_TOKEN`         | Turborepo remote cache token — shares the cache between CI and Vercel                | Actions   | no      |
-| `TURBO_TEAM`          | Turborepo team slug (a repo **variable**, not a secret)                              | Actions   | no      |
-| `SHIP_NOTE_FROM`      | From-address for the Ship stage's note (`send-ship-note.sh`)                          | local     | no      |
-| `SHIP_NOTE_RECIPIENTS`| Where the ship note goes — normally one channel inbox address                        | local     | no      |
+| Variable               | Purpose                                                                               | Where set | Public? |
+| ---------------------- | ------------------------------------------------------------------------------------- | --------- | ------- |
+| `GITHUB_TOKEN`         | Injected automatically by Actions — do **not** add it                                 | Actions   | no      |
+| `GH_TOKEN`             | Local alternative for the pipeline scripts (`resolve-run.sh`, `new-run.sh`)           | local     | no      |
+| `GITHUB_REPO`          | Optional `owner/repo` override for the pipeline scripts. Default: `k0d0minio/remi-ai` | local     | no      |
+| `TURBO_TOKEN`          | Turborepo remote cache token — shares the cache between CI and Vercel                 | Actions   | no      |
+| `TURBO_TEAM`           | Turborepo team slug (a repo **variable**, not a secret)                               | Actions   | no      |
+| `SHIP_NOTE_FROM`       | From-address for the Ship stage's note (`send-ship-note.sh`)                          | local     | no      |
+| `SHIP_NOTE_RECIPIENTS` | Where the ship note goes — normally one channel inbox address                         | local     | no      |
 
 ## Not wired yet
 

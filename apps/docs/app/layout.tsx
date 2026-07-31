@@ -5,7 +5,8 @@ import "nextra-theme-docs/style.css";
 
 export const metadata = {
   title: { default: "Remi AI docs", template: "%s · Remi AI docs" },
-  description: "How Remi AI works — business direction and technical reference.",
+  description:
+    "How Remi AI works — business direction and technical reference.",
 };
 
 const RootLayout = async ({ children }: { children: React.ReactNode }) => (
