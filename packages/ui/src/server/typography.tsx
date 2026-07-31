@@ -72,6 +72,12 @@ type Props = ComponentProps<"p"> &
   VariantProps<typeof typography> & {
     /** The semantic element to render — `h1`…`h6`, `p`, `span`, `label`. */
     as?: ElementType;
+    /**
+     * Only meaningful with `as="label"`. Present because the alternative is a
+     * raw `<label>` plus utility classes at every call site, which forks the
+     * type scale — the exact thing this component exists to prevent.
+     */
+    htmlFor?: string;
   };
 
 /**
