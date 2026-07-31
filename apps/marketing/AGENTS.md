@@ -33,8 +33,22 @@ form submission, a newsletter signup — and nothing else. This app holds no cus
 ## Structure
 
 ```text
-app/          routes — one folder per page, `page.tsx` + local components
-components/   sections and blocks composed from @remi/ui
-lib/          content, constants, metadata helpers
+app/[locale]/ routes — one folder per page, `page.tsx` + local components;
+              every page exists under /en and /fr
+components/   sections and blocks composed from @remi/ui, prop-driven so both
+              locales share them
+lib/i18n.ts   the locale list and path helpers
+lib/content/  one dictionary per locale (`en.ts`, `fr.ts`), typed by `types.ts`
+              so a missing translation is a type error
+lib/          metadata helpers
 public/       static assets
+proxy.ts      redirects bare paths to the visitor's language
 ```
+
+## Locales and truthfulness
+
+The site is bilingual (English, French) with shared slugs. Copy lives only in
+`lib/content/` — a wording change never means editing a component, and the two
+dictionaries must tell the same story. The product is pre-launch: the site
+sells the pilot programme and what is being built, and never presents a
+capability as live. No pricing appears anywhere until pricing is decided.

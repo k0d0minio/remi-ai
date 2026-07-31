@@ -43,7 +43,6 @@ export { Input } from "./server/input";
 export { Link, linkVariants } from "./server/link";
 export { Section } from "./server/section";
 export { Separator } from "./server/separator";
-export { StarRating } from "./server/star-rating";
 export { Textarea } from "./server/textarea";
 export { Typography } from "./server/typography";
 export { VisuallyHidden } from "./server/visually-hidden";
@@ -51,9 +50,4 @@ export { VisuallyHidden } from "./server/visually-hidden";
 export { CtaBand } from "./server/compound/cta-band";
 export { FeatureGrid, type Feature } from "./server/compound/feature-grid";
 export { Hero } from "./server/compound/hero";
-export {
-  PricingTable,
-  type PricingTier,
-} from "./server/compound/pricing-table";
 export { StatRow, type Stat } from "./server/compound/stat-row";
-export { TestimonialCard } from "./server/compound/testimonial-card";
