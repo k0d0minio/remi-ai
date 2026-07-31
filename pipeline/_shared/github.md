@@ -74,12 +74,12 @@ job in `.github/workflows/pipeline.yaml` runs `project-labels.sh <slug> --stage 
 reads `apps:` and `complexity:` from `spec.md` and derives `stage:*` from **which run outputs
 exist**:
 
-| Output present                     | Stage label     |
-| ---------------------------------- | --------------- |
-| `03_define/output/spec.md`         | `stage:define`  |
-| `04_build/output/notes.md`         | `stage:build`   |
-| `05_verify/output/verify.md`       | `stage:verify`  |
-| `06_ship/output/release.md`        | `stage:ship`    |
+| Output present               | Stage label    |
+| ---------------------------- | -------------- |
+| `03_define/output/spec.md`   | `stage:define` |
+| `04_build/output/notes.md`   | `stage:build`  |
+| `05_verify/output/verify.md` | `stage:verify` |
+| `06_ship/output/release.md`  | `stage:ship`   |
 
 Pushing a stage's output is what moves the label. `new-run.sh` projects the initial set when the PR
 opens; the script stays the manual fallback.

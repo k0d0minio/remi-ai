@@ -10,11 +10,11 @@ Storage, email and AI are **seams**, not integrations. Each one defines an inter
 the process. Nothing above the seam names a vendor, so choosing one later is a new file plus one
 registration line — never a rewrite of the callers.
 
-| Seam    | Interface        | Register with            | Default if unregistered            |
-| ------- | ---------------- | ------------------------ | ---------------------------------- |
-| Storage | `DatabaseClient` | `registerDatabase()`     | throws — a missing DB must be loud |
+| Seam    | Interface        | Register with            | Default if unregistered             |
+| ------- | ---------------- | ------------------------ | ----------------------------------- |
+| Storage | `DatabaseClient` | `registerDatabase()`     | throws — a missing DB must be loud  |
 | Email   | `Mailer`         | `registerMailer()`       | `consoleMailer` — logs, never sends |
-| AI      | `TextProvider`   | `registerTextProvider()` | throws                             |
+| AI      | `TextProvider`   | `registerTextProvider()` | throws                              |
 
 When you add the first adapter, it goes in this package (`src/db/adapters/<vendor>.ts`), the vendor
 SDK becomes a dependency of **this** package only, and `docs/ENV.md` gains its variables in the same
@@ -22,14 +22,14 @@ PR.
 
 ## Entrypoints — pick the one that matches where the code runs
 
-| Import                   | Contains                                        | Runs on          |
-| ------------------------ | ----------------------------------------------- | ---------------- |
-| `@remi/services/shared`  | types, formatters, `Result`, validation          | browser + server |
-| `@remi/services/server`  | storage, email, AI, env — the whole Node surface | server only      |
-| `@remi/services/db`      | the storage seam alone                           | server only      |
-| `@remi/services/ai`      | model roles + the provider seam                  | server only      |
-| `@remi/services/email`   | the mailer seam                                  | server only      |
-| `@remi/services`         | types only — apps are lint-blocked from it       | —                |
+| Import                  | Contains                                         | Runs on          |
+| ----------------------- | ------------------------------------------------ | ---------------- |
+| `@remi/services/shared` | types, formatters, `Result`, validation          | browser + server |
+| `@remi/services/server` | storage, email, AI, env — the whole Node surface | server only      |
+| `@remi/services/db`     | the storage seam alone                           | server only      |
+| `@remi/services/ai`     | model roles + the provider seam                  | server only      |
+| `@remi/services/email`  | the mailer seam                                  | server only      |
+| `@remi/services`        | types only — apps are lint-blocked from it       | —                |
 
 Adding an entrypoint means editing **two** places that must agree: `exports` in `package.json` and
 `entry` in `tsup.config.ts`.

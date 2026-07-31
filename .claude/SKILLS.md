@@ -17,9 +17,9 @@ at all. Keep this small.
 
 ## Repo-local skills
 
-| Skill      | What it does                                                          |
-| ---------- | --------------------------------------------------------------------- |
-| `pipeline` | The delivery pipeline router. Non-negotiable — it *is* the workflow.   |
+| Skill      | What it does                                                         |
+| ---------- | -------------------------------------------------------------------- |
+| `pipeline` | The delivery pipeline router. Non-negotiable — it _is_ the workflow. |
 
 That's the whole list today, and that is the correct size for a repo at this stage. Everything else
 comes from the globally installed skills (Next.js, Vercel, security, accessibility, testing, and so
