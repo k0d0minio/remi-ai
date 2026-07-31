@@ -1,0 +1,42 @@
+# Packages
+
+## `@remi/ui`
+
+Every primitive shared across apps. shadcn/ui New York over Radix, Tailwind 4.
+
+Two build entries, and the split is load-bearing:
+
+| Import              | Banner         | Callable from         |
+| ------------------- | -------------- | --------------------- |
+| `@remi/ui`          | `"use client"` | client components     |
+| `@remi/ui/utils`    | none           | server **and** client |
+
+`cn()` lives on the second one. Merging the entries breaks `cn()` in every server component in the
+repo.
+
+Tokens ship as two stylesheets: `@remi/ui/tokens.css` (raw, no Tailwind — what apps import) and
+`@remi/ui/globals.css` (a standalone Tailwind + tokens build, for consumers that run no Tailwind
+pass of their own).
+
+## `@remi/services`
+
+Storage, email, AI, and the environment reader. **No vendor is committed** — each is a seam:
+
+| Seam    | Interface        | Register with            | Default if unregistered              |
+| ------- | ---------------- | ------------------------ | ------------------------------------ |
+| Storage | `DatabaseClient` | `registerDatabase()`     | throws — a missing DB must be loud   |
+| Email   | `Mailer`         | `registerMailer()`       | `consoleMailer` — logs, never sends  |
+| AI      | `TextProvider`   | `registerTextProvider()` | throws                               |
+
+Pick the entrypoint that matches where the code runs:
+
+| Import                  | Contains                                         | Runs on          |
+| ----------------------- | ------------------------------------------------ | ---------------- |
+| `@remi/services/shared` | types, formatters, `Result`, validation           | browser + server |
+| `@remi/services/server` | storage, email, AI, env — the whole Node surface  | server only      |
+| `@remi/services/db`     | the storage seam alone                            | server only      |
+| `@remi/services/ai`     | model roles + the provider seam                   | server only      |
+| `@remi/services/email`  | the mailer seam                                   | server only      |
+
+The root `@remi/services` barrel is types-only and apps are lint-blocked from importing it, so the
+choice is always explicit at the call site.

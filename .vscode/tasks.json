@@ -1,0 +1,48 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "▶ Dev: web",
+      "detail": "The product app on :3000 (builds the shared packages first).",
+      "type": "shell",
+      "command": "pnpm web:dev",
+      "problemMatcher": [],
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "▶ Dev: admin",
+      "detail": "The internal admin app on :3002.",
+      "type": "shell",
+      "command": "pnpm admin:dev",
+      "problemMatcher": []
+    },
+    {
+      "label": "▶ Dev: marketing",
+      "detail": "The public site on :3001.",
+      "type": "shell",
+      "command": "pnpm marketing:dev",
+      "problemMatcher": []
+    },
+    {
+      "label": "▶ Dev: docs",
+      "detail": "The Nextra docs site on :3003.",
+      "type": "shell",
+      "command": "pnpm docs:dev",
+      "problemMatcher": []
+    },
+    {
+      "label": "▶ Dev: demo",
+      "detail": "The Design-stage prototype sandbox on :3005 (mock data only).",
+      "type": "shell",
+      "command": "pnpm demo:dev",
+      "problemMatcher": []
+    },
+    {
+      "label": "◆ Watch: packages",
+      "detail": "Rebuild @remi/ui and @remi/services on change — run alongside an app.",
+      "type": "shell",
+      "command": "pnpm packages:dev",
+      "problemMatcher": []
+    }
+  ]
+}

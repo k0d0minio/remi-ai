@@ -1,0 +1,93 @@
+name: Pipeline
+
+# Offloads two deterministic pipeline chores from the agent's context onto CI:
+#   1. labels     — project a run's labels (type/app/complexity + the stage:* it is now at) from
+#                   spec.md and which run outputs exist, so no stage has to advance stage:* by hand.
+#                   Pushing a stage's output is what moves the board.
+#   2. spec-check — a NON-BLOCKING structural backstop on spec.md. Define still runs
+#                   validate-spec.sh before its gate (that is the real check); this only flags drift
+#                   on later pushes via the job summary, and never red-blocks the PR.
+#
+# Runs only for same-repo PRs — a forked PR gets a read-only token that cannot write labels.
+# Markdown under pipeline/** does not trigger the heavy Quality workflow, so this is cheap and
+# independent.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "pipeline/runs/**"
+
+concurrency:
+  group: pipeline-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write # the labels REST API writes to the PR as an issue
+
+jobs:
+  labels:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    name: Project run labels
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need the base commit to diff which runs changed
+
+      - name: Project labels for each changed run
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -uo pipefail
+          slugs="$(git diff --name-only "$BASE_SHA" HEAD \
+            | grep -oE '^pipeline/runs/[^/]+/' | cut -d/ -f3 | sort -u || true)"
+          if [ -z "$slugs" ]; then echo "No changed runs — nothing to label."; exit 0; fi
+          for slug in $slugs; do
+            spec="pipeline/runs/$slug/03_define/output/spec.md"
+            if [ ! -f "$spec" ]; then
+              echo "::notice::run '$slug' changed but has no spec.md (lane run?) — skipping labels"
+              continue
+            fi
+            echo "::group::labels for $slug"
+            # One malformed spec must not red-fail the job — warn and carry on.
+            pipeline/scripts/project-labels.sh "$slug" --stage auto --pr "$PR_NUMBER" \
+              || echo "::warning::could not project labels for '$slug' (check the spec header — see log)"
+            echo "::endgroup::"
+          done
+
+  spec-check:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    name: Spec structure (advisory)
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate changed specs (advisory — never a merge gate)
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -uo pipefail
+          specs="$(git diff --name-only "$BASE_SHA" HEAD \
+            | grep -E '^pipeline/runs/[^/]+/03_define/output/spec.md$' | sort -u || true)"
+          if [ -z "$specs" ]; then echo "No spec.md changed — nothing to validate."; exit 0; fi
+          for spec in $specs; do
+            echo "::group::validate $spec"
+            if pipeline/scripts/validate-spec.sh "$spec"; then
+              echo "- ✅ \`$spec\` — structurally sound" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "- ⚠️ \`$spec\` — structural issues (advisory, see log)" >> "$GITHUB_STEP_SUMMARY"
+              echo "::warning file=${spec}::Spec has structural issues — advisory, not a merge gate. Fix with /pipeline define <slug>."
+            fi
+            echo "::endgroup::"
+          done
+          # Advisory by contract: this step always exits 0 so it never blocks the PR.
+          exit 0

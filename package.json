@@ -1,0 +1,58 @@
+{
+  "name": "remi-ai",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare": "husky",
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean",
+    "env:pull": "turbo run env:pull",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md}\"",
+    "format:staged": "lint-staged",
+    "web:dev": "turbo run dev --filter=@remi/web",
+    "web:build": "turbo run build --filter=@remi/web",
+    "admin:dev": "turbo run dev --filter=@remi/admin",
+    "admin:build": "turbo run build --filter=@remi/admin",
+    "marketing:dev": "turbo run dev --filter=@remi/marketing",
+    "marketing:build": "turbo run build --filter=@remi/marketing",
+    "docs:dev": "turbo run dev --filter=@remi/docs",
+    "docs:build": "turbo run build --filter=@remi/docs",
+    "demo:dev": "turbo run dev --filter=@remi/demo",
+    "demo:build": "turbo run build --filter=@remi/demo",
+    "ui:dev": "turbo run dev --filter=@remi/ui",
+    "ui:build": "turbo run build --filter=@remi/ui",
+    "services:dev": "turbo run dev --filter=@remi/services",
+    "services:build": "turbo run build --filter=@remi/services",
+    "packages:dev": "turbo run dev --filter=@remi/ui --filter=@remi/services",
+    "packages:build": "turbo run build --filter=@remi/ui --filter=@remi/services"
+  },
+  "engines": {
+    "node": "22.x",
+    "pnpm": ">=10"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^16.5.0",
+    "husky": "^9.1.7",
+    "jiti": "^2.4.2",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.7.4",
+    "prettier-plugin-tailwindcss": "^0.6.14",
+    "turbo": "^2.9.16",
+    "typescript": "catalog:",
+    "typescript-eslint": "^8.44.1"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,md}": ["prettier --write"]
+  }
+}

@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# builds
+.next/
+out/
+dist/
+build/
+storybook-static/
+*.tsbuildinfo
+
+# caches
+.turbo/
+.eslintcache
+
+# env — values never enter git; the catalogue of names lives in docs/ENV.md
+.env
+.env.*
+!.env.example
+
+# platform
+.vercel/
+.DS_Store
+
+# agent-local state
+.claude/settings.local.json

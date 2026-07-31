@@ -1,0 +1,169 @@
+# Remi AI — conventions (canonical Layer 3 reference)
+
+The single source of truth for code style, design-system rules, and git conventions across the
+monorepo. `CLAUDE.md` (Layer 0) points here; the pipeline's Build stage loads this file by path;
+the subtree `AGENTS.md` files link it. **Change a rule here and nowhere else.**
+
+## Code style
+
+### Functions
+
+- **Always arrow functions.** Never `function foo() {}` — ESLint enforces it.
+- **Always `async`/`await`.** Never `.then()` chains.
+- Implicit return when there is no logic between the signature and the returned value:
+
+  ```tsx
+  // Good — no logic, implicit return
+  export const Greeting = ({ name }: Props) => <div>Hello, {name}!</div>;
+
+  // Good — has logic, explicit return
+  export const Greeting = ({ name }: Props) => {
+    const formatted = name.toUpperCase();
+    return <div>Hello, {formatted}!</div>;
+  };
+  ```
+
+- **Exception:** `page.tsx`, `layout.tsx` and route handlers may use `export default function` when
+  that matches the framework's own convention.
+
+### Control flow
+
+Braces on every `if` / `else` / loop body. No `if (x) return y;` without `{ }` — `curly: "all"`.
+
+### Components
+
+- Named `const`, arrow function, one responsibility:
+
+  ```tsx
+  export const MyComponent = ({ name }: Props) => <div>{name}</div>;
+  ```
+
+- **Server components by default.** `"use client"` earns its place with an event handler, a hook,
+  or a browser API — nothing else. Push the boundary down: a client island inside a server page,
+  never a client page wrapping server content.
+
+### Types
+
+- **Always `type`, never `interface`.** ESLint warns on the latter.
+- Props are a `type` directly above the component:
+
+  ```tsx
+  type Props = {
+    name: string;
+    muted?: boolean;
+  };
+
+  export const MyComponent = ({ name, muted }: Props) => <div>{name}</div>;
+  ```
+
+- No JSDoc `@param` / `@returns` — TypeScript already says it. A JSDoc description is for logic
+  that is non-obvious, and explains *why*, not *what*.
+
+### Naming
+
+| Thing                   | Convention   |
+| ----------------------- | ------------ |
+| Variables and functions | `camelCase`  |
+| Components and types    | `PascalCase` |
+| File names              | `kebab-case` |
+| CSS classes             | `kebab-case` |
+
+### Imports
+
+- **Named imports.** Default imports only where a framework requires one.
+- `@/*` for app-local paths.
+- **Name the services entrypoint that matches where the code runs** — `@remi/services/shared`
+  (isomorphic), `/server` (Node-only), `/ai`, `/email`. The bare root barrel is lint-blocked so the
+  choice is always visible at the call site.
+- `cn()` comes from `@remi/ui/utils`, never from the main barrel — the barrel is `"use client"` and
+  its exports cannot be called from a server component.
+
+### Copy and text
+
+**Sentence case everywhere** — headings, labels, buttons, badges, placeholders. Never title case.
+
+- ✓ `Save changes` · `Billing overview` · `Awaiting approval`
+- ✗ `Save Changes` · `Billing Overview` · `Awaiting Approval`
+
+## The design system
+
+### `packages/ui` — the only home for primitives
+
+- Add components from the package: `pnpm --filter @remi/ui exec shadcn@latest add <component>`.
+- Rewrite to house style, export from `src/index.ts`.
+- Intent-bearing props use one vocabulary — `success | warning | error | info | neutral` — across
+  `Badge`, `Card`, and anything added later. A component never takes a caller-supplied colour class.
+- Nothing lands in `packages/ui` without a consuming app in the same PR.
+
+### Every app that renders product UI
+
+- Import primitives from `@remi/ui`. **Never** from `@radix-ui/*` directly, **never** from a local
+  `components/ui/` barrel — ESLint blocks both, so a second design system cannot grow inside an app.
+- Import tokens once, in the app's `globals.css`: `@import "@remi/ui/tokens.css"` after
+  `@import "tailwindcss"`. Never redefine a token.
+- Use tokens, not raw palette colours: `bg-card`, `text-muted-foreground`, `bg-success` — not
+  `bg-white`, `bg-emerald-50`.
+
+### Text
+
+Use the `Typography` component. Semantics come from `as`, scale from the variants:
+
+```tsx
+// Good
+<Typography as="h2" size="sm" weight="medium" muted>Section title</Typography>
+
+// Bad — a raw tag plus utility classes forks the type scale
+<h2 className="text-sm font-medium text-muted-foreground">Section title</h2>
+```
+
+## Keeping the codebase lean
+
+Each of these is a review blocker, not a preference. They exist because the alternative is
+discovering twenty thousand lines of drift in an audit two years from now.
+
+- **Superseding deletes the superseded.** The PR that lands a replacement deletes the old
+  implementation in the same change. Never leave files on disk "for reference" — unreachable code
+  documents nothing, it rots and hides real bugs.
+- **Shared components are built in `packages/ui`, not in apps.** A component needed by more than
+  one app, or one that renders purely from props, belongs there from its first commit. Copying a
+  component between apps is forbidden: lift it into `packages/ui` and wrap it thinly per app.
+- **Grep before writing a helper.** `cn`, `initials`, date and currency formatting each live in
+  exactly one home. Before writing any small helper, search for it; if it exists elsewhere, import
+  it or move it to the shared home first. Never a second copy, never a forked variant.
+- **Every dependency needs an import.** No speculative `package.json` entries; when the last import
+  of a dependency goes, the dependency goes. Shared runtime versions come from the pnpm `catalog:`
+  — apps do not pin their own.
+- **A barrel export is a public-API commitment.** Export only what a consumer imports today. A
+  "might be useful" export is a rename-blocker that outlives whoever added it. When a symbol's last
+  consumer goes, the symbol and its barrel line go too.
+- **No dead configuration.** A flag, env var or config key with no reader is deleted, not left
+  "in case". `docs/ENV.md` is the check: a variable not in that table does not exist.
+
+## Environment variables
+
+Every server-side `process.env` read goes through `env()` / `requireEnv()` in
+`packages/services/src/server/env.ts`. Adding a variable means three edits in the same PR: the zod
+schema, a row in [`docs/ENV.md`](docs/ENV.md), and a `globalEnv` entry in `turbo.json`. Values are
+never committed — they live in Vercel and in GitHub Actions secrets.
+
+## The factory owns the checks — you do not
+
+Format, lint, typecheck and build are deterministic work. They belong to Husky, CI and the Vercel
+preview, not to a session's context window:
+
+| Check           | Runs where                                  |
+| --------------- | ------------------------------------------- |
+| Format          | Husky pre-commit (lint-staged) + CI         |
+| Lint, typecheck | CI — `.github/workflows/quality.yaml`       |
+| Build           | The Vercel preview deploy                   |
+
+`.claude/hooks/block-local-checks.sh` enforces this for agent sessions. Push, then read the result
+back from the PR's check runs. The one exception: if you already know an edit introduced a type
+error, fix it before pushing rather than spending a CI round-trip — but do not go sweeping for them.
+
+## Git
+
+- Small, conventional commits: `feat: <slug> — <what>`, `fix:`, `chore:`, `docs:`.
+- One PR per pipeline run, from Define through Ship. Never a second PR for the same run.
+- Squash-merge, and only on a ticked **Ready to merge** box with green checks.
+- Never commit a secret. If you find one in the tree, stop and flag it.

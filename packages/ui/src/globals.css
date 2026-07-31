@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+/* Standalone build: Tailwind + the tokens, emitted to dist/globals.css. Apps that
+   run their own Tailwind pass import "@remi/ui/tokens.css" instead. */
+@source "./";

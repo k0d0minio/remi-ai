@@ -1,0 +1,35 @@
+name: Feedback
+description: Report something broken, or ask for something — for triage into the pipeline.
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the front door for reports and requests. It is **intake only** — the work itself
+        runs through the pipeline, and the spec, findings and decisions live in the run folder and
+        the PR, never in this issue.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, or what do you need?
+      description: If something is broken, say what you did, what you expected, and what you got.
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: Which app, and which page or URL.
+    validations:
+      required: false
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact
+      options:
+        - Blocking — I cannot do the thing at all
+        - Painful — there is a workaround, but it is bad
+        - Minor — worth fixing, not urgent
+        - Idea — nothing is broken
+    validations:
+      required: true

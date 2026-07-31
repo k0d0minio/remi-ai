@@ -1,0 +1,25 @@
+# Applications
+
+Five apps, one Vercel project each, one port each. Every app that renders product UI consumes
+`@remi/ui` and owns no primitives of its own.
+
+| App         | Package            | Port | Auth | Data                       | Purpose                                       |
+| ----------- | ------------------ | ---- | ---- | -------------------------- | --------------------------------------------- |
+| `web`       | `@remi/web`        | 3000 | yes  | `@remi/services/server`    | The product. Signed-in surface.               |
+| `marketing` | `@remi/marketing`  | 3001 | no   | mostly static              | The public site. Indexable, content-led.      |
+| `admin`     | `@remi/admin`      | 3002 | yes  | `@remi/services/server`    | Internal operations. Operator-only.           |
+| `docs`      | `@remi/docs`       | 3003 | no   | none                       | This site. Nextra, MDX.                       |
+| `demo`      | `@remi/demo`       | 3005 | no   | **mock only**              | The Design stage's prototype sandbox.         |
+
+## Why admin is its own app, not a route group in web
+
+A separate deployment gives a separate URL, separate environment variables, and separate access
+control. A `/admin` route group inside the product app makes every operator-only capability one
+routing mistake away from a customer.
+
+## Why demo can never reach a backend
+
+The Design stage merges demo work straight to the live URL so a stakeholder reviews the real
+deployed thing. That is only safe while the demo cannot touch a real record. Three independent
+guards enforce it: `@remi/services` is absent from its `package.json`, absent from
+`transpilePackages`, and blocked by ESLint. A feature that needs real data has outgrown the demo.

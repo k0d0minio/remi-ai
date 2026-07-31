@@ -1,0 +1,42 @@
+# Architecture
+
+## Repository structure
+
+```text
+apps/
+  web/        the product app — signed-in surface (:3000)
+  marketing/  the public site — unauthenticated, indexable (:3001)
+  admin/      internal operations — operator-only (:3002)
+  docs/       this site — Nextra (:3003)
+  demo/       the Design stage's prototype sandbox — mock data only (:3005)
+packages/
+  ui/         @remi/ui — the design system, the only home for primitives
+  services/   @remi/services — storage, email, AI, env; vendor seams, not integrations
+pipeline/     the delivery pipeline — stages, lanes, runs, scripts
+```
+
+The dependency arrow only ever points **app → package**. A package importing an app is a lint
+error, and there is no app-to-app import at all: anything two apps need lives in `packages/`.
+
+## Technology stack
+
+| Layer      | Choice                                          |
+| ---------- | ----------------------------------------------- |
+| Monorepo   | Turborepo 2, pnpm 10 workspaces, Node 22        |
+| Framework  | Next.js 16, App Router, React 19                |
+| Language   | TypeScript 5 — strict everywhere                |
+| Styling    | Tailwind CSS 4, tokens in `@remi/ui/tokens.css` |
+| Primitives | shadcn/ui (New York) over Radix                 |
+| Docs       | Nextra 4                                        |
+| Packages   | tsup → ESM                                      |
+| Hosting    | Vercel — one project per app                    |
+
+Storage, auth, email and AI are **not** in this table on purpose: `@remi/services` defines the
+seams and no vendor is committed yet. See the packages page.
+
+## How a request flows
+
+A page in `apps/web` renders as a server component, calls a service through
+`@remi/services/server`, and renders primitives from `@remi/ui`. The import path is the statement
+about where code runs — `/shared` is isomorphic, `/server` is Node-only — so a client bundle can
+never accidentally acquire a database driver.

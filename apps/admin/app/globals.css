@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "@remi/ui/tokens.css";
+
+/* Tell Tailwind to scan the shared package too — its class names live outside
+   this app's tree, so without this the primitives ship unstyled. */
+@source "../../../packages/ui/src";
