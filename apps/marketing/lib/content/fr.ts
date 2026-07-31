@@ -187,7 +187,8 @@ export const fr: Content = {
         "Un accompagnement co-conçu avec l'expertise du Dr Mouton",
         "Des patients FunMedDev parmi les premiers utilisateurs pilotes",
       ],
-      quote: "Personnalisation. Voilà, un mot. Et l'IA est un soutien à la personnalisation.",
+      quote:
+        "Personnalisation. Voilà, un mot. Et l'IA est un soutien à la personnalisation.",
       quoteAuthor: "Dr Georges Mouton",
       quoteRole: "Fondateur, FunMedDev — en échange avec l'équipe REMI",
     },
@@ -349,7 +350,7 @@ export const fr: Content = {
       subtitle:
         "On sort de consultation plein de bonnes intentions — puis les courses, le travail et 19 h arrivent. REMI se construit pour vous soutenir entre les séances, en traduisant les recommandations de votre praticien en choses à cuisiner, à choisir et à répéter.",
       actions: [
-        { href: "/contact", label: "Me tenir informé(e)", variant: "default" },
+        { href: "/contact", label: "Me tenir informé(e)", variant: "primary" },
         {
           href: "/practitioners",
           label: "Je suis praticien",
@@ -460,7 +461,8 @@ export const fr: Content = {
         "Un accompagnement co-conçu avec l'expertise du Dr Mouton",
         "Un déploiement pilote prévu avec des patients FunMedDev",
       ],
-      quote: "Personnalisation. Voilà, un mot. Et l'IA est un soutien à la personnalisation.",
+      quote:
+        "Personnalisation. Voilà, un mot. Et l'IA est un soutien à la personnalisation.",
       quoteAuthor: "Dr Georges Mouton",
       quoteRole: "Fondateur, FunMedDev — en échange avec l'équipe REMI",
     },
@@ -517,8 +519,7 @@ export const fr: Content = {
       email: "E-mail",
       emailHint: "Nous répondons à cette adresse, et à rien d'autre.",
       message: "Comment pouvons-nous aider ?",
-      consent:
-        "J'accepte que REMI conserve ce message afin d'y répondre.",
+      consent: "J'accepte que REMI conserve ce message afin d'y répondre.",
       submit: "Envoyer le message",
       submitting: "Envoi…",
       successTitle: "Message bien reçu",

@@ -17,8 +17,8 @@ const NotFound = () => (
         This page does not exist · Cette page n'existe pas
       </Typography>
       <Typography variant="lead" size="lg">
-        The address may have changed, or it never existed. · L'adresse a peut-être
-        changé, ou elle n'a jamais existé.
+        The address may have changed, or it never existed. · L'adresse a
+        peut-être changé, ou elle n'a jamais existé.
       </Typography>
       <div className="flex flex-wrap gap-3">
         <Button asChild>
