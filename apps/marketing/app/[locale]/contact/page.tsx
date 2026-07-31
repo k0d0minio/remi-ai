@@ -53,7 +53,10 @@ const Page = async ({ params }: { params: Promise<Params> }) => {
                 <Link href={`mailto:${person.email}`} className="text-sm">
                   {person.email}
                 </Link>
-                <Link href={`tel:${person.phone.replace(/\s/g, "")}`} className="text-sm">
+                <Link
+                  href={`tel:${person.phone.replace(/\s/g, "")}`}
+                  className="text-sm"
+                >
                   {person.phone}
                 </Link>
               </div>

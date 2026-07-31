@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { Alert, AlertDescription, AlertTitle, Container, Section } from "@remi/ui/server";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Container,
+  Section,
+} from "@remi/ui/server";
 import { CtaSection } from "@/components/sections/cta-section";
 import { FeatureSection } from "@/components/sections/feature-section";
 import { HeroSection } from "@/components/sections/hero-section";

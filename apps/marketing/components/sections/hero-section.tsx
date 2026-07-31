@@ -30,12 +30,7 @@ export const HeroSection = ({ content, locale }: Props) => (
       title={content.title}
       subtitle={content.subtitle}
       actions={content.actions.map((action, index) => (
-        <Button
-          key={action.href}
-          asChild
-          size="xl"
-          variant={action.variant}
-        >
+        <Button key={action.href} asChild size="xl" variant={action.variant}>
           <NextLink href={localePath(locale, action.href)}>
             {action.label}
             {index === 0 ? <ArrowRight aria-hidden="true" /> : null}

@@ -30,9 +30,7 @@ export const LocaleSwitcher = ({ locale }: Props) => {
           className={cn(
             buttonVariants({ variant: "ghost", size: "sm" }),
             "px-2 uppercase",
-            target === locale
-              ? "text-foreground"
-              : "text-muted-foreground",
+            target === locale ? "text-foreground" : "text-muted-foreground",
           )}
         >
           {target}

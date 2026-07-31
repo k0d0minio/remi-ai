@@ -53,7 +53,11 @@ export const en: Content = {
       subtitle:
         "People leave a consultation knowing what to do — then everyday life takes over. REMI is a wellness copilot being built with health practitioners: it turns their recommendations into meals, habits and small steps, and keeps the practitioner in the loop.",
       actions: [
-        { href: "/practitioners", label: "I'm a practitioner", variant: "primary" },
+        {
+          href: "/practitioners",
+          label: "I'm a practitioner",
+          variant: "primary",
+        },
         {
           href: "/individuals",
           label: "I'm working with one",
@@ -511,7 +515,8 @@ export const en: Content = {
       email: "Email",
       emailHint: "We reply to this address and nothing else.",
       message: "How can we help?",
-      consent: "I agree that REMI may store this message in order to reply to it.",
+      consent:
+        "I agree that REMI may store this message in order to reply to it.",
       submit: "Send message",
       submitting: "Sending…",
       successTitle: "Message received",
