@@ -7,8 +7,7 @@
  * caller cannot forget the failure branch.
  */
 export type Result<T, E extends string = ServiceErrorCode> =
-  | { ok: true; data: T }
-  | { ok: false; error: E; message: string };
+  { ok: true; data: T } | { ok: false; error: E; message: string };
 
 export type ServiceErrorCode =
   | "not_found"

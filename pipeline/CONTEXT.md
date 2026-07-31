@@ -10,14 +10,14 @@ is the human gate. Every rule an agent needs is inlined in these contracts.
 
 ## The spine — six stages, five gates
 
-| `/pipeline …`                 | Stage folder        | Job                                                                  | Gate after                             |
-| ----------------------------- | ------------------- | -------------------------------------------------------------------- | -------------------------------------- |
-| `scope "<topic>"`             | `stages/01_scope/`  | interrogate the business logic → `scope.md` → cut the intake batch   | ✅ scope agreed (in conversation)      |
-| `design <slug>`               | `stages/02_design/` | prototype in `apps/demo`, live via its own small demo PRs            | ✅ demo signed off from the live URL   |
-| `new` / `define` (per stub)   | `stages/03_define/` | stub → approvable `spec.md`; opens the run's **one** feature PR      | ✅ **Spec approved** PR checkbox       |
-| `build <slug>`                | `stages/04_build/`  | implement the spec on the run's branch; draft PR → open              | — (flows into Verify)                  |
-| `verify <slug>`               | `stages/05_verify/` | readiness · code review · security · DoD smoke on the preview        | ✅ quality gate confirmed              |
-| `ship <slug>`                 | `stages/06_ship/`   | docs + changelog in-PR → gated squash-merge → ship note              | ✅ **Ready to merge** PR checkbox      |
+| `/pipeline …`               | Stage folder        | Job                                                                | Gate after                           |
+| --------------------------- | ------------------- | ------------------------------------------------------------------ | ------------------------------------ |
+| `scope "<topic>"`           | `stages/01_scope/`  | interrogate the business logic → `scope.md` → cut the intake batch | ✅ scope agreed (in conversation)    |
+| `design <slug>`             | `stages/02_design/` | prototype in `apps/demo`, live via its own small demo PRs          | ✅ demo signed off from the live URL |
+| `new` / `define` (per stub) | `stages/03_define/` | stub → approvable `spec.md`; opens the run's **one** feature PR    | ✅ **Spec approved** PR checkbox     |
+| `build <slug>`              | `stages/04_build/`  | implement the spec on the run's branch; draft PR → open            | — (flows into Verify)                |
+| `verify <slug>`             | `stages/05_verify/` | readiness · code review · security · DoD smoke on the preview      | ✅ quality gate confirmed            |
+| `ship <slug>`               | `stages/06_ship/`   | docs + changelog in-PR → gated squash-merge → ship note            | ✅ **Ready to merge** PR checkbox    |
 
 Only two gates are PR checkboxes — **Spec approved** (before Build) and **Ready to merge** (before
 the squash-merge). Those two are the only **binding** approvals in the system, and both are the
@@ -134,15 +134,15 @@ get all of theirs at once).
 
 ## Where each thing is defined (edit exactly one home)
 
-| To change…                                | Edit                                                    |
-| ----------------------------------------- | ------------------------------------------------------- |
-| Routing / a subcommand                    | `.claude/skills/pipeline/SKILL.md`                      |
-| A stage's or lane's behaviour             | `pipeline/stages/NN_*/` · `pipeline/lanes/*/CONTEXT.md` |
-| The cut (breakdown / stub shape)          | `pipeline/intake/CONTEXT.md`                            |
-| GitHub calls, gates, labels, PR regimes   | `pipeline/_shared/github.md` (+ `.github/labels.yml`)   |
-| Which doc pages a stage reads             | `pipeline/_shared/knowledge-map.md`                     |
-| Run adoption                              | `pipeline/_shared/stage-preamble.md`                    |
-| Factory scripts / CI offload              | `pipeline/scripts/` + `_design/automation-offload.md`   |
-| The Definition of Ready / the scope freeze| `pipeline/stages/01_scope/CONTEXT.md`                   |
-| The Definition of Done / the quality gate | `pipeline/stages/05_verify/CONTEXT.md`                  |
-| Code rules                                | `/CONVENTIONS.md` + the subtree `AGENTS.md` files       |
+| To change…                                 | Edit                                                    |
+| ------------------------------------------ | ------------------------------------------------------- |
+| Routing / a subcommand                     | `.claude/skills/pipeline/SKILL.md`                      |
+| A stage's or lane's behaviour              | `pipeline/stages/NN_*/` · `pipeline/lanes/*/CONTEXT.md` |
+| The cut (breakdown / stub shape)           | `pipeline/intake/CONTEXT.md`                            |
+| GitHub calls, gates, labels, PR regimes    | `pipeline/_shared/github.md` (+ `.github/labels.yml`)   |
+| Which doc pages a stage reads              | `pipeline/_shared/knowledge-map.md`                     |
+| Run adoption                               | `pipeline/_shared/stage-preamble.md`                    |
+| Factory scripts / CI offload               | `pipeline/scripts/` + `_design/automation-offload.md`   |
+| The Definition of Ready / the scope freeze | `pipeline/stages/01_scope/CONTEXT.md`                   |
+| The Definition of Done / the quality gate  | `pipeline/stages/05_verify/CONTEXT.md`                  |
+| Code rules                                 | `/CONVENTIONS.md` + the subtree `AGENTS.md` files       |

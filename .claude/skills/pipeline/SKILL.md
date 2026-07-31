@@ -18,20 +18,20 @@ the hint is advice, not authority.
 
 ## Routing table
 
-| Subcommand                               | Contract to read & follow                 |
-| ---------------------------------------- | ----------------------------------------- |
-| `scope "<topic>"` / `scope <slug>`       | `pipeline/stages/01_scope/CONTEXT.md`     |
-| `design <slug>`                          | `pipeline/stages/02_design/CONTEXT.md`    |
-| `new` (all forms — see below)            | `pipeline/stages/03_define/CONTEXT.md`    |
-| `define "<request>"` / `define <slug>`   | `pipeline/stages/03_define/CONTEXT.md`    |
-| `build <slug>`                           | `pipeline/stages/04_build/CONTEXT.md`     |
-| `verify <slug>`                          | `pipeline/stages/05_verify/CONTEXT.md`    |
-| `ship <slug>`                            | `pipeline/stages/06_ship/CONTEXT.md`      |
-| `bug "<report>"` / `bug <slug>`          | `pipeline/lanes/bug/CONTEXT.md`           |
-| `tweak "<change>"` / `tweak <slug>`      | `pipeline/lanes/tweak/CONTEXT.md`         |
-| `chore "<task>"` / `chore <slug>`        | `pipeline/lanes/chore/CONTEXT.md`         |
-| `status [slug]`                          | — handled here, below                     |
-| _(empty / unclear)_                      | read `pipeline/CONTEXT.md`, show the help |
+| Subcommand                             | Contract to read & follow                 |
+| -------------------------------------- | ----------------------------------------- |
+| `scope "<topic>"` / `scope <slug>`     | `pipeline/stages/01_scope/CONTEXT.md`     |
+| `design <slug>`                        | `pipeline/stages/02_design/CONTEXT.md`    |
+| `new` (all forms — see below)          | `pipeline/stages/03_define/CONTEXT.md`    |
+| `define "<request>"` / `define <slug>` | `pipeline/stages/03_define/CONTEXT.md`    |
+| `build <slug>`                         | `pipeline/stages/04_build/CONTEXT.md`     |
+| `verify <slug>`                        | `pipeline/stages/05_verify/CONTEXT.md`    |
+| `ship <slug>`                          | `pipeline/stages/06_ship/CONTEXT.md`      |
+| `bug "<report>"` / `bug <slug>`        | `pipeline/lanes/bug/CONTEXT.md`           |
+| `tweak "<change>"` / `tweak <slug>`    | `pipeline/lanes/tweak/CONTEXT.md`         |
+| `chore "<task>"` / `chore <slug>`      | `pipeline/lanes/chore/CONTEXT.md`         |
+| `status [slug]`                        | — handled here, below                     |
+| _(empty / unclear)_                    | read `pipeline/CONTEXT.md`, show the help |
 
 Stages are discovered by folder order: `ls pipeline/stages/` → `NN_<name>/CONTEXT.md`; a subcommand
 maps to the `<name>` part. Lanes likewise under `pipeline/lanes/`.
@@ -81,7 +81,7 @@ ls pipeline/intake/*/*.md 2>/dev/null | grep -v '/breakdown.md$' | grep -v '/_do
      empty and suggest `/pipeline scope "<topic>"`, then stop.
   2. Pick the lowest `sequence: n of m` (fallback: `## Build order` position, then filename).
   3. **Dependency check.** `_done/` means **spun out, not shipped**: if the pick's `depends-on` names
-     a stub not yet in `_done/`, warn that the batch is out of order. If the dependency *is* in
+     a stub not yet in `_done/`, warn that the batch is out of order. If the dependency _is_ in
      `_done/`, confirm its PR actually **merged** before offering the pick — a dependent branched off
      `main` won't build until the dependency's code is on `main`. Unmerged → say so and recommend
      waiting; the user may still override.
@@ -102,7 +102,7 @@ All GitHub reads per `pipeline/_shared/github.md` — narrow queries, small limi
 - **`status`** (no slug) → the board: `gh pr list --state open --label type:feature` (repeat per
   lane label if lanes are in flight), plus `gh pr list --state merged --limit 5`. One line per PR:
   title, type and stage labels, draft/open, checks. Then list `pipeline/intake/*/` folders with
-  stubs remaining vs `_done/` — the filesystem *is* the intake state.
+  stubs remaining vs `_done/` — the filesystem _is_ the intake state.
 
 ## Help (when the subcommand is empty or unclear)
 

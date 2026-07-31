@@ -13,14 +13,26 @@ import {
   SheetTrigger,
 } from "@remi/ui";
 import { Link, Separator } from "@remi/ui/server";
-import { nav } from "@/lib/content/landing";
+import type { Content, NavItem } from "@/lib/content/types";
+import { localePath, type Locale } from "@/lib/i18n";
+
+type Props = {
+  locale: Locale;
+  nav: NavItem[];
+  header: Content["header"];
+};
 
 /**
- * The one interactive part of the header, so the only part that is a client
+ * The one stateful part of the header, so the only part that is a client
  * component. `open` is tracked here rather than left to Radix's uncontrolled
  * mode because each link has to close the panel when it is followed.
+ *
+ * The props are the plain-string slices of the dictionary, not the whole
+ * `Content` object: the full dictionary holds icon components, and a function
+ * cannot cross the server→client boundary — passing it all crashes the build
+ * at prerender.
  */
-export const MobileNav = () => {
+export const MobileNav = ({ locale, nav, header }: Props) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -28,19 +40,23 @@ export const MobileNav = () => {
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="md:hidden">
           <Menu aria-hidden="true" />
-          <span className="sr-only">Open menu</span>
+          <span className="sr-only">{header.menuLabel}</span>
         </Button>
       </SheetTrigger>
 
       <SheetContent side="right" className="w-full sm:max-w-xs">
         <SheetHeader>
-          <SheetTitle>Menu</SheetTitle>
+          <SheetTitle>{header.menuLabel}</SheetTitle>
         </SheetHeader>
 
         <nav aria-label="Main" className="flex flex-col gap-1 px-6">
           {nav.map((item) => (
             <SheetClose key={item.href} asChild>
-              <Link as={NextLink} href={item.href} className="py-2.5 text-base">
+              <Link
+                as={NextLink}
+                href={localePath(locale, item.href)}
+                className="py-2.5 text-base"
+              >
                 {item.label}
               </Link>
             </SheetClose>
@@ -52,12 +68,16 @@ export const MobileNav = () => {
         <div className="flex flex-col gap-3 px-6">
           <SheetClose asChild>
             <Button asChild variant="outline">
-              <NextLink href="/contact">Contact</NextLink>
+              <NextLink href={localePath(locale, "/contact")}>
+                {header.contact}
+              </NextLink>
             </Button>
           </SheetClose>
           <SheetClose asChild>
             <Button asChild>
-              <NextLink href="#pricing">Get started</NextLink>
+              <NextLink href={localePath(locale, header.cta.href)}>
+                {header.cta.label}
+              </NextLink>
             </Button>
           </SheetClose>
         </div>

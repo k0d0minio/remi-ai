@@ -57,7 +57,7 @@ Braces on every `if` / `else` / loop body. No `if (x) return y;` without `{ }` �
   ```
 
 - No JSDoc `@param` / `@returns` — TypeScript already says it. A JSDoc description is for logic
-  that is non-obvious, and explains *why*, not *what*.
+  that is non-obvious, and explains _why_, not _what_.
 
 ### Naming
 
@@ -151,11 +151,11 @@ never committed — they live in Vercel and in GitHub Actions secrets.
 Format, lint, typecheck and build are deterministic work. They belong to Husky, CI and the Vercel
 preview, not to a session's context window:
 
-| Check           | Runs where                                  |
-| --------------- | ------------------------------------------- |
-| Format          | Husky pre-commit (lint-staged) + CI         |
-| Lint, typecheck | CI — `.github/workflows/quality.yaml`       |
-| Build           | The Vercel preview deploy                   |
+| Check           | Runs where                            |
+| --------------- | ------------------------------------- |
+| Format          | Husky pre-commit (lint-staged) + CI   |
+| Lint, typecheck | CI — `.github/workflows/quality.yaml` |
+| Build           | The Vercel preview deploy             |
 
 `.claude/hooks/block-local-checks.sh` enforces this for agent sessions. Push, then read the result
 back from the PR's check runs. The one exception: if you already know an edit introduced a type
