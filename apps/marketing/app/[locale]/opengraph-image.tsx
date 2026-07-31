@@ -1,9 +1,10 @@
 import { ImageResponse } from "next/og";
+import { isLocale, type Locale } from "@/lib/i18n";
 
 /**
  * The social card, generated at build time by file convention — every route
- * inherits it, which is what makes the "every page has an OG image" rule in
- * AGENTS.md hold without wiring one per page.
+ * under the locale inherits it, which is what makes the "every page has an OG
+ * image" rule in AGENTS.md hold without wiring one per page.
  *
  * The styles are inline and literal on purpose: Satori renders this outside the
  * browser, so there is no Tailwind pass and no CSS custom properties to resolve.
@@ -12,10 +13,27 @@ import { ImageResponse } from "next/og";
  */
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Remi AI — nutrition tracking with clinical reasoning";
+export const alt = "REMI AI — the wellness copilot between two consultations";
 
-const Image = () =>
-  new ImageResponse(
+const lines: Record<Locale, { first: string; second: string; footer: string }> =
+  {
+    en: {
+      first: "Between two consultations,",
+      second: "everything is at stake.",
+      footer: "The wellness copilot for practitioner-guided nutrition",
+    },
+    fr: {
+      first: "Entre deux consultations,",
+      second: "tout se joue.",
+      footer: "Le copilote bien-être de l'accompagnement nutritionnel",
+    },
+  };
+
+const Image = async ({ params }: { params: Promise<{ locale: string }> }) => {
+  const { locale } = await params;
+  const copy = lines[isLocale(locale) ? locale : "en"];
+
+  return new ImageResponse(
     <div
       style={{
         width: "100%",
@@ -29,7 +47,7 @@ const Image = () =>
       }}
     >
       <div style={{ display: "flex", fontSize: 40, letterSpacing: -1 }}>
-        Remi
+        REMI
       </div>
 
       <div
@@ -39,26 +57,27 @@ const Image = () =>
           gap: 24,
         }}
       >
-        <div style={{ display: "flex", fontSize: 68, lineHeight: 1.1 }}>
-          Know what you eat.
+        <div style={{ display: "flex", fontSize: 64, lineHeight: 1.1 }}>
+          {copy.first}
         </div>
         <div
           style={{
             display: "flex",
-            fontSize: 68,
+            fontSize: 64,
             lineHeight: 1.1,
             color: "#6b8dff",
           }}
         >
-          Understand what it does.
+          {copy.second}
         </div>
       </div>
 
       <div style={{ display: "flex", fontSize: 26, opacity: 0.7 }}>
-        Nutrition tracking with clinical reasoning behind it
+        {copy.footer}
       </div>
     </div>,
     size,
   );
+};
 
 export default Image;

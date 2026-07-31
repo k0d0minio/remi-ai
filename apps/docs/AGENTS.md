@@ -11,10 +11,10 @@ product design system is deliberate: it is reference material, not product surfa
 
 ## Two halves, and the split is load-bearing
 
-| Under            | Holds                                          | Read by                        |
-| ---------------- | ---------------------------------------------- | ------------------------------ |
-| `app/business/`  | direction, initiatives, roles                  | Scope, Define, Ship            |
-| `app/technical/` | architecture, applications, packages, workflow | Build, Ship                    |
+| Under            | Holds                                          | Read by             |
+| ---------------- | ---------------------------------------------- | ------------------- |
+| `app/business/`  | direction, initiatives, roles                  | Scope, Define, Ship |
+| `app/technical/` | architecture, applications, packages, workflow | Build, Ship         |
 
 `pipeline/_shared/knowledge-map.md` routes each stage to a **named page**, not to "the docs" — that
 scoping is what keeps a stage's context small. When you add a page, add its row to the knowledge

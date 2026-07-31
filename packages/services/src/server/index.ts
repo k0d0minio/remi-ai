@@ -17,12 +17,7 @@ export {
 } from "../db/client";
 export type { Collection, DatabaseClient } from "../db/client";
 
-export {
-  consoleMailer,
-  getMailer,
-  registerMailer,
-  sendEmail,
-} from "../email";
+export { consoleMailer, getMailer, registerMailer, sendEmail } from "../email";
 export type { EmailMessage, Mailer, SendResult } from "../email";
 
 export {
