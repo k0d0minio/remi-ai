@@ -4,3 +4,9 @@
 /* Tell Tailwind to scan the shared package too — its class names live outside
    this app's tree, so without this the primitives ship unstyled. */
 @source "../../../packages/ui/src";
+
+/* And this app's own components. Tailwind 4 auto-detects sources from the build
+   root, but naming it is cheap insurance: the failure mode is a section that
+   renders unstyled in production and looks fine in dev. */
+@source "../components";
+@source "../lib";

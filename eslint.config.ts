@@ -216,7 +216,100 @@ export default defineConfig(
         {
           patterns: [
             {
-              group: ["@remi/web", "@remi/admin", "@remi/marketing", "@remi/demo", "@remi/docs"],
+              group: [
+                "@remi/web",
+                "@remi/admin",
+                "@remi/marketing",
+                "@remi/demo",
+                "@remi/docs",
+              ],
+              message:
+                "A package must not import an app — the dependency only ever points app → package.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // @remi/ui's server entry is bundled WITHOUT the "use client" banner, and tsup
+    // inlines every module an entry can reach. So a single import from
+    // src/components/ (client) or src/motion/ (client, and drags in `motion`)
+    // silently produces a bundle that either breaks at runtime or costs every app
+    // ~34kB on first paint. Nothing in the type system catches it; this rule does.
+    //
+    // A server compound that needs an interactive primitive takes it as a
+    // ReactNode prop — the app's server page renders <Button> and passes it down.
+    //
+    // This block replaces the packages/** rule above for these files rather than
+    // merging with it, so the app-boundary patterns are repeated here.
+    files: [
+      "packages/ui/src/server.ts",
+      "packages/ui/src/server/**/*.{ts,tsx}",
+    ],
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "**/components/*",
+                "**/motion",
+                "**/motion/*",
+                "@remi/ui",
+                "@remi/ui/motion",
+              ],
+              message:
+                'The server entry ships without a "use client" banner. Importing a client primitive inlines it into that bundle. Take it as a ReactNode prop instead — see packages/ui/AGENTS.md.',
+            },
+            {
+              group: ["motion", "motion/*"],
+              message:
+                "`motion` must stay out of the server bundle — it would load on first paint in every app. It belongs in src/motion/, behind the lazy shells.",
+            },
+            {
+              group: [
+                "@remi/web",
+                "@remi/admin",
+                "@remi/marketing",
+                "@remi/demo",
+                "@remi/docs",
+              ],
+              message:
+                "A package must not import an app — the dependency only ever points app → package.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Same reasoning in the other direction: the client barrel must not reach the
+    // motion layer, or `motion` lands in @remi/ui itself.
+    files: [
+      "packages/ui/src/index.ts",
+      "packages/ui/src/components/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["motion", "motion/*", "**/motion", "**/motion/*"],
+              message:
+                "`motion` is reachable only from src/motion/. Importing it here puts it in the @remi/ui barrel, where every app pays for it on first paint.",
+            },
+            {
+              group: [
+                "@remi/web",
+                "@remi/admin",
+                "@remi/marketing",
+                "@remi/demo",
+                "@remi/docs",
+              ],
               message:
                 "A package must not import an app — the dependency only ever points app → package.",
             },

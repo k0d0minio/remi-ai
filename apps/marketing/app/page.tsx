@@ -1,28 +1,35 @@
-import { Badge, Card, CardContent, CardHeader, CardTitle, Typography } from "@remi/ui";
+import { CtaSection } from "@/components/sections/cta-section";
+import { FaqSection } from "@/components/sections/faq-section";
+import { FeaturesSection } from "@/components/sections/features-section";
+import { HeroSection } from "@/components/sections/hero-section";
+import { HowItWorksSection } from "@/components/sections/how-it-works-section";
+import { LogoSection } from "@/components/sections/logo-section";
+import { PricingSection } from "@/components/sections/pricing-section";
+import { StatsSection } from "@/components/sections/stats-section";
+import { TestimonialsSection } from "@/components/sections/testimonials-section";
+import { buildMetadata } from "@/lib/metadata";
 
-const Home = () => (
-  <main className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center gap-6 p-8">
-    <div className="flex items-center gap-3">
-      <Typography as="h1" size="2xl" weight="semibold">
-        Remi AI
-      </Typography>
-      <Badge variant="neutral">marketing</Badge>
-    </div>
+export const metadata = buildMetadata({
+  title: "Nutrition tracking with clinical reasoning behind it",
+  description:
+    "Remi turns an everyday food log into structured nutritional insight, reviewed against clinical guidance — so the advice you act on has a reason behind it.",
+  path: "/",
+});
 
-    <Card>
-      <CardHeader>
-        <CardTitle>The public site</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-2">
-        <Typography size="sm" muted>
-          Unauthenticated, content-led, indexable. Fast by default: server components, no client bundle unless a page truly needs one.
-        </Typography>
-        <Typography size="sm" muted>
-          It shares the design system so the site and the product never drift apart.
-        </Typography>
-      </CardContent>
-    </Card>
-  </main>
+// `const Page` rather than `export default function`: prefer-arrow is a warning
+// and CI runs with --max-warnings=0, with no exemption for route files.
+const Page = () => (
+  <>
+    <HeroSection />
+    <LogoSection />
+    <StatsSection />
+    <FeaturesSection />
+    <HowItWorksSection />
+    <TestimonialsSection />
+    <PricingSection />
+    <FaqSection />
+    <CtaSection />
+  </>
 );
 
-export default Home;
+export default Page;
