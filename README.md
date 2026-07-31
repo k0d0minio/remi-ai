@@ -1,10 +1,5 @@
 # Remi AI
 
-[remiai](https://www.remiai.be/) ·
-[policloud](https://www.policloud.com) ·
-[manus pitch deck](https://remi-ai-ppt-mnnqjh7r.manus.space/) ·
-[remiai odoo](https://remiai1.odoo.com/)
-
 A Turborepo monorepo: five Next.js apps over two shared packages, with a gated delivery pipeline
 that work flows through.
 
