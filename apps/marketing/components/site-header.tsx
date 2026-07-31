@@ -61,7 +61,11 @@ export const SiteHeader = ({ locale }: Props) => {
 
         <div className="flex items-center gap-2 md:hidden">
           <LocaleSwitcher locale={locale} />
-          <MobileNav locale={locale} content={content} />
+          <MobileNav
+            locale={locale}
+            nav={content.nav}
+            header={content.header}
+          />
         </div>
       </Container>
     </header>
