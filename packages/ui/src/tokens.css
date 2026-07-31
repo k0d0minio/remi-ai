@@ -10,89 +10,256 @@
  * Apps never redefine a token and never reach past these names to a raw palette
  * colour (`bg-white`, `bg-emerald-50`) — use the semantic token so the app tracks
  * the system.
+ *
+ * Three layers, in order:
+ *   1. the raw ramps  — `--brand-*`, `--vital-*`, `--grey-*`. Never used directly
+ *                       by a component; they exist so the semantic layer can point
+ *                       at a real step instead of guessing with an opacity.
+ *   2. the semantic layer — `--primary`, `--success-subtle`, `--border`. What a
+ *                       component actually names.
+ *   3. `@theme inline` — maps the semantic layer into Tailwind's utility
+ *                       namespaces. `inline` is load-bearing: it inlines the
+ *                       `var()` into the utility, which is what lets `.dark`
+ *                       override a colour at all. Anything that must differ
+ *                       between light and dark belongs in that block, behind a
+ *                       raw var — a hard-coded value there silently keeps its
+ *                       light-mode appearance in the dark.
  */
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── 1. the raw ramps ──────────────────────────────────────────────────────── */
+
+:root {
+  /* Institutional blue — trust, clinical authority. Hue 255. */
+  --brand-50: oklch(0.97 0.02 255);
+  --brand-100: oklch(0.94 0.04 255);
+  --brand-200: oklch(0.88 0.07 255);
+  --brand-300: oklch(0.8 0.1 255);
+  --brand-400: oklch(0.66 0.14 255);
+  --brand-500: oklch(0.58 0.16 255);
+  --brand-600: oklch(0.5 0.15 255);
+  --brand-700: oklch(0.42 0.13 255);
+  --brand-800: oklch(0.34 0.1 255);
+  --brand-900: oklch(0.27 0.08 255);
+  --brand-950: oklch(0.2 0.06 255);
+
+  /* Vitality green — nutrition, progress, things going right. Hue 150. */
+  --vital-50: oklch(0.97 0.03 150);
+  --vital-100: oklch(0.94 0.06 150);
+  --vital-200: oklch(0.89 0.09 150);
+  --vital-300: oklch(0.83 0.13 150);
+  --vital-400: oklch(0.78 0.15 150);
+  --vital-500: oklch(0.72 0.16 150);
+  --vital-600: oklch(0.63 0.15 150);
+  --vital-700: oklch(0.53 0.13 150);
+  --vital-800: oklch(0.43 0.1 150);
+  --vital-900: oklch(0.34 0.08 150);
+
+  /* Cool greys — hue 255 at low chroma, so neutrals sit *under* the blue rather
+     than beside it. A pure-grey neutral next to a saturated blue reads dirty. */
+  --grey-0: oklch(1 0 0);
+  --grey-50: oklch(0.985 0.002 255);
+  --grey-100: oklch(0.968 0.004 255);
+  --grey-200: oklch(0.928 0.006 255);
+  --grey-300: oklch(0.878 0.008 255);
+  --grey-400: oklch(0.714 0.012 255);
+  --grey-500: oklch(0.588 0.014 255);
+  --grey-600: oklch(0.487 0.014 255);
+  --grey-700: oklch(0.396 0.013 255);
+  --grey-800: oklch(0.286 0.012 255);
+  --grey-900: oklch(0.208 0.01 255);
+  --grey-950: oklch(0.145 0.008 255);
+}
+
+/* ── 2. the semantic layer ─────────────────────────────────────────────────── */
+
 :root {
   --radius: 0.625rem;
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: var(--grey-0);
+  --foreground: var(--grey-950);
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card: var(--grey-0);
+  --card-foreground: var(--grey-950);
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
+  --popover: var(--grey-0);
+  --popover-foreground: var(--grey-950);
 
-  --primary: oklch(0.55 0.19 265);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: var(--brand-600);
+  --primary-foreground: var(--grey-50);
+  --primary-subtle: var(--brand-50);
+  --primary-border: var(--brand-200);
+  /* A real ramp step, not `bg-primary/90` — fading a saturated blue toward the
+     page goes muddy, where the next step down stays the same colour. */
+  --primary-hover: var(--brand-700);
 
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+  --secondary: var(--grey-100);
+  --secondary-foreground: var(--grey-900);
 
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted: var(--grey-100);
+  --muted-foreground: var(--grey-600);
 
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  /* `--accent` is the neutral hover surface, not the brand accent — `Button`'s
+     ghost and outline variants both hover onto it. The green enters the system
+     as `--success`, never here. */
+  --accent: var(--grey-100);
+  --accent-foreground: var(--grey-900);
 
-  /* The intent vocabulary. Every intent-bearing prop in @remi/ui uses these five
-     names — success | warning | error | info | neutral — and nothing else. */
-  --success: oklch(0.72 0.16 150);
-  --success-foreground: oklch(0.145 0 0);
-  --warning: oklch(0.8 0.16 85);
-  --warning-foreground: oklch(0.145 0 0);
+  /*
+   * The intent vocabulary. Every intent-bearing prop in @remi/ui uses these five
+   * names — success | warning | error | info | neutral — and nothing else.
+   *
+   * Each intent carries four values rather than one, because an intent is not
+   * only ever a filled shape:
+   *   (bare)        the solid fill
+   *   -foreground   text ON the solid fill
+   *   -subtle       a tinted surface — icon tile, callout background
+   *   -border       a quiet border on that subtle surface
+   *   -text         the intent as TEXT on --background
+   *
+   * `-text` is the one that is easy to miss. `--success` at L 0.72 is a fine
+   * fill, but as text on white it is ~2.3:1 and fails WCAG outright. A component
+   * that renders the intent as a word reaches for `-text`, never the bare token.
+   */
+  --success: var(--vital-500);
+  --success-foreground: oklch(0.2 0.05 150);
+  --success-subtle: var(--vital-50);
+  --success-border: var(--vital-200);
+  --success-text: var(--vital-700);
+
+  --warning: oklch(0.8 0.15 85);
+  --warning-foreground: oklch(0.22 0.04 85);
+  --warning-subtle: oklch(0.97 0.03 85);
+  --warning-border: oklch(0.88 0.08 85);
+  --warning-text: oklch(0.52 0.11 85);
+
   --error: oklch(0.58 0.22 27);
-  --error-foreground: oklch(0.985 0 0);
-  --info: oklch(0.68 0.14 235);
-  --info-foreground: oklch(0.145 0 0);
-  --neutral: oklch(0.97 0 0);
-  --neutral-foreground: oklch(0.205 0 0);
+  --error-foreground: var(--grey-50);
+  --error-subtle: oklch(0.97 0.02 27);
+  --error-border: oklch(0.88 0.07 27);
+  --error-text: oklch(0.52 0.2 27);
 
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  /* Hue 235 against the brand's 255 — near enough to read as the same family,
+     far enough that an info badge is never mistaken for a primary button. */
+  --info: oklch(0.62 0.13 235);
+  --info-foreground: var(--grey-50);
+  --info-subtle: oklch(0.96 0.03 235);
+  --info-border: oklch(0.87 0.06 235);
+  --info-text: oklch(0.5 0.12 235);
+
+  --neutral: var(--grey-100);
+  --neutral-foreground: var(--grey-800);
+  --neutral-subtle: var(--grey-50);
+  --neutral-border: var(--grey-200);
+  --neutral-text: var(--grey-600);
+
+  --border: var(--grey-200);
+  --input: var(--grey-200);
+  --ring: var(--brand-500);
+
+  /* The lightness/chroma/hue triple the elevation ramp builds every shadow from.
+     Shadows are tinted toward the brand, never neutral black — black shadow over
+     a cool-grey surface reads as grime. Swapped wholesale in `.dark`. */
+  --shadow-color: 0.145 0.008 255;
+
+  /*
+   * Fonts. The package cannot call `next/font` — it is a Next compiler transform
+   * and this package has no Next build — so each app declares its own families
+   * and exposes them as `--font-inter` / `--font-display` on <html>.
+   *
+   * The fallback inside `var()` is what keeps the apps that declare nothing
+   * (web, admin, demo) rendering exactly as they do today.
+   *
+   * These names deliberately differ from the `--font-*` theme keys below; a
+   * theme key that referenced its own name would be a self-reference cycle.
+   */
+  --font-family-sans:
+    var(--font-inter, ui-sans-serif), system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  --font-family-display:
+    var(--font-display, var(--font-inter, ui-serif)), Georgia, serif;
+
+  /* Motion. Durations stay raw vars — Tailwind 4 has no `--duration-*`
+     namespace, so these are read by `var()` in CSS and mirrored as literals in
+     src/motion/tokens.ts. Easings do have a namespace and live in @theme below. */
+  --duration-instant: 80ms;
+  --duration-fast: 160ms;
+  --duration-base: 240ms;
+  --duration-slow: 400ms;
+  --duration-slower: 700ms;
+
+  /* How far a fading-in element travels. Zeroed under reduced motion. */
+  --motion-rise: 16px;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
+  --background: var(--grey-950);
+  --foreground: var(--grey-50);
 
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
+  --card: oklch(0.185 0.01 255);
+  --card-foreground: var(--grey-50);
 
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0.01 255);
+  --popover-foreground: var(--grey-50);
 
-  --primary: oklch(0.68 0.17 265);
-  --primary-foreground: oklch(0.145 0 0);
+  /* Lifted and slightly desaturated: a 0.50-lightness blue on a near-black
+     surface is unreadable, and full chroma at high lightness glares. */
+  --primary: var(--brand-400);
+  --primary-foreground: oklch(0.17 0.04 255);
+  --primary-subtle: oklch(0.26 0.05 255);
+  --primary-border: oklch(0.38 0.08 255);
+  --primary-hover: var(--brand-300);
 
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.26 0.01 255);
+  --secondary-foreground: var(--grey-50);
 
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
+  --muted: oklch(0.26 0.01 255);
+  --muted-foreground: oklch(0.7 0.012 255);
 
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.285 0.012 255);
+  --accent-foreground: var(--grey-50);
 
-  --success: oklch(0.65 0.15 150);
-  --success-foreground: oklch(0.985 0 0);
+  --success: oklch(0.68 0.15 150);
+  --success-foreground: oklch(0.17 0.04 150);
+  --success-subtle: oklch(0.26 0.045 150);
+  --success-border: oklch(0.38 0.075 150);
+  --success-text: oklch(0.8 0.13 150);
+
   --warning: oklch(0.72 0.15 85);
-  --warning-foreground: oklch(0.145 0 0);
+  --warning-foreground: oklch(0.18 0.04 85);
+  --warning-subtle: oklch(0.26 0.045 85);
+  --warning-border: oklch(0.38 0.07 85);
+  --warning-text: oklch(0.82 0.13 85);
+
   --error: oklch(0.62 0.2 27);
-  --error-foreground: oklch(0.985 0 0);
-  --info: oklch(0.6 0.13 235);
-  --info-foreground: oklch(0.985 0 0);
-  --neutral: oklch(0.269 0 0);
-  --neutral-foreground: oklch(0.985 0 0);
+  --error-foreground: var(--grey-50);
+  --error-subtle: oklch(0.26 0.06 27);
+  --error-border: oklch(0.38 0.1 27);
+  --error-text: oklch(0.78 0.15 27);
+
+  --info: oklch(0.62 0.13 235);
+  --info-foreground: var(--grey-50);
+  --info-subtle: oklch(0.26 0.045 235);
+  --info-border: oklch(0.38 0.07 235);
+  --info-text: oklch(0.8 0.11 235);
+
+  --neutral: oklch(0.26 0.01 255);
+  --neutral-foreground: var(--grey-50);
+  --neutral-subtle: oklch(0.22 0.01 255);
+  --neutral-border: oklch(1 0 0 / 14%);
+  --neutral-text: oklch(0.7 0.012 255);
 
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: var(--brand-400);
+
+  /* Darker and more saturated than light mode: on a dark surface a shadow has
+     to go further to read as depth at all. */
+  --shadow-color: 0.08 0.02 255;
 }
+
+/* ── 3. the Tailwind theme ─────────────────────────────────────────────────── */
 
 @theme inline {
   --color-background: var(--background);
@@ -101,24 +268,50 @@
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-subtle: var(--primary-subtle);
+  --color-primary-border: var(--primary-border);
+  --color-primary-hover: var(--primary-hover);
+
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-success-subtle: var(--success-subtle);
+  --color-success-border: var(--success-border);
+  --color-success-text: var(--success-text);
+
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-warning-border: var(--warning-border);
+  --color-warning-text: var(--warning-text);
+
   --color-error: var(--error);
   --color-error-foreground: var(--error-foreground);
+  --color-error-subtle: var(--error-subtle);
+  --color-error-border: var(--error-border);
+  --color-error-text: var(--error-text);
+
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
+  --color-info-subtle: var(--info-subtle);
+  --color-info-border: var(--info-border);
+  --color-info-text: var(--info-text);
+
   --color-neutral: var(--neutral);
   --color-neutral-foreground: var(--neutral-foreground);
+  --color-neutral-subtle: var(--neutral-subtle);
+  --color-neutral-border: var(--neutral-border);
+  --color-neutral-text: var(--neutral-text);
+
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -127,6 +320,74 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 12px);
+
+  --font-sans: var(--font-family-sans);
+  --font-display: var(--font-family-display);
+
+  /*
+   * Only the display end of the type scale is defined here. `--text-xs` through
+   * `--text-3xl` are left at Tailwind's defaults on purpose: `Typography`
+   * already emits them across four apps, and redefining them would be a silent
+   * visual change everywhere for no marketing benefit. Above 3xl is new
+   * territory, so it gets the tighter leading and negative tracking that large
+   * type needs and Tailwind's defaults do not supply.
+   */
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 1.1;
+  --text-4xl--letter-spacing: -0.02em;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1.05;
+  --text-5xl--letter-spacing: -0.025em;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1;
+  --text-6xl--letter-spacing: -0.03em;
+  --text-7xl: 4.5rem;
+  --text-7xl--line-height: 0.98;
+  --text-7xl--letter-spacing: -0.032em;
+
+  /* The three measures every layout is allowed to be. `Container` maps its
+     `size` prop straight onto these. */
+  --container-prose: 44rem;
+  --container-content: 72rem;
+  --container-wide: 88rem;
+
+  --shadow-xs: 0 1px 2px 0 oklch(var(--shadow-color) / 0.05);
+  --shadow-sm:
+    0 1px 3px 0 oklch(var(--shadow-color) / 0.08),
+    0 1px 2px -1px oklch(var(--shadow-color) / 0.06);
+  --shadow-md:
+    0 4px 12px -2px oklch(var(--shadow-color) / 0.1),
+    0 2px 4px -2px oklch(var(--shadow-color) / 0.06);
+  --shadow-lg:
+    0 12px 28px -6px oklch(var(--shadow-color) / 0.14),
+    0 4px 8px -4px oklch(var(--shadow-color) / 0.08);
+  --shadow-xl: 0 24px 48px -12px oklch(var(--shadow-color) / 0.18);
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-entrance: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── reduced motion ───────────────────────────────────────────────────────── */
+
+/*
+ * Two of the three halves. Collapsing the duration tokens handles everything
+ * that reads them; the blanket override catches anything that hard-codes a
+ * duration instead. The third half is in JS — `<MotionConfig reducedMotion="user">`
+ * in src/motion/primitives.tsx, which makes `motion` *skip* transform and
+ * opacity animations rather than play them at 1ms.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-instant: 1ms;
+    --duration-fast: 1ms;
+    --duration-base: 1ms;
+    --duration-slow: 1ms;
+    --duration-slower: 1ms;
+    --motion-rise: 0px;
+  }
 }
 
 @layer base {
@@ -135,6 +396,17 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 1ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
