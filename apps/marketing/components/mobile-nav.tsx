@@ -13,22 +13,26 @@ import {
   SheetTrigger,
 } from "@remi/ui";
 import { Link, Separator } from "@remi/ui/server";
-import type { Content } from "@/lib/content/types";
+import type { Content, NavItem } from "@/lib/content/types";
 import { localePath, type Locale } from "@/lib/i18n";
 
 type Props = {
   locale: Locale;
-  content: Content;
+  nav: NavItem[];
+  header: Content["header"];
 };
 
 /**
  * The one stateful part of the header, so the only part that is a client
  * component. `open` is tracked here rather than left to Radix's uncontrolled
- * mode because each link has to close the panel when it is followed. The
- * content arrives as props — a client component cannot call `getContent`
- * without dragging both dictionaries into the bundle.
+ * mode because each link has to close the panel when it is followed.
+ *
+ * The props are the plain-string slices of the dictionary, not the whole
+ * `Content` object: the full dictionary holds icon components, and a function
+ * cannot cross the server→client boundary — passing it all crashes the build
+ * at prerender.
  */
-export const MobileNav = ({ locale, content }: Props) => {
+export const MobileNav = ({ locale, nav, header }: Props) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -36,17 +40,17 @@ export const MobileNav = ({ locale, content }: Props) => {
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="md:hidden">
           <Menu aria-hidden="true" />
-          <span className="sr-only">{content.header.menuLabel}</span>
+          <span className="sr-only">{header.menuLabel}</span>
         </Button>
       </SheetTrigger>
 
       <SheetContent side="right" className="w-full sm:max-w-xs">
         <SheetHeader>
-          <SheetTitle>{content.header.menuLabel}</SheetTitle>
+          <SheetTitle>{header.menuLabel}</SheetTitle>
         </SheetHeader>
 
         <nav aria-label="Main" className="flex flex-col gap-1 px-6">
-          {content.nav.map((item) => (
+          {nav.map((item) => (
             <SheetClose key={item.href} asChild>
               <Link
                 as={NextLink}
@@ -65,14 +69,14 @@ export const MobileNav = ({ locale, content }: Props) => {
           <SheetClose asChild>
             <Button asChild variant="outline">
               <NextLink href={localePath(locale, "/contact")}>
-                {content.header.contact}
+                {header.contact}
               </NextLink>
             </Button>
           </SheetClose>
           <SheetClose asChild>
             <Button asChild>
-              <NextLink href={localePath(locale, content.header.cta.href)}>
-                {content.header.cta.label}
+              <NextLink href={localePath(locale, header.cta.href)}>
+                {header.cta.label}
               </NextLink>
             </Button>
           </SheetClose>
