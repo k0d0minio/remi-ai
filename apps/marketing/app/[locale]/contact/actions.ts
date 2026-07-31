@@ -1,5 +1,8 @@
 "use server";
 
+import { getContent } from "@/lib/content";
+import { defaultLocale, isLocale } from "@/lib/i18n";
+
 export type ContactState = {
   status: "idle" | "success" | "error";
   message?: string;
@@ -19,13 +22,17 @@ const looksLikeEmail = (value: string) =>
 
 /**
  * Deliberately not `zod`: four fields do not justify a dependency this app has
- * no other use for, and CONVENTIONS.md is explicit that every dependency needs
- * an import to earn its place.
+ * no other use for. The locale travels as a hidden field so the validation
+ * messages come back in the language the visitor is reading.
  */
 export const submitContact = async (
   _previous: ContactState,
   formData: FormData,
 ): Promise<ContactState> => {
+  const rawLocale = String(formData.get("locale") ?? "");
+  const locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
+  const { form } = getContent(locale).contact;
+
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const message = String(formData.get("message") ?? "").trim();
@@ -33,24 +40,24 @@ export const submitContact = async (
 
   const errors: ContactState["errors"] = {};
   if (!name) {
-    errors.name = "Please tell us your name.";
+    errors.name = form.errors.name;
   }
   if (!email) {
-    errors.email = "Please give us an email address to reply to.";
+    errors.email = form.errors.emailMissing;
   } else if (!looksLikeEmail(email)) {
-    errors.email = "That does not look like an email address.";
+    errors.email = form.errors.emailInvalid;
   }
   if (message.length < 10) {
-    errors.message = "A little more detail will get you a better answer.";
+    errors.message = form.errors.message;
   }
   if (!consent) {
-    errors.consent = "We need your agreement before we can hold your message.";
+    errors.consent = form.errors.consent;
   }
 
   if (Object.keys(errors).length > 0) {
     return {
       status: "error",
-      message: "Please check the fields below.",
+      message: form.errorBanner,
       errors,
     };
   }
@@ -65,7 +72,6 @@ export const submitContact = async (
 
   return {
     status: "success",
-    message:
-      "Thanks — your message passed validation. Delivery is not connected yet, so nothing has been sent.",
+    message: form.successBody,
   };
 };
