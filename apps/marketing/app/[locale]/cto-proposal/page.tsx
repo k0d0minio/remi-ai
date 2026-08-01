@@ -1,22 +1,10 @@
 import type { Metadata } from "next";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Container,
-  Section,
-  Separator,
-  Typography,
-} from "@remi/ui/server";
+import { Container, Section, Separator, Typography } from "@remi/ui/server";
 import { author, preparedOn, proposal } from "./content";
 import {
-  ClauseList,
-  FigureGrid,
-  ObjectiveList,
   PointList,
-  Prose,
   ProposalHeading,
-  RightsList,
+  Prose,
   StepList,
   TermsList,
 } from "./proposal-parts";
@@ -58,187 +46,55 @@ const Page = () => (
             {author} · {preparedOn}
           </Typography>
         </div>
-        <Alert variant="info">
-          <AlertTitle>{proposal.disclaimer.title}</AlertTitle>
-          <AlertDescription>
-            <Typography size="sm" tone="muted" className="leading-relaxed">
-              {proposal.disclaimer.body}
-            </Typography>
-          </AlertDescription>
-        </Alert>
       </Container>
     </Section>
 
     <Section tone="muted" spacing="md">
       <Container size="narrow" className="flex flex-col gap-8">
-        <ProposalHeading
-          index={1}
-          title={proposal.headline.title}
-          lead={proposal.headline.lead}
-        />
-        <TermsList terms={proposal.headline.terms} />
+        <ProposalHeading index={1} title={proposal.opening.title} />
+        <Prose body={proposal.opening.body} />
       </Container>
     </Section>
 
     <Section spacing="md">
       <Container size="narrow" className="flex flex-col gap-8">
-        <ProposalHeading index={2} title={proposal.starting.title} />
-        <Prose body={proposal.starting.body} />
+        <ProposalHeading index={2} title={proposal.terms.title} />
+        <TermsList terms={proposal.terms.items} />
       </Container>
     </Section>
 
     <Section tone="muted" spacing="md">
-      <Container size="narrow" className="flex flex-col gap-10">
+      <Container size="narrow" className="flex flex-col gap-8">
         <ProposalHeading
           index={3}
-          title={proposal.role.title}
-          lead={proposal.role.lead}
-        />
-        <PointList points={proposal.role.duties} />
-        <Separator tone="subtle" />
-        <Typography size="lg" className="max-w-2xl leading-relaxed">
-          {proposal.role.closing}
-        </Typography>
-      </Container>
-    </Section>
-
-    <Section spacing="md">
-      <Container size="narrow" className="flex flex-col gap-10">
-        <ProposalHeading index={4} title={proposal.built.title} />
-        <Prose body={proposal.built.body} />
-        <PointList points={proposal.built.inventory} />
-        <Separator tone="subtle" />
-        <Prose body={proposal.built.ownership} />
-      </Container>
-    </Section>
-
-    <Section tone="muted" spacing="md">
-      <Container size="narrow" className="flex flex-col gap-10">
-        <ProposalHeading
-          index={5}
-          title={proposal.arithmetic.title}
-          lead={proposal.arithmetic.lead}
-        />
-        <FigureGrid figures={proposal.arithmetic.figures} />
-        <Prose body={proposal.arithmetic.closing} />
-      </Container>
-    </Section>
-
-    <Section spacing="md">
-      <Container size="narrow" className="flex flex-col gap-10">
-        <ProposalHeading
-          index={6}
-          title={proposal.structure.title}
-          lead={proposal.structure.lead}
-        />
-        <ClauseList clauses={proposal.structure.clauses} />
-      </Container>
-    </Section>
-
-    <Section tone="muted" spacing="md">
-      <Container size="narrow" className="flex flex-col gap-10">
-        <ProposalHeading
-          index={7}
-          title={proposal.control.title}
-          lead={proposal.control.lead}
-        />
-        <div className="grid gap-4 md:grid-cols-2">
-          <RightsList
-            title={proposal.control.reservedTitle}
-            items={proposal.control.reserved}
-          />
-          <div className="flex flex-col gap-4">
-            <RightsList
-              title={proposal.control.authorityTitle}
-              items={proposal.control.authority}
-            />
-            <RightsList
-              title={proposal.control.informationTitle}
-              items={proposal.control.information}
-            />
-          </div>
-        </div>
-      </Container>
-    </Section>
-
-    <Section spacing="md">
-      <Container size="narrow" className="flex flex-col gap-10">
-        <ProposalHeading index={8} title={proposal.vesting.title} />
-        <ClauseList clauses={proposal.vesting.clauses} />
-      </Container>
-    </Section>
-
-    <Section tone="muted" spacing="md">
-      <Container size="narrow" className="flex flex-col gap-10">
-        <ProposalHeading index={9} title={proposal.ip.title} />
-        <ClauseList clauses={proposal.ip.clauses} />
-      </Container>
-    </Section>
-
-    <Section spacing="md">
-      <Container size="narrow" className="flex flex-col gap-10">
-        <ProposalHeading
-          index={10}
-          title={proposal.commitment.title}
-          lead={proposal.commitment.lead}
-        />
-        <PointList points={proposal.commitment.points} />
-      </Container>
-    </Section>
-
-    <Section tone="muted" spacing="md">
-      <Container size="narrow" className="flex flex-col gap-10">
-        <ProposalHeading
-          index={11}
-          title={proposal.objectives.title}
-          lead={proposal.objectives.lead}
-        />
-        <ObjectiveList rows={proposal.objectives.rows} />
-      </Container>
-    </Section>
-
-    <Section spacing="md">
-      <Container size="narrow" className="flex flex-col gap-10">
-        <ProposalHeading
-          index={12}
-          title={proposal.contracting.title}
-          lead={proposal.contracting.lead}
-        />
-        <PointList points={proposal.contracting.points} />
-      </Container>
-    </Section>
-
-    <Section tone="muted" spacing="md">
-      <Container size="narrow" className="flex flex-col gap-8">
-        <ProposalHeading
-          index={13}
           title={proposal.conditions.title}
           lead={proposal.conditions.lead}
         />
-        <RightsList
-          title="Before or at signature"
-          items={proposal.conditions.items}
-        />
+        <StepList steps={proposal.conditions.items} />
       </Container>
     </Section>
 
     <Section spacing="md">
+      <Container size="narrow" className="flex flex-col gap-10">
+        <ProposalHeading index={4} title={proposal.commitments.title} />
+        <PointList points={proposal.commitments.points} />
+      </Container>
+    </Section>
+
+    <Section tone="muted" spacing="md">
       <Container size="narrow" className="flex flex-col gap-8">
-        <ProposalHeading index={14} title={proposal.alternative.title} />
-        <Prose body={proposal.alternative.body} />
+        <ProposalHeading index={5} title={proposal.next.title} />
+        <Prose body={proposal.next.body} />
       </Container>
     </Section>
 
     <Section tone="subtle" spacing="lg">
-      <Container size="narrow" className="flex flex-col gap-10">
-        <ProposalHeading index={15} title={proposal.nextSteps.title} />
-        <StepList steps={proposal.nextSteps.steps} />
+      <Container size="narrow" className="flex flex-col gap-8">
+        <ProposalHeading index={6} title={proposal.working.title} />
+        <Prose body={proposal.working.body} />
         <Separator tone="subtle" />
-        <Typography size="lg" className="max-w-2xl leading-relaxed">
-          {proposal.nextSteps.decision}
-        </Typography>
         <Typography size="sm" tone="muted">
-          {author} · {preparedOn} · Version 1 · Non-binding
+          {author} · {preparedOn} · Version 2 · Non-binding
         </Typography>
       </Container>
     </Section>
