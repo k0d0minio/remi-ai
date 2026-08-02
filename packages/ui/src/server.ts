@@ -41,13 +41,25 @@ export { Field } from "./server/field";
 export { IconTile } from "./server/icon-tile";
 export { Input } from "./server/input";
 export { Link, linkVariants } from "./server/link";
+export { Progress, progressBarVariants } from "./server/progress";
 export { Section } from "./server/section";
 export { Separator } from "./server/separator";
+export { Skeleton } from "./server/skeleton";
+export {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./server/table";
 export { Textarea } from "./server/textarea";
 export { Typography } from "./server/typography";
 export { VisuallyHidden } from "./server/visually-hidden";
 
 export { CtaBand } from "./server/compound/cta-band";
+export { EmptyState } from "./server/compound/empty-state";
 export { FeatureGrid, type Feature } from "./server/compound/feature-grid";
 export { Hero } from "./server/compound/hero";
 export { StatRow, type Stat } from "./server/compound/stat-row";
