@@ -2,9 +2,9 @@
 
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
+import { locales, type Locale } from "@remi/services/shared";
 import { buttonVariants } from "@remi/ui";
 import { cn } from "@remi/ui/utils";
-import { locales, type Locale } from "@/lib/i18n";
 
 type Props = {
   locale: Locale;

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { localePath, type Locale } from "@/lib/i18n";
+import { localePath, type Locale } from "@remi/services/shared";
 
 /**
  * The site's own origin. Needed as a real URL rather than a path because

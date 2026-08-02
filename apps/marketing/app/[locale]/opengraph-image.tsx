@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { isLocale, type Locale } from "@/lib/i18n";
+import { isLocale, type Locale } from "@remi/services/shared";
 
 /**
  * The social card, generated at build time by file convention — every route

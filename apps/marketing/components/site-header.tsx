@@ -1,10 +1,10 @@
 import NextLink from "next/link";
+import { localePath, type Locale } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Container, Link, Typography } from "@remi/ui/server";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { MobileNav } from "@/components/mobile-nav";
 import { getContent } from "@/lib/content";
-import { localePath, type Locale } from "@/lib/i18n";
 
 type Props = {
   locale: Locale;

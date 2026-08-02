@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
+import type { Locale } from "@remi/services/shared";
 import { Card, Container, Link, Section, Typography } from "@remi/ui/server";
 import { ContactForm } from "@/components/contact-form";
 import { getContent } from "@/lib/content";
-import type { Locale } from "@/lib/i18n";
 import { buildMetadata } from "@/lib/metadata";
 
 type Params = { locale: Locale };

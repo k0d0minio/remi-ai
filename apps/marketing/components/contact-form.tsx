@@ -2,6 +2,7 @@
 
 import { CircleAlert, CircleCheck } from "lucide-react";
 import { useActionState } from "react";
+import type { Locale } from "@remi/services/shared";
 import { Button, Checkbox } from "@remi/ui";
 import {
   Alert,
@@ -18,7 +19,6 @@ import {
   type ContactState,
 } from "@/app/[locale]/contact/actions";
 import type { Content } from "@/lib/content/types";
-import type { Locale } from "@/lib/i18n";
 
 type Props = {
   locale: Locale;

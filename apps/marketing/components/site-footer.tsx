@@ -1,7 +1,7 @@
 import NextLink from "next/link";
+import { localePath, type Locale } from "@remi/services/shared";
 import { Container, Link, Separator, Typography } from "@remi/ui/server";
 import { getContent } from "@/lib/content";
-import { localePath, type Locale } from "@/lib/i18n";
 import { siteName } from "@/lib/metadata";
 
 type Props = {

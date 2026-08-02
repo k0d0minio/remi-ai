@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
+import type { Locale } from "@remi/services/shared";
 import { CtaSection } from "@/components/sections/cta-section";
 import { FeatureSection } from "@/components/sections/feature-section";
 import { HeroSection } from "@/components/sections/hero-section";
 import { PilotSection } from "@/components/sections/pilot-section";
 import { getContent } from "@/lib/content";
-import type { Locale } from "@/lib/i18n";
 import { buildMetadata } from "@/lib/metadata";
 
 type Params = { locale: Locale };

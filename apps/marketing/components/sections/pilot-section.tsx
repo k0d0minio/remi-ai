@@ -1,5 +1,6 @@
 import { ArrowRight, Check } from "lucide-react";
 import NextLink from "next/link";
+import { localePath, type Locale } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import {
   Alert,
@@ -10,7 +11,6 @@ import {
   Typography,
 } from "@remi/ui/server";
 import type { Content } from "@/lib/content/types";
-import { localePath, type Locale } from "@/lib/i18n";
 
 type Props = {
   content: Content["practitioners"]["pilot"];
