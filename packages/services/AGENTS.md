@@ -22,14 +22,14 @@ PR.
 
 ## Entrypoints — pick the one that matches where the code runs
 
-| Import                  | Contains                                         | Runs on          |
-| ----------------------- | ------------------------------------------------ | ---------------- |
-| `@remi/services/shared` | types, formatters, `Result`, validation          | browser + server |
-| `@remi/services/server` | storage, email, AI, env — the whole Node surface | server only      |
-| `@remi/services/db`     | the storage seam alone                           | server only      |
-| `@remi/services/ai`     | model roles + the provider seam                  | server only      |
-| `@remi/services/email`  | the mailer seam                                  | server only      |
-| `@remi/services`        | types only — apps are lint-blocked from it       | —                |
+| Import                  | Contains                                                    | Runs on          |
+| ----------------------- | ----------------------------------------------------------- | ---------------- |
+| `@remi/services/shared` | types, the domain vocabulary, formatters, `Result`, locales | browser + server |
+| `@remi/services/server` | storage, email, AI, env — the whole Node surface            | server only      |
+| `@remi/services/db`     | the storage seam alone                                      | server only      |
+| `@remi/services/ai`     | model roles + the provider seam                             | server only      |
+| `@remi/services/email`  | the mailer seam                                             | server only      |
+| `@remi/services`        | types only — apps are lint-blocked from it                  | —                |
 
 Adding an entrypoint means editing **two** places that must agree: `exports` in `package.json` and
 `entry` in `tsup.config.ts`.
@@ -58,6 +58,11 @@ src/
   email/       the mailer seam + templates
   ai/          model roles + the provider seam
 ```
+
+`db/models/` files are **types only**. That is what lets `shared/` re-export the domain vocabulary
+to browser code while the rest of `db/` stays server-only — a runtime value there would quietly
+become part of every client bundle. A model needing a constant means the constant belongs in
+`shared/`, not in the model.
 
 One folder per entity under `db/services/`, one file per entity under `db/models/`. That is the
 shape a service layer converges on once it passes roughly fifty entities — adopted here from the

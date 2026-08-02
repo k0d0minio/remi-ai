@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Locale } from "@remi/services/shared";
 import { AudienceSection } from "@/components/sections/audience-section";
 import { CtaSection } from "@/components/sections/cta-section";
 import { FaqSection } from "@/components/sections/faq-section";
@@ -8,7 +9,6 @@ import { PartnershipSection } from "@/components/sections/partnership-section";
 import { StatsSection } from "@/components/sections/stats-section";
 import { StepsSection } from "@/components/sections/steps-section";
 import { getContent } from "@/lib/content";
-import type { Locale } from "@/lib/i18n";
 import { buildMetadata } from "@/lib/metadata";
 
 type Params = { locale: Locale };

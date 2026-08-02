@@ -1,7 +1,7 @@
 "use server";
 
+import { defaultLocale, isLocale } from "@remi/services/shared";
 import { getContent } from "@/lib/content";
-import { defaultLocale, isLocale } from "@/lib/i18n";
 
 export type ContactState = {
   status: "idle" | "success" | "error";

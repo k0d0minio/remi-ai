@@ -3,10 +3,10 @@ import { Inter, Instrument_Serif } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
+import { isLocale, locales } from "@remi/services/shared";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getContent } from "@/lib/content";
-import { isLocale, locales } from "@/lib/i18n";
 import { siteName, siteUrl } from "@/lib/metadata";
 import "../globals.css";
 
