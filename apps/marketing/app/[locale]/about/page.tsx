@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
+import type { Locale } from "@remi/services/shared";
 import { Avatar, AvatarFallback } from "@remi/ui";
 import { Card, Container, Section, Typography } from "@remi/ui/server";
 import { CtaSection } from "@/components/sections/cta-section";
 import { PartnershipSection } from "@/components/sections/partnership-section";
 import { StepsSection } from "@/components/sections/steps-section";
 import { getContent } from "@/lib/content";
-import type { Locale } from "@/lib/i18n";
 import { buildMetadata } from "@/lib/metadata";
 
 type Params = { locale: Locale };

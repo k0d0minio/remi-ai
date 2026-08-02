@@ -1,4 +1,4 @@
-import type { Locale } from "@/lib/i18n";
+import type { Locale } from "@remi/services/shared";
 import { en } from "./en";
 import { fr } from "./fr";
 import type { Content } from "./types";

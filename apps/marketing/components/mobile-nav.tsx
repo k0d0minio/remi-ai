@@ -3,6 +3,7 @@
 import { Menu } from "lucide-react";
 import NextLink from "next/link";
 import { useState } from "react";
+import { localePath, type Locale } from "@remi/services/shared";
 import {
   Button,
   Sheet,
@@ -14,7 +15,6 @@ import {
 } from "@remi/ui";
 import { Link, Separator } from "@remi/ui/server";
 import type { Content, NavItem } from "@/lib/content/types";
-import { localePath, type Locale } from "@/lib/i18n";
 
 type Props = {
   locale: Locale;
