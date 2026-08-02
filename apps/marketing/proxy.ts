@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { defaultLocale, isLocale, type Locale } from "@/lib/i18n";
+import { isLocale, pickLocaleFromHeader } from "@remi/services/shared";
 
 /**
  * Every page lives under /en or /fr; this redirects the bare paths there.
@@ -9,20 +9,6 @@ import { defaultLocale, isLocale, type Locale } from "@/lib/i18n";
  * a 307, not a 308, because the answer depends on a request header and must
  * not be cached as permanent.
  */
-const pickLocale = (request: NextRequest): Locale => {
-  const header = request.headers.get("accept-language");
-  if (!header) {
-    return defaultLocale;
-  }
-  for (const part of header.split(",")) {
-    const code = part.split(";")[0].trim().slice(0, 2).toLowerCase();
-    if (isLocale(code)) {
-      return code;
-    }
-  }
-  return defaultLocale;
-};
-
 const proxy = (request: NextRequest) => {
   const { pathname } = request.nextUrl;
   const first = pathname.split("/")[1];
@@ -31,8 +17,9 @@ const proxy = (request: NextRequest) => {
     return NextResponse.next();
   }
 
+  const locale = pickLocaleFromHeader(request.headers.get("accept-language"));
   const url = request.nextUrl.clone();
-  url.pathname = `/${pickLocale(request)}${pathname === "/" ? "" : pathname}`;
+  url.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
   return NextResponse.redirect(url);
 };
 

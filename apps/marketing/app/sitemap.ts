@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { localePath, locales } from "@/lib/i18n";
+import { localePath, locales } from "@remi/services/shared";
 import { siteUrl } from "@/lib/metadata";
 
 const pages: { path: string; priority: number }[] = [

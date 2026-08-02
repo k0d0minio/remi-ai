@@ -1,9 +1,9 @@
 import { ArrowRight } from "lucide-react";
 import NextLink from "next/link";
+import { localePath, type Locale } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { CtaBand } from "@remi/ui/server";
 import type { CtaContent } from "@/lib/content/types";
-import { localePath, type Locale } from "@/lib/i18n";
 
 type Props = {
   content: CtaContent;

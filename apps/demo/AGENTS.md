@@ -46,9 +46,25 @@ vocabulary: `success | warning | error | info | neutral`.
 ```text
 app/
   (demo)/     the prototype routes and their shared layout
+    practitioner/  the console: practice, clients, client detail, notes→plan, frame
+    person/        the daily surface: today, meals, steps, plan
 components/   demo-specific composition — tiles, tables, flows
-lib/mock/     mock data, one file per area
+lib/mock/     mock data, one file per area, plus the local view shapes in types.ts
 ```
+
+## Copy is in French
+
+The first practitioners and the people they support are francophone, and a prototype a stakeholder
+has to translate in their head is not showing them the product. Route slugs stay English, as the
+marketing site's do. The demo gets no i18n layer — the copy lives in the `lib/mock/` fixtures
+alongside the data, which is where the rest of a prototype's words already are.
+
+## Its types are local, and that is deliberate
+
+`lib/mock/types.ts` holds view shapes written for these screens. It does **not** mirror
+`packages/services/src/db/models/` — the demo is lint-blocked from `@remi/services`, and a prototype
+is exploring what a screen needs rather than committing to a schema. When a design graduates to
+`apps/web`, the real model is what it gets written against.
 
 ## Demo PRs
 
