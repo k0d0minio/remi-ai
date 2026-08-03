@@ -63,7 +63,7 @@ export const SignInForm = ({ locale, content }: Props) => (
               defaultChecked={role === "person"}
               className="peer sr-only"
             />
-            <span className="text-muted-foreground peer-checked:bg-card peer-checked:text-foreground peer-checked:shadow-sm peer-focus-visible:ring-ring/40 flex min-h-9 w-full cursor-pointer items-center justify-center rounded-md px-3 py-1.5 text-center text-sm font-medium leading-tight transition-colors duration-[--duration-fast] peer-focus-visible:ring-[3px]">
+            <span className="text-muted-foreground peer-checked:bg-card peer-checked:text-foreground peer-focus-visible:ring-ring/40 flex min-h-9 w-full cursor-pointer items-center justify-center rounded-md px-3 py-1.5 text-center text-sm font-medium leading-tight transition-colors duration-[--duration-fast] peer-checked:shadow-sm peer-focus-visible:ring-[3px]">
               {content.roles[role]}
             </span>
           </label>
