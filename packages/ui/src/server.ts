@@ -47,6 +47,16 @@ export { StarRating } from "./server/star-rating";
 export { Textarea } from "./server/textarea";
 export { Typography } from "./server/typography";
 export { VisuallyHidden } from "./server/visually-hidden";
+export { Wordmark } from "./server/wordmark";
+
+export {
+  BRAND_COLORS,
+  BRAND_GLYPH_PATH,
+  BRAND_GLYPH_VIEW_BOX,
+  BRAND_LEGAL_NAME,
+  BRAND_NAME,
+  BRAND_TAGLINE,
+} from "./lib/brand";
 
 export { CtaBand } from "./server/compound/cta-band";
 export { FeatureGrid, type Feature } from "./server/compound/feature-grid";

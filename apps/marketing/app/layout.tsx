@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Instrument_Serif } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { BRAND_TAGLINE } from "@remi/ui/server";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { siteName, siteUrl } from "@/lib/metadata";
@@ -36,11 +37,10 @@ const display = Instrument_Serif({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${siteName} — nutrition tracking with clinical reasoning behind it`,
+    default: `${siteName} — the wellness copilot between consultations`,
     template: `%s · ${siteName}`,
   },
-  description:
-    "Remi turns an everyday food log into structured nutritional insight, reviewed against clinical guidance.",
+  description: BRAND_TAGLINE.en,
   openGraph: { siteName, locale: "en_GB", type: "website" },
   twitter: { card: "summary_large_image" },
 };

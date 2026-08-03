@@ -1,7 +1,15 @@
 import NextLink from "next/link";
-import { Container, Link, Separator, Typography } from "@remi/ui/server";
+import {
+  BRAND_LEGAL_NAME,
+  BRAND_NAME,
+  BRAND_TAGLINE,
+  Container,
+  Link,
+  Separator,
+  Typography,
+  Wordmark,
+} from "@remi/ui/server";
 import { nav } from "@/lib/content/landing";
-import { siteName } from "@/lib/metadata";
 
 const year = new Date().getFullYear();
 
@@ -10,12 +18,9 @@ export const SiteFooter = () => (
     <Container className="flex flex-col gap-8 py-12">
       <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex max-w-xs flex-col gap-2">
-          <Typography as="span" variant="display" size="xl">
-            Remi
-          </Typography>
+          <Wordmark size="sm" />
           <Typography size="sm" tone="muted">
-            Nutrition tracking and decision support. Not a substitute for
-            medical advice.
+            {BRAND_TAGLINE.en}
           </Typography>
         </div>
 
@@ -45,9 +50,9 @@ export const SiteFooter = () => (
       <Separator tone="subtle" />
 
       <Typography size="xs" tone="muted">
-        © {year} {siteName}. Remi provides general nutritional information and
-        does not diagnose or treat any condition — speak to your doctor or a
-        registered dietitian about anything clinical.
+        © {year} {BRAND_LEGAL_NAME}. {BRAND_NAME} provides general nutritional
+        information and does not diagnose or treat any condition — speak to your
+        doctor or a registered dietitian about anything clinical.
       </Typography>
     </Container>
   </footer>

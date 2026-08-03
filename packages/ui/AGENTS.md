@@ -15,6 +15,7 @@ src/
   server/compound/  multi-part components built from presentational primitives
   motion/           the animation layer — lazy shells over a deferred chunk
   hooks/            hooks shared across apps
+  lib/brand.ts      the brand — names, tagline, hex, glyph. One home, five apps
   lib/utils.ts      cn()
   tokens.css        the design tokens every app imports
   index.ts          the client barrel — @remi/ui
