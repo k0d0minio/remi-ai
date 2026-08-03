@@ -23,6 +23,7 @@ in one person's head.
 | `APP_URL`                   | Absolute base URL of the app doing the reading  | Vercel    | no      |
 | `NEXT_PUBLIC_APP_URL`       | Same, where the browser needs it (links, share) | Vercel    | yes     |
 | `NEXT_PUBLIC_MARKETING_URL` | Public site URL — cross-app links               | Vercel    | yes     |
+| `NEXT_PUBLIC_SUPPORT_URL`   | Help centre URL — its own canonical + sitemap   | Vercel    | yes     |
 | `NEXT_PUBLIC_DOCS_URL`      | Docs site URL — cross-app links                 | Vercel    | yes     |
 
 ## Storage

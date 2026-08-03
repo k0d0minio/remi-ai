@@ -41,6 +41,7 @@ export { Field } from "./server/field";
 export { IconTile } from "./server/icon-tile";
 export { Input } from "./server/input";
 export { Link, linkVariants } from "./server/link";
+export { LocaleSwitcher } from "./server/locale-switcher";
 export { Progress, progressBarVariants } from "./server/progress";
 export { Section } from "./server/section";
 export { Separator } from "./server/separator";

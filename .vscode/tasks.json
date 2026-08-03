@@ -31,6 +31,13 @@
       "problemMatcher": []
     },
     {
+      "label": "▶ Dev: support",
+      "detail": "The public help centre on :3004.",
+      "type": "shell",
+      "command": "pnpm support:dev",
+      "problemMatcher": []
+    },
+    {
       "label": "▶ Dev: demo",
       "detail": "The Design-stage prototype sandbox on :3005 (mock data only).",
       "type": "shell",

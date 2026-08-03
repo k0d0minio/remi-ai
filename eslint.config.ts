@@ -14,7 +14,13 @@ import globals from "globals";
 // (see .github/workflows/quality.yaml) so the count can only go down.
 
 /** Every app that consumes the shared packages rather than owning primitives. */
-const CONSUMER_APPS = ["apps/web", "apps/admin", "apps/marketing", "apps/demo"];
+const CONSUMER_APPS = [
+  "apps/web",
+  "apps/admin",
+  "apps/marketing",
+  "apps/support",
+  "apps/demo",
+];
 const glob = (dirs: string[], ext = "{ts,tsx}") =>
   dirs.map((d) => `${d}/**/*.${ext}`);
 
@@ -154,7 +160,7 @@ export default defineConfig(
   {
     // Server-capable apps must name the services entrypoint they mean. The root
     // barrel is types-only; /server carries the Node-only surface.
-    files: glob(["apps/web", "apps/admin", "apps/marketing"]),
+    files: glob(["apps/web", "apps/admin", "apps/marketing", "apps/support"]),
     rules: {
       "no-restricted-imports": [
         "error",
@@ -220,6 +226,7 @@ export default defineConfig(
                 "@remi/web",
                 "@remi/admin",
                 "@remi/marketing",
+                "@remi/support",
                 "@remi/demo",
                 "@remi/docs",
               ],
@@ -274,6 +281,7 @@ export default defineConfig(
                 "@remi/web",
                 "@remi/admin",
                 "@remi/marketing",
+                "@remi/support",
                 "@remi/demo",
                 "@remi/docs",
               ],
@@ -307,6 +315,7 @@ export default defineConfig(
                 "@remi/web",
                 "@remi/admin",
                 "@remi/marketing",
+                "@remi/support",
                 "@remi/demo",
                 "@remi/docs",
               ],

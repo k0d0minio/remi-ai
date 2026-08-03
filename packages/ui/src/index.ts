@@ -24,7 +24,7 @@ export {
   AccordionTrigger,
 } from "./components/accordion";
 export { Avatar, AvatarFallback, AvatarImage } from "./components/avatar";
-export { Button, buttonVariants } from "./components/button";
+export { Button } from "./components/button";
 export { Checkbox } from "./components/checkbox";
 export {
   Dialog,

@@ -20,6 +20,8 @@
     "admin:build": "turbo run build --filter=@remi/admin",
     "marketing:dev": "turbo run dev --filter=@remi/marketing",
     "marketing:build": "turbo run build --filter=@remi/marketing",
+    "support:dev": "turbo run dev --filter=@remi/support",
+    "support:build": "turbo run build --filter=@remi/support",
     "docs:dev": "turbo run dev --filter=@remi/docs",
     "docs:build": "turbo run build --filter=@remi/docs",
     "demo:dev": "turbo run dev --filter=@remi/demo",
