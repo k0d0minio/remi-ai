@@ -1,4 +1,4 @@
-import type { Plan, Step } from "@remi/services/shared";
+import type { Plan, Recommendation, Step } from "@remi/services/shared";
 import { practitioner } from "./practitioner";
 
 /** Fixture data — see the note in `./practitioner.ts`. */
@@ -12,10 +12,99 @@ export const plans: readonly Plan[] = [
     publishedAt: new Date("2026-07-22T16:30:00Z"),
     summary:
       "Settle the digestive terrain first, then rebuild steady energy across the day.",
-    recommendationIds: ["rec_ferment", "rec_breakfast", "rec_oils"],
-    stepIds: ["step_ferment", "step_breakfast", "step_oils"],
+    recommendationIds: [
+      "rec_ferment",
+      "rec_raw",
+      "rec_breakfast",
+      "rec_oils",
+      "rec_fish",
+      "rec_magnesium",
+      "rec_review",
+    ],
+    stepIds: ["step_ferment", "step_breakfast", "step_oils", "step_evening"],
     createdAt: new Date("2026-07-22T16:05:00Z"),
     updatedAt: new Date("2026-07-22T16:30:00Z"),
+  },
+];
+
+/**
+ * What REMI structured out of the consultation notes, with the practitioner's
+ * sign-off on each one. `rec_magnesium` is deliberately left unconfirmed: it is
+ * what proves the person's surface filters drafts out rather than trusting that
+ * only confirmed ones were ever written.
+ */
+export const recommendations: readonly Recommendation[] = [
+  {
+    id: "rec_ferment",
+    consultationId: "cons_camille_jul",
+    category: "nutrition",
+    title: "One fermented food a day",
+    detail:
+      "Build up gradually — a spoonful at first, then a portion. Raw sauerkraut, kefir, miso.",
+    confirmed: true,
+    createdAt: new Date("2026-07-22T16:12:00Z"),
+    updatedAt: new Date("2026-07-22T16:28:00Z"),
+  },
+  {
+    id: "rec_raw",
+    consultationId: "cons_camille_jul",
+    category: "nutrition",
+    title: "No raw vegetables in the evening",
+    detail: "Cooked vegetables at dinner; raw ones kept for lunch.",
+    confirmed: true,
+    createdAt: new Date("2026-07-22T16:12:00Z"),
+    updatedAt: new Date("2026-07-22T16:28:00Z"),
+  },
+  {
+    id: "rec_breakfast",
+    category: "habit",
+    consultationId: "cons_camille_jul",
+    title: "Protein at breakfast, five mornings a week",
+    detail:
+      "To be started only once the fermented-food step has held for a fortnight.",
+    confirmed: true,
+    createdAt: new Date("2026-07-22T16:12:00Z"),
+    updatedAt: new Date("2026-07-22T16:28:00Z"),
+  },
+  {
+    id: "rec_oils",
+    consultationId: "cons_camille_jul",
+    category: "nutrition",
+    title: "Olive oil for cooking",
+    detail: "Move away from refined sunflower and rapeseed oils.",
+    confirmed: true,
+    createdAt: new Date("2026-07-22T16:12:00Z"),
+    updatedAt: new Date("2026-07-22T16:28:00Z"),
+  },
+  {
+    id: "rec_fish",
+    consultationId: "cons_camille_jul",
+    category: "nutrition",
+    title: "Oily fish twice a week",
+    detail: "Sardines, mackerel, herring. To be offered, not imposed.",
+    confirmed: true,
+    createdAt: new Date("2026-07-22T16:12:00Z"),
+    updatedAt: new Date("2026-07-22T16:28:00Z"),
+  },
+  {
+    id: "rec_magnesium",
+    consultationId: "cons_camille_jul",
+    category: "supplement",
+    title: "Magnesium bisglycinate in the evening",
+    detail: "Raised in the consultation, not decided. Revisit on 19 August.",
+    confirmed: false,
+    createdAt: new Date("2026-07-22T16:12:00Z"),
+    updatedAt: new Date("2026-07-22T16:12:00Z"),
+  },
+  {
+    id: "rec_review",
+    consultationId: "cons_camille_jul",
+    category: "monitoring",
+    title: "Review in four weeks",
+    detail: "Follow-up consultation on 19 August.",
+    confirmed: true,
+    createdAt: new Date("2026-07-22T16:12:00Z"),
+    updatedAt: new Date("2026-07-22T16:28:00Z"),
   },
 ];
 
@@ -62,6 +151,21 @@ export const steps: readonly Step[] = [
     startsOn: null,
     completedDays: 0,
     targetDays: 14,
+    createdAt: new Date("2026-07-22T16:30:00Z"),
+    updatedAt: new Date("2026-07-22T16:30:00Z"),
+  },
+  {
+    id: "step_evening",
+    planId: "plan_camille_jul",
+    personId: "per_camille",
+    order: 4,
+    title: "Dinner before 8pm, three evenings a week",
+    why: "To give digestion time to finish before you go to bed.",
+    recommendationId: null,
+    status: "upcoming",
+    startsOn: null,
+    completedDays: 0,
+    targetDays: 21,
     createdAt: new Date("2026-07-22T16:30:00Z"),
     updatedAt: new Date("2026-07-22T16:30:00Z"),
   },
