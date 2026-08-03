@@ -5,8 +5,8 @@ import {
   CardHeader,
   CardTitle,
   Typography,
-} from "@remi/ui";
-import { Wordmark } from "@remi/ui/server";
+  Wordmark,
+} from "@remi/ui/server";
 
 const Home = () => (
   <main className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center gap-6 p-8">
