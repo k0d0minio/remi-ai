@@ -24,6 +24,7 @@ in one person's head.
 | `NEXT_PUBLIC_APP_URL`       | Same, where the browser needs it (links, share) | Vercel    | yes     |
 | `NEXT_PUBLIC_MARKETING_URL` | Public site URL — cross-app links               | Vercel    | yes     |
 | `NEXT_PUBLIC_DOCS_URL`      | Docs site URL — cross-app links                 | Vercel    | yes     |
+| `NEXT_PUBLIC_SUPPORT_URL`   | Support centre URL — footer link, dev `:3004`   | Vercel    | yes     |
 
 ## Storage
 

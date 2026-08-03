@@ -29,7 +29,12 @@ export const SiteHeader = ({ locale }: Props) => {
           <Wordmark />
         </NextLink>
 
-        <nav aria-label="Main" className="hidden items-center gap-8 md:flex">
+        {/* Four links plus two buttons: the gap tightens at md so the row does
+            not wrap between the tablet breakpoint and a laptop width. */}
+        <nav
+          aria-label="Main"
+          className="hidden items-center gap-6 md:flex lg:gap-8"
+        >
           {content.nav.map((item) => (
             <Link
               key={item.href}

@@ -1,11 +1,18 @@
 import {
   ChefHat,
   Clock,
+  Compass,
   EyeOff,
+  Flag,
   Footprints,
+  KeyRound,
   LineChart,
+  ListChecks,
+  Lock,
   NotebookPen,
+  ScrollText,
   ShieldCheck,
+  ShieldOff,
   Stethoscope,
   TrendingDown,
   UtensilsCrossed,
@@ -24,6 +31,7 @@ export const fr: Content = {
   nav: [
     { href: "/practitioners", label: "Praticiens" },
     { href: "/individuals", label: "Pour vous" },
+    { href: "/trust", label: "Confiance et données" },
     { href: "/about", label: "À propos" },
   ],
 
@@ -40,6 +48,7 @@ export const fr: Content = {
     disclaimer:
       "REMI aide à appliquer les recommandations d'un praticien. Il ne diagnostique pas, ne traite pas et ne remplace pas un suivi professionnel — tout ce qui est clinique relève de votre praticien.",
     navLabel: "Pied de page",
+    support: "Centre d'aide",
   },
 
   home: {
@@ -160,6 +169,48 @@ export const fr: Content = {
           intent: "neutral",
         },
       ],
+    },
+    roadmap: {
+      eyebrow: "Feuille de route",
+      title: "Ce que nous construisons ensuite",
+      lead: "Une direction, pas un calendrier de livraison. Rien de tout cela n'est disponible aujourd'hui, et l'ordre se décide avec les praticiens pilotes plutôt qu'il ne leur est annoncé.",
+      columns: [
+        {
+          icon: ListChecks,
+          status: "En développement",
+          title: "Maintenant",
+          body: "La boucle centrale, en construction avec les premiers praticiens pilotes.",
+          items: [
+            "Traduire les recommandations d'un praticien en un plan qu'une personne peut suivre chez elle",
+            "Des idées de repas et des recettes qui restent dans le cadre de ce plan",
+            "Un petit pas à la fois, au rythme de la personne",
+            "Des signaux de progression que le praticien peut lire avant la consultation suivante",
+          ],
+        },
+        {
+          icon: Compass,
+          status: "Conçu, pas encore construit",
+          title: "Ensuite",
+          body: "Façonné avec la cohorte pilote, et prioritaire dès que la boucle centrale tient.",
+          items: [
+            "Une messagerie sécurisée entre le praticien et les personnes qu'il accompagne",
+            "Enregistrer un repas à partir d'une photo, pour que la journée se note en quelques secondes au lieu d'être abandonnée",
+            "Rédiger un projet de plan à partir des notes de consultation, que le praticien corrige et valide",
+          ],
+        },
+        {
+          icon: Flag,
+          status: "À l'horizon",
+          title: "Plus tard",
+          body: "Des intentions vers lesquelles nous concevons, sans aucune date attachée.",
+          items: [
+            "Analyses et biomarqueurs sur une frise, lus à côté du plan qu'ils ont orienté",
+            "Les objets connectés, là où le signal vaut vraiment le bruit",
+            "Des cliniques à plusieurs praticiens autour d'une même personne, chacun voyant sa part",
+          ],
+        },
+      ],
+      note: "Une ligne qui passe de « plus tard » à « ensuite », c'est une conversation avec la cohorte pilote, pas une promesse au marché. Demandez-nous où en est n'importe laquelle : la réponse honnête est plus facile à donner que la réponse polie.",
     },
     steps: {
       eyebrow: "Comment ça fonctionnera",
@@ -489,6 +540,128 @@ export const fr: Content = {
       title: "Parlez à ceux qui le construisent",
       body: "Praticien, futur utilisateur, partenaire ou simple curieux — nous répondons nous-mêmes.",
       action: { href: "/contact", label: "Nous contacter" },
+    },
+  },
+
+  trust: {
+    meta: {
+      title: "Confiance et données — RGPD, hébergement et cadre du praticien",
+      description:
+        "Comment REMI traite des données liées à la santé : le RGPD dès la conception, l'intention de garder les données personnelles dans l'UE, le cadre thérapeutique fixé par le praticien comme modèle de sécurité, et la liste claire de ce que REMI ne fait jamais.",
+    },
+    intro: {
+      eyebrow: "Confiance et données",
+      title: "Construit pour mériter la confiance autour de la consultation",
+      lead: "REMI se place à côté d'une relation clinique — les recommandations d'un praticien, et le quotidien d'une personne. Cela ne fonctionne que si la question des données trouve sa réponse avant le premier patient accompagné, pas après.",
+      body: "Voici la version honnête : ce qui est décidé, ce qui relève de l'intention, et ce qui n'est pas encore choisi. Chaque engagement ici est un engagement que vous pouvez nous opposer pendant la discussion pilote, et aucun n'est une certification que nous n'avons pas.",
+    },
+    status: {
+      title: "Où en est REMI aujourd'hui",
+      body: "REMI est en pré-lancement. Aucune donnée de patient n'est traitée, aucun hébergeur n'est retenu, et aucune certification n'a été obtenue — ni revendiquée. Ce qui suit décrit la manière dont le produit est conçu : les engagements viennent d'abord, pour que l'architecture y soit tenue.",
+    },
+    commitments: {
+      eyebrow: "Le RGPD dès la conception",
+      title: "Six décisions prises avant le premier enregistrement",
+      lead: "Une protection intégrée pendant que le schéma se dessine encore n'est pas le même produit qu'une protection ajoutée après le lancement. REMI est construit par une entreprise belge : le RGPD est le plancher, pas l'ambition.",
+      items: [
+        {
+          icon: ShieldCheck,
+          title: "Le RGPD comme point de départ",
+          body: "Base légale, limitation des finalités et droits de la personne sur ses données sont des données d'entrée de chaque fonctionnalité — pas une checklist parcourue une fois, juste avant le lancement.",
+          intent: "primary",
+        },
+        {
+          icon: Lock,
+          title: "Collecter moins que ce que l'on pourrait",
+          body: "Uniquement ce dont l'accompagnement a réellement besoin. Un champ intéressant à avoir mais inutile pour aider quelqu'un n'est pas collecté.",
+          intent: "neutral",
+        },
+        {
+          icon: KeyRound,
+          title: "L'accès suit la relation de soin",
+          body: "Un praticien voit les personnes qu'il accompagne, et personne d'autre. L'accès est limité à la relation qui le justifie, et prend fin avec elle.",
+          intent: "info",
+        },
+        {
+          icon: ShieldOff,
+          title: "Jamais vendues, jamais un jeu d'entraînement",
+          body: "Les données personnelles ne sont ni vendues, ni échangées, ni utilisées pour entraîner des modèles au service de quelqu'un d'autre que la personne concernée. C'est une décision produit, pas un réglage.",
+          intent: "success",
+        },
+        {
+          icon: ScrollText,
+          title: "Écrit, pas supposé",
+          body: "Ce qui est stocké, pourquoi, combien de temps et qui le traite — consigné au fur et à mesure. Les sous-traitants sont nommés : un prestataire que nous ne pouvons pas décrire est un prestataire que nous n'utilisons pas.",
+          intent: "info",
+        },
+        {
+          icon: Stethoscope,
+          title: "Le clinique reste clinique",
+          body: "REMI n'est pas le dossier médical. Diagnostics, prescriptions et antécédents restent dans les outils du praticien ; REMI part des recommandations qui en sortent.",
+          intent: "primary",
+        },
+      ],
+    },
+    residency: {
+      eyebrow: "Hébergement des données",
+      title: "L'intention : des données personnelles qui restent dans l'UE",
+      lead: "Aucun hébergeur n'est encore retenu. C'est délibéré — et c'est précisément ce qui permet à la localisation de rester un critère de choix plutôt qu'un projet de migration.",
+      items: [
+        "Des données personnelles hébergées dans l'UE, avec une région belge ou européenne par défaut pour le pilote",
+        "Le stockage est une couture dans le code, pas un verrou fournisseur : choisir un prestataire, c'est écrire un adaptateur, donc la localisation reste une décision prise sur le fond",
+        "Tout traitement qui sortirait de l'UE — un fournisseur d'IA, par exemple — nommé, documenté et justifié avant d'avoir lieu, jamais découvert après coup",
+        "Là où un transfert serait inévitable, les garanties exigées par le RGPD, inscrites au registre plutôt qu'en note de bas de page",
+      ],
+      note: "C'est une intention, et elle vaut ce que vaut une intention écrite. Quand l'hébergeur sera choisi, cette section portera un nom, une région et une date — et si la réponse diffère, c'est cette page qui changera, au lieu de rester silencieusement identique.",
+    },
+    frame: {
+      eyebrow: "Le modèle de sécurité",
+      title: "Le cadre du praticien est le mécanisme de sécurité",
+      lead: "La réponse habituelle à la question de la sécurité d'une IA de santé est une liste de filtres plus longue. La nôtre est structurelle : REMI n'a aucune opinion clinique propre, et tout ce qu'il dit doit tenir dans un cadre posé par le praticien.",
+      items: [
+        {
+          title: "Le praticien pose le cadre",
+          body: "Ce qui peut être suggéré, ce qui doit être évité, et pour qui. Le cadre sort de la consultation, appartient au praticien, et peut être resserré à tout moment.",
+        },
+        {
+          title: "REMI travaille strictement dedans",
+          body: "Repas, petits pas et encouragements sont générés à l'intérieur du cadre. En dehors, REMI n'improvise pas : il dit qu'il ne peut pas, et renvoie vers le praticien.",
+        },
+        {
+          title: "Tout ce qui est clinique retourne à l'humain",
+          body: "Un symptôme, une question sur un traitement, quelque chose qui a changé — REMI le transmet au praticien au lieu d'y répondre. Et ce que REMI a suggéré reste visible pour le praticien, qui peut le corriger plutôt que le découvrir.",
+        },
+      ],
+    },
+    never: {
+      eyebrow: "Les limites",
+      title: "Ce que REMI ne fait jamais",
+      lead: "Des limites produit, pas des réserves enfouies dans des conditions générales. Si une fonctionnalité devait brouiller une de ces lignes, elle ne serait pas construite — et le même engagement figure au bas de chaque page de ce site.",
+      items: [
+        "Ne diagnostique jamais. REMI ne se forme aucune opinion clinique et n'en propose aucune.",
+        "Ne traite ni ne prescrit jamais. Aucun dosage, aucun complément de sa propre initiative, aucune modification de ce qu'un praticien ou un médecin a fixé.",
+        "Ne remplace jamais un suivi professionnel. C'est un compagnon bien-être entre deux consultations, conçu pour renvoyer vers le praticien plutôt que pour retenir les gens dans une application.",
+        "N'invente jamais son propre programme. Sans les recommandations d'un praticien derrière lui, il n'y a pas de plan à accompagner.",
+        "Ne transforme jamais les données d'une personne en produit pour quelqu'un d'autre. Ni vendues, ni échangées, ni transformées en jeu d'entraînement.",
+      ],
+    },
+    questions: {
+      eyebrow: "Les questions bienvenues",
+      title: "Les questions qui rendent la conversation utile",
+      lead: "Ce sont celles que posent les praticiens, les cliniques et les juristes, et aucune n'est malvenue. Quand la réponse n'est pas encore arrêtée, vous obtenez « pas décidé » et la raison — pas une phrase rassurante.",
+      items: [
+        "Où vivront exactement les données de nos patients, et sous le contrôle de qui ?",
+        "Qu'est-ce qui est envoyé à un modèle d'IA, chez quel fournisseur, et qu'est-ce qui en est délibérément exclu ?",
+        "REMI est-il un dispositif médical — et qu'est-ce qui l'y ferait basculer ?",
+        "Pouvons-nous signer un accord de sous-traitance avant le début d'un pilote ?",
+        "Qui est responsable de quoi, entre la clinique, le praticien et REMI ?",
+        "Que deviennent nos données si nous arrêtons — ou si REMI s'arrête ?",
+      ],
+    },
+    cta: {
+      title: "Posez-nous la question qui fâche en premier",
+      body: "La question des données se règle plus facilement avant un pilote que pendant. Venez avec votre DPO, votre conseil juridique, ou votre propre liste.",
+      action: { href: "/contact", label: "Nous poser une question" },
     },
   },
 

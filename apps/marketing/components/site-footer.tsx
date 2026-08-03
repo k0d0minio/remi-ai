@@ -9,6 +9,7 @@ import {
   Wordmark,
 } from "@remi/ui/server";
 import { getContent } from "@/lib/content";
+import { supportUrl } from "@/lib/urls";
 
 type Props = {
   locale: Locale;
@@ -52,6 +53,13 @@ export const SiteFooter = ({ locale }: Props) => {
               className="text-sm"
             >
               {content.header.contact}
+            </Link>
+            {/* A plain anchor, not NextLink: the support centre is a separate
+                deployment, so it owns its own routing — including which
+                language it serves — and a client-side navigation cannot cross
+                into it. */}
+            <Link href={supportUrl} variant="muted" className="text-sm">
+              {content.footer.support}
             </Link>
           </nav>
         </div>
