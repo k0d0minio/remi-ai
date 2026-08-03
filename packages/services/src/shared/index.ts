@@ -7,7 +7,13 @@
  * under /server instead.
  */
 
-export { formatCurrency, formatDate, formatDateTime, initials } from "./format";
+export {
+  formatCurrency,
+  formatDate,
+  formatDateTime,
+  formatWeekday,
+  initials,
+} from "./format";
 export {
   defaultLocale,
   isLocale,
