@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev -p 3003",
-    "build": "next build --debug-prerender",
+    "build": "next build",
     "postbuild": "pagefind --site .next/server/app --output-path public/_pagefind",
     "start": "next start -p 3003",
     "lint": "eslint .",
