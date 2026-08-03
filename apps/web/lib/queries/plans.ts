@@ -30,6 +30,20 @@ export const getCurrentStep = async (planId: Id): Promise<Step | null> =>
  * rule, and a rule enforced once at the seam cannot be forgotten by the next
  * surface that reads a plan.
  */
+/**
+ * Everything REMI structured out of a consultation, drafts included.
+ *
+ * The one read allowed to return `confirmed: false`, and it is the practitioner's
+ * — the plan composer is where those drafts are ticked or dropped. Any read on
+ * the person's side goes through `listRecommendations` below instead.
+ */
+export const listDraftRecommendations = async (
+  consultationId: Id,
+): Promise<Recommendation[]> =>
+  recommendations.filter(
+    (recommendation) => recommendation.consultationId === consultationId,
+  );
+
 export const listRecommendations = async (
   planId: Id,
 ): Promise<Recommendation[]> => {

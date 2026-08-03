@@ -7,3 +7,15 @@ export const getConsultation = async (
 ): Promise<Consultation | null> =>
   consultations.find((consultation) => consultation.id === consultationId) ??
   null;
+
+/**
+ * The most recent consultation with a person — what the plan composer works
+ * from. The practitioner comes to that screen from a session they have just
+ * held, so the question is always "the last one", never "which one".
+ */
+export const getLatestConsultation = async (
+  personId: Id,
+): Promise<Consultation | null> =>
+  consultations
+    .filter((consultation) => consultation.personId === personId)
+    .sort((a, b) => b.heldAt.getTime() - a.heldAt.getTime())[0] ?? null;
