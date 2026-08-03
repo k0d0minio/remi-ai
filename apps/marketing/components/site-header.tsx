@@ -1,12 +1,7 @@
 import NextLink from "next/link";
 import { localePath, type Locale } from "@remi/services/shared";
 import { Button } from "@remi/ui";
-import {
-  BRAND_LEGAL_NAME,
-  Container,
-  Link,
-  Wordmark,
-} from "@remi/ui/server";
+import { BRAND_LEGAL_NAME, Container, Link, Wordmark } from "@remi/ui/server";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { MobileNav } from "@/components/mobile-nav";
 import { getContent } from "@/lib/content";

@@ -23,7 +23,7 @@ export const AppSidebar = ({ items, locale, role, content }: Props) => (
         href={localePath(locale, "/")}
         className="focus-visible:ring-ring/40 rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
       >
-<Wordmark />
+        <Wordmark />
       </NextLink>
       <Badge variant="info" tone="subtle" size="sm">
         {content.roles[role]}
