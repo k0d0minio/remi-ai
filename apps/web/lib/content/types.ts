@@ -5,7 +5,18 @@
  *
  * This covers the shell's chrome only: navigation, the user menu, empty and
  * placeholder states. Feature copy belongs with the feature.
+ *
+ * Note what is NOT here: a step's title, a recipe's method, a recommendation's
+ * detail. Those are data, not chrome — they come from the query layer in the
+ * language they were written in, and translating them is a question for the
+ * practitioner, not for a dictionary.
  */
+
+import type {
+  MealSlot,
+  RecommendationCategory,
+  StepStatus,
+} from "@remi/services/shared";
 
 export type NavItem = {
   /** Path without the locale prefix — the shell adds it. */
@@ -89,13 +100,50 @@ export type Content = {
     stepProgress: string;
     noPlan: PlaceholderContent;
   };
+  plan: {
+    title: string;
+    lead: string;
+    /** Follows the clinic name: "FunMedDev · consultation on 22 Jul 2026". */
+    consultationOn: string;
+    /** Prefixes the next consultation's date: "Review on 19 Aug 2026". */
+    nextReview: string;
+    categories: Record<RecommendationCategory, string>;
+    disclaimer: PlaceholderContent;
+    empty: PlaceholderContent;
+  };
+  meals: {
+    title: string;
+    lead: string;
+    tabs: {
+      week: string;
+      shopping: string;
+    };
+    slots: Record<MealSlot, string>;
+    /** Follows the number in each badge: "12 min", "4 servings". */
+    minutes: string;
+    servings: string;
+    /** The attribution line above every recipe's list of what it honours. */
+    because: string;
+    /** The disclosure that opens ingredients and method. */
+    details: string;
+    shopping: PlaceholderContent;
+    empty: PlaceholderContent;
+  };
+  steps: {
+    title: string;
+    lead: string;
+    held: string;
+    /** Prefixes a step's title in that step's progress bar label. */
+    progressLabel: string;
+    /** Follows the count in "4 / 14 days". */
+    days: string;
+    status: Record<StepStatus, string>;
+    empty: PlaceholderContent;
+  };
   placeholders: {
     /** Keyed by route segment, so a new placeholder route is one dictionary entry. */
     practice: PlaceholderContent;
     frame: PlaceholderContent;
-    meals: PlaceholderContent;
-    steps: PlaceholderContent;
-    plan: PlaceholderContent;
   };
   prototypeNote: {
     title: string;

@@ -79,6 +79,70 @@ export const en: Content = {
       body: "Your practitioner has not published a plan for you. It will appear here after your next consultation.",
     },
   },
+  plan: {
+    title: "My plan",
+    lead: "What your practitioner recommended, in words you can act on.",
+    consultationOn: "consultation on",
+    nextReview: "Review on",
+    categories: {
+      nutrition: "Nutrition",
+      habit: "Habit",
+      supplement: "Supplement",
+      activity: "Activity",
+      monitoring: "Follow-up",
+    },
+    disclaimer: {
+      title: "Your practitioner stays the reference",
+      body: "REMI applies these recommendations day to day. It does not diagnose and does not replace a consultation — anything clinical belongs to your practitioner.",
+    },
+    empty: {
+      title: "No plan yet",
+      body: "Your practitioner has not published a plan for you. It will appear here as soon as they do.",
+    },
+  },
+  meals: {
+    title: "Meals",
+    lead: "Ideas that follow your plan, adapted to your tastes, your time and what you have in the kitchen.",
+    tabs: {
+      week: "The week",
+      shopping: "Shopping list",
+    },
+    slots: {
+      breakfast: "breakfast",
+      lunch: "lunch",
+      dinner: "dinner",
+      snack: "snack",
+    },
+    minutes: "min",
+    servings: "servings",
+    because: "Because your practitioner recommended",
+    details: "Ingredients and method",
+    shopping: {
+      title: "Before the shop",
+      body: "Sorted the way the shop is laid out, not the way the recipes are written.",
+    },
+    empty: {
+      title: "No meals yet",
+      body: "Meal ideas appear here once your practitioner has published a plan.",
+    },
+  },
+  steps: {
+    title: "Your steps",
+    lead: "One at a time. The next one waits until this one holds.",
+    held: "Steps held",
+    progressLabel: "Progress:",
+    days: "days",
+    status: {
+      upcoming: "Upcoming",
+      current: "In progress",
+      done: "Held",
+      skipped: "Skipped",
+    },
+    empty: {
+      title: "No steps yet",
+      body: "Your steps appear here once your practitioner has published a plan.",
+    },
+  },
   placeholders: {
     practice: {
       title: "Practice",
@@ -87,18 +151,6 @@ export const en: Content = {
     frame: {
       title: "Therapeutic frame",
       body: "The préceptes REMI generates inside: what to favour, what is excluded, and how far a suggestion may go.",
-    },
-    meals: {
-      title: "Meals",
-      body: "Meal ideas and recipes that follow your plan, adapted to your tastes, your routine and your constraints.",
-    },
-    steps: {
-      title: "Steps",
-      body: "Your small steps in order — the one in flight, the ones already held, and what comes next.",
-    },
-    plan: {
-      title: "My plan",
-      body: "Your practitioner's recommendations, in words you can act on. They stay the reference.",
     },
   },
   prototypeNote: {
