@@ -1,7 +1,13 @@
 import NextLink from "next/link";
 import type { Metadata } from "next";
 import { Button } from "@remi/ui";
-import { Badge, Card, CardContent, Typography, Wordmark } from "@remi/ui/server";
+import {
+  Badge,
+  Card,
+  CardContent,
+  Typography,
+  Wordmark,
+} from "@remi/ui/server";
 
 export const metadata: Metadata = {
   title: "Not found",
