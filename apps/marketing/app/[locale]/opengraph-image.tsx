@@ -1,19 +1,20 @@
 import { ImageResponse } from "next/og";
 import { isLocale, type Locale } from "@remi/services/shared";
+import { BRAND_COLORS, BRAND_NAME } from "@remi/ui/server";
 
 /**
  * The social card, generated at build time by file convention — every route
  * under the locale inherits it, which is what makes the "every page has an OG
  * image" rule in AGENTS.md hold without wiring one per page.
  *
- * The styles are inline and literal on purpose: Satori renders this outside the
- * browser, so there is no Tailwind pass and no CSS custom properties to resolve.
- * The colours are the light-mode `--brand-600` / `--grey-950` tokens converted
- * to hex — if the brand moves in tokens.css, move them here too.
+ * The styles are inline on purpose: Satori renders this outside the browser, so
+ * there is no Tailwind pass and no CSS custom properties to resolve. The colours
+ * are the one thing that must not be literal here — they come from
+ * `BRAND_COLORS`, which is where a token-to-hex conversion is allowed to live.
  */
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "REMI AI — the wellness copilot between two consultations";
+export const alt = `${BRAND_NAME} — the wellness copilot between two consultations`;
 
 const lines: Record<Locale, { first: string; second: string; footer: string }> =
   {
@@ -42,12 +43,12 @@ const Image = async ({ params }: { params: Promise<{ locale: string }> }) => {
         flexDirection: "column",
         justifyContent: "space-between",
         padding: 80,
-        backgroundColor: "#0b1220",
-        color: "#f7f8fa",
+        backgroundColor: BRAND_COLORS.ink,
+        color: BRAND_COLORS.paper,
       }}
     >
-      <div style={{ display: "flex", fontSize: 40, letterSpacing: -1 }}>
-        REMI
+      <div style={{ display: "flex", fontSize: 40, letterSpacing: 2 }}>
+        {BRAND_NAME}
       </div>
 
       <div
@@ -65,7 +66,7 @@ const Image = async ({ params }: { params: Promise<{ locale: string }> }) => {
             display: "flex",
             fontSize: 64,
             lineHeight: 1.1,
-            color: "#6b8dff",
+            color: BRAND_COLORS.brandOnDark,
           }}
         >
           {copy.second}

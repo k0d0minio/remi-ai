@@ -1,12 +1,11 @@
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { localePath, type Locale } from "@remi/services/shared";
+import { localePath } from "@remi/services/shared";
 import { AppHeader } from "@/components/shell/app-header";
 import { AppSidebar } from "@/components/shell/app-sidebar";
 import { getSession } from "@/lib/auth/session";
 import { getContent } from "@/lib/content";
-
-type Params = { locale: Locale };
+import { resolveLocale, type LocaleParams } from "@/lib/locale-params";
 
 /**
  * The auth boundary. Every signed-in route is inside this group, so the session
@@ -18,9 +17,9 @@ const AppLayout = async ({
   params,
 }: {
   children: ReactNode;
-  params: Promise<Params>;
+  params: Promise<LocaleParams>;
 }) => {
-  const { locale } = await params;
+  const locale = await resolveLocale(params);
   const session = await getSession();
 
   if (!session) {

@@ -28,6 +28,7 @@ export const fr: Content = {
   ],
 
   header: {
+    homeLabel: "accueil",
     contact: "Contact",
     cta: { href: "/contact", label: "Rejoindre le pilote" },
     menuLabel: "Menu",

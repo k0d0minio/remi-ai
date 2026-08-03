@@ -58,6 +58,8 @@ export type Content = {
   nav: NavItem[];
   header: {
     contact: string;
+    /** Completes the wordmark link's accessible name: "Remi AI, home". */
+    homeLabel: string;
     cta: { href: string; label: string };
     menuLabel: string;
   };

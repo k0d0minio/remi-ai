@@ -1,8 +1,14 @@
 import NextLink from "next/link";
 import { localePath, type Locale } from "@remi/services/shared";
-import { Container, Link, Separator, Typography } from "@remi/ui/server";
+import {
+  BRAND_LEGAL_NAME,
+  Container,
+  Link,
+  Separator,
+  Typography,
+  Wordmark,
+} from "@remi/ui/server";
 import { getContent } from "@/lib/content";
-import { siteName } from "@/lib/metadata";
 
 type Props = {
   locale: Locale;
@@ -18,9 +24,7 @@ export const SiteFooter = ({ locale }: Props) => {
       <Container className="flex flex-col gap-8 py-12">
         <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex max-w-xs flex-col gap-2">
-            <Typography as="span" variant="display" size="xl">
-              REMI
-            </Typography>
+            <Wordmark size="sm" />
             <Typography size="sm" tone="muted">
               {content.footer.tagline}
             </Typography>
@@ -55,7 +59,7 @@ export const SiteFooter = ({ locale }: Props) => {
         <Separator tone="subtle" />
 
         <Typography size="xs" tone="muted">
-          © {year} {siteName}. {content.footer.disclaimer}
+          © {year} {BRAND_LEGAL_NAME}. {content.footer.disclaimer}
         </Typography>
       </Container>
     </footer>
