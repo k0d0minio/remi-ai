@@ -6,21 +6,27 @@ import type { Role, Session, SessionProvider } from "./session";
 /** Flipped by the role switch in the user menu, so both surfaces are reachable. */
 export const ROLE_COOKIE = "remi-role";
 
-const isRole = (value: string | undefined): value is Role =>
+export const isRole = (value: unknown): value is Role =>
   value === "practitioner" || value === "person";
 
 /**
  * Stands in until an auth vendor is chosen. It is registered by nothing — the
  * seam falls back to it — so deleting this file and registering a real provider
  * is the whole migration.
+ *
+ * No cookie means signed out. That is what makes the entry screen at
+ * `/[locale]` reachable at all: the cookie is set by signing in there, and by
+ * the role switch in the user menu.
  */
 export const developmentSessionProvider: SessionProvider = {
   name: "development",
   current: async (): Promise<Session | null> => {
     const store = await cookies();
-    const role: Role = isRole(store.get(ROLE_COOKIE)?.value)
-      ? (store.get(ROLE_COOKIE)?.value as Role)
-      : "practitioner";
+    const role = store.get(ROLE_COOKIE)?.value;
+
+    if (!isRole(role)) {
+      return null;
+    }
 
     if (role === "person") {
       const person = people[0];
