@@ -1,4 +1,10 @@
-import { Badge, Card, CardContent, Progress, Typography } from "@remi/ui/server";
+import {
+  Badge,
+  Card,
+  CardContent,
+  Progress,
+  Typography,
+} from "@remi/ui/server";
 import type { OperationsStat } from "@/lib/fixtures";
 
 type Props = {
