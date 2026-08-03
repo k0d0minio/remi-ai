@@ -1509,12 +1509,7 @@ export const featureFlags: FeatureFlag[] = [
 
 /** What an entry is about, and the only axis the log is filtered on. */
 export type AuditKind =
-  | "flag"
-  | "access"
-  | "invite"
-  | "content"
-  | "export"
-  | "support";
+  "flag" | "access" | "invite" | "content" | "export" | "support";
 
 export type AuditEntry = {
   id: string;
