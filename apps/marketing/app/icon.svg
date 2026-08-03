@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="REMI">
+  <!-- The fill and the glyph are BRAND_COLORS.brand600 and BRAND_GLYPH_PATH in
+       packages/ui/src/lib/brand.ts. A static metadata file is served verbatim and
+       cannot import, so this copy and that module move together. -->
+  <rect width="64" height="64" rx="14" fill="#1762b6" />
+  <path
+    transform="translate(11.4 11) scale(0.42)"
+    fill="#ffffff"
+    fill-rule="evenodd"
+    d="M12 0 L48 0 C66 0 76 10 76 26 C76 42 66 50 50 52 L60 54 L76 92 L90 92 L90 100 L56 100 L56 92 L64 92 L46 56 L34 56 L34 92 L46 92 L46 100 L8 100 L8 92 L20 92 L20 8 L12 8 Z M34 11 L46 11 C54 11 60 16 60 26 C60 36 54 41 46 41 L34 41 Z"
+  />
+</svg>

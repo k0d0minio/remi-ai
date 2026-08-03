@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BRAND_NAME } from "@remi/ui/server";
 
 /**
  * The site's own origin. Needed as a real URL rather than a path because
@@ -11,7 +12,12 @@ import type { Metadata } from "next";
 export const siteUrl =
   process.env.NEXT_PUBLIC_MARKETING_URL ?? "http://localhost:3001";
 
-export const siteName = "Remi AI";
+/**
+ * The product name, not the company — a search result and a browser tab are
+ * copy, and copy says REMI. `BRAND_LEGAL_NAME` appears in exactly one place on
+ * this site: the footer's © line.
+ */
+export const siteName = BRAND_NAME;
 
 type Options = {
   title: string;
