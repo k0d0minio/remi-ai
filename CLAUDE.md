@@ -31,16 +31,16 @@ importing an app is a lint error.
 
 ## Tech stack
 
-| Layer      | Technology                                       |
-| ---------- | ------------------------------------------------ |
-| Monorepo   | Turborepo 2, pnpm 10 workspaces, Node 22         |
-| Framework  | Next.js 16 (App Router), React 19                |
-| Language   | TypeScript 5 — strict everywhere                 |
-| Styling    | Tailwind CSS 4; tokens in `@remi/ui/tokens.css`  |
-| Primitives | shadcn/ui (New York) over Radix, lucide-react    |
-| Docs       | Nextra 4                                         |
-| Packages   | tsup → ESM                                       |
-| Hosting    | Vercel — one project per app                     |
+| Layer      | Technology                                      |
+| ---------- | ----------------------------------------------- |
+| Monorepo   | Turborepo 2, pnpm 10 workspaces, Node 22        |
+| Framework  | Next.js 16 (App Router), React 19               |
+| Language   | TypeScript 5 — strict everywhere                |
+| Styling    | Tailwind CSS 4; tokens in `@remi/ui/tokens.css` |
+| Primitives | shadcn/ui (New York) over Radix, lucide-react   |
+| Docs       | Nextra 4                                        |
+| Packages   | tsup → ESM                                      |
+| Hosting    | Vercel — one project per app                    |
 
 Storage, auth, email and AI are deliberately absent: see `packages/services/AGENTS.md`.
 

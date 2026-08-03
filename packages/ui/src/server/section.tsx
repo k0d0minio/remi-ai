@@ -17,8 +17,13 @@ const section = cva("w-full", {
     },
     /**
      * Vertical rhythm stays as classes rather than tokens: a spacing token would
-     * only ever be consumable as `py-[var(…)]`, which defeats class sorting and
-     * buys nothing over naming the three sizes here.
+     * only ever be consumable as an arbitrary padding value wrapping a CSS
+     * variable, which defeats class sorting and buys nothing over naming the
+     * three sizes here.
+     *
+     * That example is spelled out in prose on purpose — Tailwind scans this file
+     * as source text, so a class-shaped token in a comment becomes a real
+     * candidate and emits `padding-block: var(…)`, which is not parseable CSS.
      */
     spacing: {
       none: "",

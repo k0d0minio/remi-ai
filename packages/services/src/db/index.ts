@@ -12,9 +12,5 @@
  *   db/migrations/   forward + backward, one file per change
  */
 
-export {
-  getDatabase,
-  isDatabaseRegistered,
-  registerDatabase,
-} from "./client";
+export { getDatabase, isDatabaseRegistered, registerDatabase } from "./client";
 export type { Collection, DatabaseClient } from "./client";

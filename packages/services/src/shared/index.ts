@@ -8,6 +8,47 @@
  */
 
 export { formatCurrency, formatDate, formatDateTime, initials } from "./format";
+export {
+  defaultLocale,
+  isLocale,
+  localePath,
+  locales,
+  pickLocaleFromHeader,
+} from "./i18n";
+export type { Locale } from "./i18n";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
 export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";
+
+/**
+ * The domain vocabulary. Types only, so re-exporting it from `/db` — which is
+ * otherwise server-only — costs the browser bundle nothing.
+ */
+export type {
+  Consultation,
+  FramePrinciple,
+  GenotypeMarker,
+  HabitsProfile,
+  Ingredient,
+  Meal,
+  MealSlot,
+  MealStatus,
+  PersonalisationDimension,
+  PersonalisationProfile,
+  Person,
+  PersonStatus,
+  Plan,
+  PlanStatus,
+  Practitioner,
+  ProgressSignal,
+  PsychologyProfile,
+  Recipe,
+  Recommendation,
+  RecommendationCategory,
+  RhythmProfile,
+  SignalKind,
+  SignalSeverity,
+  Step,
+  StepStatus,
+  TherapeuticFrame,
+} from "../db/models";

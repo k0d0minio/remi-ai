@@ -1,21 +1,26 @@
 import { ArrowRight } from "lucide-react";
 import NextLink from "next/link";
+import { localePath, type Locale } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { CtaBand } from "@remi/ui/server";
+import type { CtaContent } from "@/lib/content/types";
 
-export const CtaSection = () => (
+type Props = {
+  content: CtaContent;
+  locale: Locale;
+};
+
+export const CtaSection = ({ content, locale }: Props) => (
   <CtaBand
-    title="Start with one week of honest logging"
-    body="No card, no commitment. If it does not change how you eat, nothing has been lost but a week of typing."
+    title={content.title}
+    body={content.body}
     actions={
-      <>
-        <Button asChild size="xl" variant="secondary">
-          <NextLink href="/contact">
-            Start free
-            <ArrowRight aria-hidden="true" />
-          </NextLink>
-        </Button>
-      </>
+      <Button asChild size="xl" variant="secondary">
+        <NextLink href={localePath(locale, content.action.href)}>
+          {content.action.label}
+          <ArrowRight aria-hidden="true" />
+        </NextLink>
+      </Button>
     }
   />
 );

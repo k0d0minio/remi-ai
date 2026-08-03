@@ -46,7 +46,7 @@ a one-line `Context budget:` note in `design-notes.md`.
    outside those paths → **STOP and ask**. Record each PR in `run.md` under `preview-prs:`.
 
 4. **Iterate from the live URL.** Hand over the deployed demo path; fold feedback in via further
-   demo PRs. This loop *is* the stage.
+   demo PRs. This loop _is_ the stage.
 
 5. **Declare throwaway vs seed.** Record in `design-notes.md` whether the demo is a **throwaway**
    (Build re-implements from scratch) or a **seed**, and why in one line — Define copies this into

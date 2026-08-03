@@ -57,7 +57,8 @@
   },
   "pnpm": {
     "overrides": {
-      "zod": "4.3.5"
+      "nextra>zod": "4.3.5",
+      "nextra-theme-docs>zod": "4.3.5"
     }
   }
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Instrument_Serif } from "next/font/google";
+import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { BRAND_NAME } from "@remi/ui/server";
 import "./globals.css";
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
   description: `Internal operations for the ${BRAND_NAME} platform.`,
 };
 
-const RootLayout = ({ children }: { children: React.ReactNode }) => (
+const RootLayout = ({ children }: { children: ReactNode }) => (
   <html
     lang="en"
     className={`${inter.variable} ${display.variable}`}

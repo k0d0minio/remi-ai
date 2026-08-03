@@ -25,7 +25,9 @@ export type GenerateOptions = {
   temperature?: number;
 };
 
-export const DEFAULTS: Required<Pick<GenerateOptions, "role" | "maxTokens" | "temperature">> = {
+export const DEFAULTS: Required<
+  Pick<GenerateOptions, "role" | "maxTokens" | "temperature">
+> = {
   role: "balanced",
   maxTokens: 4096,
   temperature: 0.7,

@@ -31,14 +31,14 @@ around.
 
 ## What each stage reads and writes
 
-| Stage      | Reads from docs                                                                  | Writes to docs                                                        |
-| ---------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| **Scope**  | `business/roles`, `business/initiatives` — the who and the why-now                | — (its artifacts are `scope.md` + `pipeline/intake/<slug>/`)          |
-| **Design** | `business/roles` for the lens; `technical/applications` for what `apps/demo` may do | —                                                                     |
-| **Define** | `business/initiatives`, `business/roles`, `technical/architecture` (for `touches:`) | —                                                                     |
-| **Build**  | `technical/architecture`, the relevant `technical/packages` page, `technical/development` | —                                                             |
-| **Verify** | — (works from the spec, the diff, and its own contract)                          | —                                                                     |
-| **Ship**   | `business/initiatives` (the ship note's tie-in) + the page(s) the change affects  | **updates** the affected `technical/**` and `business/**` page(s), in the same feature PR, and adds the changelog entry |
+| Stage      | Reads from docs                                                                           | Writes to docs                                                                                                          |
+| ---------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **Scope**  | `business/roles`, `business/initiatives` — the who and the why-now                        | — (its artifacts are `scope.md` + `pipeline/intake/<slug>/`)                                                            |
+| **Design** | `business/roles` for the lens; `technical/applications` for what `apps/demo` may do       | —                                                                                                                       |
+| **Define** | `business/initiatives`, `business/roles`, `technical/architecture` (for `touches:`)       | —                                                                                                                       |
+| **Build**  | `technical/architecture`, the relevant `technical/packages` page, `technical/development` | —                                                                                                                       |
+| **Verify** | — (works from the spec, the diff, and its own contract)                                   | —                                                                                                                       |
+| **Ship**   | `business/initiatives` (the ship note's tie-in) + the page(s) the change affects          | **updates** the affected `technical/**` and `business/**` page(s), in the same feature PR, and adds the changelog entry |
 
 Load only the page(s) named for the stage.
 

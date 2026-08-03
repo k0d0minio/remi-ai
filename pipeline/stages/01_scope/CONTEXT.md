@@ -98,17 +98,17 @@ a one-line `Context budget:` note in `scope.md`.
 
    **Always required, on every scope:**
 
-   | Subsection                    | What goes in it                                                                                          |
-   | ----------------------------- | -------------------------------------------------------------------------------------------------------- |
-   | **The model**                 | What this thing _is_, in the business's own words, plus the vocabulary the rest of the scope uses         |
-   | **Rules**                     | Numbered `BR-1`, `BR-2`, … — one thought per rule, each stated so it can be agreed or struck out          |
-   | **Edge cases and exceptions** | `<the awkward case>` → `<what the business does about it>`. Where the real logic hides                     |
-   | **Worked example**            | One concrete end-to-end walk-through with real names, dates and numbers                                   |
+   | Subsection                    | What goes in it                                                                                   |
+   | ----------------------------- | ------------------------------------------------------------------------------------------------- |
+   | **The model**                 | What this thing _is_, in the business's own words, plus the vocabulary the rest of the scope uses |
+   | **Rules**                     | Numbered `BR-1`, `BR-2`, … — one thought per rule, each stated so it can be agreed or struck out  |
+   | **Edge cases and exceptions** | `<the awkward case>` → `<what the business does about it>`. Where the real logic hides            |
+   | **Worked example**            | One concrete end-to-end walk-through with real names, dates and numbers                           |
 
    **Required when more than one role is named in section 2:**
 
-   | Subsection          | What goes in it                                                                                    |
-   | ------------------- | ---------------------------------------------------------------------------------------------------- |
+   | Subsection          | What goes in it                                                                                                                                                   |
+   | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
    | **Decision rights** | Per role: what they can see, what they can change, what needs someone else's say-so. "Who is allowed to do this" is the most common silent assumption in a scope. |
 
    **Menu — include a subsection only if the topic genuinely has one.** An empty heading is worse
@@ -186,9 +186,9 @@ this order:
 
 ## 2. Who it's for
 
-| Role     | What they get                      |
-| -------- | ---------------------------------- |
-| <role>   | <one line — what changes for them> |
+| Role   | What they get                      |
+| ------ | ---------------------------------- |
+| <role> | <one line — what changes for them> |
 
 ## 3. Business logic
 

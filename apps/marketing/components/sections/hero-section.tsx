@@ -1,48 +1,42 @@
 import { ArrowRight } from "lucide-react";
 import NextLink from "next/link";
+import { localePath, type Locale } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { FadeIn } from "@remi/ui/motion";
-import { Badge, Card, Hero, Typography } from "@remi/ui/server";
-import { hero } from "@/lib/content/landing";
+import { Badge, Hero } from "@remi/ui/server";
+import type { HeroContent } from "@/lib/content/types";
+
+type Props = {
+  content: HeroContent;
+  locale: Locale;
+};
 
 /**
  * The headline is inside `FadeIn`, which renders its children statically first
  * and animates only once its chunk has loaded — so this copy is in the server
  * HTML and is the LCP element whether or not JavaScript ever arrives.
+ *
+ * No `media` slot: there is no product screenshot because there is no product
+ * yet, and a mockup posing as one is exactly what this site must not do.
  */
-export const HeroSection = () => (
+export const HeroSection = ({ content, locale }: Props) => (
   <FadeIn>
     <Hero
       eyebrow={
         <Badge variant="info" tone="subtle">
-          {hero.eyebrow}
+          {content.eyebrow}
         </Badge>
       }
-      title={hero.title}
-      subtitle={hero.subtitle}
-      actions={
-        <>
-          <Button asChild size="xl">
-            <NextLink href="#pricing">
-              Start free
-              <ArrowRight aria-hidden="true" />
-            </NextLink>
-          </Button>
-          <Button asChild size="xl" variant="outline">
-            <NextLink href="#how-it-works">See how it works</NextLink>
-          </Button>
-        </>
-      }
-      media={
-        <Card
-          elevation="floating"
-          className="aspect-16/10 mx-auto w-full max-w-3xl items-center justify-center overflow-hidden"
-        >
-          <Typography size="sm" tone="muted">
-            Product screenshot — to be added
-          </Typography>
-        </Card>
-      }
+      title={content.title}
+      subtitle={content.subtitle}
+      actions={content.actions.map((action, index) => (
+        <Button key={action.href} asChild size="xl" variant={action.variant}>
+          <NextLink href={localePath(locale, action.href)}>
+            {action.label}
+            {index === 0 ? <ArrowRight aria-hidden="true" /> : null}
+          </NextLink>
+        </Button>
+      ))}
     />
   </FadeIn>
 );
