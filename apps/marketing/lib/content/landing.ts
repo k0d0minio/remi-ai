@@ -19,10 +19,15 @@ import type { Feature, PricingTier, Stat } from "@remi/ui/server";
  * cannot do it today, the page does not say it can. When a claim involves a
  * number, the number comes from somewhere real, and the page says where."
  *
+ * Everything here says the same thing as BRAND_TAGLINE in @remi/ui: REMI extends
+ * a practitioner's guidance between consultations. It is not a self-serve diet
+ * app, and copy that drifts back toward one contradicts the tagline the footer,
+ * the social card and every metadata description already carry.
+ *
  * What is honest here today:
- *   • `stats` cite published WHO figures about the problem, not about Remi's
- *     performance. Verify each against the current fact sheet before launch —
- *     they move.
+ *   • `stats` cite published WHO figures about the problem, not about REMI's
+ *     performance. Verify each against the current source before launch — they
+ *     move, and the adherence figure is from a 2003 report.
  *   • `features` describe intended capability. Cut any that do not ship.
  *
  * What is NOT yet honest and MUST be replaced:
@@ -31,7 +36,7 @@ import type { Feature, PricingTier, Stat } from "@remi/ui/server";
  *     nutritional advice are worse than an empty page.
  *   • `pricing` — indicative only. Nothing has been decided.
  *   • `logos` — the publications and bodies listed have no relationship with
- *     Remi. Delete or replace with real ones.
+ *     REMI. Delete or replace with real ones.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -42,15 +47,31 @@ export const nav = [
   { href: "#faq", label: "FAQ" },
 ] as const;
 
+/**
+ * Two sentences, kept apart because the social card sets the second in the
+ * brand colour on its own line. The page joins them; nothing retypes them.
+ */
+const heroTitleLines = [
+  "The consultation ends.",
+  "The guidance doesn't.",
+] as const;
+
 export const hero = {
-  eyebrow: "Nutrition, with a clinician behind it",
-  title: "Know what you eat. Understand what it does.",
+  eyebrow: "Wellness support between consultations",
+  titleLines: heroTitleLines,
+  title: heroTitleLines.join(" "),
   subtitle:
-    "Remi turns an everyday food log into structured nutritional insight, reviewed against clinical guidance — so the advice you act on has a reason behind it.",
+    "REMI carries your practitioner's plan into the weeks between appointments — answering the small questions as they come up, and showing your practitioner what actually happened.",
 } as const;
 
 /** Figures about the problem, from published sources. Verify before launch. */
 export const stats: Stat[] = [
+  {
+    value: "50%",
+    label:
+      "is the average adherence to long-term therapy in high-income countries",
+    source: "WHO, 2003 — verify before launch",
+  },
   {
     value: "1 in 8",
     label: "people worldwide were living with obesity in 2022",
@@ -61,30 +82,25 @@ export const stats: Stat[] = [
     label: "adult obesity has more than doubled since 1990",
     source: "WHO",
   },
-  {
-    value: "8",
-    label: "of the top risk factors for early death are diet-related",
-    source: "Placeholder — verify or remove",
-  },
 ];
 
 export const features: Feature[] = [
   {
-    icon: ClipboardList,
-    title: "Logging that takes seconds",
-    body: "Describe a meal in plain language and Remi resolves it to portions and nutrients. No weighing, no scrolling a database.",
+    icon: Stethoscope,
+    title: "Your practitioner's plan, not a generic one",
+    body: "REMI starts from what was agreed in your consultation and works within it. It does not hand you someone else's diet and hope it fits.",
     intent: "primary",
   },
   {
-    icon: Stethoscope,
-    title: "Guidance with a source",
-    body: "Every recommendation names the guideline it comes from, so you and your clinician can see the reasoning rather than a score.",
+    icon: ClipboardList,
+    title: "Logging that takes seconds",
+    body: "Describe a meal in plain language and REMI resolves it to portions and nutrients. No weighing, no scrolling a database — because a log nobody keeps tells your practitioner nothing.",
     intent: "info",
   },
   {
     icon: LineChart,
     title: "Trends, not verdicts",
-    body: "Patterns across weeks are what change outcomes. Remi shows the direction of travel instead of judging a single day.",
+    body: "Patterns across weeks are what change outcomes. REMI shows the direction of travel instead of judging a single day.",
     intent: "success",
   },
   {
@@ -96,35 +112,35 @@ export const features: Feature[] = [
   {
     icon: ShieldCheck,
     title: "Your data stays yours",
-    body: "Health data is held to the standard it deserves: encrypted, exportable, and never sold. You can delete all of it in one action.",
+    body: "Health data is held to the standard it deserves: encrypted, exportable, and never sold. Your practitioner sees it because you shared it, and you can stop sharing at any time.",
     intent: "neutral",
   },
   {
     icon: Activity,
-    title: "Ready for your care team",
-    body: "Export a clear summary your dietitian or GP can actually read, so an appointment starts from evidence instead of recall.",
+    title: "Ready for the next consultation",
+    body: "Your practitioner opens a clear summary of the weeks in between, so the appointment starts from evidence instead of recall.",
     intent: "info",
   },
 ];
 
 export const steps = [
   {
-    id: "log",
-    label: "Log",
-    title: "Tell Remi what you ate",
-    body: "Type it, speak it, or photograph it. Remi handles the translation into portions, nutrients and timing — the part that makes people give up on food diaries by week two.",
+    id: "consultation",
+    label: "In the consultation",
+    title: "Your practitioner sets the direction",
+    body: "You agree a plan with the person who knows your situation. REMI holds it — the restrictions, the goal, the reasoning — so nothing has to be remembered or re-explained later.",
   },
   {
-    id: "understand",
-    label: "Understand",
-    title: "See what it means, and why",
-    body: "Remi maps your intake against the guidance relevant to you and explains the gap in plain language, citing what the recommendation is based on.",
+    id: "between",
+    label: "In between",
+    title: "The questions get answered as they arrive",
+    body: "The ones too small for an appointment and too immediate to save up. REMI answers within your plan, in plain language, and says when something is a question for your practitioner instead.",
   },
   {
-    id: "act",
-    label: "Act",
-    title: "Change one thing at a time",
-    body: "Rather than a diet, you get the single adjustment likely to matter most this week — and a way to tell whether it worked.",
+    id: "next",
+    label: "Next time",
+    title: "The appointment starts from evidence",
+    body: "Your practitioner sees what actually happened across the weeks in between — not a recollection of it. The consultation picks up where the last one left off.",
   },
 ] as const;
 
@@ -182,28 +198,29 @@ export const pricing: Omit<PricingTier, "action">[] = [
   {
     id: "plus",
     name: "Plus",
-    description: "For anyone managing a condition or a real goal.",
+    description: "For anyone working to a plan agreed with a practitioner.",
     priceMonthly: "€9",
     priceAnnual: "€7",
     cadence: { monthly: "per month", annual: "per month, billed annually" },
     features: [
       "Everything in Free",
-      "Guidance with cited sources",
+      "Your practitioner's plan, held and applied",
+      "Answers between appointments",
       "Full history and trends",
-      "Clinician-ready exports",
       "Allergy and restriction handling",
     ],
     badge: "Most chosen",
   },
   {
-    id: "care",
-    name: "Care",
-    description: "For practices supporting clients between appointments.",
+    id: "practice",
+    name: "Practice",
+    description: "For practitioners supporting clients between consultations.",
     priceMonthly: "€29",
     priceAnnual: "€24",
     cadence: { monthly: "per month", annual: "per month, billed annually" },
     features: [
       "Everything in Plus",
+      "Set and update a client's plan",
       "Shared client view",
       "Consultation summaries",
       "Priority support",
@@ -214,37 +231,43 @@ export const pricing: Omit<PricingTier, "action">[] = [
 export const faqs = [
   {
     id: "medical-advice",
-    question: "Is Remi a substitute for medical advice?",
+    question: "Is REMI a substitute for seeing a practitioner?",
     answer:
-      "No. Remi is a tracking and decision-support tool. It can show you what you are eating and what published guidance says about it, but it does not diagnose, treat, or replace a conversation with your doctor or a registered dietitian. Anything clinical should go through them.",
+      "No — it is the opposite. REMI extends guidance you have already been given; it does not originate it, and it does not diagnose or treat. Without a practitioner setting the direction, there is nothing for it to carry. Anything clinical goes to them.",
+  },
+  {
+    id: "no-practitioner",
+    question: "Can I use REMI without a practitioner?",
+    answer:
+      "You can log and see your own trends. But the part that makes REMI worth using — guidance shaped by someone who knows your situation — needs that person to exist. If you do not have one yet, treat what you see here as background rather than instruction.",
   },
   {
     id: "sources",
-    question: "Where does the nutritional guidance come from?",
+    question: "Where does the guidance come from?",
     answer:
-      "From published dietary guidelines and peer-reviewed nutritional science. Remi names the source behind each recommendation rather than presenting a number with no provenance, so you can check it or take it to your clinician.",
+      "From the plan your practitioner set, and from published dietary guidelines and peer-reviewed nutritional science where the plan is silent. REMI names which of the two it is drawing on rather than blurring them together.",
   },
   {
     id: "accuracy",
     question: "How accurate is the logging?",
     answer:
-      "Accurate enough to be useful for trends, and not precise enough to be treated as a measurement. Portion estimates from a description or a photograph carry real uncertainty, and Remi shows that uncertainty rather than hiding it behind a confident-looking number.",
+      "Accurate enough to be useful for trends, and not precise enough to be treated as a measurement. Portion estimates from a description or a photograph carry real uncertainty, and REMI shows that uncertainty rather than hiding it behind a confident-looking number.",
   },
   {
     id: "data",
-    question: "What happens to my data?",
+    question: "What happens to my data, and what does my practitioner see?",
     answer:
-      "It is encrypted, it is not sold, and it is not used to train models without your explicit consent. You can export everything in a portable format or delete all of it permanently, in one action, at any time.",
+      "It is encrypted, it is not sold, and it is not used to train models without your explicit consent. Your practitioner sees what you chose to share with them, you can see exactly what that is, and you can stop sharing without losing your own history.",
   },
   {
     id: "conditions",
-    question: "Can I use Remi with a diagnosed condition?",
+    question: "Can I use REMI with a diagnosed condition?",
     answer:
-      "Many people will want to, and Remi is built to handle clinical dietary restrictions as first-class inputs. Tell your care team you are using it, and treat its output as something to discuss with them rather than act on alone.",
+      "That is much of the point — clinical dietary restrictions are first-class inputs, not filters bolted on afterwards. Tell your care team you are using it, and treat its output as something to discuss with them rather than act on alone.",
   },
 ] as const;
 
-/** PLACEHOLDER — none of these organisations has any relationship with Remi. */
+/** PLACEHOLDER — none of these organisations has any relationship with REMI. */
 export const logos = [
   "Placeholder body",
   "Placeholder journal",
