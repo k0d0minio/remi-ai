@@ -46,9 +46,11 @@ export const registerSessionProvider = (adapter: SessionProvider) => {
 export const isSessionProviderRegistered = () => provider !== null;
 
 /**
- * Falls back to the development session rather than throwing, because the
- * signed-out state is not built yet and a hard failure here would make every
- * route unreachable. Registering a real provider takes precedence.
+ * Falls back to the development session rather than throwing, so no vendor has
+ * to be committed for the app to run. That stand-in answers `null` when its
+ * cookie is absent, which is what gives the signed-out state — the entry screen
+ * at `/[locale]` — something to key off. Registering a real provider takes
+ * precedence.
  */
 export const getSession = async (): Promise<Session | null> => {
   if (provider) {
