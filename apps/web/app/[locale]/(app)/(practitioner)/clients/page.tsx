@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { UserPlus } from "lucide-react";
-import { formatDate, type Person } from "@remi/services/shared";
+import { ArrowRight, UserPlus } from "lucide-react";
+import NextLink from "next/link";
+import { formatDate, localePath, type Person } from "@remi/services/shared";
 import {
   Badge,
   EmptyState,
+  Link,
   Table,
   TableBody,
   TableCell,
@@ -78,6 +80,7 @@ const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
               <TableHead>{content.columns.readiness}</TableHead>
               <TableHead>{content.columns.nextConsultation}</TableHead>
               <TableHead>{content.columns.lastActive}</TableHead>
+              <TableHead />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -119,6 +122,17 @@ const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
                   {client.lastActiveAt
                     ? formatDate(client.lastActiveAt, locale)
                     : content.never}
+                </TableCell>
+                <TableCell>
+                  <Link
+                    as={NextLink}
+                    href={localePath(locale, `/clients/${client.id}`)}
+                    variant="standalone"
+                    className="whitespace-nowrap text-sm"
+                  >
+                    {content.open}
+                    <ArrowRight aria-hidden="true" />
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}
