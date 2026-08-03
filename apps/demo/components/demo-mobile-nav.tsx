@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@remi/ui";
-import { Typography } from "@remi/ui/server";
+import { Wordmark } from "@remi/ui/server";
 import { DemoNav } from "@/components/demo-nav";
 import { SurfaceSwitcher } from "@/components/surface-switcher";
 
@@ -28,9 +28,7 @@ export const DemoMobileNav = () => {
       <SheetContent side="left" className="w-72">
         <SheetHeader>
           <SheetTitle>
-            <Typography as="span" variant="display" size="xl">
-              REMI
-            </Typography>
+            <Wordmark />
           </SheetTitle>
         </SheetHeader>
         <div className="flex flex-col gap-4 px-3">

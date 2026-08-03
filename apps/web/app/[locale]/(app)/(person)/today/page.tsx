@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CalendarOff } from "lucide-react";
-import type { Locale } from "@remi/services/shared";
 import {
   Card,
   CardContent,
@@ -15,20 +14,19 @@ import {
 import { getSession } from "@/lib/auth/session";
 import { getContent } from "@/lib/content";
 import { getActivePlan, getCurrentStep } from "@/lib/queries/plans";
-
-type Params = { locale: Locale };
+import { resolveLocale, type LocaleParams } from "@/lib/locale-params";
 
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<Params>;
+  params: Promise<LocaleParams>;
 }): Promise<Metadata> => {
-  const { locale } = await params;
+  const locale = await resolveLocale(params);
   return { title: getContent(locale).today.title };
 };
 
-const Page = async ({ params }: { params: Promise<Params> }) => {
-  const { locale } = await params;
+const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
+  const locale = await resolveLocale(params);
   const session = await getSession();
   if (!session?.personId) {
     notFound();

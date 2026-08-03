@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Instrument_Serif } from "next/font/google";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
+import { BRAND_NAME } from "@remi/ui/server";
 import "./globals.css";
 
 // The Design stage prototypes here and Paul-equivalent stakeholders review the
@@ -29,8 +30,8 @@ const display = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: {
-    default: "Remi AI demo",
-    template: "%s · Remi AI demo",
+    default: `${BRAND_NAME} demo`,
+    template: `%s · ${BRAND_NAME} demo`,
   },
   description: "Prototype sandbox — mock data only, never a real backend.",
   robots: { index: false, follow: false },

@@ -5,14 +5,13 @@ import {
   CardHeader,
   CardTitle,
   Typography,
+  Wordmark,
 } from "@remi/ui/server";
 
 const Home = () => (
   <main className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center gap-6 p-8">
     <div className="flex items-center gap-3">
-      <Typography as="h1" size="2xl" weight="semibold">
-        Remi AI
-      </Typography>
+      <Wordmark as="h1" size="lg" />
       <Badge variant="warning">admin</Badge>
     </div>
 

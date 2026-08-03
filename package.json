@@ -54,5 +54,11 @@
   },
   "lint-staged": {
     "*.{ts,tsx,md}": ["prettier --write"]
+  },
+  "pnpm": {
+    "overrides": {
+      "nextra>zod": "4.3.5",
+      "nextra-theme-docs>zod": "4.3.5"
+    }
   }
 }

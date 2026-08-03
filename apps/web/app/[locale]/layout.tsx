@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { isLocale, locales } from "@remi/services/shared";
+import { BRAND_NAME } from "@remi/ui/server";
 import "../globals.css";
 
 /**
@@ -35,8 +36,8 @@ export const dynamicParams = false;
 
 export const metadata: Metadata = {
   title: {
-    default: "Remi AI",
-    template: "%s · Remi AI",
+    default: BRAND_NAME,
+    template: `%s · ${BRAND_NAME}`,
   },
   description: "The wellness copilot between consultations.",
   robots: { index: false, follow: false },

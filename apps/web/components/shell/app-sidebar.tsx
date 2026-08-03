@@ -1,6 +1,6 @@
 import NextLink from "next/link";
 import { localePath, type Locale } from "@remi/services/shared";
-import { Badge, Typography } from "@remi/ui/server";
+import { Badge, Wordmark } from "@remi/ui/server";
 import { NavLinks } from "@/components/shell/nav-links";
 import type { Content, NavItem } from "@/lib/content/types";
 import type { Role } from "@/lib/auth/session";
@@ -23,9 +23,7 @@ export const AppSidebar = ({ items, locale, role, content }: Props) => (
         href={localePath(locale, "/")}
         className="focus-visible:ring-ring/40 rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
       >
-        <Typography as="span" variant="display" size="xl">
-          REMI
-        </Typography>
+        <Wordmark />
       </NextLink>
       <Badge variant="info" tone="subtle" size="sm">
         {content.roles[role]}

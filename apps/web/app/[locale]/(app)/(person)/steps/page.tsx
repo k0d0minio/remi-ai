@@ -1,21 +1,19 @@
 import type { Metadata } from "next";
-import type { Locale } from "@remi/services/shared";
 import { PlaceholderScreen } from "@/components/shell/placeholder-screen";
 import { getContent } from "@/lib/content";
-
-type Params = { locale: Locale };
+import { resolveLocale, type LocaleParams } from "@/lib/locale-params";
 
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<Params>;
+  params: Promise<LocaleParams>;
 }): Promise<Metadata> => {
-  const { locale } = await params;
+  const locale = await resolveLocale(params);
   return { title: getContent(locale).placeholders.steps.title };
 };
 
-const Page = async ({ params }: { params: Promise<Params> }) => {
-  const { locale } = await params;
+const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
+  const locale = await resolveLocale(params);
   const content = getContent(locale);
 
   return (

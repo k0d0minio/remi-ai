@@ -10,7 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@remi/ui";
-import { Typography } from "@remi/ui/server";
+import { Wordmark } from "@remi/ui/server";
 import { NavLinks } from "@/components/shell/nav-links";
 import type { Content, NavItem } from "@/lib/content/types";
 
@@ -35,9 +35,7 @@ export const MobileNav = ({ items, locale, content }: Props) => {
       <SheetContent side="left" className="w-72">
         <SheetHeader>
           <SheetTitle>
-            <Typography as="span" variant="display" size="xl">
-              REMI
-            </Typography>
+            <Wordmark />
           </SheetTitle>
         </SheetHeader>
         <nav aria-label={content.shell.navLabel} className="px-3">

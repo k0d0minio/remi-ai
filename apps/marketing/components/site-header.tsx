@@ -1,7 +1,7 @@
 import NextLink from "next/link";
 import { localePath, type Locale } from "@remi/services/shared";
 import { Button } from "@remi/ui";
-import { Container, Link, Typography } from "@remi/ui/server";
+import { BRAND_LEGAL_NAME, Container, Link, Wordmark } from "@remi/ui/server";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { MobileNav } from "@/components/mobile-nav";
 import { getContent } from "@/lib/content";
@@ -23,12 +23,10 @@ export const SiteHeader = ({ locale }: Props) => {
       <Container className="flex h-16 items-center justify-between gap-6">
         <NextLink
           href={localePath(locale, "/")}
+          aria-label={`${BRAND_LEGAL_NAME}, ${content.header.homeLabel}`}
           className="focus-visible:ring-ring/40 rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
         >
-          <Typography as="span" variant="display" size="xl">
-            REMI
-          </Typography>
-          <span className="sr-only">REMI AI, home</span>
+          <Wordmark />
         </NextLink>
 
         <nav aria-label="Main" className="hidden items-center gap-8 md:flex">

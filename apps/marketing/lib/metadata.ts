@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { localePath, type Locale } from "@remi/services/shared";
+import { BRAND_NAME } from "@remi/ui/server";
 
 /**
  * The site's own origin. Needed as a real URL rather than a path because
@@ -12,7 +13,12 @@ import { localePath, type Locale } from "@remi/services/shared";
 export const siteUrl =
   process.env.NEXT_PUBLIC_MARKETING_URL ?? "http://localhost:3001";
 
-export const siteName = "REMI AI";
+/**
+ * The product name, not the company — a search result and a browser tab are
+ * copy, and copy says REMI. `BRAND_LEGAL_NAME` appears in exactly one place on
+ * this site: the footer's © line.
+ */
+export const siteName = BRAND_NAME;
 
 const ogLocale: Record<Locale, string> = { en: "en_GB", fr: "fr_BE" };
 

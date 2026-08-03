@@ -10,4 +10,15 @@ const withNextra = nextra({
 export default withNextra({
   poweredByHeader: false,
   reactStrictMode: true,
+  turbopack: {
+    // Unrelated to this app's own config: Nextra 4.6 points this alias at
+    // `@vercel/turbopack-next/mdx-import-source`, a Next internal that no longer
+    // exists in 16.2, so the build fails to resolve the MDX provider. Nextra's
+    // webpack path already aliases it to the root mdx-components; this is the
+    // same thing spelled for Turbopack. Nextra merges a caller's resolveAlias
+    // over its own, so this wins. Delete it when Nextra ships the fix.
+    resolveAlias: {
+      "next-mdx-import-source-file": "./mdx-components.tsx",
+    },
+  },
 });
