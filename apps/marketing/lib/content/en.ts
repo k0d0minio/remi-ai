@@ -1,11 +1,18 @@
 import {
   ChefHat,
   Clock,
+  Compass,
   EyeOff,
+  Flag,
   Footprints,
+  KeyRound,
   LineChart,
+  ListChecks,
+  Lock,
   NotebookPen,
+  ScrollText,
   ShieldCheck,
+  ShieldOff,
   Stethoscope,
   TrendingDown,
   UtensilsCrossed,
@@ -24,6 +31,7 @@ export const en: Content = {
   nav: [
     { href: "/practitioners", label: "For practitioners" },
     { href: "/individuals", label: "For you" },
+    { href: "/trust", label: "Trust and data" },
     { href: "/about", label: "About" },
   ],
 
@@ -40,6 +48,7 @@ export const en: Content = {
     disclaimer:
       "REMI helps people apply their practitioner's recommendations. It does not diagnose, treat, or replace professional care — anything clinical belongs with your practitioner.",
     navLabel: "Footer",
+    support: "Support centre",
   },
 
   home: {
@@ -160,6 +169,48 @@ export const en: Content = {
           intent: "neutral",
         },
       ],
+    },
+    roadmap: {
+      eyebrow: "Roadmap",
+      title: "What we are building next",
+      lead: "A direction, not a delivery schedule. None of it is available today, and the order is decided with the pilot practitioners rather than announced to them.",
+      columns: [
+        {
+          icon: ListChecks,
+          status: "In development",
+          title: "Now",
+          body: "The core loop, being built with the first pilot practitioners.",
+          items: [
+            "Turning a practitioner's recommendations into a plan a person can follow at home",
+            "Meal ideas and recipes that stay inside that plan",
+            "One small step at a time, at the person's own rhythm",
+            "Progress signals the practitioner can read before the next consultation",
+          ],
+        },
+        {
+          icon: Compass,
+          status: "Designed, not built",
+          title: "Next",
+          body: "Shaped with the pilot cohort, and next in line once the core loop holds.",
+          items: [
+            "Secure messaging between a practitioner and the people they support",
+            "Logging a meal from a photo, so a day is recorded in seconds rather than abandoned",
+            "Drafting a plan from consultation notes, for the practitioner to correct and approve",
+          ],
+        },
+        {
+          icon: Flag,
+          status: "On the horizon",
+          title: "Later",
+          body: "Intentions we are designing towards, with no date attached to any of them.",
+          items: [
+            "Labs and biomarkers on a timeline, read alongside the plan they informed",
+            "Wearables, where the signal is genuinely worth the noise",
+            "Clinics with several practitioners around one person, each seeing their own part",
+          ],
+        },
+      ],
+      note: "A line moving from later to next is a conversation with the pilot cohort, not a promise to the market. Ask us where any of it stands — the honest answer is easier to give than the polished one.",
     },
     steps: {
       eyebrow: "How it will work",
@@ -485,6 +536,128 @@ export const en: Content = {
       title: "Talk to the people building it",
       body: "Practitioner, future user, partner or just curious — we answer ourselves.",
       action: { href: "/contact", label: "Contact us" },
+    },
+  },
+
+  trust: {
+    meta: {
+      title: "Trust and data — GDPR, residency and the practitioner's frame",
+      description:
+        "How REMI treats health-adjacent data: GDPR by design, the intent to keep personal data in the EU, the practitioner-controlled frame as the safety model, and a plain list of what REMI never does.",
+    },
+    intro: {
+      eyebrow: "Trust and data",
+      title: "Built to be trusted with the space around a consultation",
+      lead: "REMI sits next to a clinical relationship — a practitioner's recommendations, and a person's daily life. That only works if the data question is answered before the first client is onboarded, not after.",
+      body: "This is the honest version: what is decided, what is intent, and what has not been chosen yet. Every commitment here is one you can hold us to in the pilot conversation, and none of it is a certification we do not have.",
+    },
+    status: {
+      title: "Where REMI stands today",
+      body: "REMI is pre-launch. No client data is being processed, no storage vendor is committed, and no certification has been obtained — or claimed. What follows is how the product is being designed: the commitments come first, so the architecture can be held to them.",
+    },
+    commitments: {
+      eyebrow: "GDPR by design",
+      title: "Six decisions taken before the first record exists",
+      lead: "Protection built in while the schema is still being designed is a different product from protection retrofitted after launch. REMI is built by a Belgian company, so GDPR is the floor here, not the ambition.",
+      items: [
+        {
+          icon: ShieldCheck,
+          title: "GDPR is the starting point",
+          body: "Lawful basis, purpose limitation and a person's rights over their own data are design inputs to each feature — not a checklist run once, shortly before launch.",
+          intent: "primary",
+        },
+        {
+          icon: Lock,
+          title: "Collect less than we could",
+          body: "Only what the accompaniment actually needs. A field that would be interesting to have, but is not needed to help someone, does not get collected.",
+          intent: "neutral",
+        },
+        {
+          icon: KeyRound,
+          title: "Access follows the care relationship",
+          body: "A practitioner sees the people they support, and nobody else. Access is scoped to the relationship that justifies it, and ends when that relationship does.",
+          intent: "info",
+        },
+        {
+          icon: ShieldOff,
+          title: "Never sold, never a training set",
+          body: "Personal data is not sold, not traded, and not used to train models that serve anyone but the person it belongs to. That is a product decision, not a setting.",
+          intent: "success",
+        },
+        {
+          icon: ScrollText,
+          title: "Written down, not assumed",
+          body: "What is stored, why, for how long and who processes it — recorded as it is built. Sub-processors get named: a vendor we cannot describe is a vendor we do not use.",
+          intent: "info",
+        },
+        {
+          icon: Stethoscope,
+          title: "Clinical data stays clinical",
+          body: "REMI is not the medical record. Diagnoses, prescriptions and clinical history stay in the practitioner's own system; REMI works from the recommendations that come out of it.",
+          intent: "primary",
+        },
+      ],
+    },
+    residency: {
+      eyebrow: "Data residency",
+      title: "The intent: personal data stays in the EU",
+      lead: "No storage vendor is committed yet. That is deliberate — and it is exactly why residency can still be a selection criterion rather than a migration project.",
+      items: [
+        "Personal data hosted in the EU, with a Belgian or other EU region as the default for the pilot",
+        "Storage is a seam in the codebase rather than a vendor lock-in — choosing a provider means writing one adapter, so residency stays a decision we can make on the merits",
+        "Any processing that would leave the EU — an AI provider, for instance — named, documented and justified before it happens, never discovered afterwards",
+        "Where a transfer is unavoidable, the safeguards GDPR requires, written into the record rather than into a footnote",
+      ],
+      note: "This is intent, and worth what a written intent is worth. When the vendor is chosen, this section gets a name, a region and a date — and if the answer turns out differently, this page changes rather than quietly staying the same.",
+    },
+    frame: {
+      eyebrow: "The safety model",
+      title: "The practitioner's frame is the safety mechanism",
+      lead: "The usual answer to a health AI's safety question is a longer filter list. Ours is structural: REMI holds no clinical opinion of its own, and everything it says has to sit inside a frame the practitioner set.",
+      items: [
+        {
+          title: "The practitioner sets the frame",
+          body: "What may be suggested, what must be avoided, and for whom. The frame comes out of the consultation, belongs to the practitioner, and can be tightened at any moment.",
+        },
+        {
+          title: "REMI works strictly inside it",
+          body: "Meals, steps and encouragement are generated within the frame. Outside it, REMI does not improvise: it says that it cannot, and points back to the practitioner.",
+        },
+        {
+          title: "Anything clinical goes back to the human",
+          body: "A symptom, a medication question, something that has changed — REMI routes it to the practitioner instead of answering it. And what REMI has suggested stays visible to the practitioner, so it can be corrected rather than discovered.",
+        },
+      ],
+    },
+    never: {
+      eyebrow: "The limits",
+      title: "What REMI never does",
+      lead: "Product boundaries, not caveats buried in a terms page. If a feature would blur one of these lines it does not get built — and the same commitment sits at the bottom of every page on this site.",
+      items: [
+        "Never diagnoses. REMI forms no clinical opinion and offers none.",
+        "Never treats or prescribes. No dosages, no supplements of its own initiative, no change to anything a practitioner or doctor has set.",
+        "Never replaces professional care. It is a wellness companion between consultations, built to send people back to their practitioner rather than to keep them in an app.",
+        "Never invents its own programme. Without a practitioner's recommendations behind it, there is no plan for REMI to support.",
+        "Never turns a person's data into someone else's product. Not sold, not traded, not a training set.",
+      ],
+    },
+    questions: {
+      eyebrow: "Questions we welcome",
+      title: "The questions that make this conversation useful",
+      lead: "These are what practitioners, clinics and legal teams ask, and not one of them is unwelcome. Where the answer is not decided yet, you get “not decided” and the reason — not a reassuring sentence.",
+      items: [
+        "Where exactly will our patients' data live, and under whose control?",
+        "What is sent to an AI model, to which provider, and what is deliberately kept out of it?",
+        "Is REMI a medical device — and what would push it into that category?",
+        "Can we sign a data processing agreement before a pilot starts?",
+        "Who is responsible for what, between the clinic, the practitioner and REMI?",
+        "What happens to our data if we stop — or if REMI does?",
+      ],
+    },
+    cta: {
+      title: "Ask us the hard one first",
+      body: "The data question is easier to answer before a pilot than during one. Bring your DPO, your legal counsel, or your own list.",
+      action: { href: "/contact", label: "Put a question to us" },
     },
   },
 
