@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { UserPlus } from "lucide-react";
-import { formatDate, type Locale, type Person } from "@remi/services/shared";
+import { formatDate, type Person } from "@remi/services/shared";
 import {
   Badge,
   EmptyState,
@@ -16,15 +16,14 @@ import {
 import { getSession } from "@/lib/auth/session";
 import { getContent } from "@/lib/content";
 import { listClients } from "@/lib/queries/clients";
-
-type Params = { locale: Locale };
+import { resolveLocale, type LocaleParams } from "@/lib/locale-params";
 
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<Params>;
+  params: Promise<LocaleParams>;
 }): Promise<Metadata> => {
-  const { locale } = await params;
+  const locale = await resolveLocale(params);
   return { title: getContent(locale).clients.title };
 };
 
@@ -45,8 +44,8 @@ const readinessVariant = {
  * The first screen wired end to end through the query seam — proof that a page
  * reads the domain shape and never the storage behind it.
  */
-const Page = async ({ params }: { params: Promise<Params> }) => {
-  const { locale } = await params;
+const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
+  const locale = await resolveLocale(params);
   const session = await getSession();
   if (!session) {
     notFound();
