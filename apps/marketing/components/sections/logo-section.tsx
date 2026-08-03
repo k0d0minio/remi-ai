@@ -4,7 +4,7 @@ import { logos } from "@/lib/content/landing";
 
 /**
  * PLACEHOLDER. None of the names in lib/content/landing.ts has any relationship
- * with Remi. Replace them with real ones or delete this section — an implied
+ * with REMI. Replace them with real ones or delete this section — an implied
  * endorsement that does not exist is a claim, and a false one.
  *
  * The marquee's static fallback renders every name in the HTML, so this is

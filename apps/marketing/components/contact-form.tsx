@@ -97,7 +97,7 @@ export const ContactForm = () => {
             className="mt-0.5"
           />
           <Typography as="label" htmlFor="consent" size="sm">
-            I agree that Remi may store this message in order to reply to it.
+            I agree that REMI may store this message in order to reply to it.
           </Typography>
         </div>
         {state.errors?.consent ? (

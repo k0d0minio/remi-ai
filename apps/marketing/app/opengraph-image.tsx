@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { BRAND_COLORS, BRAND_NAME, BRAND_TAGLINE } from "@remi/ui/server";
+import { hero } from "@/lib/content/landing";
 
 /**
  * The social card, generated at build time by file convention — every route
@@ -40,19 +41,21 @@ const Image = () =>
           gap: 24,
         }}
       >
-        <div style={{ display: "flex", fontSize: 68, lineHeight: 1.1 }}>
-          Know what you eat.
-        </div>
-        <div
-          style={{
-            display: "flex",
-            fontSize: 68,
-            lineHeight: 1.1,
-            color: BRAND_COLORS.brandOnDark,
-          }}
-        >
-          Understand what it does.
-        </div>
+        {hero.titleLines.map((line, index) => (
+          <div
+            key={line}
+            style={{
+              display: "flex",
+              fontSize: 68,
+              lineHeight: 1.1,
+              // The second line carries the brand colour — it is the half of the
+              // sentence the page is actually about.
+              ...(index > 0 ? { color: BRAND_COLORS.brandOnDark } : {}),
+            }}
+          >
+            {line}
+          </div>
+        ))}
       </div>
 
       <div style={{ display: "flex", fontSize: 26, opacity: 0.7 }}>

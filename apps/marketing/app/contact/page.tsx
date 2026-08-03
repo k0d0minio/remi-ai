@@ -5,7 +5,7 @@ import { buildMetadata } from "@/lib/metadata";
 export const metadata = buildMetadata({
   title: "Contact",
   description:
-    "Questions about Remi, clinical partnerships, or getting early access — send us a message.",
+    "Questions about REMI, practitioner partnerships, or getting early access — send us a message.",
   path: "/contact",
 });
 

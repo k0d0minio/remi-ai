@@ -7,12 +7,12 @@ import { LogoSection } from "@/components/sections/logo-section";
 import { PricingSection } from "@/components/sections/pricing-section";
 import { StatsSection } from "@/components/sections/stats-section";
 import { TestimonialsSection } from "@/components/sections/testimonials-section";
+import { hero } from "@/lib/content/landing";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata = buildMetadata({
-  title: "Nutrition tracking with clinical reasoning behind it",
-  description:
-    "Remi turns an everyday food log into structured nutritional insight, reviewed against clinical guidance — so the advice you act on has a reason behind it.",
+  title: "The wellness copilot between consultations",
+  description: hero.subtitle,
   path: "/",
 });
 
