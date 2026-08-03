@@ -7,15 +7,16 @@ import { LocaleSwitcher as LocaleSwitcherNav } from "@remi/ui/server";
 
 type Props = {
   locale: Locale;
+  label: string;
 };
 
 /**
- * EN | FR, preserving the current path. A client component only because it
- * needs `usePathname` to know where the visitor is — the switcher itself is a
- * server-safe primitive in @remi/ui, shared with the help centre, so this file
- * is the whole of the client cost.
+ * EN | FR, preserving the current path — someone halfway through an answer
+ * should get the same answer in the other language, not the home page. A client
+ * component only because it needs `usePathname`; the switcher itself is a
+ * server-safe primitive in @remi/ui.
  */
-export const LocaleSwitcher = ({ locale }: Props) => {
+export const LocaleSwitcher = ({ locale, label }: Props) => {
   const pathname = usePathname();
   const rest = pathname.replace(/^\/(en|fr)(?=\/|$)/, "");
 
@@ -25,7 +26,7 @@ export const LocaleSwitcher = ({ locale }: Props) => {
       locales={locales}
       current={locale}
       hrefFor={(target) => `/${target}${rest}`}
-      label="Language"
+      label={label}
     />
   );
 };

@@ -6,7 +6,7 @@ so nothing is stated in two places that can disagree.
 
 ## Project context
 
-Remi AI is an AI product built as a Turborepo monorepo: five Next.js apps sharing two packages — a
+Remi AI is an AI product built as a Turborepo monorepo: six Next.js apps sharing two packages — a
 design system and a services layer. The services layer defines **seams**, not integrations: storage,
 email and AI each have an interface and a registration point, and no vendor is committed yet.
 Choosing one later means writing one adapter, not rewriting the callers.
@@ -19,6 +19,7 @@ apps/
   marketing/    the public site — unauthenticated, indexable (:3001)
   admin/        internal operations — operator-only, separate deployment (:3002)
   docs/         the reference site — Nextra (:3003)
+  support/      the public help centre — unauthenticated, indexable (:3004)
   demo/         the Design stage's prototype sandbox — mock data only (:3005)
 packages/
   ui/           @remi/ui — the design system; the only home for primitives
@@ -50,7 +51,7 @@ Storage, auth, email and AI are deliberately absent: see `packages/services/AGEN
 pnpm install
 pnpm packages:build     # @remi/ui + @remi/services — needed before any app compiles
 pnpm dev                # every app (builds packages first)
-pnpm web:dev            # one app — also admin:dev / marketing:dev / docs:dev / demo:dev
+pnpm web:dev            # one app — also admin:dev / marketing:dev / docs:dev / support:dev / demo:dev
 pnpm packages:dev       # rebuild the packages on change, alongside an app
 ```
 
