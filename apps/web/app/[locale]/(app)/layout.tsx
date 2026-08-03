@@ -11,6 +11,10 @@ import { resolveLocale, type LocaleParams } from "@/lib/locale-params";
  * The auth boundary. Every signed-in route is inside this group, so the session
  * is resolved once here rather than page by page — a route that forgets to check
  * cannot exist, because there is nowhere for it to live outside the group.
+ *
+ * The signed-out redirect targets `/[locale]`, which is the entry screen and the
+ * one page outside this group. Anything inside it would come straight back
+ * through this layout and loop.
  */
 const AppLayout = async ({
   children,

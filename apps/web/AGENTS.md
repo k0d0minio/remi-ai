@@ -13,6 +13,7 @@ would be visible to a customer, it lands here.
 ```text
 app/[locale]/       every page ships in en and fr; `[locale]/layout.tsx` IS the
                     root layout — there is no app/layout.tsx
+  page.tsx          the entry screen — the only route outside the auth boundary
   (app)/            signed-in routes — the route group carries the auth boundary
     (practitioner)/ the console: clients, practice, therapeutic frame
     (person)/       the daily surface: today, meals, steps, plan
@@ -30,8 +31,11 @@ proxy.ts            redirects bare paths to the visitor's language
 ```
 
 The two route groups add no URL segment, so the paths stay `/en/clients` and `/en/today`. Neither
-group may hold a root `page.tsx` — they would collide on `/[locale]`; `(app)/page.tsx` redirects by
-role instead.
+group may hold a root `page.tsx` — it would collide with the entry screen at `/[locale]`, which
+owns that path and redirects a visitor who already has a session to their role's landing route.
+
+`(app)/layout.tsx` redirects a null session to `/[locale]`. That target has to stay outside the
+group: anything inside it comes back through the same layout and loops.
 
 `components/` holds composition. The moment a component renders purely from props and a second app
 could use it, it belongs in `packages/ui` — copying it into another app is forbidden.
