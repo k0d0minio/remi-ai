@@ -79,6 +79,70 @@ export const fr: Content = {
       body: "Votre praticien n'a pas encore publié de plan. Il apparaîtra ici après votre prochaine consultation.",
     },
   },
+  plan: {
+    title: "Mon plan",
+    lead: "Ce que votre praticien a recommandé, en mots sur lesquels agir.",
+    consultationOn: "consultation du",
+    nextReview: "Revoir le",
+    categories: {
+      nutrition: "Nutrition",
+      habit: "Habitude",
+      supplement: "Complément",
+      activity: "Activité",
+      monitoring: "Suivi",
+    },
+    disclaimer: {
+      title: "Votre praticien reste la référence",
+      body: "REMI applique ces recommandations au quotidien. Il ne pose pas de diagnostic et ne remplace pas une consultation — tout ce qui est clinique appartient à votre praticien.",
+    },
+    empty: {
+      title: "Pas encore de plan",
+      body: "Votre praticien n'a pas encore publié de plan pour vous. Il apparaîtra ici dès qu'il l'aura fait.",
+    },
+  },
+  meals: {
+    title: "Repas",
+    lead: "Des idées qui suivent votre plan, adaptées à vos goûts, votre temps et ce que vous avez en cuisine.",
+    tabs: {
+      week: "La semaine",
+      shopping: "Liste de courses",
+    },
+    slots: {
+      breakfast: "petit-déjeuner",
+      lunch: "déjeuner",
+      dinner: "dîner",
+      snack: "collation",
+    },
+    minutes: "min",
+    servings: "portions",
+    because: "Parce que votre praticien a recommandé",
+    details: "Ingrédients et préparation",
+    shopping: {
+      title: "Avant les courses",
+      body: "Rangée comme le magasin, pas comme les recettes.",
+    },
+    empty: {
+      title: "Pas encore de repas",
+      body: "Les idées de repas apparaîtront ici une fois que votre praticien aura publié un plan.",
+    },
+  },
+  steps: {
+    title: "Vos étapes",
+    lead: "Une seule à la fois. La suivante attend que celle-ci tienne.",
+    held: "Étapes tenues",
+    progressLabel: "Progression :",
+    days: "jours",
+    status: {
+      upcoming: "À venir",
+      current: "En cours",
+      done: "Tenue",
+      skipped: "Passée",
+    },
+    empty: {
+      title: "Pas encore d'étapes",
+      body: "Vos étapes apparaîtront ici une fois que votre praticien aura publié un plan.",
+    },
+  },
   placeholders: {
     practice: {
       title: "Ma pratique",
@@ -87,18 +151,6 @@ export const fr: Content = {
     frame: {
       title: "Cadre thérapeutique",
       body: "Les préceptes dans lesquels REMI génère : ce qu'il faut privilégier, ce qui est exclu, et jusqu'où une suggestion peut aller.",
-    },
-    meals: {
-      title: "Repas",
-      body: "Des idées de repas et des recettes qui suivent votre plan, adaptées à vos goûts, votre quotidien et vos contraintes.",
-    },
-    steps: {
-      title: "Étapes",
-      body: "Vos petits pas dans l'ordre — celui en cours, ceux déjà tenus, et ce qui vient ensuite.",
-    },
-    plan: {
-      title: "Mon plan",
-      body: "Les recommandations de votre praticien, en mots sur lesquels agir. Il ou elle reste la référence.",
     },
   },
   prototypeNote: {
