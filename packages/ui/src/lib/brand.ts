@@ -14,10 +14,18 @@ export const BRAND_NAME = "REMI";
 /** The company. © lines and legal text only — never a heading. */
 export const BRAND_LEGAL_NAME = "Remi AI";
 
-/** The canonical one-liner. Marketing copy quotes it; nothing paraphrases it. */
+/**
+ * The canonical one-liner, in both languages the product ships in. Marketing
+ * copy quotes it; nothing paraphrases it.
+ *
+ * The French is not a translation of the English — it is the line the francophone
+ * copy was written in, and `apps/marketing/lib/content/fr.ts` is where it came
+ * from. Translating the English afresh would produce a second, slightly different
+ * French tagline, which is the exact thing this module exists to prevent.
+ */
 export const BRAND_TAGLINE = {
   en: "The wellness copilot that extends a practitioner's guidance between consultations.",
-  fr: "Le copilote bien-être qui prolonge les conseils du praticien entre les consultations.",
+  fr: "Le copilote bien-être qui prolonge l'accompagnement du praticien entre deux consultations.",
 } as const;
 
 /**

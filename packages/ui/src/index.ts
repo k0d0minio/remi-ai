@@ -27,6 +27,34 @@ export { Avatar, AvatarFallback, AvatarImage } from "./components/avatar";
 export { Button, buttonVariants } from "./components/button";
 export { Checkbox } from "./components/checkbox";
 export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./components/dialog";
+export {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./components/dropdown-menu";
+export {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from "./components/select";
+export {
   Sheet,
   SheetClose,
   SheetContent,

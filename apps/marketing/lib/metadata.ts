@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { localePath, type Locale } from "@remi/services/shared";
 import { BRAND_NAME } from "@remi/ui/server";
 
 /**
@@ -19,35 +20,50 @@ export const siteUrl =
  */
 export const siteName = BRAND_NAME;
 
+const ogLocale: Record<Locale, string> = { en: "en_GB", fr: "fr_BE" };
+
 type Options = {
   title: string;
   description: string;
-  /** Route path, leading slash included. "/" for the landing page. */
+  /** Route path WITHOUT the locale prefix, leading slash included. "/" for home. */
   path: string;
+  locale: Locale;
 };
 
 /**
- * Per-route metadata with the canonical URL derived rather than retyped.
+ * Per-route metadata with the canonical and hreflang URLs derived rather than
+ * retyped. Every page is published twice — /en/... and /fr/... — and the
+ * `languages` alternates are what tell search engines the two are the same
+ * page, not duplicates. `x-default` points at English, the fallback the proxy
+ * also uses.
  *
  * apps/marketing/AGENTS.md treats a route with no metadata as incomplete, so
- * every page goes through this. The OG image is supplied by the
- * app/opengraph-image.tsx file convention and inherited automatically — it does
- * not need naming here.
+ * every page goes through this. The OG image comes from the
+ * app/[locale]/opengraph-image.tsx file convention and is inherited
+ * automatically — it does not need naming here.
  */
 export const buildMetadata = ({
   title,
   description,
   path,
+  locale,
 }: Options): Metadata => ({
   title,
   description,
-  alternates: { canonical: path },
+  alternates: {
+    canonical: localePath(locale, path),
+    languages: {
+      en: localePath("en", path),
+      fr: localePath("fr", path),
+      "x-default": localePath("en", path),
+    },
+  },
   openGraph: {
     title: `${title} · ${siteName}`,
     description,
-    url: path,
+    url: localePath(locale, path),
     siteName,
-    locale: "en_GB",
+    locale: ogLocale[locale],
     type: "website",
   },
   twitter: {

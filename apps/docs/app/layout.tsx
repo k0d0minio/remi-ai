@@ -1,4 +1,5 @@
 import { Footer, Layout, Navbar } from "nextra-theme-docs";
+import type { ReactNode } from "react";
 import { Head } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
 import "nextra-theme-docs/style.css";
@@ -18,7 +19,7 @@ export const metadata = {
   description: `How ${brandName} works — business direction and technical reference.`,
 };
 
-const RootLayout = async ({ children }: { children: React.ReactNode }) => (
+const RootLayout = async ({ children }: { children: ReactNode }) => (
   <html lang="en" dir="ltr" suppressHydrationWarning>
     <Head />
     <body>

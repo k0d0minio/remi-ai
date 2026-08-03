@@ -7,12 +7,5 @@
  * importing it can never pull a Node-only module into a client bundle.
  */
 
-export type {
-  Actor,
-  Entity,
-  Id,
-  Page,
-  PageQuery,
-  Timestamped,
-} from "./types";
+export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "./types";
 export type { Result, ServiceErrorCode } from "./shared/result";
