@@ -40,6 +40,22 @@ export type Content = {
     language: string;
     signOut: string;
   };
+  signIn: {
+    /** Sits above the display headline on the brand panel. */
+    eyebrow: string;
+    /** The display headline. The sentence under it is the brand tagline. */
+    headline: string;
+    title: string;
+    lead: string;
+    email: string;
+    emailPlaceholder: string;
+    password: string;
+    /** The role picker — a dev affordance, so both surfaces stay reachable. */
+    roleLegend: string;
+    roleHint: string;
+    submit: string;
+    pilotNote: string;
+  };
   practitionerNav: NavItem[];
   personNav: NavItem[];
   clients: {
