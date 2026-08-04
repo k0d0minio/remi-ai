@@ -18,9 +18,10 @@ knowledge lives under `app/business/`, technical reference under `app/technical/
 - `initiatives/` — the strategy a feature ladders up to, and the current objectives
 - `roles/` — who the product serves, what each role sees, and what they can change
 
-Both are **stubs today.** A stage that needs one and finds it empty should say so in its output
-rather than inventing the content — an unwritten strategy is a real finding, not a blocker to route
-around.
+Both are written. Quote them rather than paraphrasing — Ship takes its initiative tie-in verbatim
+from `initiatives/`, and a spec that contradicts `roles/` contradicts a documented decision right,
+not an opinion. Where a page says a thing is not decided, that is the answer; a stage does not fill
+the gap by inventing one.
 
 ### Technical reference — `apps/docs/app/technical/`
 
