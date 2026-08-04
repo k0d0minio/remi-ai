@@ -25,6 +25,7 @@ in one person's head.
 | `NEXT_PUBLIC_MARKETING_URL` | Public site URL — cross-app links               | Vercel    | yes     |
 | `NEXT_PUBLIC_SUPPORT_URL`   | Help centre URL — its own canonical + sitemap   | Vercel    | yes     |
 | `NEXT_PUBLIC_DOCS_URL`      | Docs site URL — cross-app links                 | Vercel    | yes     |
+| `NEXT_PUBLIC_SUPPORT_URL`   | Support centre URL — footer link, dev `:3004`   | Vercel    | yes     |
 
 ## Storage
 

@@ -6,6 +6,7 @@ import { FaqSection } from "@/components/sections/faq-section";
 import { FeatureSection } from "@/components/sections/feature-section";
 import { HeroSection } from "@/components/sections/hero-section";
 import { PartnershipSection } from "@/components/sections/partnership-section";
+import { RoadmapSection } from "@/components/sections/roadmap-section";
 import { StatsSection } from "@/components/sections/stats-section";
 import { StepsSection } from "@/components/sections/steps-section";
 import { getContent } from "@/lib/content";
@@ -46,7 +47,8 @@ const Page = async ({ params }: { params: Promise<Params> }) => {
         tone="muted"
       />
       <FeatureSection content={content.vision} id="vision" />
-      <PartnershipSection content={content.partnership} tone="muted" />
+      <RoadmapSection content={content.roadmap} tone="muted" />
+      <PartnershipSection content={content.partnership} />
       <FaqSection
         eyebrow={content.faq.eyebrow}
         title={content.faq.title}

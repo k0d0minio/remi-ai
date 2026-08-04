@@ -42,7 +42,8 @@ components/   sections and blocks composed from @remi/ui, prop-driven so both
               locales share them
 lib/content/  one dictionary per locale (`en.ts`, `fr.ts`), typed by `types.ts`
               so a missing translation is a type error
-lib/          metadata helpers
+lib/          metadata helpers; `urls.ts` for the apps this site links to but
+              does not serve — an env var per app, with a dev-port fallback
 public/       static assets
 proxy.ts      redirects bare paths to the visitor's language
 ```
