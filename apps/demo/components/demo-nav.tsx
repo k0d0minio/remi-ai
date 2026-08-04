@@ -1,12 +1,14 @@
 "use client";
 
 import {
+  Camera,
   ChefHat,
   Footprints,
   LayoutDashboard,
   MessageCircle,
   MessagesSquare,
   NotebookPen,
+  Sparkles,
   Stethoscope,
   Sun,
   Users,
@@ -47,12 +49,19 @@ const practitionerItems: Item[] = [
 
 const personItems: Item[] = [
   { href: "/person", label: "Aujourd'hui", icon: Sun },
+  { href: "/person/journal", label: "Journal", icon: Camera, upcoming: true },
   { href: "/person/meals", label: "Repas", icon: ChefHat },
   { href: "/person/steps", label: "Étapes", icon: Footprints },
   {
     href: "/person/messages",
     label: "Mes messages",
     icon: MessageCircle,
+    upcoming: true,
+  },
+  {
+    href: "/person/recap",
+    label: "Mon bilan",
+    icon: Sparkles,
     upcoming: true,
   },
   { href: "/person/plan", label: "Mon plan", icon: NotebookPen },
