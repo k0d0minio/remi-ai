@@ -203,3 +203,125 @@ export type Recap = {
   adherenceDelta: number;
   closing: string;
 };
+
+/**
+ * The design system's intent vocabulary, spelled locally so a fixture can carry
+ * the intent a row renders with instead of every screen re-deriving it from a
+ * threshold. The names are `@remi/ui`'s — `success | warning | error | info |
+ * neutral` — because a demo that invents a sixth intent is a demo drifting.
+ */
+export type Intent = "success" | "warning" | "error" | "info" | "neutral";
+
+export type TrendPoint = {
+  /** Read out in the point's tooltip and in the table view under the chart. */
+  label: string;
+  value: number;
+};
+
+export type CohortWeek = {
+  id: string;
+  /** The axis label — abbreviated, because eight sit side by side. */
+  label: string;
+  /** The whole week, for the tooltip and the table view. */
+  range: string;
+  /** Share of the cohort's planned step-days actually applied that week. */
+  adherence: number;
+};
+
+export type EngagementLevel =
+  "very-engaged" | "regular" | "irregular" | "dropped" | "pending";
+
+export type EngagementBand = {
+  level: EngagementLevel;
+  label: string;
+  /** The rule that puts someone in the band, shown so a bar can be audited. */
+  criterion: string;
+  count: number;
+  intent: Intent;
+};
+
+export type SuggestedAction = {
+  label: string;
+  /** Why this action rather than another — never "l'IA a décidé". */
+  why: string;
+  /** Where the action starts. A suggestion nobody can act on is a decoration. */
+  href: string;
+};
+
+export type AtRiskClient = {
+  /** The `Client` id when the roster holds them — the cohort is wider than it. */
+  clientId: string | null;
+  name: string;
+  initials: string;
+  adherence: number;
+  /** Change in points across the eight weeks. Negative — that is the point. */
+  delta: number;
+  lastActive: string;
+  /** The band they land in, spelled as `engagementBands` spells it. */
+  band: string;
+  /** Narrower than `Intent` on purpose: nobody is on this list to be praised. */
+  intent: Extract<Intent, "warning" | "error">;
+  trend: TrendPoint[];
+  /** What the cohort read shows, one line per signal. */
+  reasons: string[];
+  action: SuggestedAction;
+};
+
+export type ImpactStat = {
+  id: string;
+  label: string;
+  value: string;
+  /** The signed change, with the intent its direction carries here. */
+  delta: { text: string; intent: Intent } | null;
+  /** What the figure is measured against. A number without it is a claim. */
+  detail: string;
+};
+
+export type LabPanel = {
+  id: string;
+  /** The column header — abbreviated, because three sit side by side. */
+  label: string;
+  date: string;
+  lab: string;
+};
+
+export type BiomarkerStatus = "in-range" | "below" | "above";
+
+/** Which way it moved is not the same question as whether that is good news. */
+export type BiomarkerReading = "improving" | "stable" | "worsening";
+
+export type Biomarker = {
+  id: string;
+  name: string;
+  unit: string;
+  /** One value per panel, in `labPanels` order. */
+  values: number[];
+  /** Written as the lab writes it — an interval, a ceiling, or a floor. */
+  range: string;
+  status: BiomarkerStatus;
+  reading: BiomarkerReading;
+};
+
+export type ResultDrivenStep = {
+  id: string;
+  /** The marker that motivated the step, spelled as the table above spells it. */
+  marker: string;
+  /** The measurement itself, with the panel it came from. */
+  measured: string;
+  /** The `Step` it became, spelled as `steps.ts` spells it — the thread back. */
+  step: string;
+  /** The practitioner's reasoning, in their words. */
+  rationale: string;
+};
+
+/**
+ * A line of a genetic report. The field names are the domain model's
+ * (`GenotypeMarker` in `packages/services/src/db/models/person.ts`) so the two
+ * vocabularies do not drift — but the type is declared here, because the demo is
+ * lint-blocked from `@remi/services` and that guard stays.
+ */
+export type GenotypeMarker = {
+  gene: string;
+  variant: string;
+  note: string;
+};
