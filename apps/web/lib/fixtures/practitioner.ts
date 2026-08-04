@@ -31,21 +31,36 @@ export const frame: TherapeuticFrame = {
       title: "Causes before symptoms",
       detail:
         "A suggestion addresses what is driving the problem, not the discomfort it produces.",
+      active: true,
     },
     {
       id: "prin_progressive",
       title: "One change at a time",
       detail:
         "Never more than one new habit in flight. A second waits until the first holds.",
+      active: true,
     },
     {
       id: "prin_terrain",
       title: "Start from the gut",
       detail:
         "Digestive terrain comes first; the rest of the plan is built on top of it.",
+      active: true,
+    },
+    {
+      id: "prin_fasting",
+      title: "Intermittent fasting",
+      detail:
+        "Off: kept for people whose digestive terrain has already settled.",
+      active: false,
     },
   ],
-  excluded: ["Industrial seed oils", "Gluten-containing grains", "Cow's milk"],
+  excluded: [
+    "Industrial seed oils",
+    "Gluten-containing grains",
+    "Cow's milk",
+    "Artificial sweeteners",
+  ],
   emphasised: [
     "Fermented foods",
     "Oily fish",

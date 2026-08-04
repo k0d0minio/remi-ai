@@ -42,9 +42,41 @@ export const en: Content = {
     { href: "/steps", icon: "steps", label: "Steps" },
     { href: "/plan", icon: "plan", label: "My plan" },
   ],
+  practice: {
+    title: "My practice",
+    lead: "What has happened since your last consultations.",
+    stats: {
+      attention: "To look at before their consultation",
+      active: "Active accompaniments",
+      adherence: "Average adherence",
+    },
+    attention: {
+      title: "What needs your attention",
+      allClients: "All clients",
+      open: "Open the file",
+      empty: {
+        title: "Nothing is stuck",
+        body: "Everyone you support has applied something since their last consultation.",
+      },
+    },
+    signals: {
+      title: "Since last time",
+      kinds: {
+        adherence: "Adherence",
+        difficulty: "Difficulty",
+        engagement: "Engagement",
+        win: "Win",
+      },
+      empty: {
+        title: "Nothing yet",
+        body: "What the people you support apply between consultations will appear here.",
+      },
+    },
+  },
   clients: {
     title: "Clients",
     lead: "The people you support, and where each of them stands between consultations.",
+    open: "Open",
     columns: {
       name: "Name",
       status: "Status",
@@ -68,6 +100,112 @@ export const en: Content = {
       title: "No clients yet",
       body: "The people you invite will appear here, with what they have applied since their last consultation.",
     },
+  },
+  clientDetail: {
+    back: "Clients",
+    lead: "Supported since {since} · next consultation {next}",
+    preparePlan: "Prepare the plan",
+    attention: "Sticking point",
+    dimensions: {
+      title: "Personalisation across five dimensions",
+      lead: "What the plan is adapted to. The second one comes from your frame, not from them.",
+      labels: {
+        genotype: "Genotype",
+        preceptes: "Your préceptes",
+        psychology: "Psychological profile",
+        habits: "Eating habits",
+        rhythm: "Daily rhythm",
+      },
+      sources: {
+        genotype: "Genetic report",
+        frame: "Therapeutic frame · {practitioner}",
+        questionnaire: "Entry questionnaire and consultations",
+        declared: "Declared by {name}",
+      },
+      points: {
+        readiness: "Readiness:",
+        motivators: "Motivated by:",
+        barriers: "Held back by:",
+        dislikes: "Dislikes:",
+        allergies: "Allergies:",
+        cooksFor: "Cooks for:",
+        cooking: "Weekday cooking:",
+        mealsOut: "Meals out a week:",
+        shoppingDay: "Shopping day:",
+      },
+      none: "None recorded",
+      minutes: "min",
+    },
+    progress: {
+      title: "Where they are",
+      stepOf: "Step {order} of {total}",
+      label: "Days applied",
+      days: "days",
+      empty: {
+        title: "No step under way",
+        body: "Publish a plan and the step they are working on appears here.",
+      },
+    },
+    signals: {
+      title: "Signals since the last consultation",
+      empty: {
+        title: "Nothing since last time",
+        body: "What they apply, and what they find hard, will appear here.",
+      },
+    },
+  },
+  planComposer: {
+    title: "From notes to a plan",
+    lead: "Consultation of {date} · {name}",
+    notes: {
+      title: "Your notes",
+      lead: "Exactly as you wrote them. REMI never edits them.",
+    },
+    structured: {
+      title: "Structured by REMI",
+      lead: "Untick anything that does not fit. Nothing unticked reaches {name}.",
+      count: "{confirmed} of {total} confirmed",
+      publish: "Publish the plan",
+    },
+    dialog: {
+      title: "Publish {name}'s plan?",
+      body: "{count} recommendations become meals and steps in their space. The previous plan is replaced.",
+      cancel: "Cancel",
+      confirm: "Publish",
+    },
+    published: {
+      title: "Plan published",
+      body: "{name} will see {count} recommendations in their space, turned into meals and steps.",
+    },
+    empty: {
+      title: "No consultation yet",
+      body: "A plan is composed from the notes of a consultation. This one has not been held yet.",
+    },
+  },
+  frame: {
+    title: "Therapeutic frame",
+    effects: {
+      title: "You set the frame, REMI works inside it",
+      points: [
+        "No recipe suggested contains an excluded food, for anyone you support.",
+        "Only one step runs at a time — REMI does not propose a second until the first holds.",
+        "The first month's suggestions are about digestion, whatever the reason for the consultation.",
+      ],
+    },
+    principles: {
+      title: "Préceptes",
+      active: "active",
+    },
+    excluded: {
+      title: "Never suggested",
+      body: "An absolute rule, for everyone you support.",
+    },
+    emphasised: {
+      title: "Favoured",
+      body: "A preference: REMI goes here first where a choice exists.",
+    },
+    add: "Add",
+    save: "Save the frame",
   },
   today: {
     title: "Today",
@@ -142,19 +280,5 @@ export const en: Content = {
       title: "No steps yet",
       body: "Your steps appear here once your practitioner has published a plan.",
     },
-  },
-  placeholders: {
-    practice: {
-      title: "Practice",
-      body: "Who needs attention before their next consultation — progress, sticking points and engagement at a glance.",
-    },
-    frame: {
-      title: "Therapeutic frame",
-      body: "The préceptes REMI generates inside: what to favour, what is excluded, and how far a suggestion may go.",
-    },
-  },
-  prototypeNote: {
-    title: "Foundation only",
-    body: "This is the app shell and its data seam. The designs for these screens are prototyped in the demo app first.",
   },
 };

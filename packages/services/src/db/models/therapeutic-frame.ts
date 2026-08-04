@@ -5,6 +5,12 @@ export type FramePrinciple = {
   id: Id;
   title: string;
   detail: string;
+  /**
+   * Whether REMI generates under this précepte today. A principle switched off
+   * is not the same as one never written: the practitioner has considered it and
+   * ruled it out for now, and the frame screen has to be able to show both.
+   */
+  active: boolean;
 };
 
 /**
