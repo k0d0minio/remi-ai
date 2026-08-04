@@ -19,7 +19,7 @@ export const en: Content = {
     label: "Support",
     homeLabel: "help centre home",
     languageLabel: "Language",
-    product: { target: "product", path: "/", label: "Go to REMI" },
+    product: { target: "web", path: "/", label: "Go to REMI" },
   },
 
   footer: {
@@ -36,7 +36,7 @@ export const en: Content = {
         label: "For practitioners",
       },
       { target: "marketing", path: "/contact", label: "Contact" },
-      { target: "product", path: "/", label: "Go to REMI" },
+      { target: "web", path: "/", label: "Go to REMI" },
     ],
     status: "Service status",
   },

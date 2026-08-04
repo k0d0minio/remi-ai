@@ -3,7 +3,7 @@
 import { Menu } from "lucide-react";
 import NextLink from "next/link";
 import { useState } from "react";
-import { localePath, type Locale } from "@remi/services/shared";
+import { appHref, localePath, type Locale } from "@remi/services/shared";
 import {
   Button,
   Sheet,
@@ -78,6 +78,14 @@ export const MobileNav = ({ locale, nav, header }: Props) => {
               <NextLink href={localePath(locale, header.cta.href)}>
                 {header.cta.label}
               </NextLink>
+            </Button>
+          </SheetClose>
+          {/* A plain anchor — the product is a separate deployment. Last in the
+              panel because it is the one action here for someone who already
+              has an account. */}
+          <SheetClose asChild>
+            <Button asChild variant="ghost">
+              <a href={appHref("web", "/", locale)}>{header.signIn}</a>
             </Button>
           </SheetClose>
         </div>

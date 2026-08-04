@@ -22,14 +22,14 @@ PR.
 
 ## Entrypoints — pick the one that matches where the code runs
 
-| Import                  | Contains                                                    | Runs on          |
-| ----------------------- | ----------------------------------------------------------- | ---------------- |
-| `@remi/services/shared` | types, the domain vocabulary, formatters, `Result`, locales | browser + server |
-| `@remi/services/server` | storage, email, AI, env — the whole Node surface            | server only      |
-| `@remi/services/db`     | the storage seam alone                                      | server only      |
-| `@remi/services/ai`     | model roles + the provider seam                             | server only      |
-| `@remi/services/email`  | the mailer seam                                             | server only      |
-| `@remi/services`        | types only — apps are lint-blocked from it                  | —                |
+| Import                  | Contains                                                          | Runs on          |
+| ----------------------- | ----------------------------------------------------------------- | ---------------- |
+| `@remi/services/shared` | types, domain vocabulary, formatters, `Result`, locales, app URLs | browser + server |
+| `@remi/services/server` | storage, email, AI, env — the whole Node surface                  | server only      |
+| `@remi/services/db`     | the storage seam alone                                            | server only      |
+| `@remi/services/ai`     | model roles + the provider seam                                   | server only      |
+| `@remi/services/email`  | the mailer seam                                                   | server only      |
+| `@remi/services`        | types only — apps are lint-blocked from it                        | —                |
 
 Adding an entrypoint means editing **two** places that must agree: `exports` in `package.json` and
 `entry` in `tsup.config.ts`.
@@ -40,6 +40,19 @@ Every server-side `process.env` read goes through `env()` / `requireEnv()` in `s
 A read anywhere else is a review blocker — the point is that a missing variable fails at boot
 naming itself, and that [`docs/ENV.md`](../../docs/ENV.md) has one file to track. New variable →
 schema entry, `docs/ENV.md` row, and `turbo.json` `globalEnv` entry, all in the same PR.
+
+`shared/links.ts` is the one carve-out, and it is not a loophole: a `NEXT_PUBLIC_*` variable is
+inlined into the browser bundle only for a literal `process.env.NAME`, so routing it through
+`env()` would leave the browser reading `undefined`. Its six reads are literal, spelled out one per
+line, and they are overrides — the file answers from its own table when they are unset.
+
+## Where the apps live
+
+`shared/links.ts` is the single catalogue of the six origins: one root domain, one subdomain per
+app, the dev ports, and which apps carry a locale prefix. Every cross-app link, `metadataBase` and
+sitemap in the repo is built from it, so moving the ecosystem to a new domain is one edit. Never
+write an origin anywhere else — a second copy is a link that silently keeps pointing at the old
+domain.
 
 ## Errors
 

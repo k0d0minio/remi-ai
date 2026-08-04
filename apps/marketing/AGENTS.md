@@ -29,7 +29,9 @@ the number comes from somewhere real, and the page says where.
 Primitives from `@remi/ui`, `cn()` from `@remi/ui/utils`, `@/*` for app-local paths.
 The locale vocabulary — `locales`, `Locale`, `isLocale`, `localePath`, `pickLocaleFromHeader` —
 comes from `@remi/services/shared`, because the product app ships in the same two languages and a
-cross-app link has to build the path this site actually serves.
+cross-app link has to build the path this site actually serves. So do `appHref()` / `appOrigin()`,
+the catalogue of where the six apps answer: this site's own `metadataBase` and every link that
+leaves it come from there, and no origin is written out in this app.
 `@remi/services/server` is available for the few server-side needs a public site has — a contact
 form submission, a newsletter signup — and nothing else. This app holds no customer data.
 

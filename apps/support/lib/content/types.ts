@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import type { AppKey } from "@remi/services/shared";
 
 /**
  * The shape every locale dictionary fills in full. One type, two files —
@@ -15,8 +16,12 @@ export type PageMeta = {
 };
 
 export type SiteLink = {
-  /** Which app the link leaves for — this site links out more than it links in. */
-  target: "marketing" | "product";
+  /**
+   * Which app the link leaves for — this site links out more than it links in.
+   * The keys are `@remi/services/shared`'s, so a destination that exists in the
+   * catalogue is spellable here and nothing else is.
+   */
+  target: AppKey;
   /** Path inside that app, locale prefix excluded. */
   path: string;
   label: string;
@@ -86,9 +91,12 @@ export type Article = {
   related?: string[];
 };
 
-/** The six surfaces the status page reports on. */
-export type ServiceId =
-  "web" | "marketing" | "support" | "docs" | "admin" | "demo";
+/**
+ * The six surfaces the status page reports on — which is every app there is, so
+ * it borrows the catalogue's keys rather than restating them and drifting the
+ * day a seventh app exists.
+ */
+export type ServiceId = AppKey;
 
 export type Content = {
   header: {

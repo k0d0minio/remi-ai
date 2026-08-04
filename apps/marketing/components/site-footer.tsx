@@ -1,5 +1,5 @@
 import NextLink from "next/link";
-import { localePath, type Locale } from "@remi/services/shared";
+import { appHref, localePath, type Locale } from "@remi/services/shared";
 import {
   BRAND_LEGAL_NAME,
   Container,
@@ -9,7 +9,6 @@ import {
   Wordmark,
 } from "@remi/ui/server";
 import { getContent } from "@/lib/content";
-import { supportUrl } from "@/lib/urls";
 
 type Props = {
   locale: Locale;
@@ -54,12 +53,24 @@ export const SiteFooter = ({ locale }: Props) => {
             >
               {content.header.contact}
             </Link>
-            {/* A plain anchor, not NextLink: the support centre is a separate
-                deployment, so it owns its own routing — including which
-                language it serves — and a client-side navigation cannot cross
-                into it. */}
-            <Link href={supportUrl} variant="muted" className="text-sm">
+            {/* Plain anchors, not NextLink: both are separate deployments, so a
+                client-side navigation cannot cross into them. The locale goes
+                with the reader — the help centre publishes the same two
+                languages under the same prefixes, so someone reading the French
+                site stays in French when they leave it. */}
+            <Link
+              href={appHref("support", "/", locale)}
+              variant="muted"
+              className="text-sm"
+            >
               {content.footer.support}
+            </Link>
+            <Link
+              href={appHref("web", "/", locale)}
+              variant="muted"
+              className="text-sm"
+            >
+              {content.footer.signIn}
             </Link>
           </nav>
         </div>

@@ -10,6 +10,11 @@ const withNextra = nextra({
 export default withNextra({
   poweredByHeader: false,
   reactStrictMode: true,
+  // The one workspace package this app takes, and not the design system: the
+  // navbar has to link back to the other five apps, and where each one answers
+  // is catalogued once in `@remi/services/shared` → `links.ts`. `@remi/ui` stays
+  // out — that is the dependency the paragraph above is about.
+  transpilePackages: ["@remi/services"],
   turbopack: {
     // Unrelated to this app's own config: Nextra 4.6 points this alias at
     // `@vercel/turbopack-next/mdx-import-source`, a Next internal that no longer

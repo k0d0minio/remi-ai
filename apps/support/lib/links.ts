@@ -1,4 +1,4 @@
-import { localePath, type Locale } from "@remi/services/shared";
+import { appHref, type Locale } from "@remi/services/shared";
 import type { SiteLink } from "@/lib/content/types";
 
 /**
@@ -7,23 +7,11 @@ import type { SiteLink } from "@/lib/content/types";
  * has to be built rather than routed — a `next/link` to "/contact" would resolve
  * against this origin and 404.
  *
- * Both variables are registered in turbo.json's globalEnv and docs/ENV.md. The
- * localhost fallbacks are for `pnpm support:dev`, where neither is set.
- */
-const marketingUrl =
-  process.env.NEXT_PUBLIC_MARKETING_URL ?? "http://localhost:3001";
-
-const productUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-
-const origins: Record<SiteLink["target"], string> = {
-  marketing: marketingUrl,
-  product: productUrl,
-};
-
-/**
- * Both destinations ship in the same two languages under the same `/en` and
- * `/fr` prefixes, so a visitor reading the French help centre stays in French
- * when they leave it.
+ * Every origin comes from `@remi/services/shared` → `links.ts`, the one place
+ * that knows where each app answers. `appHref` also knows which destinations
+ * carry a locale prefix, so a visitor reading the French help centre stays in
+ * French when they leave it, and a link to an English-only app never gains a
+ * `/fr` that app cannot serve.
  */
 export const externalHref = (locale: Locale, link: SiteLink) =>
-  `${origins[link.target]}${localePath(locale, link.path)}`;
+  appHref(link.target, link.path, locale);

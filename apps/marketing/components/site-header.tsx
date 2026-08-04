@@ -1,5 +1,5 @@
 import NextLink from "next/link";
-import { localePath, type Locale } from "@remi/services/shared";
+import { appHref, localePath, type Locale } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { BRAND_LEGAL_NAME, Container, Link, Wordmark } from "@remi/ui/server";
 import { LocaleSwitcher } from "@/components/locale-switcher";
@@ -29,8 +29,9 @@ export const SiteHeader = ({ locale }: Props) => {
           <Wordmark />
         </NextLink>
 
-        {/* Four links plus two buttons: the gap tightens at md so the row does
-            not wrap between the tablet breakpoint and a laptop width. */}
+        {/* Four links plus the buttons: the gap tightens at md so the row does
+            not wrap between the tablet breakpoint and a laptop width, which is
+            also why sign-in only joins the row at lg. */}
         <nav
           aria-label="Main"
           className="hidden items-center gap-6 md:flex lg:gap-8"
@@ -50,6 +51,13 @@ export const SiteHeader = ({ locale }: Props) => {
 
         <div className="hidden items-center gap-3 md:flex">
           <LocaleSwitcher locale={locale} />
+          {/* A plain anchor: the product is its own deployment, so the router
+              cannot navigate into it. Held back to lg because the md row is
+              already full at two buttons — between the two breakpoints the
+              footer carries the same link, and below md the mobile panel does. */}
+          <Button asChild variant="ghost" size="sm" className="hidden lg:flex">
+            <a href={appHref("web", "/", locale)}>{content.header.signIn}</a>
+          </Button>
           <Button asChild variant="ghost" size="sm">
             <NextLink href={localePath(locale, "/contact")}>
               {content.header.contact}
