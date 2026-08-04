@@ -1,3 +1,5 @@
+import type { AppKey } from "@remi/services/shared";
+
 /**
  * The console's data, standing in for reads that do not exist yet. Admin has no
  * backend, so these shapes are the contract the real queries will have to
@@ -45,6 +47,13 @@ export type AttentionItem = {
 };
 
 export type SystemApp = {
+  /**
+   * Which deployment this row is. The origin is not stored here: uptime is a
+   * stand-in figure, but where an app answers is real configuration, and it has
+   * exactly one home — `@remi/services/shared` → `links.ts`. The row carries the
+   * key and the component asks for the URL.
+   */
+  app: AppKey;
   name: string;
   description: string;
   uptime: string;
@@ -1049,32 +1058,41 @@ export const pilotTerms: PilotTerm[] = [
   },
 ];
 
+/**
+ * The other five surfaces. Admin itself is missing on purpose — an operator
+ * reading this card is already standing in it.
+ */
 export const systemApps: SystemApp[] = [
   {
+    app: "web",
     name: "Web",
     description: "The product — the signed-in surface.",
     uptime: "99.98%",
     status: { label: "operational", intent: "success" },
   },
   {
+    app: "marketing",
     name: "Marketing",
     description: "The public site.",
     uptime: "100%",
     status: { label: "operational", intent: "success" },
   },
   {
+    app: "docs",
     name: "Docs",
     description: "The reference site.",
     uptime: "100%",
     status: { label: "operational", intent: "success" },
   },
   {
+    app: "support",
     name: "Support",
     description: "Help centre and ticket intake.",
     uptime: "99.95%",
     status: { label: "operational", intent: "success" },
   },
   {
+    app: "demo",
     name: "Demo",
     description: "The prototype sandbox.",
     uptime: "99.90%",

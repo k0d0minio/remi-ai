@@ -78,6 +78,16 @@ Braces on every `if` / `else` / loop body. No `if (x) return y;` without `{ }` �
 - `cn()` comes from `@remi/ui/utils`, never from the main barrel — the barrel is `"use client"` and
   its exports cannot be called from a server component.
 
+### Links that leave the app
+
+Six apps are six deployments on six origins, so a link between them is a plain `<a>` — `next/link`
+resolves against the origin it rendered on and 404s. **Never write an origin.** Build it with
+`appHref()` / `appOrigin()` from `@remi/services/shared`, which is the single catalogue of where
+each app answers (`packages/services/src/shared/links.ts`) and the only file that knows the domain.
+It also knows which apps carry a locale prefix, so pass your locale and let it decide. A site's own
+`metadataBase` comes from the same place: the URL a site publishes itself under and the URL another
+app links it by are one fact.
+
 ### Copy and text
 
 **Sentence case everywhere** — headings, labels, buttons, badges, placeholders. Never title case.

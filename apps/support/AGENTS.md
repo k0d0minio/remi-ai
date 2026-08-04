@@ -62,8 +62,10 @@ changed. Editing an article without re-verifying it means leaving that date alon
 Inside this app — home, category, article, status — links route through `next/link`. Everything
 else leaves: the public site and the product are separate Vercel projects on their own origins, so
 a cross-app link is a plain `<a>` built by `externalHref()` in `lib/links.ts` — a `next/link` to
-`/contact` would resolve against this origin and 404. Both destinations ship in the same two
-languages, so the link carries the visitor's locale with it.
+`/contact` would resolve against this origin and 404. That helper is a thin wrapper over `appHref()`
+from `@remi/services/shared`, which is where the six origins are catalogued; nothing in this app
+spells one out. Both destinations ship in the same two languages, so the link carries the visitor's
+locale with it.
 
 There is one contact route for the whole product, on the public site. This app never grows a second
 one; a second front door quietly becomes the unread one.

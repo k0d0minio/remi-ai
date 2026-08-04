@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import { localePath, type Locale } from "@remi/services/shared";
+import { appOrigin, localePath, type Locale } from "@remi/services/shared";
 import { BRAND_NAME } from "@remi/ui/server";
 
 /**
  * The site's own origin. Needed as a real URL rather than a path because
  * `metadataBase` resolves every relative OG and canonical URL against it.
  *
- * Registered in turbo.json's globalEnv and docs/ENV.md. The localhost fallback
- * is for `pnpm support:dev`, where the variable is not set.
+ * It comes from the same catalogue as every cross-app link
+ * (`@remi/services/shared` → `links.ts`) rather than from a local literal: this
+ * site's canonical URL and the URL the marketing footer links it by are the same
+ * fact, and two copies of one fact eventually disagree.
  */
-export const siteUrl =
-  process.env.NEXT_PUBLIC_SUPPORT_URL ?? "http://localhost:3004";
+export const siteUrl = appOrigin("support");
 
 /**
  * The product name, not the company — a search result and a browser tab are
