@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Instrument_Serif } from "next/font/google";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
-import { BRAND_NAME } from "@remi/ui/server";
+import { BRAND_NAME, themeScript } from "@remi/ui/server";
 import "./globals.css";
 
 /**
@@ -26,10 +26,11 @@ const display = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: {
-    default: `${BRAND_NAME} admin`,
+    default: `${BRAND_NAME} — admin console`,
     template: `%s · ${BRAND_NAME} admin`,
   },
   description: `Internal operations for the ${BRAND_NAME} platform.`,
+  robots: { index: false, follow: false },
 };
 
 const RootLayout = ({ children }: { children: ReactNode }) => (
@@ -39,6 +40,13 @@ const RootLayout = ({ children }: { children: ReactNode }) => (
     suppressHydrationWarning
   >
     <body className="min-h-dvh antialiased">
+      {/*
+       * First child of <body> so it runs before the browser paints anything
+       * below it, which is what stops a dark-mode operator seeing a white
+       * flash. `suppressHydrationWarning` on <html> above is the other half:
+       * this script mutates the class React is about to reconcile.
+       */}
+      <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       {children}
       <Analytics />
     </body>

@@ -1,6 +1,11 @@
 import type { Content } from "./types";
 
 export const en: Content = {
+  meta: {
+    title: "The wellness copilot between consultations",
+    description:
+      "Your practitioner's recommendations, applied day to day — meals, habits and small steps.",
+  },
   shell: {
     navLabel: "Main",
     openNav: "Open navigation",
@@ -16,6 +21,8 @@ export const en: Content = {
     label: "Account menu",
     account: "Account",
     language: "Language",
+    appearance: "Appearance",
+    themes: { system: "Match system", light: "Light", dark: "Dark" },
     signOut: "Sign out",
   },
   signIn: {

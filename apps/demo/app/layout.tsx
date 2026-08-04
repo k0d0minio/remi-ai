@@ -30,10 +30,11 @@ const display = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: {
-    default: `${BRAND_NAME} demo`,
-    template: `%s · ${BRAND_NAME} demo`,
+    default: `${BRAND_NAME} — maquette`,
+    template: `%s · ${BRAND_NAME} maquette`,
   },
-  description: "Prototype sandbox — mock data only, never a real backend.",
+  description:
+    "Bac à sable de prototypage — données fictives uniquement, jamais un vrai backend.",
   robots: { index: false, follow: false },
 };
 

@@ -12,6 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  ThemeToggle,
 } from "@remi/ui";
 import type { Content } from "@/lib/content/types";
 import { setLocale, switchRole } from "@/lib/actions/session";
@@ -33,7 +34,7 @@ const localeLabels: Record<Locale, string> = {
 /**
  * The locale switch lives in here rather than as its own control: inside the
  * app, language is an account preference, not a piece of page navigation the way
- * it is on the public site.
+ * it is on the public site. Theme joins it for the same reason.
  */
 export const UserMenu = ({ name, initials, role, locale, content }: Props) => {
   const pathname = usePathname();
@@ -75,6 +76,20 @@ export const UserMenu = ({ name, initials, role, locale, content }: Props) => {
             {localeLabels[option]}
           </DropdownMenuItem>
         ))}
+
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>{content.userMenu.appearance}</DropdownMenuLabel>
+        {/*
+         * A row inside the menu rather than three items: theme is one setting
+         * with three states, and the segmented control shows which one is live
+         * without the menu having to be reopened to check.
+         */}
+        <div className="px-2 py-1">
+          <ThemeToggle
+            label={content.userMenu.appearance}
+            optionLabels={content.userMenu.themes}
+          />
+        </div>
 
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => switchRole(otherRole, locale)}>
