@@ -1,8 +1,8 @@
 # REMI — business analysis for the incoming CTO
 
-*Prepared 4 August 2026. Written for a technical reader with no business background: every business
+_Prepared 4 August 2026. Written for a technical reader with no business background: every business
 term is explained the first time it appears. Sources are linked throughout; anything that could not
-be verified is flagged. Figures marked ⚠ are estimates or come from sources of dubious quality.*
+be verified is flagged. Figures marked ⚠ are estimates or come from sources of dubious quality._
 
 ---
 
@@ -25,7 +25,7 @@ Five findings drive everything else in this document:
    ceiling is roughly €25–40M/year — shared with established, funded competitors. This can be a
    good business; it is unlikely to be a venture-scale one without expansion or a higher price.
 3. **The €2.5M valuation the founders quoted is at the very top of what is defensible.** Standard
-   pre-revenue valuation methods put REMI at roughly €1M–€3M *if raising from investors*; on an
+   pre-revenue valuation methods put REMI at roughly €1M–€3M _if raising from investors_; on an
    asset-sale basis it is worth close to nothing today. €2.5M assumes a complete team and a working
    product — neither exists without you.
 4. **The regulatory path is navigable but not optional.** GDPR health-data compliance
@@ -47,13 +47,13 @@ the entire technical execution risk is priced onto you at 5–10% of the company
 
 ## 2. What REMI actually is
 
-**The pitch.** REMI ("Reprise En Main Individualisée") is a *wellness copilot* that extends a
+**The pitch.** REMI ("Reprise En Main Individualisée") is a _wellness copilot_ that extends a
 health practitioner's guidance between consultations. A practitioner (nutritionist, dietitian,
 functional-medicine doctor) sets recommendations; REMI turns them into daily meals, habits and
 small steps for the client, and feeds progress signals back. Two sides, one loop. Clients only
 arrive through a practitioner — there is no self-serve consumer product.
 
-**The safety thesis** (and the smartest thing in the design): the *therapeutic frame*. The
+**The safety thesis** (and the smartest thing in the design): the _therapeutic frame_. The
 practitioner defines hard boundaries (excluded foods, emphasised foods, precepts) and REMI may only
 generate content inside that frame. REMI holds no clinical opinion of its own, never diagnoses,
 never treats. This is simultaneously the product's differentiator and — as Section 7 shows — its
@@ -61,27 +61,27 @@ regulatory survival strategy.
 
 **The people.**
 
-| Who | Role | Notes |
-| --- | --- | --- |
-| Morgane Paquet | Co-founder, product & nutrition | Training in naturopathy and nutritherapy |
-| Arnaud Ruelle | Co-founder, strategy & development | Entrepreneurial background |
-| Dr Georges Mouton | Partner (not founder) | Founder of the FunMedDev clinic (Liège + London), a European reference in functional medicine; signed partnership; FunMedDev patients among first pilot users |
-| You | Proposed founding CTO | ~2 days/week, unpaid until funding; author of the entire codebase to date |
+| Who               | Role                               | Notes                                                                                                                                                         |
+| ----------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Morgane Paquet    | Co-founder, product & nutrition    | Training in naturopathy and nutritherapy                                                                                                                      |
+| Arnaud Ruelle     | Co-founder, strategy & development | Entrepreneurial background                                                                                                                                    |
+| Dr Georges Mouton | Partner (not founder)              | Founder of the FunMedDev clinic (Liège + London), a European reference in functional medicine; signed partnership; FunMedDev patients among first pilot users |
+| You               | Proposed founding CTO              | ~2 days/week, unpaid until funding; author of the entire codebase to date                                                                                     |
 
 **The go-to-market.** A hand-picked founding pilot of 15 practitioners. Per the pilot agreement
 rendered in the admin app: enrolment 1 July – 31 August 2026, free during the window, then
 **€24.50/practitioner/month** (ex VAT) from 1 September 2026, month-to-month, price held for the
-founding cohort's first year. ⚠ **Important:** these terms exist only as *fixture data* (fake demo
+founding cohort's first year. ⚠ **Important:** these terms exist only as _fixture data_ (fake demo
 content) in the admin app; the public site explicitly says pricing is not decided. Whether 15 real
 practitioners have actually signed anything is unverified — see Section 8.
 
 **Revenue reality check.** If all 15 convert on 1 September: 15 × €24.50 × 12 ≈ **€4,410 of ARR**.
-(*ARR = annual recurring revenue, the yearly value of active subscriptions — the standard measure
-of a subscription business's size.*)
+(_ARR = annual recurring revenue, the yearly value of active subscriptions — the standard measure
+of a subscription business's size._)
 
 ### The technical state, honestly
 
-You know this better than anyone, but it belongs in the business analysis because it *is* the
+You know this better than anyone, but it belongs in the business analysis because it _is_ the
 business risk: the company's only asset besides the FunMedDev relationship is a codebase that is
 all front, no back.
 
@@ -114,7 +114,7 @@ all front, no back.
   acquiring practitioners must cost well under ~€270 each — why a warm channel (FunMedDev) matters
   enormously at this price point.
 - **Pre-money / post-money valuation** — company value before / after new money goes in. "5% at a
-  €2.5M valuation" means your stake is *notionally* worth €125k — on paper, illiquid, and worth €0
+  €2.5M valuation" means your stake is _notionally_ worth €125k — on paper, illiquid, and worth €0
   unless the company eventually sells or IPOs.
 - **Vesting / cliff** — equity earned over time (typically 4 years); a 12-month cliff means leaving
   before month 12 = nothing.
@@ -132,17 +132,17 @@ all front, no back.
 The buyer is the practitioner. Verified counts
 ([Belgian FOD health-workforce statistics 2024](https://www.health.belgium.be), [DREES/AFDN](https://www.afdn.org/documentation/infographie-drees-2024-nombre-dieteticiens-france), [HCPC](https://www.hcpc-uk.org/about-us/insights-and-data/the-register/), [NVD](https://nvdietist.nl/), [EFAD](https://www.efad.org/membership/)):
 
-| Market | Licensed/active dietitians | Notes |
-| --- | --- | --- |
-| Belgium | **8,442** licensed residents (2024) | Growing ~5%/yr; 91% female; half under 35 — young, digital-native. Realistically ~3,000–4,000 in active private/ambulatory practice ⚠ |
-| France | 17,369 active (2024) | Largest francophone adjacency |
-| Netherlands | ~3,500 working | Dutch-locale flag already in REMI's roadmap |
-| Germany | ~14,000 ⚠ | Fragmented titles |
-| UK | ~12,800 registered | Mostly NHS-employed |
-| Europe total | **~70,000–100,000** | Derived from EFAD coverage |
+| Market       | Licensed/active dietitians          | Notes                                                                                                                                 |
+| ------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Belgium      | **8,442** licensed residents (2024) | Growing ~5%/yr; 91% female; half under 35 — young, digital-native. Realistically ~3,000–4,000 in active private/ambulatory practice ⚠ |
+| France       | 17,369 active (2024)                | Largest francophone adjacency                                                                                                         |
+| Netherlands  | ~3,500 working                      | Dutch-locale flag already in REMI's roadmap                                                                                           |
+| Germany      | ~14,000 ⚠                           | Fragmented titles                                                                                                                     |
+| UK           | ~12,800 registered                  | Mostly NHS-employed                                                                                                                   |
+| Europe total | **~70,000–100,000**                 | Derived from EFAD coverage                                                                                                            |
 
 The functional-medicine / health-coach tier REMI also targets is real but **uncountable and
-unregulated** — IFM-certified practitioners number only in the low thousands *worldwide* ⚠. In
+unregulated** — IFM-certified practitioners number only in the low thousands _worldwide_ ⚠. In
 Belgium the credentialed pool is dietitians; the FM tier is a long tail of at most a few thousand
 across Benelux.
 
@@ -159,22 +159,22 @@ micro-businesses that will compare against Nutrium's €15–19/month annual pla
 - **Belgian policy is actively expanding reimbursed dietetics**: new/expanded RIZIV trajectories for
   childhood obesity (10 free sessions, Dec 2023), eating disorders (up to 15 sessions/yr, Feb 2024),
   and diabetes. More reimbursed sessions → more clients per practitioner → more need for tooling.
-- **The GLP-1 twist favours REMI's buyers**: Belgium *refused* to reimburse Wegovy for obesity
+- **The GLP-1 twist favours REMI's buyers**: Belgium _refused_ to reimburse Wegovy for obesity
   (June 2026), explicitly steering obesity policy toward lifestyle and dietetic care; meanwhile
   clinical guidance says GLP-1 patients need structured nutrition support most aren't getting.
 
 ### 4.3 Market size — the honest arithmetic
 
 Ignore the "$1B dietitian software market" reports; they are content-mill fiction (at REMI-like
-prices, 100% of the *world's* ~520,000 dietitians would generate only ~€170M/year). Bottom-up:
+prices, 100% of the _world's_ ~520,000 dietitians would generate only ~€170M/year). Bottom-up:
 
-| Level | Seats | ARR at €294/seat/yr |
-| --- | --- | --- |
-| Belgium TAM (every licensed dietitian) | 8,442 | **€2.5M** |
-| Belgium SAM (private practice + coach tier) ⚠ | 4,000–6,000 | €1.2–1.8M |
-| Belgium SOM, ~3 years (5–10% of SAM) | 200–500 | **€59–147k** |
-| Europe TAM (dietitians) | ~75,000 | ~€22M |
-| Europe category ceiling incl. coach/FM tier ⚠ | — | **€25–40M/yr, shared** |
+| Level                                         | Seats       | ARR at €294/seat/yr    |
+| --------------------------------------------- | ----------- | ---------------------- |
+| Belgium TAM (every licensed dietitian)        | 8,442       | **€2.5M**              |
+| Belgium SAM (private practice + coach tier) ⚠ | 4,000–6,000 | €1.2–1.8M              |
+| Belgium SOM, ~3 years (5–10% of SAM)          | 200–500     | **€59–147k**           |
+| Europe TAM (dietitians)                       | ~75,000     | ~€22M                  |
+| Europe category ceiling incl. coach/FM tier ⚠ | —           | **€25–40M/yr, shared** |
 
 **What this means:** Belgium alone supports a founder-profitable niche product, not a venture
 outcome. €1M ARR requires ~3,400 paying practitioners — more than every private-practice dietitian
@@ -188,14 +188,14 @@ monetisation, AI add-ons — incumbents charge $35/month for an AI scribe alone)
 
 The category is served, funded, and consolidating — but not where REMI stands.
 
-| Competitor | Price (solo/mo) | Scale | Funding | Relevance |
-| --- | --- | --- | --- | --- |
-| [Practice Better](https://practicebetter.io) (CA) | $35–99 | 10,000+ practitioners (2023) | ~$41M | Closest feature analogue incl. FM positioning; English-only, US/CA compliance |
-| [Healthie](https://gethealthie.com) (US) | $19–129 | 25,000+ clinicians | ~$40M | API-first EHR; US insurance-centric |
-| [Nutrium](https://nutrium.com) (PT) | **$15–49** | claims 80k+ professionals (registered ≠ paying ⚠) | ~$20M, Series A Sep 2025 | The EU price anchor and most direct threat; 7 languages |
-| SimplePractice (US) | $49–99 | ~200k practitioners | parent taken private at **$4B** | Proves the category's ceiling — for a US horizontal player |
-| [LivingMatrix](https://livingmatrix.com) (US) | $129 | 600+ FM practices | — | Proves FM practitioners pay premium prices, sold via an education channel |
-| Fullscript/Rupa (CA/US) | free (monetises supplements) | 125k providers, >$1B rev | — | North America only — this moat/model doesn't exist in the EU |
+| Competitor                                        | Price (solo/mo)              | Scale                                             | Funding                         | Relevance                                                                     |
+| ------------------------------------------------- | ---------------------------- | ------------------------------------------------- | ------------------------------- | ----------------------------------------------------------------------------- |
+| [Practice Better](https://practicebetter.io) (CA) | $35–99                       | 10,000+ practitioners (2023)                      | ~$41M                           | Closest feature analogue incl. FM positioning; English-only, US/CA compliance |
+| [Healthie](https://gethealthie.com) (US)          | $19–129                      | 25,000+ clinicians                                | ~$40M                           | API-first EHR; US insurance-centric                                           |
+| [Nutrium](https://nutrium.com) (PT)               | **$15–49**                   | claims 80k+ professionals (registered ≠ paying ⚠) | ~$20M, Series A Sep 2025        | The EU price anchor and most direct threat; 7 languages                       |
+| SimplePractice (US)                               | $49–99                       | ~200k practitioners                               | parent taken private at **$4B** | Proves the category's ceiling — for a US horizontal player                    |
+| [LivingMatrix](https://livingmatrix.com) (US)     | $129                         | 600+ FM practices                                 | —                               | Proves FM practitioners pay premium prices, sold via an education channel     |
+| Fullscript/Rupa (CA/US)                           | free (monetises supplements) | 125k providers, >$1B rev                          | —                               | North America only — this moat/model doesn't exist in the EU                  |
 
 **Four takeaways:**
 
@@ -208,14 +208,14 @@ The category is served, funded, and consolidating — but not where REMI stands.
    (RIZIV trajectory) tooling.
 3. **The real gap REMI fills:** EU-native + GDPR-first + FR/NL + functional-medicine workflow +
    a practitioner-controlled client app. That combination genuinely does not exist. Belgium
-   specifically has *no* native modern platform.
+   specifically has _no_ native modern platform.
 4. **The FunMedDev channel is the proven playbook.** LivingMatrix built 600 practices at $129/month
    by selling through the IFM education body. REMI × FunMedDev is the same motion in Europe, where
    it has no incumbent. This partnership is arguably worth more than the codebase.
 
 **Moats in this category:** client-side lock-in (once a practitioner's whole client base is on your
 portal, switching means re-onboarding every client), content libraries, and channel endorsement.
-All three favour whoever gets practitioners *and their clients* active first.
+All three favour whoever gets practitioners _and their clients_ active first.
 
 ---
 
@@ -225,17 +225,17 @@ Three lenses, in ascending order of generosity:
 
 1. **Asset/trade-sale value: ≈ €0.** Micro-SaaS under $1M ARR sells for ~2.5–4× ARR
    ([Acquire.com closed-deal data](https://blog.acquire.com/acquire-com-biannual-acquisition-multiples-report-jan-2026/)).
-   At €4.4k pilot ARR that is €10–20k. REMI's value today is entirely *option value* on the future.
+   At €4.4k pilot ARR that is €10–20k. REMI's value today is entirely _option value_ on the future.
 2. **Pre-revenue investor methods: €1M–€3M.** The Berkus method (max ~$500k per factor: idea,
    prototype, team, relationships, sales) lands at ~€0.7–1.5M — REMI scores on prototype and
    partnership, is heavily discounted on team (solo founder pair, CTO unsigned, no full-time tech)
    and sales (€0). The Scorecard method (European pre-seed median ~€5M pre-money
    ([PitchBook 2025](https://pitchbook.com/news/reports/2025-annual-european-vc-valuations-report)),
    adjusted down for team and market size) lands at ~€1.5–3M. Note Belgian/solo-founder deals sit
-   in the *bottom half* of that European distribution.
+   in the _bottom half_ of that European distribution.
 3. **The founders' number: €2.5M.** Inside the defensible band — but at its top, and the two
    factors that would justify the top (complete team, working product) are precisely what your
-   joining would supply. You are being asked to *create* the valuation used to price you.
+   joining would supply. You are being asked to _create_ the valuation used to price you.
 
 **Sanity checks from the comparables:** Nutrium, Practice Better and Healthie — the three closest
 success stories — were all founded ~2016 and took **5–9 years** to reach institutional funding; two
@@ -246,12 +246,12 @@ The base case is a long, capital-light grind through practitioner word-of-mouth 
 
 **Scenario sketch (illustrative, not prediction):**
 
-| Scenario | ~3 yr state | Company value | Your 10% (post one ~20% dilution round) |
-| --- | --- | --- | --- |
-| Bear (most likely single outcome) | Pilot fizzles or backend never ships; company idles | ~€0 | €0 |
-| Base | 300–500 BE/FR practitioners, ~€100–150k ARR, profitable-ish niche | €0.3–0.6M (micro-SaaS multiple) | €25–50k *illiquid* |
-| Bull | FunMedDev channel scales across FR/NL/UK, 2–3k seats + AI add-on ARPU, ~€1M ARR, raises properly | €4–8M | €300–650k paper |
-| Dream | Becomes the EU Practice Better; Series A+ | €20M+ | Life-changing, and ~10 years away |
+| Scenario                          | ~3 yr state                                                                                      | Company value                   | Your 10% (post one ~20% dilution round) |
+| --------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------- | --------------------------------------- |
+| Bear (most likely single outcome) | Pilot fizzles or backend never ships; company idles                                              | ~€0                             | €0                                      |
+| Base                              | 300–500 BE/FR practitioners, ~€100–150k ARR, profitable-ish niche                                | €0.3–0.6M (micro-SaaS multiple) | €25–50k _illiquid_                      |
+| Bull                              | FunMedDev channel scales across FR/NL/UK, 2–3k seats + AI add-on ARPU, ~€1M ARR, raises properly | €4–8M                           | €300–650k paper                         |
+| Dream                             | Becomes the EU Practice Better; Series A+                                                        | €20M+                           | Life-changing, and ~10 years away       |
 
 ---
 
@@ -276,16 +276,16 @@ client **explicit consent** flows are needed — an architectural decision, not 
 EU law ([MDCG 2019-11](https://health.ec.europa.eu/system/files/2020-09/md_mdcg_2019_11_guidance_en_0.pdf)):
 software intended for **treatment or alleviation of disease** is a medical device; under Rule 11
 that means **Class IIa minimum** — notified body, ISO 13485, clinical evaluation, realistically
-12–18 months and mid-six figures. Storage, communication, scheduling and *lifestyle/wellbeing* meal
+12–18 months and mid-six figures. Storage, communication, scheduling and _lifestyle/wellbeing_ meal
 planning are explicitly exempt.
 
 REMI's word "protocols" is the tripwire. The moment templates, marketing or an AI feature frame
-protocols around *named diseases* ("SIBO protocol", "insulin-resistance plan"), intended purpose
+protocols around _named diseases_ ("SIBO protocol", "insulin-resistance plan"), intended purpose
 drifts from wellness to treatment — and disclaimers don't save you; claims and UI copy decide.
 The therapeutic-frame design (practitioner authors, REMI transports) is the right defence.
 **Recommendation: make "REMI never generates or suggests condition-specific interventions; the
 practitioner authors, REMI organises and communicates" a written product constraint with your name
-on it.** It is also the AI Act firewall: high-risk AI obligations would only reach REMI *via*
+on it.** It is also the AI Act firewall: high-risk AI obligations would only reach REMI _via_
 medical-device classification (now deferred to Dec 2027/Aug 2028 by the 2026 Omnibus). The only AI
 Act duty that bites now (from 2 Aug 2026, Art. 50): disclose AI, label AI-generated content.
 
@@ -296,7 +296,7 @@ medicine widely labels it pseudoscientific. Consequences: (a) reputational conta
 functional medicine + health protocols" is a bad headline waiting for one practitioner's harmful
 advice; (b) weaker legal footing for those users (illegal-practice-of-medicine exposure is theirs,
 but the platform's ToS must firmly allocate clinical responsibility to the practitioner); (c) the
-*regulated* dietitian segment is legally safer and has RIZIV workflow hooks — but is more
+_regulated_ dietitian segment is legally safer and has RIZIV workflow hooks — but is more
 price-sensitive. Strategic fork to force with the founders: is REMI "software for nutrition
 practitioners" (defensible, larger) that FM practitioners happen to use, or "the FM platform"
 (niche, contagious)? Positioning copy should choose the former.
@@ -339,7 +339,7 @@ require CE marking — correctly deferred.
 ### 8.3 The verification list (conditions precedent — all standard, none optional)
 
 1. **Cap table and articles of association** — confirm "€50,000 invested for 50%" (this implies the
-   founders priced *themselves* at €100k post-money and are pricing *you* at €2.5M — worth an open
+   founders priced _themselves_ at €100k post-money and are pricing _you_ at €2.5M — worth an open
    conversation), confirm no hidden convertibles/SAFEs, confirm option-pool plans.
 2. **The FunMedDev agreement, in writing** — exclusivity? duration? who owns the practitioner
    relationships? what was promised to Dr Mouton (equity? revenue share?)? The channel is the
