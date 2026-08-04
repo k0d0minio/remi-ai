@@ -1,6 +1,11 @@
 import type { Content } from "./types";
 
 export const fr: Content = {
+  meta: {
+    title: "Le copilote bien-être entre deux consultations",
+    description:
+      "Les recommandations de votre praticien, appliquées au quotidien — repas, habitudes et petits pas.",
+  },
   shell: {
     navLabel: "Principale",
     openNav: "Ouvrir la navigation",
@@ -16,6 +21,8 @@ export const fr: Content = {
     label: "Menu du compte",
     account: "Compte",
     language: "Langue",
+    appearance: "Apparence",
+    themes: { system: "Selon le système", light: "Clair", dark: "Sombre" },
     signOut: "Se déconnecter",
   },
   signIn: {
