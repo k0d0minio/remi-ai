@@ -191,6 +191,9 @@ importers:
 
   apps/docs:
     dependencies:
+      '@remi/services':
+        specifier: workspace:*
+        version: link:../../packages/services
       '@vercel/analytics':
         specifier: 'catalog:'
         version: 1.6.1(next@16.2.12(@babel/core@7.29.7)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)

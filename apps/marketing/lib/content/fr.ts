@@ -39,6 +39,7 @@ export const fr: Content = {
     homeLabel: "accueil",
     contact: "Contact",
     cta: { href: "/contact", label: "Rejoindre le pilote" },
+    signIn: "Se connecter",
     menuLabel: "Menu",
   },
 
@@ -49,6 +50,7 @@ export const fr: Content = {
       "REMI aide à appliquer les recommandations d'un praticien. Il ne diagnostique pas, ne traite pas et ne remplace pas un suivi professionnel — tout ce qui est clinique relève de votre praticien.",
     navLabel: "Pied de page",
     support: "Centre d'aide",
+    signIn: "Se connecter",
   },
 
   home: {

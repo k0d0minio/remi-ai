@@ -2,14 +2,20 @@ import { Footer, Layout, Navbar } from "nextra-theme-docs";
 import type { CSSProperties, ReactNode } from "react";
 import { Head } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
+import { appHref } from "@remi/services/shared";
 import "nextra-theme-docs/style.css";
 
 /**
  * The one place in the repo that spells the brand out rather than importing it
  * from `@remi/ui/server`. next.config.ts keeps this app off the design system on
  * purpose — it is reference material, not product surface — and taking a
- * workspace dependency for two string constants would undo that for no gain.
- * The names still have to match `BRAND_NAME` / `BRAND_LEGAL_NAME`.
+ * dependency on it for two string constants would undo that for no gain. The
+ * names still have to match `BRAND_NAME` / `BRAND_LEGAL_NAME`.
+ *
+ * The origins below are the opposite case, and that is why `@remi/services` is
+ * the one workspace dependency this app does take: an origin spelled out here
+ * would be a second copy of a fact that changes for all six apps on the same
+ * day — the day the domain moves — and the copy nobody remembers to edit.
  */
 const brandName = "REMI";
 const brandLegalName = "Remi AI";
@@ -90,12 +96,42 @@ const Logo = () => (
   </span>
 );
 
+/**
+ * The way back out. This site is the only surface with no product chrome around
+ * it, so without these a reader who arrived from the app has the back button and
+ * nothing else. Plain anchors at the navbar's end — Nextra renders `children`
+ * after its own controls — and no new tab: the docs are a destination, not a
+ * popover over the thing you were doing.
+ */
+const navLinkStyle: CSSProperties = {
+  fontSize: "0.875rem",
+  whiteSpace: "nowrap",
+};
+
+const OutboundLinks = () => (
+  <>
+    <a href={appHref("web")} style={navLinkStyle}>
+      App
+    </a>
+    <a href={appHref("marketing")} style={navLinkStyle}>
+      Site
+    </a>
+    <a href={appHref("support")} style={navLinkStyle}>
+      Support
+    </a>
+  </>
+);
+
 const RootLayout = async ({ children }: { children: ReactNode }) => (
   <html lang="en" dir="ltr" suppressHydrationWarning>
     <Head />
     <body>
       <Layout
-        navbar={<Navbar logo={<Logo />} />}
+        navbar={
+          <Navbar logo={<Logo />}>
+            <OutboundLinks />
+          </Navbar>
+        }
         footer={<Footer>© {brandLegalName}</Footer>}
         pageMap={await getPageMap()}
         docsRepositoryBase="https://github.com/k0d0minio/remi-ai/tree/main/apps/docs"

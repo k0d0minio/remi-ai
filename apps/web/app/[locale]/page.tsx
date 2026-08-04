@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { localePath } from "@remi/services/shared";
+import { appHref, localePath } from "@remi/services/shared";
 import {
   BRAND_TAGLINE,
   Card,
   CardContent,
   CardFooter,
   CardHeader,
+  Link,
   Separator,
   Typography,
   Wordmark,
@@ -95,6 +96,25 @@ const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
               <Typography size="xs" tone="muted" balance>
                 {content.signIn.pilotNote}
               </Typography>
+              {/* The note above tells someone without an account that they
+                  cannot sign in; without these two, that is where they stop.
+                  Plain anchors — both are separate deployments. */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                <Link
+                  href={appHref("marketing", "/", locale)}
+                  variant="muted"
+                  className="text-xs"
+                >
+                  {content.signIn.aboutLink}
+                </Link>
+                <Link
+                  href={appHref("support", "/", locale)}
+                  variant="muted"
+                  className="text-xs"
+                >
+                  {content.signIn.helpLink}
+                </Link>
+              </div>
             </CardFooter>
           </Card>
         </div>
