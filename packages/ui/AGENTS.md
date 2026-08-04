@@ -111,3 +111,26 @@ Every app in this repo takes the first. Importing the built sheet into an app th
 Tailwind compiles Tailwind twice and doubles the CSS — that is the mistake this split exists to
 prevent. Apps never redefine a token; if a design needs a colour that isn't one, the answer is a
 new token here, not a raw palette class in the app.
+
+## Dark mode — one class, two halves
+
+`tokens.css` already carries a full `.dark` block, so switching theme is a single class on
+`<html>` and nothing else. Turning it on in an app is two imports, and both are needed:
+
+| Half          | Import            | Where it goes                          |
+| ------------- | ----------------- | -------------------------------------- |
+| `themeScript` | `@remi/ui/server` | first child of `<body>` in root layout |
+| `ThemeToggle` | `@remi/ui`        | wherever the app keeps its preferences |
+
+The script runs before first paint and reads the stored choice; the toggle writes it. They share
+`src/lib/theme.ts` — the storage key, the class name and the three state names — because one is a
+string in the HTML and the other is React, so they can agree on constants but never call each
+other. The layout's `<html>` also needs `suppressHydrationWarning`: the script mutates the class
+React is about to reconcile.
+
+Only `apps/web` and `apps/admin` opt in today. The public sites stay light because a brand page has
+one intended look, and a dark screenshot of it is not that look.
+
+An app that opts in must be token-clean first. A raw `bg-white` survives the class change untouched
+and produces white text on white — dark mode is what turns "use the semantic token" from a
+preference into a correctness rule.

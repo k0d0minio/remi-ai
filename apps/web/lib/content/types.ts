@@ -19,6 +19,7 @@ import type {
   SignalKind,
   StepStatus,
 } from "@remi/services/shared";
+import type { Theme } from "@remi/ui/server";
 
 export type NavItem = {
   /** Path without the locale prefix — the shell adds it. */
@@ -34,6 +35,17 @@ export type PlaceholderContent = {
 };
 
 export type Content = {
+  /**
+   * The root layout's metadata. Here rather than hard-coded in `layout.tsx`
+   * because the app ships in two languages and a browser tab is copy like any
+   * other — an English title over a French page is the same bug as an English
+   * button on one.
+   */
+  meta: {
+    /** Follows the brand's title convention: rendered as "REMI — <title>". */
+    title: string;
+    description: string;
+  };
   shell: {
     /** Announced to screen readers on the sidebar and the mobile panel. */
     navLabel: string;
@@ -51,6 +63,9 @@ export type Content = {
     label: string;
     account: string;
     language: string;
+    /** The theme section's heading, and a label for each of the three states. */
+    appearance: string;
+    themes: Record<Theme, string>;
     signOut: string;
   };
   signIn: {
