@@ -95,3 +95,37 @@ export type FramePrinciple = {
   detail: string;
   active: boolean;
 };
+
+export type MessageAuthor = "practitioner" | "person";
+
+export type Message = {
+  id: string;
+  author: MessageAuthor;
+  /** The day separator this message sits under, already written for display. */
+  day: string;
+  time: string;
+  body: string;
+};
+
+export type Conversation = {
+  id: string;
+  /** The `Client` this thread belongs to — the roster is the source of truth. */
+  clientId: string;
+  clientName: string;
+  /** How the practitioner addresses them in the thread — a bubble is not a row. */
+  firstName: string;
+  initials: string;
+  /** What the exchange is about, so a list of threads reads clinically. */
+  subject: string;
+  lastAt: string;
+  /** Unread from the practitioner's side. */
+  unread: number;
+  messages: Message[];
+};
+
+export type QuickReply = {
+  id: string;
+  label: string;
+  /** What the chip drops into the composer. Nothing is sent by clicking it. */
+  text: string;
+};

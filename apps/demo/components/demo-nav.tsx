@@ -4,6 +4,8 @@ import {
   ChefHat,
   Footprints,
   LayoutDashboard,
+  MessageCircle,
+  MessagesSquare,
   NotebookPen,
   Stethoscope,
   Sun,
@@ -12,12 +14,15 @@ import {
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType } from "react";
+import { Badge } from "@remi/ui/server";
 import { cn } from "@remi/ui/utils";
 
 type Item = {
   href: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
+  /** Marks a screen that is prototyped here but not yet in the product. */
+  upcoming?: boolean;
 };
 
 const practitionerItems: Item[] = [
@@ -26,6 +31,12 @@ const practitionerItems: Item[] = [
     href: "/practitioner/clients",
     label: "Personnes accompagnées",
     icon: Users,
+  },
+  {
+    href: "/practitioner/messages",
+    label: "Messagerie",
+    icon: MessagesSquare,
+    upcoming: true,
   },
   {
     href: "/practitioner/frame",
@@ -38,6 +49,12 @@ const personItems: Item[] = [
   { href: "/person", label: "Aujourd'hui", icon: Sun },
   { href: "/person/meals", label: "Repas", icon: ChefHat },
   { href: "/person/steps", label: "Étapes", icon: Footprints },
+  {
+    href: "/person/messages",
+    label: "Mes messages",
+    icon: MessageCircle,
+    upcoming: true,
+  },
   { href: "/person/plan", label: "Mon plan", icon: NotebookPen },
 ];
 
@@ -75,7 +92,17 @@ export const DemoNav = ({ onNavigate }: Props) => {
               )}
             >
               <Icon className="size-4 shrink-0" />
-              {item.label}
+              <span className="min-w-0 truncate">{item.label}</span>
+              {item.upcoming ? (
+                <Badge
+                  variant="info"
+                  tone="subtle"
+                  size="sm"
+                  className="ml-auto"
+                >
+                  à venir
+                </Badge>
+              ) : null}
             </NextLink>
           </li>
         );
