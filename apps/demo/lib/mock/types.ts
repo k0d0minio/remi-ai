@@ -129,3 +129,77 @@ export type QuickReply = {
   /** What the chip drops into the composer. Nothing is sent by clicking it. */
   text: string;
 };
+
+export type MealSlot = "petit-déjeuner" | "déjeuner" | "collation" | "dîner";
+
+/**
+ * Which styled tile stands in for the photo. The demo ships no binary images —
+ * a prototype that needs a photographer before it can be reviewed is a
+ * prototype nobody reviews — so the tile is drawn from tokens and the tone says
+ * what kind of plate it was.
+ */
+export type PhotoTone = "greens" | "protein" | "grains" | "fruit" | "sweet";
+
+/**
+ * `matches` is a tick against a recommendation; `discuss` is a question for the
+ * next consultation. Deliberately not "écart" or "erreur" — REMI does not grade
+ * a plate, it flags what the practitioner may want to look at.
+ */
+export type RecognitionVerdict = "matches" | "discuss";
+
+export type Recognition = {
+  /** Spelled as the recommendation is in `plan.ts` — the thread back. */
+  recommendation: string;
+  verdict: RecognitionVerdict;
+  detail: string;
+};
+
+export type JournalEntry = {
+  id: string;
+  /** The day separator this entry sits under, already written for display. */
+  day: string;
+  time: string;
+  slot: MealSlot;
+  photoTone: PhotoTone;
+  /** What the recognition returned, as the sentence the person reads. */
+  identified: string;
+  items: string[];
+  /** How sure the recognition is, 0–100. Always shown, never rounded away. */
+  confidence: number;
+  recognitions: Recognition[];
+  /** What she typed under the photo, when she did. */
+  note: string | null;
+};
+
+export type RecapSectionKind = "went-well" | "was-hard" | "suggestion";
+
+export type RecapSection = {
+  kind: RecapSectionKind;
+  title: string;
+  body: string;
+  points: string[];
+};
+
+export type AdherencePoint = {
+  day: string;
+  /** The axis label — abbreviated, because the sparkline is 240px wide. */
+  label: string;
+  /** Percentage of the day's plan applied. */
+  value: number;
+};
+
+export type Recap = {
+  id: string;
+  weekLabel: string;
+  preparedOn: string;
+  /** A recap is a draft until the practitioner has read it. Never auto-sent. */
+  reviewStatus: "awaiting-review" | "reviewed";
+  opening: string;
+  sections: RecapSection[];
+  adherence: AdherencePoint[];
+  /** Average of `adherence`, written out rather than recomputed per screen. */
+  adherenceAverage: number;
+  /** Change in points against the previous week — the delta on the stat tile. */
+  adherenceDelta: number;
+  closing: string;
+};
