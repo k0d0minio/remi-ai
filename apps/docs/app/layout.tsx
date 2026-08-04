@@ -69,8 +69,14 @@ const hiddenLabelStyle: CSSProperties = {
   border: 0,
 };
 
+const logoStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "baseline",
+  gap: "0.4em",
+};
+
 const Logo = () => (
-  <span style={{ display: "inline-flex", alignItems: "baseline", gap: "0.4em" }}>
+  <span style={logoStyle}>
     <span style={hiddenLabelStyle}>{brandLegalName} docs</span>
     <span aria-hidden="true" style={wordmarkStyle}>
       {brandName}
