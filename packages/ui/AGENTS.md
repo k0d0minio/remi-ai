@@ -78,6 +78,22 @@ does not begin with `"use client"`.
 5. It needs a consuming app in the same PR. A component with no consumer does not land here —
    there is no Storybook in this repo, and a story would not have counted as a consumer anyway.
 
+### When the shared part needs something only an app can supply
+
+Some chrome is identical across apps except for one value the design system cannot know — the
+current pathname, the router, a translated label. Copying the component into each app is a review
+blocker (`CONVENTIONS.md` → "Keeping the codebase lean"), so split it instead: the markup and
+classes become a pure primitive in `src/server/`, and each app keeps a thin client wrapper that
+reads the value and passes it down.
+
+`LocaleSwitcher` is the worked example. It takes `locales`, `current`, a `hrefFor(locale)` and an
+`as` for the app's router link; each app's wrapper is the four lines that call `usePathname()`. The
+switcher itself renders on the server in every app, and the client cost is the wrapper alone.
+
+The same shape covers a callback the primitive should not own: take it as a prop rather than
+reaching for the hook here, which would move the whole component to the client barrel and put it in
+every consuming page's bundle.
+
 ## Tokens — two stylesheets, one source
 
 Colour, radius, type scale, fonts, containers, elevation and motion live in `src/tokens.css`

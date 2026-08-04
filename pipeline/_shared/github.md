@@ -86,7 +86,7 @@ opens; the script stays the manual fallback.
 
 - `stage:` — exactly one of `define → build → verify → ship`.
 - `type:feature` on spine PRs · `type:{bug,tweak,chore}` on lane PRs · `type:design` on demo PRs.
-- `app:{web,admin,marketing,docs,demo,packages}` and `complexity:{trivial,standard,complex}` from
+- `app:{web,admin,marketing,docs,support,demo,packages}` and `complexity:{trivial,standard,complex}` from
   the spec header (spine only).
 
 > **Why `app:` and not `persona:`** — the persona vocabulary this pattern came from was grounded in

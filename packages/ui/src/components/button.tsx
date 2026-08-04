@@ -59,5 +59,3 @@ export const Button = ({
     />
   );
 };
-
-export { button as buttonVariants };
