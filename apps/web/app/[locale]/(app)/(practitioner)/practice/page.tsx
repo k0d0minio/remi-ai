@@ -14,6 +14,7 @@ import type { ComponentType } from "react";
 import {
   formatDate,
   localePath,
+  type ProgressSignal,
   type SignalKind,
   type SignalSeverity,
 } from "@remi/services/shared";
@@ -29,7 +30,10 @@ import {
 } from "@remi/ui/server";
 import { getSession } from "@/lib/auth/session";
 import { getContent } from "@/lib/content";
-import { listClientOverviews } from "@/lib/queries/clients";
+import {
+  listClientOverviews,
+  type ClientOverview,
+} from "@/lib/queries/clients";
 import { listSignals } from "@/lib/queries/signals";
 import { resolveLocale, type LocaleParams } from "@/lib/locale-params";
 
@@ -77,7 +81,13 @@ const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
     overviews.map(({ person }) => [person.id, person.name]),
   );
 
-  const needingAttention = overviews.filter((overview) => overview.attention);
+  // Narrowed rather than filtered loosely: every row here renders its signal's
+  // summary, so the type says the signal is there instead of the JSX guarding
+  // for a null that the filter has already ruled out.
+  const needingAttention = overviews.filter(
+    (overview): overview is ClientOverview & { attention: ProgressSignal } =>
+      overview.attention !== null,
+  );
   const active = overviews.filter(
     (overview) => overview.person.status === "active",
   );
@@ -154,7 +164,7 @@ const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
                       )}
                     </div>
                     <Typography size="sm" tone="muted">
-                      {attention?.summary}
+                      {attention.summary}
                     </Typography>
                   </div>
                   <Link
