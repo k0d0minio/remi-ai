@@ -41,16 +41,29 @@ Copy lives in `lib/content/`, never in a component: one dictionary per locale (`
 typed by `types.ts`, so a missing translation is a type error rather than an English sentence
 appearing on the French site. Rewording an answer is an edit to a dictionary and nothing else.
 
-Articles are structured data, not prose blobs — `Category` and `Article` carry the `slug` their
-route will use, so wiring a card to a real page later is one `href`, not a content rewrite. When
-article routes land they read from the same modules; a category's `slug` is its route segment.
+Articles are structured data, not prose blobs. An `Article` is a list of `ArticleBlock`s from a
+closed union — heading, paragraph, list, steps, columns, note, action — so the only shapes a page
+can contain are the ones `components/article/article-body.tsx` knows how to draw. There is no
+markdown parser and no MDX here: a help centre where anyone can author a new shape is a design
+system with a second, undocumented half.
+
+A category's `slug` is its route segment and an article's `slug` is the one below it —
+`/[locale]/[category]/[slug]`. **Slugs are identical in both locales**: the locale switcher swaps
+the prefix and keeps the rest of the path, so a translated slug would 404 a reader mid-article.
+Everything derived from an article — its reading time, its table of contents, its neighbours — is
+computed in `lib/articles.ts` rather than authored, because a hand-written "5 min read" is a number
+that drifts the first time a paragraph lands.
+
+`updated` is the day the article was last checked against the product, not the day the file
+changed. Editing an article without re-verifying it means leaving that date alone.
 
 ## Everything links out, and links out correctly
 
-This app has one page of its own. The public site and the product are separate Vercel projects on
-their own origins, so a cross-app link is a plain `<a>` built by `externalHref()` in `lib/links.ts`
-— a `next/link` to `/contact` would resolve against this origin and 404. Both destinations ship in
-the same two languages, so the link carries the visitor's locale with it.
+Inside this app — home, category, article, status — links route through `next/link`. Everything
+else leaves: the public site and the product are separate Vercel projects on their own origins, so
+a cross-app link is a plain `<a>` built by `externalHref()` in `lib/links.ts` — a `next/link` to
+`/contact` would resolve against this origin and 404. Both destinations ship in the same two
+languages, so the link carries the visitor's locale with it.
 
 There is one contact route for the whole product, on the public site. This app never grows a second
 one; a second front door quietly becomes the unread one.
@@ -70,20 +83,43 @@ one-line client wrapper that supplies `usePathname`.
 ## Structure
 
 ```text
-app/[locale]/ routes — one folder per page, `page.tsx` + local components;
-              every page exists under /en and /fr
-app/          sitemap, robots, icon — the unprefixed metadata routes
-components/   the chrome and the home page's sections, prop-driven so both
-              locales share them
-lib/content/  one dictionary per locale (`en.ts`, `fr.ts`), typed by `types.ts`
-lib/          metadata helpers, cross-app link building
-public/       static assets
-proxy.ts      redirects bare paths to the visitor's language
+app/[locale]/            the home page
+  [category]/            a category and everything written in it
+    [slug]/              one article
+  status/                the six surfaces and their history — a static segment
+                         beside `[category]`, which Next resolves in its favour
+app/                     sitemap, robots, icon — the unprefixed metadata routes
+components/              the chrome and the home page's sections, prop-driven so
+                         both locales share them
+components/article/      the article page's parts: body, contents, pagination,
+                         the feedback row
+components/status/       the status board and its uptime bar
+lib/content/             one dictionary per locale (`en.ts`, `fr.ts`), typed by
+                         `types.ts`; article bodies in `articles/{en,fr}.ts`
+lib/articles.ts          every lookup and every derived value — the only module
+                         that knows how a category and its articles relate
+lib/status.ts            the status page's placeholder history
+lib/                     metadata helpers, cross-app link building
+public/                  static assets
+proxy.ts                 redirects bare paths to the visitor's language
 ```
+
+Every route is statically generated. `generateStaticParams` reads the English dictionary for both
+locales — the slugs are the same — and `dynamicParams = false` makes an unknown category or article
+a 404 rather than a page rendered from a half-valid param.
 
 ## Not built yet
 
-The search field on the home page is disabled and says so underneath: there is no index to search,
-and a box that swallows what a stuck person types is worse than no box. Category cards and the
-article list do not link, for the same reason — the routes do not exist. When articles land, those
-three become links and the note goes, in one change.
+Three things on this site are drawn but inert, and each says so where it stands. The rule is the
+same in all three cases: **a control that quietly swallows what someone gives it is worse than no
+control**, so the shape is shown, the control is disabled, and the note points at what does work.
+
+- **Search** — the home page's field is disabled. There is no index, and no client-side substitute
+  has been built. When search lands, the field becomes a client island and its note goes.
+- **"Was this helpful?"** — the two buttons on every article are disabled. No storage vendor is
+  committed, so a click would be discarded; the note routes the reader to the contact form instead.
+- **The status page** — no monitoring is connected, so `lib/status.ts` is placeholder data and the
+  page's own notice says so in the visitor's language. The board reads from that module and nothing
+  else, so a real probe replaces it without touching markup.
+
+Deleting one of those notes is only ever part of the change that makes the thing work.
