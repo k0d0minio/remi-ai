@@ -5,14 +5,14 @@ import {
   Stethoscope,
   UtensilsCrossed,
 } from "lucide-react";
+import { articles } from "./articles/en";
 import type { Content } from "./types";
 
 /**
  * The English dictionary. Same test as the public site's: REMI is pre-launch,
- * so the help centre describes what the product is being built to do and never
- * an answer it cannot give yet. The categories below are the shape the articles
- * will fill — nothing here claims an article already exists, and nothing claims
- * a ranking that has not been measured.
+ * so the help centre describes what the product does today and says plainly
+ * where a capability is not there yet. Nothing here claims a ranking that has
+ * not been measured, and no article describes a screen that does not exist.
  */
 export const en: Content = {
   header: {
@@ -38,6 +38,7 @@ export const en: Content = {
       { target: "marketing", path: "/contact", label: "Contact" },
       { target: "product", path: "/", label: "Go to REMI" },
     ],
+    status: "Service status",
   },
 
   home: {
@@ -55,102 +56,26 @@ export const en: Content = {
       searchLabel: "Search the help centre",
       searchPlaceholder: "How can we help?",
       searchNote:
-        "Search arrives with the first articles — until then, the categories below are the whole help centre.",
+        "Search is not connected yet — a box that swallows what you type is worse than no box. Every article is one click away in the categories below.",
     },
 
     categories: {
       eyebrow: "Browse",
       title: "Five places to look",
-      lead: "Each one is being written alongside the pilot. The questions listed are what the articles will answer.",
-      items: [
-        {
-          slug: "getting-started",
-          icon: Compass,
-          title: "Getting started",
-          body: "What REMI is, who it is for, and what happens in your first week with it.",
-          topics: [
-            "What REMI does, and what it deliberately does not do",
-            "Setting up after your practitioner invites you",
-            "What to expect in your first week",
-          ],
-        },
-        {
-          slug: "plan-and-meals",
-          icon: UtensilsCrossed,
-          title: "Your plan and meals",
-          body: "How your practitioner's recommendations become meals, habits and small daily steps.",
-          topics: [
-            "Where your meal suggestions come from",
-            "Swapping a meal you cannot or will not eat",
-            "Allergies, intolerances and foods to avoid",
-          ],
-        },
-        {
-          slug: "practitioners",
-          icon: Stethoscope,
-          title: "For practitioners",
-          body: "Running a practice in REMI: recommendations, what you see between consultations, and where your judgement stays the reference.",
-          topics: [
-            "Turning consultation notes into recommendations",
-            "What you can see between two consultations",
-            "Inviting someone you support",
-          ],
-        },
-        {
-          slug: "account-and-billing",
-          icon: CreditCard,
-          title: "Account and billing",
-          body: "Signing in, changing your details, and how billing will work once there is something to bill for.",
-          topics: [
-            "Signing in and recovering access",
-            "Changing your email or your details",
-            "Closing your account, and what happens to your data",
-          ],
-        },
-        {
-          slug: "privacy-and-data",
-          icon: ShieldCheck,
-          title: "Privacy and data",
-          body: "What REMI stores, who can see it, and the rights you have over it.",
-          topics: [
-            "What your practitioner can and cannot see",
-            "Where your data is stored, and for how long",
-            "Exporting or deleting everything REMI holds",
-          ],
-        },
-      ],
+      lead: "Each one holds the answers to the questions that category is actually asked. Every article says what REMI does today, and where it stops.",
+      countLabel: { one: "article", many: "articles" },
     },
 
     popular: {
       eyebrow: "Start here",
       title: "The questions we are asked first",
-      note: "REMI is in its pilot phase, so this is the order the help centre is being written in — not a ranking. Nothing here is measured yet, and this page will never pretend otherwise.",
-      items: [
-        {
-          slug: "what-remi-does",
-          title: "What REMI does, and what it deliberately does not do",
-          category: "getting-started",
-        },
-        {
-          slug: "what-your-practitioner-sees",
-          title: "What your practitioner can and cannot see",
-          category: "privacy-and-data",
-        },
-        {
-          slug: "swapping-a-meal",
-          title: "Swapping a meal you cannot or will not eat",
-          category: "plan-and-meals",
-        },
-        {
-          slug: "invite-someone-you-support",
-          title: "Inviting someone you support",
-          category: "practitioners",
-        },
-        {
-          slug: "signing-in",
-          title: "Signing in and recovering access",
-          category: "account-and-billing",
-        },
+      note: "REMI is in its pilot phase, so this is the order the help centre was written in — not a ranking. Nothing here is measured yet, and this page will never pretend otherwise.",
+      slugs: [
+        "what-remi-does",
+        "what-your-practitioner-sees",
+        "how-your-plan-reaches-you",
+        "joining-the-pilot",
+        "logging-meals",
       ],
     },
 
@@ -158,6 +83,130 @@ export const en: Content = {
       title: "Still stuck?",
       body: "The team is small and reads everything. Tell us what you were trying to do and we will answer — and write the article that should have saved you the message.",
       action: { target: "marketing", path: "/contact", label: "Contact us" },
+    },
+  },
+
+  categories: [
+    {
+      slug: "getting-started",
+      icon: Compass,
+      title: "Getting started",
+      body: "What REMI is, who it is for, and how you get into it during the pilot.",
+    },
+    {
+      slug: "plan-and-meals",
+      icon: UtensilsCrossed,
+      title: "Your plan and meals",
+      body: "How your practitioner's recommendations become meals, steps and a plan you can act on.",
+    },
+    {
+      slug: "practitioners",
+      icon: Stethoscope,
+      title: "For practitioners",
+      body: "Running a practice in REMI: your therapeutic frame, what you see between consultations, and inviting the people you support.",
+    },
+    {
+      slug: "account-and-billing",
+      icon: CreditCard,
+      title: "Account and billing",
+      body: "Signing in, switching language, and what billing means while REMI is still in its pilot.",
+    },
+    {
+      slug: "privacy-and-data",
+      icon: ShieldCheck,
+      title: "Privacy and data",
+      body: "What REMI stores, who can see it, and the rights you have over it.",
+    },
+  ],
+
+  articles,
+
+  category: {
+    eyebrow: "Help centre",
+    backLabel: "All categories",
+    countLabel: { one: "article", many: "articles" },
+    missing: {
+      title: "Not the answer you needed?",
+      body: "This category is written from the questions we are actually asked. If yours is not here, it is a gap worth knowing about — tell us and the article gets written.",
+      action: { target: "marketing", path: "/contact", label: "Ask us" },
+    },
+  },
+
+  article: {
+    backLabel: "Back to",
+    updatedLabel: "Checked against the product on",
+    minutesLabel: "min read",
+    tocLabel: "On this page",
+    prevLabel: "Previous",
+    nextLabel: "Next",
+    relatedLabel: "Read next",
+    helpful: {
+      question: "Was this helpful?",
+      yes: "Yes",
+      no: "No",
+      note: "These two buttons record nothing — there is no feedback pipeline behind them yet, and a control that quietly discards an answer is worse than none. Until there is one, tell us in a sentence and it reaches a person.",
+      action: {
+        target: "marketing",
+        path: "/contact",
+        label: "Tell us instead",
+      },
+    },
+  },
+
+  status: {
+    meta: {
+      title: "Service status",
+      description:
+        "The state of each REMI surface — the product, the public site, this help centre, the reference site, the operations console and the prototype sandbox.",
+    },
+    eyebrow: "Status",
+    title: "Service status",
+    lead: "Six surfaces make up REMI. This page reports on all of them, including the two only the team uses — a status page that hides half the system is a status page nobody trusts.",
+    notice: {
+      title: "No monitoring is connected yet",
+      body: "REMI is pre-launch and nothing here is measured: the ninety days below are placeholder data, kept so this page is ready the day real checks run. Treat it as the shape of the answer, not the answer. When an incident is real, it will be written here in words as well as bars.",
+    },
+    overall: "All surfaces operational",
+    operational: "Operational",
+    services: {
+      web: {
+        name: "Product",
+        description:
+          "The signed-in surface: your plan, meals and steps, and the practitioner console.",
+      },
+      marketing: {
+        name: "Main site",
+        description:
+          "The public site — what REMI is, who it is for, and how the pilot works.",
+      },
+      support: {
+        name: "Help centre",
+        description: "This site.",
+      },
+      docs: {
+        name: "Reference site",
+        description:
+          "How REMI is put together, for the people building and running it.",
+      },
+      admin: {
+        name: "Operations console",
+        description:
+          "Internal only. The team uses it to run the pilot; no visitor ever reaches it.",
+      },
+      demo: {
+        name: "Prototype sandbox",
+        description:
+          "Where a screen is tried out before it is built. Mock data only, by design.",
+      },
+    },
+    uptimeLabel: "over the last 90 days",
+    rangeStart: "90 days ago",
+    rangeEnd: "Today",
+    historyLabel: "90-day history",
+    legend: {
+      up: "Operational",
+      degraded: "Degraded",
+      down: "Outage",
     },
   },
 };

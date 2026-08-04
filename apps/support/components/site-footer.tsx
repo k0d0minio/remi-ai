@@ -1,4 +1,5 @@
-import type { Locale } from "@remi/services/shared";
+import NextLink from "next/link";
+import { localePath, type Locale } from "@remi/services/shared";
 import {
   BRAND_LEGAL_NAME,
   Container,
@@ -52,6 +53,17 @@ export const SiteFooter = ({ locale }: Props) => {
                 {link.label}
               </Link>
             ))}
+
+            {/* The one link in this footer that stays on this origin, so it is
+                the one that routes rather than navigates. */}
+            <Link
+              as={NextLink}
+              href={localePath(locale, "/status")}
+              variant="muted"
+              className="text-sm"
+            >
+              {content.footer.status}
+            </Link>
           </nav>
         </div>
 

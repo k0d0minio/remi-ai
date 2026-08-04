@@ -5,14 +5,15 @@ import {
   Stethoscope,
   UtensilsCrossed,
 } from "lucide-react";
+import { articles } from "./articles/fr";
 import type { Content } from "./types";
 
 /**
  * Le dictionnaire français — le marché de lancement. Mêmes règles que la
  * version anglaise : REMI est pré-lancement, donc le centre d'aide décrit ce que
- * le produit se construit à faire, jamais une réponse qu'il ne peut pas encore
- * donner. Aucune promesse d'article déjà écrit, aucun classement qui n'a pas été
- * mesuré.
+ * le produit fait aujourd'hui et dit clairement là où une capacité n'existe pas
+ * encore. Aucun classement qui n'a pas été mesuré, aucun article qui décrit un
+ * écran inexistant.
  */
 export const fr: Content = {
   header: {
@@ -34,6 +35,7 @@ export const fr: Content = {
       { target: "marketing", path: "/contact", label: "Contact" },
       { target: "product", path: "/", label: "Aller sur REMI" },
     ],
+    status: "État des services",
   },
 
   home: {
@@ -51,103 +53,26 @@ export const fr: Content = {
       searchLabel: "Rechercher dans le centre d'aide",
       searchPlaceholder: "Comment pouvons-nous vous aider ?",
       searchNote:
-        "La recherche arrivera avec les premiers articles — d'ici là, les catégories ci-dessous sont tout le centre d'aide.",
+        "La recherche n'est pas encore branchée — un champ qui avale ce que vous tapez est pire que pas de champ. Chaque article est à un clic dans les catégories ci-dessous.",
     },
 
     categories: {
       eyebrow: "Parcourir",
       title: "Cinq endroits où chercher",
-      lead: "Chacun s'écrit au fil du pilote. Les questions listées sont celles auxquelles les articles répondront.",
-      items: [
-        {
-          slug: "getting-started",
-          icon: Compass,
-          title: "Premiers pas",
-          body: "Ce qu'est REMI, à qui il s'adresse, et ce qui se passe pendant votre première semaine.",
-          topics: [
-            "Ce que REMI fait, et ce qu'il ne fait délibérément pas",
-            "S'installer après l'invitation de votre praticien",
-            "À quoi ressemble la première semaine",
-          ],
-        },
-        {
-          slug: "plan-and-meals",
-          icon: UtensilsCrossed,
-          title: "Votre plan et vos repas",
-          body: "Comment les recommandations de votre praticien deviennent des repas, des habitudes et de petits pas au quotidien.",
-          topics: [
-            "D'où viennent vos suggestions de repas",
-            "Remplacer un repas que vous ne pouvez ou ne voulez pas manger",
-            "Allergies, intolérances et aliments à éviter",
-          ],
-        },
-        {
-          slug: "practitioners",
-          icon: Stethoscope,
-          title: "Pour les praticiens",
-          body: "Gérer sa pratique dans REMI : recommandations, ce que vous voyez entre deux consultations, et là où votre jugement reste la référence.",
-          topics: [
-            "Transformer des notes de consultation en recommandations",
-            "Ce que vous voyez entre deux consultations",
-            "Inviter une personne que vous accompagnez",
-          ],
-        },
-        {
-          slug: "account-and-billing",
-          icon: CreditCard,
-          title: "Compte et facturation",
-          body: "Se connecter, modifier ses informations, et comment la facturation fonctionnera quand il y aura quelque chose à facturer.",
-          topics: [
-            "Se connecter et récupérer l'accès",
-            "Modifier son e-mail ou ses informations",
-            "Fermer son compte, et ce qu'il advient de vos données",
-          ],
-        },
-        {
-          slug: "privacy-and-data",
-          icon: ShieldCheck,
-          title: "Confidentialité et données",
-          body: "Ce que REMI conserve, qui peut le voir, et les droits que vous avez dessus.",
-          topics: [
-            "Ce que votre praticien voit — et ne voit pas",
-            "Où vos données sont stockées, et pour combien de temps",
-            "Exporter ou supprimer tout ce que REMI conserve",
-          ],
-        },
-      ],
+      lead: "Chacun contient les réponses aux questions qu'on lui pose vraiment. Chaque article dit ce que REMI fait aujourd'hui, et où il s'arrête.",
+      countLabel: { one: "article", many: "articles" },
     },
 
     popular: {
       eyebrow: "Commencer ici",
       title: "Les questions qui reviennent en premier",
-      note: "REMI est en phase pilote : c'est l'ordre dans lequel le centre d'aide s'écrit, pas un classement. Rien n'est mesuré ici, et cette page ne prétendra jamais le contraire.",
-      items: [
-        {
-          slug: "what-remi-does",
-          title: "Ce que REMI fait, et ce qu'il ne fait délibérément pas",
-          category: "getting-started",
-        },
-        {
-          slug: "what-your-practitioner-sees",
-          title: "Ce que votre praticien voit — et ne voit pas",
-          category: "privacy-and-data",
-        },
-        {
-          slug: "swapping-a-meal",
-          title:
-            "Remplacer un repas que vous ne pouvez ou ne voulez pas manger",
-          category: "plan-and-meals",
-        },
-        {
-          slug: "invite-someone-you-support",
-          title: "Inviter une personne que vous accompagnez",
-          category: "practitioners",
-        },
-        {
-          slug: "signing-in",
-          title: "Se connecter et récupérer l'accès",
-          category: "account-and-billing",
-        },
+      note: "REMI est en phase pilote : c'est l'ordre dans lequel le centre d'aide a été écrit, pas un classement. Rien n'est mesuré ici, et cette page ne prétendra jamais le contraire.",
+      slugs: [
+        "what-remi-does",
+        "what-your-practitioner-sees",
+        "how-your-plan-reaches-you",
+        "joining-the-pilot",
+        "logging-meals",
       ],
     },
 
@@ -155,6 +80,130 @@ export const fr: Content = {
       title: "Toujours bloqué ?",
       body: "L'équipe est petite et lit tout. Dites-nous ce que vous cherchiez à faire : nous répondrons — et nous écrirons l'article qui vous aurait évité le message.",
       action: { target: "marketing", path: "/contact", label: "Nous écrire" },
+    },
+  },
+
+  categories: [
+    {
+      slug: "getting-started",
+      icon: Compass,
+      title: "Premiers pas",
+      body: "Ce qu'est REMI, à qui il s'adresse, et comment on y entre pendant le pilote.",
+    },
+    {
+      slug: "plan-and-meals",
+      icon: UtensilsCrossed,
+      title: "Votre plan et vos repas",
+      body: "Comment les recommandations de votre praticien deviennent des repas, des pas et un plan sur lequel agir.",
+    },
+    {
+      slug: "practitioners",
+      icon: Stethoscope,
+      title: "Pour les praticiens",
+      body: "Gérer sa pratique dans REMI : le cadre thérapeutique, ce que vous voyez entre deux consultations, et l'invitation des personnes que vous accompagnez.",
+    },
+    {
+      slug: "account-and-billing",
+      icon: CreditCard,
+      title: "Compte et facturation",
+      body: "Se connecter, changer de langue, et ce que veut dire la facturation tant que REMI est en pilote.",
+    },
+    {
+      slug: "privacy-and-data",
+      icon: ShieldCheck,
+      title: "Confidentialité et données",
+      body: "Ce que REMI conserve, qui peut le voir, et les droits que vous avez dessus.",
+    },
+  ],
+
+  articles,
+
+  category: {
+    eyebrow: "Centre d'aide",
+    backLabel: "Toutes les catégories",
+    countLabel: { one: "article", many: "articles" },
+    missing: {
+      title: "Ce n'est pas la réponse qu'il vous fallait ?",
+      body: "Cette catégorie s'écrit à partir des questions qu'on nous pose réellement. Si la vôtre n'y est pas, c'est un manque qu'il vaut mieux connaître — dites-le-nous et l'article s'écrit.",
+      action: { target: "marketing", path: "/contact", label: "Nous demander" },
+    },
+  },
+
+  article: {
+    backLabel: "Retour à",
+    updatedLabel: "Vérifié contre le produit le",
+    minutesLabel: "min de lecture",
+    tocLabel: "Sur cette page",
+    prevLabel: "Précédent",
+    nextLabel: "Suivant",
+    relatedLabel: "À lire ensuite",
+    helpful: {
+      question: "Cette réponse vous a-t-elle aidé ?",
+      yes: "Oui",
+      no: "Non",
+      note: "Ces deux boutons n'enregistrent rien — il n'y a pas encore de circuit derrière eux, et un bouton qui jette discrètement votre réponse est pire que pas de bouton. En attendant, dites-le-nous en une phrase : cela arrive chez une personne.",
+      action: {
+        target: "marketing",
+        path: "/contact",
+        label: "Nous le dire plutôt",
+      },
+    },
+  },
+
+  status: {
+    meta: {
+      title: "État des services",
+      description:
+        "L'état de chaque surface REMI — le produit, le site principal, ce centre d'aide, le site de référence, la console d'exploitation et le bac à sable de prototypage.",
+    },
+    eyebrow: "État",
+    title: "État des services",
+    lead: "REMI, ce sont six surfaces. Cette page les couvre toutes, y compris les deux que seule l'équipe utilise — une page d'état qui cache la moitié du système est une page d'état à laquelle personne ne se fie.",
+    notice: {
+      title: "Aucune supervision n'est encore branchée",
+      body: "REMI est en pré-lancement et rien ici n'est mesuré : les quatre-vingt-dix jours ci-dessous sont des données de démonstration, gardées pour que cette page soit prête le jour où de vraies vérifications tourneront. Voyez-y la forme de la réponse, pas la réponse. Quand un incident sera réel, il sera écrit ici en toutes lettres, pas seulement en barres.",
+    },
+    overall: "Toutes les surfaces sont opérationnelles",
+    operational: "Opérationnel",
+    services: {
+      web: {
+        name: "Le produit",
+        description:
+          "La partie connectée : votre plan, vos repas et vos pas, et la console du praticien.",
+      },
+      marketing: {
+        name: "Site principal",
+        description:
+          "Le site public — ce qu'est REMI, à qui il s'adresse, et comment fonctionne le pilote.",
+      },
+      support: {
+        name: "Centre d'aide",
+        description: "Ce site.",
+      },
+      docs: {
+        name: "Site de référence",
+        description:
+          "Comment REMI est construit, pour celles et ceux qui le construisent et le font tourner.",
+      },
+      admin: {
+        name: "Console d'exploitation",
+        description:
+          "Usage interne uniquement. L'équipe s'en sert pour piloter le pilote ; aucun visiteur n'y accède.",
+      },
+      demo: {
+        name: "Bac à sable de prototypage",
+        description:
+          "Là où un écran est essayé avant d'être construit. Données fictives uniquement, par construction.",
+      },
+    },
+    uptimeLabel: "sur les 90 derniers jours",
+    rangeStart: "Il y a 90 jours",
+    rangeEnd: "Aujourd'hui",
+    historyLabel: "historique sur 90 jours",
+    legend: {
+      up: "Opérationnel",
+      degraded: "Dégradé",
+      down: "Interruption",
     },
   },
 };

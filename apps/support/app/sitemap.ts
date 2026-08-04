@@ -1,14 +1,28 @@
 import type { MetadataRoute } from "next";
 import { localePath, locales } from "@remi/services/shared";
+import { en } from "@/lib/content/en";
 import { siteUrl } from "@/lib/metadata";
 
 /**
- * One entry per locale, for the one route that exists. Article routes are added
- * here as they land — a help centre earns its traffic in search results, so a
- * page missing from this list is a page nobody finds.
+ * Every route, once per locale. The category and article entries are derived
+ * from the dictionary rather than listed again here: a help centre earns its
+ * traffic in search results, and an article missing from this file is an
+ * article nobody finds. Deriving them is what stops the two from drifting the
+ * day someone adds an answer and forgets this file exists.
+ *
+ * English is read for the paths because slugs are identical across locales.
  */
 const pages: { path: string; priority: number }[] = [
   { path: "/", priority: 1 },
+  ...en.categories.map((category) => ({
+    path: `/${category.slug}`,
+    priority: 0.8,
+  })),
+  ...en.articles.map((article) => ({
+    path: `/${article.category}/${article.slug}`,
+    priority: 0.7,
+  })),
+  { path: "/status", priority: 0.4 },
 ];
 
 /**
