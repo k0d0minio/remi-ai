@@ -129,9 +129,9 @@ export const AdherenceSparkline = ({ points, average, delta }: Props) => {
               height={HEIGHT}
               fill="transparent"
             >
-              <title>
-                {point.day} · {point.value} % du plan appliqué
-              </title>
+              {/* One interpolated child: React treats `title` as a metadata tag
+                  and mismatches on hydration when it receives several. */}
+              <title>{`${point.day} · ${point.value} % du plan appliqué`}</title>
             </rect>
           </g>
         ))}
