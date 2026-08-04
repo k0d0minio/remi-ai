@@ -1,6 +1,6 @@
 # Applications
 
-Five apps, one Vercel project each, one port each. Every app that renders product UI consumes
+Six apps, one Vercel project each, one port each. Every app that renders product UI consumes
 `@remi/ui` and owns no primitives of its own.
 
 | App         | Package            | Port | Auth | Data                       | Purpose                                       |
@@ -9,6 +9,7 @@ Five apps, one Vercel project each, one port each. Every app that renders produc
 | `marketing` | `@remi/marketing`  | 3001 | no   | mostly static              | The public site. Indexable, content-led.      |
 | `admin`     | `@remi/admin`      | 3002 | yes  | `@remi/services/server`    | Internal operations. Operator-only.           |
 | `docs`      | `@remi/docs`       | 3003 | no   | none                       | This site. Nextra, MDX.                       |
+| `support`   | `@remi/support`    | 3004 | no   | typed content modules      | The public help centre. Indexable, anonymous. |
 | `demo`      | `@remi/demo`       | 3005 | no   | **mock only**              | The Design stage's prototype sandbox.         |
 
 ## Why admin is its own app, not a route group in web
