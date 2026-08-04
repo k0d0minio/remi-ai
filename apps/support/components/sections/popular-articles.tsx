@@ -1,24 +1,30 @@
-import { FileText } from "lucide-react";
-import { Badge, Container, Section, Typography } from "@remi/ui/server";
+import type { Locale } from "@remi/services/shared";
+import { Container, Section, Typography } from "@remi/ui/server";
+import { ArticleList } from "@/components/article-list";
+import { findArticleBySlug } from "@/lib/articles";
 import type { Category, Content } from "@/lib/content/types";
 
 type Props = {
   content: Content["home"]["popular"];
   /** Supplies each row's category label, looked up by slug so the two cannot drift. */
   categories: Category[];
+  locale: Locale;
 };
 
 /**
- * The shortlist a help centre opens with. Rows rather than cards: this is a
- * list to scan, and five equally-weighted cards would slow that down.
+ * The shortlist a help centre opens with. The dictionary holds slugs rather
+ * than titles: a shortlist that repeated the titles would be a second place for
+ * an article's name to live, and the two would disagree the first time one was
+ * reworded.
  *
- * Like the category grid, nothing links yet — these articles are not written.
- * The note says so in the visitor's own language, because a list headed
- * "popular" that has never been measured is the kind of small untruth this
- * product does not tell.
+ * The note stays. This is the order the help centre was written in, not a
+ * ranking — nothing here is measured, and a list headed "popular" that has
+ * never been counted is the kind of small untruth this product does not tell.
  */
-export const PopularArticles = ({ content, categories }: Props) => {
-  const labels = new Map(categories.map((c) => [c.slug, c.title]));
+export const PopularArticles = ({ content, categories, locale }: Props) => {
+  const articles = content.slugs
+    .map((slug) => findArticleBySlug(locale, slug))
+    .filter((article) => article !== undefined);
 
   return (
     <Section spacing="lg" tone="muted">
@@ -32,28 +38,11 @@ export const PopularArticles = ({ content, categories }: Props) => {
           </Typography>
         </div>
 
-        <ul className="border-border divide-border bg-card divide-y rounded-xl border">
-          {content.items.map((article) => (
-            <li
-              key={article.slug}
-              className="flex flex-col gap-2 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
-            >
-              <div className="flex items-start gap-3">
-                <FileText
-                  aria-hidden="true"
-                  className="text-muted-foreground mt-0.5 size-4 shrink-0"
-                />
-                <Typography as="span" weight="medium">
-                  {article.title}
-                </Typography>
-              </div>
-
-              <Badge variant="neutral" tone="subtle" className="w-fit shrink-0">
-                {labels.get(article.category)}
-              </Badge>
-            </li>
-          ))}
-        </ul>
+        <ArticleList
+          locale={locale}
+          articles={articles}
+          categories={categories}
+        />
 
         <Typography size="sm" tone="muted">
           {content.note}

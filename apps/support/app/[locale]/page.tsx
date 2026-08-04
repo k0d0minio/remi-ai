@@ -23,17 +23,22 @@ export const generateMetadata = async ({
 // and CI runs with --max-warnings=0, with no exemption for route files.
 const Page = async ({ params }: { params: Promise<Params> }) => {
   const { locale } = await params;
-  const content = getContent(locale).home;
+  const { home, categories } = getContent(locale);
 
   return (
     <>
-      <SearchHero content={content.hero} />
-      <CategoryGrid content={content.categories} />
-      <PopularArticles
-        content={content.popular}
-        categories={content.categories.items}
+      <SearchHero content={home.hero} />
+      <CategoryGrid
+        content={home.categories}
+        categories={categories}
+        locale={locale}
       />
-      <ContactCta content={content.cta} locale={locale} />
+      <PopularArticles
+        content={home.popular}
+        categories={categories}
+        locale={locale}
+      />
+      <ContactCta content={home.cta} locale={locale} />
     </>
   );
 };
