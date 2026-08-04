@@ -20,7 +20,7 @@ export const fr: Content = {
     label: "Aide",
     homeLabel: "accueil du centre d'aide",
     languageLabel: "Langue",
-    product: { target: "product", path: "/", label: "Aller sur REMI" },
+    product: { target: "web", path: "/", label: "Aller sur REMI" },
   },
 
   footer: {
@@ -33,7 +33,7 @@ export const fr: Content = {
       { target: "marketing", path: "/", label: "Site principal" },
       { target: "marketing", path: "/practitioners", label: "Praticiens" },
       { target: "marketing", path: "/contact", label: "Contact" },
-      { target: "product", path: "/", label: "Aller sur REMI" },
+      { target: "web", path: "/", label: "Aller sur REMI" },
     ],
     status: "État des services",
   },

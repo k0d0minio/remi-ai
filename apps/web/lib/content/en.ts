@@ -23,6 +23,9 @@ export const en: Content = {
     language: "Language",
     appearance: "Appearance",
     themes: { system: "Match system", light: "Light", dark: "Dark" },
+    help: "Help",
+    supportCentre: "Support centre",
+    documentation: "Documentation",
     signOut: "Sign out",
   },
   signIn: {
@@ -37,6 +40,8 @@ export const en: Content = {
     roleHint: "Decides which side of the loop you land on.",
     submit: "Continue",
     pilotNote: "Pilot access only — contact your practitioner.",
+    aboutLink: "About REMI",
+    helpLink: "Get help",
   },
   practitionerNav: [
     { href: "/practice", icon: "practice", label: "Practice" },

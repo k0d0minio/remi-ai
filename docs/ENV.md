@@ -18,14 +18,24 @@ in one person's head.
 
 ## App configuration
 
-| Variable                    | Purpose                                         | Where set | Public? |
-| --------------------------- | ----------------------------------------------- | --------- | ------- |
-| `APP_URL`                   | Absolute base URL of the app doing the reading  | Vercel    | no      |
-| `NEXT_PUBLIC_APP_URL`       | Same, where the browser needs it (links, share) | Vercel    | yes     |
-| `NEXT_PUBLIC_MARKETING_URL` | Public site URL — cross-app links               | Vercel    | yes     |
-| `NEXT_PUBLIC_SUPPORT_URL`   | Help centre URL — its own canonical + sitemap   | Vercel    | yes     |
-| `NEXT_PUBLIC_DOCS_URL`      | Docs site URL — cross-app links                 | Vercel    | yes     |
-| `NEXT_PUBLIC_SUPPORT_URL`   | Support centre URL — footer link, dev `:3004`   | Vercel    | yes     |
+| Variable                    | Purpose                                        | Where set | Public? |
+| --------------------------- | ---------------------------------------------- | --------- | ------- |
+| `APP_URL`                   | Absolute base URL of the app doing the reading | Vercel    | no      |
+| `NEXT_PUBLIC_APP_URL`       | Overrides where `apps/web` answers             | Vercel    | yes     |
+| `NEXT_PUBLIC_MARKETING_URL` | Overrides where `apps/marketing` answers       | Vercel    | yes     |
+| `NEXT_PUBLIC_ADMIN_URL`     | Overrides where `apps/admin` answers           | Vercel    | yes     |
+| `NEXT_PUBLIC_DOCS_URL`      | Overrides where `apps/docs` answers            | Vercel    | yes     |
+| `NEXT_PUBLIC_SUPPORT_URL`   | Overrides where `apps/support` answers         | Vercel    | yes     |
+| `NEXT_PUBLIC_DEMO_URL`      | Overrides where `apps/demo` answers            | Vercel    | yes     |
+
+The six `NEXT_PUBLIC_*_URL` variables are **overrides, and normally unset**. Where each app lives
+is catalogued in `packages/services/src/shared/links.ts` — one table of subdomains under one root
+domain, plus the dev ports — and that file is what every cross-app link, canonical URL and sitemap
+is built from. Moving the whole ecosystem to a new domain is one edit there, not six rows here.
+
+Set one of these only when a deployment has to answer somewhere the catalogue does not describe: a
+staging domain, a preview URL a stakeholder is reviewing against, or a rename that has not landed
+in the catalogue yet.
 
 ## Storage
 

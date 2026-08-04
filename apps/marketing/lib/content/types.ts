@@ -93,6 +93,8 @@ export type Content = {
     /** Completes the wordmark link's accessible name: "Remi AI, home". */
     homeLabel: string;
     cta: { href: string; label: string };
+    /** Label for the way into the product — a separate app, hence an origin. */
+    signIn: string;
     menuLabel: string;
   };
   footer: {
@@ -101,6 +103,8 @@ export type Content = {
     navLabel: string;
     /** Label for the support centre link — a separate app, hence an origin. */
     support: string;
+    /** The same destination as the header's, repeated where a reader ends up. */
+    signIn: string;
   };
   home: {
     meta: PageMeta;

@@ -1,8 +1,16 @@
 "use client";
 
-import { Check, ChevronDown, LogOut, Repeat, User } from "lucide-react";
+import {
+  BookOpen,
+  Check,
+  ChevronDown,
+  LifeBuoy,
+  LogOut,
+  Repeat,
+  User,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
-import { locales, type Locale } from "@remi/services/shared";
+import { appHref, locales, type Locale } from "@remi/services/shared";
 import {
   Avatar,
   AvatarFallback,
@@ -90,6 +98,31 @@ export const UserMenu = ({ name, initials, role, locale, content }: Props) => {
             optionLabels={content.userMenu.themes}
           />
         </div>
+
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>{content.userMenu.help}</DropdownMenuLabel>
+        {/*
+         * Both are separate deployments, so these are plain anchors inside the
+         * item rather than router links — and they open in a new tab, because
+         * leaving the app to read an answer and losing the screen you were
+         * asking about is the whole reason people stop opening the help.
+         */}
+        <DropdownMenuItem asChild>
+          <a
+            href={appHref("support", "/", locale)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <LifeBuoy aria-hidden="true" />
+            {content.userMenu.supportCentre}
+          </a>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <a href={appHref("docs")} target="_blank" rel="noreferrer">
+            <BookOpen aria-hidden="true" />
+            {content.userMenu.documentation}
+          </a>
+        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => switchRole(otherRole, locale)}>
