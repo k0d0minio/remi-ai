@@ -1,20 +1,68 @@
 # Initiatives
 
-> **Not yet written.** This page is the why-now that Scope, Define and Ship all read from. Until
-> it holds the real strategy, those stages have nothing to tie a feature to — filling it is the
-> first piece of business knowledge this repo needs.
-
-The shape it should take:
+The strategy the current work ladders up to, and what this quarter is measured against. Scope and
+Define read this page for the why-now; Ship quotes an objective from it, verbatim, in the ship note.
 
 ## Current initiative
 
-One paragraph: what we are trying to move, and over what horizon.
+**The founding pilot cohort, and the ecosystem it lands in.** REMI is pre-launch: nothing is sold as
+live, no customer data is processed, and there is no traction to report. What this period is trying
+to move is one question — will fifteen practitioners keep REMI once it stops being free — and the
+horizon is the enrolment window, which closes on 31 August 2026.
+
+The cohort is small on purpose and involved on purpose: fifteen practitioners, each application
+reviewed personally, shaping what gets built rather than testing what has been. It is co-designed
+with functional medicine through a signed partnership with Dr Georges Mouton's FunMedDev clinic,
+whose patients are among the first pilot users. Nothing about the cohort is a mailing list, and
+nothing built for it is announced before it works.
+
+| Pilot term       | What was agreed                                                                   |
+| ---------------- | --------------------------------------------------------------------------------- |
+| Cohort size      | 15 practitioners — a ceiling, and raising it is a product decision                |
+| Enrolment window | 1 July – 31 August 2026; applications arriving later are held, not rejected       |
+| Price            | €24.50 per practitioner per month, VAT excluded, held for the cohort's first year |
+| Billing starts   | 1 September 2026 — the pilot runs free until the window closes                    |
+| Commitment       | Month to month; leaving keeps the practitioner's plans exportable for 90 days     |
+
+> **The public site publishes none of these figures.** Its FAQ answers that pricing is not decided,
+> and the practitioner page says the pilot terms are still being finalised with the first
+> practitioners. So the table above is the pilot agreement the operator console renders — not a
+> claim the marketing site is making. One of the two is out of date; deciding which, before the
+> window closes, is real work rather than a copy edit.
 
 ## Objectives this quarter
 
-| Objective | Measure | Where it stands |
-| --------- | ------- | --------------- |
+| Objective                                                      | Measure                                                                                      | Where it stands                                                             |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| An ecosystem that looks and feels credible end to end          | An entry screen on every surface, one brand, a public help centre                            | Entry screens in place; brand foundation shipped; one help-centre page live |
+| Fifteen practitioners enrolled before the window closes        | 15 places filled between 1 July and 31 August 2026                                           | Window open; applications tracked in the console, no count published here   |
+| The core loop, end to end, for one practitioner and one person | Recommendations become a plan; the plan becomes meals and steps; progress comes back         | Both surfaces built, on fixture data — nothing persists yet                 |
+| The data question answered before the first record exists      | Trust posture published, residency intent written down, processors named before they process | Trust page live; storage, email and AI still uncommitted seams              |
 
-Ship quotes an objective verbatim from this page in its ship note. Define connects a spec's
-**Problem** to one. If a feature cannot be tied to a line here, that is a signal about the
-feature, not about the page.
+Where each of those actually stands, in more words than a cell holds:
+
+- **The ecosystem.** Web, admin, marketing, support and the demo sandbox each have a front door a
+  stranger can land on. The brand foundation landed on 3 August 2026 and put one wordmark, one icon
+  and one tagline across every app; this site's navbar was its last plain-text holdout. The help
+  centre is live with a single page — its article routes are written as structured content and not
+  yet routed.
+- **The cohort.** The enrolment window is open. Applications are tracked in the operator console,
+  which still renders fixture data, so no number appears here until it is a real one.
+- **The core loop.** The practitioner's practice, clients and therapeutic frame are built, as are
+  the person's today, meals, steps and plan. Every screen reads fixture data through the query
+  layer: registering a database replaces the body of each query and moves no caller.
+- **The data question.** The trust page is live on the public site. Storage, email and AI are still
+  seams in `@remi/services` with no vendor committed — which is exactly what keeps data residency a
+  selection criterion rather than a migration project.
+
+## What this page does not claim
+
+No users outside the pilot, no results, no revenue. The three statistics on the public site are WHO
+figures describing the problem REMI addresses, not outcomes REMI has produced, and this page holds
+to the same rule: a number that cannot be sourced does not appear here, and fixture data is not
+evidence.
+
+## How the pipeline uses this page
+
+Ship quotes an objective verbatim in its ship note. Define connects a spec's **Problem** to one. If
+a feature cannot be tied to a line above, that is a signal about the feature, not about the page.
