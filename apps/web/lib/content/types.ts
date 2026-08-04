@@ -3,8 +3,8 @@
  * TypeScript is what guarantees the French app never silently misses a label
  * the English one has.
  *
- * This covers the shell's chrome only: navigation, the user menu, empty and
- * placeholder states. Feature copy belongs with the feature.
+ * It covers chrome — navigation, labels, headings, empty states — for both
+ * surfaces.
  *
  * Note what is NOT here: a step's title, a recipe's method, a recommendation's
  * detail. Those are data, not chrome — they come from the query layer in the
@@ -14,7 +14,9 @@
 
 import type {
   MealSlot,
+  PersonalisationDimension,
   RecommendationCategory,
+  SignalKind,
   StepStatus,
 } from "@remi/services/shared";
 
@@ -69,9 +71,32 @@ export type Content = {
   };
   practitionerNav: NavItem[];
   personNav: NavItem[];
+  practice: {
+    title: string;
+    lead: string;
+    stats: {
+      attention: string;
+      active: string;
+      adherence: string;
+    };
+    attention: {
+      title: string;
+      allClients: string;
+      open: string;
+      empty: PlaceholderContent;
+    };
+    signals: {
+      title: string;
+      /** The four things that flow back up the loop between consultations. */
+      kinds: Record<SignalKind, string>;
+      empty: PlaceholderContent;
+    };
+  };
   clients: {
     title: string;
     lead: string;
+    /** The link at the end of every row, through to that client's page. */
+    open: string;
     columns: {
       name: string;
       status: string;
@@ -92,6 +117,103 @@ export type Content = {
     };
     never: string;
     empty: PlaceholderContent;
+  };
+  clientDetail: {
+    /** The link back up to the roster. */
+    back: string;
+    /** "Supported since {since} · next consultation {next}". */
+    lead: string;
+    preparePlan: string;
+    attention: string;
+    dimensions: {
+      title: string;
+      lead: string;
+      labels: Record<PersonalisationDimension, string>;
+      /** Where each dimension's content came from — never "the AI decided". */
+      sources: {
+        genotype: string;
+        /** "Therapeutic frame · {practitioner}". */
+        frame: string;
+        questionnaire: string;
+        /** "Declared by {name}". */
+        declared: string;
+      };
+      points: {
+        readiness: string;
+        motivators: string;
+        barriers: string;
+        dislikes: string;
+        allergies: string;
+        cooksFor: string;
+        cooking: string;
+        mealsOut: string;
+        shoppingDay: string;
+      };
+      /** Stands in for an empty list — an absence, stated rather than hidden. */
+      none: string;
+      /** Follows the number of weekday cooking minutes. */
+      minutes: string;
+    };
+    progress: {
+      title: string;
+      /** "Step {order} of {total}". */
+      stepOf: string;
+      label: string;
+      days: string;
+      empty: PlaceholderContent;
+    };
+    signals: {
+      title: string;
+      empty: PlaceholderContent;
+    };
+  };
+  planComposer: {
+    title: string;
+    /** "Consultation of {date} · {name}". */
+    lead: string;
+    notes: {
+      title: string;
+      lead: string;
+    };
+    structured: {
+      title: string;
+      /** "Untick what does not fit. Nothing unticked reaches {name}." */
+      lead: string;
+      /** "{confirmed} of {total} confirmed". */
+      count: string;
+      publish: string;
+    };
+    dialog: {
+      /** "Publish {name}'s plan?" */
+      title: string;
+      /** "{count} recommendations become meals and steps in their space…" */
+      body: string;
+      cancel: string;
+      confirm: string;
+    };
+    published: {
+      title: string;
+      /** "{name} will see {count} recommendations in their space." */
+      body: string;
+    };
+    empty: PlaceholderContent;
+  };
+  frame: {
+    title: string;
+    effects: {
+      title: string;
+      /** What the frame changes in practice, in REMI's own terms. */
+      points: string[];
+    };
+    principles: {
+      title: string;
+      /** Follows the count of switched-on principles: "3 active". */
+      active: string;
+    };
+    excluded: PlaceholderContent;
+    emphasised: PlaceholderContent;
+    add: string;
+    save: string;
   };
   today: {
     title: string;
@@ -139,14 +261,5 @@ export type Content = {
     days: string;
     status: Record<StepStatus, string>;
     empty: PlaceholderContent;
-  };
-  placeholders: {
-    /** Keyed by route segment, so a new placeholder route is one dictionary entry. */
-    practice: PlaceholderContent;
-    frame: PlaceholderContent;
-  };
-  prototypeNote: {
-    title: string;
-    body: string;
   };
 };
