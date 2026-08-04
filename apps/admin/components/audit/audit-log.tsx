@@ -60,6 +60,12 @@ export const AuditLog = ({ entries }: Props) => {
       </div>
 
       <AuditTable entries={shown} />
+
+      <Typography size="xs" tone="muted">
+        These entries are fixtures. The real log is written by the service layer
+        as each action lands, never by this screen — a console that can author
+        its own audit trail is not an audit trail.
+      </Typography>
     </div>
   );
 };
