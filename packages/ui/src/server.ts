@@ -69,6 +69,12 @@ export {
   BRAND_TAGLINE,
 } from "./lib/brand";
 
+/**
+ * The theme's server-side half. `themeScript` is a string a root layout renders
+ * before paint; `ThemeToggle` — the client half — lives in the main barrel.
+ */
+export { themeScript, type Theme } from "./lib/theme";
+
 export { CtaBand } from "./server/compound/cta-band";
 export { EmptyState } from "./server/compound/empty-state";
 export { FeatureGrid, type Feature } from "./server/compound/feature-grid";

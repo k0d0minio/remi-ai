@@ -15,7 +15,10 @@ const brandName = "REMI";
 const brandLegalName = "Remi AI";
 
 export const metadata = {
-  title: { default: `${brandName} docs`, template: `%s · ${brandName} docs` },
+  title: {
+    default: `${brandName} — docs`,
+    template: `%s · ${brandName} docs`,
+  },
   description: `How ${brandName} works — business direction and technical reference.`,
 };
 

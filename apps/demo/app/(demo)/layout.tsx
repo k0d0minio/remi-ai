@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import NextLink from "next/link";
-import { Badge, Typography } from "@remi/ui/server";
+import { Badge, Wordmark } from "@remi/ui/server";
 import { DemoMobileNav } from "@/components/demo-mobile-nav";
 import { DemoNav } from "@/components/demo-nav";
 import { SurfaceSwitcher } from "@/components/surface-switcher";
@@ -19,9 +19,7 @@ const DemoLayout = ({ children }: { children: ReactNode }) => (
           href="/"
           className="focus-visible:ring-ring/40 rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
         >
-          <Typography as="span" variant="display" size="xl">
-            REMI
-          </Typography>
+          <Wordmark />
         </NextLink>
         <Badge variant="warning" tone="subtle" size="sm">
           maquette
@@ -38,9 +36,7 @@ const DemoLayout = ({ children }: { children: ReactNode }) => (
     <div className="flex min-w-0 flex-1 flex-col">
       <header className="border-border bg-background/80 sticky top-0 z-30 flex h-14 items-center gap-3 border-b px-4 backdrop-blur-md md:hidden">
         <DemoMobileNav />
-        <Typography as="span" variant="display" size="lg">
-          REMI
-        </Typography>
+        <Wordmark size="sm" />
       </header>
 
       <main className="flex-1 px-4 py-8 md:px-8">{children}</main>

@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { isLocale, locales } from "@remi/services/shared";
-import { BRAND_NAME } from "@remi/ui/server";
+import { BRAND_NAME, themeScript } from "@remi/ui/server";
+import { getContent } from "@/lib/content";
 import "../globals.css";
 
 /**
@@ -34,13 +35,22 @@ export const generateStaticParams = (): Params[] =>
 /** Only /en and /fr exist — an unknown locale is a 404, not a half-valid render. */
 export const dynamicParams = false;
 
-export const metadata: Metadata = {
-  title: {
-    default: BRAND_NAME,
-    template: `%s · ${BRAND_NAME}`,
-  },
-  description: "The wellness copilot between consultations.",
-  robots: { index: false, follow: false },
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> => {
+  const { locale } = await params;
+  const { meta } = getContent(isLocale(locale) ? locale : "en");
+
+  return {
+    title: {
+      default: `${BRAND_NAME} — ${meta.title}`,
+      template: `%s · ${BRAND_NAME}`,
+    },
+    description: meta.description,
+    robots: { index: false, follow: false },
+  };
 };
 
 const RootLayout = async ({
@@ -62,6 +72,13 @@ const RootLayout = async ({
       suppressHydrationWarning
     >
       <body className="min-h-dvh antialiased">
+        {/*
+         * First child of <body> so it runs before the browser paints anything
+         * below it, which is what stops a dark-mode visitor seeing a white
+         * flash. `suppressHydrationWarning` on <html> above is the other half:
+         * this script mutates the class React is about to reconcile.
+         */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {children}
         <Analytics />
       </body>

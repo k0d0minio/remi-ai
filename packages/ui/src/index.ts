@@ -65,6 +65,7 @@ export {
 } from "./components/sheet";
 export { Switch } from "./components/switch";
 export { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/tabs";
+export { ThemeToggle } from "./components/theme-toggle";
 export {
   Tooltip,
   TooltipContent,

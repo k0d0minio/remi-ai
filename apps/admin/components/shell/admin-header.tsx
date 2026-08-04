@@ -1,4 +1,5 @@
 import { initials } from "@remi/services/shared";
+import { ThemeToggle } from "@remi/ui";
 import { Badge, Typography } from "@remi/ui/server";
 import { MobileNav } from "@/components/shell/mobile-nav";
 import { OperatorMenu } from "@/components/shell/operator-menu";
@@ -18,6 +19,18 @@ export const AdminHeader = () => (
     </Typography>
 
     <div className="ml-auto flex items-center gap-3">
+      {/*
+       * Admin has no locale dictionaries — it ships in English only — so the
+       * labels are written here rather than looked up.
+       */}
+      <ThemeToggle
+        label="Appearance"
+        optionLabels={{
+          system: "Match system",
+          light: "Light",
+          dark: "Dark",
+        }}
+      />
       <Badge variant="neutral" tone="subtle" size="sm">
         {deployment.environment}
       </Badge>
