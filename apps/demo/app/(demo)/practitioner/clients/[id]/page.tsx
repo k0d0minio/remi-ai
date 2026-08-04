@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
+  Activity,
   ArrowLeft,
   Brain,
   Camera,
@@ -118,12 +119,23 @@ const Page = async ({ params }: { params: Promise<Params> }) => {
               {client.nextConsultation}
             </Typography>
           </div>
-          <Button asChild>
-            <NextLink href={`/practitioner/clients/${client.id}/plan`}>
-              <NotebookPen aria-hidden="true" />
-              Préparer le plan
-            </NextLink>
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button asChild variant="outline">
+              <NextLink href={`/practitioner/clients/${client.id}/labs`}>
+                <Activity aria-hidden="true" />
+                Biologie et marqueurs
+                <Badge variant="info" tone="subtle" size="sm">
+                  à venir
+                </Badge>
+              </NextLink>
+            </Button>
+            <Button asChild>
+              <NextLink href={`/practitioner/clients/${client.id}/plan`}>
+                <NotebookPen aria-hidden="true" />
+                Préparer le plan
+              </NextLink>
+            </Button>
+          </div>
         </div>
       </div>
 

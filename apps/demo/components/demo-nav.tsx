@@ -11,6 +11,7 @@ import {
   Sparkles,
   Stethoscope,
   Sun,
+  TrendingUp,
   Users,
 } from "lucide-react";
 import NextLink from "next/link";
@@ -33,6 +34,12 @@ const practitionerItems: Item[] = [
     href: "/practitioner/clients",
     label: "Personnes accompagnées",
     icon: Users,
+  },
+  {
+    href: "/practitioner/analytics",
+    label: "Cohorte",
+    icon: TrendingUp,
+    upcoming: true,
   },
   {
     href: "/practitioner/messages",
