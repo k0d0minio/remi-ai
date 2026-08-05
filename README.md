@@ -70,3 +70,7 @@ see where everything stands. The map is [`pipeline/CONTEXT.md`](pipeline/CONTEXT
 | What the product is and does      | `apps/docs` — business direction and technical reference |
 
 Each rule lives in exactly one of those. If two files say the same thing, one of them is wrong.
+
+[remiai](https://www.remiai.be/) ·
+[manus pitch deck](https://remi-ai-ppt-mnnqjh7r.manus.space/) ·
+[remiai odoo](https://remiai1.odoo.com/)
