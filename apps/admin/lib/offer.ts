@@ -33,7 +33,7 @@ export const offer = {
     title: "Where we already agree",
     body: [
       "Before anything else: I want to build this, with you. The demand side of REMI is real and it is not mine — the FunMedDev relationship, the practitioners who have already said yes, and the clinical judgement behind the therapeutic frame all came from you two. LivingMatrix reached 600 practices at $129 a month through exactly that kind of channel, and nobody has run that play in Europe yet. That is worth saying plainly rather than negotiating around.",
-      "What follows is one argument, three facts, and three alternatives. If you disagree with a line of it, say so and we will work it out in the room. This is a conversation, not a position paper.",
+      "What follows is one argument, three facts, and two alternatives. If you disagree with a line of it, say so and we will work it out in the room. This is a conversation, not a position paper.",
     ],
   },
 
@@ -77,15 +77,15 @@ export const offer = {
       },
       {
         label: "Forgone in year one",
-        value: "€88,000",
+        value: "€88,320",
         detail:
-          "€120 an hour invoiced, roughly 92 working days a year, none of it charged. That is what “no cash before funding” actually costs, and it repeats in year two if the round is slow.",
+          "€120 an hour invoiced, 92 working days a year — two days a week with six weeks off — and none of it charged. That is what “no cash before funding” actually costs, and it repeats in year two if the round is slow.",
       },
       {
         label: "Already built, sole-authored",
         value: "29,511 lines",
         detail:
-          "Six deployed apps, a design system, a services layer and a delivery pipeline across 310 TypeScript files — every commit in the log under one name, written in six days. Assigned to the company in writing on the day we sign.",
+          "Six deployed apps, a design system, a services layer and a delivery pipeline across 310 TypeScript files — every commit in the log under one name. Assigned to the company in writing on the day we sign.",
       },
     ] satisfies Row[],
   },
@@ -95,7 +95,7 @@ export const offer = {
     points: [
       {
         label: "Equity",
-        body: "10% fully diluted, earned month by month over four years, with nothing at all before month twelve.",
+        body: "10% fully diluted, issued in full on the day we sign. No vesting schedule and no cliff — most of what the shares pay for is already written and in your hands, so there is nothing to earn out over four years.",
       },
       {
         label: "Time",
@@ -106,27 +106,23 @@ export const offer = {
         body: "None. No salary, no fee, nothing accruing quietly in the background.",
       },
       {
-        label: "The two protections",
-        body: "The twelve-month cliff protects you — if I do not deliver, you owe me nothing. The good-leaver waiver protects me, so that cliff cannot be used to end this in month eleven at no cost. I would like both, and I think both are fair.",
+        label: "What 10% settles",
+        body: "At 10% I write off the invoices already accrued and ask for no signing bonus. Those invoices are a year of two days a week at €120 an hour — 92 working days, €88,320 — billed at a 20% discount, so €70,656. At 10% none of it is billed at all. No lump sum now to cover the risk, no back pay later: the shares are the whole of it, and the slate starts clean on the day we sign.",
       },
     ] satisfies Point[],
   },
 
   alternatives: {
     title: "If 10% is not available",
-    lead: "If the cap table genuinely cannot move, I would much rather find the shape that works than let a percentage point end it. Three ways, in the order I would take them.",
+    lead: "If the cap table genuinely cannot move, I would much rather find the shape that works than let a percentage point end it. At 5% the equity no longer covers the risk on its own, so one of these two has to sit beside it. Either works; I do not need both.",
     points: [
       {
-        label: "Milestone step-ups",
-        body: "6% now, a further 2% when the pilot backend ships, a further 2% if my time goes to three days a week. You would be paying in equity only for outcomes you can see, and nothing changes today.",
+        label: "A signing bonus",
+        body: "We sign at 5%, issued in full the same day, and €10,000–€20,000 is paid on signature. Not a fee for the days ahead — a one-off against the risk I am carrying by taking a minority stake in something that is not funded yet.",
       },
       {
-        label: "Fees that accrue from signature",
-        body: "From the day we sign until a round closes, my hours accrue at €120 an hour as a deferred fee — paid out of the round, and capped so it can never eat into the raise. At two days a week that is roughly €100,000 over twelve months. Not a bonus: a deferral of money I would otherwise be billing elsewhere.",
-      },
-      {
-        label: "A top-up at the first round",
-        body: "We sign at 5% now, and I am restored toward 10% when the first money arrives, ahead of the new-money dilution.",
+        label: "The accrued invoices, paid from the round",
+        body: "We sign at 5%, issued in full the same day, and the €70,656 already accrued is settled out of the first round that closes — capped so it can never eat into the raise. That figure is the invoiced rate less 20%, not the Slicing Pie uplift.",
       },
     ] satisfies Point[],
   },
