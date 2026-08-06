@@ -6,12 +6,15 @@ import { Prose } from "@/components/offer/prose";
 import { author, offer, preparedOn } from "@/lib/offer";
 
 /**
- * Deliberately absent from `navSections`. Every other route in this console is
- * operational and belongs in the sidebar; this one is a private conversation
- * that happens to live at a URL, and a link to it in the operator navigation
- * would put it in front of every future operator who has no business reading
- * it. The whole app is already `noindex` from the root layout, and
- * `app/robots.ts` keeps crawlers off the path as well.
+ * Linked from the sidebar under its own "Company" section rather than filed
+ * among the operational routes, because it is not one — nothing here acts on
+ * the cohort. Discoverability is the point: this page is meant to be opened in
+ * front of the people it concerns, not hunted for by URL.
+ *
+ * That does mean anyone who can reach the console can read it, so the console's
+ * access gate is what keeps it private. The whole app is `noindex` from the
+ * root layout and `app/robots.ts` disallows crawling, but neither of those is
+ * an access control.
  */
 export const metadata: Metadata = {
   title: "Offer",

@@ -3,8 +3,9 @@
  *
  * A private page inside the operator console rather than a document, so it can
  * be opened and talked through in the room instead of sent ahead and read
- * alone. It is unlinked from the navigation for the same reason the marketing
- * site's proposal is unlinked: the audience is three people who know the URL.
+ * alone. It sits in the sidebar under "Company" so it can be reached mid
+ * conversation; what keeps it private is the console's access gate, not
+ * obscurity.
  *
  * Every figure traces to one of three sources — the €120/hour invoiced rate,
  * the two-days-a-week commitment, or the repository's own commit history — and
