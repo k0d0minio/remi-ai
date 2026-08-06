@@ -49,6 +49,6 @@ export const navSections: NavSection[] = [
   },
   {
     title: "Company",
-    items: [{ href: "/offer", label: "CTO offer", icon: Handshake }],
+    items: [{ href: "/offer", label: "Offre CTO", icon: Handshake }],
   },
 ];
