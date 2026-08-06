@@ -77,9 +77,9 @@ export const offer = {
       },
       {
         label: "Forgone in year one",
-        value: "€88,000",
+        value: "€88,320",
         detail:
-          "€120 an hour invoiced, roughly 92 working days a year, none of it charged. That is what “no cash before funding” actually costs, and it repeats in year two if the round is slow.",
+          "€120 an hour invoiced, 92 working days a year — two days a week with six weeks off — and none of it charged. That is what “no cash before funding” actually costs, and it repeats in year two if the round is slow.",
       },
       {
         label: "Already built, sole-authored",
@@ -107,7 +107,7 @@ export const offer = {
       },
       {
         label: "What 10% settles",
-        body: "At 10% I write off the invoices already accrued and ask for no signing bonus. No lump sum now to cover the risk, no back pay later — the shares are the whole of it, and the slate starts clean on the day we sign.",
+        body: "At 10% I write off the invoices already accrued and ask for no signing bonus. Those invoices are a year of two days a week at €120 an hour — 92 working days, €88,320 — billed at a 20% discount, so €70,656. At 10% none of it is billed at all. No lump sum now to cover the risk, no back pay later: the shares are the whole of it, and the slate starts clean on the day we sign.",
       },
     ] satisfies Point[],
   },
@@ -122,7 +122,7 @@ export const offer = {
       },
       {
         label: "The accrued invoices, paid from the round",
-        body: "We sign at 5%, issued in full the same day, and the invoices already accrued are settled out of the first round that closes — capped so they can never eat into the raise, and paid at the invoiced rate rather than uplifted.",
+        body: "We sign at 5%, issued in full the same day, and the €70,656 already accrued is settled out of the first round that closes — capped so it can never eat into the raise. That figure is the invoiced rate less 20%, not the Slicing Pie uplift.",
       },
     ] satisfies Point[],
   },
