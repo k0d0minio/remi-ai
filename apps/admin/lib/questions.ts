@@ -132,6 +132,24 @@ export const questions = {
             },
           ],
         },
+        {
+          title: "L'intelligence artificielle doit-elle voir les prénoms ?",
+          context:
+            "Quand Remi génère un plan ou un texte, l'IA peut travailler sur des données pseudonymisées — « la personne », sans prénom ni détail identifiant — ou recevoir les vrais prénoms. Précision qui compte : même pseudonymisée, l'expérience peut rester chaleureuse, le prénom étant réinséré à l'affichage, chez nous, sans jamais partir chez le fournisseur d'IA. La vraie question est de savoir si le ton personnel justifie qu'une donnée personnelle de plus circule — et ce ton, c'est vous qui le portez auprès des praticiens.",
+          choices: [
+            {
+              label: "Pseudonymiser",
+              detail:
+                "L'IA ne voit jamais un prénom ni un détail identifiant. Moins de données personnelles chez un sous-traitant, un registre plus simple, et un argument fort auprès des praticiens — pour un coût technique modeste.",
+              recommended: true,
+            },
+            {
+              label: "Les prénoms réels",
+              detail:
+                "L'IA reçoit le prénom et peut écrire des textes qui l'utilisent naturellement, au-delà de la simple salutation. Plus direct — et une donnée personnelle de plus à documenter et à protéger chez le fournisseur.",
+            },
+          ],
+        },
       ],
     },
     {

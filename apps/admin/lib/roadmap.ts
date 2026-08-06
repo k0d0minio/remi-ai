@@ -58,8 +58,8 @@ export const roadmap = {
       items: [
         {
           title: "La base de données et les comptes",
-          status: "décision en cours",
-          body: "Choisir le fournisseur de base de données et d'authentification — le choix technique est en cours côté Jamie, avec une nette préférence pour un hébergement européen — puis remplacer les données de démonstration par la vraie persistance : comptes praticien et personne, relation d'accompagnement, plans. L'architecture a été construite pour que ce soit un branchement.",
+          status: "à faire",
+          body: "Le choix est fait : Neon, un Postgres hébergé en Europe, et une connexion par lien magique — sans mot de passe — avec une double authentification simple pour les praticiens. Reste à brancher : comptes praticien et personne, relation d'accompagnement, plans. L'architecture a été construite pour que ce soit un branchement, et le socle reste ouvert à une évolution vers Supabase plus tard — c'est le même moteur en dessous.",
         },
         {
           title: "Le socle légal",
@@ -99,13 +99,13 @@ export const roadmap = {
         },
         {
           title: "L'IA, dans le cadre",
-          status: "décision en cours",
-          body: "Brancher le fournisseur d'intelligence artificielle — choix technique en cours côté Jamie — avec le cadre thérapeutique comme garde-fou architectural : hors du cadre fixé par le praticien, Remi n'improvise pas, il le dit et renvoie vers le praticien. Chaque sortie de l'IA laisse une trace consultable, parce qu'un accompagnement dont on ne peut pas relire ce qui a été dit n'est pas auditable.",
+          status: "à faire",
+          body: "Le branchement est décidé — l'accès passe par la passerelle IA de notre hébergeur — et le garde-fou est architectural : chaque sortie de l'IA est validée contre le cadre fixé par le praticien avant d'être affichée, et laisse une trace consultable. Hors du cadre, Remi n'improvise pas : il le dit et renvoie vers le praticien. Une question reste ouverte pour vous — la question 5 de la page voisine : l'IA doit-elle voir les prénoms ?",
         },
         {
           title: "Le support en vrai",
           status: "à faire",
-          body: "La boîte de support de la console branchée sur de vrais messages, les premiers articles du centre d'aide publiés en français, et l'engagement de délai — question 9 de la page voisine — affiché plutôt que supposé.",
+          body: "La boîte de support de la console branchée sur de vrais messages, les premiers articles du centre d'aide publiés en français, et l'engagement de délai — question 10 de la page voisine — affiché plutôt que supposé.",
         },
       ],
     },
@@ -116,7 +116,7 @@ export const roadmap = {
         {
           title: "La facturation",
           status: "décision en attente",
-          body: "24,50 € HTVA par praticien par mois, gelé un an pour la cohorte. L'entité qui facture, la TVA et la mécanique — manuelle ou automatisée — sont la question 6 de la page voisine ; l'implémentation suit la décision, pas l'inverse.",
+          body: "24,50 € HTVA par praticien par mois, gelé un an pour la cohorte. L'entité qui facture, la TVA et la mécanique — manuelle ou automatisée — sont la question 7 de la page voisine ; l'implémentation suit la décision, pas l'inverse.",
         },
         {
           title: "La sécurité qui se prouve",
@@ -139,12 +139,12 @@ export const roadmap = {
       {
         title: "L'espace de travail commun",
         status: "décision en attente",
-        body: "Slack comme lieu du travail produit — listes, canvas, décisions — en français. C'est la question 12 de la page voisine, et le premier pas est une invitation.",
+        body: "Slack comme lieu du travail produit — listes, canvas, décisions — en français. C'est la question 13 de la page voisine, et le premier pas est une invitation.",
       },
       {
         title: "Le site public remis d'accord avec la réalité",
         status: "décision en attente",
-        body: "La FAQ publique et les conditions du pilote se contredisent sur le prix — question 5 de la page voisine. Quel que soit le choix, le site doit dire une seule chose, partout.",
+        body: "La FAQ publique et les conditions du pilote se contredisent sur le prix — question 6 de la page voisine. Quel que soit le choix, le site doit dire une seule chose, partout.",
       },
       {
         title: "La langue de travail",
