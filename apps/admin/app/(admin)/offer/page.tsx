@@ -17,7 +17,7 @@ import { author, offer, preparedOn } from "@/lib/offer";
  * an access control.
  */
 export const metadata: Metadata = {
-  title: "Offer",
+  title: "Offre",
 };
 
 const Offer = () => (
@@ -81,7 +81,7 @@ const Offer = () => (
       <Prose body={offer.closing.body} />
       <Separator tone="subtle" />
       <Typography size="xs" tone="muted">
-        {author} · {preparedOn} · Nothing here is binding
+        {author} · {preparedOn} · Rien ici n'a de valeur contraignante
       </Typography>
     </section>
   </div>
