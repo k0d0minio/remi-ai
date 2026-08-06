@@ -205,7 +205,10 @@ export const practitioners: Practitioner[] = [
     specialty: "Médecine fonctionnelle",
     practice: "FunMedDev",
     city: "Brussels",
-    email: "georges.mouton@funmeddev.be",
+    // `.example` is reserved by RFC 2606 and can never route. The rest of this
+    // record is invented activity against a real person's name, so the one
+    // field that could reach a real inbox must not be able to.
+    email: "georges.mouton@funmeddev.example",
     status: "onboarded",
     clientCount: 18,
     joinedDate: "2 June 2026",
