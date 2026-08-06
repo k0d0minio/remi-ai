@@ -1,0 +1,62 @@
+# Decisions
+
+The technical decision log. A decision recorded here is **set**: a spec cites it instead of
+reopening it, and the Build stage treats it as ground truth. Reopening one is a real event — it
+happens on this page, in a PR, never silently inside a spec. Each entry carries the date it was
+taken and, where it matters, the condition that would reopen it.
+
+Business decisions are not here — open ones live on the operator console's « Questions ouvertes »
+page until Morgane and Arnaud answer them.
+
+## Data layer — 2026-08-06
+
+- **Database: Neon** — serverless Postgres, EU region. Supabase remains the likely eventual home;
+  it is the same Postgres underneath, so the storage seam keeps that move an adapter swap, not a
+  migration project. Revisit when approaching the scaling threshold, or when a Supabase-only
+  capability (RLS-as-auth, storage buckets) is genuinely needed.
+- **Auth: magic links, kept simple.** One lightweight auth for both roles — no passwords — with
+  the session carrying `practitioner` or `person`. Practitioners additionally get **2FA that must
+  stay low-friction**; ease of enrolment is a requirement, not a nice-to-have.
+- **Tenancy: the care relationship is the access primitive.** A practitioner↔person relationship
+  row with a start and an end; every query in the services layer scopes through it, and the end
+  date ends access. This maps one-to-one onto RLS policies if Supabase arrives later.
+
+## AI layer — 2026-08-06
+
+- **Provider access goes through the Vercel AI Gateway** (`AI_GATEWAY_API_KEY`), not a direct
+  vendor SDK. Model ids stay behind the `fast` / `balanced` / `deep` roles in
+  `packages/services/src/ai/`.
+- **Guardrails are architectural, from the first adapter.** Model output is validated against the
+  therapeutic frame *before* it renders, and every AI output is persisted with its context — an
+  audit trail, not a hope. The `TextProvider` seam grows this surface before any vendor lands
+  behind it.
+- **Pseudonymization is an open business question** — « Questions ouvertes », question 5. Jamie
+  leans pseudonymize (the model never sees a name; names re-enter at render); the personal-tone
+  tradeoff belongs to Morgane and Arnaud. No AI feature spec assumes either answer until it lands.
+
+## Platform — 2026-08-06
+
+- **Vercel function regions pinned to the EU**, all six apps — compute sits beside the data, and
+  the residency story holds end to end.
+- **Email: Resend.** The seam's reserved variables (`RESEND_API_KEY`, `EMAIL_FROM`) become real
+  when the mailer adapter lands; sending happens from a transactional subdomain.
+- **Observability: Vercel's built-in suite first** — runtime logs, alerting, analytics on the Pro
+  plan — before paying for a dedicated error tracker. Sentry's reserved rows in `docs/ENV.md` stay
+  unwired unless exception grouping proves insufficient in practice.
+- **Admin console: Vercel deployment protection now** (accepting the Pro plan cost), real operator
+  authentication in roadmap phase 3. The console's current protection — an unpublished address and
+  `noindex` — is not an access control and is not treated as one.
+
+## Engineering practice — 2026-08-06
+
+- **Test-driven development wherever possible**, with a hard 75% coverage floor on the database
+  layer aiming for 90%. Canonical rule and mechanics: `/CONVENTIONS.md` → Testing.
+- **Mobile: responsive web for the pilot; a real app-store presence is a stated goal.** The hedge
+  is architectural, not a framework bet today: the person-facing core loop is built API-first —
+  route handlers / server actions over the same services — so a future native client consumes the
+  seam the web app already uses. The wrapper-vs-React-Native choice (Capacitor keeping one
+  codebase vs Expo with a second, truly native UI) is deliberately deferred until app-store work
+  is scheduled; native health integrations (HealthKit / Health Connect for steps) are the likely
+  deciding argument.
+- **Bilingual v1.** The product ships French and English, matching the marketing site. `apps/web`
+  already routes through `[locale]`; the work is finishing dictionaries, not building a system.

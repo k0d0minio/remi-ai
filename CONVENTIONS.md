@@ -95,6 +95,23 @@ app links it by are one fact.
 - ✓ `Save changes` · `Billing overview` · `Awaiting approval`
 - ✗ `Save Changes` · `Billing Overview` · `Awaiting Approval`
 
+## Working languages
+
+The repo works in two languages, and the split is a rule, not a habit:
+
+- **English is the language of the codebase.** Identifiers, comments, commit messages, PRs, and
+  every technical document — this file included.
+- **French is the language of review.** Any document prepared for Morgane and Arnaud to analyse,
+  review or sign off — the console's Company pages, business questions, roadmaps, offers — is
+  written in French. They read English fine; the point is that a review should never double as a
+  translation exercise. Belgian register (« jours prestés », « HTVA ») and French typography: a
+  space before `%` and `€`, a space as the thousands separator, a comma for the decimal,
+  guillemets for quotes.
+- **French is the language of the conversation with them** — Slack, email, meeting notes —
+  whoever starts the thread.
+- **Product copy is out of scope here.** UI strings follow each app's locale system (`marketing`
+  ships English and French); this section governs working documents, not the product.
+
 ## The design system
 
 ### `packages/ui` — the only home for primitives
@@ -148,6 +165,17 @@ discovering twenty thousand lines of drift in an audit two years from now.
   consumer goes, the symbol and its barrel line go too.
 - **No dead configuration.** A flag, env var or config key with no reader is deleted, not left
   "in case". `docs/ENV.md` is the check: a variable not in that table does not exist.
+
+## Testing
+
+- **Test-driven wherever possible.** For logic with a definable contract — the services layer above
+  all — the test lands in the same PR as the implementation, written with it or before it. UI
+  composition is exempt; behaviour is not.
+- **Coverage floors on the database layer.** `packages/services/src/db/` carries a hard floor of
+  75% line coverage and aims for 90%. A PR that drops it below the floor is red.
+- The harness (runner + coverage gate in `.github/workflows/quality.yaml`) arrives with the first
+  db adapter PR; until then this section is the standing instruction. Tests run in the factory,
+  not locally — the same rule as every other check.
 
 ## Environment variables
 

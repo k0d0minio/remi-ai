@@ -63,7 +63,8 @@ result back from the PR's check runs.
 
 Nothing below is restated here. Each rule lives once, and loads on demand.
 
-- **[`CONVENTIONS.md`](CONVENTIONS.md)** — code style, design-system rules, leanness rules, git.
+- **[`CONVENTIONS.md`](CONVENTIONS.md)** — code style, design-system rules, leanness rules,
+  working languages, git.
   The canonical code rules: the Build stage loads it by path. Read it before editing code.
 - **[`pipeline/CONTEXT.md`](pipeline/CONTEXT.md)** — the delivery pipeline. The map of its gated
   stages; each stage's contract is `pipeline/stages/NN_*/CONTEXT.md`.

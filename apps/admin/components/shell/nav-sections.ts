@@ -1,8 +1,10 @@
 import {
+  CircleHelp,
   Flag,
   Handshake,
   LayoutDashboard,
   LifeBuoy,
+  Milestone,
   Rocket,
   ScrollText,
   Stethoscope,
@@ -22,9 +24,11 @@ export type NavSection = {
 
 /**
  * The console's whole surface, in the order an operator works through it: the
- * cohort first, then the tooling that acts on it, and last the founding
- * paperwork — which is not operational at all, and so gets its own section
- * rather than sitting among the tools an operator reaches for daily.
+ * cohort first, then the tooling that acts on it, and last the founders' shelf
+ * — the pages written for Morgane and Arnaud to review, in French per the
+ * working-languages rule in `CONVENTIONS.md`. None of those act on the cohort,
+ * so they get their own section rather than sitting among the tools an
+ * operator reaches for daily.
  *
  * The icon is the component rather than a name, unlike the product app's nav —
  * admin has no locale dictionaries, so there is no serialisable-data constraint
@@ -49,6 +53,10 @@ export const navSections: NavSection[] = [
   },
   {
     title: "Company",
-    items: [{ href: "/offer", label: "Offre CTO", icon: Handshake }],
+    items: [
+      { href: "/roadmap", label: "Feuille de route", icon: Milestone },
+      { href: "/questions", label: "Questions ouvertes", icon: CircleHelp },
+      { href: "/offer", label: "Offre CTO", icon: Handshake },
+    ],
   },
 ];
