@@ -166,6 +166,17 @@ discovering twenty thousand lines of drift in an audit two years from now.
 - **No dead configuration.** A flag, env var or config key with no reader is deleted, not left
   "in case". `docs/ENV.md` is the check: a variable not in that table does not exist.
 
+## Testing
+
+- **Test-driven wherever possible.** For logic with a definable contract — the services layer above
+  all — the test lands in the same PR as the implementation, written with it or before it. UI
+  composition is exempt; behaviour is not.
+- **Coverage floors on the database layer.** `packages/services/src/db/` carries a hard floor of
+  75% line coverage and aims for 90%. A PR that drops it below the floor is red.
+- The harness (runner + coverage gate in `.github/workflows/quality.yaml`) arrives with the first
+  db adapter PR; until then this section is the standing instruction. Tests run in the factory,
+  not locally — the same rule as every other check.
+
 ## Environment variables
 
 Every server-side `process.env` read goes through `env()` / `requireEnv()` in
