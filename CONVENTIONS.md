@@ -95,6 +95,23 @@ app links it by are one fact.
 - ✓ `Save changes` · `Billing overview` · `Awaiting approval`
 - ✗ `Save Changes` · `Billing Overview` · `Awaiting Approval`
 
+## Working languages
+
+The repo works in two languages, and the split is a rule, not a habit:
+
+- **English is the language of the codebase.** Identifiers, comments, commit messages, PRs, and
+  every technical document — this file included.
+- **French is the language of review.** Any document prepared for Morgane and Arnaud to analyse,
+  review or sign off — the console's Company pages, business questions, roadmaps, offers — is
+  written in French. They read English fine; the point is that a review should never double as a
+  translation exercise. Belgian register (« jours prestés », « HTVA ») and French typography: a
+  space before `%` and `€`, a space as the thousands separator, a comma for the decimal,
+  guillemets for quotes.
+- **French is the language of the conversation with them** — Slack, email, meeting notes —
+  whoever starts the thread.
+- **Product copy is out of scope here.** UI strings follow each app's locale system (`marketing`
+  ships English and French); this section governs working documents, not the product.
+
 ## The design system
 
 ### `packages/ui` — the only home for primitives
