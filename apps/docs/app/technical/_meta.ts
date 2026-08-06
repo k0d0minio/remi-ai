@@ -3,4 +3,5 @@ export default {
   applications: "Applications",
   packages: "Packages",
   development: "Development",
+  decisions: "Decisions",
 };
