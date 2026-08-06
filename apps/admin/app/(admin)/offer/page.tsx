@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Separator, Typography } from "@remi/ui/server";
+import { Prose } from "@/components/company/prose";
 import { FigureRows } from "@/components/offer/figure-rows";
 import { PointList } from "@/components/offer/point-list";
-import { Prose } from "@/components/offer/prose";
 import { author, offer, preparedOn } from "@/lib/offer";
 
 /**
