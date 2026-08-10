@@ -5,7 +5,7 @@
 | **Type** | chore |
 | **Priority** | P0 |
 | **Size** | Hours |
-| **Depends on** | REMI-001 (verify protection first, so removal isn't racing exposure) |
+| **Depends on** | REMI-001 (gate the console first, so removal isn't racing exposure) |
 | **Blocked by** | Owner confirmation that the equity-offer page may leave the deployed app |
 | **Sources** | audit F-30 ("decide whether a negotiation document belongs in a deployed app at all"), D-1 recommendation |
 
@@ -14,10 +14,10 @@
 The admin app contains, as page content: a document headed "Confidentiel" with the live equity
 negotiation (`apps/admin/lib/offer.ts`), internal legal/strategy deliberations
 (`apps/admin/lib/questions.ts`), and the unpublished signed pilot terms (in
-`apps/admin/lib/fixtures.ts`). Even with deployment protection ON, a negotiation document gains
-nothing from being a website: every person with admin access, every preview deployment, and the
-git history carry it. The audit's recommendation is to take the equity-offer page out of the
-deployed app regardless of D-1's outcome.
+`apps/admin/lib/fixtures.ts`). Even behind REMI-001's operator sign-in, a negotiation document
+gains nothing from being a website: every operator, every preview deployment, and the git history
+carry it. The audit's recommendation is to take the equity-offer page out of the deployed app
+regardless of how the console is gated.
 
 ## Required steps
 

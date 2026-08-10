@@ -34,14 +34,16 @@ a ticket's **Blocked by** row says an owner decision or external input is still 
 ## Owner decisions that gate tickets
 
 These cannot be made by an agent. Each is written out in `docs/audit-report.md` §7,
-`docs/v1-report.md` §9.3 and indexed in `docs/info-gathering.md` §I.
+`docs/v1-report.md` §9.3 and indexed in `docs/info-gathering.md` §I. Struck-through rows are
+settled — they stay listed so the record of what was decided, and where it landed, does not vanish.
 
 | Decision | Question | Gates tickets |
 | -------- | -------- | ------------- |
-| D-1 | Deployment protection on admin; docs public or private? | 001 |
+| ~~D-1~~ | **Decided:** the admin console is gated by in-app operator sign-in, not Vercel deployment protection | — |
+| D-1b | Docs site public, or private with the business pages moved out? | 001 ships the reversible noindex interim; 013 |
 | D-v1-2 / REQ-30 | Is REMI patient-facing, practitioner-facing, or both? | 027–039 (scoping of every ported screen) |
 | D-v1-1 / REQ-12 | What happens to the Python meal-plan API? | 033, 034 |
-| D-2 | Database vendor — Neon or Supabase? | 022 |
+| ~~D-2~~ | **Decided:** Neon. Recorded by 001, which opens the project; 022 still owns the full adapter | — |
 | D-3 | Auth implementation for the magic-link shape? | 023 |
 | D-4 | How does billing happen on 1 September? | 025 |
 | D-5 | Pseudonymise before the AI provider? + DPAs | 026, 034 |
@@ -52,7 +54,7 @@ These cannot be made by an agent. Each is written out in `docs/audit-report.md` 
 ## Ticket index
 
 ### Phase 0 — Close the live risks
-- [REMI-001](REMI-001-admin-docs-exposure.md) — Verify deployment protection on admin; settle docs-site visibility
+- [REMI-001](REMI-001-admin-operator-auth.md) — Gate the admin console behind Neon-backed operator sign-in
 - [REMI-002](REMI-002-remove-confidential-content.md) — Remove confidential negotiation content from the admin app
 - [REMI-003](REMI-003-deidentify-fixtures.md) — De-identify fixtures: fictional practitioner, reserved email domains
 - [REMI-004](REMI-004-contact-form-delivery.md) — Give the contact form delivery and a record
@@ -79,7 +81,7 @@ These cannot be made by an agent. Each is written out in `docs/audit-report.md` 
 - [REMI-021](REMI-021-promote-admin-entities.md) — Promote the admin console's entities into the shared model layer
 
 ### Phase 3 — Infrastructure
-- [REMI-022](REMI-022-database-adapter.md) — Choose the database vendor and land the first adapter
+- [REMI-022](REMI-022-database-adapter.md) — Land the first database adapter on Neon
 - [REMI-023](REMI-023-real-authentication.md) — Real authentication: magic links through the session seam
 - [REMI-024](REMI-024-security-headers.md) — Security headers on the authenticated surfaces
 - [REMI-025](REMI-025-billing.md) — Billing for 1 September
