@@ -19,21 +19,21 @@ weeks of foundation work plus a handful of decisions only the owner can make (da
 authentication, payments, the data-protection posture). None of the gaps is expensive relative to
 what is already built.
 
-| # | Area | Rating | One-line reason |
-| - | ---- | ------ | --------------- |
-| 1 | Structure and boundaries | Good, gaps | The boundaries genuinely hold everywhere; the repo's own "no export without a user" rule is broken ~20 times |
-| 2 | The stack | Solid | One version of everything, everywhere; a few version pins live outside the shared catalogue |
-| 3 | The connections map | Missing | Except analytics, nothing external is connected — deliberate, but the empty rows are real, and one live form silently loses messages |
-| 4 | The seams | Good, gaps | Well-built plug sockets, but the database socket is too small for the first real screen and the AI socket is too thin for the product's own rules |
-| 5 | The data model | Needs work | The access-control entity the docs call decided does not exist; auth, audit and consent have no entities at all |
-| 6 | Configuration and environments | Solid | The three-list rule holds exactly; secrets hygiene is exemplary; two cosmetic nits |
-| 7 | Build, CI and deployment | Good, gaps | Real enforcement with a zero-warning ceiling, but documentation-only changes skip checks entirely and the human gates are enforced by nothing |
-| 8 | Testing | Missing | Zero test files, no runner, no CI step — against a stated 75% coverage commitment |
-| 9 | Running it in production | Missing | A production crash is invisible today: no error tracking, no health checks, no alerts |
-| 10 | Security and data protection | Needs work | Confidential business content is one URL-guess away; no authentication exists; secrets handling, by contrast, is exemplary |
-| 11 | Scale | Good, gaps | The rendering and bundle discipline is right; one baked-in slow-query pattern and two deployment-config traps |
-| 12 | The user-facing surface | Good, gaps | Design-system and language discipline near 100%; missing skip links and some public-site polish |
-| 13 | Documentation honesty | Good, gaps | Mechanically excellent (zero broken links), but "every rule lives in one place" is not true in practice, and five duplicated rules have already drifted |
+| #   | Area                           | Rating     | One-line reason                                                                                                                                         |
+| --- | ------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Structure and boundaries       | Good, gaps | The boundaries genuinely hold everywhere; the repo's own "no export without a user" rule is broken ~20 times                                            |
+| 2   | The stack                      | Solid      | One version of everything, everywhere; a few version pins live outside the shared catalogue                                                             |
+| 3   | The connections map            | Missing    | Except analytics, nothing external is connected — deliberate, but the empty rows are real, and the one live form collects messages it cannot deliver    |
+| 4   | The seams                      | Good, gaps | Well-built plug sockets, but the database socket is too small for the first real screen and the AI socket is too thin for the product's own rules       |
+| 5   | The data model                 | Needs work | The access-control entity the docs call decided does not exist; auth, audit and consent have no entities at all                                         |
+| 6   | Configuration and environments | Solid      | The three-list rule holds exactly; secrets hygiene is exemplary; two cosmetic nits                                                                      |
+| 7   | Build, CI and deployment       | Good, gaps | Real enforcement with a zero-warning ceiling, but documentation-only changes skip checks entirely and the human gates are enforced by nothing           |
+| 8   | Testing                        | Missing    | Zero test files, no runner, no CI step — against a stated 75% coverage commitment                                                                       |
+| 9   | Running it in production       | Missing    | A production crash is invisible today: no error tracking, no health checks, no alerts                                                                   |
+| 10  | Security and data protection   | Needs work | Confidential business content is one URL-guess away; no authentication exists; secrets handling, by contrast, is exemplary                              |
+| 11  | Scale                          | Good, gaps | The rendering and bundle discipline is right; one baked-in slow-query pattern and two deployment-config traps                                           |
+| 12  | The user-facing surface        | Good, gaps | Design-system and language discipline near 100%; missing skip links and some public-site polish                                                         |
+| 13  | Documentation honesty          | Good, gaps | Mechanically excellent (zero broken links), but "every rule lives in one place" is not true in practice, and five duplicated rules have already drifted |
 
 ## 2 · What to do before building features
 
@@ -44,41 +44,42 @@ Ordered by what has to happen first. Sizes are working-effort estimates.
    project, and decide whether the docs site should be public — it currently publishes the pilot's
    confidential pricing and the fact that the console is unprotected. Also decide whether the
    equity-offer page belongs in any deployed app at all. This comes first because it is a live
-   exposure, not a code-quality issue. *(Hours — it is configuration, not code.)* → F-30, F-31
-2. **Stop the contact form lying.** The public contact form tells the sender "message sent" and
-   delivers nothing, during an open pilot-recruitment window. Either wire the Resend email adapter
-   (the seam and the env variable are already prepared) or store submissions somewhere retrievable;
-   at minimum make the form say it is not working. *(Hours to a day.)* → F-06
+   exposure, not a code-quality issue. _(Hours — it is configuration, not code.)_ → F-30, F-31
+2. **Give the contact form somewhere to deliver.** The public contact form is honest — it tells
+   the sender delivery is not connected and to email directly — but it still keeps no record of
+   who wrote in, during an open pilot-recruitment window. Wire the Resend email adapter (the seam
+   and the env variable are already prepared) or store submissions somewhere retrievable.
+   _(Hours to a day.)_ → F-06
 3. **Turn on branch protection and settle the merge rules.** Make the Quality check required on
    the main branch, configure squash-merge (the repo's own stated rule, never yet practiced), and
    resolve the trap that documentation-only changes skip checks entirely. Everything after this
-   step inherits its safety from it. *(Hours — GitHub settings plus one workflow edit.)* → F-22, F-23, F-45
+   step inherits its safety from it. _(Hours — GitHub settings plus one workflow edit.)_ → F-22, F-23, F-45
 4. **Fix the drift batch.** One sitting: add `support` to the two pipeline scripts and two
    templates that don't know it exists; correct the four docs claiming the business pages are
    unwritten; fix the stale packages page; delete the dead routing hook. Cheap now, misleading
-   forever if left. *(Hours.)* → F-21, F-44, F-46, F-47
+   forever if left. _(Hours.)_ → F-21, F-44, F-46, F-47
 5. **Stand up the test harness.** Vitest (a test runner that fits this stack with zero extra
    build machinery), first tests on the ~900 lines of pure logic that already exist (locale
    parsing, link building, formatters, env parsing), and a CI step so it gates every PR. Do this
-   *before* the first database adapter, not with it — bootstrapping harness + adapter + coverage
-   floor in one PR is how the floor gets waived. *(A day.)* → F-26
+   _before_ the first database adapter, not with it — bootstrapping harness + adapter + coverage
+   floor in one PR is how the floor gets waived. _(A day.)_ → F-26
 6. **Wire error tracking.** Sentry (or equivalent) via an `instrumentation.ts` file in each app,
    plus the missing `global-error.tsx` safety nets. The repo already calls this "the top unstarted
    ops item" and has reserved the variable names. Until this exists, every crash after this point
-   is invisible. *(A day.)* → F-27, F-29
+   is invisible. _(A day.)_ → F-27, F-29
 7. **Model the missing entities before the first byte of real data.** The
    practitioner↔person relationship record (the decided access-control primitive), consent
    capture, the audit trail, and the AI-generation record. These shape the database schema, so
-   they come before the adapter. *(A few days, including the decisions attached.)* → F-14, F-16
+   they come before the adapter. _(A few days, including the decisions attached.)_ → F-14, F-16
 8. **Choose the database vendor and land the first adapter** — with migrations, a registration
    point, and the coverage floor switched on. This unblocks every real feature and is where
-   findings F-08 through F-11 get resolved. *(A week or more.)* → F-08–F-11
+   findings F-08 through F-11 get resolved. _(A week or more.)_ → F-08–F-11
 9. **Choose the auth approach and replace the development session.** Magic links are already
    decided in principle; pick the implementation and wire the real session provider into the seam
-   that is waiting for it. *(A week or more; can overlap with 8.)* → F-32
+   that is waiting for it. _(A week or more; can overlap with 8.)_ → F-32
 10. **Do the GDPR groundwork in parallel with 7–9:** processor agreements, the pseudonymisation
-    decision for AI calls, a retention schedule. Owner-and-legal work, not engineering. *(A few
-    days of owner time.)* → F-34 and section 7
+    decision for AI calls, a retention schedule. Owner-and-legal work, not engineering. _(A few
+    days of owner time.)_ → F-34 and section 7
 
 Items 1–4 are a day or two in total and remove every live risk. Items 5–6 make everything after
 them safe to build. Items 7–10 are the real pre-feature work and are dominated by decisions, not
@@ -94,7 +95,7 @@ code.
   variables, 6/6 public overrides).
 - **Client/server discipline is the best part of the codebase**: all 32 `"use client"` directives
   earn their place, the animation library never touches first paint, and there are documented
-  *refusals* to ship JavaScript where HTML would do.
+  _refusals_ to ship JavaScript where HTML would do.
 - **Design-system compliance in apps is effectively 100%** — tokens not raw colours, Typography
   not raw tags, one intent vocabulary, sentence case in both languages, and English/French parity
   enforced by the compiler.
@@ -110,21 +111,21 @@ code.
 
 ## 4 · The stack
 
-| Layer | Technology | Version | Pinned in |
-| ----- | ---------- | ------- | --------- |
-| Runtime | Node.js | 22.x (LTS line) | `package.json:37`, CI `quality.yaml:52` |
-| Package manager | pnpm | 10.33.0 exact | `package.json:40` |
-| Monorepo | Turborepo | ^2.9.16 | `package.json:53` |
-| Framework | Next.js (App Router) | catalogue ^16.2.3 → 16.2.12 | `pnpm-workspace.yaml:15` |
-| UI library | React | catalogue ^19.2.0 → 19.2.8 | `pnpm-workspace.yaml:16-17` |
-| Language | TypeScript, strict everywhere | catalogue ^5.9.3 | `pnpm-workspace.yaml:19`, `tsconfig.json:7` |
-| Styling | Tailwind CSS | catalogue ^4.1.14 → 4.3.3 | `pnpm-workspace.yaml:18` |
-| Components | shadcn/ui over Radix, lucide-react icons | Radix ^1/^2 per package | `packages/ui/package.json:35-51` |
-| Validation | zod | catalogue ^4.3.0 → 4.3.5 | `pnpm-workspace.yaml:20` |
-| Docs site | Nextra + Pagefind search | ^4.6.0 / ^1.4.0 | `apps/docs/package.json:21-31` |
-| Package build | tsup → ESM | ^8.5.0 | both packages |
-| Lint/format | ESLint 9 flat config, Prettier 3, Husky + lint-staged | — | root `package.json:41-56` |
-| Hosting | Vercel, one project per app | — | `apps/*/vercel.json` |
+| Layer           | Technology                                            | Version                     | Pinned in                                   |
+| --------------- | ----------------------------------------------------- | --------------------------- | ------------------------------------------- |
+| Runtime         | Node.js                                               | 22.x (LTS line)             | `package.json:37`, CI `quality.yaml:52`     |
+| Package manager | pnpm                                                  | 10.33.0 exact               | `package.json:40`                           |
+| Monorepo        | Turborepo                                             | ^2.9.16                     | `package.json:53`                           |
+| Framework       | Next.js (App Router)                                  | catalogue ^16.2.3 → 16.2.12 | `pnpm-workspace.yaml:15`                    |
+| UI library      | React                                                 | catalogue ^19.2.0 → 19.2.8  | `pnpm-workspace.yaml:16-17`                 |
+| Language        | TypeScript, strict everywhere                         | catalogue ^5.9.3            | `pnpm-workspace.yaml:19`, `tsconfig.json:7` |
+| Styling         | Tailwind CSS                                          | catalogue ^4.1.14 → 4.3.3   | `pnpm-workspace.yaml:18`                    |
+| Components      | shadcn/ui over Radix, lucide-react icons              | Radix ^1/^2 per package     | `packages/ui/package.json:35-51`            |
+| Validation      | zod                                                   | catalogue ^4.3.0 → 4.3.5    | `pnpm-workspace.yaml:20`                    |
+| Docs site       | Nextra + Pagefind search                              | ^4.6.0 / ^1.4.0             | `apps/docs/package.json:21-31`              |
+| Package build   | tsup → ESM                                            | ^8.5.0                      | both packages                               |
+| Lint/format     | ESLint 9 flat config, Prettier 3, Husky + lint-staged | —                           | root `package.json:41-56`                   |
+| Hosting         | Vercel, one project per app                           | —                           | `apps/*/vercel.json`                        |
 
 Everything resolves to exactly one version across all eight workspaces — no version splits
 anywhere. Nothing on the stack is a beta or pre-release. Two version matters need a decision:
@@ -138,16 +139,16 @@ Every external thing this product will need, with its honest status today. The e
 deliberate design (the "seams" — plug sockets a vendor gets wired into later) — but they are
 still empty.
 
-| Connection | For | Vendor chosen? | Code exists? | What happens today if something calls it |
-| ---------- | --- | -------------- | ------------ | ---------------------------------------- |
-| Database | All persistence — the entire core loop | In docs only: Neon (EU Postgres), Supabase named as likely later (`apps/docs/app/technical/decisions/page.mdx:13-16`) | Seam only — interface + registration point, no adapter | Nothing calls it. Every screen reads built-in fake data instead (`apps/web/lib/queries/clients.ts:21-22`), so it does not even fail loudly — see F-08 |
-| Authentication | Practitioner/person sign-in; operator access to admin | Shape decided (magic links, `decisions/page.mdx:17-19`); **no vendor** | A session seam in the web app only | Sign-in ignores email and password entirely; a role radio button is the whole "login" (`apps/web/lib/actions/session.ts:26-38`). Admin has **nothing** — see F-30, F-32 |
-| Email | Magic links, pilot invites, contact form | Leaning Resend (`docs/ENV.md:63`) | Seam + a console fallback that logs instead of sending (`packages/services/src/email/index.ts:34-40`) | Callers are told "sent"; nothing is delivered. The live contact form does exactly this — see F-06 |
-| AI | Structuring notes, generating plans/meals within the therapeutic frame | Anthropic models via Vercel AI Gateway, in docs (`decisions/page.mdx:26-28`; model ids hardcoded in `packages/services/src/ai/index.ts:15-19`) | Seam only, no adapter, no caller | Throws a clear "no AI provider registered" error (`ai/index.ts:48-52`) — correct behaviour, zero call sites |
-| Payments | Billing starts **1 September 2026** (`apps/docs/app/business/initiatives/page.mdx:24`) | **Nothing — no vendor, no leaning, no code, no reserved variable** | Nothing | Nothing to call. Three weeks from the audit date — see F-07 |
-| Error tracking | Knowing the product crashed | Deferred; Sentry names reserved (`docs/ENV.md:102-103`) | **Nothing** | Crashes vanish — see F-27 |
-| Analytics | Traffic measurement | **Yes — Vercel Analytics, the one live connection** | Wired in 5 of 6 apps (docs declares it but never renders it) | Works (if enabled on the Vercel side) |
-| File storage | Lab reports, plan exports (both promised by the product docs) | No; Supabase buckets mentioned as a future option | Nothing | Nothing to call — a decision for later, but the 90-day export promise needs it |
+| Connection     | For                                                                                    | Vendor chosen?                                                                                                                                 | Code exists?                                                                                          | What happens today if something calls it                                                                                                                                                    |
+| -------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Database       | All persistence — the entire core loop                                                 | In docs only: Neon (EU Postgres), Supabase named as likely later (`apps/docs/app/technical/decisions/page.mdx:13-16`)                          | Seam only — interface + registration point, no adapter                                                | Nothing calls it. Every screen reads built-in fake data instead (`apps/web/lib/queries/clients.ts:21-22`), so it does not even fail loudly — see F-08                                       |
+| Authentication | Practitioner/person sign-in; operator access to admin                                  | Shape decided (magic links, `decisions/page.mdx:17-19`); **no vendor**                                                                         | A session seam in the web app only                                                                    | Sign-in ignores email and password entirely; a role radio button is the whole "login" (`apps/web/lib/actions/session.ts:26-38`). Admin has **nothing** — see F-30, F-32                     |
+| Email          | Magic links, pilot invites, contact form                                               | Leaning Resend (`docs/ENV.md:63`)                                                                                                              | Seam + a console fallback that logs instead of sending (`packages/services/src/email/index.ts:34-40`) | Any caller of the seam is told "sent" while nothing leaves the process. The live contact form does not call the seam at all — it validates, says so plainly, and keeps no record — see F-06 |
+| AI             | Structuring notes, generating plans/meals within the therapeutic frame                 | Anthropic models via Vercel AI Gateway, in docs (`decisions/page.mdx:26-28`; model ids hardcoded in `packages/services/src/ai/index.ts:15-19`) | Seam only, no adapter, no caller                                                                      | Throws a clear "no AI provider registered" error (`ai/index.ts:48-52`) — correct behaviour, zero call sites                                                                                 |
+| Payments       | Billing starts **1 September 2026** (`apps/docs/app/business/initiatives/page.mdx:24`) | **Nothing — no vendor, no leaning, no code, no reserved variable**                                                                             | Nothing                                                                                               | Nothing to call. Three weeks from the audit date — see F-07                                                                                                                                 |
+| Error tracking | Knowing the product crashed                                                            | Deferred; Sentry names reserved (`docs/ENV.md:102-103`)                                                                                        | **Nothing**                                                                                           | Crashes vanish — see F-27                                                                                                                                                                   |
+| Analytics      | Traffic measurement                                                                    | **Yes — Vercel Analytics, the one live connection**                                                                                            | Wired in 5 of 6 apps (docs declares it but never renders it)                                          | Works (if enabled on the Vercel side)                                                                                                                                                       |
+| File storage   | Lab reports, plan exports (both promised by the product docs)                          | No; Supabase buckets mentioned as a future option                                                                                              | Nothing                                                                                               | Nothing to call — a decision for later, but the 90-day export promise needs it                                                                                                              |
 
 ## 6 · Findings
 
@@ -174,7 +175,7 @@ blocks renames and hides what the real public surface is.
 **If ignored.** The gap between claimed and actual discipline widens with every PR, and the
 "twenty thousand lines of drift" the conventions warn about starts here.
 **What to do.** One cleanup PR deleting the unused exports and the tooltip dependency — or, where
-a seam export is deliberately pre-built (see F-13 caveat), say so in the barrel comment. *(Hours.)*
+a seam export is deliberately pre-built (see F-13 caveat), say so in the barrel comment. _(Hours.)_
 
 #### F-02 · The docs app is exempt from all the boundary lint rules
 
@@ -187,7 +188,7 @@ them. Today docs behaves perfectly (its only services import is the sanctioned
 `@remi/services/shared`, `apps/docs/app/layout.tsx:5`).
 **Why it matters.** An unguarded app is where a second design system quietly starts.
 **If ignored.** Nothing, until someone adds UI to docs — that is the signal it can no longer wait.
-**What to do.** Add `apps/docs` to the restricted list; it costs nothing today. *(Minutes.)*
+**What to do.** Add `apps/docs` to the restricted list; it costs nothing today. _(Minutes.)_
 
 #### F-03 · A second real-world domain lives outside the one-domain catalogue
 
@@ -201,7 +202,7 @@ domain is `jamienisbet.com`. The marketing contact copy hardcodes `morgane@remia
 that get missed.
 **If ignored.** Contact emails pointing at the wrong domain after the move.
 **What to do.** Note them in `links.ts`'s comment or centralise contact addresses; fix at domain
-consolidation time. *(Minutes.)*
+consolidation time. _(Minutes.)_
 
 ### Area 2 · The stack
 
@@ -218,7 +219,7 @@ independently — the exact failure the catalogue comment warns against.
 **If ignored.** A future Tailwind upgrade updates the catalogue and misses a companion pin,
 producing a version mismatch that breaks builds confusingly.
 **What to do.** Add the six packages to the catalogue and replace the literal pins with
-`catalog:`. *(An hour.)*
+`catalog:`. _(An hour.)_
 
 #### F-05 · One orphaned catalogue entry and one declared-but-unused dependency
 
@@ -231,27 +232,33 @@ The docs app declares the analytics package but never renders it — every other
 the docs one also means docs is the only app reporting no traffic.
 **If ignored.** Minor confusion; missing traffic data for docs.
 **What to do.** Delete the `date-fns` line; either add `<Analytics />` to
-`apps/docs/app/layout.tsx` or drop the dependency. *(Minutes.)*
+`apps/docs/app/layout.tsx` or drop the dependency. _(Minutes.)_
 
 ### Area 3 · The connections map
 
-#### F-06 · The public contact form tells senders "sent" and delivers nothing
+#### F-06 · The public contact form delivers nowhere and keeps no record — but it says so
 
-**Severity:** Blocker
-**Where:** `apps/marketing/app/[locale]/contact/actions.ts:65-76`
+**Severity:** Important
+**Where:** `apps/marketing/app/[locale]/contact/actions.ts:65-76` · the success copy at
+`apps/marketing/lib/content/en.ts:698-700` and `fr.ts:701-703`
 
-**What is true.** The marketing contact form validates input, then returns success to the sender
-while delivering the message nowhere — a code comment admits it ("When an adapter lands: import it
-from @remi/services/email"). The pilot-recruitment window is open right now (1 July – 31 August
-2026, `apps/docs/app/business/initiatives/page.mdx:19-25`), and this form is the public site's
-contact channel.
-**Why it matters.** A prospective pilot practitioner who writes in believes they have reached you.
-They have not, and there is no record they tried. (Caveat: whether the marketing site is deployed
-and receiving traffic could not be verified from the repo — section 8.)
-**If ignored.** Lost pilot candidates during the one window the current quarter is built around,
-with no way to even know how many.
+**What is true.** The marketing contact form validates input, then returns success without
+delivering the message anywhere — a code comment admits it ("When an adapter lands: import it
+from @remi/services/email"). It is **not** dishonest about this: the success body reads "Delivery
+is not connected yet, so nothing has been sent; write to us directly at the addresses above"
+(French equivalent identical in force), so the sender is told to use the addresses in F-03. What
+is still missing is any record that they wrote at all. The pilot-recruitment window is open right
+now (1 July – 31 August 2026, `apps/docs/app/business/initiatives/page.mdx:19-25`), and this is
+the public site's contact channel.
+**Why it matters.** The honest copy removes the deception but not the loss: a prospective pilot
+practitioner who fills the form and does not go on to re-type their message into a mail client is
+gone with no trace. (Caveat: whether the marketing site is deployed and receiving traffic could
+not be verified from the repo — section 8.)
+**If ignored.** Silent drop-off during the one window the current quarter is built around, with no
+way to know how many.
 **What to do.** Wire the Resend adapter (seam and env variable already prepared) or persist
-submissions somewhere retrievable; failing both, make the form honestly decline. *(Hours to a day.)*
+submissions somewhere retrievable, and then restore an ordinary "we'll reply" success message.
+_(Hours to a day.)_
 
 #### F-07 · Payments do not exist in any form, and billing starts on 1 September 2026
 
@@ -286,7 +293,7 @@ fixtures, and the difference will surface as a surprise during the adapter migra
 in front of a pilot user.
 **What to do.** When the first adapter lands, make the query modules go through the seam in the
 same PR, and delete the fixture path or gate it behind an explicit flag. Until then, treat every
-screen as a mock-up. *(Part of the adapter PR.)*
+screen as a mock-up. _(Part of the adapter PR.)_
 
 #### F-09 · The database interface is too small for the first real screen
 
@@ -301,7 +308,7 @@ cursor-based with no defined sort order, which cannot be implemented determinist
 registration line". With this interface, it is that plus an interface redesign.
 **If ignored.** The first adapter PR grows into a seam-redesign PR under feature pressure.
 **What to do.** Extend `Collection` (sort, range, in-list) before the adapter, as its own small
-reviewed change. *(A day.)*
+reviewed change. _(A day.)_
 
 #### F-10 · The decided access model cannot be expressed through the seam
 
@@ -317,7 +324,7 @@ app code, repeated per query.
 **If ignored.** Tenancy checks get hand-rolled per screen — the classic origin of
 "practitioner A saw practitioner B's patient".
 **What to do.** Design the scoped-query shape (or commit to database-level row security and say
-so) together with F-14, before the adapter. *(Part of the F-14 work.)*
+so) together with F-14, before the adapter. _(Part of the F-14 work.)_
 
 #### F-11 · There is no place where an adapter would actually be registered
 
@@ -348,7 +355,7 @@ thesis, and the current interface cannot carry them.
 **If ignored.** The first AI feature either bypasses the seam (breaking the architecture) or ships
 without the audit trail (breaking the promise).
 **What to do.** Redesign `TextProvider` (structured output, generation-context in, persisted
-generation record out) alongside the F-16 entity, before any AI feature. *(A few days, design-heavy.)*
+generation record out) alongside the F-16 entity, before any AI feature. _(A few days, design-heavy.)_
 
 #### F-13 · Small seam inconsistencies worth one tidy-up
 
@@ -362,7 +369,7 @@ today) are documented as deliberately pre-built, a stated tension with the lean 
 rot.
 **Why it matters.** Each is a small trap for the person wiring the first adapter.
 **If ignored.** Minor confusion at adapter time; nothing before that.
-**What to do.** Align the registration guards, and check the model ids in the adapter PR. *(An hour.)*
+**What to do.** Align the registration guards, and check the model ids in the adapter PR. _(An hour.)_
 
 ### Area 5 · The data model
 
@@ -380,8 +387,8 @@ the database's own row-level security will be shaped by it.
 relationship history onto live health data later is a migration with legal implications, not a
 refactor.
 **What to do.** Model `CareRelationship` (and adjust Person) before the first adapter — this is
-section 2, item 7, and it is small once decided. *(A day of modelling; the decisions around it are
-the real work.)*
+section 2, item 7, and it is small once decided. _(A day of modelling; the decisions around it are
+the real work.)_
 
 #### F-15 · The admin console's whole domain lives outside the shared model layer
 
@@ -397,7 +404,7 @@ these in the shared model layer, where every other entity lives.
 **If ignored.** Either the admin domain gets persisted app-locally (forking the architecture) or
 the first admin feature starts with an unplanned model migration.
 **What to do.** Promote the admin entities into the shared models when the enrolment feature is
-scoped. *(A day.)*
+scoped. _(A day.)_
 
 #### F-16 · No entities for auth, consent, audit, or AI generations
 
@@ -411,11 +418,11 @@ destructive admin operations record who did what, `apps/admin/AGENTS.md`), and n
 record (despite "every AI output persisted with its context", `decisions/page.mdx:30-31`). No
 entity carries actor attribution or supports soft deletion.
 **Why it matters.** These are the entities GDPR and the product's own safety rules require to
-exist *before* the first real record, not after.
+exist _before_ the first real record, not after.
 **If ignored.** Personal health data exists before the structures that make it lawful and
 accountable — retrofit under regulatory exposure.
 **What to do.** Model consent, audit and AI-generation entities with F-14, before the adapter.
-*(Included in section 2, item 7.)*
+_(Included in section 2, item 7.)_
 
 #### F-17 · Several relationships are stored twice or as prose, and can drift
 
@@ -430,12 +437,12 @@ and prose links cannot be queried or verified.
 **If ignored.** "Which recommendation did this recipe honour?" becomes unanswerable in real data —
 and that traceability is a selling point.
 **What to do.** Pick one owning side per relationship and make `honours` a typed reference during
-the F-14 modelling pass. *(Included in item 7.)*
+the F-14 modelling pass. _(Included in item 7.)_
 
 #### F-18 · Primitive choices that will calcify
 
 **Severity:** Later
-**Where:** `recipe.ts` (`Ingredient.quantity` is free text, regex-parsed at `apps/web/lib/queries/meals.ts:33-44`) · `person.ts:39` (`shoppingDay` free text) · `meal.ts`/`step.ts` (calendar-day concepts typed as `Date` — a timezone hazard) · `step.ts:21` (`completedDays` is a counter, so *which* days is unrecoverable) · `recipe.ts` (no language field in a bilingual product)
+**Where:** `recipe.ts` (`Ingredient.quantity` is free text, regex-parsed at `apps/web/lib/queries/meals.ts:33-44`) · `person.ts:39` (`shoppingDay` free text) · `meal.ts`/`step.ts` (calendar-day concepts typed as `Date` — a timezone hazard) · `step.ts:21` (`completedDays` is a counter, so _which_ days is unrecoverable) · `recipe.ts` (no language field in a bilingual product)
 
 **What is true.** Several fields are typed loosely in ways that are convenient now and painful
 after real data exists.
@@ -443,7 +450,7 @@ after real data exists.
 **If ignored.** Lossy shopping-list maths, off-by-one-day bugs across timezones, and untranslatable
 recipes — each surfacing after launch.
 **What to do.** Sweep these in the same modelling pass as F-14/F-16/F-17; none needs more than an
-hour of thought. *(Included in item 7.)*
+hour of thought. _(Included in item 7.)_
 
 ### Area 6 · Configuration and environments
 
@@ -461,7 +468,7 @@ was ever committed, and a full-history scan for credential patterns came back cl
 **Why it matters.** The env discipline is the repo's proudest mechanical rule; the one file with a
 carve-out miscounts its own carve-out.
 **If ignored.** Nothing breaks; the rule's credibility erodes slightly.
-**What to do.** Fix the AGENTS.md sentence and add (or explicitly exempt) a `NODE_ENV` row. *(Minutes.)*
+**What to do.** Fix the AGENTS.md sentence and add (or explicitly exempt) a `NODE_ENV` row. _(Minutes.)_
 
 #### F-20 · A ghost variable, and an undocumented command
 
@@ -472,7 +479,7 @@ carve-out miscounts its own carve-out.
 deleted"; ENV.md as the single catalogue).
 **Why it matters / if ignored.** Small, but ENV.md is bus-factor insurance and should be exact.
 **What to do.** Delete the analytics row and turbo entry (or move to "Not wired yet"); add a line
-for `env:pull` and `GITHUB_API_URL`. *(Minutes.)*
+for `env:pull` and `GITHUB_API_URL`. _(Minutes.)_
 
 ### Area 7 · Build, CI and deployment
 
@@ -480,7 +487,7 @@ What is actually enforced before code reaches main: Prettier at commit time (Hus
 then one CI workflow running format-check, lint with a **zero-warning ceiling**, and typecheck
 (`.github/workflows/quality.yaml:59-68`) — real and well built, with minimal permissions and a
 shared build cache. Deploys are per-app Vercel projects that skip unaffected apps
-(`apps/*/vercel.json`). What is *not* enforced: everything else — see below. Rollback: nothing
+(`apps/*/vercel.json`). What is _not_ enforced: everything else — see below. Rollback: nothing
 written anywhere; in practice it would be Vercel's instant-rollback or a git revert, but nobody
 has written down which (`pipeline/lanes/chore/CONTEXT.md:58` is the only rollback mention in the
 repo).
@@ -496,7 +503,7 @@ the labelling script dies.
 **Why it matters.** This is a live contradiction inside the repo, and the first support-touching
 feature run will hit it as a hard error.
 **If ignored.** The first support feature fails at the Define stage with a confusing message.
-**What to do.** Add `support` in the four places. *(Minutes — part of the drift batch, item 4.)*
+**What to do.** Add `support` in the four places. _(Minutes — part of the drift batch, item 4.)_
 
 #### F-22 · Documentation-only and pipeline-only changes skip the Quality checks entirely
 
@@ -504,7 +511,7 @@ feature run will hit it as a hard error.
 **Where:** `.github/workflows/quality.yaml:8-10` (`paths-ignore: pipeline/**, **/*.md`)
 
 **What is true.** PRs touching only markdown or the pipeline folder never trigger the Quality
-workflow. If branch protection *requires* that check, such PRs can never merge (a deadlock); if it
+workflow. If branch protection _requires_ that check, such PRs can never merge (a deadlock); if it
 doesn't, then a red Quality run blocks nothing anywhere (a hole). Which regime applies is invisible
 from the repo (section 8). Markdown formatting is also genuinely unchecked on those PRs even
 though the format command covers `.md` files.
@@ -529,7 +536,7 @@ they are honour-system.
 is gone.
 **What to do.** Branch protection with required reviews (item 3), and/or a small workflow that
 fails when a gate anchor is present and unticked; remove `gh pr merge` from the pre-approved list.
-*(Hours.)*
+_(Hours.)_
 
 #### F-24 · Rollback is undocumented
 
@@ -541,16 +548,16 @@ improvising between Vercel's rollback button and a git revert — with six apps 
 **If ignored.** Fine until the first bad deploy under time pressure; the signal is the first real
 user.
 **What to do.** A half-page runbook: where the button is, when to revert instead, what to check
-after. *(An hour.)*
+after. _(An hour.)_
 
 #### F-25 · A deleted automation is still documented as live, and its script is still on disk
 
 **Severity:** Later
-**Where:** `.claude/hooks/route-request.sh` (unreachable — its registration was removed in commit `41b59d6`) · `.claude/skills/pipeline/SKILL.md:14-17` (still tells the router to expect its output) · also `.claude/SKILLS.md:52-53` calls a label-*writing* script "read-only"
+**Where:** `.claude/hooks/route-request.sh` (unreachable — its registration was removed in commit `41b59d6`) · `.claude/skills/pipeline/SKILL.md:14-17` (still tells the router to expect its output) · also `.claude/SKILLS.md:52-53` calls a label-_writing_ script "read-only"
 
 **What is true.** As stated — dead code plus two stale descriptions, in the repo whose conventions
 call unreachable code a review blocker.
-**What to do.** Delete the script, fix the two sentences. *(Minutes — drift batch, item 4.)*
+**What to do.** Delete the script, fix the two sentences. _(Minutes — drift batch, item 4.)_
 
 ### Area 8 · Testing
 
@@ -566,16 +573,16 @@ whose own comment advertises it as designed for testability), cross-app link bui
 (`shared/links.ts` — the file that 404s every cross-app link if it regresses), formatters, the
 Result type, env parsing, and the three seam registries.
 **Why it matters.** The plan bundles harness-bootstrapping into the first adapter PR — runner,
-coverage gate, CI wiring *and* the adapter at once. That is how coverage floors get waived "just
+coverage gate, CI wiring _and_ the adapter at once. That is how coverage floors get waived "just
 this once".
 **If ignored.** The floor exists only on paper at the exact moment the layer it protects starts
 holding health data.
-**What to do.** Stand the harness up *now*, before the adapter (section 2, item 5): Vitest +
+**What to do.** Stand the harness up _now_, before the adapter (section 2, item 5): Vitest +
 `@vitest/coverage-v8` in the catalogue, colocated `*.test.ts` files, a `test` task in
 `turbo.json`, a Test step in `quality.yaml`, and the 75% threshold pre-wired for `src/db/**`.
 First five test files cover nearly all existing logic. One decision attached: the "factory owns
 the checks" hook should block local test runs too, or the rule forks (`CONVENTIONS.md:177`).
-*(A day.)*
+_(A day.)_
 
 ### Area 9 · Running it in production
 
@@ -586,7 +593,7 @@ the checks" hook should block local test runs too, or the rule forks (`CONVENTIO
 
 **What is true.** A server-side crash shows the user a branded error page with a correlation id,
 and writes a stack trace to hosting logs that expire unread — no alert, no aggregation. A
-*client-side* crash (in the browser) is recorded **nowhere at all** — there is no client tracker,
+_client-side_ crash (in the browser) is recorded **nowhere at all** — there is no client tracker,
 and browser errors never reach server logs. A whole-app outage has no uptime probe. The team
 learns about failures when a human reports them. The one passive signal is Vercel Analytics
 traffic curves in five apps.
@@ -596,7 +603,7 @@ monitoring system.
 id whose matching log line has already expired.
 **What to do.** Item 6: error tracking via `instrumentation.ts` + the error boundaries' report
 hook, an uptime check on the six origins, and a decision on who gets alerted. The variable names
-are already reserved; this is a day of wiring. *(A day.)*
+are already reserved; this is a day of wiring. _(A day.)_
 
 #### F-28 · No health checks — and no API surface at all
 
@@ -605,9 +612,9 @@ are already reserved; this is a day of wiring. *(A day.)*
 
 **What is true.** There is nothing to probe and, today, little that needs probing — six
 static/server-rendered sites with no backend. The seam docs already anticipate a health endpoint.
-**Why it matters / if ignored.** The moment a database adapter registers, "is the app up *and can
-it reach its database*" becomes a question nothing can answer. That moment is the signal.
-**What to do.** Add a health route in the same PR as the first adapter. *(An hour, then.)*
+**Why it matters / if ignored.** The moment a database adapter registers, "is the app up _and can
+it reach its database_" becomes a question nothing can answer. That moment is the signal.
+**What to do.** Add a health route in the same PR as the first adapter. _(An hour, then.)_
 
 #### F-29 · Missing safety nets: no `global-error.tsx`, no `instrumentation.ts`, anywhere
 
@@ -617,7 +624,7 @@ it reach its database*" becomes a question nothing can answer. That moment is th
 **What is true.** An exception in a root layout bypasses every existing error boundary and renders
 Next.js's unstyled crash page. `instrumentation.ts` is also where both F-27's tracking and F-11's
 adapter registration want to live — one file, three reasons.
-**What to do.** Add both files per app as part of item 6. *(Included there.)*
+**What to do.** Add both files per app as part of item 6. _(Included there.)_
 
 ### Area 10 · Security and data protection
 
@@ -638,7 +645,7 @@ they must not be readable by, silently.
 **What to do.** Today: confirm deployment protection is ON for the admin project (and see F-31 for
 docs). Then decide whether a negotiation document belongs in a deployed app at all — a private
 doc would carry zero risk. Real operator authentication is already roadmapped and should not slip
-past phase 3. *(Hours for the config; the auth is item 9.)*
+past phase 3. _(Hours for the config; the auth is item 9.)_
 
 #### F-31 · The docs site is fully crawlable and publishes what the public site deliberately withholds
 
@@ -654,7 +661,7 @@ confidential pilot terms and a signpost to the unprotected console.
 becomes false via a different app.
 **What to do.** Decide (section 7): private (deployment protection + noindex, like admin) or
 public (then move business/decision content out). Either is an hour; the middle is the only wrong
-answer. *(Hours.)*
+answer. _(Hours.)_
 
 #### F-32 · No real authentication exists anywhere; the sign-in form ignores its own fields
 
@@ -672,7 +679,7 @@ session provider replaces the development one.**
 special-category health data to anyone who clicks a radio button.
 **What to do.** Item 9: pick the auth implementation for the already-decided magic-link shape and
 register it into the existing seam. The silent dev fallback should also refuse to run in
-production builds. *(A week or more; the refuse-in-prod guard is an hour now.)*
+production builds. _(A week or more; the refuse-in-prod guard is an hour now.)_
 
 #### F-33 · A real, named practitioner appears in fixtures with invented professional activity
 
@@ -689,7 +696,7 @@ findings compound each other.
 **If ignored.** Combined with F-30, an outsider could read an invented client list under a real
 doctor's name.
 **What to do.** Rename the record to a fictional person; switch fixture email domains to
-`example.com`-style reserved domains. *(An hour.)*
+`example.com`-style reserved domains. _(An hour.)_
 
 #### F-34 · The data-protection groundwork that must precede the first real record is undecided
 
@@ -699,14 +706,14 @@ doctor's name.
 **What is true.** The thinking is unusually good and unusually honest — but the concrete
 obligations (signed processor agreements, retention, deletion capability, the
 pseudonymise-before-AI decision) are all still open, and the genotype field already in the model
-(`packages/services/src/db/models/person.ts:15-20`) is *genetic* data, the most sensitive GDPR
+(`packages/services/src/db/models/person.ts:15-20`) is _genetic_ data, the most sensitive GDPR
 category, which the open questions don't yet call out.
 **Why it matters.** These aren't launch tasks; they are preconditions for the first stored record
 — the repo's own quarter objective says "the data question answered before the first record
 exists".
 **If ignored.** Health data exists before its legal basis does; every later fix is remediation.
-**What to do.** Section 7 lists the decisions; the owner-and-legal work is item 10. *(A few days
-of owner time, zero engineering.)*
+**What to do.** Section 7 lists the decisions; the owner-and-legal work is item 10. _(A few days
+of owner time, zero engineering.)_
 
 #### F-35 · No security headers anywhere
 
@@ -717,7 +724,7 @@ of owner time, zero engineering.)*
 do), strict-transport-security on custom domains, or clickjacking protection.
 **Why it matters / if ignored.** Low risk for static content sites; real for the sign-in surface
 and the console. The signal it can no longer wait: real authentication going live.
-**What to do.** A shared headers block in the web and admin configs when auth lands. *(Hours, then.)*
+**What to do.** A shared headers block in the web and admin configs when auth lands. _(Hours, then.)_
 
 #### F-36 · Dependency updates are entirely manual
 
@@ -728,7 +735,7 @@ and the console. The signal it can no longer wait: real authentication going liv
 account-level alerts may exist — unverifiable, section 8). CI does use a frozen lockfile,
 correctly.
 **What to do.** Enable Dependabot alerts + a weekly update batch through the chore lane, once real
-users exist. *(An hour.)*
+users exist. _(An hour.)_
 
 ### Area 11 · Scale
 
@@ -751,7 +758,7 @@ invisible-cost.
 **If ignored.** The pilot's largest practice gets a roster page that makes ~46 database
 round-trips per view.
 **What to do.** Fold a batched read into the F-09 interface work; restructure this query when the
-adapter lands. *(Part of item 8.)*
+adapter lands. _(Part of item 8.)_
 
 #### F-38 · Preview deployments cross-link to production unless six variables are set per environment
 
@@ -759,14 +766,14 @@ adapter lands. *(Part of item 8.)*
 **Where:** `packages/services/src/shared/links.ts:51-64,90-94` — any non-development build answers with production origins unless each `NEXT_PUBLIC_*_URL` override is set
 
 **What is true.** A preview build of the marketing site links its header and footer to
-*production* web/support/docs. The pipeline's whole review model is stakeholders clicking through
+_production_ web/support/docs. The pipeline's whole review model is stakeholders clicking through
 preview URLs.
 **Why it matters.** A reviewer on a preview silently walks onto production mid-review — confusing
 at best, wrong-data-shown at worst.
 **If ignored.** Every design review carries a trapdoor into production.
 **What to do.** Set the six overrides in each Vercel project's preview scope (Vercel exposes the
 deployment URL as an env variable that can feed this), or teach `links.ts` to detect preview
-hosts. *(Hours, config-side.)*
+hosts. _(Hours, config-side.)_
 
 #### F-39 · Every public canonical URL currently advertises a placeholder personal domain
 
@@ -781,7 +788,7 @@ canonical home of Remi AI is a personal domain — SEO equity accrues to the wro
 **If ignored.** The longer it runs, the more indexed URLs point at the placeholder; the migration
 is one edit, but the re-indexing isn't.
 **What to do.** Decide the real domain (section 7) and change one line — that being one line is
-the payoff of the design. *(Minutes, after the decision.)*
+the payoff of the design. _(Minutes, after the decision.)_
 
 ### Area 12 · The user-facing surface
 
@@ -802,7 +809,7 @@ missing everywhere, despite two apps already having the anchor target it would p
 **Why it matters.** It is the single cheapest accessibility fix with the broadest daily impact,
 and a health product sold partly on care quality should clear the accessibility floor.
 **If ignored.** Every keyboard user pays a toll on every page; it also fails WCAG 2.4.1.
-**What to do.** One small component in `packages/ui`, rendered first in each shell. *(Hours.)*
+**What to do.** One small component in `packages/ui`, rendered first in each shell. _(Hours.)_
 
 #### F-41 · Public-site polish gaps: a promised social image that doesn't exist, and weak-form noindex
 
@@ -811,7 +818,7 @@ and a health product sold partly on care quality should clear the accessibility 
 
 **What is true / what to do.** Support links shared on social render imageless; add an
 `opengraph-image.tsx` like marketing's. Give web and demo the same two-line robots file admin has.
-The signal it can't wait: the marketing push for the pilot. *(Hours.)*
+The signal it can't wait: the marketing push for the pilot. _(Hours.)_
 
 #### F-42 · Language attributes and baked-in English strings undercut the French surfaces
 
@@ -820,14 +827,14 @@ The signal it can't wait: the marketing push for the pilot. *(Hours.)*
 
 **What is true / what to do.** Three small accessibility/i18n leaks. A `lang="fr"` on the admin
 Company wrapper, a label prop on the two primitives, and an `aria-describedby` on the consent
-error. *(Hours.)*
+error. _(Hours.)_
 
 #### F-43 · Unknown-language URLs get the unstyled default 404
 
 **Severity:** Later
-**Where:** web, marketing and support have `not-found.tsx` only *inside* the `[locale]` segment; a request like `/xx/anything` 404s outside it and renders Next.js's default page. Admin and demo place theirs at the app root, correctly. No app has `global-error.tsx` (also F-29)
+**Where:** web, marketing and support have `not-found.tsx` only _inside_ the `[locale]` segment; a request like `/xx/anything` 404s outside it and renders Next.js's default page. Admin and demo place theirs at the app root, correctly. No app has `global-error.tsx` (also F-29)
 
-**What is true / what to do.** Add a root-level not-found page to the three locale apps. *(An hour.)*
+**What is true / what to do.** Add a root-level not-found page to the three locale apps. _(An hour.)_
 
 ### Area 13 · Documentation honesty
 
@@ -847,7 +854,7 @@ several "not built yet" admissions are models of honest docs. But the repo's str
 An agent following its own contract will ignore the real product knowledge and improvise.
 **If ignored.** The first scoping run works from the assumption the product definition doesn't
 exist.
-**What to do.** Fix the four sentences. *(Minutes — drift batch, item 4.)*
+**What to do.** Fix the four sentences. _(Minutes — drift batch, item 4.)_
 
 #### F-45 · The process documentation describes practices that have never happened
 
@@ -863,7 +870,7 @@ genuinely be the plan for what comes next — but then the docs should say so.
 which other present-tense claims are aspirations.
 **What to do.** Either run the next feature through the pipeline (its machinery all checks out —
 this audit verified the scripts) and configure squash-merge in GitHub, or reword both claims as
-intent. *(The GitHub setting is part of item 3.)*
+intent. _(The GitHub setting is part of item 3.)_
 
 #### F-46 · The same rule is restated in three to six places, and five sets have already drifted
 
@@ -879,7 +886,7 @@ All currently-agreeing copies are future drift.
 whose docs are load-bearing (agents execute them).
 **If ignored.** The drift rate compounds with each feature; trust in any single document drops.
 **What to do.** In the drift batch: fix the five stale sets, then thin the worst duplications to
-pointers (the `_shared/conventions.md` redirect file is the in-repo model of how). *(Half a day.)*
+pointers (the `_shared/conventions.md` redirect file is the in-repo model of how). _(Half a day.)_
 
 #### F-47 · The technical docs page for the packages describes a structure two versions old
 
@@ -892,7 +899,7 @@ stale on the package's basic shape; the accurate description exists in
 **Why it matters.** This isn't passive documentation — the pipeline feeds it to the agent doing
 the building.
 **If ignored.** Build-stage work starts from a wrong map of the very package it modifies.
-**What to do.** Rewrite the page from the AGENTS files, or reduce it to pointers at them. *(An hour.)*
+**What to do.** Rewrite the page from the AGENTS files, or reduce it to pointers at them. _(An hour.)_
 
 #### F-48 · Small drift residue, one list
 
@@ -900,7 +907,7 @@ the building.
 **Where:** `eslint.config.ts:201` (error message points at "CONVENTIONS.md → apps/demo", a section that doesn't exist — the rules live in `apps/demo/AGENTS.md`) · `CONVENTIONS.md:1` + `pipeline/CONTEXT.md:50,54` (CONVENTIONS is "Layer 3" in three places and Layer 0 in one) · `CONVENTIONS.md:11` says ESLint "enforces" arrow functions while the rule is a warning — enforcement is real but indirect, via CI's zero-warning ceiling (`eslint.config.ts:90-97`, `quality.yaml:64-65`) · commit-format compliance is good but not clean (8 non-conforming of the last 200; undocumented scoped forms like `refactor(web):`)
 
 **What is true / what to do.** Four small inconsistencies, none load-bearing; sweep them with the
-drift batch. *(Minutes each.)*
+drift batch. _(Minutes each.)_
 
 ## 7 · Decisions the owner needs to make
 
@@ -910,56 +917,56 @@ each can wait.
 **D-1 · Is Vercel deployment protection on for admin — and is the docs site public or private?**
 Options: (a) protection on both, business content stays; (b) protection on admin, docs goes
 public with the business/decision pages moved out; (c) status quo. Cost of (a)/(b): minutes of
-configuration or an afternoon of content moves; cost of (c): F-30/F-31 remain live. *Recommendation:
+configuration or an afternoon of content moves; cost of (c): F-30/F-31 remain live. _Recommendation:
 (a) today, then decide (b) at leisure — and take the equity-offer page out of the deployed app
-regardless; a negotiation document gains nothing from being a website.* **Can wait: not at all.**
+regardless; a negotiation document gains nothing from being a website._ **Can wait: not at all.**
 
 **D-2 · Which database vendor?** The docs lean Neon (EU serverless Postgres) with Supabase as the
 likely eventual home. Options: Neon now / Supabase now / defer further. Neon is the lighter
 commitment consistent with the decided EU posture; Supabase bundles auth+storage (which would also
-answer parts of D-3) but is a bigger commitment. Deferring further costs nothing *except* that
-items 7–8 of the checklist are blocked on it. *Recommendation: decide within the month; either
-named option is fine — the seam genuinely makes this cheap to be wrong about.* **Can wait: until
+answer parts of D-3) but is a bigger commitment. Deferring further costs nothing _except_ that
+items 7–8 of the checklist are blocked on it. _Recommendation: decide within the month; either
+named option is fine — the seam genuinely makes this cheap to be wrong about._ **Can wait: until
 the first persistence feature — which is the next real milestone.**
 
 **D-3 · Which auth implementation for the decided magic-link shape?** Options: Auth.js
 (self-hosted, free, more wiring), a hosted provider (Clerk et al. — fastest, per-user cost, EU
 data questions), or the database vendor's auth if D-2 lands on Supabase. Locks in: session
-mechanics, the 2FA path for practitioners, part of the GDPR processor list. *Recommendation:
-decide together with D-2 — the pairing changes the answer.* **Can wait: until real users; but the
+mechanics, the 2FA path for practitioners, part of the GDPR processor list. _Recommendation:
+decide together with D-2 — the pairing changes the answer._ **Can wait: until real users; but the
 dev-session must refuse to run in production before any real data exists (F-32).**
 
 **D-4 · How does billing actually happen on 1 September?** Options: a payment provider (Stripe
 being the obvious one — real integration work, weeks), or manual invoicing for the fifteen pilot
-practitioners (hours of admin per month, zero code). *Recommendation: manual invoicing for the
-pilot; decide the provider when self-serve signup is scoped.* **Can wait: the decision cannot
+practitioners (hours of admin per month, zero code). _Recommendation: manual invoicing for the
+pilot; decide the provider when self-serve signup is scoped._ **Can wait: the decision cannot
 (three weeks); the integration can.**
 
 **D-5 · Is personal data pseudonymised before it reaches the AI provider?** The docs lean yes;
 it costs a mapping layer and some prompt quality, and buys a materially smaller GDPR surface with
 a US-owned processor. Also in this decision: the DPAs/processor register (Vercel, Anthropic,
-Neon/Supabase, Resend) the docs promise "before they process". *Recommendation: yes, and do the
-processor paperwork as item 10 — it is owner-and-legal work that gates nothing else.* **Can wait:
+Neon/Supabase, Resend) the docs promise "before they process". _Recommendation: yes, and do the
+processor paperwork as item 10 — it is owner-and-legal work that gates nothing else._ **Can wait:
 until the first AI feature touches real data — but not one day past.**
 
 **D-6 · Which domain is the real one?** `links.ts` says `jamienisbet.com`; the brand and the
 contact addresses say `remiai.be`. The design makes the switch one line (F-39) plus DNS/Vercel
-work; every week of delay adds wrongly-indexed URLs. *Recommendation: consolidate on the brand
-domain before any marketing push.* **Can wait: until the sites are meant to be found.**
+work; every week of delay adds wrongly-indexed URLs. _Recommendation: consolidate on the brand
+domain before any marketing push._ **Can wait: until the sites are meant to be found.**
 
 **D-7 · Does the delivery pipeline start now, or get relabelled as intent?** The machinery
 verifies clean (scripts, labels, templates — this audit checked), but 29 PRs happened outside it
 and the gates are unenforced (F-23, F-45). Options: run the next feature through it and add the
 enforcement; or keep the fast informal loop and mark the pipeline docs as the plan. Both are
-honest; the middle isn't. *Recommendation: run the next real feature through it as its shakedown —
-it was built for exactly the phase now starting.* **Can wait: until the next feature — i.e. not
+honest; the middle isn't. _Recommendation: run the next real feature through it as its shakedown —
+it was built for exactly the phase now starting._ **Can wait: until the next feature — i.e. not
 long.**
 
 **D-8 · Accept or annotate the pre-built-seam exception to the lean rules?** The unused seam
 entrypoints and ~20 dead exports (F-01) technically violate "no export without a consumer".
 Options: delete the genuinely dead ones and write the seam exception down; or enforce the rule
-literally and trim the seams too. *Recommendation: the former — the seams are the architecture's
-best idea; the tooltip and variant exports are just dead.* **Can wait: the next chore pass.**
+literally and trim the seams too. _Recommendation: the former — the seams are the architecture's
+best idea; the tooltip and variant exports are just dead._ **Can wait: the next chore pass.**
 
 ## 8 · Could not check
 
