@@ -1,8 +1,13 @@
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { Footer, Layout, Navbar } from "nextra-theme-docs";
 import type { CSSProperties, ReactNode } from "react";
 import { Head } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
 import { appHref } from "@remi/services/shared";
+import { signOut } from "@/lib/auth/actions";
+import { PATHNAME_HEADER, SIGN_IN_PATH } from "@/lib/auth/constants";
+import { isOperatorSignedIn } from "@/lib/auth/session";
 import "nextra-theme-docs/style.css";
 
 /**
@@ -26,6 +31,13 @@ export const metadata = {
     template: `%s · ${brandName} docs`,
   },
   description: `How ${brandName} works — business direction and technical reference.`,
+  /*
+   * This site publishes the pilot's exact figures and the reasoning behind them
+   * — the numbers the public site withholds on purpose. It is not public
+   * material, and now it is not reachable either; `app/robots.ts` says the same
+   * thing one step earlier, before a crawler has fetched anything.
+   */
+  robots: { index: false, follow: false },
 };
 
 /**
@@ -108,6 +120,22 @@ const navLinkStyle: CSSProperties = {
   whiteSpace: "nowrap",
 };
 
+/**
+ * Sign out sits with them because this is the only chrome the site has. A plain
+ * form around a submit button, styled to read as one of the links beside it —
+ * the action revokes the session row before clearing the cookie.
+ */
+const signOutButtonStyle: CSSProperties = {
+  ...navLinkStyle,
+  background: "none",
+  border: 0,
+  padding: 0,
+  cursor: "pointer",
+  font: "inherit",
+  fontSize: "0.875rem",
+  color: "inherit",
+};
+
 const OutboundLinks = () => (
   <>
     <a href={appHref("web")} style={navLinkStyle}>
@@ -119,27 +147,60 @@ const OutboundLinks = () => (
     <a href={appHref("support")} style={navLinkStyle}>
       Support
     </a>
+    <form action={signOut}>
+      <button type="submit" style={signOutButtonStyle}>
+        Sign out
+      </button>
+    </form>
   </>
 );
 
-const RootLayout = async ({ children }: { children: ReactNode }) => (
-  <html lang="en" dir="ltr" suppressHydrationWarning>
-    <Head />
-    <body>
-      <Layout
-        navbar={
-          <Navbar logo={<Logo />}>
-            <OutboundLinks />
-          </Navbar>
-        }
-        footer={<Footer>© {brandLegalName}</Footer>}
-        pageMap={await getPageMap()}
-        docsRepositoryBase="https://github.com/k0d0minio/remi-ai/tree/main/apps/docs"
-      >
-        {children}
-      </Layout>
-    </body>
-  </html>
-);
+/**
+ * The authoritative half of the gate, and the reason it lives in the root layout
+ * rather than in a route group: Nextra builds its navigation from the app
+ * directory, so wrapping every page in a `(gated)` folder would rewrite the page
+ * map this site is made of. One check here covers every MDX page instead.
+ *
+ * The sign-in page is the single exemption, identified by the pathname
+ * `middleware.ts` stamped on the request. It renders *outside* Nextra's
+ * `<Layout>` deliberately: that component's sidebar lists every page title on
+ * the site, which is exactly the sort of thing a signed-out visitor should not
+ * be reading off the login screen.
+ *
+ * Reading the session makes every page dynamic. That is the trade: the docs stop
+ * being static HTML that anyone with the URL can fetch.
+ */
+const RootLayout = async ({ children }: { children: ReactNode }) => {
+  const pathname = (await headers()).get(PATHNAME_HEADER);
+  const gated = pathname !== SIGN_IN_PATH;
+
+  if (gated && !(await isOperatorSignedIn())) {
+    redirect(SIGN_IN_PATH);
+  }
+
+  return (
+    <html lang="en" dir="ltr" suppressHydrationWarning>
+      <Head />
+      <body>
+        {gated ? (
+          <Layout
+            navbar={
+              <Navbar logo={<Logo />}>
+                <OutboundLinks />
+              </Navbar>
+            }
+            footer={<Footer>© {brandLegalName}</Footer>}
+            pageMap={await getPageMap()}
+            docsRepositoryBase="https://github.com/k0d0minio/remi-ai/tree/main/apps/docs"
+          >
+            {children}
+          </Layout>
+        ) : (
+          children
+        )}
+      </body>
+    </html>
+  );
+};
 
 export default RootLayout;

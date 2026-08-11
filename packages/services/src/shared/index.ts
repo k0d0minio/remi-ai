@@ -26,6 +26,18 @@ export { appHref, appOrigin } from "./links";
 export type { AppKey } from "./links";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
+
+/**
+ * The session cookie's name and shape. Isomorphic because each gated app's
+ * middleware runs on the edge and has to know which cookie to look for — see
+ * `session-cookie.ts` for why nothing else from `auth/` may follow it here.
+ */
+export {
+  SESSION_COOKIE,
+  SESSION_TTL_SECONDS,
+  sessionCookieOptions,
+} from "./session-cookie";
+export type { SessionCookieOptions } from "./session-cookie";
 export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";
 
 /**

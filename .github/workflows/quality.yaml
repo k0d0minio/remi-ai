@@ -66,3 +66,10 @@ jobs:
 
       - name: Typecheck
         run: pnpm typecheck
+
+      # Only @remi/services defines a `test` task today — REMI-001 brought the
+      # minimum Vitest setup with it so the auth layer could not ship untested.
+      # REMI-008 widens this to every workspace and adds the src/db/** coverage
+      # floor; until then turbo simply finds nothing to run elsewhere.
+      - name: Test
+        run: pnpm test

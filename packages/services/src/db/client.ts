@@ -3,10 +3,12 @@ import type { Id, Page, PageQuery } from "../types";
 /**
  * The storage seam.
  *
- * No database vendor is committed in this repo yet, so the rest of the package is
- * written against these interfaces rather than a driver. When the vendor is
- * chosen, write ONE adapter that satisfies `DatabaseClient`, register it at
- * process start with `registerDatabase()`, and nothing above this file changes.
+ * The vendor is Neon — `src/auth/adapters/neon.ts` already talks to it, and the
+ * migration chain under `db/migrations/` is the one both will share. What does
+ * not exist yet is an adapter for *this* interface: the general storage surface
+ * is still unimplemented, so the rest of the package stays written against these
+ * types rather than a driver. Writing that adapter and registering it at process
+ * start with `registerDatabase()` changes nothing above this file.
  *
  * The rule that keeps this seam honest: a service under `db/services/` may
  * import from here, never from a driver package directly.

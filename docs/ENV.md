@@ -39,21 +39,58 @@ in the catalogue yet.
 
 ## Storage
 
-No database vendor is committed yet — `@remi/services` defines the seam and an adapter registers
-against it (`packages/services/AGENTS.md`). These are the names reserved for it; fill in the rows
-when the adapter lands.
+**Neon** — serverless Postgres, EU region (Frankfurt). Read by the auth store in
+`@remi/services/auth` and by the migration runner. `apps/web`'s query layer still returns fixtures
+until REMI-022 lands the general `DatabaseClient`; only the auth tables are real today.
 
-| Variable       | Purpose           | Where set | Public? |
-| -------------- | ----------------- | --------- | ------- |
-| `DATABASE_URL` | Connection string | both      | no      |
+| Variable       | Purpose                                                | Where set | Public? |
+| -------------- | ------------------------------------------------------ | --------- | ------- |
+| `DATABASE_URL` | Neon **pooled** connection string — the `-pooler` host | both      | no      |
+
+Use the pooled string, not the direct one. The adapter talks to Neon over HTTP, which is what the
+pooled endpoint fronts, and a serverless function has nowhere to keep a long-lived connection.
+
+Set it on the **admin** and **docs** Vercel projects (all environments — production, preview and
+development), and locally in each app's `.env.local` via `pnpm env:pull`.
 
 ## Auth
 
-No auth vendor is committed yet.
+Email + password against the `auth_user` table, sessions in `auth_session`. Both apps that read
+these are internal: `apps/admin` and `apps/docs`. There is no auth vendor — the gate is code in
+this repo (`packages/services/src/auth/`).
 
-| Variable      | Purpose                      | Where set | Public? |
-| ------------- | ---------------------------- | --------- | ------- |
-| `AUTH_SECRET` | Session/token signing secret | Vercel    | no      |
+| Variable      | Purpose                                                            | Where set | Public? |
+| ------------- | ------------------------------------------------------------------ | --------- | ------- |
+| `AUTH_SECRET` | Peppers the session-token HMAC stored in `auth_session.token_hash` | Vercel    | no      |
+
+`AUTH_SECRET` is why a read-only leak of the session table hands over nothing usable: the column
+holds `HMAC-SHA256(token, AUTH_SECRET)`, and the secret is not in the database. Generate it with
+`openssl rand -base64 32`. **Rotating it signs every operator out** — every stored hash stops
+matching — which is the intended emergency lever, not a routine one.
+
+### Running the migrations
+
+The chain lives in `packages/services/src/db/migrations/` and is forward-only. Against a fresh Neon
+project, or after pulling a change that adds a migration:
+
+```bash
+pnpm --filter @remi/services db:migrate    # needs DATABASE_URL in the environment
+```
+
+### Creating an operator
+
+There is no self-service signup. An operator is seeded, and re-running the same command with a new
+password is how one is rotated:
+
+```bash
+pnpm --filter @remi/services build                 # the script runs the built package
+pnpm --filter @remi/services auth:create-operator -- --email=you@example.com
+```
+
+It prompts for the password with the echo off, so the value never reaches shell history or a
+process list. For a non-interactive run, pass it through `OPERATOR_PASSWORD` in the environment
+instead. **Never** put an operator password in this repository, in a fixture, or in a PR
+description.
 
 ## Email
 

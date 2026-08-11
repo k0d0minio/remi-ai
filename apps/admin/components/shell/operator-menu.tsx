@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@remi/ui";
 import { Typography } from "@remi/ui/server";
+import { signOut } from "@/lib/actions/auth";
 
 type Props = {
   name: string;
@@ -23,8 +24,12 @@ type Props = {
 /**
  * Who is holding the console. It shows the operator's grant rather than account
  * settings, because the question an operator asks of this menu is "what am I
- * allowed to do from here" — every item is inert until there is a session
- * behind it.
+ * allowed to do from here".
+ *
+ * Sign out is the one live item. Everything the menu says about the operator is
+ * a prop, resolved from the session in the group's layout — this component
+ * looks nothing up, which is why it can stay a client island around a server
+ * action without a session ever crossing into the browser.
  */
 export const OperatorMenu = ({ name, initials, email, role }: Props) => (
   <DropdownMenu>
@@ -62,10 +67,19 @@ export const OperatorMenu = ({ name, initials, email, role }: Props) => (
       </DropdownMenuItem>
 
       <DropdownMenuSeparator />
-      <DropdownMenuItem disabled destructive>
-        <LogOut aria-hidden="true" />
-        Sign out
-      </DropdownMenuItem>
+      {/*
+       * A real form around a real submit button: the action revokes the session
+       * row in Postgres before clearing the cookie, so signing out ends the
+       * session rather than only this browser's memory of it.
+       */}
+      <form action={signOut}>
+        <DropdownMenuItem asChild destructive>
+          <button type="submit" className="w-full cursor-pointer">
+            <LogOut aria-hidden="true" />
+            Sign out
+          </button>
+        </DropdownMenuItem>
+      </form>
     </DropdownMenuContent>
   </DropdownMenu>
 );

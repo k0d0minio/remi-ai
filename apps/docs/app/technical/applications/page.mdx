@@ -8,7 +8,7 @@ Six apps, one Vercel project each, one port each. Every app that renders product
 | `web`       | `@remi/web`        | 3000 | yes  | `@remi/services/server`    | The product. Signed-in surface.               |
 | `marketing` | `@remi/marketing`  | 3001 | no   | mostly static              | The public site. Indexable, content-led.      |
 | `admin`     | `@remi/admin`      | 3002 | yes  | `@remi/services/server`    | Internal operations. Operator-only.           |
-| `docs`      | `@remi/docs`       | 3003 | no   | none                       | This site. Nextra, MDX.                       |
+| `docs`      | `@remi/docs`       | 3003 | yes  | `@remi/services/auth`      | This site. Nextra, MDX. Operator-only.        |
 | `support`   | `@remi/support`    | 3004 | no   | typed content modules      | The public help centre. Indexable, anonymous. |
 | `demo`      | `@remi/demo`       | 3005 | no   | **mock only**              | The Design stage's prototype sandbox.         |
 
@@ -17,6 +17,13 @@ Six apps, one Vercel project each, one port each. Every app that renders product
 A separate deployment gives a separate URL, separate environment variables, and separate access
 control. A `/admin` route group inside the product app makes every operator-only capability one
 routing mistake away from a customer.
+
+## Why this site is gated too
+
+It publishes the pilot's exact figures and the reasoning behind them — the numbers the public site
+withholds on purpose. So `docs` runs the same operator gate as `admin`, against the same
+`auth_user` table: one account opens both. The `web` column above is the product's own sign-in,
+which is still a development stand-in and unrelated to this one.
 
 ## Why demo can never reach a backend
 

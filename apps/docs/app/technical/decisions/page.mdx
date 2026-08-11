@@ -14,9 +14,12 @@ page until Morgane and Arnaud answer them.
   it is the same Postgres underneath, so the storage seam keeps that move an adapter swap, not a
   migration project. Revisit when approaching the scaling threshold, or when a Supabase-only
   capability (RLS-as-auth, storage buckets) is genuinely needed.
-- **Auth: magic links, kept simple.** One lightweight auth for both roles — no passwords — with
-  the session carrying `practitioner` or `person`. Practitioners additionally get **2FA that must
-  stay low-friction**; ease of enrolment is a requirement, not a nice-to-have.
+- **Auth: magic links, kept simple** — for the *product*. One lightweight auth for both roles — no
+  passwords — with the session carrying `practitioner` or `person`. Practitioners additionally get
+  **2FA that must stay low-friction**; ease of enrolment is a requirement, not a nice-to-have. Not
+  built yet: `apps/web` still runs a development role picker. Operator access to the internal
+  consoles is deliberately a different thing — email and password, seeded accounts, no signup — and
+  is described under Platform below.
 - **Tenancy: the care relationship is the access primitive.** A practitioner↔person relationship
   row with a start and an end; every query in the services layer scopes through it, and the end
   date ends access. This maps one-to-one onto RLS policies if Supabase arrives later.
@@ -43,9 +46,28 @@ page until Morgane and Arnaud answer them.
 - **Observability: Vercel's built-in suite first** — runtime logs, alerting, analytics on the Pro
   plan — before paying for a dedicated error tracker. Sentry's reserved rows in `docs/ENV.md` stay
   unwired unless exception grouping proves insufficient in practice.
-- **Admin console: Vercel deployment protection now** (accepting the Pro plan cost), real operator
-  authentication in roadmap phase 3. The console's current protection — an unpublished address and
-  `noindex` — is not an access control and is not treated as one.
+- **Admin and docs: operator sign-in, built in this repo.** Both apps are gated on email and
+  password against a `auth_user` table in Neon, with sessions in `auth_session`. The gate is two
+  layers: `middleware.ts` redirects a request with no session cookie, and the app's layout
+  exchanges the token for a database row and reads the role off it — server-side, on every request.
+  Passwords are stored as salted `scrypt` hashes; a session token is 256 random bits, stored only
+  as `HMAC-SHA256(token, AUTH_SECRET)`, so the session table on its own grants nothing. Sign-out
+  revokes the row rather than clearing the cookie. Operators are seeded by a script; there is no
+  signup, no password reset and no MFA yet.
+
+  This **supersedes the earlier decision to rely on Vercel deployment protection**, which was
+  recorded here on 2026-08-06 and is withdrawn. Three reasons: it is a dashboard setting that
+  cannot be verified from the repository, so nobody reading the code could tell whether the
+  exposure was live or mitigated; it makes preview deployments awkward to share; and it postponed
+  the real work rather than doing it. If it happens to be switched on it may stay as defence in
+  depth, but nothing now depends on it.
+
+  Both apps also carry `robots.ts` and `noindex` — the gate is the access control, robots is the
+  layer in front of it. Reading the session makes every page dynamic; that is the intended cost.
+
+  `apps/web`'s sign-in is **not** covered by this and is still a development role picker that
+  ignores its own fields. Replacing it with the magic-link shape decided above is separate work,
+  and no real personal data may enter the product before it lands.
 
 ## Engineering practice — 2026-08-06
 

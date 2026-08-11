@@ -3,22 +3,29 @@
 The global rules in [`/CONVENTIONS.md`](../../CONVENTIONS.md) still apply. This file holds only
 what is specific to this package.
 
-## No vendor is committed yet — and that is the design
+## Seams, not integrations
 
-Storage, email and AI are **seams**, not integrations. Each one defines an interface and a
-`register*()` call; the concrete adapter is registered once at process start by the app that owns
-the process. Nothing above the seam names a vendor, so choosing one later is a new file plus one
-registration line — never a rewrite of the callers.
+Storage, auth, email and AI each define an interface and a `register*()` call; the concrete adapter
+is registered once at process start by the app that owns the process. Nothing above the seam names
+a vendor, so choosing one later is a new file plus one registration line — never a rewrite of the
+callers.
 
-| Seam    | Interface        | Register with            | Default if unregistered             |
-| ------- | ---------------- | ------------------------ | ----------------------------------- |
-| Storage | `DatabaseClient` | `registerDatabase()`     | throws — a missing DB must be loud  |
-| Email   | `Mailer`         | `registerMailer()`       | `consoleMailer` — logs, never sends |
-| AI      | `TextProvider`   | `registerTextProvider()` | throws                              |
+| Seam    | Interface        | Register with            | Default if unregistered              |
+| ------- | ---------------- | ------------------------ | ------------------------------------ |
+| Storage | `DatabaseClient` | `registerDatabase()`     | throws — a missing DB must be loud   |
+| Auth    | `AuthStore`      | `registerAuthStore()`    | throws — an ungated console is worse |
+| Email   | `Mailer`         | `registerMailer()`       | `consoleMailer` — logs, never sends  |
+| AI      | `TextProvider`   | `registerTextProvider()` | throws                               |
 
-When you add the first adapter, it goes in this package (`src/db/adapters/<vendor>.ts`), the vendor
-SDK becomes a dependency of **this** package only, and `docs/ENV.md` gains its variables in the same
-PR.
+Auth is the one seam with an adapter behind it today: **Neon**, in `src/auth/adapters/neon.ts`,
+registered from each gated app's `instrumentation.ts` via `registerNeonAuthStore()`. It is also the
+only place in the repo that names a database vendor. Storage, email and AI are still open, and the
+general `DatabaseClient` is REMI-022 — when it lands it inherits this connection and the one
+migration chain under `src/db/migrations/` rather than starting a second of either.
+
+When you add the next adapter, it goes in this package (`src/<seam>/adapters/<vendor>.ts`), the
+vendor SDK becomes a dependency of **this** package only, and `docs/ENV.md` gains its variables in
+the same PR.
 
 ## Entrypoints — pick the one that matches where the code runs
 
@@ -27,6 +34,7 @@ PR.
 | `@remi/services/shared` | types, domain vocabulary, formatters, `Result`, locales, app URLs | browser + server |
 | `@remi/services/server` | storage, email, AI, env — the whole Node surface                  | server only      |
 | `@remi/services/db`     | the storage seam alone                                            | server only      |
+| `@remi/services/auth`   | operator sign-in — the seam, the crypto, the Neon adapter         | server only      |
 | `@remi/services/ai`     | model roles + the provider seam                                   | server only      |
 | `@remi/services/email`  | the mailer seam                                                   | server only      |
 | `@remi/services`        | types only — apps are lint-blocked from it                        | —                |
@@ -68,9 +76,15 @@ src/
   shared/      isomorphic — no fs, no driver, no secret
   server/      the Node barrel + env
   db/          client.ts (the seam) · models/ · services/ · migrations/
+  auth/        the auth seam · password + token crypto · adapters/
   email/       the mailer seam + templates
   ai/          model roles + the provider seam
 ```
+
+`shared/session-cookie.ts` is the one piece of auth outside `auth/`, and the reason is a runtime
+boundary: each gated app's `middleware.ts` runs on the edge and needs the cookie's name, while
+everything that touches a token needs `node:crypto` and cannot be reached from there. A cookie name
+and a TTL carry no secret. Nothing else from `auth/` may follow it across.
 
 `db/models/` files are **types only**. That is what lets `shared/` re-export the domain vocabulary
 to browser code while the rest of `db/` stays server-only — a runtime value there would quietly

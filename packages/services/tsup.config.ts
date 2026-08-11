@@ -11,6 +11,7 @@ export default defineConfig({
     "src/shared/index.ts",
     "src/server/index.ts",
     "src/db/index.ts",
+    "src/auth/index.ts",
     "src/ai/index.ts",
     "src/email/index.ts",
   ],

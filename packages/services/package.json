@@ -22,6 +22,10 @@
       "types": "./dist/db/index.d.ts",
       "import": "./dist/db/index.js"
     },
+    "./auth": {
+      "types": "./dist/auth/index.d.ts",
+      "import": "./dist/auth/index.js"
+    },
     "./ai": {
       "types": "./dist/ai/index.d.ts",
       "import": "./dist/ai/index.js"
@@ -36,14 +40,19 @@
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:migrate": "node scripts/migrate.mjs",
+    "auth:create-operator": "node scripts/create-operator.mjs"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "tsup": "^8.5.0",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
