@@ -33,7 +33,7 @@ a ticket's **Blocked by** row says an owner decision or external input is still 
 
 | Phase                        | Tickets | Theme                                                                             | Gate to the next phase                                                                       |
 | ---------------------------- | ------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| **0 — Close the live risks** | 001–007 | Exposure, honesty, and safety issues that are live today. Days, not weeks.        | No confidential content reachable; contact channel records submissions; merges are protected |
+| **0 — Close the live risks** | 001–007 | Exposure, honesty, and safety issues that are live today. Days, not weeks.        | Admin and docs behind a real sign-in; contact channel records submissions; merges are protected |
 | **1 — Foundation**           | 008–017 | Test harness, error tracking, cleanups. Makes everything after it safe to build.  | Tests gate every PR; a production crash is visible                                           |
 | **2 — Data model & seams**   | 018–021 | The entities and interfaces real data will live in. All before the first adapter. | Schema and seams reviewed and merged                                                         |
 | **3 — Infrastructure**       | 022–026 | Database, auth, headers, billing, GDPR. The decisions-heavy phase.                | Real persistence + real sign-in exist; legal groundwork done                                 |
@@ -46,11 +46,11 @@ These cannot be made by an agent. Each is written out in `docs/audit-report.md` 
 
 | Decision        | Question                                                | Gates tickets                            |
 | --------------- | ------------------------------------------------------- | ---------------------------------------- |
-| D-1             | Deployment protection on admin; docs public or private? | 001                                      |
+| ~~D-1~~         | ~~Deployment protection on admin; docs public~~         | **Withdrawn** — REMI-001 builds the gate |
 | D-v1-2 / REQ-30 | Is REMI patient-facing, practitioner-facing, or both?   | 027–039 (scoping of every ported screen) |
 | D-v1-1 / REQ-12 | What happens to the Python meal-plan API?               | 033, 034                                 |
-| D-2             | Database vendor — Neon or Supabase?                     | 022                                      |
-| D-3             | Auth implementation for the magic-link shape?           | 023                                      |
+| D-2             | Database vendor — Neon or Supabase?                     | 022 (settled as Neon for auth by 001)    |
+| D-3             | Auth implementation for the magic-link shape?           | 023 (operator half answered by 001)      |
 | D-4             | How does billing happen on 1 September?                 | 025                                      |
 | D-5             | Pseudonymise before the AI provider? + DPAs             | 026, 034                                 |
 | D-6             | Which domain is the real one?                           | 015                                      |
@@ -61,7 +61,7 @@ These cannot be made by an agent. Each is written out in `docs/audit-report.md` 
 
 ### Phase 0 — Close the live risks
 
-- [REMI-001](REMI-001-admin-docs-exposure.md) — Verify deployment protection on admin; settle docs-site visibility
+- [REMI-001](REMI-001-admin-docs-exposure.md) — Gate admin and docs behind Neon-backed operator sign-in
 - [REMI-002](REMI-002-remove-confidential-content.md) — Remove confidential negotiation content from the admin app
 - [REMI-003](REMI-003-deidentify-fixtures.md) — De-identify fixtures: fictional practitioner, reserved email domains
 - [REMI-004](REMI-004-contact-form-delivery.md) — Give the contact form delivery and a record
