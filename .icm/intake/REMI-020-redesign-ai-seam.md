@@ -48,7 +48,7 @@ Guardian validation result.
 
 ```text
 Work in the remi-ai monorepo. Read CLAUDE.md, CONVENTIONS.md, packages/services/AGENTS.md, then
-docs/audit-report.md findings F-12 and F-13, then docs/v1-report.md §5.2 in full (the generation
+.icm/docs/audit-report.md findings F-12 and F-13, then .icm/docs/v1-report.md §5.2 in full (the generation
 pipeline and the Guardian validation schema), and
 apps/docs/app/technical/decisions/page.mdx (the therapeutic-frame and audit-trail requirements).
 Current seam: packages/services/src/ai/index.ts.

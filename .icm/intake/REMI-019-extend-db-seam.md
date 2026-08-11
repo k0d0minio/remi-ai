@@ -42,7 +42,7 @@ roster page's 1+3×N query pattern needs a batched read, or it becomes the first
 
 ```text
 Work in the remi-ai monorepo. Read CLAUDE.md, CONVENTIONS.md, packages/services/AGENTS.md, then
-docs/audit-report.md findings F-09, F-10, F-37, then packages/services/src/db/client.ts and
+.icm/docs/audit-report.md findings F-09, F-10, F-37, then packages/services/src/db/client.ts and
 types/index.ts, and all eight files in apps/web/lib/queries/ (they are the demand the interface
 must meet).
 

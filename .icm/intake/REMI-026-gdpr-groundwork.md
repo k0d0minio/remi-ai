@@ -45,9 +45,9 @@ modèles d'IA" as a purpose) needs counsel's second look.
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then docs/audit-report.md
-finding F-34 and decision D-5, docs/v1-report.md §7 (the promises already made) and §8.10,
-and docs/info-gathering.md section E.
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
+finding F-34 and decision D-5, .icm/docs/v1-report.md §7 (the promises already made) and §8.10,
+and .icm/docs/info-gathering.md section E.
 
 Task: prepare the GDPR groundwork as decision-support — you must not make legal decisions.
 1. Draft docs/gdpr/processor-register.md: every processor in the planned stack (Vercel, the

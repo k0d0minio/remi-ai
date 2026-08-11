@@ -35,7 +35,7 @@ the exact failure the catalogue comment warns against. Separately, a few pre-1.0
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
 finding F-04 and its §4 note on pre-1.0 pins.
 
 Task: one version, one home.

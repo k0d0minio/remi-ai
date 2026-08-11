@@ -44,7 +44,7 @@ adapter registration (F-11), want to live in.
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
 findings F-27, F-29, F-43, and docs/ENV.md (SENTRY_DSN is reserved there).
 
 Task: make production failures visible.

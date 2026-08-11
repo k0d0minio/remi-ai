@@ -44,7 +44,7 @@ all future plan weeks** (safety, not cosmetics — it becomes a REMI-034 hook).
 
 ```text
 Work in the remi-ai monorepo. Enter through the delivery pipeline per CLAUDE.md. Read
-CONVENTIONS.md, then docs/v1-report.md §3's /app/profile row and §6.4 (the complete vocabulary),
+CONVENTIONS.md, then .icm/docs/v1-report.md §3's /app/profile row and §6.4 (the complete vocabulary),
 plus audit F-18's primitive warnings.
 
 Build the profile feature in apps/web on the shared models:

@@ -40,7 +40,7 @@ programmatically linked to its checkbox.
 
 ```text
 Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md (design-system rules), then
-docs/audit-report.md findings F-40, F-42, F-43.
+.icm/docs/audit-report.md findings F-40, F-42, F-43.
 
 Task: clear the accessibility floor.
 1. Create a SkipLink component in packages/ui (visually hidden until focused, styled with

@@ -42,8 +42,8 @@ real before invoicing anyone.
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then docs/audit-report.md
-finding F-07 and decision D-4, and docs/info-gathering.md REQ-19, REQ-20, REQ-32.
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
+finding F-07 and decision D-4, and .icm/docs/info-gathering.md REQ-19, REQ-20, REQ-32.
 
 Task: prepare the billing decision and implement its cheap half.
 1. Write a one-page decision brief for the owner comparing: (a) manual invoicing for ~15 pilot
@@ -57,7 +57,7 @@ Task: prepare the billing decision and implement its cheap half.
    the repo's routing conventions) and link it from the decisions index.
 3. If the owner has already answered D-4 as "manual": write the invoicing runbook
    (docs/BILLING.md): source of the practitioner list, invoice fields (SRL details from
-   docs/v1-report.md §7), VAT, schedule, who sends, where copies are kept.
+   .icm/docs/v1-report.md §7), VAT, schedule, who sends, where copies are kept.
 4. Do not build any payment integration in this ticket; if D-4 lands on a provider, that is a
    pipeline feature to scope separately.
 Push a feature branch and open a PR. Anything financial is decision-support only — mark figures

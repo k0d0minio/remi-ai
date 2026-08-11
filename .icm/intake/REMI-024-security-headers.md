@@ -35,7 +35,7 @@ sites; real for the sign-in surface and the operator console once real authentic
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
 finding F-35.
 
 Task: add security headers, derived from what the apps actually load.

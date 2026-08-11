@@ -61,7 +61,7 @@ D-v1-1 decision goes.
 ```text
 Work in the remi-ai monorepo. Enter through the delivery pipeline per CLAUDE.md; this is the
 core feature and should be split into multiple pipeline runs (model+jobs, generation path,
-scheduling, admin controls). Read CONVENTIONS.md, then docs/v1-report.md §5.2 steps 4-7 IN FULL
+scheduling, admin controls). Read CONVENTIONS.md, then .icm/docs/v1-report.md §5.2 steps 4-7 IN FULL
 (the preserved generation contract), §5.1's week_recipes row, §6.5's constants, and §8 items 6-7.
 Also read audit F-12's requirements: validated-before-render, persisted-with-context.
 
