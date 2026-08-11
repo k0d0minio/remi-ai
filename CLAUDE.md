@@ -85,3 +85,7 @@ Through the pipeline, not ad hoc. `/pipeline scope "<topic>"` for a new capabili
 `/pipeline bug | tweak | chore "<request>"` for the fast lanes; `/pipeline status` to see where
 everything stands. Every stage has a human gate at its boundary and the agent never crosses one on
 its own.
+
+The ordered backlog lives in [`.icm/intake/`](.icm/intake/README.md) (estate ticket standard,
+formerly `ISSUES/`): one markdown ticket per unit of work, each with a pasteable agent prompt.
+Finished tickets move to `.icm/intake/_done/`.
