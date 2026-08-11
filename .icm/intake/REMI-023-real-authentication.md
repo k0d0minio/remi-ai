@@ -1,13 +1,13 @@
 # REMI-023 · Real authentication: magic links through the session seam
 
-|                |                                                                                                                                           |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Type**       | feature (infrastructure)                                                                                                                  |
-| **Priority**   | P1 — the hard precondition for any real personal data                                                                                     |
-| **Size**       | A week or more; can overlap REMI-022                                                                                                      |
+|                |                                                                                                                                                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Type**       | feature (infrastructure)                                                                                                                                                                                                 |
+| **Priority**   | P1 — the hard precondition for any real personal data                                                                                                                                                                    |
+| **Size**       | A week or more; can overlap REMI-022                                                                                                                                                                                     |
 | **Depends on** | REMI-001 (the auth seam, the Neon adapter and the operator gate this extends), REMI-007 (prod guard), REMI-018 (session entity), REMI-004 (email adapter, for link delivery), REMI-022 (persistence for sessions/tokens) |
 | **Blocked by** | Nothing external — REMI-001 answered D-3 by building it: hand-rolled against Neon, no auth vendor. This ticket adds the magic-link flow to that seam                                                                     |
-| **Sources**    | audit F-32, D-3, checklist item 9; v1-report §9.2 (anti-enumeration reset behaviour worth keeping)                                        |
+| **Sources**    | audit F-32, D-3, checklist item 9; v1-report §9.2 (anti-enumeration reset behaviour worth keeping)                                                                                                                       |
 
 ## Problem statement
 

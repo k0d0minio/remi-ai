@@ -31,31 +31,31 @@ a ticket's **Blocked by** row says an owner decision or external input is still 
 
 ## Phases
 
-| Phase                        | Tickets | Theme                                                                             | Gate to the next phase                                                                       |
-| ---------------------------- | ------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Phase                        | Tickets | Theme                                                                             | Gate to the next phase                                                                          |
+| ---------------------------- | ------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | **0 — Close the live risks** | 001–007 | Exposure, honesty, and safety issues that are live today. Days, not weeks.        | Admin and docs behind a real sign-in; contact channel records submissions; merges are protected |
-| **1 — Foundation**           | 008–017 | Test harness, error tracking, cleanups. Makes everything after it safe to build.  | Tests gate every PR; a production crash is visible                                           |
-| **2 — Data model & seams**   | 018–021 | The entities and interfaces real data will live in. All before the first adapter. | Schema and seams reviewed and merged                                                         |
-| **3 — Infrastructure**       | 022–026 | Database, auth, headers, billing, GDPR. The decisions-heavy phase.                | Real persistence + real sign-in exist; legal groundwork done                                 |
-| **4 — Feature port from v1** | 027–039 | The product itself, in dependency order per `.icm/docs/v1-report.md` §9.2.        | The pilot can run on it                                                                      |
+| **1 — Foundation**           | 008–017 | Test harness, error tracking, cleanups. Makes everything after it safe to build.  | Tests gate every PR; a production crash is visible                                              |
+| **2 — Data model & seams**   | 018–021 | The entities and interfaces real data will live in. All before the first adapter. | Schema and seams reviewed and merged                                                            |
+| **3 — Infrastructure**       | 022–026 | Database, auth, headers, billing, GDPR. The decisions-heavy phase.                | Real persistence + real sign-in exist; legal groundwork done                                    |
+| **4 — Feature port from v1** | 027–039 | The product itself, in dependency order per `.icm/docs/v1-report.md` §9.2.        | The pilot can run on it                                                                         |
 
 ## Owner decisions that gate tickets
 
 These cannot be made by an agent. Each is written out in `.icm/docs/audit-report.md` §7,
 `.icm/docs/v1-report.md` §9.3 and indexed in `.icm/docs/info-gathering.md` §I.
 
-| Decision        | Question                                                | Gates tickets                            |
-| --------------- | ------------------------------------------------------- | ---------------------------------------- |
-| ~~D-1~~         | ~~Deployment protection on admin; docs public~~         | **Withdrawn** — REMI-001 builds the gate |
-| D-v1-2 / REQ-30 | Is REMI patient-facing, practitioner-facing, or both?   | 027–039 (scoping of every ported screen) |
-| D-v1-1 / REQ-12 | What happens to the Python meal-plan API?               | 033, 034                                 |
-| D-2             | Database vendor — Neon or Supabase?                     | 022 (settled as Neon for auth by 001)    |
-| D-3             | Auth implementation for the magic-link shape?           | 023 (operator half answered by 001)      |
-| D-4             | How does billing happen on 1 September?                 | 025                                      |
-| D-5             | Pseudonymise before the AI provider? + DPAs             | 026, 034                                 |
-| D-6             | Which domain is the real one?                           | 015                                      |
-| REQ-26          | The original FunMedDev genotype source table            | 028                                      |
-| REQ-21          | Legal validation of the CGV / privacy policy            | 039                                      |
+| Decision        | Question                                              | Gates tickets                            |
+| --------------- | ----------------------------------------------------- | ---------------------------------------- |
+| ~~D-1~~         | ~~Deployment protection on admin; docs public~~       | **Withdrawn** — REMI-001 builds the gate |
+| D-v1-2 / REQ-30 | Is REMI patient-facing, practitioner-facing, or both? | 027–039 (scoping of every ported screen) |
+| D-v1-1 / REQ-12 | What happens to the Python meal-plan API?             | 033, 034                                 |
+| D-2             | Database vendor — Neon or Supabase?                   | 022 (settled as Neon for auth by 001)    |
+| D-3             | Auth implementation for the magic-link shape?         | 023 (operator half answered by 001)      |
+| D-4             | How does billing happen on 1 September?               | 025                                      |
+| D-5             | Pseudonymise before the AI provider? + DPAs           | 026, 034                                 |
+| D-6             | Which domain is the real one?                         | 015                                      |
+| REQ-26          | The original FunMedDev genotype source table          | 028                                      |
+| REQ-21          | Legal validation of the CGV / privacy policy          | 039                                      |
 
 ## Ticket index
 

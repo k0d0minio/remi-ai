@@ -1,13 +1,13 @@
 # REMI-002 · Remove confidential negotiation content from the admin app
 
-|                |                                                                                                           |
-| -------------- | --------------------------------------------------------------------------------------------------------- |
-| **Type**       | chore                                                                                                     |
-| **Priority**   | P0                                                                                                        |
-| **Size**       | Hours                                                                                                     |
-| **Depends on** | REMI-001 (the sign-in gate lands first, so removal isn't racing exposure)                                 |
-| **Blocked by** | Owner confirmation that the equity-offer page may leave the deployed app                                  |
-| **Sources**    | audit F-30 ("decide whether a negotiation document belongs in a deployed app at all")                    |
+|                |                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------- |
+| **Type**       | chore                                                                                 |
+| **Priority**   | P0                                                                                    |
+| **Size**       | Hours                                                                                 |
+| **Depends on** | REMI-001 (the sign-in gate lands first, so removal isn't racing exposure)             |
+| **Blocked by** | Owner confirmation that the equity-offer page may leave the deployed app              |
+| **Sources**    | audit F-30 ("decide whether a negotiation document belongs in a deployed app at all") |
 
 ## Problem statement
 

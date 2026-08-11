@@ -1,13 +1,13 @@
 # REMI-022 · Choose the database vendor and land the first adapter
 
-|                |                                                                                                                                                         |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Type**       | feature (infrastructure)                                                                                                                                |
-| **Priority**   | P1 — unblocks every real feature                                                                                                                        |
-| **Size**       | A week or more (the audit warns against sizing it as an afternoon)                                                                                      |
-| **Depends on** | REMI-001 (Neon project + the migration chain), REMI-008 (harness + 75% floor), REMI-018 (entities), REMI-019 (seam)                                     |
-| **Blocked by** | Nothing external — D-2 is settled as Neon by REMI-001. Reopen only if the owner reverses it (v1 having run on Supabase auth/storage/cron is the case)  |
-| **Sources**    | audit F-08, F-11, F-28, D-2, checklist item 8; v1-report §9.2                                                                                           |
+|                |                                                                                                                                                       |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Type**       | feature (infrastructure)                                                                                                                              |
+| **Priority**   | P1 — unblocks every real feature                                                                                                                      |
+| **Size**       | A week or more (the audit warns against sizing it as an afternoon)                                                                                    |
+| **Depends on** | REMI-001 (Neon project + the migration chain), REMI-008 (harness + 75% floor), REMI-018 (entities), REMI-019 (seam)                                   |
+| **Blocked by** | Nothing external — D-2 is settled as Neon by REMI-001. Reopen only if the owner reverses it (v1 having run on Supabase auth/storage/cron is the case) |
+| **Sources**    | audit F-08, F-11, F-28, D-2, checklist item 8; v1-report §9.2                                                                                         |
 
 ## Problem statement
 

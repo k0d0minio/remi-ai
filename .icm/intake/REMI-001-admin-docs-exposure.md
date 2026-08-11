@@ -1,13 +1,13 @@
 # REMI-001 · Gate admin and docs behind Neon-backed operator sign-in
 
-|                |                                                                                          |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| **Type**       | feature (infrastructure)                                                                 |
-| **Priority**   | P0 — live exposure, close this week                                                      |
-| **Size**       | A day or two — this is code, not a dashboard toggle                                      |
-| **Depends on** | —                                                                                        |
+|                |                                                                                           |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| **Type**       | feature (infrastructure)                                                                  |
+| **Priority**   | P0 — live exposure, close this week                                                       |
+| **Size**       | A day or two — this is code, not a dashboard toggle                                       |
+| **Depends on** | —                                                                                         |
 | **Blocked by** | Neon account + project access; `DATABASE_URL` and `AUTH_SECRET` set in Vercel and locally |
-| **Sources**    | audit F-30, F-31, F-32 (operator half), checklist item 1; supersedes decision D-1        |
+| **Sources**    | audit F-30, F-31, F-32 (operator half), checklist item 1; supersedes decision D-1         |
 
 ## Problem statement
 
@@ -26,8 +26,8 @@ password, the session lives in Postgres, and the gate is code in this repo that 
 can see.
 
 This also settles two things that were floating. **D-1** (protect-or-publish, via Vercel) is
-withdrawn — both apps get the in-app gate. **D-2** (database vendor) is answered *for the auth
-store*: Neon, EU region, consistent with the decided data-residency posture. The general
+withdrawn — both apps get the in-app gate. **D-2** (database vendor) is answered _for the auth
+store_: Neon, EU region, consistent with the decided data-residency posture. The general
 `DatabaseClient` adapter and the query-layer migration stay in REMI-022; this ticket does not
 pre-empt that work, it lands the connection and the migration chain that work will inherit.
 
@@ -47,7 +47,7 @@ Scope discipline matters here — it is a P0 and it should ship in days.
 
 ## Required steps
 
-1. **Neon project.** Create it in an EU region (Frankfurt), take the *pooled* connection string,
+1. **Neon project.** Create it in an EU region (Frankfurt), take the _pooled_ connection string,
    and set `DATABASE_URL` and a freshly generated `AUTH_SECRET` in Vercel for the **admin** and
    **docs** projects (all environments) and in local `.env`. Three edits in the same PR per the
    env rule: the zod entry in `packages/services/src/server/env.ts` (both already exist as
