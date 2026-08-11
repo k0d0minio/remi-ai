@@ -51,10 +51,10 @@ one here too, no real personal data may enter the system in any form.
 Work in the remi-ai monorepo. The implementation is settled: extend the hand-rolled auth REMI-001
 built against Neon (packages/services/src/auth/ — the seam, the Neon adapter, the auth_user and
 auth_session tables). Do not introduce an auth vendor. Read CLAUDE.md, CONVENTIONS.md, then
-docs/audit-report.md finding F-32, docs/v1-report.md §9.2's auth note and §8.1, §8.2 (the IDOR and
-spoofable-admin defects that must not recur), and the existing seams: packages/services/src/auth/,
-apps/web/lib/auth/session.ts, development-session.ts, apps/web/lib/actions/session.ts, and the
-gate at apps/web/app/[locale]/(app)/layout.tsx.
+.icm/docs/audit-report.md finding F-32, .icm/docs/v1-report.md §9.2's auth note and §8.1, §8.2
+(the IDOR and spoofable-admin defects that must not recur), and the existing seams:
+packages/services/src/auth/, apps/web/lib/auth/session.ts, development-session.ts,
+apps/web/lib/actions/session.ts, and the gate at apps/web/app/[locale]/(app)/layout.tsx.
 
 Task: replace the development session with real magic-link authentication.
 1. Implement the provider behind the existing session seam — the gate stays one check in one

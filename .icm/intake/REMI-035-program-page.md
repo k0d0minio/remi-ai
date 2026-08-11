@@ -51,7 +51,7 @@ recomputed, and the meal excluded from future weeks.
 
 ```text
 Work in the remi-ai monorepo. Enter through the delivery pipeline per CLAUDE.md. Read
-CONVENTIONS.md, then docs/v1-report.md §3's rows for /app (Dashboard/TodayMeals) and
+CONVENTIONS.md, then .icm/docs/v1-report.md §3's rows for /app (Dashboard/TodayMeals) and
 /app/program, §5.2 step 6 (the skip/regenerate mechanics incl. shopping-list recomputation), and
 §6.5 (medal thresholds and constants). §8.8 warns about UTC/Paris drift — this product's "today"
 is Europe/Brussels.

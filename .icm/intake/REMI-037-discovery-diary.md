@@ -43,8 +43,8 @@ whether the discovery week survives the port before spending the effort.
 
 ```text
 Work in the remi-ai monorepo. Enter through the delivery pipeline per CLAUDE.md. FIRST: confirm
-the product decision that the discovery week survives (docs/v1-report.md §9.2 step 7 raises it).
-If undecided, stop and ask rather than building. Read CONVENTIONS.md, then docs/v1-report.md §2
+the product decision that the discovery week survives (.icm/docs/v1-report.md §9.2 step 7 raises it).
+If undecided, stop and ask rather than building. Read CONVENTIONS.md, then .icm/docs/v1-report.md §2
 step 4, §3's /app/diary row, and §6.5's diary constants.
 
 If confirmed, build the discovery diary in apps/web:

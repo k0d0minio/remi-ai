@@ -59,8 +59,8 @@ tables' worth of proven shapes (§5.1) and 12 defects to fix by construction (§
 
 ```text
 Work in the remi-ai monorepo. Read CLAUDE.md, CONVENTIONS.md, packages/services/AGENTS.md, then:
-docs/audit-report.md findings F-14, F-16, F-17, F-18 (and the F-34 genotype note);
-docs/v1-report.md §5.1 (the proven schema), §8 (defects that must not survive), §9.2;
+.icm/docs/audit-report.md findings F-14, F-16, F-17, F-18 (and the F-34 genotype note);
+.icm/docs/v1-report.md §5.1 (the proven schema), §8 (defects that must not survive), §9.2;
 apps/docs/app/technical/decisions/page.mdx (the decided tenancy model);
 every file in packages/services/src/db/models/.
 

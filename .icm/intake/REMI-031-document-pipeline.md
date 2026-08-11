@@ -53,7 +53,7 @@ authorized against the patient they acted on (§8.1).
 
 ```text
 Work in the remi-ai monorepo. Enter through the delivery pipeline per CLAUDE.md. Read
-CONVENTIONS.md and packages/services/AGENTS.md, then docs/v1-report.md §5.2 step 1 (the proven
+CONVENTIONS.md and packages/services/AGENTS.md, then .icm/docs/v1-report.md §5.2 step 1 (the proven
 pipeline), §5.1's clinic_insights row (the shape to improve on), and §8 items 1, 4, 5, 7, 9
 (the defects this port exists to fix). Confirm the storage and parser vendors are decided
 (D-2 storage, D-v1-3 LlamaParse) before building; if not, stop and ask.

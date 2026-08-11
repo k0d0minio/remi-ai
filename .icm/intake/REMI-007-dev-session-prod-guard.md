@@ -42,7 +42,7 @@ that must exist _now_: the development session must refuse to run in a productio
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
 finding F-32, then apps/web/lib/auth/session.ts, development-session.ts, and
 apps/web/lib/actions/session.ts.
 

@@ -13,7 +13,7 @@
 
 The 20-question Nutrition Mindset questionnaire and the 7-profile psychological scoring
 algorithm are part of the product's irreplaceable domain knowledge — fully preserved in
-`docs/v1-report.md` §6.1–6.2 after the v1 code was deleted. Nothing in the monorepo implements
+`.icm/docs/v1-report.md` §6.1–6.2 after the v1 code was deleted. Nothing in the monorepo implements
 them. This is pure, fully-specified logic: the perfect first feature port and the first real TDD
 exercise on the new harness.
 
@@ -47,7 +47,7 @@ exercise on the new harness.
 
 ```text
 Work in the remi-ai monorepo. Read CLAUDE.md, CONVENTIONS.md, packages/services/AGENTS.md, then
-docs/v1-report.md §6.1 and §6.2 VERY carefully — they are the complete spec, reconstructed from
+.icm/docs/v1-report.md §6.1 and §6.2 VERY carefully — they are the complete spec, reconstructed from
 deleted code; there is no other source. Also read §9.1's porting-map row for this piece.
 
 Task: implement the Nutrition Mindset questionnaire and 7-profile scoring engine as pure TypeScript

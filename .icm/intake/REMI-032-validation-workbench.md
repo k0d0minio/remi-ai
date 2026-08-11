@@ -44,7 +44,7 @@ row-per-item model, validation becomes per-row state changes with audit attribut
 
 ```text
 Work in the remi-ai monorepo. Enter through the delivery pipeline per CLAUDE.md. Read
-CONVENTIONS.md, apps/admin/AGENTS.md, then docs/v1-report.md §4's Documents bullet (the proven
+CONVENTIONS.md, apps/admin/AGENTS.md, then .icm/docs/v1-report.md §4's Documents bullet (the proven
 workbench UX) and §8.4 (the storage anti-pattern this port fixes).
 
 Build the document-validation workbench in apps/admin against the row-per-item extraction model:
