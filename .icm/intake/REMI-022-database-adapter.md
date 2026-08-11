@@ -5,8 +5,8 @@
 | **Type**       | feature (infrastructure)                                                                                                                                |
 | **Priority**   | P1 — unblocks every real feature                                                                                                                        |
 | **Size**       | A week or more (the audit warns against sizing it as an afternoon)                                                                                      |
-| **Depends on** | REMI-008 (harness + 75% floor), REMI-018 (entities), REMI-019 (seam)                                                                                    |
-| **Blocked by** | Owner decision D-2 (Neon vs Supabase — v1 having run on Supabase auth/storage/cron materially strengthens Supabase, per v1 §9.2); vendor account access |
+| **Depends on** | REMI-001 (Neon project + the migration chain), REMI-008 (harness + 75% floor), REMI-018 (entities), REMI-019 (seam)                                     |
+| **Blocked by** | Nothing external — D-2 is settled as Neon by REMI-001. Reopen only if the owner reverses it (v1 having run on Supabase auth/storage/cron is the case)  |
 | **Sources**    | audit F-08, F-11, F-28, D-2, checklist item 8; v1-report §9.2                                                                                           |
 
 ## Problem statement
@@ -21,8 +21,9 @@ tooling + connection lifecycle + query-module migration, not "one file and one r
 
 ## Required steps
 
-1. Get D-2 decided (recommend deciding with D-3/auth in the same sitting — Supabase answers both;
-   EU region either way, per the decided data posture).
+1. Build on the Neon project REMI-001 already stood up (EU region, per the decided data posture)
+   rather than choosing again; the auth migration chain and connection strategy are already there
+   to inherit, and the auth adapter's ad-hoc connection folds onto the shared pool here.
 2. Implement the adapter for the REMI-019 interface in `packages/services/src/db/`; it must pass
    the REMI-019 contract-test suite. The 75% coverage floor on `src/db/**` switches on here.
 3. Stand up migrations tooling and the initial migration generated from the REMI-018 models
@@ -47,8 +48,9 @@ tooling + connection lifecycle + query-module migration, not "one file and one r
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Do not start unless decision D-2 (database vendor) is confirmed —
-if unconfirmed, stop and ask. Read CLAUDE.md, CONVENTIONS.md, packages/services/AGENTS.md, then
+Work in the remi-ai monorepo. The vendor is Neon — REMI-001 already stood up the project, the
+connection variables and the migration chain; extend those rather than choosing again. Read
+CLAUDE.md, CONVENTIONS.md, packages/services/AGENTS.md, then
 docs/audit-report.md findings F-08, F-09, F-11, F-28, F-37 and decision D-2, and
 docs/v1-report.md §9.2's database note and §8.12 (migration hygiene lessons).
 
