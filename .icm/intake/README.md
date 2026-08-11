@@ -10,9 +10,9 @@
 
 This folder is the actionable translation of three documents into tickets:
 
-- [`docs/audit-report.md`](../../docs/audit-report.md) — the pre-build audit of this monorepo (findings F-01–F-48, decisions D-1–D-8)
-- [`docs/v1-report.md`](../../docs/v1-report.md) — the analysis of the deleted Lovable v1; the product spec for the feature port
-- [`docs/info-gathering.md`](../../docs/info-gathering.md) — the requests and decisions pending from Morgane and Arnaud (REQ-01–REQ-39)
+- [`.icm/docs/audit-report.md`](../docs/audit-report.md) — the pre-build audit of this monorepo (findings F-01–F-48, decisions D-1–D-8)
+- [`.icm/docs/v1-report.md`](../docs/v1-report.md) — the analysis of the deleted Lovable v1; the product spec for the feature port
+- [`.icm/docs/info-gathering.md`](../docs/info-gathering.md) — the requests and decisions pending from Morgane and Arnaud (REQ-01–REQ-39)
 
 Every ticket is one actionable unit of work with a problem statement, required steps, acceptance
 criteria, and a **prompt** that can be pasted into a fresh Claude Code session to do the work.
@@ -22,7 +22,7 @@ a ticket's **Blocked by** row says an owner decision or external input is still 
 ## How to use a ticket
 
 1. Check **Depends on** (earlier tickets) and **Blocked by** (owner decisions / external inputs —
-   these map to `docs/info-gathering.md`). Don't start a blocked ticket.
+   these map to `.icm/docs/info-gathering.md`). Don't start a blocked ticket.
 2. Hand the **Agent prompt** section to a Claude Code session, or work through the steps yourself.
 3. A ticket is done when every acceptance criterion is checked and the PR is merged.
 4. This repo routes feature work through the delivery pipeline (`CLAUDE.md` → "How work gets done
@@ -37,12 +37,12 @@ a ticket's **Blocked by** row says an owner decision or external input is still 
 | **1 — Foundation**           | 008–017 | Test harness, error tracking, cleanups. Makes everything after it safe to build.  | Tests gate every PR; a production crash is visible                                           |
 | **2 — Data model & seams**   | 018–021 | The entities and interfaces real data will live in. All before the first adapter. | Schema and seams reviewed and merged                                                         |
 | **3 — Infrastructure**       | 022–026 | Database, auth, headers, billing, GDPR. The decisions-heavy phase.                | Real persistence + real sign-in exist; legal groundwork done                                 |
-| **4 — Feature port from v1** | 027–039 | The product itself, in dependency order per `docs/v1-report.md` §9.2.             | The pilot can run on it                                                                      |
+| **4 — Feature port from v1** | 027–039 | The product itself, in dependency order per `.icm/docs/v1-report.md` §9.2.        | The pilot can run on it                                                                      |
 
 ## Owner decisions that gate tickets
 
-These cannot be made by an agent. Each is written out in `docs/audit-report.md` §7,
-`docs/v1-report.md` §9.3 and indexed in `docs/info-gathering.md` §I.
+These cannot be made by an agent. Each is written out in `.icm/docs/audit-report.md` §7,
+`.icm/docs/v1-report.md` §9.3 and indexed in `.icm/docs/info-gathering.md` §I.
 
 | Decision        | Question                                                | Gates tickets                            |
 | --------------- | ------------------------------------------------------- | ---------------------------------------- |

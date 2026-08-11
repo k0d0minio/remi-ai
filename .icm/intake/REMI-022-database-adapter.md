@@ -49,8 +49,8 @@ tooling + connection lifecycle + query-module migration, not "one file and one r
 ```text
 Work in the remi-ai monorepo. Do not start unless decision D-2 (database vendor) is confirmed —
 if unconfirmed, stop and ask. Read CLAUDE.md, CONVENTIONS.md, packages/services/AGENTS.md, then
-docs/audit-report.md findings F-08, F-09, F-11, F-28, F-37 and decision D-2, and
-docs/v1-report.md §9.2's database note and §8.12 (migration hygiene lessons).
+.icm/docs/audit-report.md findings F-08, F-09, F-11, F-28, F-37 and decision D-2, and
+.icm/docs/v1-report.md §9.2's database note and §8.12 (migration hygiene lessons).
 
 Task: land real persistence, honestly sized. Work in reviewable stages (separate PRs are fine):
 1. Adapter: implement the Collection/AccessContext interface from packages/services/src/db/ for

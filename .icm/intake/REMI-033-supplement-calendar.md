@@ -47,7 +47,7 @@ regeneration-only editing model, and replaces inference-based state with the job
 
 ```text
 Work in the remi-ai monorepo. Enter through the delivery pipeline per CLAUDE.md. Read
-CONVENTIONS.md, then docs/v1-report.md §5.1's patient_supplement_calendars row, §5.2 step 3, and
+CONVENTIONS.md, then .icm/docs/v1-report.md §5.1's patient_supplement_calendars row, §5.2 step 3, and
 §6.5's constants (duration default 3 months, range 1-24, re-kick policy). Confirm the D-v1-1
 decision (Python API as vendor vs in-house computation) before implementing the compute step; if
 undecided, build everything up to the compute call and stop — say so in the PR.

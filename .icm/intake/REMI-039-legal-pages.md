@@ -42,7 +42,7 @@ no legal pages; the consent flow (REMI-029) needs versioned texts to consent to.
 
 ```text
 Work in the remi-ai monorepo. Enter through the delivery pipeline per CLAUDE.md. Read
-CONVENTIONS.md, then docs/v1-report.md §7 and docs/info-gathering.md REQ-21/REQ-23.
+CONVENTIONS.md, then .icm/docs/v1-report.md §7 and .icm/docs/info-gathering.md REQ-21/REQ-23.
 
 HARD PRECONDITION: you may not author binding legal terms. If the validated CGV and privacy
 texts have not been supplied, build the machinery with clearly-marked placeholder content

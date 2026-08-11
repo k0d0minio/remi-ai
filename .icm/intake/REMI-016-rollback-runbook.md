@@ -37,7 +37,7 @@ down. Rollback is mentioned exactly once in the repo, in passing.
 
 ```text
 Work in the remi-ai monorepo. Read CLAUDE.md ("Where the rules live"), CONVENTIONS.md, then
-docs/audit-report.md finding F-24, plus pipeline/lanes/chore/CONTEXT.md:58-64 and
+.icm/docs/audit-report.md finding F-24, plus pipeline/lanes/chore/CONTEXT.md:58-64 and
 pipeline/stages/06_ship/CONTEXT.md to see where deployment knowledge currently lives.
 
 Task: write the rollback runbook.

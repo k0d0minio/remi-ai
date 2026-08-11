@@ -46,7 +46,7 @@ data, and is also where pilot applications get tracked (the quarter's stated obj
 
 ```text
 Work in the remi-ai monorepo. Enter through the delivery pipeline per CLAUDE.md. Read
-CONVENTIONS.md and apps/admin/AGENTS.md, then docs/v1-report.md §4 in full (the proven console),
+CONVENTIONS.md and apps/admin/AGENTS.md, then .icm/docs/v1-report.md §4 in full (the proven console),
 and audit F-15.
 
 Build the real admin console in apps/admin, replacing the fixture-driven screens:

@@ -46,7 +46,7 @@ dashboard sidebar. v1's defects here: feedback matched weeks by a 4-strategy heu
 
 ```text
 Work in the remi-ai monorepo. Enter through the delivery pipeline per CLAUDE.md. Read
-CONVENTIONS.md, then docs/v1-report.md §3's weekly-feedback paragraph (timing rules), §5.1's
+CONVENTIONS.md, then .icm/docs/v1-report.md §3's weekly-feedback paragraph (timing rules), §5.1's
 weekly_feedback and weekly_advice rows, §6.5's thresholds, and §8 items 6, 9, 10.
 
 Build the feedback loop:

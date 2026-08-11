@@ -49,7 +49,7 @@ patients directly, or persons invited by a practitioner through a CareRelationsh
 ```text
 Work in the remi-ai monorepo. This is a product feature: enter it through the repo's delivery
 pipeline (CLAUDE.md "How work gets done here" — /pipeline scope, then the stages), respecting its
-human gates. Read CLAUDE.md, CONVENTIONS.md, then docs/v1-report.md §2 (steps 1-3), §3's rows for
+human gates. Read CLAUDE.md, CONVENTIONS.md, then .icm/docs/v1-report.md §2 (steps 1-3), §3's rows for
 /, /onboarding, /psychological-profile-result and /questionnaires, and §8.10/§8.11 (the two
 defects this port must fix by construction). Confirm the D-v1-2 audience decision before scoping;
 if unanswered, stop and ask.

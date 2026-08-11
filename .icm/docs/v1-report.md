@@ -8,7 +8,7 @@ untracked and **without any git history** — the folder carries no provenance b
 report, so this document is deliberately self-contained: everything needed to port the
 functionality is written down here, and nothing below assumes the code still exists.
 
-**How to use this document.** The companion `docs/audit-report.md` says what the new foundation
+**How to use this document.** The companion `.icm/docs/audit-report.md` says what the new foundation
 needs before feature work (its section 2 checklist). This report says what the features _are_.
 The intended order: audit items first (test harness, error tracking, entity modelling, database
 adapter, auth), then port the v1 functionality feature by feature using sections 3–8 here as the

@@ -46,7 +46,7 @@ The plan bundles harness-bootstrapping into the first database-adapter PR (runne
 
 ```text
 Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md (its testing commitments,
-~lines 169-178), then docs/audit-report.md finding F-26.
+~lines 169-178), then .icm/docs/audit-report.md finding F-26.
 
 Task: bootstrap the test harness, before any database adapter exists.
 1. Add vitest and @vitest/coverage-v8 to the catalogue in pnpm-workspace.yaml and consume them

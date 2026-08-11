@@ -41,7 +41,7 @@ deployed app regardless of D-1's outcome.
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
 finding F-30.
 
 Task: remove the confidential equity-negotiation content from the deployed admin app.

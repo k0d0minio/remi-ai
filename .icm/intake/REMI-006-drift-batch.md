@@ -50,7 +50,7 @@ restatements have drifted. Plus small env-catalogue residue (F-19, F-20).
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
 findings F-19, F-20, F-21, F-25, F-44, F-46, F-47, F-48 — each names exact files and lines.
 
 Task: fix all catalogued documentation/config drift in one sitting. Work finding by finding:

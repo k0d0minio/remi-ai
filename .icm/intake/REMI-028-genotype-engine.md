@@ -49,8 +49,8 @@ preserved-but-buggy rule list.
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md, CONVENTIONS.md, then docs/v1-report.md §6.3 in
-full — including the "known bug preserved knowingly" paragraph — and docs/info-gathering.md
+Work in the remi-ai monorepo. Read CLAUDE.md, CONVENTIONS.md, then .icm/docs/v1-report.md §6.3 in
+full — including the "known bug preserved knowingly" paragraph — and .icm/docs/info-gathering.md
 REQ-26.
 
 HARD PRECONDITION: this engine encodes clinical doctrine with a known bug in its only code-derived

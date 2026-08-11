@@ -47,7 +47,7 @@ one, no real personal data may enter the system in any form.
 ```text
 Work in the remi-ai monorepo. Do not start unless decision D-3 (auth implementation) is
 confirmed — if unconfirmed, stop and ask. Read CLAUDE.md, CONVENTIONS.md, then
-docs/audit-report.md finding F-32 and decision D-3, docs/v1-report.md §9.2's auth note and §8.1,
+.icm/docs/audit-report.md finding F-32 and decision D-3, .icm/docs/v1-report.md §9.2's auth note and §8.1,
 §8.2 (the IDOR and spoofable-admin defects that must not recur), and the existing seam:
 apps/web/lib/auth/session.ts, development-session.ts, apps/web/lib/actions/session.ts, and the
 gate at apps/web/app/[locale]/(app)/layout.tsx.

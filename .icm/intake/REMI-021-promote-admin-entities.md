@@ -37,7 +37,7 @@ architecture) or starts with an unplanned model migration.
 
 ```text
 Work in the remi-ai monorepo. Read CLAUDE.md, CONVENTIONS.md, packages/services/AGENTS.md, then
-docs/audit-report.md finding F-15, then apps/admin/lib/fixtures.ts (the app-local entity
+.icm/docs/audit-report.md finding F-15, then apps/admin/lib/fixtures.ts (the app-local entity
 definitions around lines 781, 799, 1121, 1407, 1535).
 
 Task: give the admin domain its real home.
@@ -51,7 +51,7 @@ Task: give the admin domain its real home.
 3. Update apps/admin's fixtures, components and lib code to import from @remi/services; the
    dependency arrow stays app → package.
 4. If the session owner can supply the real pilot-application list's fields (REQ-11 in
-   docs/info-gathering.md), shape PilotApplication from it and note the source in the PR;
+   .icm/docs/info-gathering.md), shape PilotApplication from it and note the source in the PR;
    otherwise keep the fixture-derived shape and flag it as unvalidated.
 5. Add model tests consistent with the existing model test style.
 Run tests only; push a feature branch and open a PR.

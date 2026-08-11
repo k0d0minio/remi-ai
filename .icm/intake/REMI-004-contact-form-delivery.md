@@ -40,7 +40,7 @@ the form and doesn't re-type their message into a mail client is gone without a 
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
 finding F-06, then packages/services/AGENTS.md for how seams and adapters work here.
 
 Task: make the public contact form actually deliver.

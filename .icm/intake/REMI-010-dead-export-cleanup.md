@@ -43,7 +43,7 @@ never renders it, and the three seam registries guard re-registration three diff
 
 ```text
 Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md (lean rules ~lines 160-165),
-then docs/audit-report.md findings F-01, F-05, F-13 and decision D-8.
+then .icm/docs/audit-report.md findings F-01, F-05, F-13 and decision D-8.
 
 Task: enforce "no export without a consumer", keeping the deliberate seam exception.
 1. For each export F-01 lists (packages/ui/src/index.ts, server.ts, motion/index.tsx,
