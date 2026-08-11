@@ -40,7 +40,7 @@ squash-merge rule has never been practiced — all 29 merged PRs landed as ordin
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
 findings F-22, F-23, F-45.
 
 Task: make "merge only on green, past a human gate" mechanically true.

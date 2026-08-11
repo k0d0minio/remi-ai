@@ -142,7 +142,7 @@ Scope discipline matters here — it is a P0 and it should ship in days.
 
 ```text
 Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md first, then
-packages/services/AGENTS.md and apps/admin/AGENTS.md, then docs/audit-report.md findings F-30,
+packages/services/AGENTS.md and apps/admin/AGENTS.md, then .icm/docs/audit-report.md findings F-30,
 F-31 and F-32 in full.
 
 Context and the one thing that changed: the audit and the decisions page both say the interim

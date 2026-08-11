@@ -36,7 +36,7 @@ practitioners use plausible real `.be` email domains that could belong to actual
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
 finding F-33.
 
 Task: de-identify all fixture data.

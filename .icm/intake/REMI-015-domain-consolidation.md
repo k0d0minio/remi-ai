@@ -36,7 +36,7 @@ code fix one line; DNS, Vercel domains, and redirects are the real work.
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
 findings F-39 and F-03 and decision D-6. Do not start unless the owner has confirmed the target
 domain; if unconfirmed, stop and ask.
 

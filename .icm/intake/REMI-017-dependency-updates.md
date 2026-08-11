@@ -34,7 +34,7 @@ frozen lockfile — but nothing tells anyone a dependency has a known vulnerabil
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
 finding F-36.
 
 Task: automate dependency updates.
