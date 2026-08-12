@@ -70,6 +70,8 @@ Nothing below is restated here. Each rule lives once, and loads on demand.
   stages; each stage's contract is `pipeline/stages/NN_*/CONTEXT.md`.
 - **[`docs/ENV.md`](docs/ENV.md)** — the single catalogue of environment variables and secrets.
   Bus-factor insurance: the setup is never trapped in one person's head.
+- **[`docs/VERCEL.md`](docs/VERCEL.md)** — the hosting playbook: what the Pro plan includes, the
+  settings that keep builds free, and the spend backstop. Read it before touching Vercel config.
 - **[`.claude/skills/`](.claude/skills/)** — one-job capability skills, called by pipeline stages.
 - **Subtree deltas** — `apps/*/AGENTS.md` and `packages/*/AGENTS.md` hold rules specific to that
   subtree (e.g. [`apps/demo/AGENTS.md`](apps/demo/AGENTS.md),
