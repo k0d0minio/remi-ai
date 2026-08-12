@@ -2,6 +2,7 @@
 
 |                |                                                                                                 |
 | -------------- | ----------------------------------------------------------------------------------------------- |
+| Status         | ready                                                                                           |
 | **Type**       | chore                                                                                           |
 | **Priority**   | P0 (compounds with F-30 while exposure is unverified)                                           |
 | **Size**       | An hour                                                                                         |

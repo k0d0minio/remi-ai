@@ -2,6 +2,7 @@
 
 |                |                                                        |
 | -------------- | ------------------------------------------------------ |
+| Status         | ready                                                  |
 | **Type**       | feature (interface design)                             |
 | **Priority**   | P1 — its own small reviewed change, before the adapter |
 | **Size**       | A day                                                  |

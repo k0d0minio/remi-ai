@@ -2,6 +2,7 @@
 
 |                |                                                                                                                       |
 | -------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Status         | ready                                                                                                                 |
 | **Type**       | feature                                                                                                               |
 | **Priority**   | P2 (needed before plan week 1 in v1's flow; sequence with REMI-034)                                                   |
 | **Size**       | Days to a week                                                                                                        |

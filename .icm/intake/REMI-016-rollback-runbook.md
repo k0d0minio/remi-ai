@@ -2,6 +2,7 @@
 
 |                |                                                      |
 | -------------- | ---------------------------------------------------- |
+| Status         | ready                                                |
 | **Type**       | chore (documentation)                                |
 | **Priority**   | P2 — the signal it can't wait is the first real user |
 | **Size**       | An hour                                              |

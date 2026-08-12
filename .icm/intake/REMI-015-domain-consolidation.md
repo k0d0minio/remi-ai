@@ -2,6 +2,7 @@
 
 |                |                                                                                          |
 | -------------- | ---------------------------------------------------------------------------------------- |
+| Status         | ready                                                                                    |
 | **Type**       | config + chore                                                                           |
 | **Priority**   | P1 — every week of delay adds wrongly-indexed URLs                                       |
 | **Size**       | Minutes of code; DNS/Vercel work around it                                               |

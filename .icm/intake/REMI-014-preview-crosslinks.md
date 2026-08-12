@@ -2,6 +2,7 @@
 
 |                |                                                                       |
 | -------------- | --------------------------------------------------------------------- |
+| Status         | ready                                                                 |
 | **Type**       | config + chore                                                        |
 | **Priority**   | P1 — every design review currently carries a trapdoor into production |
 | **Size**       | Hours                                                                 |

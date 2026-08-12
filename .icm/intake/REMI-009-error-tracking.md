@@ -2,6 +2,7 @@
 
 |                |                                                                                   |
 | -------------- | --------------------------------------------------------------------------------- |
+| Status         | ready                                                                             |
 | **Type**       | feature (foundation)                                                              |
 | **Priority**   | P1 — until this exists, every crash after it is invisible                         |
 | **Size**       | A day                                                                             |

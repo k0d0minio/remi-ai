@@ -2,6 +2,7 @@
 
 |                |                                                                              |
 | -------------- | ---------------------------------------------------------------------------- |
+| Status         | ready                                                                        |
 | **Type**       | chore                                                                        |
 | **Priority**   | P2 — becomes P1 the moment the pilot marketing push starts                   |
 | **Size**       | Hours                                                                        |

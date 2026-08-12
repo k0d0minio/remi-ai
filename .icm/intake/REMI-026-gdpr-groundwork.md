@@ -2,6 +2,7 @@
 
 |                |                                                                       |
 | -------------- | --------------------------------------------------------------------- |
+| Status         | ready                                                                 |
 | **Type**       | owner (agent = decision-support only)                                 |
 | **Priority**   | P0 — precondition for the first stored real record                    |
 | **Size**       | A few days of owner time; agent support in parallel with REMI-018–023 |

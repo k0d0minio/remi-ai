@@ -2,6 +2,7 @@
 
 |                |                                                                                                                       |
 | -------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Status         | ready                                                                                                                 |
 | **Type**       | feature (pure logic — the ideal first TDD target)                                                                     |
 | **Priority**   | P1 — first port; needs nothing but the test harness                                                                   |
 | **Size**       | Days                                                                                                                  |

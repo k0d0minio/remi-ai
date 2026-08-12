@@ -2,6 +2,7 @@
 
 |                |                                                                                                                                                         |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Status         | ready                                                                                                                                                   |
 | **Type**       | feature (infrastructure)                                                                                                                                |
 | **Priority**   | P1 — unblocks every real feature                                                                                                                        |
 | **Size**       | A week or more (the audit warns against sizing it as an afternoon)                                                                                      |

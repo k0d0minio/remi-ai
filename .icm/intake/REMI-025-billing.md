@@ -2,6 +2,7 @@
 
 |                |                                                                                                                    |
 | -------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Status         | ready                                                                                                              |
 | **Type**       | decision-support, then (maybe) feature                                                                             |
 | **Priority**   | P0 decision, P2 integration — the signed pilot terms start billing 1 September 2026                                |
 | **Size**       | Decision: owner. Manual process: hours. Integration: weeks                                                         |

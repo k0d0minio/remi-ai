@@ -2,6 +2,7 @@
 
 |                |                                                        |
 | -------------- | ------------------------------------------------------ |
+| Status         | ready                                                  |
 | **Type**       | config + chore                                         |
 | **Priority**   | P0 — everything after this inherits its safety from it |
 | **Size**       | Hours                                                  |
