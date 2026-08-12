@@ -102,8 +102,9 @@ Each of these either bills per build/event or is a monthly add-on. All of them d
 - **Speed Insights** ($10/month/project), **Web Analytics Plus** ($10/month), **Observability
   Plus** ($1.20/M events) — the built-in logs and analytics tiers are the chosen observability
   suite (decisions page); the paid tiers wait until something demands them.
-- **Advanced Deployment Protection** ($150/month) — already rejected for the admin exposure
-  problem (REMI-001); real operator auth is the plan.
+- **Advanced Deployment Protection** ($150/month) — not needed for the admin exposure problem
+  (REMI-001): standard deployment protection (Vercel Authentication) is included on Pro and is
+  the answer there.
 - **SAML** ($300), **Flags Explorer** ($250), **Preview Deployment Suffix** ($100), **Static
   IPs** ($100/project), **Microfrontends** ($250/project — the six apps stay six plain projects).
 - **Marketplace integrations** (storage, databases, etc.) — billed monthly *outside* both the
