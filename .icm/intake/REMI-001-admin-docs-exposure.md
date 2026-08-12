@@ -2,6 +2,7 @@
 
 |                |                                                                |
 | -------------- | -------------------------------------------------------------- |
+| Status         | ready                                                          |
 | **Type**       | config + decision-support                                      |
 | **Priority**   | P0 — live exposure, close today                                |
 | **Size**       | Hours                                                          |

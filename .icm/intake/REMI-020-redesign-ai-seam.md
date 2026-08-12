@@ -2,6 +2,7 @@
 
 |                |                                                                                                 |
 | -------------- | ----------------------------------------------------------------------------------------------- |
+| Status         | ready                                                                                           |
 | **Type**       | feature (interface design)                                                                      |
 | **Priority**   | P1 — before any AI feature                                                                      |
 | **Size**       | A few days, design-heavy                                                                        |

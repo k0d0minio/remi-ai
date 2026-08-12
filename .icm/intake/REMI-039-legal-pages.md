@@ -2,6 +2,7 @@
 
 |                |                                                                                                                                                     |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Status         | ready                                                                                                                                               |
 | **Type**       | feature (content)                                                                                                                                   |
 | **Priority**   | P1 — must exist before real users; consent (REMI-029) references these texts                                                                        |
 | **Size**       | Days (engineering); the validation is counsel's                                                                                                     |

@@ -2,6 +2,7 @@
 
 |                |                                                                                          |
 | -------------- | ---------------------------------------------------------------------------------------- |
+| Status         | ready                                                                                    |
 | **Type**       | feature (fast lane)                                                                      |
 | **Priority**   | P0 — the pilot-recruitment window is open until 31 August                                |
 | **Size**       | Hours to a day                                                                           |

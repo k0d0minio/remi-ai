@@ -2,6 +2,7 @@
 
 |                |                                                                                                                                                  |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Status         | ready                                                                                                                                            |
 | **Type**       | feature                                                                                                                                          |
 | **Priority**   | P1 (assembles the operator workflow around everything else)                                                                                      |
 | **Size**       | A week                                                                                                                                           |

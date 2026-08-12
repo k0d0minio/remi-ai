@@ -2,6 +2,7 @@
 
 |                |                                                                                    |
 | -------------- | ---------------------------------------------------------------------------------- |
+| Status         | ready                                                                              |
 | **Type**       | chore                                                                              |
 | **Priority**   | P2 — the signal it can no longer wait is real authentication going live (REMI-023) |
 | **Size**       | Hours                                                                              |

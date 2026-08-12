@@ -2,6 +2,7 @@
 
 |                |                                                                                                                                           |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Status         | ready                                                                                                                                     |
 | **Type**       | feature (infrastructure)                                                                                                                  |
 | **Priority**   | P1 — the hard precondition for any real personal data                                                                                     |
 | **Size**       | A week or more; can overlap REMI-022                                                                                                      |

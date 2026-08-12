@@ -2,6 +2,7 @@
 
 |                |                                                                                                  |
 | -------------- | ------------------------------------------------------------------------------------------------ |
+| Status         | ready                                                                                            |
 | **Type**       | feature                                                                                          |
 | **Priority**   | P1                                                                                               |
 | **Size**       | A week+ (v1's version was 2,168 lines — decompose properly)                                      |

@@ -2,6 +2,7 @@
 
 |                |                                                                        |
 | -------------- | ---------------------------------------------------------------------- |
+| Status         | ready                                                                  |
 | **Type**       | chore                                                                  |
 | **Priority**   | P0 (cheap now, misleading forever if left)                             |
 | **Size**       | Half a day                                                             |

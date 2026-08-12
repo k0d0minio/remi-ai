@@ -2,6 +2,7 @@
 
 |                |                                                                                                                                                                                    |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Status         | ready                                                                                                                                                                              |
 | **Type**       | feature (design-heavy)                                                                                                                                                             |
 | **Priority**   | P1 — Blocker-severity underneath: must precede the first adapter and the first real record                                                                                         |
 | **Size**       | A few days (the decisions attached are the real work)                                                                                                                              |

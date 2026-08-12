@@ -2,6 +2,7 @@
 
 |                |                                                                                         |
 | -------------- | --------------------------------------------------------------------------------------- |
+| Status         | ready                                                                                   |
 | **Type**       | chore / feature                                                                         |
 | **Priority**   | P2 — becomes P1 when the first real admin feature (pilot enrolment) is scoped           |
 | **Size**       | A day                                                                                   |

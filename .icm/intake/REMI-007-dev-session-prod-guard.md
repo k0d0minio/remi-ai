@@ -2,6 +2,7 @@
 
 |                |                                                             |
 | -------------- | ----------------------------------------------------------- |
+| Status         | ready                                                       |
 | **Type**       | chore                                                       |
 | **Priority**   | P0 — the hard precondition before any real data can exist   |
 | **Size**       | An hour                                                     |

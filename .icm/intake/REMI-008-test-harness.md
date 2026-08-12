@@ -2,6 +2,7 @@
 
 |                |                                                       |
 | -------------- | ----------------------------------------------------- |
+| Status         | ready                                                 |
 | **Type**       | chore (foundation)                                    |
 | **Priority**   | P1 — must land before REMI-022 (database adapter)     |
 | **Size**       | A day                                                 |

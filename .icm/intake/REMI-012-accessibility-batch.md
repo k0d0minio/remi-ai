@@ -2,6 +2,7 @@
 
 |                |                                                                          |
 | -------------- | ------------------------------------------------------------------------ |
+| Status         | ready                                                                    |
 | **Type**       | chore                                                                    |
 | **Priority**   | P1 (skip link fails WCAG 2.4.1 today)                                    |
 | **Size**       | Hours                                                                    |

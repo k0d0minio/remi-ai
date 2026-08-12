@@ -2,6 +2,7 @@
 
 |                |                                                              |
 | -------------- | ------------------------------------------------------------ |
+| Status         | ready                                                        |
 | **Type**       | config + chore                                               |
 | **Priority**   | P2 — before real users exist                                 |
 | **Size**       | An hour                                                      |
