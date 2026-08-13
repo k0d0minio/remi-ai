@@ -5,7 +5,7 @@
 ```bash
 pnpm install
 pnpm packages:build   # @remi/ui and @remi/services must exist before an app can compile
-pnpm web:dev          # or admin:dev / marketing:dev / docs:dev / demo:dev
+pnpm web:dev          # or admin:dev / marketing:dev / docs:dev / support:dev / demo:dev
 ```
 
 `turbo run dev` declares `dependsOn: ["^build"]`, so a bare `pnpm dev` builds the packages first.
@@ -14,16 +14,13 @@ Run `pnpm packages:dev` in a second terminal to rebuild them on change.
 ## The factory owns the checks
 
 Format, lint, typecheck and build are deterministic, non-AI work. They belong to Husky, CI and the
-Vercel preview — not to a session's context window:
+Vercel preview — not to a session's context window. An agent working in this repo is blocked from
+running them locally by `.claude/hooks/block-local-checks.sh`: push, then read the result back from
+the PR's check runs.
 
-| Check           | Runs where                                    |
-| --------------- | --------------------------------------------- |
-| Format          | Husky pre-commit (lint-staged) + CI           |
-| Lint, typecheck | CI — `.github/workflows/quality.yaml`         |
-| Build           | The Vercel preview deploy                     |
-
-An agent working in this repo is blocked from running them locally by
-`.claude/hooks/block-local-checks.sh`: push, then read the result back from the PR's check runs.
+Which check runs where is one table, and it lives in `/CONVENTIONS.md` § "The factory owns the
+checks — you do not". It is not copied here, because a second copy is how the two start
+disagreeing.
 
 ## CI/CD
 

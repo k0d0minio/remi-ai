@@ -169,7 +169,7 @@ export default defineConfig(
             {
               name: "@remi/services",
               message:
-                "Use an explicit entrypoint: @remi/services/shared (isomorphic), /server (Node-only), /ai or /email.",
+                "Use an explicit entrypoint: @remi/services/shared (isomorphic), or /server, /db, /ai, /email (Node-only). Catalogue: packages/services/AGENTS.md.",
             },
           ],
           patterns: [
@@ -198,7 +198,7 @@ export default defineConfig(
             {
               group: ["@remi/services", "@remi/services/*"],
               message:
-                "apps/demo is mock-data only — it never reaches a backend. See CONVENTIONS.md → apps/demo.",
+                "apps/demo is mock-data only — it never reaches a backend. See apps/demo/AGENTS.md.",
             },
             {
               group: ["@radix-ui/*", "@headlessui/*"],

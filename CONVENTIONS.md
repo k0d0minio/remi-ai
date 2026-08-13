@@ -8,7 +8,8 @@ the subtree `AGENTS.md` files link it. **Change a rule here and nowhere else.**
 
 ### Functions
 
-- **Always arrow functions.** Never `function foo() {}` — ESLint enforces it.
+- **Always arrow functions.** Never `function foo() {}` — ESLint flags it as a warning, and CI runs
+  lint with a zero-warning ceiling, so the warning is a red check.
 - **Always `async`/`await`.** Never `.then()` chains.
 - Implicit return when there is no logic between the signature and the returned value:
 
@@ -72,9 +73,10 @@ Braces on every `if` / `else` / loop body. No `if (x) return y;` without `{ }` �
 
 - **Named imports.** Default imports only where a framework requires one.
 - `@/*` for app-local paths.
-- **Name the services entrypoint that matches where the code runs** — `@remi/services/shared`
-  (isomorphic), `/server` (Node-only), `/ai`, `/email`. The bare root barrel is lint-blocked so the
-  choice is always visible at the call site.
+- **Name the services entrypoint that matches where the code runs** — `@remi/services/shared` is
+  isomorphic; `/server`, `/db`, `/ai` and `/email` are Node-only. The bare root barrel is
+  lint-blocked so the choice is always visible at the call site. What each entrypoint carries is
+  catalogued once, in [`packages/services/AGENTS.md`](packages/services/AGENTS.md).
 - `cn()` comes from `@remi/ui/utils`, never from the main barrel — the barrel is `"use client"` and
   its exports cannot be called from a server component.
 
@@ -201,7 +203,9 @@ error, fix it before pushing rather than spending a CI round-trip — but do not
 
 ## Git
 
-- Small, conventional commits: `feat: <slug> — <what>`, `fix:`, `chore:`, `docs:`.
+- Small, conventional commits: `feat: <slug> — <what>`. The type vocabulary is `feat`, `fix`,
+  `chore`, `docs`, `refactor`, `style`, `build`. A scope is optional and is the workspace it lands
+  in — `fix(web):`, `refactor(services):`.
 - One PR per pipeline run, from Define through Ship. Never a second PR for the same run.
 - Squash-merge, and only on a ticked **Ready to merge** box with green checks.
 - Never commit a secret. If you find one in the tree, stop and flag it.

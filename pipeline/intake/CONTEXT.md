@@ -15,8 +15,9 @@ agreed scope gets an intake folder, however small** — a single-PR scope gets e
 
 - The agreed scope — `runs/<scope-slug>/01_scope/output/scope.md`.
 - `pipeline/_shared/knowledge-map.md` — from it, only `business/roles/` and `business/initiatives/`,
-  for the real product seams to cut along. Both are stubs today; if they're empty, cut along the
-  seams the scope itself describes and note that in the breakdown.
+  for the real product seams to cut along. Both are written; cut along the seams they describe, and
+  fall back to the seams the scope itself describes only where they are silent — noting that in the
+  breakdown.
 
 Do **not** load `_shared/conventions.md` and do **not** read source code. The cut runs inside the
 Scope stage and inherits its rule: seams come from the business docs and the agreed scope. If a seam
@@ -91,7 +92,7 @@ contract**: its fields map mechanically onto Define's `spec.md`.
 
 - feature-slug: <kebab>
 - scope: <scope-slug>
-- apps: <web | admin | marketing | docs | demo | packages>
+- apps: <web | admin | marketing | docs | support | demo | packages>
 - initiative: <name, or none yet>
 - depends-on: <other feature-slugs, or none>
 - sequence: <n of m> # what `/pipeline new` reads to find "next"
