@@ -1,7 +1,6 @@
 import {
   CircleHelp,
   Flag,
-  Handshake,
   LayoutDashboard,
   LifeBuoy,
   Milestone,
@@ -56,7 +55,6 @@ export const navSections: NavSection[] = [
     items: [
       { href: "/roadmap", label: "Feuille de route", icon: Milestone },
       { href: "/questions", label: "Questions ouvertes", icon: CircleHelp },
-      { href: "/offer", label: "Offre CTO", icon: Handshake },
     ],
   },
 ];
