@@ -43,9 +43,7 @@ page until Morgane and Arnaud answer them.
 - **Observability: Vercel's built-in suite first** — runtime logs, alerting, analytics on the Pro
   plan — before paying for a dedicated error tracker. Sentry's reserved rows in `docs/ENV.md` stay
   unwired unless exception grouping proves insufficient in practice.
-- **Admin console: Vercel deployment protection now** (accepting the Pro plan cost), real operator
-  authentication in roadmap phase 3. The console's current protection — an unpublished address and
-  `noindex` — is not an access control and is not treated as one.
+- **Admin console access — superseded on 2026-08-13.** See _Access control_ below.
 
 ## Engineering practice — 2026-08-06
 
@@ -60,3 +58,20 @@ page until Morgane and Arnaud answer them.
   deciding argument.
 - **Bilingual v1.** The product ships French and English, matching the marketing site. `apps/web`
   already routes through `[locale]`; the work is finishing dictionaries, not building a system.
+
+## Access control — 2026-08-13
+
+- **Operator access is a role, not a URL.** An `operator` role lands in the database and the backend
+  alongside `practitioner` and `person`, and the admin console sits behind it. This supersedes the
+  platform decision of 2026-08-06, which leaned on Vercel deployment protection as the interim:
+  that tier covers preview deployments but, by design, not a production domain, and extending it to
+  production sits behind a paid add-on. The role is the thing that was wanted anyway — the interim
+  was only ever buying time until it existed.
+- **Confidential material does not live in a deployed app.** Commercial terms, the offer and
+  internal deliberations belong in the operator console and nowhere else. Nothing that would matter
+  if read goes into a site that is merely unlisted. This is a standing rule rather than a phase, and
+  it does not wait on the role above.
+- **The docs site is uncrawlable but publicly viewable.** `app/robots.ts` disallows everything and
+  the root layout sends `noindex`, so it stays out of search results. That is a publishing choice,
+  not an access control, and this site's content is written on that basis — figures live in the
+  console and this site carries the shape of a decision rather than its numbers.

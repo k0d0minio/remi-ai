@@ -1,4 +1,5 @@
 import { Footer, Layout, Navbar } from "nextra-theme-docs";
+import type { Metadata } from "next";
 import type { CSSProperties, ReactNode } from "react";
 import { Head } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
@@ -20,12 +21,19 @@ import "nextra-theme-docs/style.css";
 const brandName = "REMI";
 const brandLegalName = "Remi AI";
 
-export const metadata = {
+/**
+ * `robots` matches `app/robots.ts` and is here for the same reason admin has
+ * both: the file stops well-behaved crawlers before they fetch, this stops the
+ * ones that fetched anyway from indexing what they read. This site publishes
+ * business direction, so neither is optional while it is reachable.
+ */
+export const metadata: Metadata = {
   title: {
     default: `${brandName} — docs`,
     template: `%s · ${brandName} docs`,
   },
   description: `How ${brandName} works — business direction and technical reference.`,
+  robots: { index: false, follow: false },
 };
 
 /**
