@@ -26,21 +26,54 @@ type ResendPayload = {
   reply_to?: string;
 };
 
+const EMAIL = /[^\s<>@]+@[^\s<>@]+/;
+
+/** RFC 5322 specials: a display name containing one has to be quoted. */
+const NEEDS_QUOTING = /[()<>[\]:;@\\,."]/;
+
+const stripWrappingQuotes = (value: string) => {
+  const first = value.charAt(0);
+  if (
+    (first === '"' || first === "'") &&
+    value.length > 1 &&
+    value.endsWith(first)
+  ) {
+    return value.slice(1, -1).trim();
+  }
+  return value;
+};
+
 /**
- * An address copied into a dashboard field arrives with whatever came with it —
- * surrounding whitespace, or the quotes someone typed around
- * `"Name <a@b.c>"` because the shell needs them and a web form does not. Neither
- * is ever part of a valid address, and Resend answers both with the same 422
- * about the `from` field's format, which sends the reader looking at their
- * domain instead of their variable.
+ * Rebuild a from-address from whatever the environment holds, rather than trust
+ * it to already be a well-formed header.
+ *
+ * A sender is configured by hand, once, in a dashboard field, and every way of
+ * getting it slightly wrong — a dropped `>`, the quotes a shell needs and a web
+ * form does not, a stray newline — earns the same 422 describing the *rule*
+ * rather than the value. So the address is taken apart and put back together:
+ * find the one thing that has to be right, the mailbox, and treat everything
+ * before it as a display name.
+ *
+ * A value with no mailbox in it at all is passed through untouched — there is
+ * nothing to rebuild from, and the provider's rejection is the honest answer.
  */
 export const normaliseAddress = (value: string) => {
-  const trimmed = value.trim();
-  const first = trimmed.charAt(0);
-  if ((first === '"' || first === "'") && trimmed.endsWith(first)) {
-    return trimmed.slice(1, -1).trim();
+  const unwrapped = stripWrappingQuotes(value.trim());
+  const email = unwrapped.match(EMAIL)?.[0];
+  if (email === undefined) {
+    return unwrapped;
   }
-  return trimmed;
+
+  const name = stripWrappingQuotes(
+    unwrapped.slice(0, unwrapped.indexOf(email)).replace(/[<>]/g, "").trim(),
+  );
+  if (name === "") {
+    return email;
+  }
+
+  return NEEDS_QUOTING.test(name)
+    ? `"${name.replace(/(["\\])/g, "\\$1")}" <${email}>`
+    : `${name} <${email}>`;
 };
 
 /**
