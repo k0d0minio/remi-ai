@@ -9,8 +9,8 @@ name: Pipeline
 #                   on later pushes via the job summary, and never red-blocks the PR.
 #
 # Runs only for same-repo PRs — a forked PR gets a read-only token that cannot write labels.
-# Markdown under pipeline/** does not trigger the heavy Quality workflow, so this is cheap and
-# independent.
+# Quality runs on every PR, this one only on runs that touch pipeline/runs/** — the two are
+# independent, and this one stays cheap because it installs nothing.
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]

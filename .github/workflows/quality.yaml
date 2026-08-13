@@ -1,13 +1,12 @@
 name: Quality
 
+# No path filter, deliberately. A check that some PRs never produce cannot be a required
+# check: branch protection would either deadlock those PRs or let a red run block nothing.
+# Every PR runs this, and doc-only diffs stay cheap on their own merits — `format:check`
+# covers markdown anyway, and lint/typecheck restore from the shared Turborepo cache
+# instead of recomputing. Never reintroduce a skip here (audit F-22).
 on:
   pull_request:
-    # Markdown-only and pipeline-doc commits can't affect format/lint/types. Skip the
-    # full install and checks when nothing else changed — the pipeline workflow handles
-    # those paths, and it is far cheaper.
-    paths-ignore:
-      - "pipeline/**"
-      - "**/*.md"
   push:
     branches:
       - main

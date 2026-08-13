@@ -27,7 +27,6 @@
       "Bash(gh pr checks:*)",
       "Bash(gh pr ready:*)",
       "Bash(gh pr edit:*)",
-      "Bash(gh pr merge:*)",
       "Bash(gh label:*)",
       "Bash(gh auth status:*)",
       "Bash(gh api:*)",

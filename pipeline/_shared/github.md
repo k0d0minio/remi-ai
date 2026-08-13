@@ -63,8 +63,15 @@ The template ends with the pipeline checklist, anchored so parsing never depends
   `gate:ready-to-merge`; parse what's present. A missing `gate:ready-to-merge` anchor on **any**
   pipeline PR is a malformed body — STOP and fix the body first.
 - **The agent never ticks either box.** If a required box is unticked: STOP and say so. The ticked
-  **Ready to merge** box _is_ the merge authorisation — no further prompt is needed.
+  **Ready to merge** box _is_ the merge authorisation — the agent asks for nothing beyond it.
 - Both boxes are the owner's to tick. There is no scripted exception.
+- **CI reads the same anchors.** The `Pipeline gates` job (`.github/workflows/gates.yaml`) fails
+  while a gate present in the body is unticked, so the tick is what turns the check green — the
+  honour system is now a required check. Its parse is the one described above, plus a fallback on
+  the label text so that deleting an anchor cannot silently drop a gate.
+- `gh pr merge` is **not** on the pre-approved command list (`.claude/settings.json`): the merge
+  itself asks the operator once, at the keyboard. That prompt is a tool permission, not a second
+  gate — the ticked box already authorised it.
 
 ## Labels
 
