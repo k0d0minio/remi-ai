@@ -29,9 +29,12 @@ one, no real personal data may enter the system in any form.
    this right; keep it).
 4. Register the real provider into `apps/web`'s session seam; the development provider remains
    dev-only (REMI-007's guard now has a real counterpart).
-5. Operator access for `apps/admin` — the same provider with an operator role check, replacing
-   reliance on deployment protection alone. Role must be server-verified, never client-supplied
-   metadata (v1 §8.2's spoofable fallback is the anti-pattern).
+5. Operator access for `apps/admin` — the same provider with an operator role check. As of
+   2026-08-13 this is **the console's only gate, not a replacement for one**: the owner rejected
+   Vercel's paid production protection, so there is no platform wall behind this step and none is
+   coming. The `operator` role belongs in the database and the backend alongside `practitioner` and
+   `person`, and must be server-verified, never client-supplied metadata (v1 §8.2's spoofable
+   fallback is the anti-pattern).
 6. Session lifecycle: sign-out, expiry, and the audit-trail hook (sign-ins are auditable events).
 7. Tests on token generation/verification and the gate logic.
 
@@ -39,7 +42,7 @@ one, no real personal data may enter the system in any form.
 
 - [ ] A user can sign in via an emailed magic link and reach the app; nobody can via the role
       radio button in production.
-- [ ] Admin requires an operator sign-in inside the app, not just Vercel's wall.
+- [ ] Admin requires an operator sign-in inside the app — there is no Vercel wall behind it.
 - [ ] The request endpoint leaks no account-existence signal.
 - [ ] Tokens are single-use and expiring, covered by tests.
 
