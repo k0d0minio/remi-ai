@@ -6,6 +6,10 @@
  * instead of sending, so a local run or a preview deploy without credentials is
  * loud rather than silently dropping mail.
  *
+ * One adapter exists — `createResendMailer()`, in ./adapters/resend.ts. It is
+ * the only place in the repo that names a mail vendor, apart from the single
+ * registration line in the app that owns the process.
+ *
  * Email fails silently by design in every provider — a send that returns 200 is
  * not a delivered message. Whatever adapter lands here must surface failures as
  * a rejected promise, never a swallowed one.
@@ -48,4 +52,14 @@ export const registerMailer = (adapter: Mailer) => {
 
 export const getMailer = () => mailer;
 
+/**
+ * Whether a real adapter is registered, or the seam is still on its logging
+ * fallback. Anything that promises a human something — "we have your message" —
+ * asks this first: `consoleMailer` returns a success it did not earn, and
+ * repeating that to a sender is how a message gets lost silently.
+ */
+export const isMailerRegistered = () => mailer !== consoleMailer;
+
 export const sendEmail = (message: EmailMessage) => mailer.send(message);
+
+export { createResendMailer } from "./adapters/resend";

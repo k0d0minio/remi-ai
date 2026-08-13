@@ -57,14 +57,22 @@ No auth vendor is committed yet.
 
 ## Email
 
-| Variable         | Purpose                                                    | Where set | Public? |
-| ---------------- | ---------------------------------------------------------- | --------- | ------- |
-| `EMAIL_FROM`     | Default from-address for outbound email                    | Vercel    | no      |
-| `RESEND_API_KEY` | Resend API key — needed once a real `Mailer` is registered | Vercel    | no      |
+| Variable         | Purpose                                                   | Where set | Public? |
+| ---------------- | --------------------------------------------------------- | --------- | ------- |
+| `EMAIL_FROM`     | Default from-address for outbound email                   | Vercel    | no      |
+| `RESEND_API_KEY` | Resend API key — read by the Resend adapter on every send | Vercel    | no      |
 
-Until a `Mailer` is registered, `@remi/services/email` falls back to `consoleMailer`: it logs and
-sends nothing. That is deliberate — a preview deploy without credentials is loud, not silently
-dropping mail.
+Resend is the registered mail vendor: `packages/services/src/email/adapters/resend.ts` implements
+the `Mailer` seam, and `apps/marketing` registers it for the public contact form.
+
+**Both variables are required on the marketing project**, and `EMAIL_FROM` has to be an address on a
+domain verified in Resend — an unverified sender is refused at the API.
+
+With `RESEND_API_KEY` unset, nothing is registered and `@remi/services/email` keeps its
+`consoleMailer` fallback: it logs and sends nothing. That is deliberate — a preview deploy without
+credentials is loud, not silently dropping mail — and the contact form treats it as a delivery
+failure, telling the sender to write to the founders directly rather than acknowledging a message
+that went nowhere.
 
 ## AI
 
