@@ -11,11 +11,6 @@ That keeps the skills list to one pipeline entry no matter how many stages exist
 
 Argument form: `<subcommand> [slug, "request", or stub path]`. The argument is: `$ARGUMENTS`
 
-**Auto-routing hint:** the `route-request.sh` `UserPromptSubmit` hook may have injected an advisory
-`[pipeline-router]` line classifying the user's prompt. Announce the suggested lane in one line and
-proceed with it — unless the user named a different subcommand or overrides. Their word always wins;
-the hint is advice, not authority.
-
 ## Routing table
 
 | Subcommand                             | Contract to read & follow                 |

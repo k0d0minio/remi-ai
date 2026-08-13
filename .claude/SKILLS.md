@@ -49,7 +49,9 @@ the inline version starts repeating itself across stages — not before.
 
 ## A note on permissions
 
-`.claude/settings.json` allowlists the **read-only** pipeline scripts (`resolve-run.sh`,
-`validate-spec.sh`, `project-labels.sh`). `new-run.sh` and `send-ship-note.sh` are deliberately
-**not** allowlisted: they open pull requests and send email. Those get an explicit prompt every
-time, because an outward action that happens silently is one nobody notices went wrong.
+`.claude/settings.json` allowlists the three pipeline scripts whose effects stay inside the run:
+`resolve-run.sh` and `validate-spec.sh` read only, and `project-labels.sh` writes a PR's labels —
+a projection of `spec.md` onto a fixed vocabulary, reversible and visible on the PR. `new-run.sh`
+and `send-ship-note.sh` are deliberately **not** allowlisted: they open pull requests and send
+email. Those get an explicit prompt every time, because an outward action that happens silently is
+one nobody notices went wrong.

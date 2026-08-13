@@ -90,9 +90,10 @@ opens; the script stays the manual fallback.
   the spec header (spine only).
 
 > **Why `app:` and not `persona:`** — the persona vocabulary this pattern came from was grounded in
-> a documented set of six roles. Remi AI's roles aren't written yet
-> (`apps/docs/app/business/roles`). `app:` is a dimension that is verifiably true today. Add a
-> `persona:` axis once that page is real; the projection script takes it in one place.
+> a documented set of six roles. Remi AI documents three (`apps/docs/app/business/roles` — person,
+> practitioner, operator), and `app:` is the dimension that is verifiable from the diff itself. Add
+> a `persona:` axis alongside it when a run needs one; the projection script takes the new
+> vocabulary in one place.
 
 ## Define — draft PR projected from `spec.md`
 

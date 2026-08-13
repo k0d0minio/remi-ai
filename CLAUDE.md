@@ -88,4 +88,5 @@ its own.
 
 The ordered backlog lives in [`.icm/intake/`](.icm/intake/README.md) (estate ticket standard,
 formerly `ISSUES/`): one markdown ticket per unit of work, each with a pasteable agent prompt.
-Finished tickets move to `.icm/intake/_done/`.
+**The PR that implements a ticket is the PR that retires it** — the move into `_done/` rides along
+with the work, never a follow-up sweep. The mechanics are in that README.
