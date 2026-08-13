@@ -78,9 +78,6 @@ export const submitContact = async (
   // form used to admit to in its success copy, so an unregistered mailer is a
   // failure here — not a quiet success.
   if (!isMailerRegistered()) {
-    console.error(
-      "[contact] no mailer registered — RESEND_API_KEY is unset, so the submission was not delivered",
-    );
     return deliveryFailed(form);
   }
 
