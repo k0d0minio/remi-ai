@@ -26,8 +26,9 @@ the gap by inventing one.
 ### Technical reference — `apps/docs/app/technical/`
 
 - `architecture/` — repository structure, technology stack, how a request flows
-- `applications/` — the five apps, their ports, their boundaries
-- `packages/` — `@remi/ui` and `@remi/services`, and which entrypoint to import
+- `applications/` — the six apps, their ports, their boundaries
+- `packages/` — `@remi/ui` and `@remi/services`: the build units, the seams, and which entrypoint
+  to import (the full rules live in each package's `AGENTS.md`, which the page points at)
 - `development/` — getting started, the factory, CI/CD, delivery
 - `decisions/` — the technical decision log: set choices a spec cites instead of reopening
 

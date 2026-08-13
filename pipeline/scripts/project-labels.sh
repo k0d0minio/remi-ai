@@ -37,7 +37,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 die() { echo "error: $*" >&2; exit 1; }
 
 # The app vocabulary — must stay in step with .github/labels.yml and validate-spec.sh.
-APPS=(web admin marketing docs demo packages)
+APPS=(web admin marketing docs support demo packages)
 
 # --- args -------------------------------------------------------------------------------------
 

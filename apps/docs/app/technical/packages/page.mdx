@@ -1,43 +1,53 @@
 # Packages
 
+Two packages, and the dependency arrow only ever points **app → package**.
+
+Each package's full rules live beside its code, and that is the copy to trust: `packages/ui/AGENTS.md`
+and `packages/services/AGENTS.md` change in the same commit as the thing they describe. This page is
+the orientation — what each package is for, and the one fact about each that is easy to get wrong.
+
 ## `@remi/ui`
 
 Every primitive shared across apps. shadcn/ui New York over Radix, Tailwind 4.
 
-Two build entries, and the split is load-bearing:
+`tsup.config.ts` emits **four** build units, and every split is load-bearing:
 
-| Import              | Banner         | Callable from         |
-| ------------------- | -------------- | --------------------- |
-| `@remi/ui`          | `"use client"` | client components     |
-| `@remi/ui/utils`    | none           | server **and** client |
+| Import path       | Banner         | Callable from         |
+| ----------------- | -------------- | --------------------- |
+| `@remi/ui`        | `"use client"` | client components     |
+| `@remi/ui/server` | none           | server **and** client |
+| `@remi/ui/utils`  | none           | server **and** client |
+| `@remi/ui/motion` | `"use client"` | client components     |
 
-`cn()` lives on the second one. Merging the entries breaks `cn()` in every server component in the
-repo.
+`cn()` lives on `/utils`. Merging that entry into the barrel breaks `cn()` in every server component
+in the repo; merging `/server` into it gives up RSC on the marketing site. tsup **bundles** each
+entry, so what an entry can reach it inlines — the two import directions that silently break the
+split are documented in `packages/ui/AGENTS.md` and enforced by `no-restricted-imports` zones in
+`eslint.config.ts`.
 
-Tokens ship as two stylesheets: `@remi/ui/tokens.css` (raw, no Tailwind — what apps import) and
-`@remi/ui/globals.css` (a standalone Tailwind + tokens build, for consumers that run no Tailwind
-pass of their own).
+Tokens ship as two stylesheets: `@remi/ui/tokens.css` (raw, no Tailwind — what every app in this
+repo imports) and `@remi/ui/globals.css` (a standalone Tailwind + tokens build, for a consumer that
+runs no Tailwind pass of its own). Apps never redefine a token.
 
 ## `@remi/services`
 
-Storage, email, AI, and the environment reader. Each is a seam, and **only email has picked a
-vendor** — one adapter behind the interface, registered by the app that owns the process:
-
-| Seam    | Interface        | Register with            | Adapter                         | Default if unregistered              |
-| ------- | ---------------- | ------------------------ | ------------------------------- | ------------------------------------ |
-| Storage | `DatabaseClient` | `registerDatabase()`     | none yet                        | throws — a missing DB must be loud   |
-| Email   | `Mailer`         | `registerMailer()`       | Resend (`createResendMailer()`) | `consoleMailer` — logs, never sends  |
-| AI      | `TextProvider`   | `registerTextProvider()` | none yet                        | throws                               |
+Storage, email, AI, and the environment reader. Each is a **seam**, not an integration: an interface
+plus a `register*()` call, with the concrete adapter registered once at process start by the app that
+owns the process. Only email has picked a vendor so far (Resend), so choosing a database or an AI
+provider later is a new file plus one registration line — never a rewrite of the callers. The seam
+table — interface, registration call, and what happens when nothing is registered — is in
+`packages/services/AGENTS.md`.
 
 Pick the entrypoint that matches where the code runs:
 
-| Import                  | Contains                                         | Runs on          |
-| ----------------------- | ------------------------------------------------ | ---------------- |
-| `@remi/services/shared` | types, formatters, `Result`, validation           | browser + server |
-| `@remi/services/server` | storage, email, AI, env — the whole Node surface  | server only      |
-| `@remi/services/db`     | the storage seam alone                            | server only      |
-| `@remi/services/ai`     | model roles + the provider seam                   | server only      |
-| `@remi/services/email`  | the mailer seam                                   | server only      |
+| Import                  | Runs on          |
+| ----------------------- | ---------------- |
+| `@remi/services/shared` | browser + server |
+| `@remi/services/server` | server only      |
+| `@remi/services/db`     | server only      |
+| `@remi/services/ai`     | server only      |
+| `@remi/services/email`  | server only      |
 
 The root `@remi/services` barrel is types-only and apps are lint-blocked from importing it, so the
-choice is always explicit at the call site.
+choice is always explicit at the call site. What each entrypoint carries, and why a seam's registry
+belongs to the entrypoint you reached it through, are in `packages/services/AGENTS.md`.

@@ -15,8 +15,7 @@
     "NEXT_PUBLIC_ADMIN_URL",
     "NEXT_PUBLIC_DOCS_URL",
     "NEXT_PUBLIC_SUPPORT_URL",
-    "NEXT_PUBLIC_DEMO_URL",
-    "NEXT_PUBLIC_ANALYTICS_KEY"
+    "NEXT_PUBLIC_DEMO_URL"
   ],
   "remoteCache": {
     "enabled": true

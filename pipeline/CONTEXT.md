@@ -47,7 +47,8 @@ Lane PRs carry only the **Ready to merge** anchor. A missing anchor means "not r
 
 ## Layers (what each stage loads — keep context small)
 
-- **Layer 0** — `/CLAUDE.md` (repo identity + routing) and `/CONVENTIONS.md` (the code rules).
+- **Layer 0** — `/CLAUDE.md` (repo identity + routing). It points at the code rules; it does not
+  carry them.
 - **Layer 1** — this file + `.claude/skills/pipeline/SKILL.md` (the router).
 - **Layer 2** — each `stages/NN_*/CONTEXT.md` / `lanes/*/CONTEXT.md` — Inputs / Process / Outputs /
   Verify.
