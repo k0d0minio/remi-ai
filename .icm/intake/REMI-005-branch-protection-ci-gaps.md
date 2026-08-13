@@ -2,7 +2,7 @@
 
 |                |                                                        |
 | -------------- | ------------------------------------------------------ |
-| Status         | ready                                                  |
+| Status         | blocked — code half landed; settings half needs admin  |
 | **Type**       | config + chore                                         |
 | **Priority**   | P0 — everything after this inherits its safety from it |
 | **Size**       | Hours                                                  |
@@ -31,12 +31,36 @@ squash-merge rule has never been practiced — all 29 merged PRs landed as ordin
 4. **Remove the trapdoor:** delete `gh pr merge` from the pre-approved commands in
    `.claude/settings.json`.
 
+## The settings half — exactly what to apply (needs admin)
+
+Steps 1, 3 and 4 landed in code. Step 2 is repository settings, which no agent token here can
+read or write (`GET /branches/main/protection` → 403). Apply these by hand; the ticket moves to
+`_done/` once they are in place.
+
+**GitHub → Settings → Branches → add a rule for `main`** (or the equivalent ruleset):
+
+- ✅ Require a pull request before merging — no direct pushes to `main`.
+- ✅ Require status checks to pass before merging, with these two contexts (they are the job
+  names, so they must match exactly):
+  - `Format, lint, typecheck` — the `Quality` workflow.
+  - `Pipeline gates` — the `Gates` workflow.
+- ✅ Require branches to be up to date before merging.
+- ✅ Block force pushes and branch deletion.
+- ✅ Do not allow bypassing the above settings — a rule administrators can step around is the
+  honour system with extra steps.
+
+**GitHub → Settings → General → Pull Requests:**
+
+- ✅ Allow squash merging — and **uncheck** "Allow merge commits" and "Allow rebase merging", so
+  `CONVENTIONS.md`'s squash rule is the only thing the button can do (audit F-45).
+- ✅ Automatically delete head branches after merge.
+
 ## Acceptance criteria
 
-- [ ] Quality workflow runs on a docs-only PR (verify with this ticket's own PR).
+- [x] Quality workflow runs on a docs-only PR (verify with this ticket's own PR).
 - [ ] `main` requires the Quality check and a PR; squash is the only merge method.
-- [ ] A PR with an unticked gate checkbox fails a required check.
-- [ ] Agent sessions can no longer merge without a human prompt.
+- [x] A PR with an unticked gate checkbox fails a required check.
+- [x] Agent sessions can no longer merge without a human prompt.
 
 ## Agent prompt
 

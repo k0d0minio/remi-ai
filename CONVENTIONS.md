@@ -191,11 +191,12 @@ never committed — they live in Vercel and in GitHub Actions secrets.
 Format, lint, typecheck and build are deterministic work. They belong to Husky, CI and the Vercel
 preview, not to a session's context window:
 
-| Check           | Runs where                            |
-| --------------- | ------------------------------------- |
-| Format          | Husky pre-commit (lint-staged) + CI   |
-| Lint, typecheck | CI — `.github/workflows/quality.yaml` |
-| Build           | The Vercel preview deploy             |
+| Check           | Runs where                                                    |
+| --------------- | ------------------------------------------------------------- |
+| Format          | Husky pre-commit (lint-staged) + CI                           |
+| Lint, typecheck | CI — `.github/workflows/quality.yaml`, on **every** PR        |
+| Build           | The Vercel preview deploy                                     |
+| Pipeline gates  | CI — `.github/workflows/gates.yaml` reads the PR's checkboxes |
 
 `.claude/hooks/block-local-checks.sh` enforces this for agent sessions. Push, then read the result
 back from the PR's check runs. The one exception: if you already know an edit introduced a type
@@ -207,5 +208,10 @@ error, fix it before pushing rather than spending a CI round-trip — but do not
   `chore`, `docs`, `refactor`, `style`, `build`. A scope is optional and is the workspace it lands
   in — `fix(web):`, `refactor(services):`.
 - One PR per pipeline run, from Define through Ship. Never a second PR for the same run.
-- Squash-merge, and only on a ticked **Ready to merge** box with green checks.
+- Squash-merge, and only on a ticked **Ready to merge** box with green checks. The tick half is
+  enforced rather than trusted — the `Pipeline gates` check stays red until the box is ticked. The
+  required-checks and squash-only half is a GitHub branch-protection setting on `main`, outside the
+  repo: the settings it must carry are written down in
+  [`.icm/intake/REMI-005-branch-protection-ci-gaps.md`](.icm/intake/REMI-005-branch-protection-ci-gaps.md)
+  until an admin applies them.
 - Never commit a secret. If you find one in the tree, stop and flag it.

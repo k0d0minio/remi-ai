@@ -103,8 +103,10 @@ Vercel preview), not to your context window. **Do not run `pnpm format`, `pnpm l
 `.claude/hooks/block-local-checks.sh` blocks them. Push, and read CI back.
 
 - **Format** — Husky pre-commit runs prettier on staged files; CI re-checks.
-- **Lint / typecheck** — `.github/workflows/quality.yaml` on the PR.
+- **Lint / typecheck** — `.github/workflows/quality.yaml`, on every PR including docs-only ones.
 - **Build** — the Vercel preview deploy compiles the whole PR.
+- **Gates** — `.github/workflows/gates.yaml` reads the PR body's gate checkboxes. It is red while a
+  gate is unticked, which is its job, not a failure to fix.
 
 Verify and Ship gate on these via the PR's check runs. The one local exception: if you _already
 know_ an edit introduced a type error, fix it before pushing rather than burning a CI round-trip —
