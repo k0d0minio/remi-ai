@@ -51,9 +51,9 @@
 
 # --- App — which workspace the change lands in (zero or more) -------------------------------------
 #
-# This is the axis a persona vocabulary would occupy in a product with documented roles. Remi AI's
-# roles aren't written yet (apps/docs/app/business/roles), so `app:` is used instead: it is
-# verifiable from the diff today. Add a `persona:` axis alongside it once that page is real —
+# This is the axis a persona vocabulary would occupy. Remi AI's roles are documented
+# (apps/docs/app/business/roles — person, practitioner, operator), but `app:` is used because it is
+# verifiable from the diff itself. Add a `persona:` axis alongside it when a run needs one —
 # project-labels.sh takes the new vocabulary in one place.
 - name: "app:web"
   color: "ededed"

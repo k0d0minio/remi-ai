@@ -39,9 +39,10 @@ the scope — it is a flag for the owner or a question for the operator.
 
 - The user's input — a brief, a call summary, or a topic to investigate.
 - `pipeline/_shared/knowledge-map.md` — from it, only `apps/docs/app/business/roles/` (who this
-  serves) and `business/initiatives/` (the why-now). **Both are stubs today**: if they are empty,
-  say so in `scope.md` and carry on — an unwritten strategy is a finding to report, not a reason to
-  invent one or to go reading source instead.
+  serves) and `business/initiatives/` (the why-now). **Both are written**: quote them rather than
+  paraphrasing. Where a page says a thing is not decided, that is the answer — record the gap in
+  `scope.md` and carry on. A hole in the strategy is a finding to report, not a reason to invent
+  one or to go reading source instead.
 - For the cut (step 4 only): `pipeline/intake/CONTEXT.md`.
 - If revising: the existing `pipeline/runs/<slug>/01_scope/output/scope.md`.
 

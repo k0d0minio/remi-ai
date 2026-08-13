@@ -86,7 +86,7 @@ a one-line `Context budget:` note in `spec.md`.
 # Spec: <feature title>
 
 - slug: <slug>
-- apps: <web | admin | marketing | docs | demo | packages — comma-separated>
+- apps: <web | admin | marketing | docs | support | demo | packages — comma-separated>
 - touches: <e.g. apps/web/app/(app)/billing, packages/services/src/db>
 - complexity: trivial | standard | complex
 - demo: throwaway | seed | none

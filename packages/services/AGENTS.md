@@ -45,13 +45,15 @@ for both.
 
 Every server-side `process.env` read goes through `env()` / `requireEnv()` in `src/server/env.ts`.
 A read anywhere else is a review blocker — the point is that a missing variable fails at boot
-naming itself, and that [`docs/ENV.md`](../../docs/ENV.md) has one file to track. New variable →
-schema entry, `docs/ENV.md` row, and `turbo.json` `globalEnv` entry, all in the same PR.
+naming itself, and that [`docs/ENV.md`](../../docs/ENV.md) has one file to track. Adding a variable
+is the three-edit rule in [`/CONVENTIONS.md`](../../CONVENTIONS.md) § "Environment variables".
 
 `shared/links.ts` is the one carve-out, and it is not a loophole: a `NEXT_PUBLIC_*` variable is
 inlined into the browser bundle only for a literal `process.env.NAME`, so routing it through
-`env()` would leave the browser reading `undefined`. Its six reads are literal, spelled out one per
-line, and they are overrides — the file answers from its own table when they are unset.
+`env()` would leave the browser reading `undefined`. Its **seven** reads are literal and spelled out
+one per line: the six `NEXT_PUBLIC_*_URL` overrides — the file answers from its own table when they
+are unset — plus `NODE_ENV`, which selects the dev ports and which Next.js inlines on the same
+terms.
 
 ## Where the apps live
 

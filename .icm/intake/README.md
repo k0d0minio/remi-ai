@@ -4,9 +4,9 @@
 > `_system/TICKETS-SPEC.md` in the Apps estate). Estate conventions on top of the ticket
 > format described below: an optional `Status` row (`ready` → `today` → `in-progress` →
 > `blocked`; missing = `ready`; `today` marks the day's worklist), and finished tickets
-> are `git mv`'d to `_done/` rather than edited. `## Agent prompt` is the accepted alias
-> for the standard's `## Prompt` section. The admin dashboard's tickets board reads this
-> folder from `main`.
+> are `git mv`'d to `_done/` rather than edited — **by the PR that implements them**.
+> `## Agent prompt` is the accepted alias for the standard's `## Prompt` section. The admin
+> dashboard's tickets board reads this folder from `main`.
 
 This folder is the actionable translation of three documents into tickets:
 
@@ -24,8 +24,14 @@ a ticket's **Blocked by** row says an owner decision or external input is still 
 1. Check **Depends on** (earlier tickets) and **Blocked by** (owner decisions / external inputs —
    these map to `.icm/docs/info-gathering.md`). Don't start a blocked ticket.
 2. Hand the **Agent prompt** section to a Claude Code session, or work through the steps yourself.
-3. A ticket is done when every acceptance criterion is checked and the PR is merged.
-4. This repo routes feature work through the delivery pipeline (`CLAUDE.md` → "How work gets done
+3. **Retire the ticket in the same PR as the work.** The implementing PR `git mv`s the ticket file
+   into [`_done/`](_done/) and flips its line in the index below to **done**, pointing at the new
+   path. Not a follow-up chore: a ticket left in the backlog after its PR merges reads as unstarted
+   work, and the board above `main` is only honest if the move rides along with the change that
+   earned it.
+4. A ticket is done when every acceptance criterion is checked and its PR is merged. Until then the
+   move lives on the branch, which is exactly right — `_done/` on `main` means merged, always.
+5. This repo routes feature work through the delivery pipeline (`CLAUDE.md` → "How work gets done
    here"). Phase 4 tickets should enter as `/pipeline` features; Phase 0–3 tickets are mostly
    chores/foundation work and can run through the chore lane or directly, as the prompt says.
 
@@ -69,7 +75,7 @@ Finished tickets keep their place in the order, marked **done** and linked into
 - **done** · [REMI-003](_done/REMI-003-deidentify-fixtures.md) — De-identify fixtures: fictional practitioner, reserved email domains
 - [REMI-004](REMI-004-contact-form-delivery.md) — Give the contact form delivery and a record
 - [REMI-005](REMI-005-branch-protection-ci-gaps.md) — Branch protection, required checks, squash merge; close the docs-only check gap
-- [REMI-006](REMI-006-drift-batch.md) — Fix the documentation drift batch
+- **done** · [REMI-006](_done/REMI-006-drift-batch.md) — Fix the documentation drift batch
 - [REMI-007](REMI-007-dev-session-prod-guard.md) — Make the development session refuse to run in production
 
 ### Phase 1 — Foundation
