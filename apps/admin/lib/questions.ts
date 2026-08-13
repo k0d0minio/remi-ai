@@ -12,7 +12,8 @@
  *
  * Written in French per the working-languages rule in `CONVENTIONS.md`: this
  * is a review document for Morgane and Arnaud. Belgian register and French
- * typography throughout, matching `lib/offer.ts`.
+ * typography throughout — « jours prestés », a space before `%` and `€`, a
+ * space as the thousands separator, a comma for the decimal.
  */
 
 export const author = "Jamie Nisbet";
