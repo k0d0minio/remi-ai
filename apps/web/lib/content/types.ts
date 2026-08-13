@@ -247,7 +247,7 @@ export type Content = {
   plan: {
     title: string;
     lead: string;
-    /** Follows the clinic name: "FunMedDev · consultation on 22 Jul 2026". */
+    /** Follows the clinic name: "<clinic> · consultation on 22 Jul 2026". */
     consultationOn: string;
     /** Prefixes the next consultation's date: "Review on 19 Aug 2026". */
     nextReview: string;

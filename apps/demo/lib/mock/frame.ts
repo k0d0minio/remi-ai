@@ -8,7 +8,7 @@ import type { FramePrinciple } from "./types";
  * outside it. `excluded` is a hard rule, `emphasised` is a preference — the
  * distinction is the whole design.
  */
-export const frameName = "Médecine fonctionnelle — FunMedDev";
+export const frameName = "Médecine fonctionnelle — Cabinet Vasseur";
 
 export const frameSummary =
   "Chercher les causes avant de traiter les symptômes, et ne changer qu'une chose à la fois.";
