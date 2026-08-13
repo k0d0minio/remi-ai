@@ -40,10 +40,49 @@ deployed app regardless of D-1's outcome.
 
 ## Acceptance criteria
 
-- [ ] Content handed to the owner in a private form before removal.
-- [ ] The equity-offer page and its data no longer exist in any deployed app.
-- [ ] No dangling imports, routes, or nav links remain.
-- [ ] PR notes that git history retains the content, for the owner to decide on separately.
+- [x] Content handed to the owner in a private form before removal — a handover document was
+      produced and delivered to the owner directly, outside the repository, before any deletion.
+- [x] The equity-offer page and its data no longer exist in any deployed app.
+- [x] No dangling imports, routes, or nav links remain.
+- [x] PR notes that git history retains the content, for the owner to decide on separately.
+
+## Progress — 2026-08-13
+
+Removed from `apps/admin`, so `/offer` no longer exists in the deployed console:
+
+- `app/(admin)/offer/page.tsx` — the page
+- `lib/offer.ts` — the offer data, headed « Confidentiel », with the valuation, the percentages,
+  the €120/hour rate, the accrued €70 656, and the two fallback positions
+- `components/offer/figure-rows.tsx` and `components/offer/point-list.tsx` — the offer page was
+  their only consumer, so they go with it per the leanness rule
+- the « Offre CTO » entry in `components/shell/nav-sections.ts`, and the now-unused `Handshake`
+  icon import
+- a stale doc-comment cross-reference to `lib/offer.ts` in `lib/questions.ts`
+
+### The bigger exposure this surfaced
+
+**The repository is public** (`gh api repos/k0d0minio/remi-ai` → `visibility: public`). The offer
+was therefore never only behind the admin URL — it has been readable by anyone on GitHub, and
+deleting the file does not change that, because git history keeps it.
+
+That reframes the priority order the audit set. Removing the file stops the console serving it and
+stops it growing new readers, but **the content is still retrievable from history today**. Options,
+for the owner:
+
+- **Rewrite history** (`git filter-repo` + force-push) — the only thing that actually removes it.
+  Breaks every clone and open branch; needs a quiet moment and everyone warned. GitHub also keeps
+  unreachable objects until asked to garbage-collect, so it needs a support request to be complete.
+- **Make the repository private** — cheaper and immediate, and it closes the whole class rather
+  than one file. Worth considering on its own merits given what else the repo carries.
+- **Accept it** — defensible only if the negotiation is settled and the figures no longer matter.
+
+### Still open — the rest of REMI-002's scope
+
+`lib/questions.ts` (`/questions`) and the pilot-terms block in `lib/fixtures.ts` were **left in
+place**, as step 3 of this ticket specifies: unlike the offer, they are arguably working features
+of the console rather than documents that merely happen to be hosted. Both are still publicly
+reachable on the production domain, and `/questions` carries the internal legal and strategy
+deliberations. They close when the owner decides, or when REMI-023's operator role lands.
 
 ## Agent prompt
 
