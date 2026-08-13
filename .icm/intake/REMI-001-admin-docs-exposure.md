@@ -36,10 +36,88 @@ state: crawlable with no guidance.
 
 ## Acceptance criteria
 
-- [ ] Deployment protection verified ON for the admin project, in writing.
-- [ ] Docs-site posture decided (D-1) and implemented — no crawlable-with-no-guidance middle state.
-- [ ] `apps/docs` has either robots+noindex (private) or its confidential content removed (public).
-- [ ] Findings F-30 and F-31 can be marked mitigated.
+- [x] Deployment protection state established for the admin project, in writing — **measured OFF for
+      production**, see below.
+- [x] Docs-site posture decided (D-1) and implemented — no crawlable-with-no-guidance middle state.
+- [x] `apps/docs` has robots+noindex **and** its confidential content removed — the owner's answer to
+      D-1 took both halves, not one.
+- [ ] Finding F-31 mitigated — the docs half is done; closing it needs the owner to confirm nothing
+      confidential remains.
+- [ ] Finding F-30 mitigated — **not this ticket any more**: it now runs through REMI-002 (remove the
+      content) and REMI-023 (the operator role).
+
+## Decision — D-1, answered 2026-08-13
+
+**The docs site stays uncrawlable but publicly viewable, with the confidential content removed.**
+Vercel deployment protection is rejected: covering a production domain costs $150/month, which is
+not a trade worth making at this stage. The admin console will instead be protected by a real
+**`operator`/admin role in the database and backend**, which is REMI-023's existing scope — not by a
+platform wall.
+
+Two consequences follow, and both are now on the critical path rather than "at leisure":
+
+- **REMI-002 becomes the mitigation for F-30, not a tidy-up.** With no protection being bought and
+  the role a week or more away, taking the confidential content out of the deployed app is the only
+  thing that actually closes the exposure. It should not wait for REMI-023.
+- **Nothing may rely on deployment protection as an interim** anywhere in the backlog or the docs.
+
+## Progress
+
+Landed in code:
+
+- `apps/docs/app/robots.ts` — `disallow: "/"`, modelled on `apps/admin/app/robots.ts`, no sitemap.
+- `apps/docs/app/layout.tsx` — `robots: { index: false, follow: false }` in the root metadata.
+- `apps/docs/app/business/initiatives/page.mdx` — the pilot-terms table (cohort ceiling, enrolment
+  window, **price**, billing date, commitment) and the named partner clinic are gone, replaced by a
+  note that the terms live in the operator console. The quarter's objectives no longer restate the
+  cohort size or the window dates.
+- `apps/docs/app/technical/decisions/page.mdx` — the entry describing the console's absent access
+  gate is gone; a new **Access control — 2026-08-13** section records the decision above without
+  publishing a signpost to anything.
+
+`apps/docs` is therefore out of the crawlable-with-no-guidance middle state **and** no longer carries
+the confidential figures. F-30 is untouched by this work.
+
+### Verified — deployment protection is NOT covering production
+
+The dashboard could not be reached from an agent session (no Vercel MCP server, no `vercel` CLI, no
+`VERCEL_*` token, no linked project; and `vercel.json` has no field for this — it lives only in the
+dashboard and the REST API). But the question is answerable from outside, by asking the
+deployments themselves. Measured 2026-08-13, unauthenticated:
+
+- `remi-admin.jamienisbet.com/` → **200**, and it is the real console (title "Overview · REMI admin")
+- `remi-admin.jamienisbet.com/offer` → **200** — the equity negotiation
+- `remi-admin.jamienisbet.com/questions` → **200** — the internal legal/strategy deliberations
+- `remi-docs.jamienisbet.com/` → **200**
+- `remi-docs.jamienisbet.com/business/initiatives` → **200** — the pilot pricing
+- `remi-docs.jamienisbet.com/robots.txt` → **404**, confirming F-31 in production
+- the docs **preview** deployment → **302 to `vercel.com/sso-api`** — protected
+
+So protection is **on for previews and off for production**. **F-30 and F-31 are live exposures,
+confirmed, not theoretical ones.** The equity-offer page and the internal questions page are
+readable by anyone with the URL, right now.
+
+That pattern is not a mistake anyone made — it is Vercel's default. **Standard Protection protects
+every deployment _except_ production domains**, by design
+([Vercel docs](https://vercel.com/docs/deployment-protection)). Protecting production needs the
+**All Deployments** scope.
+
+`docs/VERCEL.md` used to claim the opposite — that standard protection "is enough" for REMI-001 and
+the $150/month Advanced add-on is "not needed". That claim was the belief this ticket disproved, and
+the file has since been **deleted** (commit `2d4398c`), taking the wrong claim with it and removing
+the hosting playbook's routing entry from `CLAUDE.md`. Nothing in the repo now recommends the paid
+route. If the playbook is ever wanted back, the free-tier facts in it are still good — only the
+deployment-protection section was wrong — and it is recoverable from git history.
+
+The cost is what settled D-1: the owner rejected the add-on rather than pay it. See the decision
+section above.
+
+### Still open
+
+- **The admin console remains readable by anyone with the URL.** Nothing in this ticket changed
+  that, and nothing will until REMI-002 lands. It is the last piece of F-30 and it is now unblocked
+  — D-1's answer is the owner confirmation REMI-002 was waiting on.
+- Then F-31 can be ticked and this ticket moved to `_done/`.
 
 ## Agent prompt
 
