@@ -41,10 +41,11 @@ state: crawlable with no guidance.
 - [x] Docs-site posture decided (D-1) and implemented — no crawlable-with-no-guidance middle state.
 - [x] `apps/docs` has robots+noindex **and** its confidential content removed — the owner's answer to
       D-1 took both halves, not one.
-- [ ] Finding F-31 mitigated — the docs half is done; closing it needs the owner to confirm nothing
-      confidential remains.
-- [ ] Finding F-30 mitigated — **not this ticket any more**: it now runs through REMI-002 (remove the
-      content) and REMI-023 (the operator role).
+- [x] Finding F-31 mitigated — the docs half is done, and the owner confirmed on 2026-08-13 that
+      nothing confidential remains in `apps/docs`.
+- [ ] Finding F-30 mitigated — **never this ticket's to close**: it was reassigned to REMI-002
+      (remove the content) and REMI-023 (the operator role). Left unticked deliberately; see
+      "Closed" below.
 
 ## Decision — D-1, answered 2026-08-13
 
@@ -112,12 +113,21 @@ deployment-protection section was wrong — and it is recoverable from git histo
 The cost is what settled D-1: the owner rejected the add-on rather than pay it. See the decision
 section above.
 
-### Still open
+## Closed — 2026-08-13
 
-- **The admin console remains readable by anyone with the URL.** Nothing in this ticket changed
-  that, and nothing will until REMI-002 lands. It is the last piece of F-30 and it is now unblocked
-  — D-1's answer is the owner confirmation REMI-002 was waiting on.
-- Then F-31 can be ticked and this ticket moved to `_done/`.
+Every criterion this ticket owns is met: the protection state is established in writing, D-1 is
+answered, and `apps/docs` carries robots + noindex with its confidential content removed. The owner
+confirmed nothing confidential remains there, which ticks F-31 and was the last thing holding the
+ticket open.
+
+The F-30 box stays unticked on purpose. That finding was reassigned out of this ticket, so ticking
+it here would claim work this ticket never did. Where it actually stands:
+
+- **REMI-002 has landed** — the equity-offer page and `lib/offer.ts` are gone from the deployed
+  console.
+- **`/questions` and the pilot-terms fixture are still publicly reachable.** REMI-002 left them in
+  place by design, and they close when the owner decides or when **REMI-023**'s operator role lands.
+  F-30 is not fully mitigated, and REMI-023 is where it finishes.
 
 ## Agent prompt
 
