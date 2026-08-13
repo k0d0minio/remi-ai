@@ -41,6 +41,38 @@ state: crawlable with no guidance.
 - [ ] `apps/docs` has either robots+noindex (private) or its confidential content removed (public).
 - [ ] Findings F-30 and F-31 can be marked mitigated.
 
+## Progress
+
+**Step 3 of the required steps is done; steps 1, 2 and 5 need the owner.**
+
+Landed in code (the safe interim, chosen because it is correct under either branch of D-1 and
+reverts to a one-file change if D-1 lands on "public"):
+
+- `apps/docs/app/robots.ts` — `disallow: "/"`, modelled on `apps/admin/app/robots.ts`, no sitemap.
+- `apps/docs/app/layout.tsx` — `robots: { index: false, follow: false }` in the root metadata.
+
+`apps/docs` is therefore out of the crawlable-with-no-guidance middle state. That closes the
+indexing half of F-31 and nothing else: **neither F-30 nor F-31 is mitigated**, because both hinge
+on reachability, and reachability is a Vercel setting.
+
+### Open — for the owner
+
+- **Deployment protection is unverified.** It could not be checked from an agent session: there is
+  no Vercel MCP server, no `vercel` CLI, no `VERCEL_*` token in the environment, and no linked
+  project. It is also not settable from this repo — `vercel.json` has no field for it; it exists
+  only in the dashboard and the REST API. Someone with dashboard access must look:
+  **Vercel → the project whose root directory is `apps/admin` → Settings → Deployment Protection →
+  Vercel Authentication**, confirm it is on and that its scope covers **Production**, not previews
+  only; then the same for the `apps/docs` project. (Project names are not recorded anywhere in this
+  repo, so identify them by root directory.) `docs/VERCEL.md:105-106` confirms standard protection
+  is included on Pro — this is a toggle, not a purchase.
+- **D-1 is unanswered.** Protect docs and keep the business content (option a), or make docs public
+  and move `app/business/**` plus the sensitive part of `app/technical/decisions/` out first
+  (option b). The audit recommends (a) now and (b) at leisure. This code change is the interim
+  under (a) and is deleted under (b).
+- **Record the answers here and in the PR** — what was on or off, when it was checked, who decided
+  D-1 — then the acceptance criteria above can be ticked and the ticket moved to `_done/`.
+
 ## Agent prompt
 
 ```text
