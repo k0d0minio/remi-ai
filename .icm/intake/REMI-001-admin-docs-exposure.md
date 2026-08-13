@@ -102,25 +102,21 @@ every deployment _except_ production domains**, by design
 ([Vercel docs](https://vercel.com/docs/deployment-protection)). Protecting production needs the
 **All Deployments** scope.
 
-**`docs/VERCEL.md:105-106` is wrong on this point** and should be corrected: it says standard
-protection "is enough" for REMI-001 and that the $150/month Advanced add-on is "not needed". Vercel
-documents "Private Production Deployments" as an Advanced Deployment Protection feature, i.e. the
-$150/month add-on on Pro — while also listing All Deployments as "available on Pro and Enterprise".
-The two statements sit awkwardly together; the dashboard settles it, by either applying the setting
-or showing an **Enable and Pay** prompt.
+`docs/VERCEL.md` used to claim the opposite — that standard protection "is enough" for REMI-001 and
+the $150/month Advanced add-on is "not needed". That claim was the belief this ticket disproved, and
+the file has since been **deleted** (commit `2d4398c`), taking the wrong claim with it and removing
+the hosting playbook's routing entry from `CLAUDE.md`. Nothing in the repo now recommends the paid
+route. If the playbook is ever wanted back, the free-tier facts in it are still good — only the
+deployment-protection section was wrong — and it is recoverable from git history.
 
 The cost is what settled D-1: the owner rejected the add-on rather than pay it. See the decision
-section above. `docs/VERCEL.md:105-106` still needs its correction — it currently tells the next
-reader that the included tier is enough, which is the belief this ticket disproved.
+section above.
 
 ### Still open
 
 - **The admin console remains readable by anyone with the URL.** Nothing in this ticket changed
   that, and nothing will until REMI-002 lands. It is the last piece of F-30 and it is now unblocked
   — D-1's answer is the owner confirmation REMI-002 was waiting on.
-- **Correct `docs/VERCEL.md:105-106`** so the "standard protection is enough" claim does not
-  outlive the decision. Small enough for the drift batch (REMI-006) if it does not travel with
-  REMI-002.
 - Then F-31 can be ticked and this ticket moved to `_done/`.
 
 ## Agent prompt
