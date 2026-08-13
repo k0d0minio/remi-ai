@@ -249,6 +249,9 @@ export type Content = {
       successTitle: string;
       successBody: string;
       errorBanner: string;
+      /** Shown when the message validated but could not be delivered. */
+      deliveryErrorTitle: string;
+      deliveryErrorBody: string;
       errors: {
         name: string;
         emailMissing: string;

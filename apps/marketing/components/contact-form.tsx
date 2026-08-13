@@ -58,6 +58,9 @@ export const ContactForm = ({ locale, labels }: Props) => {
         <Alert variant="error">
           <CircleAlert />
           <AlertTitle>{state.message}</AlertTitle>
+          {state.detail ? (
+            <AlertDescription>{state.detail}</AlertDescription>
+          ) : null}
         </Alert>
       ) : null}
 

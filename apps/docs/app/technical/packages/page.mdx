@@ -20,13 +20,14 @@ pass of their own).
 
 ## `@remi/services`
 
-Storage, email, AI, and the environment reader. **No vendor is committed** — each is a seam:
+Storage, email, AI, and the environment reader. Each is a seam, and **only email has picked a
+vendor** — one adapter behind the interface, registered by the app that owns the process:
 
-| Seam    | Interface        | Register with            | Default if unregistered              |
-| ------- | ---------------- | ------------------------ | ------------------------------------ |
-| Storage | `DatabaseClient` | `registerDatabase()`     | throws — a missing DB must be loud   |
-| Email   | `Mailer`         | `registerMailer()`       | `consoleMailer` — logs, never sends  |
-| AI      | `TextProvider`   | `registerTextProvider()` | throws                               |
+| Seam    | Interface        | Register with            | Adapter                         | Default if unregistered              |
+| ------- | ---------------- | ------------------------ | ------------------------------- | ------------------------------------ |
+| Storage | `DatabaseClient` | `registerDatabase()`     | none yet                        | throws — a missing DB must be loud   |
+| Email   | `Mailer`         | `registerMailer()`       | Resend (`createResendMailer()`) | `consoleMailer` — logs, never sends  |
+| AI      | `TextProvider`   | `registerTextProvider()` | none yet                        | throws                               |
 
 Pick the entrypoint that matches where the code runs:
 

@@ -1,11 +1,17 @@
 "use server";
 
+import { isMailerRegistered, sendEmail } from "@remi/services/server";
 import { defaultLocale, isLocale } from "@remi/services/shared";
+import { buildContactEmail } from "@/lib/contact-email";
 import { getContent } from "@/lib/content";
+import type { Content } from "@/lib/content/types";
+import { ensureMailer } from "@/lib/mailer";
 
 export type ContactState = {
   status: "idle" | "success" | "error";
   message?: string;
+  /** A second line under `message`. Only delivery failures need one. */
+  detail?: string;
   /** Field name → what is wrong with it. Rendered by `Field`'s `error` prop. */
   errors?: Partial<Record<"name" | "email" | "message" | "consent", string>>;
 };
@@ -21,6 +27,17 @@ const looksLikeEmail = (value: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
 /**
+ * Both ways delivery can fail read the same to the sender, because the
+ * difference is ours to fix and theirs to work around: the copy keeps the direct
+ * addresses in front of them either way.
+ */
+const deliveryFailed = (form: Content["contact"]["form"]): ContactState => ({
+  status: "error",
+  message: form.deliveryErrorTitle,
+  detail: form.deliveryErrorBody,
+});
+
+/**
  * Deliberately not `zod`: four fields do not justify a dependency this app has
  * no other use for. The locale travels as a hidden field so the validation
  * messages come back in the language the visitor is reading.
@@ -31,7 +48,7 @@ export const submitContact = async (
 ): Promise<ContactState> => {
   const rawLocale = String(formData.get("locale") ?? "");
   const locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
-  const { form } = getContent(locale).contact;
+  const { form, people } = getContent(locale).contact;
 
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
@@ -62,13 +79,37 @@ export const submitContact = async (
     };
   }
 
-  // The email seam is not wired yet — packages/services keeps an interface and a
-  // registration point for email, and no vendor has been chosen. Until one is,
-  // this validates and acknowledges without delivering anywhere, which is why
-  // the success message says so rather than promising a reply.
-  //
-  // When an adapter lands: import it from "@remi/services/email" and send from
-  // here. Nothing else about this action needs to change.
+  ensureMailer();
+
+  // No adapter means the seam is on the mailer that only logs. Telling a visitor
+  // their message arrived when it reached stdout is the exact dishonesty this
+  // form used to admit to in its success copy, so an unregistered mailer is a
+  // failure here — not a quiet success.
+  if (!isMailerRegistered()) {
+    console.error(
+      "[contact] no mailer registered — RESEND_API_KEY is unset, so the submission was not delivered",
+    );
+    return deliveryFailed(form);
+  }
+
+  // The recipients are the addresses the page already puts in front of the
+  // visitor, so what the form does and what the page says stay one fact.
+  try {
+    await sendEmail(
+      buildContactEmail({
+        name,
+        email,
+        message,
+        locale,
+        to: people.map((person) => person.email),
+      }),
+    );
+  } catch (error) {
+    // The provider's complaint belongs in the server log, where it can be read
+    // in full; the sender gets copy that gives them somewhere else to go.
+    console.error("[contact] delivery failed", error);
+    return deliveryFailed(form);
+  }
 
   return {
     status: "success",
