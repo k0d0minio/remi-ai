@@ -6,7 +6,7 @@ type Props = {
   messages: Message[];
   /** Which side of the exchange is reading — theirs sits right, the other left. */
   viewer: MessageAuthor;
-  /** How the other side signs, e.g. "Camille" or "Dr Mouton". */
+  /** How the other side signs, e.g. "Camille" or "Dr Vasseur". */
   counterpartLabel: string;
 };
 

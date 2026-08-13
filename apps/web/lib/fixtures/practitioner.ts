@@ -6,23 +6,28 @@ import type { Practitioner, TherapeuticFrame } from "@remi/services/shared";
  * The whole `lib/fixtures/` folder is deleted by the PR that registers the first
  * `DatabaseClient` — `CONVENTIONS.md`: superseding deletes the superseded. The
  * query layer in `lib/queries/` is the seam that makes that a one-file change.
+ *
+ * The practitioner and everyone on their books are invented, and every address
+ * sits on a domain RFC 2606 reserves. A fixture never names a real person: the
+ * activity around it is fabricated, and fabricated activity hung on a real name
+ * is personal data.
  */
 export const practitioner: Practitioner = {
-  id: "prac_mouton",
-  name: "Dr Georges Mouton",
-  email: "g.mouton@funmeddev.example",
+  id: "prac_vasseur",
+  name: "Dr Hélène Vasseur",
+  email: "h.vasseur@cabinetvasseur.example",
   discipline: "Functional medicine",
-  clinic: "FunMedDev",
+  clinic: "Cabinet Vasseur",
   locale: "fr",
-  frameId: "frame_funmeddev",
+  frameId: "frame_vasseur",
   createdAt: new Date("2026-02-16T09:00:00Z"),
   updatedAt: new Date("2026-07-28T14:12:00Z"),
 };
 
 export const frame: TherapeuticFrame = {
-  id: "frame_funmeddev",
+  id: "frame_vasseur",
   practitionerId: practitioner.id,
-  name: "Functional medicine — FunMedDev",
+  name: "Functional medicine — Cabinet Vasseur",
   summary:
     "Look for the causes before treating the symptoms, and change one thing at a time.",
   principles: [
