@@ -46,7 +46,7 @@ These cannot be made by an agent. Each is written out in `.icm/docs/audit-report
 
 | Decision        | Question                                                | Gates tickets                            |
 | --------------- | ------------------------------------------------------- | ---------------------------------------- |
-| D-1             | Deployment protection on admin; docs public or private? | 001                                      |
+| D-1 — answered  | Deployment protection on admin; docs public or private? | 001 — done                               |
 | D-v1-2 / REQ-30 | Is REMI patient-facing, practitioner-facing, or both?   | 027–039 (scoping of every ported screen) |
 | D-v1-1 / REQ-12 | What happens to the Python meal-plan API?               | 033, 034                                 |
 | D-2             | Database vendor — Neon or Supabase?                     | 022                                      |
@@ -59,11 +59,14 @@ These cannot be made by an agent. Each is written out in `.icm/docs/audit-report
 
 ## Ticket index
 
+Finished tickets keep their place in the order, marked **done** and linked into
+[`_done/`](_done/) — the sequence is easier to read when what has already happened is still visible.
+
 ### Phase 0 — Close the live risks
 
-- [REMI-001](REMI-001-admin-docs-exposure.md) — Verify deployment protection on admin; settle docs-site visibility
-- [REMI-002](REMI-002-remove-confidential-content.md) — Remove confidential negotiation content from the admin app
-- [REMI-003](REMI-003-deidentify-fixtures.md) — De-identify fixtures: fictional practitioner, reserved email domains
+- **done** · [REMI-001](_done/REMI-001-admin-docs-exposure.md) — Verify deployment protection on admin; settle docs-site visibility
+- **done** · [REMI-002](_done/REMI-002-remove-confidential-content.md) — Remove confidential negotiation content from the admin app
+- **done** · [REMI-003](_done/REMI-003-deidentify-fixtures.md) — De-identify fixtures: fictional practitioner, reserved email domains
 - [REMI-004](REMI-004-contact-form-delivery.md) — Give the contact form delivery and a record
 - [REMI-005](REMI-005-branch-protection-ci-gaps.md) — Branch protection, required checks, squash merge; close the docs-only check gap
 - [REMI-006](REMI-006-drift-batch.md) — Fix the documentation drift batch
