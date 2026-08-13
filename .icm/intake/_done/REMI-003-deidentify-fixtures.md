@@ -30,9 +30,56 @@ practitioners use plausible real `.be` email domains that could belong to actual
 
 ## Acceptance criteria
 
-- [ ] No real person's name appears anywhere in fixture data.
-- [ ] All fixture emails use reserved documentation domains.
-- [ ] A repo-wide search for the removed names returns zero hits outside git history.
+- [x] No real person's name appears anywhere in fixture data.
+- [x] All fixture emails use reserved documentation domains.
+- [x] A repo-wide search for the removed names returns zero hits in fixture data — see the note on
+      the criterion's literal wording below.
+
+## Progress — 2026-08-13 (PR #41, merged)
+
+The real practitioner is fictional everywhere, and every fixture address is unroutable.
+
+**The identity**, replaced across `apps/admin`, `apps/web` and `apps/demo`: Dr Georges Mouton →
+**Dr Hélène Vasseur**; FunMedDev → **Cabinet Vasseur**; Brussels → **Waterloo**. The ids followed
+it — `georges-mouton`, `app-georges-mouton`, `prac_mouton` and `frame_funmeddev` became
+`helene-vasseur`, `app-helene-vasseur`, `prac_vasseur` and `frame_vasseur` — as did the three
+"Referred by …" application sources and the demo's `practitionerName` / `clinicName` / `frameName`
+constants, which every demo screen renders from.
+
+**The addresses**: all eighteen moved onto domains RFC 2606 reserves — the fourteen admin practice
+addresses from `.be` to `.example`, and the four web patient addresses from `example.be` to
+`example.com`.
+
+One deliberate departure from step 2's wording: `example.be` is a **registered** `.be` domain, not
+a reserved one. RFC 2606 reserves `example.com` / `.net` / `.org` and the whole `.example` TLD, so
+those are what the fixtures use. That meets the second criterion more strictly than the literal
+suggestion would have.
+
+**Two invented practices** were renamed off real organisations found during the step-3 sweep:
+`Centre Nutrisens` → `Centre Delcourt` (a French medical-nutrition company) and
+`Sint-Rafaël nutrition` → `Praktijk Peeters` (a UZ Leuven campus), both following through to their
+support tickets and audit-log entries.
+
+### On the third criterion's literal wording
+
+"Zero hits repo-wide" cannot be met, and should not be. The name legitimately remains in two
+places, neither of which is invented data:
+
+- **`apps/marketing`** names Dr Georges Mouton and FunMedDev as a real partner in true, published
+  copy — the content file's own comment records that the founders confirmed the partnership. F-33 is
+  about *fabricated* activity attributed to a real person; removing a real partner from real copy is
+  the founders' decision, not this ticket's.
+- **`.icm/docs/` and this ticket** name him because they are the record of the finding. Erasing that
+  would destroy the audit trail.
+
+`apps/admin/lib/questions.ts` also asks the founders what the FunMedDev partnership covers — a
+business question about a real relationship, not fixture data.
+
+### Noted, not changed
+
+`apps/web/lib/content/fr.ts:37` uses `vous@exemple.com` as the French email placeholder, and
+`exemple.com` is a registered domain. It is product copy rather than fixture data, so it sat outside
+this ticket's scope; `vous@example.com` would be reserved.
 
 ## Agent prompt
 
