@@ -6,9 +6,15 @@
 | **Type**       | chore                                                                                                     |
 | **Priority**   | P0                                                                                                        |
 | **Size**       | Hours                                                                                                     |
-| **Depends on** | REMI-001 (verify protection first, so removal isn't racing exposure)                                      |
-| **Blocked by** | Owner confirmation that the equity-offer page may leave the deployed app                                  |
+| **Depends on** | REMI-001 — **done**: protection measured OFF for production, so removal _is_ racing exposure              |
+| **Blocked by** | Nothing. Unblocked 2026-08-13 by the owner's answer to D-1                                                |
 | **Sources**    | audit F-30 ("decide whether a negotiation document belongs in a deployed app at all"), D-1 recommendation |
+
+> **Escalated 2026-08-13.** REMI-001 measured the admin console's production domain as
+> **unprotected** — `/offer` and `/questions` return 200 to anyone with the URL — and the owner has
+> rejected Vercel's paid production protection. The console's real gate is an `operator` role
+> (REMI-023), which is a week or more out. Until then **this ticket is the only thing that closes
+> F-30.** It no longer waits on anything, and it should not wait for REMI-023.
 
 ## Problem statement
 
