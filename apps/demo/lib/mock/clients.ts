@@ -1,7 +1,7 @@
 import type { Client, Dimension } from "./types";
 
-export const practitionerName = "Dr Georges Mouton";
-export const clinicName = "FunMedDev";
+export const practitionerName = "Dr Hélène Vasseur";
+export const clinicName = "Cabinet Vasseur";
 
 export const clients: Client[] = [
   {
@@ -62,7 +62,8 @@ export const clients: Client[] = [
 /**
  * The five axes a plan is adapted along ("personnalisation à 360°"). Four
  * describe Camille; the fifth is not hers to hold — it comes from her
- * practitioner's frame, which is why its source line names him rather than her.
+ * practitioner's frame, which is why its source line names the practitioner
+ * rather than Camille.
  */
 export const dimensions: Dimension[] = [
   {
