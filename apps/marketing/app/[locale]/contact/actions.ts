@@ -6,17 +6,9 @@ import { buildContactEmail } from "@/lib/contact-email";
 import { getContent } from "@/lib/content";
 import type { Content } from "@/lib/content/types";
 import { ensureMailer } from "@/lib/mailer";
+import type { ContactState } from "./state";
 
-export type ContactState = {
-  status: "idle" | "success" | "error";
-  message?: string;
-  /** A second line under `message`. Only delivery failures need one. */
-  detail?: string;
-  /** Field name → what is wrong with it. Rendered by `Field`'s `error` prop. */
-  errors?: Partial<Record<"name" | "email" | "message" | "consent", string>>;
-};
-
-export const initialContactState: ContactState = { status: "idle" };
+// Nothing but `submitContact` may be exported from this file — see ./state.ts.
 
 /**
  * A loose email check on purpose. The only way to know an address is real is to
