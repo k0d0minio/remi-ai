@@ -43,7 +43,8 @@ state: crawlable with no guidance.
 
 ## Progress
 
-**Step 3 of the required steps is done; steps 1, 2 and 5 need the owner.**
+**Steps 1–3 are answered; steps 4–5 need the owner.** Protection was verified from outside rather
+than from the dashboard, and the answer is worse than the audit assumed.
 
 Landed in code (the safe interim, chosen because it is correct under either branch of D-1 and
 reverts to a one-file change if D-1 lands on "public"):
@@ -55,21 +56,49 @@ reverts to a one-file change if D-1 lands on "public"):
 indexing half of F-31 and nothing else: **neither F-30 nor F-31 is mitigated**, because both hinge
 on reachability, and reachability is a Vercel setting.
 
+### Verified — deployment protection is NOT covering production
+
+The dashboard could not be reached from an agent session (no Vercel MCP server, no `vercel` CLI, no
+`VERCEL_*` token, no linked project; and `vercel.json` has no field for this — it lives only in the
+dashboard and the REST API). But the question is answerable from outside, by asking the
+deployments themselves. Measured 2026-08-13, unauthenticated:
+
+- `remi-admin.jamienisbet.com/` → **200**, and it is the real console (title "Overview · REMI admin")
+- `remi-admin.jamienisbet.com/offer` → **200** — the equity negotiation
+- `remi-admin.jamienisbet.com/questions` → **200** — the internal legal/strategy deliberations
+- `remi-docs.jamienisbet.com/` → **200**
+- `remi-docs.jamienisbet.com/business/initiatives` → **200** — the pilot pricing
+- `remi-docs.jamienisbet.com/robots.txt` → **404**, confirming F-31 in production
+- the docs **preview** deployment → **302 to `vercel.com/sso-api`** — protected
+
+So protection is **on for previews and off for production**. **F-30 and F-31 are live exposures,
+confirmed, not theoretical ones.** The equity-offer page and the internal questions page are
+readable by anyone with the URL, right now.
+
+That pattern is not a mistake anyone made — it is Vercel's default. **Standard Protection protects
+every deployment _except_ production domains**, by design
+([Vercel docs](https://vercel.com/docs/deployment-protection)). Protecting production needs the
+**All Deployments** scope.
+
+**`docs/VERCEL.md:105-106` is wrong on this point** and should be corrected: it says standard
+protection "is enough" for REMI-001 and that the $150/month Advanced add-on is "not needed". Vercel
+documents "Private Production Deployments" as an Advanced Deployment Protection feature, i.e. the
+$150/month add-on on Pro — while also listing All Deployments as "available on Pro and Enterprise".
+The two statements sit awkwardly together; the dashboard settles it, by either applying the setting
+or showing an **Enable and Pay** prompt.
+
 ### Open — for the owner
 
-- **Deployment protection is unverified.** It could not be checked from an agent session: there is
-  no Vercel MCP server, no `vercel` CLI, no `VERCEL_*` token in the environment, and no linked
-  project. It is also not settable from this repo — `vercel.json` has no field for it; it exists
-  only in the dashboard and the REST API. Someone with dashboard access must look:
-  **Vercel → the project whose root directory is `apps/admin` → Settings → Deployment Protection →
-  Vercel Authentication**, confirm it is on and that its scope covers **Production**, not previews
-  only; then the same for the `apps/docs` project. (Project names are not recorded anywhere in this
-  repo, so identify them by root directory.) `docs/VERCEL.md:105-106` confirms standard protection
-  is included on Pro — this is a toggle, not a purchase.
-- **D-1 is unanswered.** Protect docs and keep the business content (option a), or make docs public
-  and move `app/business/**` plus the sensitive part of `app/technical/decisions/` out first
-  (option b). The audit recommends (a) now and (b) at leisure. This code change is the interim
-  under (a) and is deleted under (b).
+- **Look at the dashboard and settle the cost question.** Vercel → the project whose root directory
+  is `apps/admin` → **Settings → Deployment Protection** → set the scope to **All Deployments**;
+  then the same for the `apps/docs` project. The projects are `remi-admin` and `remi-docs` on team
+  `remi21`. Note whether it applies free or prompts to pay.
+- **D-1 is unanswered, and the cost finding changes its shape.** If protecting production costs
+  $150/month, that is a poor trade against the repo's stated budget rule for content that,
+  per the audit, gains nothing from being deployed. The cheap and complete answer is
+  **REMI-002 — take the confidential content out of the deployed apps** — which costs nothing,
+  removes the exposure at its source rather than gating it, and leaves both sites publishable.
+  Recommend deciding REMI-001 and REMI-002 together rather than in sequence.
 - **Record the answers here and in the PR** — what was on or off, when it was checked, who decided
   D-1 — then the acceptance criteria above can be ticked and the ticket moved to `_done/`.
 
