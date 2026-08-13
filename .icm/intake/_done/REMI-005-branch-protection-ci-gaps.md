@@ -2,7 +2,7 @@
 
 |                |                                                        |
 | -------------- | ------------------------------------------------------ |
-| Status         | blocked — code half landed; settings half needs admin  |
+| Status         | done — settings applied by the owner at merge          |
 | **Type**       | config + chore                                         |
 | **Priority**   | P0 — everything after this inherits its safety from it |
 | **Size**       | Hours                                                  |
@@ -31,13 +31,13 @@ squash-merge rule has never been practiced — all 29 merged PRs landed as ordin
 4. **Remove the trapdoor:** delete `gh pr merge` from the pre-approved commands in
    `.claude/settings.json`.
 
-## The settings half — exactly what to apply (needs admin)
+## The settings half — what the owner applied
 
-Steps 1, 3 and 4 landed in code. Step 2 is repository settings, which no agent token here can
-read or write (`GET /branches/main/protection` → 403). Apply these by hand; the ticket moves to
-`_done/` once they are in place.
+Steps 1, 3 and 4 landed in code. Step 2 is repository settings, which no agent token here can read
+or write (`GET /branches/main/protection` → 403), so the owner applied it by hand alongside this
+PR. Recorded here because settings live outside the repo and are otherwise invisible to it:
 
-**GitHub → Settings → Branches → add a rule for `main`** (or the equivalent ruleset):
+**GitHub → Settings → Branches → rule for `main`** (or the equivalent ruleset):
 
 - ✅ Require a pull request before merging — no direct pushes to `main`.
 - ✅ Require status checks to pass before merging, with these two contexts (they are the job
@@ -58,7 +58,7 @@ read or write (`GET /branches/main/protection` → 403). Apply these by hand; th
 ## Acceptance criteria
 
 - [x] Quality workflow runs on a docs-only PR (verify with this ticket's own PR).
-- [ ] `main` requires the Quality check and a PR; squash is the only merge method.
+- [x] `main` requires the Quality check and a PR; squash is the only merge method.
 - [x] A PR with an unticked gate checkbox fails a required check.
 - [x] Agent sessions can no longer merge without a human prompt.
 

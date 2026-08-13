@@ -210,8 +210,7 @@ error, fix it before pushing rather than spending a CI round-trip — but do not
 - One PR per pipeline run, from Define through Ship. Never a second PR for the same run.
 - Squash-merge, and only on a ticked **Ready to merge** box with green checks. The tick half is
   enforced rather than trusted — the `Pipeline gates` check stays red until the box is ticked. The
-  required-checks and squash-only half is a GitHub branch-protection setting on `main`, outside the
-  repo: the settings it must carry are written down in
-  [`.icm/intake/REMI-005-branch-protection-ci-gaps.md`](.icm/intake/REMI-005-branch-protection-ci-gaps.md)
-  until an admin applies them.
+  required-checks and squash-only half is branch protection on `main` — a GitHub setting, so it is
+  invisible from here; what it carries is recorded in
+  [`.icm/intake/_done/REMI-005-branch-protection-ci-gaps.md`](.icm/intake/_done/REMI-005-branch-protection-ci-gaps.md).
 - Never commit a secret. If you find one in the tree, stop and flag it.
