@@ -13,11 +13,11 @@ import {
   Textarea,
   Typography,
 } from "@remi/ui/server";
+import { submitContact } from "@/app/[locale]/contact/actions";
 import {
   initialContactState,
-  submitContact,
   type ContactState,
-} from "@/app/[locale]/contact/actions";
+} from "@/app/[locale]/contact/state";
 import type { Content } from "@/lib/content/types";
 
 type Props = {
@@ -58,6 +58,9 @@ export const ContactForm = ({ locale, labels }: Props) => {
         <Alert variant="error">
           <CircleAlert />
           <AlertTitle>{state.message}</AlertTitle>
+          {state.detail ? (
+            <AlertDescription>{state.detail}</AlertDescription>
+          ) : null}
         </Alert>
       ) : null}
 

@@ -3,22 +3,23 @@
 The global rules in [`/CONVENTIONS.md`](../../CONVENTIONS.md) still apply. This file holds only
 what is specific to this package.
 
-## No vendor is committed yet — and that is the design
+## Storage and AI have no vendor yet — and that is the design
 
 Storage, email and AI are **seams**, not integrations. Each one defines an interface and a
 `register*()` call; the concrete adapter is registered once at process start by the app that owns
 the process. Nothing above the seam names a vendor, so choosing one later is a new file plus one
 registration line — never a rewrite of the callers.
 
-| Seam    | Interface        | Register with            | Default if unregistered             |
-| ------- | ---------------- | ------------------------ | ----------------------------------- |
-| Storage | `DatabaseClient` | `registerDatabase()`     | throws — a missing DB must be loud  |
-| Email   | `Mailer`         | `registerMailer()`       | `consoleMailer` — logs, never sends |
-| AI      | `TextProvider`   | `registerTextProvider()` | throws                              |
+| Seam    | Interface        | Register with            | Adapter                         | Default if unregistered             |
+| ------- | ---------------- | ------------------------ | ------------------------------- | ----------------------------------- |
+| Storage | `DatabaseClient` | `registerDatabase()`     | none yet                        | throws — a missing DB must be loud  |
+| Email   | `Mailer`         | `registerMailer()`       | Resend (`createResendMailer()`) | `consoleMailer` — logs, never sends |
+| AI      | `TextProvider`   | `registerTextProvider()` | none yet                        | throws                              |
 
-When you add the first adapter, it goes in this package (`src/db/adapters/<vendor>.ts`), the vendor
-SDK becomes a dependency of **this** package only, and `docs/ENV.md` gains its variables in the same
-PR.
+An adapter goes in this package under `src/<seam>/adapters/<vendor>.ts`, the seam's own module is
+the only thing that re-exports it, and `docs/ENV.md` gains its variables in the same PR. A vendor
+SDK, if one is needed, becomes a dependency of **this** package only. The Resend adapter needs none:
+it is one POST to one endpoint, so it uses `fetch` and the package stays at a single dependency.
 
 ## Entrypoints — pick the one that matches where the code runs
 
@@ -33,6 +34,12 @@ PR.
 
 Adding an entrypoint means editing **two** places that must agree: `exports` in `package.json` and
 `entry` in `tsup.config.ts`.
+
+**A seam's registry belongs to the entrypoint you reached it through.** tsup bundles each entry
+independently, so `@remi/services/email` and `@remi/services/server` carry their own copy of the
+module-level `mailer` — register through one and send through the other and the send silently uses
+the fallback. Pick one entrypoint per seam per app and stay on it; `apps/marketing` uses `/server`
+for both.
 
 ## Environment
 

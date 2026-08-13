@@ -697,8 +697,11 @@ export const en: Content = {
       submitting: "Sending…",
       successTitle: "Message received",
       successBody:
-        "Thanks — your message passed validation. Delivery is not connected yet, so nothing has been sent; write to us directly at the addresses above.",
+        "Thanks — your message is with us, and we will reply to the address you gave us.",
       errorBanner: "Please check the fields below.",
+      deliveryErrorTitle: "Your message could not be sent",
+      deliveryErrorBody:
+        "Something went wrong on our side, so nothing has reached us. Please write to us directly at the addresses above, or try again in a moment.",
       errors: {
         name: "Please tell us your name.",
         emailMissing: "Please give us an email address to reply to.",

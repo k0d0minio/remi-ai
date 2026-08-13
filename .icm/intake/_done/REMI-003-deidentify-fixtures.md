@@ -67,7 +67,7 @@ places, neither of which is invented data:
 
 - **`apps/marketing`** names Dr Georges Mouton and FunMedDev as a real partner in true, published
   copy — the content file's own comment records that the founders confirmed the partnership. F-33 is
-  about *fabricated* activity attributed to a real person; removing a real partner from real copy is
+  about _fabricated_ activity attributed to a real person; removing a real partner from real copy is
   the founders' decision, not this ticket's.
 - **`.icm/docs/` and this ticket** name him because they are the record of the finding. Erasing that
   would destroy the audit trail.

@@ -700,8 +700,11 @@ export const fr: Content = {
       submitting: "Envoi…",
       successTitle: "Message bien reçu",
       successBody:
-        "Merci — votre message est valide. L'envoi n'est pas encore raccordé, rien n'a donc été transmis ; écrivez-nous directement aux adresses ci-dessus.",
+        "Merci — votre message nous est bien parvenu, et nous répondrons à l'adresse que vous nous avez indiquée.",
       errorBanner: "Merci de vérifier les champs ci-dessous.",
+      deliveryErrorTitle: "Votre message n'a pas pu être envoyé",
+      deliveryErrorBody:
+        "Un problème est survenu de notre côté : rien ne nous est parvenu. Écrivez-nous directement aux adresses ci-dessus, ou réessayez dans un instant.",
       errors: {
         name: "Dites-nous votre nom, s'il vous plaît.",
         emailMissing: "Indiquez-nous une adresse e-mail pour vous répondre.",
