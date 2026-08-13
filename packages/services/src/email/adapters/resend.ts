@@ -27,6 +27,23 @@ type ResendPayload = {
 };
 
 /**
+ * An address copied into a dashboard field arrives with whatever came with it —
+ * surrounding whitespace, or the quotes someone typed around
+ * `"Name <a@b.c>"` because the shell needs them and a web form does not. Neither
+ * is ever part of a valid address, and Resend answers both with the same 422
+ * about the `from` field's format, which sends the reader looking at their
+ * domain instead of their variable.
+ */
+export const normaliseAddress = (value: string) => {
+  const trimmed = value.trim();
+  const first = trimmed.charAt(0);
+  if ((first === '"' || first === "'") && trimmed.endsWith(first)) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return trimmed;
+};
+
+/**
  * Pure: a seam message plus the configured from-address in, one wire body out.
  * Separate from the send so the mapping can be tested without a network.
  */
@@ -34,7 +51,7 @@ export const toResendPayload = (
   message: EmailMessage,
   defaultFrom: string,
 ): ResendPayload => ({
-  from: message.from ?? defaultFrom,
+  from: normaliseAddress(message.from ?? defaultFrom),
   to: typeof message.to === "string" ? [message.to] : [...message.to],
   subject: message.subject,
   text: message.text,
@@ -81,20 +98,25 @@ export const createResendMailer = (): Mailer => ({
     const apiKey = requireEnv("RESEND_API_KEY", "the Resend mailer");
     const from = message.from ?? requireEnv("EMAIL_FROM", "the Resend mailer");
 
+    const payload = toResendPayload(message, from);
+
     const response = await fetch(ENDPOINT, {
       method: "POST",
       headers: {
         authorization: `Bearer ${apiKey}`,
         "content-type": "application/json",
       },
-      body: JSON.stringify(toResendPayload(message, from)),
+      body: JSON.stringify(payload),
     });
 
     const body = await response.text();
 
     if (!response.ok) {
+      // The sender is quoted back because Resend's complaints about it describe
+      // the rule rather than the value, and the value is the thing that is
+      // wrong. It is a public address, not a credential — the key never appears.
       throw new Error(
-        `resend refused the send (HTTP ${response.status}): ${summariseBody(body)}`,
+        `resend refused the send (HTTP ${response.status}) from ${JSON.stringify(payload.from)}: ${summariseBody(body)}`,
       );
     }
 
