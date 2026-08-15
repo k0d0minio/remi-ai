@@ -1,7 +1,7 @@
 # Intake — the ordered backlog to bring Remi AI to production level
 
 > This folder follows the estate-wide ticket standard (`.icm/intake/`, canonical spec:
-> `_system/TICKETS-SPEC.md` in the Apps estate). Estate conventions on top of the ticket
+> `_system/contracts/TICKETS.md` in the Apps estate). Estate conventions on top of the ticket
 > format described below: an optional `Status` row (`ready` → `today` → `in-progress` →
 > `blocked`; missing = `ready`; `today` marks the day's worklist), and finished tickets
 > are `git mv`'d to `_done/` rather than edited — **by the PR that implements them**.
