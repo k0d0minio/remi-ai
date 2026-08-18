@@ -12,8 +12,8 @@
 
 ## Problem statement
 
-The braindump states the AI priorities directly: *stabilité des workflows, cohérence des résultats,
-gestion des erreurs, suivi des coûts par génération, qualité des recommandations* — and an
+The braindump states the AI priorities directly: _stabilité des workflows, cohérence des résultats,
+gestion des erreurs, suivi des coûts par génération, qualité des recommandations_ — and an
 architecture of "appels IA ciblés" with "limitation des coûts de génération". This is not a
 performance nicety. V2 is self-funded and capped around €10k, and the two most-used features in the
 product ("Améliore mon assiette", the daily hub) are both AI calls on the critical path.

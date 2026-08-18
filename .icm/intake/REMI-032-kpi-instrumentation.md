@@ -17,8 +17,8 @@ practitioners, 100–300 active users, €2,000–5,000 monthly recurring revenu
 three months.
 
 None of it is measured today. Instrumenting after the beta means the beta produces impressions
-rather than evidence — and the whole point of the founding-practitioner phase is *validation
-terrain*, which requires numbers.
+rather than evidence — and the whole point of the founding-practitioner phase is _validation
+terrain_, which requires numbers.
 
 ## Required steps
 

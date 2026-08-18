@@ -12,8 +12,8 @@
 
 ## Problem statement
 
-The braindump asks for two lightweight communication features whose purpose is *maintenir le lien
-motivationnel entre les consultations*: quick feedback — encouragements, emojis, short messages —
+The braindump asks for two lightweight communication features whose purpose is _maintenir le lien
+motivationnel entre les consultations_: quick feedback — encouragements, emojis, short messages —
 and group messages to several patients at once (advice, reminders, educational content).
 
 The word doing the work is _rapide_. A practitioner with forty patients will use a one-tap

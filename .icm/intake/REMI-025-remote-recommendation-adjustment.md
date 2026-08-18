@@ -13,8 +13,8 @@
 ## Problem statement
 
 Seeing that a patient is struggling is only half of it. The braindump asks that the practitioner be
-able to *ajuster les recommandations, modifier les règles, et regénérer le plan d'accompagnement à
-distance* — without waiting for the next consultation.
+able to _ajuster les recommandations, modifier les règles, et regénérer le plan d'accompagnement à
+distance_ — without waiting for the next consultation.
 
 That is the loop REMI exists to close: the practitioner recommends, REMI executes daily, the
 practitioner sees what happened, adjusts, and REMI executes the adjusted version. Everything else

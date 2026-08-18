@@ -14,8 +14,8 @@
 
 This is what practitioners pay for. Not the patient app — the visibility. The braindump is explicit
 that the practitioner dashboard is _le chantier le plus stratégique de REMI_, and priority №2 is
-making REMI indispensable between two consultations: *gain de temps, visibilité sur l'adhérence,
-amélioration du suivi, fidélisation patient*.
+making REMI indispensable between two consultations: _gain de temps, visibilité sur l'adhérence,
+amélioration du suivi, fidélisation patient_.
 
 The cohort view is the front door: every patient, adherence at a glance, and — the part that
 actually saves time — **who is struggling**, surfaced without the practitioner having to go
