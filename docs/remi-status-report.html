@@ -1,0 +1,597 @@
+<title>REMI Direction Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+
+<style>
+  :root {
+    --paper:      #FBFCFB;
+    --surface:    #F2F5F3;
+    --surface-2:  #E7ECE9;
+    --ink:        #14201E;
+    --ink-soft:   #3A4A46;
+    --muted:      #5E706B;
+    --rule:       #D3DCD8;
+    --rule-soft:  #E4EAE7;
+    --accent:     #0F6E5C;
+    --accent-dim: #0F6E5C1a;
+    --critical:   #A62E1B;
+    --crit-dim:   #A62E1B14;
+    --warn:       #8A5D06;
+    --warn-dim:   #8A5D0614;
+    --good:       #1F6B44;
+    --good-dim:   #1F6B4414;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #0E1614;
+      --surface:    #16211F;
+      --surface-2:  #1E2B28;
+      --ink:        #E6EDEA;
+      --ink-soft:   #BCC9C5;
+      --muted:      #8B9C97;
+      --rule:       #2A3936;
+      --rule-soft:  #1F2C29;
+      --accent:     #5CC5A8;
+      --accent-dim: #5CC5A81f;
+      --critical:   #E8836E;
+      --crit-dim:   #E8836E1a;
+      --warn:       #D9A441;
+      --warn-dim:   #D9A4411a;
+      --good:       #63BE8C;
+      --good-dim:   #63BE8C1a;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #0E1614;
+    --surface:    #16211F;
+    --surface-2:  #1E2B28;
+    --ink:        #E6EDEA;
+    --ink-soft:   #BCC9C5;
+    --muted:      #8B9C97;
+    --rule:       #2A3936;
+    --rule-soft:  #1F2C29;
+    --accent:     #5CC5A8;
+    --accent-dim: #5CC5A81f;
+    --critical:   #E8836E;
+    --crit-dim:   #E8836E1a;
+    --warn:       #D9A441;
+    --warn-dim:   #D9A4411a;
+    --good:       #63BE8C;
+    --good-dim:   #63BE8C1a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Source Sans 3", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    margin: 0;
+    padding: 0 1.5rem 6rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 62rem; margin: 0 auto; display: flex; flex-direction: column; gap: 3.25rem; }
+  .col  { max-width: 40rem; display: flex; flex-direction: column; gap: 1.1rem; }
+
+  h1, h2, h3 {
+    font-family: "Fraunces", Georgia, "Times New Roman", serif;
+    text-wrap: balance;
+    margin: 0;
+    line-height: 1.15;
+    font-weight: 600;
+  }
+  h1 { font-size: clamp(2.3rem, 5.5vw, 3.4rem); letter-spacing: -.02em; font-weight: 700; }
+  h2 { font-size: clamp(1.6rem, 3.4vw, 2.15rem); letter-spacing: -.015em; }
+  h3 { font-size: 1.3rem; letter-spacing: -.01em; }
+  h4 { font-size: 1.05rem; font-family: "Source Sans 3", sans-serif; font-weight: 700; margin: 0; }
+
+  p { margin: 0; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+  strong { font-weight: 700; color: var(--ink); }
+  em { font-style: italic; }
+
+  .eyebrow {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .lede { font-size: 1.16rem; color: var(--ink-soft); line-height: 1.6; }
+
+  header.masthead {
+    padding-top: 4rem;
+    display: flex; flex-direction: column; gap: 1.4rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2.5rem;
+  }
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: .5rem 1.5rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .72rem; color: var(--muted); letter-spacing: .04em;
+  }
+
+  section { display: flex; flex-direction: column; gap: 1.75rem; }
+  .part-head {
+    display: flex; flex-direction: column; gap: .6rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--ink);
+  }
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+  table { border-collapse: collapse; width: 100%; font-size: .92rem; min-width: 34rem; }
+  th {
+    text-align: left;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .66rem; text-transform: uppercase; letter-spacing: .1em;
+    color: var(--muted); font-weight: 600;
+    padding: .7rem .9rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  td { padding: .7rem .9rem; border-bottom: 1px solid var(--rule-soft); vertical-align: top; line-height: 1.45; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .pill {
+    display: inline-block;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .64rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    padding: .18rem .5rem; border-radius: 2px; white-space: nowrap;
+    border: 1px solid transparent;
+  }
+  .pill.good { color: var(--good);     background: var(--good-dim); border-color: var(--good); }
+  .pill.warn { color: var(--warn);     background: var(--warn-dim); border-color: var(--warn); }
+  .pill.crit { color: var(--critical); background: var(--crit-dim); border-color: var(--critical); }
+  .pill.none { color: var(--muted);    background: var(--surface);  border-color: var(--rule); }
+
+  .callout {
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    background: var(--accent-dim);
+    padding: 1.1rem 1.3rem;
+    border-radius: 3px;
+    display: flex; flex-direction: column; gap: .6rem;
+  }
+  .callout.crit { border-left-color: var(--critical); background: var(--crit-dim); }
+  .callout.warn { border-left-color: var(--warn); background: var(--warn-dim); }
+  .callout .callout-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .66rem; text-transform: uppercase; letter-spacing: .12em;
+    font-weight: 600; color: var(--accent);
+  }
+  .callout.crit .callout-label { color: var(--critical); }
+  .callout.warn .callout-label { color: var(--warn); }
+
+  .q { display: flex; flex-direction: column; gap: 1.2rem; padding: 1.75rem 0 0; border-top: 1px solid var(--rule); }
+  .q-head { display: flex; gap: 1rem; align-items: baseline; }
+  .q-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .78rem; font-weight: 600; color: var(--accent);
+    flex: none; padding-top: .25rem;
+  }
+  .q-ask {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.32rem; font-weight: 600; line-height: 1.25; letter-spacing: -.01em;
+  }
+  .q-fr {
+    font-style: italic; color: var(--muted); font-size: .93rem;
+    border-left: 2px solid var(--rule); padding-left: .9rem; line-height: 1.5;
+  }
+  .q-body { display: flex; flex-direction: column; gap: 1.1rem; }
+  @media (min-width: 42rem) { .q-body { padding-left: 3.1rem; } }
+
+  .verdict {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.08rem; line-height: 1.5;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1rem 1.2rem;
+  }
+
+  ul.clean { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .7rem; }
+  ul.clean > li { padding-left: 1.15rem; position: relative; }
+  ul.clean > li::before {
+    content: ""; position: absolute; left: 0; top: .68em;
+    width: .38rem; height: .38rem; background: var(--accent); border-radius: 50%;
+  }
+
+  ol.steps { padding-left: 0; margin: 0; list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 1rem; }
+  ol.steps > li { counter-increment: s; padding-left: 2.4rem; position: relative; }
+  ol.steps > li::before {
+    content: counter(s);
+    position: absolute; left: 0; top: 0;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .72rem; font-weight: 600; color: var(--accent);
+    border: 1px solid var(--rule); background: var(--surface);
+    width: 1.6rem; height: 1.6rem;
+    display: grid; place-items: center; border-radius: 2px;
+  }
+
+  .phase {
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--surface);
+    padding: 1.3rem 1.4rem;
+    display: flex; flex-direction: column; gap: .8rem;
+  }
+  .phase .phase-tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .68rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .phase h3 { font-size: 1.15rem; }
+  .phases { display: flex; flex-direction: column; gap: 1rem; }
+
+  footer.end {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.5rem;
+    color: var(--muted); font-size: .85rem;
+    display: flex; flex-direction: column; gap: .5rem;
+  }
+
+  code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .84em;
+    background: var(--surface-2);
+    padding: .1em .35em;
+    border-radius: 2px;
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Rebuilt from Morgane's braindump · 40 documents, received 18 August 2026</div>
+    <h1>REMI Direction Report</h1>
+    <p class="lede">Morgane's braindump is now in the project and it is the source of truth for what REMI is. This report reads the whole of it, answers her questions plainly, is honest about where what we built diverges from her vision, and proposes the plan that replaces the old one. The old task list has been wiped — this page explains why and what comes next.</p>
+    <div class="meta-row">
+      <span>18 August 2026</span>
+      <span>Startup Boost closes 15 September — 28 days</span>
+      <span>everything cited from docs/morgane-braindump/</span>
+    </div>
+  </header>
+
+  <!-- ============ THE PRODUCT ============ -->
+  <section>
+    <div class="part-head col">
+      <span class="eyebrow">Part one</span>
+      <h2>What REMI actually is, in Morgane's own words</h2>
+    </div>
+
+    <div class="col">
+      <p class="verdict">REMI is not a nutrition app. It is the <strong>"last kilometre"</strong> between a health practitioner and a patient's everyday life: the practitioner recommends, and REMI turns those recommendations into small, concrete, daily actions the patient can actually do. The whole product exists to close one gap — the gap between <em>"I know what I should do"</em> and <em>"I actually do it."</em></p>
+
+      <p>Three things define the product now, and all three come from lessons learned the hard way with version 1:</p>
+
+      <ul class="clean">
+        <li><strong>The practitioner is the centre of everything.</strong> REMI started as an app sold directly to patients. It pivoted: practitioners (nutritionists, dietitians, functional-medicine doctors) are now the customers, the prescribers, and the acquisition channel. They pay a monthly subscription; their patients arrive through them — via a QR code or an invitation — at almost zero acquisition cost. Patients get a free version, with a paid premium tier later.</li>
+        <li><strong>No more rigid meal plans.</strong> V1 imposed plans and asked users to fill a 7-day food diary before getting anything back. People quit. V2 flips the model: the user says what they're about to eat, and REMI instantly suggests a realistic improvement — adapted to their practitioner's recommendations, their tastes, budget, time, and family life — and explains <em>why</em>. Morgane's rule for V2: <strong>deliver value in under 60 seconds.</strong></li>
+        <li><strong>Small steps, not transformations.</strong> The unit of progress is the "micro-action": something doable in minutes ("tomorrow morning, swap your usual bread for buckwheat bread"), with the reasoning attached. Adherence over ambition.</li>
+      </ul>
+
+      <h3>What V2 must contain</h3>
+      <p>The braindump is precise about this. On the patient side: an ultra-simple onboarding (the 7-day diary is explicitly killed), the central <strong>"Améliore mon assiette"</strong> feature ("improve my plate"), a daily hub, a <em>"je mange autre chose"</em> mode for when real life doesn't match the plan, a smart supplement journal, and micro-actions with their "why". On the practitioner side — which Morgane calls <em>the most strategic build of all</em>: a dashboard showing each patient's adherence at a glance, a detailed per-patient view, the ability to adjust recommendations remotely, quick encouragements, and group messages. And one technical centrepiece: a <strong>recommendation parser</strong> that reads a practitioner's PDF or consultation notes and turns them automatically into structured rules REMI can act on.</p>
+
+      <h3>The numbers she is steering by</h3>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>What</th><th>Target (from the braindump)</th><th>Status note</th></tr></thead>
+        <tbody>
+          <tr><td>V2 launch</td><td>mid-2026</td><td><span class="pill warn">Slipped</span> — it is August and V2 is not launched; worth acknowledging together and re-dating</td></tr>
+          <tr><td>Beta pilot</td><td>~15 founding practitioners, feedback every two weeks</td><td><span class="pill none">Planned</span> — this is where the "15 practitioners" figure everywhere actually comes from: a recruitment target, not signed contracts</td></tr>
+          <tr><td>First-year adoption</td><td>10–30 active practitioners, 100–300 active users</td><td><span class="pill none">Ahead of us</span></td></tr>
+          <tr><td>First revenue</td><td>€2,000–5,000/month recurring; retention &gt;50% at 3 months</td><td><span class="pill none">Ahead of us</span></td></tr>
+          <tr><td>Pricing (reflections, not final)</td><td>Practitioners: €39 / €79 / €199 per month (Starter / Growth / Clinic). Patients: free, premium ~€9.99</td><td><span class="pill warn">Replaces</span> the €24.50 figure that circulated in the codebase — that number was never real</td></tr>
+          <tr><td>Budget</td><td>Self-funded, V2 deliberately capped around €10k</td><td><span class="pill warn">Constraint</span> — the build must be sized to this</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ THE GAP ============ -->
+  <section>
+    <div class="part-head col">
+      <span class="eyebrow">Part two</span>
+      <h2>Where what we built diverges from her vision</h2>
+    </div>
+
+    <div class="col">
+      <p>Being straight about this matters more than being comfortable: <strong>everything built so far was built on assumptions about the product, and the braindump has now replaced those assumptions.</strong> Some of the work transfers well. Some of it doesn't.</p>
+
+      <h3>What transfers</h3>
+      <ul class="clean">
+        <li><strong>The engineering foundation is sound and reusable.</strong> Clean structure, good conventions, working email delivery, protected code review. None of that is wasted regardless of direction.</li>
+        <li><strong>Supabase, which Morgane names as V2's base, fits.</strong> Her braindump says V2 runs on "Supabase, simplified AI workflows, targeted AI calls, cost control". The codebase was deliberately built so the database and login system could be plugged in later without rework — Supabase can be that plug. This also quietly resolves a debate that had been going back and forth in our docs (Neon vs Supabase): <strong>her document settles it — Supabase.</strong></li>
+        <li><strong>The general shape</strong> — a patient app plus a practitioner space plus an admin view — matches what she describes.</li>
+      </ul>
+
+      <h3>What doesn't</h3>
+      <ul class="clean">
+        <li><strong>The old backlog was pointed at the wrong product.</strong> Its feature list was reconstructed from the deleted V1 code: a psychological scoring questionnaire, a genetics interpretation engine, weekly plan generation. <strong>None of those appear in Morgane's V2 priorities.</strong> Her V2 is "improve my plate", the daily hub, micro-actions, the practitioner dashboard, and the parser. (Genetics appears only as a far-future idea, "REMI Genetics".) Building the old list would have spent the ~€10k budget on the wrong things.</li>
+        <li><strong>Six separate websites is heavier than a ~€10k, validate-fast project needs.</strong> The current setup runs six deployed apps (product, marketing site, admin, docs, support centre, demo). Morgane's priority №1 is radical simplicity and fast iteration. A leaner surface — product, practitioner space, one marketing page — deserves discussion. Not a decision for this report; a conversation for the call.</li>
+        <li><strong>The "signed pilot" never existed.</strong> Demo data in the admin console (15 practitioners, €24.50/month, billing from 1 September) was mistaken by an earlier audit for a real contract and turned into a deadline. The braindump confirms the truth: the 15 practitioners are a <em>beta recruitment target</em>. There is no billing deadline and no revenue yet. All work items built on that fiction have been removed.</li>
+      </ul>
+
+      <div class="callout">
+        <span class="callout-label">The backlog reset</span>
+        <p>The 33 open tickets in the project's task list have been <strong>wiped in this change</strong>. They were derived from the audit and the V1 reconstruction — both now superseded. The six completed tickets stay (that work was real and remains valid: security exposure closed, contact form wired, code review protections on). Every removed ticket stays recoverable in the project history. The replacement plan is Part four, below — new tickets get cut from it once you've reviewed it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ANSWERS ============ -->
+  <section>
+    <div class="part-head col">
+      <span class="eyebrow">Part three</span>
+      <h2>Answers to Morgane</h2>
+      <p class="lede">Both of her emails, answered in order. Written to be translated and defended, not just read.</p>
+    </div>
+
+    <!-- Q1 -->
+    <div class="q">
+      <div class="q-head">
+        <span class="q-num">Q1</span>
+        <span class="q-ask">Could REMI V2 meet the Startup Boost criteria?</span>
+      </div>
+      <div class="q-body">
+        <p class="q-fr">« Pourrais-tu me dire si, selon toi, la V2 de REMI pourrait correspondre aux critères de l'appel ? »</p>
+
+        <p><strong>Yes — REMI is a credible candidate, with two strong criteria, one weak one, and two eligibility facts to confirm before spending any more time on it.</strong> Startup Boost is a €100,000 convertible loan from Wallonie Entreprendre; the current call is themed AI &amp; cybersecurity and closes <strong>15 September</strong> — 28 days away.</p>
+
+        <h4>First, the two gates (facts, not arguments)</h4>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Requirement</th><th>Where we stand</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>Company less than 3 years old</td><td>Almost certainly fine — the idea itself only dates from July 2025, so the company must be younger. The exact incorporation date should be in the shareholders' register you sent (it's a scanned PDF; please just confirm the date on it).</td><td><span class="pill good">Likely ok</span></td></tr>
+              <tr><td>Operating headquarters in the Walloon Region</td><td>Not stated anywhere in the braindump. If the company seat is in Brussels or Flanders, the application fails on eligibility no matter how good the pitch. One line from you settles it.</td><td><span class="pill crit">Must confirm</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>Then the five criteria, honestly scored</h4>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Criterion (from the call)</th><th>How REMI argues it</th><th>Fit</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Sector-specific solutions addressing clearly identified business needs with tangible operational value</td>
+                <td><strong>REMI's strongest ground.</strong> The need is documented in your own field work: practitioners prescribe increasingly complex protocols, patients fail to apply them, and no existing tool covers the space between consultations. You tested the MVP with real FunMedDev patients and interviewed practitioners — the problem is validated, not assumed. The operational value is concrete: adherence visibility, time saved, patient retention.</td>
+                <td><span class="pill good">Strong</span></td>
+              </tr>
+              <tr>
+                <td>Strong scalability, replicable model, national/international markets</td>
+                <td><strong>Also strong.</strong> A subscription model where each practitioner brings their own patients is replicable by design — every new practitioner is a new distribution channel at near-zero acquisition cost. The braindump's mid-term plan (300 paying practitioners, European expansion) is exactly the shape this criterion asks for.</td>
+                <td><span class="pill good">Strong</span></td>
+              </tr>
+              <tr>
+                <td>Sovereign AI — control over key technologies, strategic data, critical infrastructure</td>
+                <td><strong>Arguable, if we make it true before claiming it.</strong> We control the platform, can host all data in the EU, and can choose a European AI model provider. Health-behaviour data accumulated over time becomes a strategic asset we own. But none of that is deployed yet — it's a posture we can commit to, not a fact we can show. Claim it as a commitment, backed by concrete choices (EU hosting, EU processing agreements), not as an achievement.</td>
+                <td><span class="pill warn">Conditional</span></td>
+              </tr>
+              <tr>
+                <td>Deeptech with proprietary IP, beyond mere integration of existing tools</td>
+                <td><strong>The weak point, and the one a jury will probe.</strong> The call explicitly excludes "projects primarily integrating third-party technologies" and "generic chatbots relying on existing models". Today, REMI's technical reality is standard tools plus AI calls. What is genuinely ours: the behavioural method (micro-actions, progressive transition, the "why" layer), the recommendation parser that turns practitioner documents into structured rules, and — over time — the adherence dataset nobody else has. That is real know-how, but it is thinner than "deeptech". Recommendation: lead the pitch on the two strong criteria, present the parser and behaviour engine as the proprietary core in development, and never overclaim.</td>
+                <td><span class="pill crit">Weak — handle with care</span></td>
+              </tr>
+              <tr>
+                <td>Innovative cybersecurity</td>
+                <td>Not REMI's field. Skip it; applying under a criterion you can't defend costs credibility on the ones you can.</td>
+                <td><span class="pill none">N/A</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-label">One thing we must not do</span>
+          <p>We have <strong>no paying customers and no signed pilot</strong> — the "15 practitioners with signed terms" that appeared in our internal documents was demo data, since corrected. What we <em>can</em> honestly claim: real user tests with FunMedDev patients, validated practitioner interest, a planned founding-practitioner beta, and an incubator already accompanying the project. That's a normal early-stage story. Inventing more than that in front of a public-funding jury would be discovered and would be fatal.</p>
+        </div>
+
+        <p><strong>Bottom line:</strong> worth applying if the Walloon seat is confirmed — with a pitch led by market need and scalability, an honest "in development" framing of the proprietary tech, and the P&amp;L your accountant will need to produce (the pitch deck must include financial projections).</p>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q">
+      <div class="q-head">
+        <span class="q-num">Q2</span>
+        <span class="q-ask">The arguments, structured so you can defend them in front of the jury</span>
+      </div>
+      <div class="q-body">
+        <p class="q-fr">« …une explication claire et structurée des éléments qui permettent à REMI d'y répondre, afin que je puisse bien comprendre les arguments à mettre en avant et être capable de les défendre correctement devant le jury. »</p>
+
+        <p>Five arguments, in the order to make them. Each one is sourced from your own material, so you can defend every sentence.</p>
+
+        <ol class="steps">
+          <li><strong>The problem is proven, and it's behavioural, not informational.</strong> "Patients don't lack information — they fail to apply it. We tested our first version with real patients from a functional-medicine clinic and watched exactly where they drop off: too much effort before any value, too rigid, too much mental load. That field learning is our unfair advantage — we know why health apps lose people."</li>
+          <li><strong>We occupy an empty space: the last kilometre.</strong> "Practice-management software manages the cabinet. Nutrition apps count calories. Nothing manages what actually happens between two consultations — whether the patient applies anything. REMI is built exclusively for that gap."</li>
+          <li><strong>The business model makes the practitioner our distribution.</strong> "We don't buy patients with ads. Practitioners subscribe (€39–199/month), and each brings their patient base through a QR code. Acquisition cost near zero, credibility built in, retention anchored in a human relationship. That's what makes the model replicable city by city, country by country."</li>
+          <li><strong>The technology in development is genuinely ours.</strong> "Two proprietary components: a parser that converts a practitioner's PDF or notes into structured, actionable rules — and a behavioural engine that turns those rules into daily micro-actions with the reasoning attached. Over time, the adherence data this generates — what people actually manage to change, and what makes them give up — becomes an asset nobody else in this market holds."</li>
+          <li><strong>Sovereignty is a design commitment we can demonstrate.</strong> "Health data stays in the EU. Our infrastructure and AI-provider choices are being made on that basis, and it's written into how the V2 is built — not retrofitted after growth."</li>
+        </ol>
+
+        <p><strong>And the honest answers to the two hard questions the jury will ask.</strong> <em>"Isn't this just an app calling an AI model?"</em> — "The model is a commodity; the parser, the behavioural method, and the practitioner–patient data loop are not. That's where the work and the value are." <em>"What traction?"</em> — "Field-tested MVP with clinic patients, validated practitioner demand from interviews, a founding-practitioner beta of ~15 launching with the V2, incubator support in place. Revenue starts with the V2 — that's precisely what this financing accelerates."</p>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="q">
+      <div class="q-head">
+        <span class="q-num">Q3</span>
+        <span class="q-ask">Our tools, our needs, and what they cost</span>
+      </div>
+      <div class="q-body">
+        <p class="q-fr">« J'aimerais aussi qu'on fasse le point sur les différents outils et programmes que nous utilisons déjà ou dont nous aurons besoin pour la suite : Supabase, DigitalOcean, Mistral, Euria, etc. »</p>
+
+        <p>Here's the full picture — including a surprise: <strong>three of the four tools you named don't appear anywhere in the codebase, and don't appear in your own braindump either.</strong> So we need to reconcile lists on the call.</p>
+
+        <h4>What the new codebase actually uses today</h4>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Tool</th><th>What it does for us</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Vercel</strong></td><td>Hosts all the websites</td><td><span class="pill good">Live</span></td></tr>
+              <tr><td><strong>GitHub</strong></td><td>The code, with review protections on</td><td><span class="pill good">Live</span></td></tr>
+              <tr><td><strong>Resend</strong></td><td>Sends email (the contact form works through it)</td><td><span class="pill good">Live</span></td></tr>
+              <tr><td><strong>Supabase</strong></td><td>Your braindump names it as V2's base (database, login, storage). Not connected yet in the new codebase — the code was built ready to plug it in.</td><td><span class="pill warn">To connect</span></td></tr>
+              <tr><td>AI model provider</td><td>Needed for "improve my plate" and the parser. None connected yet; the choice is open — and if sovereignty matters for Startup Boost, a European provider (e.g. Mistral) strengthens that story.</td><td><span class="pill warn">To choose</span></td></tr>
+              <tr><td>Payment provider</td><td>Needed for practitioner subscriptions when monetisation starts. Nothing chosen.</td><td><span class="pill none">Later</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>The tools you named that I can't find</h4>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Your list</th><th>What I found</th><th>Question for you</th></tr></thead>
+            <tbody>
+              <tr><td><strong>DigitalOcean</strong></td><td>Nowhere — not in the code, not in the braindump.</td><td>Is something still running (and billing) there from V1? If so, whose account, and can we get access or shut it down?</td></tr>
+              <tr><td><strong>Mistral</strong></td><td>Nowhere.</td><td>In use somewhere, or a plan? As said above — as a European AI provider it would genuinely help the sovereignty argument, so if you were leaning that way, good instinct.</td></tr>
+              <tr><td><strong>Euria</strong></td><td>Nowhere, and I won't guess what it is.</td><td>What is it, what's it for, and are we paying for it?</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>What V1 ran on — accounts that may still be billing</h4>
+        <p>The old version used <strong>Supabase</strong> (its whole backend), <strong>OpenRouter</strong> (AI calls), <strong>LlamaParse</strong> (PDF reading), <strong>Brevo</strong> (email), and <strong>Lovable</strong> (the build platform). Each of those is potentially a card being charged monthly for a product that no longer runs. One important question rides on the V1 Supabase project specifically: <strong>does it still hold real patients' health data from the FunMedDev tests?</strong> If yes, that's a data-protection obligation we need to deal with regardless of anything else.</p>
+
+        <p><strong>On costs:</strong> I've deliberately not written numbers I can't verify. The way to get the real monthly figure is either the invoices, or adding me to each account. Suggested outcome of the call: one shared sheet — tool / who owns the account / what it's for / still billing? / €/month. Half an hour, done once, and the "vision claire des coûts" you asked for exists permanently.</p>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="q">
+      <div class="q-head">
+        <span class="q-num">Q4</span>
+        <span class="q-ask">The OneNote, and being on the same wavelength</span>
+      </div>
+      <div class="q-body">
+        <p class="q-fr">« Avais-tu bien reçu mon OneNote ? … faire le point sur REMI afin de nous assurer que nous sommes sur la même longueur d'onde. »</p>
+        <p><strong>Received — and it changed everything, in the best way.</strong> The braindump (all 40 documents) is now stored in the project itself and has been adopted as the single source of truth for what REMI is. Concretely, "same wavelength" now means: the old work plan built on assumptions has been retired, and the new plan below is derived line by line from your documents. The remaining gaps are the short list of questions in this report — the Walloon seat, the incorporation date, the three mystery tools, the V1 data — plus the accesses you already offered to send (Lovable, GitHub, and ideally Vercel and the V1 Supabase).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NEW PLAN ============ -->
+  <section>
+    <div class="part-head col">
+      <span class="eyebrow">Part four</span>
+      <h2>A new plan: phases for the next ticket set</h2>
+      <p class="lede">The old backlog is gone. This is the proposed replacement, built from the braindump's own priorities — simplicity first, practitioner dashboard as the strategic centre, value in 60 seconds, ~€10k discipline. Once you've both reviewed it, each phase gets cut into concrete tickets.</p>
+    </div>
+
+    <div class="phases">
+      <div class="phase">
+        <span class="phase-tag">Phase A · Decide &amp; clear the ground — days</span>
+        <h3>Align the project with the braindump</h3>
+        <ul class="clean">
+          <li>Adopt Supabase officially (your document names it; the code is ready to receive it) — one decision, closes an old internal debate.</li>
+          <li>Freeze the V2 scope to the braindump's feature list: improve-my-plate, daily hub, "je mange autre chose", supplement journal, micro-actions + why, practitioner dashboard, parser. Nothing else enters V2.</li>
+          <li>Decide how much of the current six-site setup survives — recommendation: product + practitioner space + one marketing page for now; park the rest.</li>
+          <li>Answer the Startup Boost gates (seat, incorporation date) and decide go / no-go on the application — before the dossier consumes September.</li>
+          <li>Settle the V1 estate: check the old Supabase for real patient data, close or claim the old vendor accounts.</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <span class="phase-tag">Phase B · Foundation — 1–2 weeks</span>
+        <h3>Real accounts, real data, safety nets</h3>
+        <ul class="clean">
+          <li>Connect Supabase: database + login (practitioner accounts, patient accounts, the invite/QR link between them).</li>
+          <li>Data model for the V2 loop: patient profile, practitioner, recommendation, rule, micro-action, feedback — matching the braindump's concepts, not V1's.</li>
+          <li>Data protection groundwork <em>before</em> the first real record: EU hosting, processing agreements, retention rules. Health data — non-negotiable.</li>
+          <li>Basic test coverage and crash reporting, so the beta doesn't debug itself through practitioners.</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <span class="phase-tag">Phase C · The patient core loop — the heart of V2</span>
+        <h3>Value in under 60 seconds</h3>
+        <ul class="clean">
+          <li>Ultra-simple onboarding — most-frequent-foods based, first micro-action generated immediately; no 7-day diary.</li>
+          <li><strong>"Améliore mon assiette"</strong>: user says what they'll eat → analysis against their practitioner's recommendations → one concrete improvement → the "why".</li>
+          <li>Daily hub + "je mange autre chose" mode (works with what's actually in the fridge).</li>
+          <li>Supplement journal with reminders; micro-action tracking that feeds the practitioner view.</li>
+          <li>AI cost discipline from day one: targeted calls, per-generation cost tracking, retry/error handling — your own stated priorities.</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <span class="phase-tag">Phase D · The practitioner dashboard — the strategic build</span>
+        <h3>What makes practitioners subscribe</h3>
+        <ul class="clean">
+          <li>Cohort view: all patients, adherence at a glance, who's struggling.</li>
+          <li>Per-patient detail: actions done, difficulties, food habits, feedback.</li>
+          <li>Adjust recommendations remotely; regenerate the patient's guidance.</li>
+          <li>Quick feedback (encouragements, emojis, short messages) and group messages to several patients.</li>
+          <li>QR / invite-link patient onboarding — the acquisition mechanism itself.</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <span class="phase-tag">Phase E · The parser — the proprietary core</span>
+        <h3>Practitioner documents → structured rules</h3>
+        <ul class="clean">
+          <li>Upload a PDF / consultation notes → extract recommendations → structured food rules → feed the patient loop automatically.</li>
+          <li>Start narrow (the formats your beta practitioners actually produce), widen later.</li>
+          <li>This is also the strongest "proprietary technology" exhibit for Startup Boost — building it early serves the pitch and the product at once.</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <span class="phase-tag">Phase F · Money &amp; the beta — validation</span>
+        <h3>First revenue, real usage</h3>
+        <ul class="clean">
+          <li>Payments: practitioner subscriptions (Starter/Growth/Clinic tiers), patient premium later.</li>
+          <li>Recruit and onboard the ~15 founding practitioners; two-week feedback cycles, as your workflow describes.</li>
+          <li>Instrument the KPIs from your own list: daily/monthly actives, adherence rate, retention at J+7/30/90, practitioner usage.</li>
+          <li>Target: the braindump's own first milestones — 10–30 active practitioners, €2–5k monthly recurring revenue.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="callout">
+        <span class="callout-label">How Startup Boost fits this plan</span>
+        <p>If the application goes ahead, it runs in parallel with Phase A/B — it's writing and financial-projection work (Morgane + accountant + me for the technical annexes), not engineering. Phases C–E are precisely what the €100k would accelerate, which makes the funding ask easy to justify: "finish the execution engine and run the founding-practitioner beta at full speed."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ASKS ============ -->
+  <section>
+    <div class="part-head col">
+      <span class="eyebrow">Part five</span>
+      <h2>The short list we still need from Morgane</h2>
+    </div>
+    <div class="col">
+      <ol class="steps">
+        <li><strong>Walloon seat — yes or no?</strong> Decides the Startup Boost application by itself.</li>
+        <li><strong>Incorporation date</strong> — probably on the shareholders' register you sent; just confirm the date.</li>
+        <li><strong>DigitalOcean, Mistral, Euria</strong> — what are they, who owns them, are they billing?</li>
+        <li><strong>The V1 Supabase project</strong> — does it still hold real patient data from the FunMedDev tests?</li>
+        <li><strong>The accesses you offered</strong> — Lovable and GitHub, plus Vercel and the V1 Supabase if possible. Invitations as a user, never passwords by email.</li>
+      </ol>
+      <p>Everything else in this report can move without waiting on these.</p>
+    </div>
+  </section>
+
+  <footer class="end">
+    <p>Prepared 18 August 2026, from the 40 documents in docs/morgane-braindump/ (adopted as source of truth), the current codebase, and the published Startup Boost call. The shareholders' register PDF is a scan and couldn't be machine-read — the incorporation facts in it still need a human eye.</p>
+    <p>Changes made alongside this report: the 33 old work tickets were removed (recoverable in project history); the six completed ones were kept; the task-list README now explains the reset and points here.</p>
+  </footer>
+
+</div>
