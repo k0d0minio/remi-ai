@@ -1,20 +1,20 @@
 # REMI-030 · Practitioner subscriptions — first revenue
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | blocked — pricing not confirmed, no payment provider chosen         |
-| **Type**       | feature                                                             |
+|                |                                                                                |
+| -------------- | ------------------------------------------------------------------------------ |
+| Status         | blocked — pricing not confirmed, no payment provider chosen                    |
+| **Type**       | feature                                                                        |
 | **Priority**   | P1 — Phase F; no contractual date exists, despite what older documents claimed |
-| **Size**       | Weeks                                                               |
-| **Depends on** | REMI-013, REMI-023                                                  |
-| **Blocked by** | A pricing decision and a payment provider                           |
-| **Sources**    | Status report Phase F bullet 1 · `.icm/docs/braindump/business/pricing.md` |
+| **Size**       | Weeks                                                                          |
+| **Depends on** | REMI-013, REMI-023                                                             |
+| **Blocked by** | A pricing decision and a payment provider                                      |
+| **Sources**    | Status report Phase F bullet 1 · `.icm/docs/braindump/business/pricing.md`     |
 
 ## Problem statement
 
 REMI has no revenue and no payment vendor — no code, no seam, not even a reserved variable name.
 The braindump proposes practitioner tiers at **Starter €39 / Growth €79 / Clinic €199** per month,
-with a patient premium around **€9.99** later, and it labels these *réflexions*, not decisions.
+with a patient premium around **€9.99** later, and it labels these _réflexions_, not decisions.
 
 Worth stating plainly, because older documents in this repository said otherwise: **there is no
 billing deadline.** The "signed pilot at €24.50/month from 1 September" was demo fixture data. This

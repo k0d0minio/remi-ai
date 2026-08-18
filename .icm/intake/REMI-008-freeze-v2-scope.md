@@ -1,14 +1,14 @@
 # REMI-008 · Freeze the V2 scope to the braindump, and fix the docs that contradict it
 
-|                |                                                                                                   |
-| -------------- | --------------------------------------------------------------------------------------------------- |
-| Status         | ready                                                                                             |
-| **Type**       | chore + decision-support                                                                          |
-| **Priority**   | P0 — Phase A; the ~€10k budget is spent wrongly for as long as the old scope is documented        |
-| **Size**       | Half a day                                                                                        |
-| **Depends on** | —                                                                                                 |
-| **Blocked by** | —                                                                                                 |
-| **Sources**    | Status report Phase A bullet 2 and Part two · `.icm/docs/braindump/roadmap/features.md`           |
+|                |                                                                                            |
+| -------------- | ------------------------------------------------------------------------------------------ |
+| Status         | ready                                                                                      |
+| **Type**       | chore + decision-support                                                                   |
+| **Priority**   | P0 — Phase A; the ~€10k budget is spent wrongly for as long as the old scope is documented |
+| **Size**       | Half a day                                                                                 |
+| **Depends on** | —                                                                                          |
+| **Blocked by** | —                                                                                          |
+| **Sources**    | Status report Phase A bullet 2 and Part two · `.icm/docs/braindump/roadmap/features.md`    |
 
 ## Problem statement
 
@@ -45,7 +45,7 @@ fix.
 
 - **Is the V2 launch date being re-dated?** The braindump says mid-2026; it is August and V2 is not
   launched. The report recommends acknowledging and re-dating it together. Do not invent a date.
-- **Are the braindump's prices final?** €39/€79/€199 and ~€9.99 are described as *réflexions*. The
+- **Are the braindump's prices final?** €39/€79/€199 and ~€9.99 are described as _réflexions_. The
   business pages should not present a proposal as a decision.
 - **Does the docs site stay public?** REMI-009 may retire it. Confirm before investing heavily in
   rewriting its pages.

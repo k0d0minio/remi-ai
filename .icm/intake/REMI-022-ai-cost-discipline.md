@@ -1,13 +1,13 @@
 # REMI-022 · AI cost discipline from day one
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | ready once an AI provider is chosen                                 |
-| **Type**       | feature (infrastructure)                                            |
-| **Priority**   | P0 — Phase C; retrofitting cost control after launch is how budgets die |
-| **Size**       | A few days                                                          |
-| **Depends on** | REMI-014 (the AI-generation record)                                 |
-| **Blocked by** | The AI provider choice (REMI-012)                                   |
+|                |                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------- |
+| Status         | ready once an AI provider is chosen                                                |
+| **Type**       | feature (infrastructure)                                                           |
+| **Priority**   | P0 — Phase C; retrofitting cost control after launch is how budgets die            |
+| **Size**       | A few days                                                                         |
+| **Depends on** | REMI-014 (the AI-generation record)                                                |
+| **Blocked by** | The AI provider choice (REMI-012)                                                  |
 | **Sources**    | Status report Phase C bullet 5 · `.icm/docs/braindump/developpement-produit/ai.md` |
 
 ## Problem statement

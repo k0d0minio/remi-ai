@@ -10,7 +10,7 @@ functionality is written down here, and nothing below assumes the code still exi
 
 > **Historical record — v1 is not the V2 spec.** This report was written on the assumption that
 > V2 would be a port of v1, feature by feature. The braindump replaced that assumption: V2 is
-> "Améliore mon assiette", the daily hub, "je mange autre chose", micro-actions with their *why*,
+> "Améliore mon assiette", the daily hub, "je mange autre chose", micro-actions with their _why_,
 > the practitioner dashboard, and the recommendation parser. The 7-day food diary is **explicitly
 > killed**, and rigid weekly plan generation, the psychological questionnaire and the
 > nutrigenomics engine are **not in V2's scope** (genetics survives only as the far-future "REMI

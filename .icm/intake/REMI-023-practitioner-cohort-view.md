@@ -1,19 +1,19 @@
 # REMI-023 · Practitioner cohort view — adherence at a glance
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | ready once Phase C produces adherence data                          |
-| **Type**       | feature                                                             |
+|                |                                                                                 |
+| -------------- | ------------------------------------------------------------------------------- |
+| Status         | ready once Phase C produces adherence data                                      |
+| **Type**       | feature                                                                         |
 | **Priority**   | P0 — Phase D; the braindump calls the dashboard the most strategic build of all |
-| **Size**       | A week                                                              |
-| **Depends on** | REMI-013, REMI-021 (the adherence signal), REMI-009 (where it lives) |
-| **Blocked by** | The practitioner-space decision in REMI-009                         |
-| **Sources**    | Status report Phase D bullet 1 · `.icm/docs/braindump/roadmap/features.md` |
+| **Size**       | A week                                                                          |
+| **Depends on** | REMI-013, REMI-021 (the adherence signal), REMI-009 (where it lives)            |
+| **Blocked by** | The practitioner-space decision in REMI-009                                     |
+| **Sources**    | Status report Phase D bullet 1 · `.icm/docs/braindump/roadmap/features.md`      |
 
 ## Problem statement
 
 This is what practitioners pay for. Not the patient app — the visibility. The braindump is explicit
-that the practitioner dashboard is *le chantier le plus stratégique de REMI*, and priority №2 is
+that the practitioner dashboard is _le chantier le plus stratégique de REMI_, and priority №2 is
 making REMI indispensable between two consultations: *gain de temps, visibilité sur l'adhérence,
 amélioration du suivi, fidélisation patient*.
 

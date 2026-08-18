@@ -1,13 +1,13 @@
 # REMI-015 · Data-protection groundwork before the first real health record
 
-|                |                                                                         |
-| -------------- | ------------------------------------------------------------------------- |
-| Status         | blocked — owner and legal work, prepared here                           |
-| **Type**       | decision-support + chore                                                |
-| **Priority**   | P0 — Phase B; it must be in place *before* the first real record exists |
-| **Size**       | A few days of owner time; a day of preparation                          |
-| **Depends on** | REMI-014 (the model has to be able to express retention and deletion)   |
-| **Blocked by** | Owner and counsel — the agent prepares, it does not sign                |
+|                |                                                                                        |
+| -------------- | -------------------------------------------------------------------------------------- |
+| Status         | blocked — owner and legal work, prepared here                                          |
+| **Type**       | decision-support + chore                                                               |
+| **Priority**   | P0 — Phase B; it must be in place _before_ the first real record exists                |
+| **Size**       | A few days of owner time; a day of preparation                                         |
+| **Depends on** | REMI-014 (the model has to be able to express retention and deletion)                  |
+| **Blocked by** | Owner and counsel — the agent prepares, it does not sign                               |
 | **Sources**    | Status report Phase B bullet 3 · audit F-34, D-5 · `.icm/docs/history/v1-report.md` §7 |
 
 ## Problem statement

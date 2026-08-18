@@ -1,13 +1,13 @@
 # REMI-028 · Collect the real practitioner document formats
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | blocked — needs real documents from real practitioners              |
-| **Type**       | chore (input gathering)                                             |
-| **Priority**   | P1 — Phase E; the parser cannot be scoped without it                |
-| **Size**       | A day, once documents arrive                                        |
-| **Depends on** | —                                                                   |
-| **Blocked by** | Real consultation documents, de-identified                          |
+|                |                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------- |
+| Status         | blocked — needs real documents from real practitioners                             |
+| **Type**       | chore (input gathering)                                                            |
+| **Priority**   | P1 — Phase E; the parser cannot be scoped without it                               |
+| **Size**       | A day, once documents arrive                                                       |
+| **Depends on** | —                                                                                  |
+| **Blocked by** | Real consultation documents, de-identified                                         |
 | **Sources**    | Status report Phase E bullet 2 · `.icm/docs/braindump/developpement-produit/ai.md` |
 
 ## Problem statement

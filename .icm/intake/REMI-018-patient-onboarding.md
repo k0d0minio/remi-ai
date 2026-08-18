@@ -1,13 +1,13 @@
 # REMI-018 · Ultra-simple patient onboarding — a first micro-action immediately
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | ready once Phase B lands                                            |
-| **Type**       | feature                                                             |
-| **Priority**   | P0 — Phase C; it is the first thing every patient meets             |
-| **Size**       | A week                                                              |
-| **Depends on** | REMI-013, REMI-014                                                  |
-| **Blocked by** | An AI provider, for the first micro-action                          |
+|                |                                                                                                     |
+| -------------- | --------------------------------------------------------------------------------------------------- |
+| Status         | ready once Phase B lands                                                                            |
+| **Type**       | feature                                                                                             |
+| **Priority**   | P0 — Phase C; it is the first thing every patient meets                                             |
+| **Size**       | A week                                                                                              |
+| **Depends on** | REMI-013, REMI-014                                                                                  |
+| **Blocked by** | An AI provider, for the first micro-action                                                          |
 | **Sources**    | Status report Phase C bullet 1 · `.icm/docs/braindump/roadmap/features.md`, `roadmap/court-term.md` |
 
 ## Problem statement
@@ -26,7 +26,7 @@ mental load), not informational.
 1. Design the shortest onboarding that can produce a useful first micro-action: the patient's most
    frequent foods, their practitioner's recommendations (arriving via the invite/QR binding), and
    the minimum context — tastes, budget, time available, family situation.
-2. Generate and show a first micro-action at the end of it, with its *why*. Not a summary, not a
+2. Generate and show a first micro-action at the end of it, with its _why_. Not a summary, not a
    plan: one concrete thing to do.
 3. Enforce the 60-second rule as a real constraint on the design, and instrument it so the claim
    can be checked against actual sessions.
@@ -49,7 +49,7 @@ mental load), not informational.
 
 ## Acceptance criteria
 
-- [ ] A new patient reaches a first, concrete micro-action with its *why* in under 60 seconds.
+- [ ] A new patient reaches a first, concrete micro-action with its _why_ in under 60 seconds.
 - [ ] No 7-day diary, and no multi-day wait, exists anywhere in the flow.
 - [ ] Health-data consent is captured before any health information is collected.
 - [ ] Allergies and intolerances are handled safely, wherever they are captured.

@@ -1,14 +1,14 @@
 # REMI-029 · The recommendation parser — practitioner documents into structured rules
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | ready once REMI-028 provides a corpus                               |
-| **Type**       | feature                                                             |
-| **Priority**   | P0 — Phase E; the proprietary core, and the Startup Boost exhibit    |
-| **Size**       | Weeks                                                               |
+|                |                                                                               |
+| -------------- | ----------------------------------------------------------------------------- |
+| Status         | ready once REMI-028 provides a corpus                                         |
+| **Type**       | feature                                                                       |
+| **Priority**   | P0 — Phase E; the proprietary core, and the Startup Boost exhibit             |
+| **Size**       | Weeks                                                                         |
 | **Depends on** | REMI-014 (the rule entity), REMI-022 (cost and safety), REMI-028 (the corpus) |
-| **Blocked by** | The corpus, and the AI provider choice                              |
-| **Sources**    | Status report Phase E · `.icm/docs/braindump/developpement-produit/ai.md` |
+| **Blocked by** | The corpus, and the AI provider choice                                        |
+| **Sources**    | Status report Phase E · `.icm/docs/braindump/developpement-produit/ai.md`     |
 
 ## Problem statement
 

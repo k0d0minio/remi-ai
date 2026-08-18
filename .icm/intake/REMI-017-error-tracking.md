@@ -1,14 +1,14 @@
 # REMI-017 · Wire error tracking and the missing safety nets
 
-|                |                                                                |
-| -------------- | ---------------------------------------------------------------- |
-| Status         | ready                                                          |
-| **Type**       | chore                                                          |
+|                |                                                                   |
+| -------------- | ----------------------------------------------------------------- |
+| Status         | ready                                                             |
+| **Type**       | chore                                                             |
 | **Priority**   | P0 — Phase B; the beta must not be debugged through practitioners |
-| **Size**       | A day                                                          |
-| **Depends on** | —                                                              |
-| **Blocked by** | An error-tracking account (Sentry or equivalent)               |
-| **Sources**    | Status report Phase B bullet 4 · audit F-27, F-28, F-29        |
+| **Size**       | A day                                                             |
+| **Depends on** | —                                                                 |
+| **Blocked by** | An error-tracking account (Sentry or equivalent)                  |
+| **Sources**    | Status report Phase B bullet 4 · audit F-27, F-28, F-29           |
 
 ## Problem statement
 

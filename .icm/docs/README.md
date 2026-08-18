@@ -13,13 +13,13 @@ holds both the knowledge and the work derived from it.
 When two documents disagree, the one higher in this list wins. This ordering is the whole point of
 the folder.
 
-| #   | Source                                                        | What it settles                                                                        |
-| --- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| 1   | [`braindump/`](braindump/)                                    | What REMI is: vision, positioning, pivots, the V2 feature set, business model, roadmap |
-| 2   | [`remi-status-report.html`](remi-status-report.html)          | The plan derived from it — Phases A–F — and the open questions still outstanding       |
-| 3   | [`correspondence/`](correspondence/)                          | What Morgane actually asked for, in her words                                          |
-| 4   | [`ENV.md`](ENV.md)                                            | Environment variables and secrets — the only catalogue                                 |
-| 5   | [`history/`](history/)                                        | Engineering findings and the v1 record. **Superseded wherever it touches direction.**  |
+| #   | Source                                               | What it settles                                                                        |
+| --- | ---------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| 1   | [`braindump/`](braindump/)                           | What REMI is: vision, positioning, pivots, the V2 feature set, business model, roadmap |
+| 2   | [`remi-status-report.html`](remi-status-report.html) | The plan derived from it — Phases A–F — and the open questions still outstanding       |
+| 3   | [`correspondence/`](correspondence/)                 | What Morgane actually asked for, in her words                                          |
+| 4   | [`ENV.md`](ENV.md)                                   | Environment variables and secrets — the only catalogue                                 |
+| 5   | [`history/`](history/)                               | Engineering findings and the v1 record. **Superseded wherever it touches direction.**  |
 
 ## The contents
 
@@ -58,11 +58,11 @@ The single catalogue of environment variables and secrets. The three-list rule
 
 ### `history/` — retained, but not authoritative on direction
 
-| File                                                | Still load-bearing for                                                              | Superseded on                                                       |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
-| [`audit-report.md`](history/audit-report.md)        | Code-level findings F-01 … F-48, read out of the repository                         | What to build and in what order; anything about a pilot or billing  |
-| [`v1-report.md`](history/v1-report.md)              | The v1 estate (vendors, accounts, data), the schema/contract evidence, the defects   | v1 as V2's spec — the porting map is retired                        |
-| [`info-gathering.md`](history/info-gathering.md)    | The full inventory of accesses and documents still needed                            | Every row that rested on a signed pilot — struck in place           |
+| File                                             | Still load-bearing for                                                             | Superseded on                                                      |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| [`audit-report.md`](history/audit-report.md)     | Code-level findings F-01 … F-48, read out of the repository                        | What to build and in what order; anything about a pilot or billing |
+| [`v1-report.md`](history/v1-report.md)           | The v1 estate (vendors, accounts, data), the schema/contract evidence, the defects | v1 as V2's spec — the porting map is retired                       |
+| [`info-gathering.md`](history/info-gathering.md) | The full inventory of accesses and documents still needed                          | Every row that rested on a signed pilot — struck in place          |
 
 **What was wrong in them.** All three were written before the braindump, and an earlier audit read
 demo fixture data in the admin console as fact: a signed pilot of fifteen practitioners at

@@ -1,13 +1,13 @@
 # REMI-025 · Adjust recommendations remotely and regenerate the patient's guidance
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | ready once REMI-024 lands                                           |
-| **Type**       | feature                                                             |
-| **Priority**   | P0 — Phase D; it is what closes the loop between consultations       |
-| **Size**       | A week                                                              |
-| **Depends on** | REMI-014, REMI-019, REMI-024                                        |
-| **Blocked by** | —                                                                   |
+|                |                                                                            |
+| -------------- | -------------------------------------------------------------------------- |
+| Status         | ready once REMI-024 lands                                                  |
+| **Type**       | feature                                                                    |
+| **Priority**   | P0 — Phase D; it is what closes the loop between consultations             |
+| **Size**       | A week                                                                     |
+| **Depends on** | REMI-014, REMI-019, REMI-024                                               |
+| **Blocked by** | —                                                                          |
 | **Sources**    | Status report Phase D bullet 3 · `.icm/docs/braindump/roadmap/features.md` |
 
 ## Problem statement
@@ -25,7 +25,7 @@ in Phase D is visibility; this is the intervention.
 1. Let a practitioner edit a patient's recommendations and the structured rules derived from them.
 2. Regenerate the patient's guidance from the changed rules, so the next micro-action reflects the
    adjustment rather than the old protocol.
-3. Show the patient what changed and — consistent with the whole product — *why*.
+3. Show the patient what changed and — consistent with the whole product — _why_.
 4. Keep a history. Who changed what and when is both clinically useful and part of REMI-014's audit
    trail.
 5. Do not let an edit silently invalidate something the patient has already been asked to do

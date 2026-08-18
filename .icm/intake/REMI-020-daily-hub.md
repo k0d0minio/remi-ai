@@ -1,13 +1,13 @@
 # REMI-020 · The daily hub and "je mange autre chose"
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | ready once REMI-019 lands                                           |
-| **Type**       | feature                                                             |
-| **Priority**   | P1 — Phase C; it is what makes REMI a daily reflex rather than a tool |
-| **Size**       | A week                                                              |
-| **Depends on** | REMI-019                                                            |
-| **Blocked by** | —                                                                   |
+|                |                                                                            |
+| -------------- | -------------------------------------------------------------------------- |
+| Status         | ready once REMI-019 lands                                                  |
+| **Type**       | feature                                                                    |
+| **Priority**   | P1 — Phase C; it is what makes REMI a daily reflex rather than a tool      |
+| **Size**       | A week                                                                     |
+| **Depends on** | REMI-019                                                                   |
+| **Blocked by** | —                                                                          |
 | **Sources**    | Status report Phase C bullet 3 · `.icm/docs/braindump/roadmap/features.md` |
 
 ## Problem statement
@@ -23,7 +23,7 @@ compatible with their recommendations, in the moment. Braindump priority №5 is
 
 ## Required steps
 
-1. Build the daily hub: today's micro-action with its *why*, what has already been done, and a
+1. Build the daily hub: today's micro-action with its _why_, what has already been done, and a
    recipe that fits the patient's actual constraints.
 2. Build "je mange autre chose": input what is genuinely available, receive a compatible
    alternative immediately.

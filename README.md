@@ -65,7 +65,7 @@ see where everything stands. The map is [`pipeline/CONTEXT.md`](pipeline/CONTEXT
 | Code style, design system, git    | [`CONVENTIONS.md`](CONVENTIONS.md)                       |
 | Repo identity and routing         | [`CLAUDE.md`](CLAUDE.md)                                 |
 | The delivery pipeline             | [`pipeline/CONTEXT.md`](pipeline/CONTEXT.md)             |
-| Environment variables and secrets | [`.icm/docs/ENV.md`](.icm/docs/ENV.md)                             |
+| Environment variables and secrets | [`.icm/docs/ENV.md`](.icm/docs/ENV.md)                   |
 | Rules for one app or package      | that subtree's `AGENTS.md`                               |
 | What the product is and does      | `apps/docs` — business direction and technical reference |
 

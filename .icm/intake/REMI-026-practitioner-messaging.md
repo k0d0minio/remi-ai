@@ -1,13 +1,13 @@
 # REMI-026 · Quick feedback and group messages
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | ready once REMI-023 lands                                           |
-| **Type**       | feature                                                             |
-| **Priority**   | P1 — Phase D                                                        |
-| **Size**       | Half a week                                                         |
-| **Depends on** | REMI-023                                                            |
-| **Blocked by** | —                                                                   |
+|                |                                                                            |
+| -------------- | -------------------------------------------------------------------------- |
+| Status         | ready once REMI-023 lands                                                  |
+| **Type**       | feature                                                                    |
+| **Priority**   | P1 — Phase D                                                               |
+| **Size**       | Half a week                                                                |
+| **Depends on** | REMI-023                                                                   |
+| **Blocked by** | —                                                                          |
 | **Sources**    | Status report Phase D bullet 4 · `.icm/docs/braindump/roadmap/features.md` |
 
 ## Problem statement
@@ -16,7 +16,7 @@ The braindump asks for two lightweight communication features whose purpose is *
 motivationnel entre les consultations*: quick feedback — encouragements, emojis, short messages —
 and group messages to several patients at once (advice, reminders, educational content).
 
-The word doing the work is *rapide*. A practitioner with forty patients will use a one-tap
+The word doing the work is _rapide_. A practitioner with forty patients will use a one-tap
 encouragement and will not use an inbox. The design constraint is that sending must cost seconds,
 not minutes.
 

@@ -1,19 +1,19 @@
 # REMI-009 · Decide how much of the six-app estate survives
 
-|                |                                                                                       |
-| -------------- | --------------------------------------------------------------------------------------- |
-| Status         | blocked — owner decision                                                              |
-| **Type**       | decision-support                                                                      |
-| **Priority**   | P1 — Phase A; cheap to defer, expensive to keep paying for                            |
-| **Size**       | Half a day of analysis, then whatever the decision costs                              |
-| **Depends on** | —                                                                                     |
-| **Blocked by** | An owner decision — this ticket prepares it, it does not make it                      |
+|                |                                                                                           |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| Status         | blocked — owner decision                                                                  |
+| **Type**       | decision-support                                                                          |
+| **Priority**   | P1 — Phase A; cheap to defer, expensive to keep paying for                                |
+| **Size**       | Half a day of analysis, then whatever the decision costs                                  |
+| **Depends on** | —                                                                                         |
+| **Blocked by** | An owner decision — this ticket prepares it, it does not make it                          |
 | **Sources**    | Status report Phase A bullet 3 and Part two · `.icm/docs/braindump/roadmap/priorities.md` |
 
 ## Problem statement
 
 Six deployed apps — product, marketing, admin, docs, support, demo — is a heavy surface for a
-self-funded project capped around €10k whose stated priority №1 is *simplifier radicalement*. Each
+self-funded project capped around €10k whose stated priority №1 is _simplifier radicalement_. Each
 one is a Vercel project, a deployment to keep green, a set of environment variables, and a surface
 that can drift from the others.
 

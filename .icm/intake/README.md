@@ -21,72 +21,72 @@ data. They were wiped in one commit and remain recoverable in git history. The s
 
 ## The phases
 
-| Phase | What it is                            | Tickets           |
-| ----- | ------------------------------------- | ----------------- |
-| **A** | Decide and clear the ground — days    | REMI-007 … 012    |
-| **B** | Foundation — 1–2 weeks                | REMI-013 … 017    |
-| **C** | The patient core loop — the heart of V2 | REMI-018 … 022  |
+| Phase | What it is                                       | Tickets        |
+| ----- | ------------------------------------------------ | -------------- |
+| **A** | Decide and clear the ground — days               | REMI-007 … 012 |
+| **B** | Foundation — 1–2 weeks                           | REMI-013 … 017 |
+| **C** | The patient core loop — the heart of V2          | REMI-018 … 022 |
 | **D** | The practitioner dashboard — the strategic build | REMI-023 … 027 |
-| **E** | The parser — the proprietary core     | REMI-028, 029     |
-| **F** | Money and the beta — validation       | REMI-030 … 032    |
-| **∥** | Startup Boost, in parallel with A/B   | REMI-010, 033     |
+| **E** | The parser — the proprietary core                | REMI-028, 029  |
+| **F** | Money and the beta — validation                  | REMI-030 … 032 |
+| **∥** | Startup Boost, in parallel with A/B              | REMI-010, 033  |
 
 ### Phase A · Decide & clear the ground
 
-| Ticket                                                          | What                                                        |
-| --------------------------------------------------------------- | ------------------------------------------------------------- |
-| [REMI-007](REMI-007-adopt-supabase.md)                          | Adopt Supabase officially; close the Neon question          |
-| [REMI-008](REMI-008-freeze-v2-scope.md)                         | Freeze the V2 scope; fix the docs that contradict it        |
-| [REMI-009](REMI-009-estate-footprint.md)                        | Decide how much of the six-app estate survives              |
-| [REMI-010](REMI-010-startup-boost-gates.md)                     | Startup Boost eligibility gates and go / no-go              |
-| [REMI-011](REMI-011-v1-estate.md)                               | Settle the v1 estate — old data first, then the accounts    |
-| [REMI-012](REMI-012-tool-and-cost-register.md)                  | Build the tool and cost register                            |
+| Ticket                                         | What                                                     |
+| ---------------------------------------------- | -------------------------------------------------------- |
+| [REMI-007](REMI-007-adopt-supabase.md)         | Adopt Supabase officially; close the Neon question       |
+| [REMI-008](REMI-008-freeze-v2-scope.md)        | Freeze the V2 scope; fix the docs that contradict it     |
+| [REMI-009](REMI-009-estate-footprint.md)       | Decide how much of the six-app estate survives           |
+| [REMI-010](REMI-010-startup-boost-gates.md)    | Startup Boost eligibility gates and go / no-go           |
+| [REMI-011](REMI-011-v1-estate.md)              | Settle the v1 estate — old data first, then the accounts |
+| [REMI-012](REMI-012-tool-and-cost-register.md) | Build the tool and cost register                         |
 
 ### Phase B · Foundation
 
-| Ticket                                                          | What                                                        |
-| --------------------------------------------------------------- | ------------------------------------------------------------- |
-| [REMI-013](REMI-013-connect-supabase.md)                        | Connect Supabase — database and authentication              |
-| [REMI-014](REMI-014-v2-data-model.md)                           | Model the V2 loop                                           |
-| [REMI-015](REMI-015-data-protection-groundwork.md)              | Data-protection groundwork before the first real record     |
-| [REMI-016](REMI-016-test-harness.md)                            | Stand up the test harness                                   |
-| [REMI-017](REMI-017-error-tracking.md)                          | Wire error tracking and the missing safety nets             |
+| Ticket                                             | What                                                    |
+| -------------------------------------------------- | ------------------------------------------------------- |
+| [REMI-013](REMI-013-connect-supabase.md)           | Connect Supabase — database and authentication          |
+| [REMI-014](REMI-014-v2-data-model.md)              | Model the V2 loop                                       |
+| [REMI-015](REMI-015-data-protection-groundwork.md) | Data-protection groundwork before the first real record |
+| [REMI-016](REMI-016-test-harness.md)               | Stand up the test harness                               |
+| [REMI-017](REMI-017-error-tracking.md)             | Wire error tracking and the missing safety nets         |
 
 ### Phase C · The patient core loop
 
-| Ticket                                                          | What                                                        |
-| --------------------------------------------------------------- | ------------------------------------------------------------- |
-| [REMI-018](REMI-018-patient-onboarding.md)                      | Ultra-simple onboarding — a first micro-action immediately  |
-| [REMI-019](REMI-019-ameliore-mon-assiette.md)                   | "Améliore mon assiette" — the central V2 feature            |
-| [REMI-020](REMI-020-daily-hub.md)                               | The daily hub and "je mange autre chose"                    |
-| [REMI-021](REMI-021-supplement-journal-and-tracking.md)         | Smart supplement journal and micro-action tracking          |
-| [REMI-022](REMI-022-ai-cost-discipline.md)                      | AI cost discipline from day one                             |
+| Ticket                                                  | What                                                       |
+| ------------------------------------------------------- | ---------------------------------------------------------- |
+| [REMI-018](REMI-018-patient-onboarding.md)              | Ultra-simple onboarding — a first micro-action immediately |
+| [REMI-019](REMI-019-ameliore-mon-assiette.md)           | "Améliore mon assiette" — the central V2 feature           |
+| [REMI-020](REMI-020-daily-hub.md)                       | The daily hub and "je mange autre chose"                   |
+| [REMI-021](REMI-021-supplement-journal-and-tracking.md) | Smart supplement journal and micro-action tracking         |
+| [REMI-022](REMI-022-ai-cost-discipline.md)              | AI cost discipline from day one                            |
 
 ### Phase D · The practitioner dashboard
 
-| Ticket                                                          | What                                                        |
-| --------------------------------------------------------------- | ------------------------------------------------------------- |
-| [REMI-023](REMI-023-practitioner-cohort-view.md)                | Cohort view — adherence at a glance                         |
-| [REMI-024](REMI-024-patient-detail-view.md)                     | Per-patient detail view                                     |
-| [REMI-025](REMI-025-remote-recommendation-adjustment.md)        | Adjust recommendations remotely and regenerate guidance     |
-| [REMI-026](REMI-026-practitioner-messaging.md)                  | Quick feedback and group messages                           |
-| [REMI-027](REMI-027-qr-invite-onboarding.md)                    | QR and invite-link onboarding — the acquisition mechanism   |
+| Ticket                                                   | What                                                      |
+| -------------------------------------------------------- | --------------------------------------------------------- |
+| [REMI-023](REMI-023-practitioner-cohort-view.md)         | Cohort view — adherence at a glance                       |
+| [REMI-024](REMI-024-patient-detail-view.md)              | Per-patient detail view                                   |
+| [REMI-025](REMI-025-remote-recommendation-adjustment.md) | Adjust recommendations remotely and regenerate guidance   |
+| [REMI-026](REMI-026-practitioner-messaging.md)           | Quick feedback and group messages                         |
+| [REMI-027](REMI-027-qr-invite-onboarding.md)             | QR and invite-link onboarding — the acquisition mechanism |
 
 ### Phase E · The parser
 
-| Ticket                                                          | What                                                        |
-| --------------------------------------------------------------- | ------------------------------------------------------------- |
-| [REMI-028](REMI-028-collect-practitioner-documents.md)          | Collect the real practitioner document formats              |
-| [REMI-029](REMI-029-recommendation-parser.md)                   | The recommendation parser — documents into structured rules |
+| Ticket                                                 | What                                                        |
+| ------------------------------------------------------ | ----------------------------------------------------------- |
+| [REMI-028](REMI-028-collect-practitioner-documents.md) | Collect the real practitioner document formats              |
+| [REMI-029](REMI-029-recommendation-parser.md)          | The recommendation parser — documents into structured rules |
 
 ### Phase F · Money and the beta
 
-| Ticket                                                          | What                                                        |
-| --------------------------------------------------------------- | ------------------------------------------------------------- |
-| [REMI-030](REMI-030-practitioner-subscriptions.md)              | Practitioner subscriptions — first revenue                  |
-| [REMI-031](REMI-031-founding-practitioner-beta.md)              | Recruit and onboard the ~15 founding practitioners          |
-| [REMI-032](REMI-032-kpi-instrumentation.md)                     | Instrument the KPIs                                         |
-| [REMI-033](REMI-033-startup-boost-dossier.md)                   | Write the Startup Boost dossier (if REMI-010 says go)       |
+| Ticket                                             | What                                                  |
+| -------------------------------------------------- | ----------------------------------------------------- |
+| [REMI-030](REMI-030-practitioner-subscriptions.md) | Practitioner subscriptions — first revenue            |
+| [REMI-031](REMI-031-founding-practitioner-beta.md) | Recruit and onboard the ~15 founding practitioners    |
+| [REMI-032](REMI-032-kpi-instrumentation.md)        | Instrument the KPIs                                   |
+| [REMI-033](REMI-033-startup-boost-dossier.md)      | Write the Startup Boost dossier (if REMI-010 says go) |
 
 ## Open questions are deliberate
 

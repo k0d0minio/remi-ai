@@ -1,14 +1,14 @@
 # REMI-007 · Adopt Supabase officially and close the database question
 
-|                |                                                                                                  |
-| -------------- | ------------------------------------------------------------------------------------------------ |
-| Status         | ready                                                                                            |
-| **Type**       | decision + chore                                                                                 |
-| **Priority**   | P0 — Phase A; every Phase B ticket is blocked behind it                                          |
-| **Size**       | An hour                                                                                          |
-| **Depends on** | —                                                                                                |
-| **Blocked by** | —                                                                                                |
-| **Sources**    | Status report Phase A bullet 1 · `.icm/docs/braindump/developpement-produit/ai.md` · audit D-2   |
+|                |                                                                                                |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| Status         | ready                                                                                          |
+| **Type**       | decision + chore                                                                               |
+| **Priority**   | P0 — Phase A; every Phase B ticket is blocked behind it                                        |
+| **Size**       | An hour                                                                                        |
+| **Depends on** | —                                                                                              |
+| **Blocked by** | —                                                                                              |
+| **Sources**    | Status report Phase A bullet 1 · `.icm/docs/braindump/developpement-produit/ai.md` · audit D-2 |
 
 ## Problem statement
 

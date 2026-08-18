@@ -1,13 +1,13 @@
 # REMI-031 · Recruit and onboard the ~15 founding practitioners
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | ready once Phases C and D are usable                                |
-| **Type**       | chore + feature                                                     |
-| **Priority**   | P0 — Phase F; validation is the point of the whole V2                |
-| **Size**       | Ongoing                                                             |
-| **Depends on** | REMI-027 (the onboarding mechanism), Phases C and D                 |
-| **Blocked by** | A product a practitioner can actually be given                      |
+|                |                                                                                                      |
+| -------------- | ---------------------------------------------------------------------------------------------------- |
+| Status         | ready once Phases C and D are usable                                                                 |
+| **Type**       | chore + feature                                                                                      |
+| **Priority**   | P0 — Phase F; validation is the point of the whole V2                                                |
+| **Size**       | Ongoing                                                                                              |
+| **Depends on** | REMI-027 (the onboarding mechanism), Phases C and D                                                  |
+| **Blocked by** | A product a practitioner can actually be given                                                       |
 | **Sources**    | Status report Phase F bullet 2 · `.icm/docs/braindump/developpement-produit/workflow.md`, `tests.md` |
 
 ## Problem statement
@@ -18,7 +18,7 @@ anything. Earlier documents in this repository treated the number as a contract;
 The braindump's pilot workflow is specific: select the practitioners, define duration, price and
 conditions, onboard them, use it in real conditions, take feedback **every two weeks**, analyse the
 blockages, adjust, and validate the key features. Priority №3 is validating real usage before
-scaling — this is that validation, and it is the mechanism by which V2 gets built *with*
+scaling — this is that validation, and it is the mechanism by which V2 gets built _with_
 practitioners rather than at them.
 
 ## Required steps

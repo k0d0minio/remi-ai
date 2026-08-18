@@ -1,13 +1,13 @@
 # REMI-021 · Smart supplement journal and micro-action tracking
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | ready once Phase B lands                                            |
-| **Type**       | feature                                                             |
-| **Priority**   | P1 — Phase C; it is what the practitioner dashboard actually reads   |
-| **Size**       | A week                                                              |
-| **Depends on** | REMI-014, REMI-018                                                  |
-| **Blocked by** | —                                                                   |
+|                |                                                                            |
+| -------------- | -------------------------------------------------------------------------- |
+| Status         | ready once Phase B lands                                                   |
+| **Type**       | feature                                                                    |
+| **Priority**   | P1 — Phase C; it is what the practitioner dashboard actually reads         |
+| **Size**       | A week                                                                     |
+| **Depends on** | REMI-014, REMI-018                                                         |
+| **Blocked by** | —                                                                          |
 | **Sources**    | Status report Phase C bullet 4 · `.icm/docs/braindump/roadmap/features.md` |
 
 ## Problem statement
@@ -21,7 +21,7 @@ protocols from more than one.
 
 **Micro-action tracking** is the adherence signal itself. Every micro-action completed, skipped or
 marked difficult is what makes the practitioner's cohort view (REMI-023) possible. Without it the
-dashboard has nothing to show and the whole practitioner proposition — *visibilité sur l'adhérence*
+dashboard has nothing to show and the whole practitioner proposition — _visibilité sur l'adhérence_
 — is empty.
 
 ## Required steps
@@ -30,7 +30,7 @@ dashboard has nothing to show and the whole practitioner proposition — *visibi
    nagging at a fixed hour.
 2. Standardise the supplement model across practitioners so two protocols do not produce two
    incompatible representations.
-3. Micro-action tracking: done, skipped, or difficult — and *why it was difficult*, which is the
+3. Micro-action tracking: done, skipped, or difficult — and _why it was difficult_, which is the
    part the practitioner actually needs.
 4. Make the difficulty signal cheap to give. A patient who has to write a paragraph will write
    nothing.

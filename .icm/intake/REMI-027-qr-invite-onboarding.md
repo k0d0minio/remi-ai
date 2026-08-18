@@ -1,13 +1,13 @@
 # REMI-027 · QR and invite-link patient onboarding — the acquisition mechanism
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | ready once REMI-013 lands                                           |
-| **Type**       | feature                                                             |
-| **Priority**   | P0 — Phase D; this *is* the business model, not a convenience        |
-| **Size**       | Half a week                                                         |
-| **Depends on** | REMI-013 (the practitioner↔patient binding), REMI-018               |
-| **Blocked by** | —                                                                   |
+|                |                                                                                                     |
+| -------------- | --------------------------------------------------------------------------------------------------- |
+| Status         | ready once REMI-013 lands                                                                           |
+| **Type**       | feature                                                                                             |
+| **Priority**   | P0 — Phase D; this _is_ the business model, not a convenience                                       |
+| **Size**       | Half a week                                                                                         |
+| **Depends on** | REMI-013 (the practitioner↔patient binding), REMI-018                                               |
+| **Blocked by** | —                                                                                                   |
 | **Sources**    | Status report Phase D bullet 5 and Part one · `.icm/docs/braindump/marketing-growth/acquisition.md` |
 
 ## Problem statement

@@ -1,22 +1,22 @@
 # REMI-024 · Per-patient detail view for the practitioner
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | ready once REMI-023 lands                                           |
-| **Type**       | feature                                                             |
-| **Priority**   | P0 — Phase D                                                        |
-| **Size**       | A week                                                              |
-| **Depends on** | REMI-023                                                            |
-| **Blocked by** | —                                                                   |
+|                |                                                                            |
+| -------------- | -------------------------------------------------------------------------- |
+| Status         | ready once REMI-023 lands                                                  |
+| **Type**       | feature                                                                    |
+| **Priority**   | P0 — Phase D                                                               |
+| **Size**       | A week                                                                     |
+| **Depends on** | REMI-023                                                                   |
+| **Blocked by** | —                                                                          |
 | **Sources**    | Status report Phase D bullet 2 · `.icm/docs/braindump/roadmap/features.md` |
 
 ## Problem statement
 
-The cohort view says *who* needs attention; this one says *why*. The braindump asks for four things
+The cohort view says _who_ needs attention; this one says _why_. The braindump asks for four things
 a practitioner can see per patient: actions actually completed, difficulties encountered, food
 habits, and the patient's own feedback.
 
-This is where REMI earns *gain de temps*: a practitioner opening a consultation should already know
+This is where REMI earns _gain de temps_: a practitioner opening a consultation should already know
 what happened since the last one, without asking the patient to recall it.
 
 ## Required steps

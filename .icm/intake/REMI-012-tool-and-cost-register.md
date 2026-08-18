@@ -1,14 +1,14 @@
 # REMI-012 · Build the tool and cost register
 
-|                |                                                                        |
-| -------------- | ------------------------------------------------------------------------ |
-| Status         | blocked — needs answers on three unidentified tools                    |
-| **Type**       | chore                                                                  |
-| **Priority**   | P1 — Phase A; Morgane asked for "une vision claire des coûts"          |
-| **Size**       | Half a day, once the answers arrive                                    |
-| **Depends on** | REMI-011 (feeds the v1 vendor rows)                                    |
-| **Blocked by** | What DigitalOcean, Mistral and Euria are, and who owns them            |
-| **Sources**    | Status report Q3 · `.icm/docs/correspondence/02-onenote-and-tools.md`   |
+|                |                                                                       |
+| -------------- | --------------------------------------------------------------------- |
+| Status         | blocked — needs answers on three unidentified tools                   |
+| **Type**       | chore                                                                 |
+| **Priority**   | P1 — Phase A; Morgane asked for "une vision claire des coûts"         |
+| **Size**       | Half a day, once the answers arrive                                   |
+| **Depends on** | REMI-011 (feeds the v1 vendor rows)                                   |
+| **Blocked by** | What DigitalOcean, Mistral and Euria are, and who owns them           |
+| **Sources**    | Status report Q3 · `.icm/docs/correspondence/02-onenote-and-tools.md` |
 
 ## Problem statement
 

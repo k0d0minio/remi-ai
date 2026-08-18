@@ -1,14 +1,14 @@
 # REMI-014 · Model the V2 loop — practitioner, patient, recommendation, rule, micro-action, feedback
 
-|                |                                                                        |
-| -------------- | ------------------------------------------------------------------------ |
-| Status         | ready                                                                  |
-| **Type**       | feature (modelling)                                                    |
-| **Priority**   | P0 — Phase B; it shapes the schema, so it precedes the adapter         |
-| **Size**       | A few days                                                             |
-| **Depends on** | REMI-008 (scope frozen)                                                |
-| **Blocked by** | —                                                                      |
-| **Sources**    | Status report Phase B bullet 2 · audit F-14, F-16, F-17, F-18          |
+|                |                                                                |
+| -------------- | -------------------------------------------------------------- |
+| Status         | ready                                                          |
+| **Type**       | feature (modelling)                                            |
+| **Priority**   | P0 — Phase B; it shapes the schema, so it precedes the adapter |
+| **Size**       | A few days                                                     |
+| **Depends on** | REMI-008 (scope frozen)                                        |
+| **Blocked by** | —                                                              |
+| **Sources**    | Status report Phase B bullet 2 · audit F-14, F-16, F-17, F-18  |
 
 ## Problem statement
 
@@ -25,7 +25,7 @@ a specification — it belonged to a product with a 7-day diary and rigid weekly
 
 1. Model the V2 loop as its own thing: **practitioner**, **patient profile**, **recommendation**
    (what the practitioner prescribed), **rule** (the structured, machine-actionable form of it),
-   **micro-action** (what the patient is asked to do, with its *why*), and **feedback** (what came
+   **micro-action** (what the patient is asked to do, with its _why_), and **feedback** (what came
    back — done, skipped, difficult).
 2. Add the entities the docs already promised: the practitioner↔patient care relationship as a
    first-class record, consent capture with its timestamp, an audit trail, and an AI-generation

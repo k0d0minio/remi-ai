@@ -1,14 +1,14 @@
 # REMI-010 · Answer the Startup Boost eligibility gates and decide go / no-go
 
-|                |                                                                                        |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| Status         | blocked — needs two facts only the owner has                                           |
-| **Type**       | decision-support                                                                       |
-| **Priority**   | P0 — the call closes 15 September; the dossier would consume September                 |
-| **Size**       | An hour once the two facts arrive                                                      |
-| **Depends on** | —                                                                                      |
-| **Blocked by** | The Walloon-seat answer and the incorporation date                                     |
-| **Sources**    | Status report Q1 and Part five · `.icm/docs/correspondence/01-startup-boost.md`         |
+|                |                                                                                 |
+| -------------- | ------------------------------------------------------------------------------- |
+| Status         | blocked — needs two facts only the owner has                                    |
+| **Type**       | decision-support                                                                |
+| **Priority**   | P0 — the call closes 15 September; the dossier would consume September          |
+| **Size**       | An hour once the two facts arrive                                               |
+| **Depends on** | —                                                                               |
+| **Blocked by** | The Walloon-seat answer and the incorporation date                              |
+| **Sources**    | Status report Q1 and Part five · `.icm/docs/correspondence/01-startup-boost.md` |
 
 ## Problem statement
 

@@ -1,19 +1,19 @@
 # REMI-019 · "Améliore mon assiette" — the central V2 feature
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | ready once Phase B lands                                            |
-| **Type**       | feature                                                             |
-| **Priority**   | P0 — Phase C; this is the product                                   |
-| **Size**       | A week or more                                                      |
-| **Depends on** | REMI-013, REMI-014, REMI-018                                        |
-| **Blocked by** | An AI provider (REMI-012)                                           |
+|                |                                                                                                 |
+| -------------- | ----------------------------------------------------------------------------------------------- |
+| Status         | ready once Phase B lands                                                                        |
+| **Type**       | feature                                                                                         |
+| **Priority**   | P0 — Phase C; this is the product                                                               |
+| **Size**       | A week or more                                                                                  |
+| **Depends on** | REMI-013, REMI-014, REMI-018                                                                    |
+| **Blocked by** | An AI provider (REMI-012)                                                                       |
 | **Sources**    | Status report Phase C bullet 2 · `.icm/docs/braindump/developpement-produit/fonctionnalites.md` |
 
 ## Problem statement
 
 This is the feature REMI is for. The user says what they are about to eat; REMI analyses it against
-their practitioner's recommendations, proposes **one** concrete improvement, and explains the *why*.
+their practitioner's recommendations, proposes **one** concrete improvement, and explains the _why_.
 Not a plan, not a score, not a list of everything wrong with the meal — one realistic change,
 adapted to their tastes, budget, time and family life, with the reasoning attached.
 
@@ -27,7 +27,7 @@ recommended and what someone actually eats tonight.
 2. Analysis against the patient's active rules — the structured form of their practitioner's
    recommendations (REMI-014, later fed automatically by REMI-029).
 3. **One** improvement, concrete and immediately actionable. Resist returning a list.
-4. The *why*, always, in plain language. The braindump treats the explanation as load-bearing:
+4. The _why_, always, in plain language. The braindump treats the explanation as load-bearing:
    it is what builds understanding, adherence and autonomy.
 5. Respect the constraints that make a suggestion realistic: tastes, budget, time available, family
    context — and, non-negotiably, allergies and intolerances.
@@ -49,7 +49,7 @@ recommended and what someone actually eats tonight.
 
 ## Acceptance criteria
 
-- [ ] A patient can describe a meal and get one concrete improvement with its *why*.
+- [ ] A patient can describe a meal and get one concrete improvement with its _why_.
 - [ ] The suggestion respects the practitioner's rules and the patient's allergies without exception.
 - [ ] The interaction is recorded and visible to the practitioner.
 - [ ] Every AI call is cost-tracked and error-handled.

@@ -1,14 +1,14 @@
 # REMI-016 · Stand up the test harness
 
-|                |                                                                    |
-| -------------- | -------------------------------------------------------------------- |
-| Status         | ready                                                              |
-| **Type**       | chore                                                              |
-| **Priority**   | P0 — Phase B; do it *before* the first adapter, not with it        |
-| **Size**       | A day                                                              |
-| **Depends on** | —                                                                  |
-| **Blocked by** | —                                                                  |
-| **Sources**    | Status report Phase B bullet 4 · audit F-26                        |
+|                |                                                             |
+| -------------- | ----------------------------------------------------------- |
+| Status         | ready                                                       |
+| **Type**       | chore                                                       |
+| **Priority**   | P0 — Phase B; do it _before_ the first adapter, not with it |
+| **Size**       | A day                                                       |
+| **Depends on** | —                                                           |
+| **Blocked by** | —                                                           |
+| **Sources**    | Status report Phase B bullet 4 · audit F-26                 |
 
 ## Problem statement
 

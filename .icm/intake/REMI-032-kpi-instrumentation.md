@@ -1,13 +1,13 @@
 # REMI-032 · Instrument the KPIs
 
-|                |                                                                     |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | ready once Phase C produces usage                                   |
-| **Type**       | feature                                                             |
-| **Priority**   | P1 — Phase F; it must exist before the beta, not after              |
-| **Size**       | A week                                                              |
-| **Depends on** | REMI-021 (adherence), REMI-013                                      |
-| **Blocked by** | —                                                                   |
+|                |                                                                        |
+| -------------- | ---------------------------------------------------------------------- |
+| Status         | ready once Phase C produces usage                                      |
+| **Type**       | feature                                                                |
+| **Priority**   | P1 — Phase F; it must exist before the beta, not after                 |
+| **Size**       | A week                                                                 |
+| **Depends on** | REMI-021 (adherence), REMI-013                                         |
+| **Blocked by** | —                                                                      |
 | **Sources**    | Status report Phase F bullet 3 · `.icm/docs/braindump/business/kpi.md` |
 
 ## Problem statement
