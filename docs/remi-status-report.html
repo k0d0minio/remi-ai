@@ -418,7 +418,7 @@
           <tr><td>User-facing surface</td><td><span class="pill good">Good</span></td><td>45 pages built — web 10, demo 16, admin 9, marketing 6, support 4, plus the Nextra docs site. Design-system and FR/EN language discipline near 100%.</td></tr>
           <tr><td>Seams (db / email / AI)</td><td><span class="pill good">Good</span></td><td>Clean interfaces with registration points, so a vendor choice is one adapter rather than a rewrite. Ten domain models defined.</td></tr>
           <tr><td>Email delivery</td><td><span class="pill good">Live</span></td><td>The Resend adapter is the <strong>only working external integration in the product</strong>. Contact-form submissions now actually reach you.</td></tr>
-          <tr><td>CI &amp; merge gates</td><td><span class="pill good">Enforced</span></td><td>Three workflows; Quality required on every PR, no pre-approved merges, docs-only bypass closed.</td></tr>
+          <tr><td>CI &amp; merge gates</td><td><span class="pill warn">Built, currently red</span></td><td>Three workflows; Quality required on every PR, no pre-approved merges, docs-only bypass closed. The machinery is right — but the required check is failing on <code>main</code> today. See below.</td></tr>
           <tr><td>Secrets &amp; config</td><td><span class="pill good">Exemplary</span></td><td>Single env catalogue, names never values, nothing committed.</td></tr>
         </tbody>
       </table>
@@ -465,8 +465,9 @@
     </div>
 
     <div class="col">
-      <h3>Two drift findings from today's pass</h3>
+      <h3>Three findings from today's pass</h3>
       <ul class="clean">
+        <li><strong>The required Quality check is failing, so nothing can merge right now.</strong> <code>apps/marketing</code> does not typecheck: three errors in <code>feature-section.tsx</code> and <code>hero-section.tsx</code>, where the <code>Stagger</code> and <code>StaggerItem</code> wrappers arrive with required <code>any</code> props. The source in <code>packages/ui</code> is correctly typed — <code>className</code> and <code>gap</code> are both optional there — so this is not a source bug. <code>packages/ui/dist</code> is built rather than committed, and CI relies on Turborepo restoring that build from the shared remote cache; marketing typechecked against a stale or unrestored copy of those declarations. It reproduces on content identical to <code>main</code>, so it is not caused by any open branch. <strong>Until it is fixed, branch protection will hold every PR</strong> — worth an hour before anything else queues up behind it.</li>
         <li><strong>A broken row on the ticket index — now fixed.</strong> REMI-004 (contact-form delivery) shipped and its file was moved to <code>_done/</code>, but the index still pointed at the old path and did not carry the <strong>done</strong> marker. The board reads from <code>main</code>, so a finished ticket was showing as unstarted work behind a dead link. I corrected that one line; all 39 links now resolve. The audit had previously scored the docs at zero broken links, so this was a regression.</li>
         <li><strong>The database decision contradicts itself in three places — not fixed, because it is yours to make.</strong> The technical docs and the admin roadmap both state plainly that the choice is made: <em>"Le choix est fait : Neon."</em> But ticket REMI-022 lists itself as blocked by open decision D-2 (Neon vs Supabase), the intake board lists D-2 as unanswered, <strong>and Morgane's email names Supabase as something we already use.</strong> Three sources, three different answers. This is the highest-value thing to settle in your call — details in Q3 below.</li>
       </ul>
@@ -660,6 +661,7 @@
     </div>
     <div class="col">
       <ol class="steps">
+        <li><strong>Today — get CI green.</strong> The required Quality check is red on <code>main</code>, so branch protection is currently holding every merge. It looks like a stale <code>@remi/ui</code> build restored from the Turborepo cache rather than a source defect, so the fix is likely small. Nothing else can land until it clears.</li>
         <li><strong>This week — decide, do not build.</strong> Settle billing for 1 September (manual invoicing is the recommended answer and costs hours, not weeks), and confirm which price is binding. Settle D-2 on the database, which also answers authentication if it lands on Supabase. Neither needs code.</li>
         <li><strong>This week — send the requests register.</strong> It is written and it is blocking. Morgane has explicitly offered twice now to prepare everything in one go; take her up on it.</li>
         <li><strong>Confirm Startup Boost eligibility before investing in it.</strong> Two one-line facts — company age and Walloon seat — decide whether the dossier is worth a month of attention at all.</li>
@@ -676,7 +678,7 @@
   </section>
 
   <footer class="end">
-    <p>Prepared 18 August 2026 from the repository at commit 2c41e44, the pre-build audit, the v1 analysis, and the requests register. The only change made to the repository was correcting the stale REMI-004 row on the ticket index.</p>
+    <p>Prepared 18 August 2026 from the repository at commit 2c41e44, the pre-build audit, the v1 analysis, and the requests register. The only change made to the repository was correcting the stale REMI-004 row on the ticket index; the failing typecheck was diagnosed but deliberately not fixed here, since it sits in code this change does not touch.</p>
     <p>Figures for company age, Walloon registration, and all vendor costs are marked unknown rather than estimated — they need account access or an answer from Morgane and Arnaud.</p>
   </footer>
 
