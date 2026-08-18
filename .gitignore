@@ -25,3 +25,10 @@ storybook-static/
 
 # agent-local state
 .claude/settings.local.json
+
+# media — large binaries never enter git
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
