@@ -57,7 +57,7 @@ red-blocks the PR.
 
 ## 4 · Open items
 
-- **Error tracking.** Until a DSN is wired (`docs/ENV.md` → Not wired yet), a production exception
+- **Error tracking.** Until a DSN is wired (`.icm/docs/ENV.md` → Not wired yet), a production exception
   is invisible, and Verify's readiness pass has nothing to point at. Top unstarted ops item.
 - **A smoke suite.** Sign-in, each app's landing route, one write path. Would convert half of
   Verify's DoD checklist from operator-demonstrated to CI-enforced.

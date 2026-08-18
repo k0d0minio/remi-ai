@@ -65,7 +65,7 @@ PR. Recorded here because settings live outside the repo and are otherwise invis
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/history/audit-report.md
 findings F-22, F-23, F-45.
 
 Task: make "merge only on green, past a human gate" mechanically true.

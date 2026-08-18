@@ -166,7 +166,7 @@ discovering twenty thousand lines of drift in an audit two years from now.
   "might be useful" export is a rename-blocker that outlives whoever added it. When a symbol's last
   consumer goes, the symbol and its barrel line go too.
 - **No dead configuration.** A flag, env var or config key with no reader is deleted, not left
-  "in case". `docs/ENV.md` is the check: a variable not in that table does not exist.
+  "in case". `.icm/docs/ENV.md` is the check: a variable not in that table does not exist.
 
 ## Testing
 
@@ -183,7 +183,7 @@ discovering twenty thousand lines of drift in an audit two years from now.
 
 Every server-side `process.env` read goes through `env()` / `requireEnv()` in
 `packages/services/src/server/env.ts`. Adding a variable means three edits in the same PR: the zod
-schema, a row in [`docs/ENV.md`](docs/ENV.md), and a `globalEnv` entry in `turbo.json`. Values are
+schema, a row in [`.icm/docs/ENV.md`](.icm/docs/ENV.md), and a `globalEnv` entry in `turbo.json`. Values are
 never committed — they live in Vercel and in GitHub Actions secrets.
 
 ## The factory owns the checks — you do not

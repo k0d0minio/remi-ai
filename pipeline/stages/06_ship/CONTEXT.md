@@ -89,7 +89,7 @@ a one-line `Context budget:` note in `release.md`.
    ```
 
    Config from the environment (`RESEND_API_KEY`, `SHIP_NOTE_RECIPIENTS`, `SHIP_NOTE_FROM` /
-   `EMAIL_FROM` — see `docs/ENV.md`). Running Ship is the authorisation; the no-flag dry run exists
+   `EMAIL_FROM` — see `.icm/docs/ENV.md`). Running Ship is the authorisation; the no-flag dry run exists
    for debugging.
 
 7. **Close out.** Write `release.md` and tell the user the run is complete. The run folder stays on

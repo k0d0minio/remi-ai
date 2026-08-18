@@ -14,7 +14,7 @@ storybook-static/
 .turbo/
 .eslintcache
 
-# env — values never enter git; the catalogue of names lives in docs/ENV.md
+# env — values never enter git; the catalogue of names lives in .icm/docs/ENV.md
 .env
 .env.*
 !.env.example

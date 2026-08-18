@@ -23,6 +23,14 @@ from `initiatives/`, and a spec that contradicts `roles/` contradicts a document
 not an opinion. Where a page says a thing is not decided, that is the answer; a stage does not fill
 the gap by inventing one.
 
+> **These pages are outranked.** They were written before Morgane's braindump landed
+> (18 August 2026), and some of what they state — notably the pilot's pricing and dates — came from
+> demo fixture data and was never true. The source of truth for direction is
+> [`.icm/docs/braindump/`](../../.icm/docs/braindump/), with the plan in
+> [`.icm/docs/remi-status-report.html`](../../.icm/docs/remi-status-report.html). Where the two
+> disagree, `.icm/docs/` wins and the docs page is the thing to fix. Reconciling them is an open
+> intake ticket.
+
 ### Technical reference — `apps/docs/app/technical/`
 
 - `architecture/` — repository structure, technology stack, how a request flows

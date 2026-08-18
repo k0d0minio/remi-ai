@@ -8,12 +8,28 @@ untracked and **without any git history** — the folder carries no provenance b
 report, so this document is deliberately self-contained: everything needed to port the
 functionality is written down here, and nothing below assumes the code still exists.
 
-**How to use this document.** The companion `.icm/docs/audit-report.md` says what the new foundation
-needs before feature work (its section 2 checklist). This report says what the features _are_.
-The intended order: audit items first (test harness, error tracking, entity modelling, database
-adapter, auth), then port the v1 functionality feature by feature using sections 3–8 here as the
-spec. Section 9 maps every v1 feature onto the monorepo and onto the audit's findings; section 10
-lists what must _not_ be ported.
+> **Historical record — v1 is not the V2 spec.** This report was written on the assumption that
+> V2 would be a port of v1, feature by feature. The braindump replaced that assumption: V2 is
+> "Améliore mon assiette", the daily hub, "je mange autre chose", micro-actions with their *why*,
+> the practitioner dashboard, and the recommendation parser. The 7-day food diary is **explicitly
+> killed**, and rigid weekly plan generation, the psychological questionnaire and the
+> nutrigenomics engine are **not in V2's scope** (genetics survives only as the far-future "REMI
+> Genetics" idea). See [`.icm/docs/braindump/roadmap/features.md`](../braindump/roadmap/features.md)
+> and the plan in [`.icm/docs/remi-status-report.html`](../remi-status-report.html).
+
+**How to use this document.** Read it for **what exists and what was learned**, not for what to
+build. Three things in it remain live and load-bearing:
+
+1. **The v1 estate** (§5.3 vendors, §11) — accounts that may still be billing, and the question of
+   whether the old Supabase project still holds real patients' health data. Phase A owns this.
+2. **The technical shape** (§5.1 schema, §5.2 edge-function contract, §8 defects) — evidence of
+   which query and AI-call shapes a real implementation needs, and a catalogue of mistakes not to
+   repeat.
+3. **The domain knowledge** (§6) — the allergen/intolerance model and the progressive
+   phase-reduction rules still describe real product doctrine. The questionnaire and genotype
+   tables are recorded for provenance only; nothing in V2 consumes them.
+
+Section 9's porting map and sequencing have been retired — see the note in that section.
 
 ---
 
@@ -22,13 +38,16 @@ lists what must _not_ be ported.
 **v1 is a real, working product with a genuinely valuable core — and almost none of its code is
 worth carrying over.** What is worth carrying over, and is captured in full below, is:
 
-1. **The product definition** — a complete, coherent user journey from psychological onboarding
-   through medical-document ingestion to an AI-generated, guardian-validated 12-week nutrition
-   plan with a feedback loop. Nobody has to invent the product again; v1 _is_ the spec.
-2. **The domain knowledge** — the 20-question Nutrition Mindset questionnaire, the 7-profile
-   psychological scoring algorithm with per-profile coaching doctrine, the 26-rule
-   ApoE/DIO2/AMY1A nutrigenomic interpretation table, the EU-14 allergen model, and the
-   phase-reduction rules. This is irreplaceable and reproduced in section 6.
+1. ~~**The product definition** — v1 _is_ the spec.~~ **Retracted.** v1's journey (psychological
+   onboarding → document ingestion → a rigid 12-week plan) is precisely the product the braindump
+   pivoted away from: too much effort before any value, too rigid, and users quit. What v1
+   contributes here is the **negative** result — documented in
+   `.icm/docs/braindump/developpement-produit/tests.md` — and that is genuinely valuable, but it
+   is not a spec.
+2. **The domain knowledge** — the EU-14 allergen/intolerance model and the phase-reduction rules
+   still describe live product doctrine and are reproduced in section 6. The 20-question Nutrition
+   Mindset questionnaire, the 7-profile scoring algorithm and the 26-rule ApoE/DIO2/AMY1A
+   nutrigenomic table are recorded there for provenance only — **V2 consumes none of them**.
 3. **The data model and pipeline shape** — 13 tables, 23 edge functions, two cron loops, and a
    bidirectional contract with an external Python meal-plan API that does the actual AI
    generation and "Guardian Agent" validation. The _shape_ is right even where the
@@ -438,65 +457,29 @@ The port is a chance to fix these by construction; each is verified, not hypothe
 
 ## 9 · Porting map — from v1 to the monorepo
 
-### 9.1 Where each piece lands
-
-| v1 piece                                                            | New home                                                           | Notes                                                                                                                                                                     |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Patient app (dashboard, program, diary, profile, onboarding funnel) | `apps/web`                                                         | The existing fixture-driven screens (clients/plans/meals) are practitioner-oriented; v1 is patient-oriented — reconcile the two audiences during Scope, don't assume 1:1. |
-| Admin console (user list, document validation, plan controls)       | `apps/admin`                                                       | Replaces/extends the fixture-based console; the admin entities join the shared model layer (audit F-15).                                                                  |
-| Data model (§5.1, corrected per §8)                                 | `packages/services/src/db/models/` + migrations                    | Do this **with** audit item 7 (CareRelationship, consent, audit, AI-generation entities) — v1's tables are the concrete input that modelling pass was waiting for.        |
-| Edge-function logic                                                 | Next.js route handlers / server actions calling the services seams | The seam interfaces must grow first (audit F-09/F-12) — v1 is the evidence for exactly which query shapes and AI-call shapes are needed.                                  |
-| Psych scoring + questionnaire (§6.1–6.2)                            | Pure TS module in `packages/services` (or a domain package)        | Pure logic, fully specified above, ideal first TDD target — v1 even ships tests to translate.                                                                             |
-| Genotype interpretation (§6.3)                                      | Same                                                               | Re-derive the duplicated rows from the original source table before implementing.                                                                                         |
-| Guardian validation + generation                                    | Decision needed (D-below)                                          | Either keep the Python API as a vendor behind the AI seam, or rebuild in-house per the audit's Anthropic-via-gateway decision.                                            |
-| Weekly-advice bank, coaching briefs, legal docs                     | Content/seed data + marketing/web legal pages                      | French-first; the new repo's compiler-enforced fr/en parity fixes v1's 10% i18n.                                                                                          |
-| Brevo templates, OpenRouter prompts                                 | Translate into the email seam (Resend) and AI seam                 | Prompt _intent_ is documented in §5.2; vendors change.                                                                                                                    |
-
-### 9.2 Sequencing against the audit report
-
-Audit section 2 items 1–6 (exposure, contact form, branch protection, drift, **test harness**,
-**error tracking**) are untouched by this report — do them first. Then:
-
-- **Audit item 7 (model the missing entities)** now has its real-world input: model v1's schema
-  (§5.1) _plus_ the audit's CareRelationship/consent/audit/AI-generation entities _minus_ the
-  §8 defects, in one pass. v1's consent flow (timestamp before signup) becomes a proper consent
-  record; v1's `clinic_insights` becomes a document entity with history; `guardian_validation_result`
-  becomes the AI-generation audit record the docs already require.
-- **Audit item 8 (database vendor)** — v1 ran on Supabase and used its auth, storage, RLS, cron
-  and edge functions, not just Postgres. That materially strengthens the Supabase side of the
-  audit's D-2 (Neon vs Supabase): choosing Supabase makes the port a translation; choosing Neon
-  means rebuilding storage/auth/cron elsewhere. Decide with this in hand.
-- **Audit item 9 (auth)** — v1 used Supabase email+password with a custom Brevo reset; the new
-  repo has decided magic links. Note for D-3: if D-2 lands on Supabase, its auth answers this
-  too, and v1's anti-enumeration reset behaviour is worth keeping.
-- **Then port features in dependency order**: (1) onboarding funnel + consent + psych scoring
-  (pure logic first — it needs only auth + profiles); (2) profile + allergens model;
-  (3) document upload/parse/extract/validate (needs storage + AI seam + admin);
-  (4) supplement calendar; (5) week generation + guardian loop + crons (needs the
-  Python-API decision); (6) program page + skip/regenerate + weekly feedback + badges +
-  advice; (7) diary (only needed pre-plan — consider whether the discovery week survives
-  product-wise); (8) admin console around all of it.
-
-### 9.3 Decisions this report adds to the audit's list
-
-- **D-v1-1 · What happens to the Python meal-plan API?** It is the product's brain and lives
-  outside this repo. Is it Morgane's, is it running, is its code preserved? Options: keep it as
-  a vendor behind the AI seam (fastest path to parity); absorb its logic into this repo against
-  the audit's Anthropic decision (one stack, but the generation + guardian logic must be
-  re-specified from §5.2's contract); or rebuild generation from scratch (the guardian schema in
-  §5.2 is the safety spec either way). **Decide before deleting anything Python-side — this
-  report only preserves the Supabase half of the contract.**
-- **D-v1-2 · Patient-facing, practitioner-facing, or both?** v1 is direct-to-patient with a
-  back-office operator; the new repo's docs and fixtures are practitioner-first with a
-  practitioner↔person access model. These are different products sharing a domain. The Scope
-  stage for the first ported feature has to answer which audience v1's screens serve now.
-- **D-v1-3 · Do the v1 vendors survive?** Brevo vs the repo's Resend leaning; OpenRouter/Gemini
-  vs Anthropic-via-gateway; LlamaParse for PDF extraction (no equivalent decided in the new
-  repo — this one likely simply carries over). Fold into the audit's D-2/D-5 decision sitting.
-- **D-v1-4 · Is there production data?** If the Lovable Supabase project ever held real users,
-  patients or uploaded medical documents, it is special-category personal data under GDPR and
-  needs an explicit migrate-or-erase decision (with the §7 privacy promises applying to it) —
-  deleting the _code_ folder does not answer what happens to the _project_.
+> **Retired.** This section mapped every v1 feature onto the monorepo and sequenced the port
+> against the audit's checklist. Both inputs are superseded: the braindump defines V2's feature
+> set, and the phases in [`.icm/docs/remi-status-report.html`](../remi-status-report.html) define
+> the order. Building the map that used to be here would have spent the budget on the wrong
+> product.
+>
+> Three of its four open decisions still matter and have moved into the intake backlog:
+>
+> - **D-v1-1 · What happens to the Python meal-plan API?** It lives outside this repo and may
+>   still be running and billing. V2 does not need its weekly-plan generation, but the account and
+>   its code are still someone's responsibility. **Do not delete or let lapse anything Python-side
+>   before this is answered.**
+> - **D-v1-3 · Do the v1 vendors survive?** Brevo, OpenRouter, LlamaParse, the v1 Supabase project,
+>   Lovable — each is potentially a card being charged for a product that no longer runs. Note that
+>   LlamaParse-style PDF extraction is directly relevant again: the recommendation parser (Phase E)
+>   needs exactly that capability.
+> - **D-v1-4 · Is there production data?** If the v1 Supabase project ever held real users,
+>   patients or uploaded medical documents, that is special-category personal data under GDPR and
+>   needs an explicit migrate-or-erase decision. This is the highest-stakes item in the whole v1
+>   estate.
+>
+> **D-v1-2 (patient-facing, practitioner-facing, or both?) is closed:** the braindump answers it —
+> both, with the practitioner as the customer and the patient arriving through them.
 
 ## 10 · Do not port (dead code and abandoned generations)
 
