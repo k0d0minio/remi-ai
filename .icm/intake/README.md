@@ -73,7 +73,7 @@ Finished tickets keep their place in the order, marked **done** and linked into
 - **done** · [REMI-001](_done/REMI-001-admin-docs-exposure.md) — Verify deployment protection on admin; settle docs-site visibility
 - **done** · [REMI-002](_done/REMI-002-remove-confidential-content.md) — Remove confidential negotiation content from the admin app
 - **done** · [REMI-003](_done/REMI-003-deidentify-fixtures.md) — De-identify fixtures: fictional practitioner, reserved email domains
-- [REMI-004](REMI-004-contact-form-delivery.md) — Give the contact form delivery and a record
+- **done** · [REMI-004](_done/REMI-004-contact-form-delivery.md) — Give the contact form delivery and a record
 - **done** · [REMI-005](_done/REMI-005-branch-protection-ci-gaps.md) — Branch protection, required checks, squash merge; close the docs-only check gap
 - **done** · [REMI-006](_done/REMI-006-drift-batch.md) — Fix the documentation drift batch
 - [REMI-007](REMI-007-dev-session-prod-guard.md) — Make the development session refuse to run in production

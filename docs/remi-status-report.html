@@ -1,0 +1,683 @@
+<title>REMI Check-In Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+
+<style>
+  :root {
+    --paper:      #FBFCFB;
+    --surface:    #F2F5F3;
+    --surface-2:  #E7ECE9;
+    --ink:        #14201E;
+    --ink-soft:   #3A4A46;
+    --muted:      #5E706B;
+    --rule:       #D3DCD8;
+    --rule-soft:  #E4EAE7;
+    --accent:     #0F6E5C;
+    --accent-dim: #0F6E5C1a;
+    --critical:   #A62E1B;
+    --crit-dim:   #A62E1B14;
+    --warn:       #8A5D06;
+    --warn-dim:   #8A5D0614;
+    --good:       #1F6B44;
+    --good-dim:   #1F6B4414;
+    --shadow:     0 1px 2px rgba(20,32,30,.05), 0 8px 24px -12px rgba(20,32,30,.12);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #0E1614;
+      --surface:    #16211F;
+      --surface-2:  #1E2B28;
+      --ink:        #E6EDEA;
+      --ink-soft:   #BCC9C5;
+      --muted:      #8B9C97;
+      --rule:       #2A3936;
+      --rule-soft:  #1F2C29;
+      --accent:     #5CC5A8;
+      --accent-dim: #5CC5A81f;
+      --critical:   #E8836E;
+      --crit-dim:   #E8836E1a;
+      --warn:       #D9A441;
+      --warn-dim:   #D9A4411a;
+      --good:       #63BE8C;
+      --good-dim:   #63BE8C1a;
+      --shadow:     0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #0E1614;
+    --surface:    #16211F;
+    --surface-2:  #1E2B28;
+    --ink:        #E6EDEA;
+    --ink-soft:   #BCC9C5;
+    --muted:      #8B9C97;
+    --rule:       #2A3936;
+    --rule-soft:  #1F2C29;
+    --accent:     #5CC5A8;
+    --accent-dim: #5CC5A81f;
+    --critical:   #E8836E;
+    --crit-dim:   #E8836E1a;
+    --warn:       #D9A441;
+    --warn-dim:   #D9A4411a;
+    --good:       #63BE8C;
+    --good-dim:   #63BE8C1a;
+    --shadow:     0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Source Sans 3", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    margin: 0;
+    padding: 0 1.5rem 6rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 62rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3.25rem;
+  }
+
+  .col {
+    max-width: 40rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: "Fraunces", Georgia, "Times New Roman", serif;
+    text-wrap: balance;
+    margin: 0;
+    line-height: 1.15;
+    font-weight: 600;
+  }
+
+  h1 { font-size: clamp(2.3rem, 5.5vw, 3.4rem); letter-spacing: -.02em; font-weight: 700; }
+  h2 { font-size: clamp(1.6rem, 3.4vw, 2.15rem); letter-spacing: -.015em; }
+  h3 { font-size: 1.3rem; letter-spacing: -.01em; }
+  h4 { font-size: 1.05rem; font-family: "Source Sans 3", sans-serif; font-weight: 700; }
+
+  p { margin: 0; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+  strong { font-weight: 700; color: var(--ink); }
+  em { font-style: italic; }
+
+  .eyebrow {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .lede { font-size: 1.16rem; color: var(--ink-soft); line-height: 1.6; }
+
+  /* ---------- masthead ---------- */
+
+  header.masthead {
+    padding-top: 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2.5rem;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.5rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .72rem;
+    color: var(--muted);
+    letter-spacing: .04em;
+  }
+
+  /* ---------- the clocks ---------- */
+
+  .clocks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1rem;
+  }
+
+  .clock {
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1.25rem 1.35rem;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    border-left: 3px solid var(--muted);
+  }
+  .clock.is-critical { border-left-color: var(--critical); background: var(--crit-dim); }
+  .clock.is-warn     { border-left-color: var(--warn);     background: var(--warn-dim); }
+
+  .clock .days {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 2.1rem;
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .clock.is-critical .days { color: var(--critical); }
+  .clock.is-warn .days     { color: var(--warn); }
+  .clock .what { font-weight: 700; font-size: 1rem; }
+  .clock .when { font-family: "JetBrains Mono", monospace; font-size: .72rem; color: var(--muted); }
+
+  /* ---------- sections ---------- */
+
+  section { display: flex; flex-direction: column; gap: 1.75rem; }
+
+  .part-head {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--ink);
+  }
+
+  /* ---------- tables ---------- */
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+
+  table { border-collapse: collapse; width: 100%; font-size: .92rem; min-width: 34rem; }
+
+  th {
+    text-align: left;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .66rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+    font-weight: 600;
+    padding: .7rem .9rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: .7rem .9rem;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+    line-height: 1.45;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  td.mono, th.mono { font-family: "JetBrains Mono", monospace; font-size: .8rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: "JetBrains Mono", monospace; font-size: .82rem; }
+
+  /* ---------- pills ---------- */
+
+  .pill {
+    display: inline-block;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .64rem;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    padding: .18rem .5rem;
+    border-radius: 2px;
+    white-space: nowrap;
+    border: 1px solid transparent;
+  }
+  .pill.good { color: var(--good);     background: var(--good-dim); border-color: var(--good); }
+  .pill.warn { color: var(--warn);     background: var(--warn-dim); border-color: var(--warn); }
+  .pill.crit { color: var(--critical); background: var(--crit-dim); border-color: var(--critical); }
+  .pill.none { color: var(--muted);    background: var(--surface);  border-color: var(--rule); }
+
+  /* ---------- callouts ---------- */
+
+  .callout {
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    background: var(--accent-dim);
+    padding: 1.1rem 1.3rem;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+  }
+  .callout.crit { border-left-color: var(--critical); background: var(--crit-dim); }
+  .callout .callout-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .66rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .callout.crit .callout-label { color: var(--critical); }
+
+  /* ---------- question blocks ---------- */
+
+  .q {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 1.75rem 0 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .q-head { display: flex; gap: 1rem; align-items: baseline; }
+  .q-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--accent);
+    flex: none;
+    padding-top: .25rem;
+  }
+  .q-ask {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.32rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -.01em;
+  }
+  .q-fr {
+    font-style: italic;
+    color: var(--muted);
+    font-size: .93rem;
+    border-left: 2px solid var(--rule);
+    padding-left: .9rem;
+    line-height: 1.5;
+  }
+  .q-body { display: flex; flex-direction: column; gap: 1.1rem; padding-left: 0; }
+  @media (min-width: 42rem) { .q-body { padding-left: 3.1rem; } }
+
+  .verdict {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.08rem;
+    line-height: 1.5;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1rem 1.2rem;
+  }
+
+  /* ---------- lists ---------- */
+
+  ul.clean { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .7rem; }
+  ul.clean > li { padding-left: 1.15rem; position: relative; }
+  ul.clean > li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: .68em;
+    width: .38rem; height: .38rem;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  ol.steps { padding-left: 0; margin: 0; list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 1rem; }
+  ol.steps > li { counter-increment: s; padding-left: 2.4rem; position: relative; }
+  ol.steps > li::before {
+    content: counter(s);
+    position: absolute; left: 0; top: 0;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .72rem; font-weight: 600;
+    color: var(--accent);
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    width: 1.6rem; height: 1.6rem;
+    display: grid; place-items: center;
+    border-radius: 2px;
+  }
+
+  footer.end {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.5rem;
+    color: var(--muted);
+    font-size: .85rem;
+    display: flex; flex-direction: column; gap: .5rem;
+  }
+
+  code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .84em;
+    background: var(--surface-2);
+    padding: .1em .35em;
+    border-radius: 2px;
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Status briefing · prepared for review before replying</div>
+    <h1>REMI Check-In Briefing</h1>
+    <p class="lede">Where the codebase actually stands, what the ticket board says, and a drafted answer to each of Morgane's four questions. Nothing here has been sent to her.</p>
+    <div class="meta-row">
+      <span>18 August 2026</span>
+      <span>repo k0d0minio/remi-ai</span>
+      <span>branch claude/codebase-status-morgane-7mg13x</span>
+      <span>head 2c41e44</span>
+    </div>
+  </header>
+
+  <!-- ============ CLOCKS ============ -->
+  <section>
+    <div class="col">
+      <h2>Two hard dates govern everything else</h2>
+      <p>Every other priority should be read against these. One is contractual, one is an opportunity with a closing window — and they land two weeks apart, competing for the same month.</p>
+    </div>
+    <div class="clocks">
+      <div class="clock is-critical">
+        <span class="days">14</span>
+        <span class="what">Pilot billing begins</span>
+        <span class="when">1 Sep 2026 · €24.50/practitioner/month × 15</span>
+      </div>
+      <div class="clock is-warn">
+        <span class="days">28</span>
+        <span class="what">Startup Boost applications close</span>
+        <span class="when">15 Sep 2026 · Wallonie Entreprendre</span>
+      </div>
+    </div>
+    <div class="col">
+      <div class="callout crit">
+        <span class="callout-label">The single most urgent thing</span>
+        <p>The signed pilot terms start billing in <strong>14 days</strong>, and payments are the least-started part of the product: <strong>no vendor, no code, no seam, not even a reserved environment variable</strong>. This is the only commitment in the project with a contractual date attached, and it needs a decision this week, not an implementation. Manual invoicing for fifteen practitioners is a perfectly good answer — roughly €367.50/month of billing — but it has to be a decision rather than a discovery on 1 September.</p>
+        <p>There is a second trap underneath it: the audit found that <strong>the public pricing and the signed pilot pricing contradict each other</strong>. Which figure is binding needs settling before anyone is invoiced.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART I ============ -->
+  <section>
+    <div class="part-head col">
+      <span class="eyebrow">Part one</span>
+      <h2>State of the codebase</h2>
+    </div>
+
+    <div class="col">
+      <p class="verdict">The architecture is genuinely strong and unusually honest about its own gaps. What is missing is <em>everything that touches the outside world</em>. There is no database, no sign-in, no tests, and no way to know the product has crashed. It is a well-built chassis with no engine fitted yet — and it cannot legally or technically hold a real patient record today.</p>
+    </div>
+
+    <div class="col"><h3>What is built and working</h3></div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Area</th><th>State</th><th>Detail</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Monorepo &amp; structure</td><td><span class="pill good">Solid</span></td><td>Turborepo 2 / pnpm 10 / Node 22; six Next.js 16 apps, two shared packages. App→package boundaries hold everywhere.</td></tr>
+          <tr><td>User-facing surface</td><td><span class="pill good">Good</span></td><td>45 pages built — web 10, demo 16, admin 9, marketing 6, support 4, plus the Nextra docs site. Design-system and FR/EN language discipline near 100%.</td></tr>
+          <tr><td>Seams (db / email / AI)</td><td><span class="pill good">Good</span></td><td>Clean interfaces with registration points, so a vendor choice is one adapter rather than a rewrite. Ten domain models defined.</td></tr>
+          <tr><td>Email delivery</td><td><span class="pill good">Live</span></td><td>The Resend adapter is the <strong>only working external integration in the product</strong>. Contact-form submissions now actually reach you.</td></tr>
+          <tr><td>CI &amp; merge gates</td><td><span class="pill good">Enforced</span></td><td>Three workflows; Quality required on every PR, no pre-approved merges, docs-only bypass closed.</td></tr>
+          <tr><td>Secrets &amp; config</td><td><span class="pill good">Exemplary</span></td><td>Single env catalogue, names never values, nothing committed.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col"><h3>What is missing</h3>
+      <p>These are not polish items. Each one blocks the pilot from running on the product.</p>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Capability</th><th>State</th><th>Consequence today</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Database</strong></td><td><span class="pill crit">None</span></td><td>Every query in the signed-in app returns fixture data unconditionally. A production deploy renders plausible fake patients with no error anywhere.</td></tr>
+          <tr><td><strong>Authentication</strong></td><td><span class="pill crit">None</span></td><td>No sign-in exists. There is no way to tell one practitioner from another.</td></tr>
+          <tr><td><strong>Tests</strong></td><td><span class="pill crit">Zero files</span></td><td>No runner, no CI step — against a stated 75% coverage commitment. Verified: no test file exists anywhere in the repo.</td></tr>
+          <tr><td><strong>Error tracking</strong></td><td><span class="pill crit">None</span></td><td>A production crash is invisible. The pilot's fifteen practitioners would be the monitoring system.</td></tr>
+          <tr><td><strong>Payments</strong></td><td><span class="pill crit">None</span></td><td>14 days from a contractual billing date. See above.</td></tr>
+          <tr><td><strong>GDPR groundwork</strong></td><td><span class="pill crit">Not started</span></td><td>No DPAs, no retention policy, no pseudonymisation. This is health data — GDPR special-category. It is a precondition for storing the first real record, not a follow-up.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col"><h3>The ticket board</h3></div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Phase</th><th class="mono">Tickets</th><th>Theme</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>0 — Close the live risks</td><td class="mono">001–007</td><td>Exposure, honesty and safety issues that were live</td><td><span class="pill warn">6 of 7 done</span></td></tr>
+          <tr><td>1 — Foundation</td><td class="mono">008–017</td><td>Test harness, error tracking, cleanups</td><td><span class="pill none">Not started</span></td></tr>
+          <tr><td>2 — Data model &amp; seams</td><td class="mono">018–021</td><td>Entities and interfaces real data will live in</td><td><span class="pill none">Not started</span></td></tr>
+          <tr><td>3 — Infrastructure</td><td class="mono">022–026</td><td>Database, auth, headers, billing, GDPR</td><td><span class="pill none">Not started</span></td></tr>
+          <tr><td>4 — Feature port from v1</td><td class="mono">027–039</td><td>The product itself, in dependency order</td><td><span class="pill none">Not started</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col">
+      <p><strong>39 tickets total: 6 done, 33 open.</strong> Every one of the 33 is marked <code>ready</code> — none is in progress. Phase 0 closed the genuinely dangerous items (confidential content removed from the admin console, fixtures de-identified, branch protection turned on, contact form wired). The one Phase 0 ticket still open, <strong>REMI-007</strong>, is P0: making the development session refuse to run in production, which is the hard precondition before any real data can exist.</p>
+      <p>Of the open tickets, <strong>3 are P0</strong> (007 dev-session guard, 025 billing, 026 GDPR), 22 are P1 and 11 are P2. Momentum has stalled: the last feature merge was <strong>13 August</strong>; everything since has been documentation and admin.</p>
+    </div>
+
+    <div class="col">
+      <h3>Two drift findings from today's pass</h3>
+      <ul class="clean">
+        <li><strong>A broken row on the ticket index — now fixed.</strong> REMI-004 (contact-form delivery) shipped and its file was moved to <code>_done/</code>, but the index still pointed at the old path and did not carry the <strong>done</strong> marker. The board reads from <code>main</code>, so a finished ticket was showing as unstarted work behind a dead link. I corrected that one line; all 39 links now resolve. The audit had previously scored the docs at zero broken links, so this was a regression.</li>
+        <li><strong>The database decision contradicts itself in three places — not fixed, because it is yours to make.</strong> The technical docs and the admin roadmap both state plainly that the choice is made: <em>"Le choix est fait : Neon."</em> But ticket REMI-022 lists itself as blocked by open decision D-2 (Neon vs Supabase), the intake board lists D-2 as unanswered, <strong>and Morgane's email names Supabase as something we already use.</strong> Three sources, three different answers. This is the highest-value thing to settle in your call — details in Q3 below.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PART II ============ -->
+  <section>
+    <div class="part-head col">
+      <span class="eyebrow">Part two</span>
+      <h2>Answers to Morgane</h2>
+      <p class="lede">Her email asks four things. Drafted answers below — review and adjust the tone before sending; she wrote in French, so these are pitched to be translated rather than pasted.</p>
+    </div>
+
+    <!-- Q1 -->
+    <div class="q">
+      <div class="q-head">
+        <span class="q-num">Q1</span>
+        <span class="q-ask">Did the OneNote arrive?</span>
+      </div>
+      <div class="q-body">
+        <p class="q-fr">« Avais-tu bien reçu mon OneNote ? J'avais essayé de te le partager. »</p>
+        <p><strong>No — and there is no trace of it anywhere I can see.</strong> The word "OneNote" appears nowhere in the repository except in her own email. I searched the connected mailbox and found nothing from her; note that the mailbox connected to this session is a different account entirely (a Sustentus one), not your <code>outlook.be</code> address, so I cannot rule out that it landed there and you simply have not opened it. Worth checking that inbox and its junk folder directly before replying.</p>
+        <div class="callout">
+          <span class="callout-label">Related — a gap worth mentioning to her</span>
+          <p>Her <em>earlier</em> email is also missing from our records. The requests document we compiled on 10 August quotes it at specific line numbers — including the Startup Boost criteria and her offer to prepare everything you need in one go — but the file in the repo now holds only this week's nine-line message. <strong>The sourcing for those quotes is dangling.</strong> Asking her to re-send both the OneNote and that original email closes it, and gives you a clean reason to ask without it sounding like nothing was read.</p>
+        </div>
+        <p><strong>Suggested reply:</strong> the OneNote never arrived — ask her to re-share it, ideally as a link with explicit permission granted to your address, since OneNote sharing across organisations fails silently more often than not.</p>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q">
+      <div class="q-head">
+        <span class="q-num">Q2</span>
+        <span class="q-ask">Could REMI meet the conditions for Startup Boost?</span>
+      </div>
+      <div class="q-body">
+        <p class="q-fr">« As-tu également eu l'occasion de regarder le programme Start-up Boost ? Penses-tu que REMI pourrait remplir les conditions pour postuler ? »</p>
+
+        <p><strong>Yes, plausibly — and the thematic fit is unusually good — but it turns on two hard eligibility gates neither of us has confirmed, and the deadline is 28 days away.</strong></p>
+
+        <p>Startup Boost is Wallonie Entreprendre's early-stage instrument: a <strong>€100,000 convertible loan</strong> on standardised terms, roughly eight weeks from application to decision, minimum two startups selected per call. The current edition is explicitly an <strong>AI and cybersecurity</strong> call, and it closes <strong>15 September 2026</strong>.</p>
+
+        <h4>The two gates that decide it — please confirm both</h4>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Requirement</th><th>Where REMI stands</th><th>Risk</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Company less than 3 years old</strong></td><td>Incorporation date unknown to me</td><td><span class="pill warn">Confirm</span></td></tr>
+              <tr><td><strong>Operating headquarters in the Walloon Region</strong></td><td>Registered seat unknown to me. If the company sits in Brussels or Flanders, the application fails on eligibility regardless of merit.</td><td><span class="pill crit">Blocking</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Neither is a judgement call — they are facts Morgane or Arnaud can answer in one line, and there is no point building a dossier before they do.</p>
+
+        <h4>Where REMI argues strongly</h4>
+        <ul class="clean">
+          <li><strong>Genuine proprietary IP, and it is the clinical layer.</strong> The Nutrition Mindset psychological scoring model (a 20-item instrument scored across seven dimensions into seven profiles), the nutrigenomic interpretation grid (ApoE × DIO2 × AMY1A), and the Guardian validation doctrine are real know-how that a competitor cannot copy from the interface. This is the deeptech argument, and it is honest.</li>
+          <li><strong>A sector-specific solution to an identified need</strong> — exactly the phrasing the call uses — rather than a horizontal tool.</li>
+          <li><strong>Real traction to cite:</strong> fifteen pilot practitioners with signed terms and billing starting 1 September. Many applicants at this stage have no revenue date at all.</li>
+          <li><strong>Technical replicability:</strong> a multi-tenant architecture, one deployment, six apps. The scalability criterion is straightforwardly answerable on the engineering side.</li>
+        </ul>
+
+        <h4>Where a jury will push — and where we are exposed</h4>
+        <p>This is the part worth being unsentimental about, because the call's exclusions are specific and REMI brushes against them.</p>
+        <ul class="clean">
+          <li><strong>The call explicitly excludes</strong> "projects primarily integrating third-party technologies without significant innovation", "generic chatbots relying on existing models", and technology-integration businesses. REMI's <em>platform</em> is assembled from standard tools; only the clinical models are proprietary. The application must therefore be built on the models and the doctrine, never on the stack.</li>
+          <li><strong>The AI brain may not be ours.</strong> Plan generation and the Guardian validation run through a private Python API whose authorship I still do not know. <strong>If we did not write it, the deeptech claim is thin and a jury will find that out.</strong> This is the single most important thing to establish before drafting anything.</li>
+          <li><strong>The sovereignty claim does not yet hold.</strong> The call's first criterion is control over key technologies, strategic data and critical infrastructure. The new codebase has <em>decided</em> an EU posture and leans toward pseudonymising personal data before it reaches any AI provider — but the v1 that actually ran in production sent generation through OpenRouter to a Google model and PDFs through a US parsing service. That gap between decided posture and deployed reality should be closed before it is claimed, not after.</li>
+        </ul>
+
+        <div class="callout">
+          <span class="callout-label">Where Morgane's own list helps</span>
+          <p>Her mention of <strong>Mistral</strong> is interesting precisely here. A European model provider is a materially stronger sovereignty story than the American ones in the current architecture. If there is a reason she named it, it is worth hearing — it may be the missing half of the criterion-one argument.</p>
+        </div>
+
+        <p><strong>Suggested reply:</strong> yes, it is worth applying and the thematic fit is strong — but confirm company age and Walloon registered seat first, and send the full call regulation rather than the landing page, since eligibility rules usually sit separately from the thematic criteria and are what actually disqualifies people. Flag honestly that the pitch needs a P&amp;L, which needs your accountant.</p>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="q">
+      <div class="q-head">
+        <span class="q-num">Q3</span>
+        <span class="q-ask">What is our stack, what do we need, and what does it cost?</span>
+      </div>
+      <div class="q-body">
+        <p class="q-fr">« J'aimerais aussi qu'on fasse le point sur les différents outils et programmes que nous utilisons déjà ou dont nous aurons besoin pour la suite : Supabase, DigitalOcean, Mistral, Euria, etc. »</p>
+
+        <p>This is the most useful question she asked, and the answer has a twist worth handling carefully: <strong>three of the four tools she named appear nowhere in the current codebase.</strong> That is not a contradiction — she is almost certainly describing the v1 estate and things bought outside the repo. But it means you and she currently hold two different mental models of the stack, and the call is the moment to reconcile them.</p>
+
+        <h4>What is actually wired up today</h4>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Tool</th><th>Role</th><th>State</th><th>Cost basis</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Vercel</strong></td><td>Hosting — one project per app, six projects</td><td><span class="pill good">Live</span></td><td>Per-seat plan + usage</td></tr>
+              <tr><td><strong>Resend</strong></td><td>Transactional email</td><td><span class="pill good">Live</span></td><td>Free tier, then per-volume</td></tr>
+              <tr><td><strong>GitHub</strong></td><td>Repository and CI</td><td><span class="pill good">Live</span></td><td>Likely free at this size</td></tr>
+              <tr><td>Vercel Analytics</td><td>Traffic analytics</td><td><span class="pill good">Live</span></td><td>Bundled / usage</td></tr>
+              <tr><td>Anthropic</td><td>Named as the model tier in the AI seam</td><td><span class="pill warn">No account</span></td><td>Usage-based, unstarted</td></tr>
+              <tr><td>Database vendor</td><td>—</td><td><span class="pill crit">Undecided</span></td><td>—</td></tr>
+              <tr><td>Auth vendor</td><td>—</td><td><span class="pill crit">Undecided</span></td><td>—</td></tr>
+              <tr><td>Payment vendor</td><td>—</td><td><span class="pill crit">Undecided</span></td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>I have deliberately not put figures in that last column. Published list prices change, and more importantly <strong>I have no visibility into what is actually being billed</strong> — that needs access to the Vercel account, or simply the invoices. I would rather leave a blank than invent a number.</p>
+
+        <h4>What v1 ran on — the bill that may still be running</h4>
+        <p>This is the part to raise with real urgency, because <strong>some of these may still be charging a card every month for a product that no longer exists.</strong></p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Tool</th><th>Role in v1</th><th>Question for Morgane</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Supabase</strong></td><td>Database, auth, storage, edge functions, cron — the whole backend</td><td>Whose account? Still billing? <strong>Does it hold real patient data?</strong></td></tr>
+              <tr><td><strong>Private Python meal-plan API</strong></td><td>Plan generation, Guardian validation, supplement calendars — the AI brain</td><td><strong>Who wrote it, and where is it hosted?</strong> (This is very likely the DigitalOcean answer.)</td></tr>
+              <tr><td>OpenRouter</td><td>Extraction LLM + shopping-list consolidation, defaulting to a Google model</td><td>Account holder? Still billing?</td></tr>
+              <tr><td>LlamaParse (LlamaCloud)</td><td>PDF → markdown extraction</td><td>Account holder? Still billing?</td></tr>
+              <tr><td>Brevo</td><td>Transactional email; holds the password-reset template</td><td>Account holder? The template is content worth keeping.</td></tr>
+              <tr><td>Lovable</td><td>The v1 build platform itself</td><td>Still subscribed?</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>The four tools she named, mapped honestly</h4>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Her list</th><th>What I can establish</th><th>What to ask</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Supabase</strong></td>
+                <td>Real, and central to v1. <em>Not</em> in the current codebase — but the technical docs claim Neon was chosen while the ticket board still lists that decision as open.</td>
+                <td>This is decision <strong>D-2</strong> and it should be settled on the call. v1 having genuinely run on Supabase auth, storage and cron materially strengthens the Supabase case: choosing it makes the feature port a translation rather than a rebuild, and it answers the authentication decision in the same sitting.</td>
+              </tr>
+              <tr>
+                <td><strong>DigitalOcean</strong></td>
+                <td>Appears nowhere — not in the codebase, not in the audit, not in the v1 analysis.</td>
+                <td>Strong hypothesis: this is where the private Python meal-plan API is hosted. Confirm — it would also answer who controls the AI brain, which Q2 turns on.</td>
+              </tr>
+              <tr>
+                <td><strong>Mistral</strong></td>
+                <td>Appears nowhere. v1 used OpenRouter to a Google model; v2 names Anthropic in the seam.</td>
+                <td>Is this in use, or a proposal? Either way it is strategically interesting for the sovereignty argument — see Q2.</td>
+              </tr>
+              <tr>
+                <td><strong>Euria</strong></td>
+                <td>Appears nowhere, and I will not guess at what it is.</td>
+                <td>Simply ask what it does and whether we are paying for it.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p><strong>Suggested reply:</strong> agree enthusiastically — this is overdue — and propose a concrete shape for it: a single shared sheet with one row per tool giving the account holder, what it is for, whether it is still billing, and the monthly cost. Ask her to bring the invoices or add you as a user to each account, since the account-level access is the thing that turns guesses into figures. Then name D-2 explicitly as the decision to close in the same conversation.</p>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="q">
+      <div class="q-head">
+        <span class="q-num">Q4</span>
+        <span class="q-ask">Do you need more information about the past work?</span>
+      </div>
+      <div class="q-body">
+        <p class="q-fr">« Si tu as besoin aussi de plus d'infos sur le travail passé. »</p>
+        <p><strong>Yes — and there is already a document listing exactly what.</strong> A full requests register was compiled on 10 August covering 39 items across access, infrastructure facts, the v1 estate, vendor accounts, legal and GDPR, and the Startup Boost dossier. It has never been sent. Sending it is probably the highest-leverage thing you can do off the back of this email, because most of it is blocking.</p>
+        <p>If you would rather not open with a 39-item list, these are the ones that unblock the most:</p>
+        <ol class="steps">
+          <li><strong>Who wrote the Python meal-plan API, and where does it run?</strong> This decides whether the deeptech claim in the grant application is real, and whether the AI brain is an asset we own or a dependency we rent.</li>
+          <li><strong>Does the v1 Supabase project hold real patient data?</strong> If actual people's health records are sitting in a project nobody is maintaining, that is a live GDPR exposure and it outranks everything else on this page.</li>
+          <li><strong>Vercel and GitHub access.</strong> Several open questions can only be answered from inside those accounts, and you cannot set branch protection or read deployment settings without admin rather than write.</li>
+          <li><strong>The executed pilot terms.</strong> Needed to settle which price is binding before invoicing anyone on 1 September.</li>
+          <li><strong>The FunMedDev genotype source table.</strong> The nutrigenomic engine cannot be ported faithfully without the original grid.</li>
+        </ol>
+        <div class="callout">
+          <span class="callout-label">Handling note</span>
+          <p>Nothing in the credentials category should arrive as plain text in an email or a chat. Ask to be invited as a user wherever that is possible; for raw keys that cannot work that way, a one-time secret link or a shared password manager. And if any key has already been pasted into an email thread, it needs rotating rather than hiding — worth saying so explicitly, without making it sound like an accusation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RECOMMENDATION ============ -->
+  <section>
+    <div class="part-head col">
+      <span class="eyebrow">Recommendation</span>
+      <h2>How I would spend the next 28 days</h2>
+      <p>The tension worth naming out loud: the grant application is business work and the billing deadline is operational work, and neither of them is the engineering work that actually makes the product able to hold a patient record. All three want the same month. Trying to do all three at full tilt is how none of them lands.</p>
+    </div>
+    <div class="col">
+      <ol class="steps">
+        <li><strong>This week — decide, do not build.</strong> Settle billing for 1 September (manual invoicing is the recommended answer and costs hours, not weeks), and confirm which price is binding. Settle D-2 on the database, which also answers authentication if it lands on Supabase. Neither needs code.</li>
+        <li><strong>This week — send the requests register.</strong> It is written and it is blocking. Morgane has explicitly offered twice now to prepare everything in one go; take her up on it.</li>
+        <li><strong>Confirm Startup Boost eligibility before investing in it.</strong> Two one-line facts — company age and Walloon seat — decide whether the dossier is worth a month of attention at all.</li>
+        <li><strong>Then, and only then, restart the engineering.</strong> The board is correctly ordered: the test harness and error tracking (REMI-008, 009) come before the database adapter, because landing an adapter with no tests and no crash visibility is how the pilot finds the bugs for you. REMI-007 is P0 and cheap — do it first.</li>
+        <li><strong>Treat GDPR as a gate, not a task.</strong> This is special-category health data. The DPAs, retention policy and pseudonymisation posture need to exist <em>before</em> the first real record is stored, not in the sprint after.</li>
+      </ol>
+    </div>
+    <div class="col">
+      <div class="callout crit">
+        <span class="callout-label">The one thing to say out loud on the call</span>
+        <p>Fifteen practitioners start being billed in 14 days for a product that cannot currently store a patient record, has no sign-in, and would not tell anyone if it crashed. That is not a criticism of the build — the foundation is deliberately and honestly staged, and Phase 0 closed the genuinely dangerous items. But the gap between the commercial commitment and the technical reality is the real subject of this check-in, and it is better raised by you than discovered by a practitioner.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="end">
+    <p>Prepared 18 August 2026 from the repository at commit 2c41e44, the pre-build audit, the v1 analysis, and the requests register. The only change made to the repository was correcting the stale REMI-004 row on the ticket index.</p>
+    <p>Figures for company age, Walloon registration, and all vendor costs are marked unknown rather than estimated — they need account access or an answer from Morgane and Arnaud.</p>
+  </footer>
+
+</div>
