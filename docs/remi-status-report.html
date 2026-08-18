@@ -361,6 +361,7 @@
     <div class="eyebrow">Status briefing · prepared for review before replying</div>
     <h1>REMI Check-In Briefing</h1>
     <p class="lede">Where the codebase actually stands, what the ticket board says, and a drafted answer to each of Morgane's four questions. Nothing here has been sent to her.</p>
+    <p class="lede">One real deadline governs the next month, and one widely-repeated commitment turns out not to exist.</p>
     <div class="meta-row">
       <span>18 August 2026</span>
       <span>repo k0d0minio/remi-ai</span>
@@ -369,29 +370,25 @@
     </div>
   </header>
 
-  <!-- ============ CLOCKS ============ -->
+  <!-- ============ CLOCK ============ -->
   <section>
     <div class="col">
-      <h2>Two hard dates govern everything else</h2>
-      <p>Every other priority should be read against these. One is contractual, one is an opportunity with a closing window — and they land two weeks apart, competing for the same month.</p>
+      <h2>One hard date, and one that was never real</h2>
+      <p>Read every other priority against the deadline below. It is the only fixed, externally-imposed date REMI actually has.</p>
     </div>
     <div class="clocks">
-      <div class="clock is-critical">
-        <span class="days">14</span>
-        <span class="what">Pilot billing begins</span>
-        <span class="when">1 Sep 2026 · €24.50/practitioner/month × 15</span>
-      </div>
       <div class="clock is-warn">
         <span class="days">28</span>
         <span class="what">Startup Boost applications close</span>
-        <span class="when">15 Sep 2026 · Wallonie Entreprendre</span>
+        <span class="when">15 Sep 2026 · Wallonie Entreprendre · €100,000</span>
       </div>
     </div>
     <div class="col">
       <div class="callout crit">
-        <span class="callout-label">The single most urgent thing</span>
-        <p>The signed pilot terms start billing in <strong>14 days</strong>, and payments are the least-started part of the product: <strong>no vendor, no code, no seam, not even a reserved environment variable</strong>. This is the only commitment in the project with a contractual date attached, and it needs a decision this week, not an implementation. Manual invoicing for fifteen practitioners is a perfectly good answer — roughly €367.50/month of billing — but it has to be a decision rather than a discovery on 1 September.</p>
-        <p>There is a second trap underneath it: the audit found that <strong>the public pricing and the signed pilot pricing contradict each other</strong>. Which figure is binding needs settling before anyone is invoiced.</p>
+        <span class="callout-label">Correction — the pilot programme does not exist</span>
+        <p>Much of this repository is written as though fifteen practitioners had signed terms billing €24.50 each per month from 1 September. <strong>That programme is fiction.</strong> The numbers live in <code>apps/admin/lib/fixtures.ts</code>, a file whose own header describes it as <em>"the console's data, standing in for reads that do not exist yet"</em> — demo placeholders for a console with no backend. The entire admin <code>pilot/</code> surface renders from them.</p>
+        <p>The pre-build audit read that fixture data as a real commercial contract and propagated it: finding F-07, owner decision D-4, the P0 ticket <strong>REMI-025 "Billing for 1 September"</strong>, and three items in the requests register. REQ-20 even calls it <em>"the signed pilot terms"</em> in the same sentence that identifies it as fixture data.</p>
+        <p><strong>What follows from that:</strong> there is no billing deadline, no revenue to invoice, and no contractual pressure on 1 September. REMI-025 should be closed or rewritten rather than worked. And — the part that actually matters — <strong>none of this may appear in the Startup Boost application.</strong> Traction is exactly what a jury probes hardest, and citing fifteen paying practitioners that do not exist would be a material misrepresentation to a public funding body. See Q2.</p>
       </div>
     </div>
   </section>
@@ -436,8 +433,8 @@
           <tr><td><strong>Database</strong></td><td><span class="pill crit">None</span></td><td>Every query in the signed-in app returns fixture data unconditionally. A production deploy renders plausible fake patients with no error anywhere.</td></tr>
           <tr><td><strong>Authentication</strong></td><td><span class="pill crit">None</span></td><td>No sign-in exists. There is no way to tell one practitioner from another.</td></tr>
           <tr><td><strong>Tests</strong></td><td><span class="pill crit">Zero files</span></td><td>No runner, no CI step — against a stated 75% coverage commitment. Verified: no test file exists anywhere in the repo.</td></tr>
-          <tr><td><strong>Error tracking</strong></td><td><span class="pill crit">None</span></td><td>A production crash is invisible. The pilot's fifteen practitioners would be the monitoring system.</td></tr>
-          <tr><td><strong>Payments</strong></td><td><span class="pill crit">None</span></td><td>14 days from a contractual billing date. See above.</td></tr>
+          <tr><td><strong>Error tracking</strong></td><td><span class="pill crit">None</span></td><td>A production crash is invisible — nothing would report it but a user.</td></tr>
+          <tr><td><strong>Payments</strong></td><td><span class="pill none">Not needed yet</span></td><td>Nothing to bill: the pilot cohort was fixture data. Previously carried as a P0 deadline — that pressure was never real.</td></tr>
           <tr><td><strong>GDPR groundwork</strong></td><td><span class="pill crit">Not started</span></td><td>No DPAs, no retention policy, no pseudonymisation. This is health data — GDPR special-category. It is a precondition for storing the first real record, not a follow-up.</td></tr>
         </tbody>
       </table>
@@ -453,7 +450,7 @@
           <tr><td>0 — Close the live risks</td><td class="mono">001–007</td><td>Exposure, honesty and safety issues that were live</td><td><span class="pill warn">6 of 7 done</span></td></tr>
           <tr><td>1 — Foundation</td><td class="mono">008–017</td><td>Test harness, error tracking, cleanups</td><td><span class="pill none">Not started</span></td></tr>
           <tr><td>2 — Data model &amp; seams</td><td class="mono">018–021</td><td>Entities and interfaces real data will live in</td><td><span class="pill none">Not started</span></td></tr>
-          <tr><td>3 — Infrastructure</td><td class="mono">022–026</td><td>Database, auth, headers, billing, GDPR</td><td><span class="pill none">Not started</span></td></tr>
+          <tr><td>3 — Infrastructure</td><td class="mono">022–026</td><td>Database, auth, headers, GDPR (billing now moot)</td><td><span class="pill none">Not started</span></td></tr>
           <tr><td>4 — Feature port from v1</td><td class="mono">027–039</td><td>The product itself, in dependency order</td><td><span class="pill none">Not started</span></td></tr>
         </tbody>
       </table>
@@ -461,12 +458,13 @@
 
     <div class="col">
       <p><strong>39 tickets total: 6 done, 33 open.</strong> Every one of the 33 is marked <code>ready</code> — none is in progress. Phase 0 closed the genuinely dangerous items (confidential content removed from the admin console, fixtures de-identified, branch protection turned on, contact form wired). The one Phase 0 ticket still open, <strong>REMI-007</strong>, is P0: making the development session refuse to run in production, which is the hard precondition before any real data can exist.</p>
-      <p>Of the open tickets, <strong>3 are P0</strong> (007 dev-session guard, 025 billing, 026 GDPR), 22 are P1 and 11 are P2. Momentum has stalled: the last feature merge was <strong>13 August</strong>; everything since has been documentation and admin.</p>
+      <p>Of the open tickets, three are marked P0 — but one of them, <strong>025 (billing)</strong>, rests entirely on the fictional pilot and should be closed rather than worked. That leaves <strong>two real P0s</strong>: 007 (dev-session guard) and 026 (GDPR groundwork). 22 are P1 and 11 are P2. Momentum has stalled: the last feature merge was <strong>13 August</strong>; everything since has been documentation and admin.</p>
     </div>
 
     <div class="col">
-      <h3>Three findings from today's pass</h3>
+      <h3>Four findings from today's pass</h3>
       <ul class="clean">
+        <li><strong>A P0 ticket and three register items rest on demo data.</strong> The full reasoning is in the correction at the top. In backlog terms: <code>REMI-025 "Billing for 1 September"</code> should be closed or rewritten, decision <strong>D-4</strong> retired, and <strong>REQ-19, REQ-20 and REQ-32</strong> struck from the requests register before it is sent — otherwise the first thing Morgane reads is a request for the executed copy of a contract that was never signed. Worth a wider pass, too: if the audit mistook fixtures for fact once, the same reflex may sit elsewhere in it.</li>
         <li><strong>The required Quality check is failing, so nothing can merge right now.</strong> <code>apps/marketing</code> does not typecheck: three errors in <code>feature-section.tsx</code> and <code>hero-section.tsx</code>, where the <code>Stagger</code> and <code>StaggerItem</code> wrappers arrive with required <code>any</code> props. The source in <code>packages/ui</code> is correctly typed — <code>className</code> and <code>gap</code> are both optional there — so this is not a source bug. <code>packages/ui/dist</code> is built rather than committed, and CI relies on Turborepo restoring that build from the shared remote cache; marketing typechecked against a stale or unrestored copy of those declarations. It reproduces on content identical to <code>main</code>, so it is not caused by any open branch. <strong>Until it is fixed, branch protection will hold every PR</strong> — worth an hour before anything else queues up behind it.</li>
         <li><strong>A broken row on the ticket index — now fixed.</strong> REMI-004 (contact-form delivery) shipped and its file was moved to <code>_done/</code>, but the index still pointed at the old path and did not carry the <strong>done</strong> marker. The board reads from <code>main</code>, so a finished ticket was showing as unstarted work behind a dead link. I corrected that one line; all 39 links now resolve. The audit had previously scored the docs at zero broken links, so this was a regression.</li>
         <li><strong>The database decision contradicts itself in three places — not fixed, because it is yours to make.</strong> The technical docs and the admin roadmap both state plainly that the choice is made: <em>"Le choix est fait : Neon."</em> But ticket REMI-022 lists itself as blocked by open decision D-2 (Neon vs Supabase), the intake board lists D-2 as unanswered, <strong>and Morgane's email names Supabase as something we already use.</strong> Three sources, three different answers. This is the highest-value thing to settle in your call — details in Q3 below.</li>
@@ -528,9 +526,14 @@
         <ul class="clean">
           <li><strong>Genuine proprietary IP, and it is the clinical layer.</strong> The Nutrition Mindset psychological scoring model (a 20-item instrument scored across seven dimensions into seven profiles), the nutrigenomic interpretation grid (ApoE × DIO2 × AMY1A), and the Guardian validation doctrine are real know-how that a competitor cannot copy from the interface. This is the deeptech argument, and it is honest.</li>
           <li><strong>A sector-specific solution to an identified need</strong> — exactly the phrasing the call uses — rather than a horizontal tool.</li>
-          <li><strong>Real traction to cite:</strong> fifteen pilot practitioners with signed terms and billing starting 1 September. Many applicants at this stage have no revenue date at all.</li>
-          <li><strong>Technical replicability:</strong> a multi-tenant architecture, one deployment, six apps. The scalability criterion is straightforwardly answerable on the engineering side.</li>
+                    <li><strong>Technical replicability:</strong> a multi-tenant architecture, one deployment, six apps. The scalability criterion is straightforwardly answerable on the engineering side.</li>
         </ul>
+
+        <div class="callout crit">
+          <span class="callout-label">Do not cite the pilot</span>
+          <p>An earlier draft of this page listed "fifteen pilot practitioners with signed terms" as REMI's strongest traction claim. <strong>It is not real</strong> — see the correction at the top. Startup Boost is public money assessed by a jury of investors and operators who probe traction hardest of all, and a claim of fifteen paying customers would be checked. Presenting it would be a material misrepresentation, and the reputational cost of being caught at it in a small ecosystem outlasts any single application.</p>
+          <p>So the honest position on traction is: <strong>I have no verified commercial traction to point at.</strong> If real numbers exist — signed letters of intent, practitioners trialling the product, a waiting list — they are outside the repository and I need them from you. If they do not exist yet, the application argues on the models, the team and the market instead, which is a perfectly normal shape for an early-stage deeptech dossier.</p>
+        </div>
 
         <h4>Where a jury will push — and where we are exposed</h4>
         <p>This is the part worth being unsentimental about, because the call's exclusions are specific and REMI brushes against them.</p>
@@ -545,7 +548,7 @@
           <p>Her mention of <strong>Mistral</strong> is interesting precisely here. A European model provider is a materially stronger sovereignty story than the American ones in the current architecture. If there is a reason she named it, it is worth hearing — it may be the missing half of the criterion-one argument.</p>
         </div>
 
-        <p><strong>Suggested reply:</strong> yes, it is worth applying and the thematic fit is strong — but confirm company age and Walloon registered seat first, and send the full call regulation rather than the landing page, since eligibility rules usually sit separately from the thematic criteria and are what actually disqualifies people. Flag honestly that the pitch needs a P&amp;L, which needs your accountant.</p>
+        <p><strong>Suggested reply:</strong> yes, it is worth applying and the thematic fit is strong — but confirm company age and Walloon registered seat first, and send the full call regulation rather than the landing page, since eligibility rules usually sit separately from the thematic criteria and are what actually disqualifies people. Flag honestly that the pitch needs a P&amp;L, which needs your accountant — and settle between you what, if anything, we can truthfully claim as traction.</p>
       </div>
     </div>
 
@@ -641,7 +644,7 @@
           <li><strong>Who wrote the Python meal-plan API, and where does it run?</strong> This decides whether the deeptech claim in the grant application is real, and whether the AI brain is an asset we own or a dependency we rent.</li>
           <li><strong>Does the v1 Supabase project hold real patient data?</strong> If actual people's health records are sitting in a project nobody is maintaining, that is a live GDPR exposure and it outranks everything else on this page.</li>
           <li><strong>Vercel and GitHub access.</strong> Several open questions can only be answered from inside those accounts, and you cannot set branch protection or read deployment settings without admin rather than write.</li>
-          <li><strong>The executed pilot terms.</strong> Needed to settle which price is binding before invoicing anyone on 1 September.</li>
+          <li><strong>Whatever real traction exists, if any.</strong> Signed letters of intent, practitioners actually trialling the product, a waiting list — anything genuine. This replaces the request for "the executed pilot terms", which I have withdrawn: there is no such document, and asking for it would have signalled that we believe our own fixtures.</li>
           <li><strong>The FunMedDev genotype source table.</strong> The nutrigenomic engine cannot be ported faithfully without the original grid.</li>
         </ol>
         <div class="callout">
@@ -657,12 +660,12 @@
     <div class="part-head col">
       <span class="eyebrow">Recommendation</span>
       <h2>How I would spend the next 28 days</h2>
-      <p>The tension worth naming out loud: the grant application is business work and the billing deadline is operational work, and neither of them is the engineering work that actually makes the product able to hold a patient record. All three want the same month. Trying to do all three at full tilt is how none of them lands.</p>
+      <p>With the billing deadline gone, the month is much less crowded than it looked. One external deadline, one blocked pipeline, and a foundation that can resume at its own pace. The tension left is a real but manageable one: the grant application is business work, and it competes with the engineering that makes the product able to hold a patient record.</p>
     </div>
     <div class="col">
       <ol class="steps">
         <li><strong>Today — get CI green.</strong> The required Quality check is red on <code>main</code>, so branch protection is currently holding every merge. It looks like a stale <code>@remi/ui</code> build restored from the Turborepo cache rather than a source defect, so the fix is likely small. Nothing else can land until it clears.</li>
-        <li><strong>This week — decide, do not build.</strong> Settle billing for 1 September (manual invoicing is the recommended answer and costs hours, not weeks), and confirm which price is binding. Settle D-2 on the database, which also answers authentication if it lands on Supabase. Neither needs code.</li>
+        <li><strong>This week — clean the backlog of the fiction.</strong> Close REMI-025, retire D-4, and strike REQ-19/20/32 before the requests register goes to Morgane. Then settle D-2 on the database, which also answers authentication if it lands on Supabase. None of this needs code.</li>
         <li><strong>This week — send the requests register.</strong> It is written and it is blocking. Morgane has explicitly offered twice now to prepare everything in one go; take her up on it.</li>
         <li><strong>Confirm Startup Boost eligibility before investing in it.</strong> Two one-line facts — company age and Walloon seat — decide whether the dossier is worth a month of attention at all.</li>
         <li><strong>Then, and only then, restart the engineering.</strong> The board is correctly ordered: the test harness and error tracking (REMI-008, 009) come before the database adapter, because landing an adapter with no tests and no crash visibility is how the pilot finds the bugs for you. REMI-007 is P0 and cheap — do it first.</li>
@@ -672,7 +675,8 @@
     <div class="col">
       <div class="callout crit">
         <span class="callout-label">The one thing to say out loud on the call</span>
-        <p>Fifteen practitioners start being billed in 14 days for a product that cannot currently store a patient record, has no sign-in, and would not tell anyone if it crashed. That is not a criticism of the build — the foundation is deliberately and honestly staged, and Phase 0 closed the genuinely dangerous items. But the gap between the commercial commitment and the technical reality is the real subject of this check-in, and it is better raised by you than discovered by a practitioner.</p>
+        <p>The repository has been describing a commercial reality that does not exist. Fifteen practitioners, signed terms, a billing date — all of it demo data that an audit mistook for fact and then built a P0 ticket and three information requests on top of. Nothing was done dishonestly; fixtures are exactly the right way to design a console with no backend. But the fiction propagated, and it very nearly went into a public funding application as a traction claim.</p>
+        <p>That is the thing to name early, because the correction is cheap now and expensive later. The real position is a strong, honestly-staged foundation with genuine clinical IP, no customers yet, and one grant deadline 28 days out.</p>
       </div>
     </div>
   </section>
