@@ -1,9 +1,22 @@
-Bonjour Jamie,
+Je viens de télécharger Slack et de créer l’espace. Concernant le Startup Boost dont je t’ai parlé, voici le lien avec les prérequis pour pouvoir pitcher le projet devant le jury :
+https://startup.wallonie-entreprendre.be/en/startup-boost/
 
-J’espère que tu as passé un bon week-end ! Je suis enfin de retour de vacances et je pense que ce serait bien qu’on prenne un moment pour faire le point sur REMI afin de nous assurer que nous sommes sur la même longueur d’onde et de fixer clairement les prochains objectifs et priorités.
+Pourrais-tu me dire si, selon toi, la V2 de REMI pourrait correspondre aux critères de l’appel ?
 
-Avais-tu bien reçu mon OneNote ? J’avais essayé de te le partager.
+Si oui, j’aurais également besoin d’une explication claire et structurée des éléments qui permettent à REMI d’y répondre, afin que je puisse bien comprendre les arguments à mettre en avant et être capable de les défendre correctement devant le jury.
 
-As-tu également eu l’occasion de regarder le programme Start-up Boost ? Penses-tu que REMI pourrait remplir les conditions pour postuler ? Ce serait intéressant de voir ensemble si cela peut représenter une opportunité pour nous.
+Voici notamment les critères mentionnés :
 
-J’aimerais aussi qu’on fasse le point sur les différents outils et programmes que nous utilisons déjà ou dont nous aurons besoin pour la suite : Supabase, DigitalOcean, Mistral, Euria, etc. L’objectif serait d’avoir une vision claire de notre stack, de nos besoins et des coûts associés. Si tu as besoin aussi de plus d’infos sur le travail passé.
+As part of this thematic call, particular attention will be given to startups developing:
+
+Sovereign artificial intelligence or cybersecurity solutions, characterized by control over key technologies, strategic data, and, where relevant, the critical infrastructure required for their deployment;
+
+Sector-specific solutions addressing clearly identified business needs and demonstrating tangible operational value;
+
+Innovative cybersecurity solutions leveraging, in particular, automation, artificial intelligence, or advanced technological approaches to improve threat prevention, detection, analysis, or response capabilities;
+
+Deeptech products incorporating advanced artificial intelligence or cybersecurity technologies and relying on proprietary intellectual property, know-how, or technological developments (beyond the mere integration of existing tools);
+
+Solutions with strong scalability potential, based on a replicable product model and targeting national and/or international markets.
+
+Je vais également t’envoyer un maximum de documents et d’informations sur REMI au plus tard le week-end prochain. Je te transmettrai aussi les accès nécessaires, notamment à Lovable, GitHub, etc.
