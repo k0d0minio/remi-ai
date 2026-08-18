@@ -36,7 +36,7 @@ restatements have drifted. Plus small env-catalogue residue (F-19, F-20).
 6. **F-48:** the residue list — eslint error message pointing at a nonexistent section, the
    Layer 3/Layer 0 contradiction, "enforces" vs warning wording.
 7. **F-19/F-20:** fix the six-vs-seven `NODE_ENV` carve-out sentence in
-   `packages/services/AGENTS.md`; add or exempt a `NODE_ENV` row in `docs/ENV.md`; delete the
+   `packages/services/AGENTS.md`; add or exempt a `NODE_ENV` row in `.icm/docs/ENV.md`; delete the
    ghost `NEXT_PUBLIC_ANALYTICS_KEY` row and its `turbo.json` entry; document `env:pull` and
    `GITHUB_API_URL`.
 
@@ -46,12 +46,12 @@ restatements have drifted. Plus small env-catalogue residue (F-19, F-20).
 - [ ] No document claims the business pages are unwritten.
 - [ ] No unreachable hook script on disk; skill docs match reality.
 - [ ] The packages docs page matches `packages/ui/tsup.config.ts` and the AGENTS files.
-- [ ] `docs/ENV.md` has no ghost variables and no uncatalogued readers.
+- [ ] `.icm/docs/ENV.md` has no ghost variables and no uncatalogued readers.
 
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/history/audit-report.md
 findings F-19, F-20, F-21, F-25, F-44, F-46, F-47, F-48 — each names exact files and lines.
 
 Task: fix all catalogued documentation/config drift in one sitting. Work finding by finding:

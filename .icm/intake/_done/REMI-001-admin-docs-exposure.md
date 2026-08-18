@@ -133,7 +133,7 @@ it here would claim work this ticket never did. Where it actually stands:
 
 ```text
 Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md first, then read
-.icm/docs/audit-report.md findings F-30 and F-31 and decision D-1 in full.
+.icm/docs/history/audit-report.md findings F-30 and F-31 and decision D-1 in full.
 
 Context: the admin app (apps/admin) statically renders confidential content and relies on Vercel
 deployment protection, which cannot be verified from the repo. The docs app (apps/docs) has no

@@ -22,13 +22,13 @@ the form and doesn't re-type their message into a mail client is gone without a 
 
 1. Wire the email seam: implement a Resend adapter for the existing email interface in
    `packages/services/src/email/` (a console fallback exists; the seam and `RESEND_API_KEY`
-   variable are already reserved in `docs/ENV.md`).
+   variable are already reserved in `.icm/docs/ENV.md`).
 2. Make the contact form action (`apps/marketing/app/[locale]/contact/actions.ts`) call the seam
    instead of returning fake success. Deliver to the monitored contact addresses.
 3. Handle failure honestly: if sending fails, tell the sender (in both languages) and keep the
    "email us directly" fallback copy for that path.
 4. Restore an ordinary "we'll reply" success message in `en.ts` and `fr.ts` once delivery works.
-5. Keep the three-list env rule: zod schema + `docs/ENV.md` + `turbo.json` all updated together.
+5. Keep the three-list env rule: zod schema + `.icm/docs/ENV.md` + `turbo.json` all updated together.
 6. Set `RESEND_API_KEY` in the Vercel marketing project (or document that the owner must).
 
 ## Acceptance criteria
@@ -41,7 +41,7 @@ the form and doesn't re-type their message into a mail client is gone without a 
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/history/audit-report.md
 finding F-06, then packages/services/AGENTS.md for how seams and adapters work here.
 
 Task: make the public contact form actually deliver.
@@ -54,7 +54,7 @@ Task: make the public contact form actually deliver.
    form renders, keeping the "email us directly" fallback.
 3. Update the success copy in apps/marketing/lib/content/en.ts and fr.ts (currently says delivery
    is not connected) to an ordinary confirmation, keeping EN/FR parity — the compiler enforces it.
-4. Keep the env three-list rule: the zod schema in packages/services, docs/ENV.md, and turbo.json
+4. Keep the env three-list rule: the zod schema in packages/services, .icm/docs/ENV.md, and turbo.json
    must agree. Never commit a key.
 5. Add tests for any pure logic you introduce if the test harness (Vitest) exists by the time you
    work on this; otherwise keep logic minimal and pure so it is testable later.

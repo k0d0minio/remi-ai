@@ -13,7 +13,7 @@
 # Config comes straight from the process environment; this script does NOT load any .env file:
 #
 #   RESEND_API_KEY         (required)  Resend API key.
-#   SHIP_NOTE_RECIPIENTS   (required)  Comma-separated recipients (docs/ENV.md).
+#   SHIP_NOTE_RECIPIENTS   (required)  Comma-separated recipients (.icm/docs/ENV.md).
 #   EMAIL_FROM             (required*) The "from" sender.
 #   SHIP_NOTE_FROM         (optional)  Overrides EMAIL_FROM for ship-note mail only.
 #   * one of EMAIL_FROM / SHIP_NOTE_FROM must be set.

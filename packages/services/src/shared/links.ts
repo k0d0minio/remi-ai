@@ -52,7 +52,7 @@ const devPorts: Record<AppKey, number> = {
  * a preview deployment, a staging domain, a rename that has not landed here yet.
  * Set the variable in Vercel and it wins; leave it unset — which is the normal
  * case — and the table answers. All six are registered in turbo.json's
- * `globalEnv` and docs/ENV.md.
+ * `globalEnv` and .icm/docs/ENV.md.
  */
 const overrides: Record<AppKey, string | undefined> = {
   web: process.env.NEXT_PUBLIC_APP_URL,

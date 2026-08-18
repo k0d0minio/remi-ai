@@ -17,7 +17,7 @@ registration line — never a rewrite of the callers.
 | AI      | `TextProvider`   | `registerTextProvider()` | none yet                        | throws                              |
 
 An adapter goes in this package under `src/<seam>/adapters/<vendor>.ts`, the seam's own module is
-the only thing that re-exports it, and `docs/ENV.md` gains its variables in the same PR. A vendor
+the only thing that re-exports it, and `.icm/docs/ENV.md` gains its variables in the same PR. A vendor
 SDK, if one is needed, becomes a dependency of **this** package only. The Resend adapter needs none:
 it is one POST to one endpoint, so it uses `fetch` and the package stays at a single dependency.
 
@@ -45,7 +45,7 @@ for both.
 
 Every server-side `process.env` read goes through `env()` / `requireEnv()` in `src/server/env.ts`.
 A read anywhere else is a review blocker — the point is that a missing variable fails at boot
-naming itself, and that [`docs/ENV.md`](../../docs/ENV.md) has one file to track. Adding a variable
+naming itself, and that [`.icm/docs/ENV.md`](../../.icm/docs/ENV.md) has one file to track. Adding a variable
 is the three-edit rule in [`/CONVENTIONS.md`](../../CONVENTIONS.md) § "Environment variables".
 
 `shared/links.ts` is the one carve-out, and it is not a loophole: a `NEXT_PUBLIC_*` variable is

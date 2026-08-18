@@ -35,7 +35,7 @@ export const ensureMailer = () => {
 
   if (missing.length > 0) {
     console.error(
-      `[mailer] no mailer registered — unset on this deployment: ${missing.join(", ")}. Contact-form submissions cannot be delivered. See docs/ENV.md.`,
+      `[mailer] no mailer registered — unset on this deployment: ${missing.join(", ")}. Contact-form submissions cannot be delivered. See .icm/docs/ENV.md.`,
     );
     return;
   }

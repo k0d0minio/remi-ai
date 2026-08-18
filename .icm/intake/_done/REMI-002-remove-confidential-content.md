@@ -87,7 +87,7 @@ deliberations. They close when the owner decides, or when REMI-023's operator ro
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/history/audit-report.md
 finding F-30.
 
 Task: remove the confidential equity-negotiation content from the deployed admin app.

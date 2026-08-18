@@ -29,7 +29,7 @@ Context budget: the Inputs above are the budget (`pipeline/CONTEXT.md` → Layer
    - **A dependency bump** to a shared runtime dep updates the pnpm `catalog:` entry, not an app's
      own pin. If an app has its own pin, removing it is part of the chore.
    - **An env var change** touches three files in one PR: the zod schema in
-     `packages/services/src/server/env.ts`, a row in `docs/ENV.md`, and `globalEnv` in `turbo.json`
+     `packages/services/src/server/env.ts`, a row in `.icm/docs/ENV.md`, and `globalEnv` in `turbo.json`
      — plus the value set in Vercel and Actions.
 
 3. **Open the lane PR:**

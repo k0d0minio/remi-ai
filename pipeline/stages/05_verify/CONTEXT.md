@@ -28,7 +28,7 @@ a one-line `Context budget:` note in `verify.md`.
    **storage, auth, payments, or environment variables** (the spec's `touches:` plus the diff
    decide), run the readiness pass:
    - A migration has a working, tested `down`.
-   - A new env var is in `docs/ENV.md`, in the `env.ts` schema, in `turbo.json` `globalEnv`, **and**
+   - A new env var is in `.icm/docs/ENV.md`, in the `env.ts` schema, in `turbo.json` `globalEnv`, **and**
      actually set in Vercel and Actions. Three files and two dashboards; check all five.
    - A new service adapter is registered exactly once, at process start, and fails loudly when its
      configuration is missing.

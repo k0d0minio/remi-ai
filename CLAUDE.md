@@ -68,16 +68,22 @@ Nothing below is restated here. Each rule lives once, and loads on demand.
   The canonical code rules: the Build stage loads it by path. Read it before editing code.
 - **[`pipeline/CONTEXT.md`](pipeline/CONTEXT.md)** — the delivery pipeline. The map of its gated
   stages; each stage's contract is `pipeline/stages/NN_*/CONTEXT.md`.
-- **[`docs/ENV.md`](docs/ENV.md)** — the single catalogue of environment variables and secrets.
+- **[`.icm/docs/ENV.md`](.icm/docs/ENV.md)** — the single catalogue of environment variables and secrets.
   Bus-factor insurance: the setup is never trapped in one person's head.
 - **[`.claude/skills/`](.claude/skills/)** — one-job capability skills, called by pipeline stages.
 - **Subtree deltas** — `apps/*/AGENTS.md` and `packages/*/AGENTS.md` hold rules specific to that
   subtree (e.g. [`apps/demo/AGENTS.md`](apps/demo/AGENTS.md),
   [`packages/services/AGENTS.md`](packages/services/AGENTS.md)). The global rules still apply.
-- **Product knowledge** — `apps/docs/app/business/**` (direction) and `app/technical/**`
-  (architecture), routed per stage by
+- **[`.icm/docs/`](.icm/docs/README.md)** — the source of truth for **what REMI is**. Its
+  [`braindump/`](.icm/docs/braindump/) is Morgane's own material and outranks every other account
+  of the product; [`remi-status-report.html`](.icm/docs/remi-status-report.html) is the plan
+  derived from it. Read its README for the precedence order before trusting anything about
+  direction.
+- **Product knowledge** — `apps/docs/app/technical/**` (architecture) and
+  `app/business/**` (direction), routed per stage by
   [`pipeline/_shared/knowledge-map.md`](pipeline/_shared/knowledge-map.md). Load the named page,
-  never the whole site.
+  never the whole site. **The business pages predate the braindump and have not been reconciled
+  with it yet** — where they disagree, `.icm/docs/braindump/` wins.
 
 ## How work gets done here
 
