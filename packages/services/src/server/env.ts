@@ -5,7 +5,7 @@ import { z } from "zod";
  *
  * Two reasons it is worth the indirection: a missing variable fails at boot with
  * the variable's name rather than as `undefined` three layers down, and
- * `docs/ENV.md` has exactly one file to stay in sync with. Adding a
+ * `.icm/docs/ENV.md` has exactly one file to stay in sync with. Adding a
  * `process.env.*` read anywhere else is a review blocker.
  */
 const schema = z.object({
@@ -48,7 +48,7 @@ export const requireEnv = <K extends keyof ServerEnv>(
   const value = env()[key];
   if (value === undefined || value === "") {
     throw new Error(
-      `${String(key)} is not set — required by ${usedBy}. Add it in Vercel and document it in docs/ENV.md.`,
+      `${String(key)} is not set — required by ${usedBy}. Add it in Vercel and document it in .icm/docs/ENV.md.`,
     );
   }
   return value as NonNullable<ServerEnv[K]>;

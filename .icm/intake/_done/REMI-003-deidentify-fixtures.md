@@ -84,7 +84,7 @@ this ticket's scope; `vous@example.com` would be reserved.
 ## Agent prompt
 
 ```text
-Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/audit-report.md
+Work in the remi-ai monorepo. Read CLAUDE.md and CONVENTIONS.md, then .icm/docs/history/audit-report.md
 finding F-33.
 
 Task: de-identify all fixture data.

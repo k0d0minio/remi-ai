@@ -40,7 +40,7 @@ Candidates worth building once the repo has the surface to justify them:
 - **`shared-component`** — add a primitive to `packages/ui`: shadcn add, rewrite to house style,
   export from the barrel, wire a consumer. Called by Build and Design.
 - **`service-adapter`** — implement and register a seam adapter in `packages/services` (storage,
-  email, AI) with its env vars, `docs/ENV.md` row and `turbo.json` entry. Called by Build.
+  email, AI) with its env vars, `.icm/docs/ENV.md` row and `turbo.json` entry. Called by Build.
 - **`changelog-entry`** — the changelog page's frontmatter and user-voice copy rules. Called by Ship.
 - **`docs-sync`** — update the affected `apps/docs` pages in the feature PR. Called by Ship.
 

@@ -1,9 +1,18 @@
 # Remi AI — pre-build audit report
 
+> **Historical record — engineering findings only.** Audited 2026-08-08, before Morgane's
+> braindump arrived. Where this report speaks about **what REMI is, what it should build, or in
+> what order**, it is superseded by [`.icm/docs/braindump/`](../braindump/) (the source of truth)
+> and the plan in [`.icm/docs/remi-status-report.html`](../remi-status-report.html). The claims it
+> made from demo fixture data — a signed pilot, €24.50/practitioner/month, billing from
+> 1 September 2026, fifteen enrolled practitioners — were **never true** and have been removed
+> from this file. What survives is the code-level findings (F-01 … F-48), which stand on their own
+> because they were read out of the repository, not inferred from the business.
+
 Audited on 2026-08-08 at commit `5844bbb`, by reading the repository end to end: every rule
 document, every source file in both packages and all six apps, the pipeline contracts and scripts,
 the CI workflows, and the git history. Nothing was executed and nothing was changed except this
-file. The brief for this audit is `docs/audit-prompt.md`.
+file.
 
 ---
 
@@ -37,53 +46,14 @@ what is already built.
 
 ## 2 · What to do before building features
 
-Ordered by what has to happen first. Sizes are working-effort estimates.
-
-1. **Close the admin and docs exposure — today.** Verify Vercel deployment protection (a
-   password/SSO wall the hosting provider puts in front of a site) is actually ON for the admin
-   project, and decide whether the docs site should be public — it currently publishes the pilot's
-   confidential pricing and the fact that the console is unprotected. Also decide whether the
-   equity-offer page belongs in any deployed app at all. This comes first because it is a live
-   exposure, not a code-quality issue. _(Hours — it is configuration, not code.)_ → F-30, F-31
-2. **Give the contact form somewhere to deliver.** The public contact form is honest — it tells
-   the sender delivery is not connected and to email directly — but it still keeps no record of
-   who wrote in, during an open pilot-recruitment window. Wire the Resend email adapter (the seam
-   and the env variable are already prepared) or store submissions somewhere retrievable.
-   _(Hours to a day.)_ → F-06
-3. **Turn on branch protection and settle the merge rules.** Make the Quality check required on
-   the main branch, configure squash-merge (the repo's own stated rule, never yet practiced), and
-   resolve the trap that documentation-only changes skip checks entirely. Everything after this
-   step inherits its safety from it. _(Hours — GitHub settings plus one workflow edit.)_ → F-22, F-23, F-45
-4. **Fix the drift batch.** One sitting: add `support` to the two pipeline scripts and two
-   templates that don't know it exists; correct the four docs claiming the business pages are
-   unwritten; fix the stale packages page; delete the dead routing hook. Cheap now, misleading
-   forever if left. _(Hours.)_ → F-21, F-44, F-46, F-47
-5. **Stand up the test harness.** Vitest (a test runner that fits this stack with zero extra
-   build machinery), first tests on the ~900 lines of pure logic that already exist (locale
-   parsing, link building, formatters, env parsing), and a CI step so it gates every PR. Do this
-   _before_ the first database adapter, not with it — bootstrapping harness + adapter + coverage
-   floor in one PR is how the floor gets waived. _(A day.)_ → F-26
-6. **Wire error tracking.** Sentry (or equivalent) via an `instrumentation.ts` file in each app,
-   plus the missing `global-error.tsx` safety nets. The repo already calls this "the top unstarted
-   ops item" and has reserved the variable names. Until this exists, every crash after this point
-   is invisible. _(A day.)_ → F-27, F-29
-7. **Model the missing entities before the first byte of real data.** The
-   practitioner↔person relationship record (the decided access-control primitive), consent
-   capture, the audit trail, and the AI-generation record. These shape the database schema, so
-   they come before the adapter. _(A few days, including the decisions attached.)_ → F-14, F-16
-8. **Choose the database vendor and land the first adapter** — with migrations, a registration
-   point, and the coverage floor switched on. This unblocks every real feature and is where
-   findings F-08 through F-11 get resolved. _(A week or more.)_ → F-08–F-11
-9. **Choose the auth approach and replace the development session.** Magic links are already
-   decided in principle; pick the implementation and wire the real session provider into the seam
-   that is waiting for it. _(A week or more; can overlap with 8.)_ → F-32
-10. **Do the GDPR groundwork in parallel with 7–9:** processor agreements, the pseudonymisation
-    decision for AI calls, a retention schedule. Owner-and-legal work, not engineering. _(A few
-    days of owner time.)_ → F-34 and section 7
-
-Items 1–4 are a day or two in total and remove every live risk. Items 5–6 make everything after
-them safe to build. Items 7–10 are the real pre-feature work and are dominated by decisions, not
-code.
+> **Superseded.** This section used to carry a ten-item ordering built partly on a pilot that did
+> not exist. Items 1–4 (admin/docs exposure, contact-form delivery, branch protection, the drift
+> batch) were done and are recorded in [`.icm/intake/_done/`](../../intake/_done/). Everything else
+> it proposed — test harness, error tracking, entity modelling, database adapter, auth, GDPR
+> groundwork — now lives in **Phases A and B** of
+> [`.icm/docs/remi-status-report.html`](../remi-status-report.html) and is cut into tickets in
+> [`.icm/intake/`](../../intake/). Read the findings below for the _what_; read the report for the
+> _order_.
 
 ## 3 · What is already right
 
@@ -139,16 +109,16 @@ Every external thing this product will need, with its honest status today. The e
 deliberate design (the "seams" — plug sockets a vendor gets wired into later) — but they are
 still empty.
 
-| Connection     | For                                                                                    | Vendor chosen?                                                                                                                                 | Code exists?                                                                                          | What happens today if something calls it                                                                                                                                                    |
-| -------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Database       | All persistence — the entire core loop                                                 | In docs only: Neon (EU Postgres), Supabase named as likely later (`apps/docs/app/technical/decisions/page.mdx:13-16`)                          | Seam only — interface + registration point, no adapter                                                | Nothing calls it. Every screen reads built-in fake data instead (`apps/web/lib/queries/clients.ts:21-22`), so it does not even fail loudly — see F-08                                       |
-| Authentication | Practitioner/person sign-in; operator access to admin                                  | Shape decided (magic links, `decisions/page.mdx:17-19`); **no vendor**                                                                         | A session seam in the web app only                                                                    | Sign-in ignores email and password entirely; a role radio button is the whole "login" (`apps/web/lib/actions/session.ts:26-38`). Admin has **nothing** — see F-30, F-32                     |
-| Email          | Magic links, pilot invites, contact form                                               | Leaning Resend (`docs/ENV.md:63`)                                                                                                              | Seam + a console fallback that logs instead of sending (`packages/services/src/email/index.ts:34-40`) | Any caller of the seam is told "sent" while nothing leaves the process. The live contact form does not call the seam at all — it validates, says so plainly, and keeps no record — see F-06 |
-| AI             | Structuring notes, generating plans/meals within the therapeutic frame                 | Anthropic models via Vercel AI Gateway, in docs (`decisions/page.mdx:26-28`; model ids hardcoded in `packages/services/src/ai/index.ts:15-19`) | Seam only, no adapter, no caller                                                                      | Throws a clear "no AI provider registered" error (`ai/index.ts:48-52`) — correct behaviour, zero call sites                                                                                 |
-| Payments       | Billing starts **1 September 2026** (`apps/docs/app/business/initiatives/page.mdx:24`) | **Nothing — no vendor, no leaning, no code, no reserved variable**                                                                             | Nothing                                                                                               | Nothing to call. Three weeks from the audit date — see F-07                                                                                                                                 |
-| Error tracking | Knowing the product crashed                                                            | Deferred; Sentry names reserved (`docs/ENV.md:102-103`)                                                                                        | **Nothing**                                                                                           | Crashes vanish — see F-27                                                                                                                                                                   |
-| Analytics      | Traffic measurement                                                                    | **Yes — Vercel Analytics, the one live connection**                                                                                            | Wired in 5 of 6 apps (docs declares it but never renders it)                                          | Works (if enabled on the Vercel side)                                                                                                                                                       |
-| File storage   | Lab reports, plan exports (both promised by the product docs)                          | No; Supabase buckets mentioned as a future option                                                                                              | Nothing                                                                                               | Nothing to call — a decision for later, but the 90-day export promise needs it                                                                                                              |
+| Connection     | For                                                                        | Vendor chosen?                                                                                                                                   | Code exists?                                                                                          | What happens today if something calls it                                                                                                                                                    |
+| -------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Database       | All persistence — the entire core loop                                     | **Supabase** — named by the braindump as V2's base (`.icm/docs/braindump/developpement-produit/ai.md`); at audit time the docs still leaned Neon | Seam only — interface + registration point, no adapter                                                | Nothing calls it. Every screen reads built-in fake data instead (`apps/web/lib/queries/clients.ts:21-22`), so it does not even fail loudly — see F-08                                       |
+| Authentication | Practitioner/person sign-in; operator access to admin                      | Shape decided (magic links, `decisions/page.mdx:17-19`); **no vendor**                                                                           | A session seam in the web app only                                                                    | Sign-in ignores email and password entirely; a role radio button is the whole "login" (`apps/web/lib/actions/session.ts:26-38`). Admin has **nothing** — see F-30, F-32                     |
+| Email          | Magic links, pilot invites, contact form                                   | Leaning Resend (`.icm/docs/ENV.md:63`)                                                                                                           | Seam + a console fallback that logs instead of sending (`packages/services/src/email/index.ts:34-40`) | Any caller of the seam is told "sent" while nothing leaves the process. The live contact form does not call the seam at all — it validates, says so plainly, and keeps no record — see F-06 |
+| AI             | Structuring notes, generating plans/meals within the therapeutic frame     | Anthropic models via Vercel AI Gateway, in docs (`decisions/page.mdx:26-28`; model ids hardcoded in `packages/services/src/ai/index.ts:15-19`)   | Seam only, no adapter, no caller                                                                      | Throws a clear "no AI provider registered" error (`ai/index.ts:48-52`) — correct behaviour, zero call sites                                                                                 |
+| Payments       | Practitioner subscriptions when monetisation starts — no date, no contract | **Nothing — no vendor, no leaning, no code, no reserved variable**                                                                               | Nothing                                                                                               | Nothing to call. Scheduled in Phase F of the direction report, not before                                                                                                                   |
+| Error tracking | Knowing the product crashed                                                | Deferred; Sentry names reserved (`.icm/docs/ENV.md:102-103`)                                                                                     | **Nothing**                                                                                           | Crashes vanish — see F-27                                                                                                                                                                   |
+| Analytics      | Traffic measurement                                                        | **Yes — Vercel Analytics, the one live connection**                                                                                              | Wired in 5 of 6 apps (docs declares it but never renders it)                                          | Works (if enabled on the Vercel side)                                                                                                                                                       |
+| File storage   | Lab reports, plan exports (both promised by the product docs)              | No; Supabase buckets mentioned as a future option                                                                                                | Nothing                                                                                               | Nothing to call — a decision for later, but the 90-day export promise needs it                                                                                                              |
 
 ## 6 · Findings
 
@@ -247,33 +217,31 @@ delivering the message anywhere — a code comment admits it ("When an adapter l
 from @remi/services/email"). It is **not** dishonest about this: the success body reads "Delivery
 is not connected yet, so nothing has been sent; write to us directly at the addresses above"
 (French equivalent identical in force), so the sender is told to use the addresses in F-03. What
-is still missing is any record that they wrote at all. The pilot-recruitment window is open right
-now (1 July – 31 August 2026, `apps/docs/app/business/initiatives/page.mdx:19-25`), and this is
-the public site's contact channel.
-**Why it matters.** The honest copy removes the deception but not the loss: a prospective pilot
+is still missing is any record that they wrote at all, and this is the public site's only contact
+channel. (The "1 July – 31 August 2026 pilot-recruitment window" cited in the original finding was
+fixture-derived and did not exist.)
+**Why it matters.** The honest copy removes the deception but not the loss: a prospective
 practitioner who fills the form and does not go on to re-type their message into a mail client is
 gone with no trace. (Caveat: whether the marketing site is deployed and receiving traffic could
 not be verified from the repo — section 8.)
-**If ignored.** Silent drop-off during the one window the current quarter is built around, with no
-way to know how many.
+**If ignored.** Silent drop-off, with no way to know how many.
 **What to do.** Wire the Resend adapter (seam and env variable already prepared) or persist
 submissions somewhere retrievable, and then restore an ordinary "we'll reply" success message.
 _(Hours to a day.)_
 
-#### F-07 · Payments do not exist in any form, and billing starts on 1 September 2026
+#### F-07 · Payments do not exist in any form
 
-**Severity:** Important
-**Where:** `docs/ENV.md:104-105` (the only mention) · `apps/docs/app/business/initiatives/page.mdx:24` (the billing date)
+**Severity:** Deferred — **the deadline this finding carried was fiction**
 
-**What is true.** The signed pilot terms say billing (€24.50/practitioner/month) starts
-1 September 2026. There is no payment vendor, no code, no seam, and no reserved variable — the
-only trace is a smoke-test checklist line that stays "not touched".
-**Why it matters.** This is the only connection with a contractual date attached, and it is the
-least started.
-**If ignored.** Either billing slips, or it gets built in a rush against the pilot's first
-invoice — the most error-intolerant feature in the product, done under the most time pressure.
-**What to do.** Decide the vendor now (section 7); for fifteen practitioners, even manual
-invoicing is a legitimate first answer — but decide it, don't discover it in September.
+**Retracted.** The original finding said billing of €24.50/practitioner/month began on
+1 September 2026 under signed pilot terms. There were no signed pilot terms: the figures came from
+demo fixture data in the admin console, and the braindump confirms the fifteen practitioners are a
+**beta-recruitment target**, not contracts. There is no billing date and no revenue.
+
+**What is still true.** There is no payment vendor, no code, no seam and no reserved variable for
+payments. That is now a planned Phase F item (practitioner Starter/Growth/Clinic tiers at
+€39/€79/€199 per month, patient premium around €9.99 — `.icm/docs/braindump/business/pricing.md`),
+not an overdue one.
 
 ### Area 4 · The seams
 
@@ -454,7 +422,7 @@ hour of thought. _(Included in item 7.)_
 
 ### Area 6 · Configuration and environments
 
-The three-list rule (zod schema + `docs/ENV.md` + `turbo.json`) was checked variable by variable
+The three-list rule (zod schema + `.icm/docs/ENV.md` + `turbo.json`) was checked variable by variable
 and **holds exactly**: 8/8 server variables agree across all three lists, the six public URL
 overrides agree across their three homes, CI-only variables are correctly excluded, no `.env` file
 was ever committed, and a full-history scan for credential patterns came back clean. Two nits:
@@ -462,7 +430,7 @@ was ever committed, and a full-history scan for credential patterns came back cl
 #### F-19 · One raw environment read outside the documented exception, and one uncatalogued variable
 
 **Severity:** Later
-**Where:** `packages/services/src/shared/links.ts:87` (a raw `NODE_ENV` read — the file's documented exception covers six reads; it has seven, and `packages/services/AGENTS.md:46` states "six") · `NODE_ENV` itself is in the schema and `turbo.json:5` but has no `docs/ENV.md` row
+**Where:** `packages/services/src/shared/links.ts:87` (a raw `NODE_ENV` read — the file's documented exception covers six reads; it has seven, and `packages/services/AGENTS.md:46` states "six") · `NODE_ENV` itself is in the schema and `turbo.json:5` but has no `.icm/docs/ENV.md` row
 
 **What is true.** As stated. Functionally harmless — Next.js inlines `NODE_ENV` anyway.
 **Why it matters.** The env discipline is the repo's proudest mechanical rule; the one file with a
@@ -473,7 +441,7 @@ carve-out miscounts its own carve-out.
 #### F-20 · A ghost variable, and an undocumented command
 
 **Severity:** Later
-**Where:** `docs/ENV.md:84` + `turbo.json:19` (`NEXT_PUBLIC_ANALYTICS_KEY` — read by nothing; Vercel Analytics needs no key) · `turbo.json:55` + all six apps (`env:pull` scripts exist, documented nowhere) · three pipeline scripts read `GITHUB_API_URL`, absent from ENV.md's table
+**Where:** `.icm/docs/ENV.md:84` + `turbo.json:19` (`NEXT_PUBLIC_ANALYTICS_KEY` — read by nothing; Vercel Analytics needs no key) · `turbo.json:55` + all six apps (`env:pull` scripts exist, documented nowhere) · three pipeline scripts read `GITHUB_API_URL`, absent from ENV.md's table
 
 **What is true.** As stated — each violates a stated rule ("a config key with no reader is
 deleted"; ENV.md as the single catalogue).
@@ -589,7 +557,7 @@ _(A day.)_
 #### F-27 · Nothing tells you when the product breaks
 
 **Severity:** Important
-**Where:** `docs/ENV.md:102-103` — "Until it exists, a production exception is invisible. This is the top unstarted ops item." Nothing reads `SENTRY_DSN`; no tracking SDK exists anywhere
+**Where:** `.icm/docs/ENV.md:102-103` — "Until it exists, a production exception is invisible. This is the top unstarted ops item." Nothing reads `SENTRY_DSN`; no tracking SDK exists anywhere
 
 **What is true.** A server-side crash shows the user a branded error page with a correlation id,
 and writes a stack trace to hosting logs that expire unread — no alert, no aggregation. A
@@ -597,7 +565,7 @@ _client-side_ crash (in the browser) is recorded **nowhere at all** — there is
 and browser errors never reach server logs. A whole-app outage has no uptime probe. The team
 learns about failures when a human reports them. The one passive signal is Vercel Analytics
 traffic curves in five apps.
-**Why it matters.** "Invisible failure" here is literal: the pilot's fifteen practitioners are the
+**Why it matters.** "Invisible failure" here is literal: the founding-practitioner beta group is the
 monitoring system.
 **If ignored.** The first production incident is diagnosed from a user's screenshot of an error
 id whose matching log line has already expired.
@@ -701,7 +669,7 @@ doctor's name.
 #### F-34 · The data-protection groundwork that must precede the first real record is undecided
 
 **Severity:** Important
-**Where:** Decided and documented: EU database region, EU function regions, AI via gateway, pseudonymisation leaning (`apps/docs/app/technical/decisions/page.mdx:13-40`); undecided and absent: any processor register or DPA record (none for Vercel, Anthropic, Neon, or Resend — "processors named before they process" is promised at `apps/docs/app/business/initiatives/page.mdx:40`), any retention schedule, any deletion/anonymisation capability (no model support — F-16), the pseudonymisation decision itself (`decisions/page.mdx:33-36`)
+**Where:** Decided and documented: EU database region, EU function regions, AI via gateway, pseudonymisation leaning (`apps/docs/app/technical/decisions/page.mdx:13-40`); undecided and absent: any processor register or DPA record (none for Vercel, the AI provider, Supabase, or Resend — "processors named before they process" is promised at `apps/docs/app/business/initiatives/page.mdx:40`), any retention schedule, any deletion/anonymisation capability (no model support — F-16), the pseudonymisation decision itself (`decisions/page.mdx:33-36`)
 
 **What is true.** The thinking is unusually good and unusually honest — but the concrete
 obligations (signed processor agreements, retention, deletion capability, the
@@ -921,31 +889,29 @@ configuration or an afternoon of content moves; cost of (c): F-30/F-31 remain li
 (a) today, then decide (b) at leisure — and take the equity-offer page out of the deployed app
 regardless; a negotiation document gains nothing from being a website._ **Can wait: not at all.**
 
-**D-2 · Which database vendor?** The docs lean Neon (EU serverless Postgres) with Supabase as the
-likely eventual home. Options: Neon now / Supabase now / defer further. Neon is the lighter
-commitment consistent with the decided EU posture; Supabase bundles auth+storage (which would also
-answer parts of D-3) but is a bigger commitment. Deferring further costs nothing _except_ that
-items 7–8 of the checklist are blocked on it. _Recommendation: decide within the month; either
-named option is fine — the seam genuinely makes this cheap to be wrong about._ **Can wait: until
-the first persistence feature — which is the next real milestone.**
+**D-2 · Which database vendor?** ~~Neon or Supabase.~~ **Settled — Supabase.** The braindump names
+Supabase as V2's base (`.icm/docs/braindump/developpement-produit/ai.md`, "Architecture pragmatique
+V2"), and v1 already ran on its auth, storage, cron and RLS. The seam makes the adapter the only
+work. **Closed.**
 
 **D-3 · Which auth implementation for the decided magic-link shape?** Options: Auth.js
 (self-hosted, free, more wiring), a hosted provider (Clerk et al. — fastest, per-user cost, EU
-data questions), or the database vendor's auth if D-2 lands on Supabase. Locks in: session
-mechanics, the 2FA path for practitioners, part of the GDPR processor list. _Recommendation:
-decide together with D-2 — the pairing changes the answer._ **Can wait: until real users; but the
-dev-session must refuse to run in production before any real data exists (F-32).**
+data questions), or **Supabase Auth**, which D-2 now makes the default answer to beat. Locks in:
+session mechanics, the 2FA path for practitioners, part of the GDPR processor list.
+_Recommendation: Supabase Auth unless something specific rules it out — one vendor, one DPA._
+**Can wait: until real users; but the dev-session must refuse to run in production before any real
+data exists (F-32).**
 
-**D-4 · How does billing actually happen on 1 September?** Options: a payment provider (Stripe
-being the obvious one — real integration work, weeks), or manual invoicing for the fifteen pilot
-practitioners (hours of admin per month, zero code). _Recommendation: manual invoicing for the
-pilot; decide the provider when self-serve signup is scoped._ **Can wait: the decision cannot
-(three weeks); the integration can.**
+**D-4 · How does billing actually happen on 1 September?** ~~Stripe or manual invoicing for the
+fifteen pilot practitioners.~~ **Retracted — the question rested on a contract that does not
+exist.** There is no billing date. Pricing tiers are proposals in
+`.icm/docs/braindump/business/pricing.md`, and choosing a payment provider is Phase F work.
+**Closed.**
 
 **D-5 · Is personal data pseudonymised before it reaches the AI provider?** The docs lean yes;
 it costs a mapping layer and some prompt quality, and buys a materially smaller GDPR surface with
 a US-owned processor. Also in this decision: the DPAs/processor register (Vercel, Anthropic,
-Neon/Supabase, Resend) the docs promise "before they process". _Recommendation: yes, and do the
+Supabase, Resend) the docs promise "before they process". _Recommendation: yes, and do the
 processor paperwork as item 10 — it is owner-and-legal work that gates nothing else._ **Can wait:
 until the first AI feature touches real data — but not one day past.**
 
@@ -989,7 +955,7 @@ several findings above hinge on it.
   `.github/labels.yml` was ever created on the live repo (its comment says setup is manual).
 - **GitHub account-level security features** — Dependabot alerts, secret-scanning push
   protection (F-36).
-- **Any signed processor agreements** (Vercel, Anthropic, Neon, Resend) — no repo evidence either
+- **Any signed processor agreements** (Vercel, the AI provider, Supabase, Resend) — no repo evidence either
   way (F-34).
 - **Any external uptime monitoring** configured outside the repo (F-27).
 - **Whether the globally-provided agent skills named by the Design stage** (`accessibility`,

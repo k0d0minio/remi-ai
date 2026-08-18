@@ -47,7 +47,7 @@ the source files you actually edit. Record overruns on a one-line `Context budge
    implementation quietly breaks:
    - A component two apps could use goes in `packages/ui` from its first commit, never copied.
    - A new `process.env` read goes through `packages/services/src/server/env.ts`, plus a row in
-     `docs/ENV.md` and a `globalEnv` entry in `turbo.json` — same PR.
+     `.icm/docs/ENV.md` and a `globalEnv` entry in `turbo.json` — same PR.
    - The superseded implementation is deleted in the same change as its replacement.
 
 5. **Use capability skills where they apply.** For repeatable work, prefer the matching skill in
