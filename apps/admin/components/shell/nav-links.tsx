@@ -11,6 +11,13 @@ type Props = {
   onNavigate?: () => void;
 };
 
+// Overview owns the root, so it matches exactly; every other link owns its
+// subtree.
+const matches = (href: string, pathname: string) =>
+  href === "/"
+    ? pathname === "/"
+    : pathname === href || pathname.startsWith(`${href}/`);
+
 /**
  * A client island purely because the current route decides which link is
  * highlighted. The sidebar and header around it stay on the server.
@@ -33,13 +40,7 @@ export const NavLinks = ({ onNavigate }: Props) => {
 
           <ul className="flex flex-col gap-0.5">
             {section.items.map((item) => {
-              // Overview owns the root, so it matches exactly; every other
-              // section owns its subtree.
-              const active =
-                item.href === "/"
-                  ? pathname === "/"
-                  : pathname === item.href ||
-                    pathname.startsWith(`${item.href}/`);
+              const active = matches(item.href, pathname);
               const Icon = item.icon;
 
               return (

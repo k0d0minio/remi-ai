@@ -8,14 +8,15 @@ import {
 
 type Props = {
   header: PageHeader;
+  /**
+   * Renders the audience and authorship line. Set on the Synthèse alone: the
+   * dossier is one document, and a masthead repeated on every page of it is
+   * four lines the reader has to skip four times to reach the content.
+   */
+  masthead?: true;
 };
 
-/**
- * One masthead for the whole dossier. The seven pages are a single document
- * split across a sidebar, and a shared header is what makes that legible
- * without repeating the framing paragraph on each of them.
- */
-export const ReportHeader = ({ header }: Props) => (
+export const ReportHeader = ({ header, masthead }: Props) => (
   <div className="flex flex-col gap-3">
     <Typography variant="eyebrow" tone="muted">
       {header.eyebrow}
@@ -29,15 +30,18 @@ export const ReportHeader = ({ header }: Props) => (
       {header.lead}
     </Typography>
 
-    <Separator tone="subtle" />
-
-    <div className="flex flex-wrap gap-x-8 gap-y-1">
-      <Typography size="xs" tone="muted">
-        {preparedFor}
-      </Typography>
-      <Typography size="xs" tone="muted">
-        {author} · {preparedOn}
-      </Typography>
-    </div>
+    {masthead ? (
+      <>
+        <Separator tone="subtle" />
+        <div className="flex flex-wrap gap-x-8 gap-y-1">
+          <Typography size="xs" tone="muted">
+            {preparedFor}
+          </Typography>
+          <Typography size="xs" tone="muted">
+            {author} · {preparedOn}
+          </Typography>
+        </div>
+      </>
+    ) : null}
   </div>
 );
