@@ -37,7 +37,6 @@ const Decisions = () => (
       title={decisions.closing.title}
       body={decisions.closing.body}
     />
-
   </div>
 );
 

@@ -58,7 +58,6 @@ const StartupBoost = () => (
       title={startupBoost.conclusion.title}
       body={startupBoost.conclusion.body}
     />
-
   </div>
 );
 

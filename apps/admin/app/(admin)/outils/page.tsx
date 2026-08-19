@@ -48,7 +48,6 @@ const Outils = () => (
     </Alert>
 
     <ReportSection title={outils.costs.title} body={outils.costs.body} />
-
   </div>
 );
 
