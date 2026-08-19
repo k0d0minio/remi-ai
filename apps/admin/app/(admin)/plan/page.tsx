@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { FactTable } from "@/components/company/fact-table";
 import { ItemCard } from "@/components/company/item-card";
+import { PhaseTrack } from "@/components/company/phase-track";
 import { ReportHeader } from "@/components/company/report-header";
 import { ReportSection } from "@/components/company/report-section";
 import { plan } from "@/lib/dossier/plan";
@@ -23,12 +24,16 @@ const Plan = () => (
   <div className="flex max-w-4xl flex-col gap-8">
     <ReportHeader header={plan.header} />
 
-    <ReportSection title={plan.retired.title} body={plan.retired.body} />
+    <PhaseTrack
+      title={plan.track.title}
+      description={plan.track.description}
+      steps={plan.track.steps}
+    />
 
     <ItemCard
-      title={plan.survives.title}
-      description={plan.survives.lead}
-      items={plan.survives.items}
+      title={plan.foundations.title}
+      description={plan.foundations.lead}
+      items={plan.foundations.items}
     />
 
     <FactTable

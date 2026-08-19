@@ -1,53 +1,80 @@
 /**
- * The plan that replaces the retired backlog — and, since the consolidation,
- * the whole of what used to be spread across three pages.
+ * The plan, as data — presented as the plan, not as the successor to anything.
  *
- * What was "Écarts constatés" is now this page's opening two sections: what
- * was retired and what survives are the reason the plan exists, not a separate
- * argument. What was "Le produit" is reduced to the numbers table — the rest
- * of that page handed Morgane her own product definition back, and the phases
- * below already carry the scope it described.
+ * Six phases in dependency order. The track at the top carries the sequence so
+ * the six detail cards can be read as detail rather than as a wall; the frame
+ * table carries the numbers the periphery of each phase is cut to fit.
  *
- * Six phases in dependency order, cut from the braindump's own priorities.
  * Proposed, not decided: nothing here is opened as a ticket before Morgane and
  * Arnaud have read it.
  */
 
+import type { TrackStep } from "@/components/company/phase-track";
 import type { FactRow, Item, PageHeader } from "@/lib/dossier/shared";
 
 export const plan = {
   header: {
     eyebrow: "Le plan proposé",
     title: "Plan V2",
-    lead: "L'ancien backlog visait le mauvais produit et a été retiré. Voici son remplaçant, construit à partir de vos propres priorités : la simplicité d'abord, le dashboard praticien comme centre stratégique, de la valeur en moins de 60 secondes, et la discipline des 10 000 €. Six phases, dans l'ordre où elles doivent tomber, découpées en 27 tickets — qui ne seront ouverts qu'après votre relecture.",
+    lead: "Six phases, dans l'ordre où elles doivent tomber : la simplicité d'abord, le dashboard praticien comme centre stratégique, de la valeur en moins de 60 secondes, et la discipline des 10 000 €. Découpées en 27 tickets, qui ne seront ouverts qu'après votre relecture.",
   } satisfies PageHeader,
 
-  retired: {
-    title: "Ce qui a été retiré",
-    body: [
-      "Les 33 tickets ouverts de l'ancienne liste ont été supprimés en une fois. Ils avaient été reconstruits à partir du code de la V1 : questionnaire de scoring psychologique, moteur d'interprétation génétique, génération de plans hebdomadaires rigides. Aucun n'apparaît dans vos priorités V2 — la génétique n'y figure que comme idée lointaine. Les construire aurait dépensé le budget des 10 000 € sur les mauvaises choses.",
-      "Les six tickets déjà terminés sont conservés : ce travail était réel et reste valable — exposition de contenu confidentiel fermée, formulaire de contact branché, protections de relecture de code actives. Chaque ticket supprimé reste récupérable dans l'historique du projet : rien n'est effacé, tout est daté.",
-    ],
+  track: {
+    title: "Les six phases",
+    description:
+      "Chacune dépend de la précédente. Les phases C, D et E sont le produit lui-même ; A et B sont ce qui doit être réglé pour pouvoir les construire sans se tromper.",
+    steps: [
+      {
+        letter: "A",
+        label: "Décider",
+        note: "Quelques jours. Des arbitrages, pas du code.",
+      },
+      {
+        letter: "B",
+        label: "Fondations",
+        note: "1 à 2 semaines. Comptes, données, socle légal.",
+      },
+      {
+        letter: "C",
+        label: "Boucle patient",
+        note: "Le cœur de la V2. Valeur en 60 secondes.",
+      },
+      {
+        letter: "D",
+        label: "Dashboard praticien",
+        note: "Ce qui fait qu'un praticien s'abonne.",
+      },
+      {
+        letter: "E",
+        label: "Parser",
+        note: "Le cœur propriétaire.",
+      },
+      {
+        letter: "F",
+        label: "Argent et bêta",
+        note: "Premiers revenus, praticiens fondateurs.",
+      },
+    ] satisfies readonly TrackStep[],
   },
 
-  survives: {
-    title: "Ce qui se reporte",
-    lead: "Rien de tout cela n'est perdu, quelle que soit la direction retenue.",
+  foundations: {
+    title: "Ce qui est déjà en place",
+    lead: "Le point de départ des phases ci-dessous — construit, en service, et sans travail à refaire.",
     items: [
       {
-        title: "Les fondations techniques sont saines et réutilisables",
-        body: "Structure propre, conventions écrites et appliquées automatiquement, envoi d'emails qui fonctionne, relecture de code protégée. Le genre de socle qui coûte cher à rattraper plus tard, et rien n'y est spécifique au mauvais produit.",
-        tag: { label: "acquis", intent: "success" },
+        title: "Les fondations techniques",
+        body: "Structure propre, conventions écrites et appliquées automatiquement, envoi d'emails qui fonctionne, relecture de code protégée. Le genre de socle qui coûte cher à rattraper plus tard.",
+        tag: { label: "en service", intent: "success" },
       },
       {
-        title: "Supabase s'emboîte là où il était prévu",
-        body: "Le code a été construit délibérément pour que la base de données et l'authentification se branchent plus tard sans réécriture. Vos documents nomment Supabase comme base de la V2 : c'est exactement ce branchement, et cela referme au passage un débat interne qui traînait entre Neon et Supabase.",
-        tag: { label: "acquis", intent: "success" },
+        title: "La place de Supabase est prête",
+        body: "Le code est construit pour que la base de données et l'authentification se branchent sans réécriture. Supabase est ce branchement : c'est la phase B, et il n'y a rien à défaire d'ici là.",
+        tag: { label: "à brancher", intent: "warning" },
       },
       {
-        title: "La forme générale correspond",
-        body: "Une application patient, un espace praticien, une console d'administration : c'est bien l'architecture que vos documents décrivent. Le désaccord portait sur le contenu des écrans, pas sur leur existence.",
-        tag: { label: "acquis", intent: "success" },
+        title: "Les trois surfaces existent",
+        body: "Une application patient, un espace praticien, une console d'administration : l'architecture est en place. Ce sont les écrans qui restent à construire, pas leur cadre.",
+        tag: { label: "en service", intent: "success" },
       },
     ] satisfies readonly Item[],
   },
@@ -56,7 +83,7 @@ export const plan = {
     title: "Le cadre : vos chiffres, et la contrainte",
     description:
       "Vos objectifs, avec une note d'état honnête en face de chacun. C'est ce tableau qui décide du périmètre des six phases, pas l'inverse.",
-    columns: ["Quoi", "Cible, selon vos documents", "Note d'état"],
+    columns: ["Quoi", "Cible", "Note d'état"],
     statusColumn: "État",
     rows: [
       {
@@ -71,7 +98,7 @@ export const plan = {
         cells: [
           "Pilote bêta",
           "~15 praticiens fondateurs, retours toutes les deux semaines",
-          "Une cible de recrutement — c'est la phase F.",
+          "Une cible de recrutement — c'est la phase F. Personne n'a signé à ce jour.",
         ],
         tag: { label: "prévu", intent: "info" },
       },
@@ -79,7 +106,7 @@ export const plan = {
         cells: [
           "Adoption la première année",
           "10 à 30 praticiens actifs, 100 à 300 utilisateurs actifs",
-          "Devant nous. Le socle en construction porte cet ordre de grandeur sans question d'échelle.",
+          "Devant nous. Le socle porte cet ordre de grandeur sans question d'échelle.",
         ],
         tag: { label: "devant nous", intent: "neutral" },
       },
@@ -95,7 +122,7 @@ export const plan = {
         cells: [
           "Tarification",
           "Praticiens : 39 € / 79 € / 199 € par mois (Starter, Growth, Clinic). Patients : gratuit, premium ~9,99 €",
-          "Vos réflexions, pas des prix arrêtés. Elles remplacent le chiffre de 24,50 € qui circulait dans le code et qui n'a jamais été réel.",
+          "Des réflexions, pas des prix arrêtés. À trancher avant la phase F.",
         ],
         tag: { label: "à arrêter", intent: "warning" },
       },
@@ -116,7 +143,7 @@ export const plan = {
     items: [
       {
         title: "Adopter Supabase officiellement",
-        body: "Vos documents le nomment, le code est prêt à le recevoir. Une décision, qui referme un vieux débat interne.",
+        body: "Base de données, authentification et stockage de la V2. Le code est prêt à le recevoir ; il ne manque que la décision.",
         tag: { label: "décision", intent: "info" },
       },
       {
@@ -136,7 +163,7 @@ export const plan = {
       },
       {
         title: "Régler le sort de la V1",
-        body: "Vérifier si l'ancien Supabase contient de vraies données patients, puis fermer ou reprendre les comptes fournisseurs. Les données d'abord, les comptes ensuite — jamais l'inverse.",
+        body: "Vérifier si le Supabase de la V1 contient de vraies données patients, puis fermer ou reprendre les comptes fournisseurs. Les données d'abord, les comptes ensuite — jamais l'inverse.",
         tag: { label: "urgent", intent: "error" },
       },
       {
@@ -157,7 +184,7 @@ export const plan = {
       },
       {
         title: "Modéliser la boucle de la V2",
-        body: "Profil patient, praticien, recommandation, règle, micro-action, retour — en suivant vos concepts, pas ceux de la V1.",
+        body: "Profil patient, praticien, recommandation, règle, micro-action, retour — les six objets du schéma de la Synthèse, et rien de plus.",
       },
       {
         title:
@@ -178,7 +205,7 @@ export const plan = {
     items: [
       {
         title: "L'onboarding ultra-simplifié",
-        body: "Fondé sur les aliments les plus fréquents, avec une première micro-action générée immédiatement. Pas de journal de sept jours.",
+        body: "Fondé sur les aliments les plus fréquents, avec une première micro-action générée immédiatement.",
       },
       {
         title: "« Améliore mon assiette »",
@@ -276,10 +303,10 @@ export const plan = {
   },
 
   backlog: {
-    title: "Comment le backlog est organisé",
+    title: "Comment le travail est organisé",
     body: [
-      "Les six phases sont découpées en 27 tickets, un par unité de travail, chacun avec son énoncé de problème, ses étapes et ses critères d'acceptation. Ils vivent dans le projet lui-même, et le ticket est retiré par la modification qui le réalise — jamais par un ménage ultérieur.",
-      "Chaque ticket porte aussi une section « questions ouvertes » explicite, et la consigne pour quiconque le prend en main est la même : faire le travail qui ne dépend pas de la question, poser la question, ne jamais inventer une réponse et l'enterrer dans le code. Les phases ont été proposées avant votre relecture, et un certain nombre de choses que vos documents ne tranchent pas seraient sinon décidées par accident.",
+      "Les six phases sont découpées en 27 tickets, un par unité de travail, chacun avec son énoncé de problème, ses étapes et ses critères d'acceptation.",
+      "Chaque ticket porte une section « questions ouvertes » explicite, et la consigne pour quiconque le prend en main est la même : faire le travail qui ne dépend pas de la question, poser la question, ne jamais inventer une réponse et l'enterrer dans le code. C'est ce qui garantit que les points de la page « Décisions » vous reviennent au lieu d'être tranchés par accident.",
     ],
   },
 } as const;

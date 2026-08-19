@@ -43,12 +43,12 @@ export const dossierPages: readonly DossierPage[] = [
     href: "/plan",
     label: "Plan V2",
     summary:
-      "Ce qui a été retiré de l'ancien plan et ce qui survit, puis les six phases qui le remplacent — 27 tickets, en attente de votre relecture.",
+      "Les six phases de la V2 dans l'ordre où elles doivent tomber, ce qui est déjà en place, et le cadre chiffré qui décide du périmètre.",
   },
   {
     href: "/outils",
     label: "Outils",
     summary:
-      "L'état réel de la stack, les trois outils de votre liste introuvables, et les comptes de la V1 qui sont peut-être encore facturés.",
+      "Ce que la stack utilise aujourd'hui, les trois outils de votre liste que je ne trouve pas, et les comptes de la V1 peut-être encore facturés.",
   },
 ];

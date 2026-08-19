@@ -13,13 +13,12 @@ export const outils = {
   header: {
     eyebrow: "Réponse à la question 3",
     title: "Outils et coûts",
-    lead: "Vous demandez une vision claire de la stack, des besoins et des coûts associés, en citant Supabase, DigitalOcean, Mistral et Euria. Voici l'image complète — avec une surprise : trois des quatre outils que vous nommez n'apparaissent nulle part, ni dans le code, ni dans vos propres documents. Il faut donc réconcilier nos listes pendant l'appel.",
+    lead: "Ce que la stack utilise aujourd'hui, ce qu'il lui manque, et ce que la V1 fait peut-être encore payer. Un point à réconcilier pendant l'appel : sur les quatre outils que vous citez, seul Supabase est de mon côté — DigitalOcean, Mistral et Euria, je ne les trouve pas.",
   } satisfies PageHeader,
 
   current: {
-    title: "Ce que le nouveau socle utilise aujourd'hui",
-    description:
-      "L'état réel, lu dans le dépôt et non de mémoire. Quatre lignes en service, deux à décider.",
+    title: "Ce que la stack utilise aujourd'hui",
+    description: "Quatre lignes en service, une à brancher, deux à décider.",
     columns: ["Outil", "Ce qu'il fait pour nous"],
     statusColumn: "État",
     rows: [
@@ -44,7 +43,7 @@ export const outils = {
       {
         cells: [
           "Supabase",
-          "Votre braindump le nomme comme base de la V2 : base de données, authentification, stockage. Pas encore connecté au nouveau socle — le code a été construit prêt à le recevoir.",
+          "Base de données, authentification et stockage de la V2. Pas encore connecté — le code est construit prêt à le recevoir, c'est la phase B.",
         ],
         tag: { label: "à connecter", intent: "warning" },
       },
@@ -74,7 +73,7 @@ export const outils = {
       {
         cells: [
           "DigitalOcean",
-          "Nulle part — ni dans le code, ni dans le braindump.",
+          "Introuvable de mon côté.",
           "Quelque chose y tourne-t-il encore, et facture-t-il, depuis la V1 ? Si oui, sur quel compte, et pouvons-nous y accéder ou l'arrêter ?",
         ],
       },
@@ -96,7 +95,7 @@ export const outils = {
   },
 
   legacy: {
-    title: "Ce sur quoi tournait la V1 — des comptes peut-être encore facturés",
+    title: "Les comptes de la V1 — peut-être encore facturés",
     description:
       "Chacun est potentiellement une carte débitée chaque mois pour un produit qui ne tourne plus.",
     columns: ["Outil", "Son rôle dans la V1"],

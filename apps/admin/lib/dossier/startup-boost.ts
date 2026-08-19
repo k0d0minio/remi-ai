@@ -3,8 +3,8 @@
  * and what are the arguments to defend in front of the jury.
  *
  * Scored honestly rather than favourably. The criteria are quoted from the call
- * itself; the arguments are written as sentences she can say out loud, each one
- * sourced from her own material so every claim is defensible under a question.
+ * itself; the arguments are written as sentences she can say out loud, and every
+ * claim is one the project can defend under a jury's question.
  */
 
 import type { FactRow, Item, PageHeader } from "@/lib/dossier/shared";
@@ -33,7 +33,7 @@ export const startupBoost = {
       {
         cells: [
           "Siège d'exploitation en Région wallonne",
-          "Nulle part dans vos documents. Si le siège est à Bruxelles ou en Flandre, la candidature échoue sur l'éligibilité quelle que soit la qualité du pitch. Une ligne de vous tranche la question.",
+          "À confirmer. Si le siège est à Bruxelles ou en Flandre, la candidature échoue sur l'éligibilité quelle que soit la qualité du pitch. Une ligne de vous tranche la question.",
         ],
         tag: { label: "à confirmer", intent: "error" },
       },
@@ -88,7 +88,7 @@ export const startupBoost = {
 
   arguments: {
     title: "Les cinq arguments, dans l'ordre où les dire",
-    lead: "Chacun est sourcé dans vos propres documents, pour que vous puissiez défendre chaque phrase. Ils sont écrits pour être dits à voix haute, pas lus.",
+    lead: "Chacun est défendable phrase par phrase. Ils sont écrits pour être dits à voix haute, pas lus.",
     items: [
       {
         title:
@@ -133,7 +133,7 @@ export const startupBoost = {
 
   redLine: {
     title: "La seule chose à ne pas faire",
-    body: "Nous n'avons aucun client payant et aucun pilote signé — les « 15 praticiens avec conditions signées » qui apparaissaient dans nos documents internes étaient des données de démonstration, depuis corrigées. Ce que nous pouvons honnêtement revendiquer : de vrais tests utilisateurs avec des patients de FunMedDev, un intérêt praticien validé, une bêta de praticiens fondateurs planifiée, et un incubateur qui accompagne déjà le projet. C'est une histoire de démarrage tout à fait normale. Inventer davantage devant un jury de financement public serait découvert, et serait fatal.",
+    body: "Nous n'avons aucun client payant et aucun pilote signé : les ~15 praticiens fondateurs sont une cible de recrutement, pas des contrats. Ce que nous pouvons honnêtement revendiquer : de vrais tests utilisateurs avec des patients de FunMedDev, un intérêt praticien validé, une bêta de praticiens fondateurs planifiée, et un incubateur qui accompagne déjà le projet. C'est une histoire de démarrage tout à fait normale. Inventer davantage devant un jury de financement public serait découvert, et serait fatal.",
   },
 
   conclusion: {

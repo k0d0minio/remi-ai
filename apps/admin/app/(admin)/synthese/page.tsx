@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Typography } from "@remi/ui/server";
+import { FlowDiagram } from "@/components/company/flow-diagram";
 import { ItemCard } from "@/components/company/item-card";
 import { PageIndex } from "@/components/company/page-index";
 import { ReportHeader } from "@/components/company/report-header";
@@ -22,16 +23,17 @@ const Synthese = () => (
 
     <ReportSection title={synthese.minute.title} body={synthese.minute.body} />
 
+    <FlowDiagram
+      title={synthese.loop.title}
+      description={synthese.loop.description}
+      nodes={synthese.loop.nodes}
+      returnLabel={synthese.loop.returnLabel}
+    />
+
     <ItemCard
       title={synthese.answers.title}
       description={synthese.answers.lead}
       items={synthese.answers.items}
-    />
-
-    <ItemCard
-      title={synthese.changed.title}
-      description={synthese.changed.lead}
-      items={synthese.changed.items}
     />
 
     <ItemCard

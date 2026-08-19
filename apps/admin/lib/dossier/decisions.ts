@@ -3,8 +3,8 @@
  *
  * Two kinds of thing, kept apart on purpose. The first section is facts we do
  * not have and cannot look up. The second is choices the build would otherwise
- * make by default — the braindump does not settle them, and an implementation
- * that just picks one buries the decision in code where nobody sees it again.
+ * make by default, and an implementation that just picks one buries the decision
+ * in code where nobody sees it again.
  *
  * Display-only: options are laid out a/b/c to give the discussion a shape,
  * never to close it, and nothing here is a form. The answers happen in
@@ -27,7 +27,7 @@ export const decisions = {
       {
         title: "Le siège d'exploitation est-il en Région wallonne ?",
         context:
-          "Le critère d'éligibilité du Startup Boost porte sur le siège d'exploitation, pas sur le lieu de travail. Rien dans vos documents ne le dit.",
+          "Le critère d'éligibilité du Startup Boost porte sur le siège d'exploitation, pas sur le lieu de travail.",
         consequence:
           "Une réponse négative ferme la candidature immédiatement, quelle que soit la qualité du dossier — et nous fait économiser les semaines de rédaction de septembre.",
       },
@@ -41,7 +41,7 @@ export const decisions = {
       {
         title: "DigitalOcean, Mistral, Euria — qu'est-ce que c'est ?",
         context:
-          "Aucun des trois n'apparaît dans le code ni dans vos propres documents. Pour chacun : de quoi s'agit-il, qui détient le compte, et est-ce que cela facture aujourd'hui ?",
+          "Aucun des trois n'est branché sur la V2. Pour chacun : de quoi s'agit-il, qui détient le compte, et est-ce que cela facture aujourd'hui ?",
         consequence:
           "Des abonnements potentiellement payés chaque mois pour rien — et, dans le cas de Mistral, un choix de fournisseur d'IA européen qui servirait directement l'argument de souveraineté du dossier.",
       },
@@ -49,7 +49,7 @@ export const decisions = {
         title:
           "Le projet Supabase de la V1 contient-il encore de vraies données patients ?",
         context:
-          "Le MVP a été testé avec de vrais patients de FunMedDev. Si leurs données de santé sont toujours dans l'ancien projet, c'est une obligation de protection des données, indépendante de toute décision produit.",
+          "Le MVP a été testé avec de vrais patients de FunMedDev. Si leurs données de santé y sont toujours, c'est une obligation de protection des données, indépendante de toute décision produit.",
         consequence:
           "Si oui, cela se traite avant de fermer quoi que ce soit : fermer un compte n'efface ni les sauvegardes ni la responsabilité.",
       },
@@ -132,7 +132,7 @@ export const decisions = {
       {
         title: "Qu'est-ce qui compte comme adhérence ?",
         context:
-          "L'adhérence est l'indicateur central du dashboard praticien et de vos propres KPI, mais vos documents n'en donnent pas la définition. Une micro-action cochée ? Un repas amélioré ? Une semaine sans rupture ? Chaque définition produit un chiffre différent, et un praticien qui voit « 62 % » doit savoir de quoi il s'agit.",
+          "L'adhérence est l'indicateur central du dashboard praticien et de vos KPI, et sa définition reste à fixer. Une micro-action cochée ? Un repas amélioré ? Une semaine sans rupture ? Chaque définition produit un chiffre différent, et un praticien qui voit « 62 % » doit savoir de quoi il s'agit.",
         consequence:
           "Ce que le dashboard praticien affiche, et ce que « rétention supérieure à 50 % » voudra dire au moment du bilan.",
       },

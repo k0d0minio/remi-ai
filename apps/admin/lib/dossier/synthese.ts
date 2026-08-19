@@ -1,28 +1,57 @@
 /**
  * The dossier's opening page, as data.
  *
- * Everything on it is a pointer: what changed, the four answers, and an agenda
- * for the call. Nothing is argued here — the four pages behind it do that, and
- * a summary that argues is a summary that disagrees with its own pages sooner
- * or later.
+ * Written from where the project stands today, never as a before-and-after:
+ * the plan this dossier presents is the plan, and an earlier one Morgane never
+ * saw is not context she can use. Everything here is a pointer — what REMI
+ * does, the four answers, and an agenda for the call. Nothing is argued; the
+ * four pages behind it do that.
  */
 
+import { ClipboardList, Sparkles, Utensils } from "lucide-react";
+import type { FlowNode } from "@/components/company/flow-diagram";
 import type { Item, PageHeader } from "@/lib/dossier/shared";
 
 export const synthese = {
   header: {
     eyebrow: "À lire avant l'appel",
     title: "Synthèse",
-    lead: "Vos quatre questions répondues en une ligne chacune, ce qui a changé dans le projet cette semaine, et un ordre du jour pour l'appel. Quatre pages derrière celle-ci ; celle-ci se lit en une minute.",
+    lead: "Vos quatre questions répondues en une ligne chacune, le produit en un schéma, et un ordre du jour pour l'appel. Quatre pages derrière celle-ci ; celle-ci se lit en une minute.",
   } satisfies PageHeader,
 
   minute: {
     title: "En une minute",
     body: [
-      "Vos documents sont devenus la référence du projet : quand un document plus ancien les contredit, ce sont eux qui l'emportent. Concrètement, l'ancien plan de travail — bâti sur des suppositions — a été retiré, et le nouveau est tiré ligne à ligne de ce que vous avez écrit.",
-      "Ce qui les remplace : six phases, A à F, découpées en 27 tickets — simplicité radicale d'abord, valeur en moins de 60 secondes, dashboard praticien comme chantier le plus stratégique, parser des recommandations comme cœur propriétaire. C'est une proposition, pas une décision : elle attend votre relecture.",
-      "Et une correction qui compte, parce qu'elle circulait dans nos documents internes : le « pilote signé de 15 praticiens à 24,50 € par mois, facturé à partir du 1er septembre » n'a jamais existé. C'étaient des données de démonstration de cette console, prises pour un contrat par un audit antérieur. Les ~15 praticiens sont une cible de recrutement bêta : il n'y a ni date de facturation ni revenu.",
+      "La V2 tient en six phases, A à F : décider, poser les fondations, la boucle patient, le dashboard praticien, le parser, puis l'argent et la bêta. Simplicité radicale d'abord, de la valeur en moins de 60 secondes, et le budget d'environ 10 000 € comme contrainte qui décide du périmètre.",
+      "C'est une proposition, pas une décision : elle attend votre relecture. Deux choses ont une échéance et ne peuvent pas l'attendre — la candidature Startup Boost, qui clôture le 15 septembre, et le sort des données patients de la V1.",
     ],
+  },
+
+  loop: {
+    title: "Ce que REMI fait, en un schéma",
+    description:
+      "Le dernier kilomètre entre le praticien et le quotidien du patient. Tout le produit sert cette boucle, et chaque phase du plan en construit un morceau.",
+    nodes: [
+      {
+        title: "Le praticien",
+        body: "Il consulte et rédige ses recommandations, comme il le fait déjà.",
+        icon: ClipboardList,
+        via: "PDF ou compte rendu, lu automatiquement",
+      },
+      {
+        title: "REMI",
+        body: "Le parser en tire des règles structurées, puis en fait des micro-actions faisables en quelques minutes — avec leur pourquoi.",
+        icon: Sparkles,
+        via: "une action à la fois, adaptée au repas prévu",
+      },
+      {
+        title: "Le patient",
+        body: "Il dit ce qu'il s'apprête à manger et reçoit une amélioration réaliste, tenant compte de ses goûts, son budget et son temps.",
+        icon: Utensils,
+      },
+    ] satisfies readonly FlowNode[],
+    returnLabel:
+      "Ce qu'il fait réellement remonte au praticien : adhérence, difficultés, retours — qui ajuste ses règles sans attendre la consultation suivante.",
   },
 
   answers: {
@@ -42,40 +71,13 @@ export const synthese = {
       },
       {
         title: "Où en est notre stack, et que coûte-t-elle ?",
-        body: "Surprise : trois des quatre outils que vous citez — DigitalOcean, Mistral, Euria — n'apparaissent nulle part, ni dans le code, ni dans vos propres documents. Le quatrième, Supabase, est bien la base de la V2 mais n'est pas encore branché. En face, les comptes de la V1 sont peut-être encore facturés chaque mois pour un produit qui ne tourne plus. Aucun chiffre inventé : la vision claire des coûts se construit avec les factures ou les accès.",
+        body: "Quatre outils en service, Supabase à brancher, un fournisseur d'IA à choisir. Trois des outils que vous citez — DigitalOcean, Mistral, Euria — restent introuvables de mon côté, et les comptes de la V1 sont peut-être encore facturés chaque mois. Aucun chiffre inventé : la vision claire des coûts se construit avec les factures ou les accès.",
         tag: { label: "Outils", intent: "info" },
       },
       {
         title: "Sommes-nous sur la même longueur d'onde ?",
-        body: "Maintenant oui, et le plan est le prix de cette phrase. Il dit ce qui se reporte (les fondations techniques, la forme générale, Supabase) et ce qui ne se reporte pas (l'ancien backlog, et probablement une partie des six sites déployés). Rien n'y est enjolivé.",
+        body: "Oui. Le périmètre gelé de la V2 est celui de vos priorités — améliore mon assiette, hub du jour, « je mange autre chose », journal de compléments, micro-actions, dashboard praticien, parser — et rien d'autre n'y entre. Le seul point où je vous propose de trancher autrement que l'installation actuelle : six sites déployés, c'est lourd pour un budget de 10 000 €.",
         tag: { label: "Plan V2", intent: "info" },
-      },
-    ] satisfies readonly Item[],
-  },
-
-  changed: {
-    title: "Ce qui a changé dans le projet cette semaine",
-    lead: "Des changements déjà effectués, pas des intentions — chacun est visible dans le dépôt.",
-    items: [
-      {
-        title: "L'ancien backlog a été retiré",
-        body: "33 tickets supprimés en une fois, récupérables dans l'historique. Les six tickets déjà terminés sont conservés : ce travail-là était réel et reste valable — faille de confidentialité fermée, formulaire de contact branché, protections de relecture de code activées.",
-        tag: { label: "fait", intent: "success" },
-      },
-      {
-        title: "Un nouveau plan, en six phases",
-        body: "27 tickets tirés de vos priorités, chacun portant explicitement ses questions ouvertes pour qu'aucune ne soit tranchée par accident dans le code.",
-        tag: { label: "à valider", intent: "warning" },
-      },
-      {
-        title: "Le pilote signé a été corrigé partout",
-        body: "Les affirmations fausses ont été barrées dans les anciens rapports plutôt que discrètement effacées, pour que la correction reste visible et ne se ré-invente pas dans six mois.",
-        tag: { label: "fait", intent: "success" },
-      },
-      {
-        title: "La question de la base de données est close",
-        body: "Vos documents nomment Supabase pour la V2. Cela tranche un débat interne qui traînait entre Neon et Supabase, et le socle avait justement été construit pour recevoir l'un ou l'autre sans réécriture.",
-        tag: { label: "décidé", intent: "success" },
       },
     ] satisfies readonly Item[],
   },
@@ -96,7 +98,7 @@ export const synthese = {
       },
       {
         title: "Le plan V2 : valider les six phases",
-        body: "L'ordre proposé vous convient-il, et le budget d'environ 10 000 € tient-il encore la comparaison avec ce périmètre ? C'est la conversation la plus structurante de l'appel.",
+        body: "L'ordre proposé vous convient-il, et le budget d'environ 10 000 € tient-il la comparaison avec ce périmètre ? C'est la conversation la plus structurante de l'appel.",
         tag: { label: "15 min", intent: "neutral" },
       },
       {
