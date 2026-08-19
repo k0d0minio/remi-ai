@@ -1,28 +1,27 @@
 /**
  * The dossier's opening page, as data.
  *
- * Everything on it is a pointer: the four answers, what changed in the project
- * this week, and an agenda for the call. Nothing is argued here — the six pages
- * behind it do that, and a summary that argues is a summary that disagrees with
- * its own sources sooner or later.
+ * Everything on it is a pointer: what changed, the four answers, and an agenda
+ * for the call. Nothing is argued here — the four pages behind it do that, and
+ * a summary that argues is a summary that disagrees with its own pages sooner
+ * or later.
  */
 
 import type { Item, PageHeader } from "@/lib/dossier/shared";
 
 export const synthese = {
   header: {
-    eyebrow: "Dossier de préparation — à lire avant l'appel",
+    eyebrow: "À lire avant l'appel",
     title: "Synthèse",
-    lead: "Vos 40 documents sont arrivés le 18 août et ils sont devenus la référence du projet : quand un document du dépôt les contredit, ce sont eux qui gagnent. Ce dossier en est la lecture complète — vos quatre questions répondues, les écarts dits franchement, le plan qui remplace l'ancien, et la courte liste de ce qui ne dépend que de vous. Sept pages dans la colonne de gauche, dans l'ordre ou à picorer.",
+    lead: "Vos quatre questions répondues en une ligne chacune, ce qui a changé dans le projet cette semaine, et un ordre du jour pour l'appel. Quatre pages derrière celle-ci ; celle-ci se lit en une minute.",
   } satisfies PageHeader,
 
   minute: {
     title: "En une minute",
     body: [
-      "Le OneNote a tout changé, dans le bon sens. Vos documents sont désormais stockés dans le projet lui-même et adoptés comme source de vérité. Concrètement, « être sur la même longueur d'onde » veut dire ceci : l'ancien plan de travail, bâti sur des suppositions, a été retiré, et le nouveau est tiré ligne à ligne de ce que vous avez écrit.",
-      "Ce qui a été retiré : 33 tickets reconstruits à partir du code de la V1 et d'un audit antérieur — questionnaire psychologique, moteur de nutrigénomique, génération de plans hebdomadaires. Aucun n'apparaît dans vos priorités V2. Les construire aurait dépensé le budget des 10 000 € sur le mauvais produit. Ils restent récupérables dans l'historique du projet.",
+      "Vos documents sont devenus la référence du projet : quand un document plus ancien les contredit, ce sont eux qui l'emportent. Concrètement, l'ancien plan de travail — bâti sur des suppositions — a été retiré, et le nouveau est tiré ligne à ligne de ce que vous avez écrit.",
       "Ce qui les remplace : six phases, A à F, découpées en 27 tickets — simplicité radicale d'abord, valeur en moins de 60 secondes, dashboard praticien comme chantier le plus stratégique, parser des recommandations comme cœur propriétaire. C'est une proposition, pas une décision : elle attend votre relecture.",
-      "Et une correction qui compte, parce qu'elle circulait dans nos documents internes : le « pilote signé de 15 praticiens à 24,50 € par mois, facturé à partir du 1er septembre » n'a jamais existé. C'étaient des données de démonstration de cette console, prises pour un contrat par un audit antérieur. Vos documents rétablissent le fait — les ~15 praticiens sont une cible de recrutement bêta, et il n'y a ni date de facturation ni revenu.",
+      "Et une correction qui compte, parce qu'elle circulait dans nos documents internes : le « pilote signé de 15 praticiens à 24,50 € par mois, facturé à partir du 1er septembre » n'a jamais existé. C'étaient des données de démonstration de cette console, prises pour un contrat par un audit antérieur. Les ~15 praticiens sont une cible de recrutement bêta : il n'y a ni date de facturation ni revenu.",
     ],
   },
 
@@ -38,18 +37,18 @@ export const synthese = {
       },
       {
         title: "Quels arguments mettre en avant devant le jury ?",
-        body: "Cinq, dans l'ordre où les dire, chacun sourcé dans vos propres documents pour que chaque phrase soit défendable : le problème est prouvé et comportemental ; nous occupons un espace vide, le dernier kilomètre ; le praticien est notre distribution ; la technologie en développement est réellement nôtre ; la souveraineté est un choix de conception démontrable. Plus les deux questions dures du jury et leurs réponses honnêtes.",
+        body: "Cinq, dans l'ordre où les dire : le problème est prouvé et comportemental ; nous occupons un espace vide, le dernier kilomètre ; le praticien est notre distribution ; la technologie en développement est réellement nôtre ; la souveraineté est un choix de conception démontrable. Plus les deux questions dures du jury et leurs réponses honnêtes.",
         tag: { label: "Startup Boost", intent: "info" },
       },
       {
         title: "Où en est notre stack, et que coûte-t-elle ?",
-        body: "Surprise : trois des quatre outils que vous citez — DigitalOcean, Mistral, Euria — n'apparaissent nulle part, ni dans le code, ni dans vos propres documents. Le quatrième, Supabase, est bien la base de la V2 mais n'est pas encore branché. En face, les comptes de la V1 sont peut-être encore facturés chaque mois pour un produit qui ne tourne plus. Aucun chiffre inventé sur cette page : la vision claire des coûts se construit avec les factures ou les accès.",
-        tag: { label: "Outils et coûts", intent: "info" },
+        body: "Surprise : trois des quatre outils que vous citez — DigitalOcean, Mistral, Euria — n'apparaissent nulle part, ni dans le code, ni dans vos propres documents. Le quatrième, Supabase, est bien la base de la V2 mais n'est pas encore branché. En face, les comptes de la V1 sont peut-être encore facturés chaque mois pour un produit qui ne tourne plus. Aucun chiffre inventé : la vision claire des coûts se construit avec les factures ou les accès.",
+        tag: { label: "Outils", intent: "info" },
       },
       {
         title: "Sommes-nous sur la même longueur d'onde ?",
-        body: "Maintenant oui — et la page « Écarts constatés » est le prix de cette phrase. Elle dit ce qui se reporte (les fondations techniques, la forme générale, Supabase) et ce qui ne se reporte pas (l'ancien backlog, le pilote imaginaire, et probablement une partie des six sites déployés). Rien n'y est enjolivé.",
-        tag: { label: "Écarts constatés", intent: "info" },
+        body: "Maintenant oui, et le plan est le prix de cette phrase. Il dit ce qui se reporte (les fondations techniques, la forme générale, Supabase) et ce qui ne se reporte pas (l'ancien backlog, et probablement une partie des six sites déployés). Rien n'y est enjolivé.",
+        tag: { label: "Plan V2", intent: "info" },
       },
     ] satisfies readonly Item[],
   },
@@ -59,18 +58,13 @@ export const synthese = {
     lead: "Des changements déjà effectués, pas des intentions — chacun est visible dans le dépôt.",
     items: [
       {
-        title: "Vos 40 documents sont la source de vérité",
-        body: "Ils vivent dans le projet, ils ne sont jamais réécrits, et l'ordre de priorité entre documents est écrit noir sur blanc : quand un document plus ancien les contredit, ce sont eux qui l'emportent.",
-        tag: { label: "en place", intent: "success" },
-      },
-      {
         title: "L'ancien backlog a été retiré",
         body: "33 tickets supprimés en une fois, récupérables dans l'historique. Les six tickets déjà terminés sont conservés : ce travail-là était réel et reste valable — faille de confidentialité fermée, formulaire de contact branché, protections de relecture de code activées.",
         tag: { label: "fait", intent: "success" },
       },
       {
         title: "Un nouveau plan, en six phases",
-        body: "27 tickets tirés de vos priorités, chacun portant explicitement ses questions ouvertes pour qu'aucune ne soit tranchée par accident dans le code. C'est ce que la page « Plan V2 » détaille.",
+        body: "27 tickets tirés de vos priorités, chacun portant explicitement ses questions ouvertes pour qu'aucune ne soit tranchée par accident dans le code.",
         tag: { label: "à valider", intent: "warning" },
       },
       {
@@ -124,18 +118,15 @@ export const synthese = {
   },
 
   index: {
-    title: "Le dossier, page par page",
-    lead: "Les six pages qui suivent celle-ci. Chacune se lit seule.",
+    title: "Le reste du dossier",
+    lead: "Quatre pages. Chacune se lit seule, dans l'ordre ou à picorer.",
   },
 
   closing: {
     title: "Comment répondre",
     body: [
-      "Dans l'ordre qui vous arrange et sous la forme qui vous arrange — un message, une note, un appel. La page « Décisions attendues » rassemble tout ce qui ne dépend que de vous : cinq points courts, dont deux qui décident du Startup Boost à eux seuls.",
+      "Dans l'ordre qui vous arrange et sous la forme qui vous arrange — un message, une note, un appel. La page « Décisions » rassemble tout ce qui ne dépend que de vous, dont deux points qui décident du Startup Boost à eux seuls.",
       "Tout le reste du plan peut avancer sans attendre ces réponses. C'est volontaire : rien dans ce dossier ne vous met en position de bloquer le travail en prenant le temps de réfléchir.",
     ],
   },
-
-  footer:
-    "Préparé à partir des 40 documents de votre braindump (reçus le 18 août 2026), du rapport de direction du 18 août, de vos deux courriels et du code du dépôt.",
 } as const;

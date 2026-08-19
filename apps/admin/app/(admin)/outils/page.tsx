@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Alert, AlertDescription, AlertTitle } from "@remi/ui/server";
 import { FactTable } from "@/components/company/fact-table";
-import { ReportFooter } from "@/components/company/report-footer";
 import { ReportHeader } from "@/components/company/report-header";
 import { ReportSection } from "@/components/company/report-section";
 import { outils } from "@/lib/dossier/outils";
@@ -50,7 +49,6 @@ const Outils = () => (
 
     <ReportSection title={outils.costs.title} body={outils.costs.body} />
 
-    <ReportFooter note={outils.footer} />
   </div>
 );
 

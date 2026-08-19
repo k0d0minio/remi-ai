@@ -1,79 +1,54 @@
-import {
-  CircleHelp,
-  Compass,
-  FileText,
-  GitCompare,
-  Landmark,
-  Milestone,
-  Wrench,
-} from "lucide-react";
-import type { ComponentType } from "react";
-
 export type DossierPage = {
   href: string;
+  /** Short enough for a sidebar row. The page's own full title lives in its header. */
   label: string;
-  icon: ComponentType<{ className?: string }>;
   /** One line on the Synthèse page's index — what this page settles. */
   summary: string;
 };
 
-/** The Synthèse page's own route, excluded from the index it renders. */
-export const synthesisHref = "/synthese";
+/**
+ * The page the dossier opens on, and the only one written to be read first.
+ * It is kept out of `dossierPages` because both readers — the sidebar and the
+ * index it renders — treat it as the thing the others sit under, never as one
+ * of them.
+ */
+export const dossierLead: DossierPage = {
+  href: "/synthese",
+  label: "Synthèse",
+  summary:
+    "Ce qui a changé, vos quatre questions répondues en une ligne chacune, et un ordre du jour pour l'appel.",
+};
 
 /**
- * The dossier, in reading order — and the single home for that order. The
- * sidebar's Company section is derived from this list rather than restating it,
- * so a page cannot exist in the navigation and be missing from the index, or
- * the reverse.
+ * The four pages behind the Synthèse, in the order they ask something of the
+ * reader rather than in the order they argue — and the single home for that
+ * order. The sidebar's Dossier section and the Synthèse's index are both
+ * derived from this list, so a page cannot exist in one and be missing from
+ * the other.
  */
 export const dossierPages: readonly DossierPage[] = [
   {
-    href: synthesisHref,
-    label: "Synthèse",
-    icon: FileText,
+    href: "/decisions",
+    label: "Décisions",
     summary:
-      "Ce qui a changé cette semaine, les quatre questions répondues en une ligne chacune, et un ordre du jour proposé pour l'appel.",
-  },
-  {
-    href: "/produit",
-    label: "Le produit",
-    icon: Compass,
-    summary:
-      "Ce que REMI est, dans vos propres mots : le dernier kilomètre, les trois principes de la V2, son périmètre, et les chiffres que vous pilotez.",
-  },
-  {
-    href: "/ecarts",
-    label: "Écarts constatés",
-    icon: GitCompare,
-    summary:
-      "Où ce qui a été construit s'écarte de votre vision : ce qui se reporte, ce qui ne se reporte pas, et pourquoi l'ancien plan a été retiré.",
+      "Cinq faits que nous n'avons pas, et sept choix que le développement prendrait par défaut si personne ne les prenait pour de bon. Deux décident du Startup Boost à eux seuls.",
   },
   {
     href: "/startup-boost",
     label: "Startup Boost",
-    icon: Landmark,
     summary:
-      "L'appel noté critère par critère, les deux verrous d'éligibilité, les cinq arguments à défendre devant le jury et la ligne à ne pas franchir.",
-  },
-  {
-    href: "/outils",
-    label: "Outils et coûts",
-    icon: Wrench,
-    summary:
-      "L'état réel de la stack, les trois outils de votre liste introuvables, et les comptes de la V1 qui sont peut-être encore facturés.",
+      "Les deux verrous d'éligibilité, l'appel noté critère par critère, et les cinq arguments à défendre devant le jury. Clôture le 15 septembre.",
   },
   {
     href: "/plan",
     label: "Plan V2",
-    icon: Milestone,
     summary:
-      "Les six phases proposées — décider, fonder, la boucle patient, le dashboard praticien, le parser, l'argent — et les 27 tickets qui en sortent.",
+      "Ce qui a été retiré de l'ancien plan et ce qui survit, puis les six phases qui le remplacent — 27 tickets, en attente de votre relecture.",
   },
   {
-    href: "/decisions",
-    label: "Décisions attendues",
-    icon: CircleHelp,
+    href: "/outils",
+    label: "Outils",
     summary:
-      "La courte liste de ce qui ne dépend que de vous, et les choix laissés ouverts volontairement plutôt que tranchés par défaut.",
+      "L'état réel de la stack, les trois outils de votre liste introuvables, et les comptes de la V1 qui sont peut-être encore facturés.",
   },
 ];

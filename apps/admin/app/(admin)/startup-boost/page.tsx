@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Alert, AlertDescription, AlertTitle } from "@remi/ui/server";
 import { FactTable } from "@/components/company/fact-table";
 import { ItemCard } from "@/components/company/item-card";
-import { ReportFooter } from "@/components/company/report-footer";
 import { ReportHeader } from "@/components/company/report-header";
 import { ReportSection } from "@/components/company/report-section";
 import { startupBoost } from "@/lib/dossier/startup-boost";
@@ -60,7 +59,6 @@ const StartupBoost = () => (
       body={startupBoost.conclusion.body}
     />
 
-    <ReportFooter note={startupBoost.footer} />
   </div>
 );
 

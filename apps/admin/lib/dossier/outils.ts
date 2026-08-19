@@ -146,7 +146,4 @@ export const outils = {
       "La façon d'obtenir le vrai montant mensuel est simple : les factures, ou m'ajouter sur chaque compte. Résultat proposé pour l'appel : un seul tableau partagé — outil, qui détient le compte, à quoi il sert, facture-t-il encore, combien par mois. Une demi-heure, fait une bonne fois, et la vision claire des coûts que vous demandez existe de façon permanente.",
     ],
   },
-
-  footer:
-    "Sources : le code du dépôt lu de bout en bout, le rapport d'analyse de la V1 (inventaire des fournisseurs et des variables d'environnement), votre courriel sur les outils, et le braindump.",
 } as const;

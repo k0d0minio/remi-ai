@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import { FactTable } from "@/components/company/fact-table";
 import { ItemCard } from "@/components/company/item-card";
-import { ReportFooter } from "@/components/company/report-footer";
 import { ReportHeader } from "@/components/company/report-header";
 import { ReportSection } from "@/components/company/report-section";
 import { plan } from "@/lib/dossier/plan";
@@ -23,6 +23,22 @@ const Plan = () => (
   <div className="flex max-w-4xl flex-col gap-8">
     <ReportHeader header={plan.header} />
 
+    <ReportSection title={plan.retired.title} body={plan.retired.body} />
+
+    <ItemCard
+      title={plan.survives.title}
+      description={plan.survives.lead}
+      items={plan.survives.items}
+    />
+
+    <FactTable
+      title={plan.frame.title}
+      description={plan.frame.description}
+      columns={plan.frame.columns}
+      statusColumn={plan.frame.statusColumn}
+      rows={plan.frame.rows}
+    />
+
     {phases.map((phase) => (
       <ItemCard
         key={phase.title}
@@ -35,8 +51,6 @@ const Plan = () => (
     <ReportSection title={plan.boost.title} body={plan.boost.body} />
 
     <ReportSection title={plan.backlog.title} body={plan.backlog.body} />
-
-    <ReportFooter note={plan.footer} />
   </div>
 );
 

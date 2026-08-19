@@ -15,7 +15,7 @@ import type { Decision, PageHeader } from "@/lib/dossier/shared";
 
 export const decisions = {
   header: {
-    eyebrow: "Partie cinq — ce qui ne dépend que de vous",
+    eyebrow: "Ce qui ne dépend que de vous",
     title: "Décisions attendues",
     lead: "Tout le reste du dossier peut avancer sans attendre ces réponses ; c'est volontaire. Les cinq premières sont des faits que nous n'avons pas et que nous ne pouvons pas aller chercher. Les suivantes sont des choix que le développement prendrait par défaut si personne ne les prenait pour de bon — et un choix pris par défaut est un choix que plus personne ne revoit.",
   } satisfies PageHeader,
@@ -191,10 +191,7 @@ export const decisions = {
     title: "Comment répondre",
     body: [
       "Dans l'ordre qui vous arrange et sous la forme qui vous arrange — un message, une note, un appel. Les cinq premiers points sont ceux qui débloquent le plus : deux décident du Startup Boost, un porte une obligation légale, et deux conditionnent l'inventaire des coûts.",
-      "Cette page suit une règle écrite du dépôt : tout document préparé pour votre analyse est rédigé en français. Si un point mérite plus de détail — ou un vrai dossier — dites-le, et il arrivera sous cette forme.",
+      "Si un point mérite plus de détail — ou un vrai dossier — dites-le, et il arrivera sous cette forme.",
     ],
   },
-
-  footer:
-    "Sources : le rapport de direction du 18 août 2026 (partie cinq), les questions ouvertes portées par les 27 tickets du nouveau plan, et vos deux courriels.",
 } as const;

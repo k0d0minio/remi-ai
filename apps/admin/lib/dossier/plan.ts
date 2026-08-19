@@ -1,21 +1,114 @@
 /**
- * Part four: the plan that replaces the retired backlog.
+ * The plan that replaces the retired backlog — and, since the consolidation,
+ * the whole of what used to be spread across three pages.
  *
- * Six phases in dependency order, cut from the braindump's own priorities —
- * simplicity first, the practitioner dashboard as the strategic centre, value
- * in 60 seconds, and the ~€10k budget as a constraint rather than a footnote.
+ * What was "Écarts constatés" is now this page's opening two sections: what
+ * was retired and what survives are the reason the plan exists, not a separate
+ * argument. What was "Le produit" is reduced to the numbers table — the rest
+ * of that page handed Morgane her own product definition back, and the phases
+ * below already carry the scope it described.
+ *
+ * Six phases in dependency order, cut from the braindump's own priorities.
  * Proposed, not decided: nothing here is opened as a ticket before Morgane and
  * Arnaud have read it.
  */
 
-import type { Item, PageHeader } from "@/lib/dossier/shared";
+import type { FactRow, Item, PageHeader } from "@/lib/dossier/shared";
 
 export const plan = {
   header: {
-    eyebrow: "Partie quatre — le plan proposé",
+    eyebrow: "Le plan proposé",
     title: "Plan V2",
-    lead: "L'ancien backlog a disparu. Voici son remplaçant, construit à partir de vos propres priorités : la simplicité d'abord, le dashboard praticien comme centre stratégique, de la valeur en moins de 60 secondes, et la discipline des 10 000 €. Six phases, dans l'ordre où elles doivent tomber, découpées en 27 tickets — qui ne seront ouverts qu'après votre relecture.",
+    lead: "L'ancien backlog visait le mauvais produit et a été retiré. Voici son remplaçant, construit à partir de vos propres priorités : la simplicité d'abord, le dashboard praticien comme centre stratégique, de la valeur en moins de 60 secondes, et la discipline des 10 000 €. Six phases, dans l'ordre où elles doivent tomber, découpées en 27 tickets — qui ne seront ouverts qu'après votre relecture.",
   } satisfies PageHeader,
+
+  retired: {
+    title: "Ce qui a été retiré",
+    body: [
+      "Les 33 tickets ouverts de l'ancienne liste ont été supprimés en une fois. Ils avaient été reconstruits à partir du code de la V1 : questionnaire de scoring psychologique, moteur d'interprétation génétique, génération de plans hebdomadaires rigides. Aucun n'apparaît dans vos priorités V2 — la génétique n'y figure que comme idée lointaine. Les construire aurait dépensé le budget des 10 000 € sur les mauvaises choses.",
+      "Les six tickets déjà terminés sont conservés : ce travail était réel et reste valable — exposition de contenu confidentiel fermée, formulaire de contact branché, protections de relecture de code actives. Chaque ticket supprimé reste récupérable dans l'historique du projet : rien n'est effacé, tout est daté.",
+    ],
+  },
+
+  survives: {
+    title: "Ce qui se reporte",
+    lead: "Rien de tout cela n'est perdu, quelle que soit la direction retenue.",
+    items: [
+      {
+        title: "Les fondations techniques sont saines et réutilisables",
+        body: "Structure propre, conventions écrites et appliquées automatiquement, envoi d'emails qui fonctionne, relecture de code protégée. Le genre de socle qui coûte cher à rattraper plus tard, et rien n'y est spécifique au mauvais produit.",
+        tag: { label: "acquis", intent: "success" },
+      },
+      {
+        title: "Supabase s'emboîte là où il était prévu",
+        body: "Le code a été construit délibérément pour que la base de données et l'authentification se branchent plus tard sans réécriture. Vos documents nomment Supabase comme base de la V2 : c'est exactement ce branchement, et cela referme au passage un débat interne qui traînait entre Neon et Supabase.",
+        tag: { label: "acquis", intent: "success" },
+      },
+      {
+        title: "La forme générale correspond",
+        body: "Une application patient, un espace praticien, une console d'administration : c'est bien l'architecture que vos documents décrivent. Le désaccord portait sur le contenu des écrans, pas sur leur existence.",
+        tag: { label: "acquis", intent: "success" },
+      },
+    ] satisfies readonly Item[],
+  },
+
+  frame: {
+    title: "Le cadre : vos chiffres, et la contrainte",
+    description:
+      "Vos objectifs, avec une note d'état honnête en face de chacun. C'est ce tableau qui décide du périmètre des six phases, pas l'inverse.",
+    columns: ["Quoi", "Cible, selon vos documents", "Note d'état"],
+    statusColumn: "État",
+    rows: [
+      {
+        cells: [
+          "Lancement de la V2",
+          "mi-2026",
+          "Nous sommes en août et la V2 n'est pas lancée. À acter ensemble et redater, pas à contourner.",
+        ],
+        tag: { label: "glissé", intent: "warning" },
+      },
+      {
+        cells: [
+          "Pilote bêta",
+          "~15 praticiens fondateurs, retours toutes les deux semaines",
+          "Une cible de recrutement — c'est la phase F.",
+        ],
+        tag: { label: "prévu", intent: "info" },
+      },
+      {
+        cells: [
+          "Adoption la première année",
+          "10 à 30 praticiens actifs, 100 à 300 utilisateurs actifs",
+          "Devant nous. Le socle en construction porte cet ordre de grandeur sans question d'échelle.",
+        ],
+        tag: { label: "devant nous", intent: "neutral" },
+      },
+      {
+        cells: [
+          "Premiers revenus",
+          "2 000 à 5 000 € de revenu récurrent mensuel, rétention supérieure à 50 % à 3 mois",
+          "Aucun revenu à ce jour. C'est la phase F.",
+        ],
+        tag: { label: "devant nous", intent: "neutral" },
+      },
+      {
+        cells: [
+          "Tarification",
+          "Praticiens : 39 € / 79 € / 199 € par mois (Starter, Growth, Clinic). Patients : gratuit, premium ~9,99 €",
+          "Vos réflexions, pas des prix arrêtés. Elles remplacent le chiffre de 24,50 € qui circulait dans le code et qui n'a jamais été réel.",
+        ],
+        tag: { label: "à arrêter", intent: "warning" },
+      },
+      {
+        cells: [
+          "Budget",
+          "Autofinancé, V2 volontairement plafonnée autour de 10 000 €",
+          "La contrainte qui décide de tout le reste : le périmètre se taille pour ce montant.",
+        ],
+        tag: { label: "contrainte", intent: "warning" },
+      },
+    ] satisfies readonly FactRow[],
+  },
 
   phaseA: {
     title: "Phase A · Décider et déblayer le terrain",
@@ -33,7 +126,7 @@ export const plan = {
       },
       {
         title: "Décider ce qui survit des six sites",
-        body: "Recommandation : produit patient, espace praticien et une page marketing pour l'instant ; le reste en pause. C'est votre priorité de simplicité radicale appliquée à notre propre installation.",
+        body: "L'installation actuelle fait tourner six applications déployées, ce qui ne va pas naturellement avec votre priorité de simplicité radicale. Recommandation : produit patient, espace praticien et une page marketing pour l'instant ; le reste en pause plutôt que supprimé.",
         tag: { label: "à décider ensemble", intent: "warning" },
       },
       {
@@ -48,7 +141,7 @@ export const plan = {
       },
       {
         title: "Construire le registre des outils et des coûts",
-        body: "Le tableau partagé de la page « Outils et coûts » : outil, détenteur du compte, usage, facturation, montant mensuel.",
+        body: "Le tableau partagé de la page « Outils » : outil, détenteur du compte, usage, facturation, montant mensuel.",
         tag: { label: "une demi-heure", intent: "neutral" },
       },
     ] satisfies readonly Item[],
@@ -171,11 +264,6 @@ export const plan = {
         title: "Instrumenter les indicateurs",
         body: "Actifs quotidiens et mensuels, taux d'adhérence, rétention à J+7, J+30 et J+90, usage praticien — votre propre liste de KPI, pas une autre.",
       },
-      {
-        title: "La cible",
-        body: "Les premiers jalons de vos documents : 10 à 30 praticiens actifs, 2 000 à 5 000 € de revenu récurrent mensuel.",
-        tag: { label: "vos jalons", intent: "info" },
-      },
     ] satisfies readonly Item[],
   },
 
@@ -191,10 +279,7 @@ export const plan = {
     title: "Comment le backlog est organisé",
     body: [
       "Les six phases sont découpées en 27 tickets, un par unité de travail, chacun avec son énoncé de problème, ses étapes et ses critères d'acceptation. Ils vivent dans le projet lui-même, et le ticket est retiré par la modification qui le réalise — jamais par un ménage ultérieur.",
-      "Chaque ticket porte aussi une section « questions ouvertes » explicite, et la consigne pour quiconque le prend en main est la même : faire le travail qui ne dépend pas de la question, poser la question, ne jamais inventer une réponse et l'enterrer dans le code. C'est volontaire — les phases ont été proposées avant votre relecture, et un certain nombre de choses que vos documents ne tranchent pas seraient sinon décidées par accident.",
+      "Chaque ticket porte aussi une section « questions ouvertes » explicite, et la consigne pour quiconque le prend en main est la même : faire le travail qui ne dépend pas de la question, poser la question, ne jamais inventer une réponse et l'enterrer dans le code. Les phases ont été proposées avant votre relecture, et un certain nombre de choses que vos documents ne tranchent pas seraient sinon décidées par accident.",
     ],
   },
-
-  footer:
-    "Sources : le rapport de direction du 18 août 2026 (partie quatre) et le braindump — roadmap/court-term.md, roadmap/priorities.md, roadmap/features.md, developpement-produit/ai.md, developpement-produit/workflow.md, business/kpi.md.",
 } as const;

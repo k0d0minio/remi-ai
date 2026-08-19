@@ -143,7 +143,4 @@ export const startupBoost = {
       "Si l'application se fait, elle tourne en parallèle des phases A et B du plan : c'est du travail de rédaction et de projection financière — vous, votre comptable, et moi pour les annexes techniques — pas du développement. Les phases C à E sont exactement ce que les 100 000 € accéléreraient, ce qui rend la demande facile à justifier : terminer le moteur d'exécution et mener la bêta des praticiens fondateurs à plein régime.",
     ],
   },
-
-  footer:
-    "Sources : le texte publié de l'appel Startup Boost (Wallonie Entreprendre), votre courriel du même jour, et le braindump — developpement-produit/tests.md, vision-strategy/objectifs.md, business/model-economic.md, business/pricing.md.",
 } as const;

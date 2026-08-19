@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { DecisionList } from "@/components/company/decision-list";
-import { ReportFooter } from "@/components/company/report-footer";
 import { ReportHeader } from "@/components/company/report-header";
 import { ReportSection } from "@/components/company/report-section";
 import { decisions } from "@/lib/dossier/decisions";
@@ -39,7 +38,6 @@ const Decisions = () => (
       body={decisions.closing.body}
     />
 
-    <ReportFooter note={decisions.footer} />
   </div>
 );
 
