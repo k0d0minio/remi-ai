@@ -66,6 +66,8 @@ export const decisions = {
   open: {
     title: "Les choix laissés ouverts volontairement",
     lead: "Là où des options se dessinent, elles sont posées — a, b, c — pour donner une forme à la discussion, pas pour la fermer. Rien n'est interactif : les réponses se prennent en conversation.",
+    openNote:
+      "Pas d'options préparées sur celle-ci — elle se tranche en conversation, et une option inventée ici fermerait la question plutôt que de l'ouvrir.",
     decisions: [
       {
         title: "Combien des six sites gardons-nous ?",

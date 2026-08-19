@@ -31,6 +31,7 @@ const Decisions = () => (
       description={decisions.open.lead}
       startAt={openStartsAt}
       decisions={decisions.open.decisions}
+      openNote={decisions.open.openNote}
     />
 
     <ReportSection

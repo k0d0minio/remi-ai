@@ -16,22 +16,25 @@ type Props = {
   /** First number in this section — numbering runs across the whole page. */
   startAt: number;
   decisions: readonly Decision[];
+  /**
+   * Rendered under a decision that carries no options. Only worth saying where
+   * options were a possibility — a section of factual questions has none by
+   * nature, and a note repeating that under every one of them is noise.
+   */
+  openNote?: string;
 };
-
-const openNote =
-  "Question ouverte — pas d'options préparées, la réponse se construit en conversation.";
 
 /**
  * Numbered continuously across the page so an answer can name its decision —
  * « la 3 » — without also naming a section. Options render as lettered choices
- * to give the discussion a shape, never to close it; a decision without options
- * is open on purpose, and says so.
+ * to give the discussion a shape, never to close it.
  */
 export const DecisionList = ({
   title,
   description,
   startAt,
   decisions,
+  openNote,
 }: Props) => (
   <Card elevation="flat">
     <CardHeader>
@@ -100,11 +103,11 @@ export const DecisionList = ({
                     </li>
                   ))}
                 </ul>
-              ) : (
+              ) : openNote ? (
                 <Typography size="sm" tone="muted" className="italic">
                   {openNote}
                 </Typography>
-              )}
+              ) : null}
             </div>
           </li>
         ))}
