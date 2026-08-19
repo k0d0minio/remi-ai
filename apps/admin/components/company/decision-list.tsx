@@ -8,30 +8,33 @@ import {
   Typography,
 } from "@remi/ui/server";
 import { cn } from "@remi/ui/utils";
-import type { Question } from "@/lib/questions";
+import type { Decision } from "@/lib/dossier/shared";
 
 type Props = {
   title: string;
   description?: string;
-  /** First question number in this section — numbering runs across sections. */
+  /** First number in this section — numbering runs across the whole page. */
   startAt: number;
-  questions: readonly Question[];
+  decisions: readonly Decision[];
+  /**
+   * Rendered under a decision that carries no options. Only worth saying where
+   * options were a possibility — a section of factual questions has none by
+   * nature, and a note repeating that under every one of them is noise.
+   */
+  openNote?: string;
 };
 
-const openNote =
-  "Question ouverte — pas d'options préparées, la réponse se construit en conversation.";
-
 /**
- * A section of questions, numbered continuously across the page so an answer
- * can name its question — « la 6 » — without also naming a section. Choices
- * render as lettered options to give the discussion a shape, not to close it;
- * a question without choices is open on purpose, and says so.
+ * Numbered continuously across the page so an answer can name its decision —
+ * « la 3 » — without also naming a section. Options render as lettered choices
+ * to give the discussion a shape, never to close it.
  */
-export const QuestionList = ({
+export const DecisionList = ({
   title,
   description,
   startAt,
-  questions,
+  decisions,
+  openNote,
 }: Props) => (
   <Card elevation="flat">
     <CardHeader>
@@ -41,9 +44,9 @@ export const QuestionList = ({
 
     <CardContent>
       <ol className="flex flex-col">
-        {questions.map((question, index) => (
+        {decisions.map((decision, index) => (
           <li
-            key={question.title}
+            key={decision.title}
             className={cn(
               "grid gap-x-3 gap-y-2 py-5 md:grid-cols-[2rem_1fr]",
               index > 0 && "border-border border-t",
@@ -60,42 +63,51 @@ export const QuestionList = ({
 
             <div className="flex flex-col gap-3">
               <Typography as="h3" size="sm" weight="semibold">
-                {question.title}
+                {decision.title}
               </Typography>
 
               <Typography size="sm" tone="muted" className="max-w-2xl">
-                {question.context}
+                {decision.context}
               </Typography>
 
-              {question.choices ? (
+              <Typography size="sm" className="max-w-2xl">
+                <Typography as="span" size="sm" weight="medium">
+                  Ce qui en dépend —{" "}
+                </Typography>
+                <Typography as="span" size="sm" tone="muted">
+                  {decision.consequence}
+                </Typography>
+              </Typography>
+
+              {decision.options ? (
                 <ul className="flex flex-col gap-2">
-                  {question.choices.map((choice, choiceIndex) => (
+                  {decision.options.map((option, optionIndex) => (
                     <li
-                      key={choice.label}
+                      key={option.label}
                       className="border-border flex flex-col gap-1 rounded-md border p-3"
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <Typography size="sm" weight="medium">
-                          {String.fromCharCode(97 + choiceIndex)}.{" "}
-                          {choice.label}
+                          {String.fromCharCode(97 + optionIndex)}.{" "}
+                          {option.label}
                         </Typography>
-                        {choice.recommended ? (
+                        {option.recommended ? (
                           <Badge variant="info" tone="subtle" size="sm">
                             recommandation de Jamie
                           </Badge>
                         ) : null}
                       </div>
                       <Typography size="sm" tone="muted" className="max-w-2xl">
-                        {choice.detail}
+                        {option.detail}
                       </Typography>
                     </li>
                   ))}
                 </ul>
-              ) : (
+              ) : openNote ? (
                 <Typography size="sm" tone="muted" className="italic">
                   {openNote}
                 </Typography>
-              )}
+              ) : null}
             </div>
           </li>
         ))}
