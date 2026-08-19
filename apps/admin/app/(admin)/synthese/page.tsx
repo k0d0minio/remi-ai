@@ -1,0 +1,63 @@
+import type { Metadata } from "next";
+import { Typography } from "@remi/ui/server";
+import { ItemCard } from "@/components/company/item-card";
+import { PageIndex } from "@/components/company/page-index";
+import { ReportFooter } from "@/components/company/report-footer";
+import { ReportHeader } from "@/components/company/report-header";
+import { ReportSection } from "@/components/company/report-section";
+import { dossierPages, synthesisHref } from "@/lib/dossier/pages";
+import { synthese } from "@/lib/dossier/synthese";
+
+/**
+ * The dossier's front page, linked from the sidebar's Company section: written
+ * to be reviewed, not operated. What keeps it private is the console's access
+ * gate, not obscurity.
+ */
+export const metadata: Metadata = {
+  title: "Synthèse",
+};
+
+/** The index lists the other six pages — never the page rendering it. */
+const otherPages = dossierPages.filter((page) => page.href !== synthesisHref);
+
+const Synthese = () => (
+  <div className="flex max-w-4xl flex-col gap-8">
+    <ReportHeader header={synthese.header} />
+
+    <ReportSection title={synthese.minute.title} body={synthese.minute.body} />
+
+    <ItemCard
+      title={synthese.answers.title}
+      description={synthese.answers.lead}
+      items={synthese.answers.items}
+    />
+
+    <ItemCard
+      title={synthese.changed.title}
+      description={synthese.changed.lead}
+      items={synthese.changed.items}
+    />
+
+    <ItemCard
+      title={synthese.agenda.title}
+      description={synthese.agenda.lead}
+      items={synthese.agenda.items}
+    />
+
+    <ReportSection title={synthese.index.title}>
+      <Typography size="sm" tone="muted" className="max-w-2xl">
+        {synthese.index.lead}
+      </Typography>
+      <PageIndex pages={otherPages} />
+    </ReportSection>
+
+    <ReportSection
+      title={synthese.closing.title}
+      body={synthese.closing.body}
+    />
+
+    <ReportFooter note={synthese.footer} />
+  </div>
+);
+
+export default Synthese;

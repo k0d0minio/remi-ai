@@ -8,30 +8,20 @@ import {
   Typography,
 } from "@remi/ui/server";
 import { cn } from "@remi/ui/utils";
-import type { RoadmapItem, RoadmapStatus } from "@/lib/roadmap";
+import type { Item } from "@/lib/dossier/shared";
 
 type Props = {
   title: string;
   description?: string;
-  items: readonly RoadmapItem[];
+  items: readonly Item[];
 };
 
 /**
- * The status vocabulary maps onto the design system's intents so « décision
- * en attente » reads as the amber it is — the items Morgane and Arnaud
- * unblock — while plain work stays neutral and done reads as done.
+ * The dossier's workhorse: a titled card over a list of points, each with an
+ * optional status. The badge's intent comes from the data, so a new status is
+ * one more row of content rather than one more branch here.
  */
-const statusVariant: Record<
-  RoadmapStatus,
-  "neutral" | "info" | "warning" | "success"
-> = {
-  "à faire": "neutral",
-  "décision en cours": "info",
-  "décision en attente": "warning",
-  "en place": "success",
-};
-
-export const PhaseCard = ({ title, description, items }: Props) => (
+export const ItemCard = ({ title, description, items }: Props) => (
   <Card elevation="flat">
     <CardHeader>
       <CardTitle>{title}</CardTitle>
@@ -52,13 +42,11 @@ export const PhaseCard = ({ title, description, items }: Props) => (
               <Typography as="h3" size="sm" weight="medium">
                 {item.title}
               </Typography>
-              <Badge
-                variant={statusVariant[item.status]}
-                tone="subtle"
-                size="sm"
-              >
-                {item.status}
-              </Badge>
+              {item.tag ? (
+                <Badge variant={item.tag.intent} tone="subtle" size="sm">
+                  {item.tag.label}
+                </Badge>
+              ) : null}
             </div>
             <Typography size="sm" tone="muted" className="max-w-2xl">
               {item.body}

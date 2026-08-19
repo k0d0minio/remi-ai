@@ -1,14 +1,13 @@
 import {
-  CircleHelp,
   Flag,
   LayoutDashboard,
   LifeBuoy,
-  Milestone,
   Rocket,
   ScrollText,
   Stethoscope,
 } from "lucide-react";
 import type { ComponentType } from "react";
+import { dossierPages } from "@/lib/dossier/pages";
 
 export type NavItem = {
   href: string;
@@ -24,10 +23,13 @@ export type NavSection = {
 /**
  * The console's whole surface, in the order an operator works through it: the
  * cohort first, then the tooling that acts on it, and last the founders' shelf
- * — the pages written for Morgane and Arnaud to review, in French per the
- * working-languages rule in `CONVENTIONS.md`. None of those act on the cohort,
- * so they get their own section rather than sitting among the tools an
+ * — the dossier written for Morgane and Arnaud to review, in French per the
+ * working-languages rule in `CONVENTIONS.md`. None of those pages act on the
+ * cohort, so they get their own section rather than sitting among the tools an
  * operator reaches for daily.
+ *
+ * The Company section is derived from `dossierPages` rather than restated here:
+ * the dossier's reading order and the sidebar's order are one fact.
  *
  * The icon is the component rather than a name, unlike the product app's nav —
  * admin has no locale dictionaries, so there is no serialisable-data constraint
@@ -52,9 +54,6 @@ export const navSections: NavSection[] = [
   },
   {
     title: "Company",
-    items: [
-      { href: "/roadmap", label: "Feuille de route", icon: Milestone },
-      { href: "/questions", label: "Questions ouvertes", icon: CircleHelp },
-    ],
+    items: dossierPages.map(({ href, label, icon }) => ({ href, label, icon })),
   },
 ];
