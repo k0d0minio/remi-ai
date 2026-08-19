@@ -1,10 +1,10 @@
 /**
  * The dossier's shared vocabulary.
  *
- * Seven pages carry one masthead, one badge vocabulary and one authorship line,
- * so all three live here rather than being restated per page. A badge's intent
- * travels with the data instead of being derived from its French label — a
- * status vocabulary a component has to parse is a vocabulary that drifts.
+ * Five pages carry one badge vocabulary and one authorship line, so both live
+ * here rather than being restated per page. A badge's intent travels with the
+ * data instead of being derived from its French label — a status vocabulary a
+ * component has to parse is a vocabulary that drifts.
  *
  * Written in French per the working-languages rule in `CONVENTIONS.md`: the
  * whole shelf is a review document for Morgane and Arnaud. Belgian register and
