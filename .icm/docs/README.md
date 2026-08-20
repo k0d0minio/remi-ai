@@ -58,11 +58,16 @@ The single catalogue of environment variables and secrets. The three-list rule
 
 ### `slack.md` — how the team runs, day to day
 
-The Slack workspace: the channel map, the knowledge centre, the alerts, the forms, and the cadence
-that surrounds the pipeline. It is **operational, not product truth** — it holds no claim about
-what REMI is, and it deliberately sits outside the precedence table above. Its one rule is that
-Slack carries the flow and this folder carries the memory, so every canvas in it points here rather
-than restating anything.
+The Slack workspace: the channel map, the scoping loop, the product board, the alerts, the forms
+and the cadence. It is **operational, not product truth** — it holds no claim about what REMI is,
+and it sits outside the precedence table above.
+
+It exists because this folder has one audience and the company has three people. Everything here is
+written for Jamie and the agents; Morgane and Arnaud work in Slack and do not open the repository.
+So the Slack side is written to be **read on its own, in French** — the state of every feature, what
+was decided, what is expected of whom — rather than as an index pointing back here. The two surfaces
+stay honest through fixed crossing points (a scope agreed, a decision taken, a question answered, the
+fortnightly bet, a ship note) and a monthly check that they still agree.
 
 ### `history/` — retained, but not authoritative on direction
 
