@@ -56,6 +56,14 @@ The single catalogue of environment variables and secrets. The three-list rule
 (`CONVENTIONS.md`) binds it to the zod schema in `packages/services` and `globalEnv` in
 `turbo.json`: a variable that is not in all three does not exist.
 
+### `slack.md` — how the team runs, day to day
+
+The Slack workspace: the channel map, the knowledge centre, the alerts, the forms, and the cadence
+that surrounds the pipeline. It is **operational, not product truth** — it holds no claim about
+what REMI is, and it deliberately sits outside the precedence table above. Its one rule is that
+Slack carries the flow and this folder carries the memory, so every canvas in it points here rather
+than restating anything.
+
 ### `history/` — retained, but not authoritative on direction
 
 | File                                             | Still load-bearing for                                                             | Superseded on                                                      |
