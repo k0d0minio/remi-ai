@@ -56,6 +56,16 @@ The single catalogue of environment variables and secrets. The three-list rule
 (`CONVENTIONS.md`) binds it to the zod schema in `packages/services` and `globalEnv` in
 `turbo.json`: a variable that is not in all three does not exist.
 
+### `slack.md` — the team's Slack workspace
+
+Three channels, one pinned page, one board, two buttons. It is **operational, not product truth** —
+it holds no claim about what REMI is, and it sits outside the precedence table above.
+
+It stays deliberately small because the pipeline already does the heavy lifting. Slack exists so
+Morgane and Arnaud — neither of whom opens this repository — can see where things stand, say
+something, and answer when a build is waiting on them. Anything beyond those three jobs was cut,
+with the signal that would justify bringing it back written down next to it.
+
 ### `history/` — retained, but not authoritative on direction
 
 | File                                             | Still load-bearing for                                                             | Superseded on                                                      |
