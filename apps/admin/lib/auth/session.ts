@@ -6,6 +6,7 @@ import {
   verifySessionToken,
   type Operator,
 } from "@remi/services/server";
+import { ensureDatabase } from "@/lib/database";
 
 export const SESSION_COOKIE = "remi-admin-session";
 
@@ -23,6 +24,7 @@ export const getOperatorSession = cache(async (): Promise<Operator | null> => {
   if (!operatorId) {
     return null;
   }
+  ensureDatabase();
   return getOperator(operatorId);
 });
 
