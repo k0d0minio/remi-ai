@@ -21,6 +21,7 @@ import {
   patientStatusIntents,
   patientStatusLabels,
 } from "@/components/patients/vocabulary";
+import { ensureDatabase } from "@/lib/database";
 
 /** Reads the database on every hit — never prerendered. */
 export const dynamic = "force-dynamic";
@@ -34,6 +35,8 @@ type Params = { id: string };
  * mid-consultation, phone first.
  */
 const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
+  // The page's own graph, not the layout's — the two render in parallel.
+  ensureDatabase();
   const { id } = await params;
   const result = await getPatient(id);
   if (!result.ok) {

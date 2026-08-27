@@ -6,9 +6,13 @@ what is specific to this package.
 ## Seams, not integrations — AI still has no vendor, and that is the design
 
 Storage, email and AI are **seams**: each defines an interface and a `register*()` call; the
-concrete adapter is registered once at process start by the app that owns the process. Nothing
-above a seam names a vendor, so changing one is a new file plus one registration line — never a
-rewrite of the callers.
+concrete adapter is registered by the app that owns the process — **lazily, at first use**, from
+an idempotent `ensure*()` helper beside the code that reads (`apps/marketing/lib/mailer.ts`,
+`apps/admin/lib/database.ts`, `apps/web/lib/database.ts`). Never from `instrumentation.ts`:
+Next.js gives every route its own copy of this package's modules, so a boot hook's registration
+never reaches them — that mistake shipped once and threw "no database adapter registered" in
+production with the variable set. Nothing above a seam names a vendor, so changing one is a new
+file plus one registration line — never a rewrite of the callers.
 
 | Seam    | Interface        | Register with            | Adapter                         | Default if unregistered             |
 | ------- | ---------------- | ------------------------ | ------------------------------- | ----------------------------------- |

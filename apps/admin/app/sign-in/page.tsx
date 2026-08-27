@@ -5,6 +5,7 @@ import { Card, CardContent, Typography, Wordmark } from "@remi/ui/server";
 import { BootstrapForm } from "@/components/auth/bootstrap-form";
 import { SignInForm } from "@/components/auth/sign-in-form";
 import { getOperatorSession } from "@/lib/auth/session";
+import { ensureDatabase } from "@/lib/database";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -21,6 +22,7 @@ export const dynamic = "force-dynamic";
  * instead, guarded by `OPERATOR_EMAIL`; see `bootstrapAction`.
  */
 const SignIn = async () => {
+  ensureDatabase();
   const operator = await getOperatorSession();
   if (operator) {
     redirect("/patients");

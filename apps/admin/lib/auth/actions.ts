@@ -10,6 +10,7 @@ import {
   hasOperator,
   verifyOperator,
 } from "@remi/services/server";
+import { ensureDatabase } from "@/lib/database";
 import { SESSION_COOKIE } from "./session";
 
 export type AuthFormState = { error: string | null };
@@ -29,6 +30,7 @@ export const signInAction = async (
   _previous: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> => {
+  ensureDatabase();
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   const result = await verifyOperator(email, password);
@@ -50,6 +52,7 @@ export const bootstrapAction = async (
   _previous: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> => {
+  ensureDatabase();
   if (await hasOperator()) {
     return { error: "the operator account already exists — sign in instead" };
   }

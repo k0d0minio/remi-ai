@@ -13,6 +13,7 @@ import {
   Wordmark,
 } from "@remi/ui/server";
 import { getContent } from "@/lib/content";
+import { ensureDatabase } from "@/lib/database";
 
 /** Reads the database on every hit — never prerendered. */
 export const dynamic = "force-dynamic";
@@ -37,6 +38,7 @@ const PatientLink = async ({ params }: { params: Promise<Params> }) => {
   }
   const content = getContent(locale).patientLink;
 
+  ensureDatabase();
   const result = await getPatientByShareToken(token);
   if (!result.ok) {
     notFound();

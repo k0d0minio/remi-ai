@@ -9,6 +9,7 @@ import {
   patientStatusIntents,
   patientStatusLabels,
 } from "@/components/patients/vocabulary";
+import { ensureDatabase } from "@/lib/database";
 
 export const metadata: Metadata = {
   title: "Patients",
@@ -24,6 +25,9 @@ export const dynamic = "force-dynamic";
  * opens this between consultations.
  */
 const Patients = async () => {
+  // The page's own graph, not the layout's: the two render in parallel, so
+  // the guard's registration cannot be relied on to have happened first.
+  ensureDatabase();
   const patients = await listPatients();
 
   return (
