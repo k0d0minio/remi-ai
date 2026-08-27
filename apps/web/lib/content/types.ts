@@ -284,4 +284,21 @@ export type Content = {
     status: Record<StepStatus, string>;
     empty: PlaceholderContent;
   };
+  /**
+   * The shareable patient view at `/p/[token]` — the one public page in this
+   * app, reached by link rather than sign-in. Its own copy, not `plan`'s: that
+   * section belongs to the parked practitioner world and can go with it.
+   */
+  patientLink: {
+    /** Precedes the patient's name: "Bonjour Claire". */
+    greeting: string;
+    lead: string;
+    objectiveTitle: string;
+    recommendationsTitle: string;
+    categories: Record<RecommendationCategory, string>;
+    empty: string;
+    disclaimer: PlaceholderContent;
+    /** The beta framing consultants read before giving UX feedback. */
+    betaNote: string;
+  };
 };

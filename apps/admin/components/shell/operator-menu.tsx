@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@remi/ui";
 import { Typography } from "@remi/ui/server";
+import { signOutAction } from "@/lib/auth/actions";
 
 type Props = {
   name: string;
@@ -23,8 +24,8 @@ type Props = {
 /**
  * Who is holding the console. It shows the operator's grant rather than account
  * settings, because the question an operator asks of this menu is "what am I
- * allowed to do from here" — every item is inert until there is a session
- * behind it.
+ * allowed to do from here". Sign out is live; the audit-trail item stays inert
+ * until an audit trail exists (REMI-014).
  */
 export const OperatorMenu = ({ name, initials, email, role }: Props) => (
   <DropdownMenu>
@@ -62,7 +63,7 @@ export const OperatorMenu = ({ name, initials, email, role }: Props) => (
       </DropdownMenuItem>
 
       <DropdownMenuSeparator />
-      <DropdownMenuItem disabled destructive>
+      <DropdownMenuItem destructive onSelect={() => void signOutAction()}>
         <LogOut aria-hidden="true" />
         Sign out
       </DropdownMenuItem>

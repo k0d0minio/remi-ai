@@ -293,4 +293,25 @@ export const en: Content = {
       body: "Your steps appear here once your practitioner has published a plan.",
     },
   },
+  patientLink: {
+    greeting: "Hello",
+    lead: "Your REMI space: your profile and your practitioner's recommendations, in one place.",
+    objectiveTitle: "Your objective",
+    recommendationsTitle: "Your recommendations",
+    categories: {
+      nutrition: "Nutrition",
+      habit: "Habit",
+      supplement: "Supplement",
+      activity: "Activity",
+      monitoring: "Follow-up",
+    },
+    empty:
+      "Your recommendations will appear here once your practitioner has encoded them.",
+    disclaimer: {
+      title: "Your practitioner stays the reference",
+      body: "This page reflects what was agreed in consultation. It does not diagnose and does not replace medical advice.",
+    },
+    betaNote:
+      "REMI is in beta — feedback is welcome, tell us what is missing or in the way.",
+  },
 };
