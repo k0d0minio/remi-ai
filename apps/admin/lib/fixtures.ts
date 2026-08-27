@@ -10,12 +10,6 @@ import type { AppKey } from "@remi/services/shared";
 /** The shared intent vocabulary — the same five names as `Badge` and `Card`. */
 export type Intent = "success" | "warning" | "error" | "info" | "neutral";
 
-export type Operator = {
-  name: string;
-  email: string;
-  role: string;
-};
-
 export type Deployment = {
   environment: string;
   release: string;
@@ -58,12 +52,6 @@ export type SystemApp = {
   description: string;
   uptime: string;
   status: { label: string; intent: Intent };
-};
-
-export const operator: Operator = {
-  name: "Dana Okafor",
-  email: "dana@remi.internal",
-  role: "Operations lead",
 };
 
 export const deployment: Deployment = {

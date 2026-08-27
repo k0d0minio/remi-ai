@@ -24,6 +24,7 @@ export {
 export type { Locale } from "./i18n";
 export { appHref, appOrigin } from "./links";
 export type { AppKey } from "./links";
+export { patientStatuses, recommendationCategories } from "./patient";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
 export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";
@@ -41,6 +42,9 @@ export type {
   Meal,
   MealSlot,
   MealStatus,
+  PatientProfile,
+  PatientRecommendation,
+  PatientStatus,
   PersonalisationDimension,
   PersonalisationProfile,
   Person,
