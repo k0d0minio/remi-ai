@@ -8,6 +8,9 @@
 
 export type { Consultation } from "./consultation";
 export type { Meal, MealSlot, MealStatus } from "./meal";
+export type { Operator } from "./operator";
+export type { PatientProfile, PatientStatus } from "./patient-profile";
+export type { PatientRecommendation } from "./patient-recommendation";
 export type {
   GenotypeMarker,
   HabitsProfile,

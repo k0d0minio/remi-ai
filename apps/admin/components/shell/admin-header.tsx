@@ -3,14 +3,20 @@ import { ThemeToggle } from "@remi/ui";
 import { Badge, Typography } from "@remi/ui/server";
 import { MobileNav } from "@/components/shell/mobile-nav";
 import { OperatorMenu } from "@/components/shell/operator-menu";
-import { deployment, operator } from "@/lib/fixtures";
+import { deployment } from "@/lib/fixtures";
+
+type Props = {
+  /** From the session the `(admin)` layout resolved — strings, never the record. */
+  operatorName: string;
+  operatorEmail: string;
+};
 
 /**
  * Sticky, so the environment an operator is acting against stays on screen. A
  * console where "which environment is this" scrolls away is how a staging
  * habit gets performed on production data.
  */
-export const AdminHeader = () => (
+export const AdminHeader = ({ operatorName, operatorEmail }: Props) => (
   <header className="border-border bg-background/80 sticky top-0 z-30 flex h-14 items-center gap-3 border-b px-4 backdrop-blur-md md:px-8">
     <MobileNav />
 
@@ -35,10 +41,10 @@ export const AdminHeader = () => (
         {deployment.environment}
       </Badge>
       <OperatorMenu
-        name={operator.name}
-        initials={initials(operator.name)}
-        email={operator.email}
-        role={operator.role}
+        name={operatorName}
+        initials={initials(operatorName)}
+        email={operatorEmail}
+        role="Operator"
       />
     </div>
   </header>

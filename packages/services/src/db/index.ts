@@ -14,3 +14,37 @@
 
 export { getDatabase, isDatabaseRegistered, registerDatabase } from "./client";
 export type { Collection, DatabaseClient } from "./client";
+
+/**
+ * The one adapter — Neon over Drizzle. This line and the registration call in
+ * each app's `instrumentation.ts` are the only places the vendor is named.
+ */
+export { createNeonDatabase } from "./adapters/neon";
+
+export {
+  createPatient,
+  deletePatient,
+  getPatient,
+  getPatientByShareToken,
+  listPatients,
+  regenerateShareToken,
+  updatePatient,
+} from "./services/patients";
+export type { PatientInput } from "./services/patients";
+
+export {
+  addPatientRecommendation,
+  deletePatientRecommendation,
+  listPatientRecommendations,
+  updatePatientRecommendation,
+} from "./services/patient-recommendations";
+export type { RecommendationInput } from "./services/patient-recommendations";
+
+export {
+  createOperator,
+  findOperatorByEmail,
+  getOperator,
+  hasOperator,
+  verifyOperator,
+} from "./services/operators";
+export type { OperatorInput } from "./services/operators";

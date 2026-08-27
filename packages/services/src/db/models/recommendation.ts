@@ -1,7 +1,8 @@
 import type { Entity, Id } from "../../types";
+import type { recommendationCategories } from "../../shared/patient";
 
-export type RecommendationCategory =
-  "nutrition" | "habit" | "supplement" | "activity" | "monitoring";
+/** Derived from the runtime list in `shared/patient.ts` — one source for the vocabulary. */
+export type RecommendationCategory = (typeof recommendationCategories)[number];
 
 /**
  * One recommendation, structured out of a consultation's notes.
