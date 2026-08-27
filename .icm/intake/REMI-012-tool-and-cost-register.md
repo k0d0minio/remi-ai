@@ -34,7 +34,7 @@ time someone asks.
    needs an invoice or an account login.
 3. Ask the owner directly about DigitalOcean, Mistral and Euria: what each is, who owns it, and
    whether it is billing.
-4. Fold in the v1 vendor rows from REMI-011 once that ticket has them.
+4. ~~Fold in the v1 vendor rows from REMI-011~~ — REMI-011 was dropped 27 Aug; v1 vendors are out of scope.
 5. Do not write cost figures that cannot be verified from an invoice or an account page.
 
 ## Open questions — flag these on pickup
