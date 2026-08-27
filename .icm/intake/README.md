@@ -35,7 +35,7 @@ data. They were wiped in one commit and remain recoverable in git history. The s
 
 | Ticket                                         | What                                                     |
 | ---------------------------------------------- | -------------------------------------------------------- |
-| [REMI-007](REMI-007-adopt-supabase.md)         | Adopt Supabase officially; close the Neon question       |
+| [REMI-007](_done/REMI-007-adopt-supabase.md)   | Dropped — the answer is Neon, not Supabase               |
 | [REMI-008](REMI-008-freeze-v2-scope.md)        | Freeze the V2 scope; fix the docs that contradict it     |
 | [REMI-009](REMI-009-estate-footprint.md)       | Decide how much of the six-app estate survives           |
 | [REMI-010](REMI-010-startup-boost-gates.md)    | Startup Boost eligibility gates and go / no-go           |
@@ -109,7 +109,9 @@ Worth knowing before reading any older document in this repository:
    signed anything.
 2. **There is no billing date and no revenue.** The "€24.50/practitioner/month from 1 September
    2026" was demo fixture data that an earlier audit read as a contract.
-3. **The database question is closed — Supabase.** The braindump names it.
+3. **The database question is closed — Neon.** The braindump named Supabase; the owner settled on
+   Neon on 27 August 2026 and it is being wired up now. REMI-007, which existed to record
+   Supabase, was dropped for that reason.
 4. **V2 is not a port of v1.** The 7-day food diary, the psychological questionnaire, the
    nutrigenomics engine and rigid weekly plan generation are all out of scope.
 
