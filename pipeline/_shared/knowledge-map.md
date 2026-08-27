@@ -16,20 +16,18 @@ knowledge lives under `app/business/`, technical reference under `app/technical/
 ### Direction and product — `apps/docs/app/business/`
 
 - `initiatives/` — the strategy a feature ladders up to, and the current objectives
+- `scope/` — the frozen V2 feature list, and what is explicitly out of it
 - `roles/` — who the product serves, what each role sees, and what they can change
 
-Both are written. Quote them rather than paraphrasing — Ship takes its initiative tie-in verbatim
-from `initiatives/`, and a spec that contradicts `roles/` contradicts a documented decision right,
-not an opinion. Where a page says a thing is not decided, that is the answer; a stage does not fill
-the gap by inventing one.
+All three are written, and they are reconciled with `.icm/docs/` — the braindump and the direction
+of record. Quote them rather than paraphrasing: Ship takes its initiative tie-in verbatim from
+`initiatives/`, a request that is not on `scope/` is not in this build, and a spec that contradicts
+`roles/` contradicts a documented decision right, not an opinion. Where a page says a thing is not
+decided, that is the answer; a stage does not fill the gap by inventing one.
 
-> **These pages are outranked.** They were written before Morgane's braindump landed
-> (18 August 2026), and some of what they state — notably the pilot's pricing and dates — came from
-> demo fixture data and was never true. The source of truth for direction is
-> [`.icm/docs/braindump/`](../../.icm/docs/braindump/), with the plan in
-> [`.icm/docs/remi-status-report.html`](../../.icm/docs/remi-status-report.html). Where the two
-> disagree, `.icm/docs/` wins and the docs page is the thing to fix. Reconciling them is an open
-> intake ticket.
+`.icm/docs/` remains the source of truth for direction, and its precedence order is in
+[`.icm/docs/README.md`](../../.icm/docs/README.md). These pages restate it for the stages; if one
+ever drifts from it again, `.icm/docs/` wins and the docs page is the thing to fix.
 
 ### Technical reference — `apps/docs/app/technical/`
 
@@ -44,9 +42,9 @@ the gap by inventing one.
 
 | Stage      | Reads from docs                                                                                                  | Writes to docs                                                                                                          |
 | ---------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| **Scope**  | `business/roles`, `business/initiatives` — the who and the why-now                                               | — (its artifacts are `scope.md` + `pipeline/intake/<slug>/`)                                                            |
+| **Scope**  | `business/roles`, `business/initiatives`, `business/scope` — the who, the why-now and the frozen list            | — (its artifacts are `scope.md` + `pipeline/intake/<slug>/`)                                                            |
 | **Design** | `business/roles` for the lens; `technical/applications` for what `apps/demo` may do                              | —                                                                                                                       |
-| **Define** | `business/initiatives`, `business/roles`, `technical/architecture` (for `touches:`), `technical/decisions`       | —                                                                                                                       |
+| **Define** | `business/initiatives`, `business/scope`, `business/roles`, `technical/architecture`, `technical/decisions`      | —                                                                                                                       |
 | **Build**  | `technical/architecture`, the relevant `technical/packages` page, `technical/development`, `technical/decisions` | —                                                                                                                       |
 | **Verify** | — (works from the spec, the diff, and its own contract)                                                          | —                                                                                                                       |
 | **Ship**   | `business/initiatives` (the ship note's tie-in) + the page(s) the change affects                                 | **updates** the affected `technical/**` and `business/**` page(s), in the same feature PR, and adds the changelog entry |

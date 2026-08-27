@@ -1,59 +1,75 @@
 # Initiatives
 
-The strategy the current work ladders up to, and what this quarter is measured against. Scope and
+The strategy the current work ladders up to, and what this period is measured against. Scope and
 Define read this page for the why-now; Ship quotes an objective from it, verbatim, in the ship note.
+The feature list the work is drawn from is [V2 scope](/business/scope).
 
 ## Current initiative
 
-**The founding pilot cohort, and the ecosystem it lands in.** REMI is pre-launch: nothing is sold as
-live, no customer data is processed, and there is no traction to report. What this period is trying
-to move is one question — will the founding cohort keep REMI once it stops being free — and the
-horizon is the enrolment window.
+**A patient experience validated on real terrain, in time for the December open day.** REMI is
+pre-launch: nothing is sold, no customer data is processed, there is no revenue and there is no
+traction to report. What this period is trying to move is one question — does REMI actually help a
+patient apply what their practitioner told them — and the horizon is the clinical partner's open
+day on 19 December 2026, where the new version is presented and commercialisation begins.
 
-The cohort is small on purpose and involved on purpose: a capped number of practitioners, each
-application reviewed personally, shaping what gets built rather than testing what has been. It is
-co-designed with functional medicine through a signed clinical partnership. Nothing about the cohort
-is a mailing list, and nothing built for it is announced before it works.
+The method is deliberate and it is the opposite of the previous plan. Rather than building the
+complete product and confronting it with users afterwards, Morgane accompanies 10–15 of her own
+patients now — with tools as simple as a messaging thread where that is enough — and each brick of
+REMI is tested against that accompaniment as it is built. Terrain, test, feedback, build, test
+again. Less is built, and what is built is built right.
 
-> **The pilot's commercial terms are not published here.** The cohort ceiling, the enrolment window,
-> the price and the billing date are a signed agreement, and they live in exactly one place: the
-> operator console, which renders them rather than editing them. This site is publicly viewable, so
-> it carries the shape of the pilot and not its figures — and the partner clinic is described rather
-> than named for the same reason. A spec that needs a number takes it from the console.
+Two consequences follow, and both are scope decisions rather than preferences:
 
-## Objectives this quarter
+- **The patient experience comes first, alone.** A practitioner encodes a patient's profile and
+  recommendations in the patient's own space, which is what makes it possible to test the real
+  product without a practitioner dashboard existing yet.
+- **The practitioner space is parked** until the patient half is validated, and will then be
+  specified from what Morgane has learned accompanying those patients — not from a specification
+  written ahead of the experience.
 
-| Objective                                                      | Measure                                                                                      | Where it stands                                                             |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| An ecosystem that looks and feels credible end to end          | An entry screen on every surface, one brand, a public help centre                            | Entry screens in place; brand foundation shipped; one help-centre page live |
-| The cohort enrolled before the window closes                   | Every place filled inside the enrolment window                                               | Window open; applications tracked in the console, no count published here   |
-| The core loop, end to end, for one practitioner and one person | Recommendations become a plan; the plan becomes meals and steps; progress comes back         | Both surfaces built, on fixture data — nothing persists yet                 |
-| The data question answered before the first record exists      | Trust posture published, residency intent written down, processors named before they process | Trust page live; storage, email and AI still uncommitted seams              |
+> **There is no pilot, no pilot price and no billing date.** Earlier versions of this page carried
+> a founding cohort with commercial terms, a ceiling and an enrolment window. None of it existed:
+> it was demo fixture data in the operator console that an earlier audit read as a signed
+> agreement. The ~15 practitioners in the braindump are a **beta recruitment target**, nobody has
+> signed anything, and no price is decided — the braindump's own figures are written as
+> _réflexions_. A stage that needs a commercial number does not have one to take.
+
+## Objectives
+
+| Objective                                                      | Measure                                                                                     | Where it stands                                                           |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| The patient loop working end to end for one real patient       | A profile, the practitioner's recommendations, and a first micro-action inside a minute     | Both surfaces built on fixture data — nothing persists yet                |
+| A usable patient version for the partner clinic to test        | Testable by their team on 1 December 2026                                                   | Not started as product; the terrain accompaniment is running              |
+| The database and accounts under it                             | Supabase connected: real accounts, real records, the invite link between them               | Decided and unstarted — storage, email and AI are still uncommitted seams |
+| The data question answered before the first real record exists | EU hosting, processing agreements and retention rules written down before processing        | Trust page live; nothing processes personal data yet                      |
+| The build kept inside what self-funding allows                 | Every feature outside [V2 scope](/business/scope) is a no, and the estate is sized to match | The scope is frozen; the six-app footprint is under review                |
 
 Where each of those actually stands, in more words than a cell holds:
 
-- **The ecosystem.** Web, admin, marketing, support and the demo sandbox each have a front door a
-  stranger can land on. The brand foundation landed on 3 August 2026 and put one wordmark, one icon
-  and one tagline across every app; this site's navbar was its last plain-text holdout. The help
-  centre is live with a single page — its article routes are written as structured content and not
-  yet routed.
-- **The cohort.** The enrolment window is open. Applications are tracked in the operator console,
-  which still renders fixture data, so no number appears here until it is a real one.
-- **The core loop.** The practitioner's practice, clients and therapeutic frame are built, as are
-  the person's today, meals, steps and plan. Every screen reads fixture data through the query
-  layer: registering a database replaces the body of each query and moves no caller.
-- **The data question.** The trust page is live on the public site. Storage, email and AI are still
-  seams in `@remi/services` with no vendor committed — which is exactly what keeps data residency a
-  selection criterion rather than a migration project.
+- **The patient loop.** Today, meals, steps and the plan behind them are built, and so is the
+  practitioner side of the same fixture data. Every screen reads through the query layer:
+  registering a database replaces the body of each query and moves no caller.
+- **The December version.** The terrain phase has started outside the product — real patients,
+  simple tools, real observations. The product work that meets it is the patient core loop:
+  onboarding, « améliore mon assiette », the daily hub, the supplement journal, micro-actions.
+- **The database.** Supabase is the decision of record, named in the braindump and adopted here.
+  The code was built so it could be plugged in without rework; that is now the next foundation.
+- **The data question.** The trust posture is published on the public site. Storage, email and AI
+  are still seams in `@remi/services` with no vendor committed — which is exactly what keeps data
+  residency a selection criterion rather than a migration project.
+- **The budget.** V2 is self-funded and deliberately capped, which is why the frozen scope is a
+  gate rather than a wish list: anything outside it spends money the project does not have. The
+  figure itself is not published here — a stage that needs it asks the owner.
 
 ## What this page does not claim
 
-No users outside the pilot, no results, no revenue. The three statistics on the public site are WHO
-figures describing the problem REMI addresses, not outcomes REMI has produced, and this page holds
-to the same rule: a number that cannot be sourced does not appear here, and fixture data is not
-evidence.
+No users, no results, no revenue, no signed practitioners, no price. The three statistics on the
+public site are WHO figures describing the problem REMI addresses, not outcomes REMI has produced,
+and this page holds to the same rule: a number that cannot be sourced does not appear here, and
+fixture data is not evidence.
 
 ## How the pipeline uses this page
 
 Ship quotes an objective verbatim in its ship note. Define connects a spec's **Problem** to one. If
-a feature cannot be tied to a line above, that is a signal about the feature, not about the page.
+a feature cannot be tied to a line above, that is a signal about the feature, not about the page —
+and if it is not on [V2 scope](/business/scope) either, it is not in this build.

@@ -21,7 +21,7 @@ importing the design system is what "off the design system" means.
 
 | Under            | Holds                                          | Read by             |
 | ---------------- | ---------------------------------------------- | ------------------- |
-| `app/business/`  | direction, initiatives, roles                  | Scope, Define, Ship |
+| `app/business/`  | direction, initiatives, the V2 scope, roles    | Scope, Define, Ship |
 | `app/technical/` | architecture, applications, packages, workflow | Build, Ship         |
 
 `pipeline/_shared/knowledge-map.md` routes each stage to a **named page**, not to "the docs" — that

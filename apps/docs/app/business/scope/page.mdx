@@ -1,0 +1,110 @@
+# V2 scope
+
+The frozen feature list for V2, and the list of things that are explicitly not in it. Scope and
+Define read this page to check that a request is inside the build; anything not named here is out
+until the owner adds it.
+
+Every line below is taken from Morgane's braindump — [`roadmap/features.md`][features],
+[`roadmap/court-term.md`][court] and [`roadmap/priorities.md`][priorities]. Nothing is added to it.
+The braindump is the source of truth for **what** REMI is; where sequencing is concerned it is
+outranked by the direction of record (below), and the precedence order between all of those
+documents is in [`.icm/docs/README.md`][precedence].
+
+## The order the work is built in
+
+The direction of record, adopted 27 August 2026, is terrain-first: build from what real patients
+turn out to need rather than shipping a complete product and discovering the gaps afterwards.
+
+- **The patient experience is built and validated first.** A patient can create a profile, carry
+  the recommendations their practitioner gave them, and get personalised accompaniment from them —
+  without a practitioner space existing yet. In this first phase the practitioner encodes a
+  patient's profile and recommendations in the patient's own space.
+- **The practitioner space comes after that is validated**, and is specified from Morgane's own
+  experience of accompanying 10–15 patients, not from a spec written ahead of it. The practitioner
+  features below stay in the V2 scope; they are not in the first phase.
+- **Milestones.** A usable patient version for the clinical partner's team to test on
+  **1 December 2026**; their feedback and corrections through 18 December; the partner's open day
+  on **19 December 2026**, where the new version is presented and commercialisation begins.
+- **Genotype-based personalisation is a live business track, not a build item.** Laboratories are
+  being contacted; it is explicitly not to block the first patient version. The nutrigenomics
+  engine stays out of scope — see below.
+
+## Patient — the V2 features
+
+| Feature                             | What it is                                                                                                                                                                                                                      |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Ultra-simple onboarding**         | Fast and intuitive, built on the foods a patient eats most often, ending in a first micro-action generated immediately. The 7-day food diary is removed outright                                                                |
+| **« Améliore mon assiette »**       | The central V2 feature. The patient says what they are about to eat; REMI reads the meal, compares it with the practitioner's recommendations, proposes one concrete improvement, explains the why, and shifts habits gradually |
+| **The daily hub — « hub du jour »** | Replaces the rigid meal plan with daily accompaniment and made-to-measure recipes                                                                                                                                               |
+| **« Je mange autre chose »**        | The flexibility mode: the patient says what is actually available to them, and REMI generates an adapted alternative that stays compatible with the recommendations                                                             |
+| **Smart supplement journal**        | The supplement follow-up, evolved: adapted reminders, better observance, and one standard across practitioners                                                                                                                  |
+| **Micro-actions**                   | Not general advice — simple, immediate actions that take minutes to do                                                                                                                                                          |
+| **The « pourquoi »**                | Every recommendation carries a clear explanation, so understanding and autonomy grow rather than compliance alone                                                                                                               |
+
+Two constraints sit across all of them, from `priorities.md` and `court-term.md`: value delivered in
+**under 60 seconds**, and a daily moment that is worth opening the app for.
+
+## Practitioner — the V2 features
+
+Parked until the patient experience is validated, and re-specified from terrain experience when it
+is picked up. Listed here so the frozen scope is complete, not because it is next.
+
+| Feature                       | What it is                                                                                                                                                                                     |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Practitioner dashboard**    | Patient follow-up, adherence at a glance, and quick identification of the patients who are struggling                                                                                          |
+| **Per-patient detail view**   | Actions done, difficulties met, eating habits, and the patient's own feedback                                                                                                                  |
+| **Adjusting recommendations** | Change the recommendations and the rules, and regenerate the accompaniment remotely                                                                                                            |
+| **Quick feedback**            | Encouragements, emoji and short messages, to keep the motivational link alive between consultations                                                                                            |
+| **Group messages**            | One piece of advice, a reminder or a teaching resource sent to several patients at once                                                                                                        |
+| **Practitioner profile**      | A public profile, a content space and a small community around the practitioner — described in the braindump as a progressive build, and not named in the direction report's short freeze list |
+
+## The technical centrepiece — the recommendation parser
+
+`court-term.md` names it as the priority technical objective: turn a practitioner's own documents
+into concrete accompaniment rules. It must read a PDF, extract the recommendations, structure them
+as dietary rules, and personalise the advice automatically. Every patient feature above depends on
+having those rules, which is why it is scope rather than infrastructure.
+
+## Explicitly out of V2
+
+Named here so they are not re-added. The first two were reconstructed from the deleted v1 and
+appear nowhere in the braindump's V2; the next two existed in v1 and are dropped on purpose; the
+rest are the braindump's own long term, which is not this build.
+
+| Out of scope                      | Why                                                                                                                                                                                          |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Psychological questionnaire**   | A v1 reconstruction. Not in the braindump's V2                                                                                                                                               |
+| **Nutrigenomics engine**          | A v1 reconstruction. Genetics appears in the braindump only as the far-future « REMI Genetics » idea; genotype personalisation is being explored commercially, but no engine is in the build |
+| **Rigid weekly plan generation**  | Deliberately replaced. The daily hub is what supersedes it                                                                                                                                   |
+| **7-day food diary**              | Deliberately killed. It is the single biggest source of v1's up-front effort, and removing it is stated as a V2 requirement                                                                  |
+| Practitioner network and search   | The braindump's long term, not V2                                                                                                                                                            |
+| Health marketplace                | The braindump's long term, not V2                                                                                                                                                            |
+| Sleep, activity, stress, hormones | Multidisciplinary accompaniment is the braindump's long term, not V2                                                                                                                         |
+| Behavioural-intelligence AI       | The braindump's long term, not V2                                                                                                                                                            |
+| Wearables and health-system links | The braindump's long term, not V2                                                                                                                                                            |
+
+The v1 feature list in `features.md` — plan generation, the food journal, recipe generation, the
+supplement journal, progressive adaptation — is a record of what was built, not a specification.
+V2 is not a port of v1.
+
+## What is not decided
+
+A stage that needs one of these takes the answer from the owner, not from this page.
+
+- **Prices.** The braindump's practitioner tiers and patient premium are written as _réflexions_,
+  not decisions. No figure appears on this site, and none is settled — see
+  [`braindump/business/pricing.md`][pricing].
+- **A V2 launch date.** The braindump's mid-2026 target passed. The 1 and 19 December dates above
+  are the first patient version's milestones, not a V2 launch.
+
+## How the pipeline uses this page
+
+Scope checks a request against the tables above before writing a scope document; Define cites the
+feature it is specifying. A request that is not on the patient list is not automatically a no — it
+is a question for the owner, and the answer is a change to this page.
+
+[features]: https://github.com/k0d0minio/remi-ai/blob/main/.icm/docs/braindump/roadmap/features.md
+[court]: https://github.com/k0d0minio/remi-ai/blob/main/.icm/docs/braindump/roadmap/court-term.md
+[priorities]: https://github.com/k0d0minio/remi-ai/blob/main/.icm/docs/braindump/roadmap/priorities.md
+[pricing]: https://github.com/k0d0minio/remi-ai/blob/main/.icm/docs/braindump/business/pricing.md
+[precedence]: https://github.com/k0d0minio/remi-ai/blob/main/.icm/docs/README.md

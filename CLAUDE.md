@@ -82,8 +82,9 @@ Nothing below is restated here. Each rule lives once, and loads on demand.
 - **Product knowledge** — `apps/docs/app/technical/**` (architecture) and
   `app/business/**` (direction), routed per stage by
   [`pipeline/_shared/knowledge-map.md`](pipeline/_shared/knowledge-map.md). Load the named page,
-  never the whole site. **The business pages predate the braindump and have not been reconciled
-  with it yet** — where they disagree, `.icm/docs/braindump/` wins.
+  never the whole site. The business pages are reconciled with the braindump and the direction of
+  record; `.icm/docs/` still outranks them, so where one drifts, `.icm/docs/` wins and the page is
+  the thing to fix.
 
 ## How work gets done here
 
