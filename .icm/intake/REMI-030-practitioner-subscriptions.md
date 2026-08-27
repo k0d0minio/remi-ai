@@ -1,14 +1,16 @@
 # REMI-030 · Practitioner subscriptions — first revenue
 
-|                |                                                                                |
-| -------------- | ------------------------------------------------------------------------------ |
-| Status         | blocked — pricing not confirmed, no payment provider chosen                    |
-| **Type**       | feature                                                                        |
-| **Priority**   | P1 — Phase F; no contractual date exists, despite what older documents claimed |
-| **Size**       | Weeks                                                                          |
-| **Depends on** | REMI-013, REMI-023                                                             |
-| **Blocked by** | A pricing decision and a payment provider                                      |
-| **Sources**    | Status report Phase F bullet 1 · `.icm/docs/braindump/business/pricing.md`     |
+> **Deferred (2026-08-27):** practitioner-phase / later-phase work. Per `.icm/docs/new-development-direction.docx`, the patient experience is built and validated first (FunMedDev test 1 Dec, open day 19 Dec); the practitioner space, parser, subscriptions and practitioner beta come after, informed by Morgane's own terrain experience with 10-15 patients. Was higher priority under the retired Phase A-F plan.
+
+|                |                                                                                   |
+| -------------- | --------------------------------------------------------------------------------- |
+| Status         | blocked — pricing not confirmed, no payment provider chosen                       |
+| **Type**       | feature                                                                           |
+| **Priority**   | P2 — parked until the patient experience is validated (new development direction) |
+| **Size**       | Weeks                                                                             |
+| **Depends on** | REMI-013, REMI-023                                                                |
+| **Blocked by** | A pricing decision and a payment provider                                         |
+| **Sources**    | Status report Phase F bullet 1 · `.icm/docs/braindump/business/pricing.md`        |
 
 ## Problem statement
 

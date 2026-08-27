@@ -1,4 +1,12 @@
-# REMI-008 · Freeze the V2 scope to the braindump, and fix the docs that contradict it
+# REMI-008 · Freeze the V2 scope to the new development direction, and fix the docs that contradict it
+
+> **Rescoped 2026-08-27.** The scope of record is no longer the braindump alone:
+> `.icm/docs/new-development-direction.docx` + `.icm/docs/call-summary.pdf` (25 Aug call)
+> now outrank it — patient experience first, practitioner space parked, FunMedDev test
+> 1 Dec, open day 19 Dec. Jamie's instruction: **anything in the codebase that
+> contradicts these documents gets removed.** The sweep below applies to
+> `apps/docs/app/business/**` and any other surface asserting the old plan, pilot
+> terms, or practitioner-first sequencing.
 
 |                |                                                                                            |
 | -------------- | ------------------------------------------------------------------------------------------ |

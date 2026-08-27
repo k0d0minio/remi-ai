@@ -1,10 +1,12 @@
 # REMI-031 · Recruit and onboard the ~15 founding practitioners
 
+> **Deferred (2026-08-27):** practitioner-phase / later-phase work. Per `.icm/docs/new-development-direction.docx`, the patient experience is built and validated first (FunMedDev test 1 Dec, open day 19 Dec); the practitioner space, parser, subscriptions and practitioner beta come after, informed by Morgane's own terrain experience with 10-15 patients. Was higher priority under the retired Phase A-F plan.
+
 |                |                                                                                                      |
 | -------------- | ---------------------------------------------------------------------------------------------------- |
 | Status         | ready once Phases C and D are usable                                                                 |
 | **Type**       | chore + feature                                                                                      |
-| **Priority**   | P0 — Phase F; validation is the point of the whole V2                                                |
+| **Priority**   | P2 — parked until the patient experience is validated (new development direction)                    |
 | **Size**       | Ongoing                                                                                              |
 | **Depends on** | REMI-027 (the onboarding mechanism), Phases C and D                                                  |
 | **Blocked by** | A product a practitioner can actually be given                                                       |

@@ -1,14 +1,14 @@
 # REMI-013 · Connect Supabase — database and authentication
 
-|                |                                                                  |
-| -------------- | ---------------------------------------------------------------- |
-| Status         | ready once REMI-007 and REMI-014 land                            |
-| **Type**       | feature                                                          |
-| **Priority**   | P0 — Phase B; every real feature is blocked behind it            |
-| **Size**       | A week or more                                                   |
-| **Depends on** | REMI-007 (decision recorded), REMI-014 (entities modelled first) |
-| **Blocked by** | A Supabase account and project, in an EU region                  |
-| **Sources**    | Status report Phase B bullet 1 · audit F-08 – F-11, F-32         |
+|                |                                                                                                                                                                           |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Status         | ready once REMI-007 and REMI-014 land — but note REMI-035 (due Fri 29 Aug) may stand up a minimal Supabase slice first; this ticket then formalises rather than fights it |
+| **Type**       | feature                                                                                                                                                                   |
+| **Priority**   | P0 — Phase B; every real feature is blocked behind it                                                                                                                     |
+| **Size**       | A week or more                                                                                                                                                            |
+| **Depends on** | REMI-007 (decision recorded), REMI-014 (entities modelled first)                                                                                                          |
+| **Blocked by** | A Supabase account and project, in an EU region                                                                                                                           |
+| **Sources**    | Status report Phase B bullet 1 · audit F-08 – F-11, F-32                                                                                                                  |
 
 ## Problem statement
 

@@ -1,8 +1,10 @@
 # REMI-010 · Answer the Startup Boost eligibility gates and decide go / no-go
 
+> **Resolved: GO** (Jamie, 2026-08-27). The two gating facts — Walloon operating seat and the incorporation date — are verified, and the criteria are naturally met. The dossier work continues as REMI-033 (deadline 15 September).
+
 |                |                                                                                 |
 | -------------- | ------------------------------------------------------------------------------- |
-| Status         | blocked — needs two facts only the owner has                                    |
+| Status         | resolved — go                                                                   |
 | **Type**       | decision-support                                                                |
 | **Priority**   | P0 — the call closes 15 September; the dossier would consume September          |
 | **Size**       | An hour once the two facts arrive                                               |

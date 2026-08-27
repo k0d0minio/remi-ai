@@ -1,4 +1,11 @@
-# REMI-014 · Model the V2 loop — practitioner, patient, recommendation, rule, micro-action, feedback
+# REMI-014 · Model the V2 loop — patient, recommendation, rule, micro-action, feedback
+
+> **Direction note (2026-08-27):** model **patient-first**, per
+> `.icm/docs/new-development-direction.docx` — the phase-1 loop is: patient profile,
+> practitioner recommendations **encoded manually by Morgane** (no parser, no
+> practitioner dashboard), personalised recipes, meal feedback, micro-actions. The
+> practitioner entities stay minimal placeholders until the practitioner phase. Check
+> what REMI-035 has already shipped before modelling from scratch.
 
 |                |                                                                |
 | -------------- | -------------------------------------------------------------- |
