@@ -70,5 +70,6 @@ The single catalogue of environment variables and secrets. The three-list rule
 demo fixture data in the admin console as fact: a signed pilot of fifteen practitioners at
 €24.50/month with billing from 1 September 2026. None of that existed. The ~15 practitioners are a
 **beta-recruitment target**. Those claims have been struck from these files rather than quietly
-edited, so the correction stays visible. The database question is likewise closed: the braindump
-names **Supabase**.
+edited, so the correction stays visible. The database question is likewise closed — though not the
+way the braindump has it: the braindump names Supabase, and the owner settled on **Neon** on
+27 August 2026.

@@ -46,7 +46,7 @@ data. They were wiped in one commit and remain recoverable in git history. The s
 
 | Ticket                                             | What                                                    |
 | -------------------------------------------------- | ------------------------------------------------------- |
-| [REMI-013](REMI-013-connect-supabase.md)           | Connect Supabase — database and authentication          |
+| [REMI-013](_done/REMI-013-connect-supabase.md)     | Dropped — superseded by connecting Neon                 |
 | [REMI-014](REMI-014-v2-data-model.md)              | Model the V2 loop                                       |
 | [REMI-015](REMI-015-data-protection-groundwork.md) | Data-protection groundwork before the first real record |
 | [REMI-016](REMI-016-test-harness.md)               | Stand up the test harness                               |
@@ -110,8 +110,9 @@ Worth knowing before reading any older document in this repository:
 2. **There is no billing date and no revenue.** The "€24.50/practitioner/month from 1 September
    2026" was demo fixture data that an earlier audit read as a contract.
 3. **The database question is closed — Neon.** The braindump named Supabase; the owner settled on
-   Neon on 27 August 2026 and it is being wired up now. REMI-007, which existed to record
-   Supabase, was dropped for that reason.
+   Neon on 27 August 2026 and it is being connected in a separate session. REMI-007 (record the
+   Supabase decision) and REMI-013 (connect Supabase) were both dropped for that reason — see
+   REMI-013's banner for the foundation work that went down with it and has not been re-cut.
 4. **V2 is not a port of v1.** The 7-day food diary, the psychological questionnaire, the
    nutrigenomics engine and rigid weekly plan generation are all out of scope.
 
