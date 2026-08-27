@@ -293,4 +293,25 @@ export const fr: Content = {
       body: "Vos étapes apparaîtront ici une fois que votre praticien aura publié un plan.",
     },
   },
+  patientLink: {
+    greeting: "Bonjour",
+    lead: "Votre espace REMI : votre profil et les recommandations de votre praticienne, réunis au même endroit.",
+    objectiveTitle: "Votre objectif",
+    recommendationsTitle: "Vos recommandations",
+    categories: {
+      nutrition: "Nutrition",
+      habit: "Habitude",
+      supplement: "Complément",
+      activity: "Activité",
+      monitoring: "Suivi",
+    },
+    empty:
+      "Vos recommandations apparaîtront ici dès que votre praticienne les aura encodées.",
+    disclaimer: {
+      title: "Votre praticienne reste la référence",
+      body: "Cette page reprend ce qui a été convenu en consultation. Elle ne pose pas de diagnostic et ne remplace pas un avis médical.",
+    },
+    betaNote:
+      "REMI est en version bêta — vos retours sont les bienvenus, dites-nous ce qui manque ou ce qui gêne.",
+  },
 };

@@ -15,6 +15,7 @@ const schema = z.object({
   APP_URL: z.string().url().optional(),
   DATABASE_URL: z.string().optional(),
   AUTH_SECRET: z.string().optional(),
+  OPERATOR_EMAIL: z.string().optional(),
   EMAIL_FROM: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
   AI_GATEWAY_API_KEY: z.string().optional(),

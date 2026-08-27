@@ -65,3 +65,8 @@ jobs:
 
       - name: Typecheck
         run: pnpm typecheck
+
+      # The service-layer suite (vitest, in @remi/services). No database and no
+      # network: the db services run against an in-memory client at the seam.
+      - name: Test
+        run: pnpm test

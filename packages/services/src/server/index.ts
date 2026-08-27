@@ -17,6 +17,44 @@ export {
 } from "../db/client";
 export type { Collection, DatabaseClient } from "../db/client";
 
+export { createNeonDatabase } from "../db/adapters/neon";
+
+export {
+  createPatient,
+  deletePatient,
+  getPatient,
+  getPatientByShareToken,
+  listPatients,
+  regenerateShareToken,
+  updatePatient,
+} from "../db/services/patients";
+export type { PatientInput } from "../db/services/patients";
+
+export {
+  addPatientRecommendation,
+  deletePatientRecommendation,
+  listPatientRecommendations,
+  updatePatientRecommendation,
+} from "../db/services/patient-recommendations";
+export type { RecommendationInput } from "../db/services/patient-recommendations";
+
+export {
+  createOperator,
+  findOperatorByEmail,
+  getOperator,
+  hasOperator,
+  verifyOperator,
+} from "../db/services/operators";
+export type { OperatorInput } from "../db/services/operators";
+export type { Operator } from "../db/models/operator";
+
+export { hashPassword, verifyPassword } from "../auth/password";
+export {
+  SESSION_TTL_SECONDS,
+  createSessionToken,
+  verifySessionToken,
+} from "../auth/session-token";
+
 export {
   consoleMailer,
   createResendMailer,
