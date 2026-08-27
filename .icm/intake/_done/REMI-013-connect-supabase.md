@@ -1,14 +1,25 @@
 # REMI-013 · Connect Supabase — database and authentication
 
-|                |                                                                                                                                                                           |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Status         | ready once REMI-007 and REMI-014 land — but note REMI-035 (due Fri 29 Aug) may stand up a minimal Supabase slice first; this ticket then formalises rather than fights it |
-| **Type**       | feature                                                                                                                                                                   |
-| **Priority**   | P0 — Phase B; every real feature is blocked behind it                                                                                                                     |
-| **Size**       | A week or more                                                                                                                                                            |
-| **Depends on** | REMI-007 (decision recorded), REMI-014 (entities modelled first)                                                                                                          |
-| **Blocked by** | A Supabase account and project, in an EU region                                                                                                                           |
-| **Sources**    | Status report Phase B bullet 1 · audit F-08 – F-11, F-32                                                                                                                  |
+> **Dropped** (Jamie, 2026-08-27): the database is **Neon**, not Supabase, and it is being
+> connected in a separate session — so this ticket is superseded end to end, not just in its
+> vendor name. Tickets that still say "depends on REMI-013" should be read as depending on the
+> database being connected at all.
+>
+> **Not carried anywhere yet**, and worth re-cutting once Neon lands: the checked-in migrations,
+> deleting the fixture fallbacks so a missing database fails loudly instead of serving invented
+> content (audit F-08), the development session refusing to run in production (audit F-32), and
+> the RLS-or-application-level authorisation question that v1's IDOR defects make load-bearing.
+> None of that was Supabase-specific.
+
+|                |                                                                  |
+| -------------- | ---------------------------------------------------------------- |
+| Status         | dropped                                                          |
+| **Type**       | feature                                                          |
+| **Priority**   | P0 — Phase B; every real feature is blocked behind it            |
+| **Size**       | A week or more                                                   |
+| **Depends on** | REMI-007 (decision recorded), REMI-014 (entities modelled first) |
+| **Blocked by** | A Supabase account and project, in an EU region                  |
+| **Sources**    | Status report Phase B bullet 1 · audit F-08 – F-11, F-32         |
 
 ## Problem statement
 

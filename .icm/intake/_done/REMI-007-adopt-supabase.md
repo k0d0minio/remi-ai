@@ -1,8 +1,15 @@
 # REMI-007 · Adopt Supabase officially and close the database question
 
+> **Dropped** (Jamie, 2026-08-27): the database question closed the other way — **Neon**, not
+> Supabase. Neon is being wired up in a separate session, so there is no decision left to record
+> here and no Neon leaning left to sweep: the decision log already names Neon, and the Supabase
+> variables this ticket would have reserved are the wrong ones. The braindump's "Supabase" line in
+> `developpement-produit/ai.md` is superseded by the owner's call. Reopen this file only if the
+> vendor choice is reconsidered.
+
 |                |                                                                                                |
 | -------------- | ---------------------------------------------------------------------------------------------- |
-| Status         | ready                                                                                          |
+| Status         | dropped                                                                                        |
 | **Type**       | decision + chore                                                                               |
 | **Priority**   | P0 — Phase A; every Phase B ticket is blocked behind it                                        |
 | **Size**       | An hour                                                                                        |
