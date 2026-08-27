@@ -29,7 +29,7 @@ exists, because then every gap is a live obligation rather than a plan.
 ## Required steps
 
 1. **Processor register.** One row per processor — Vercel, Supabase, the AI provider, Resend, and
-   anything the v1 estate keeps (REMI-011) — with what it processes, where, and whether a DPA is
+   anything the v1 estate keeps (decided in REMI-011, executed by REMI-009) — with what it processes, where, and whether a DPA is
    signed. The product's own published commitment is that processors are named before they process.
 2. **EU hosting, stated and verified.** Database region, function regions, storage region, and the
    AI provider's processing location. Verify rather than assume; record where each is set.

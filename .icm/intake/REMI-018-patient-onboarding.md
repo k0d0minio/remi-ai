@@ -2,9 +2,9 @@
 
 |                |                                                                                                     |
 | -------------- | --------------------------------------------------------------------------------------------------- |
-| Status         | ready once Phase B lands                                                                            |
+| Status         | ready once REMI-013 and REMI-014 land                                                               |
 | **Type**       | feature                                                                                             |
-| **Priority**   | P0 — Phase C; it is the first thing every patient meets                                             |
+| **Priority**   | P0 — it is the first thing every patient meets, and the 1 Dec version needs it                      |
 | **Size**       | A week                                                                                              |
 | **Depends on** | REMI-013, REMI-014                                                                                  |
 | **Blocked by** | An AI provider, for the first micro-action                                                          |
@@ -24,14 +24,15 @@ mental load), not informational.
 ## Required steps
 
 1. Design the shortest onboarding that can produce a useful first micro-action: the patient's most
-   frequent foods, their practitioner's recommendations (arriving via the invite/QR binding), and
+   frequent foods, the recommendations Morgane has encoded for them (REMI-035's admin — the
+   invite/QR binding is the parked phase), and
    the minimum context — tastes, budget, time available, family situation.
 2. Generate and show a first micro-action at the end of it, with its _why_. Not a summary, not a
    plan: one concrete thing to do.
 3. Enforce the 60-second rule as a real constraint on the design, and instrument it so the claim
    can be checked against actual sessions.
-4. Handle the patient who arrives with **no** practitioner recommendations yet — a QR scan can
-   precede the consultation.
+4. Handle the patient who arrives with **no** encoded recommendations yet — a profile can
+   precede Morgane's encoding.
 5. French first; the braindump's product language is French, and EN/FR parity is compiler-enforced
    on this surface.
 
@@ -42,8 +43,8 @@ mental load), not informational.
   matter — getting this wrong is not a UX problem.
 - **Is the first micro-action AI-generated or rule-based?** Under the 60-second rule and the cost
   discipline (REMI-022), a deterministic first action may be better than an AI call.
-- **What does onboarding look like without a practitioner?** Free patients may arrive on their own.
-  Whether that is even supported at launch is a product decision.
+- **What does onboarding look like without a practitioner?** Phase-1 patients are Morgane's own;
+  free-arriving patients are a later product decision — do not build for them now.
 - **Consent placement.** Health-data consent (REMI-015) has to be captured before any health input.
   Where it sits in a 60-second flow needs deciding, not improvising.
 
@@ -64,11 +65,11 @@ developpement-produit/tests.md — the last of these says exactly why v1's onboa
 
 Task: build the V2 patient onboarding.
 1. The shortest flow that can produce a genuinely useful first micro-action: most frequent foods,
-   the practitioner's recommendations if present, and minimum context (tastes, budget, time,
+   the recommendations Morgane has encoded if present, and minimum context (tastes, budget, time,
    family). Nothing else.
 2. End on one concrete micro-action with its "why" — not a summary or a plan.
 3. Treat 60 seconds as a hard design constraint and instrument it so the claim is checkable.
-4. Support the patient who has no practitioner recommendations yet.
+4. Support the patient whose recommendations are not yet encoded.
 5. French first, with EN/FR parity — the compiler enforces it.
 Use @remi/ui primitives only; do not add a component library. Do not run build/lint/typecheck/
 format locally. Push a branch, open a PR, git mv this ticket into .icm/intake/_done/, and put the

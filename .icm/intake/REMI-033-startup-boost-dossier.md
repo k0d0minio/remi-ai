@@ -12,7 +12,7 @@
 
 ## Problem statement
 
-If REMI-010 comes back "go", the dossier has to be written inside a tight window, and it runs in
+REMI-010 resolved as go (27 Aug): the dossier has to be written inside a tight window, and it runs in
 **parallel** with Phases A and B — it is writing and financial-projection work, not engineering.
 The report has already prepared the argument: five arguments in the order to make them, the honest
 scoring of the five criteria, and the two hard questions a jury will ask, with answers.
@@ -63,7 +63,7 @@ Work in the remi-ai monorepo. Read Q1 and Q2 of .icm/docs/remi-status-report.htm
 argument is already prepared there — plus .icm/docs/correspondence/01-startup-boost.md and the
 braindump's vision-strategy/ and business/ folders.
 
-Task: write the Startup Boost dossier, only if REMI-010 returned "go".
+Task: write the Startup Boost dossier — REMI-010 resolved as go on 27 Aug.
 1. Lead on market need with operational value, and on scalability through the practitioner-led
    model. Both are strong and both are evidenced by Morgane's own field work.
 2. Present the recommendation parser and the behavioural engine as proprietary technology IN
