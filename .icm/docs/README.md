@@ -13,13 +13,15 @@ holds both the knowledge and the work derived from it.
 When two documents disagree, the one higher in this list wins. This ordering is the whole point of
 the folder.
 
-| #   | Source                                               | What it settles                                                                        |
-| --- | ---------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| 1   | [`braindump/`](braindump/)                           | What REMI is: vision, positioning, pivots, the V2 feature set, business model, roadmap |
-| 2   | [`remi-status-report.html`](remi-status-report.html) | The plan derived from it — Phases A–F — and the open questions still outstanding       |
-| 3   | [`correspondence/`](correspondence/)                 | What Morgane actually asked for, in her words                                          |
-| 4   | [`ENV.md`](ENV.md)                                   | Environment variables and secrets — the only catalogue                                 |
-| 5   | [`history/`](history/)                               | Engineering findings and the v1 record. **Superseded wherever it touches direction.**  |
+| #   | Source                                                             | What it settles                                                                                                                                                                |
+| --- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | [`new-development-direction.docx`](new-development-direction.docx) | **The current direction** (from Morgane & Arnaud, adopted 27 Aug 2026): terrain-first, patient experience before the practitioner space, FunMedDev test 1 Dec, open day 19 Dec |
+| 2   | [`call-summary.pdf`](call-summary.pdf)                             | The 25 Aug team call: Slack working rhythm, the beta patient-profile admin due Friday 29 Aug, weekly Friday calls, access list (GoDaddy, DigitalOcean, emails)                 |
+| 3   | [`braindump/`](braindump/)                                         | What REMI is: vision, positioning, the V2 feature ideas, business model. **On sequencing and priorities, 1–2 win.**                                                            |
+| 4   | [`remi-status-report.html`](remi-status-report.html)               | The 18 Aug plan (Phases A–F). **Its phase ordering is superseded by 1** — the backlog has been re-cut.                                                                         |
+| 5   | [`correspondence/`](correspondence/)                               | What Morgane actually asked for, in her words                                                                                                                                  |
+| 6   | [`ENV.md`](ENV.md)                                                 | Environment variables and secrets — the only catalogue                                                                                                                         |
+| 7   | [`history/`](history/)                                             | Engineering findings and the v1 record. **Superseded wherever it touches direction.**                                                                                          |
 
 ## The contents
 

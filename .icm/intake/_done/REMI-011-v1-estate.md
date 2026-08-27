@@ -1,5 +1,7 @@
 # REMI-011 · Settle the v1 estate — old data first, then the accounts
 
+> **Dropped** (Jamie, 2026-08-27): after the 26 Aug call, settling the v1 estate is abandoned entirely — no access will be pursued and no v1 accounts get inventoried. If the old Supabase project ever resurfaces as a concern, this is the file to reopen.
+
 |                |                                                                                                |
 | -------------- | ---------------------------------------------------------------------------------------------- |
 | Status         | blocked — needs access to the v1 Supabase project                                              |

@@ -1,5 +1,11 @@
 # REMI-015 · Data-protection groundwork before the first real health record
 
+> **Urgency note (2026-08-27):** the first real records are no longer hypothetical —
+> Morgane started with her first patient on 26 Aug, and REMI-035 puts real patient
+> profiles into the platform from Friday 29 Aug. The groundwork here (processor
+> register, retention, deletion, pseudonymisation posture) should land with or
+> immediately behind REMI-035, not after Phase B.
+
 |                |                                                                                        |
 | -------------- | -------------------------------------------------------------------------------------- |
 | Status         | blocked — owner and legal work, prepared here                                          |

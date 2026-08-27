@@ -1,14 +1,14 @@
 # REMI-033 · Write the Startup Boost dossier
 
-|                |                                                             |
-| -------------- | ----------------------------------------------------------- |
-| Status         | blocked — conditional on REMI-010's go decision             |
-| **Type**       | decision-support (writing, not engineering)                 |
-| **Priority**   | P0 if go — the call closes 15 September                     |
-| **Size**       | Owner + accountant time; the technical annexes are mine     |
-| **Depends on** | REMI-010                                                    |
-| **Blocked by** | The go / no-go, and the accountant's financial projections  |
-| **Sources**    | Status report Q1, Q2 and "How Startup Boost fits this plan" |
+|                |                                                                                                            |
+| -------------- | ---------------------------------------------------------------------------------------------------------- |
+| Status         | ready — **it is GO** (Jamie, 27 Aug): the two gating facts are verified and the criteria are naturally met |
+| **Type**       | decision-support (writing, not engineering)                                                                |
+| **Priority**   | P0 — the call closes **15 September**, 19 days out                                                         |
+| **Size**       | Owner + accountant time; the technical annexes are mine                                                    |
+| **Depends on** | — (REMI-010 resolved as go, 27 Aug)                                                                        |
+| **Blocked by** | The accountant's financial projections                                                                     |
+| **Sources**    | Status report Q1, Q2 and "How Startup Boost fits this plan"                                                |
 
 ## Problem statement
 

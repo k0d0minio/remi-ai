@@ -1,14 +1,14 @@
 # REMI-012 · Build the tool and cost register
 
-|                |                                                                       |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | blocked — needs answers on three unidentified tools                   |
-| **Type**       | chore                                                                 |
-| **Priority**   | P1 — Phase A; Morgane asked for "une vision claire des coûts"         |
-| **Size**       | Half a day, once the answers arrive                                   |
-| **Depends on** | REMI-011 (feeds the v1 vendor rows)                                   |
-| **Blocked by** | What DigitalOcean, Mistral and Euria are, and who owns them           |
-| **Sources**    | Status report Q3 · `.icm/docs/correspondence/02-onenote-and-tools.md` |
+|                |                                                                                                                                                                                                                                                                                                 |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Status         | ready                                                                                                                                                                                                                                                                                           |
+| **Type**       | chore                                                                                                                                                                                                                                                                                           |
+| **Priority**   | P1 — Morgane asked for "une vision claire des coûts"                                                                                                                                                                                                                                            |
+| **Size**       | Half a day                                                                                                                                                                                                                                                                                      |
+| **Depends on** | — (REMI-011 dropped 27 Aug; v1 vendor rows are out of scope with it)                                                                                                                                                                                                                            |
+| **Blocked by** | — unblocked 27 Aug: Jamie has access to everything now. DigitalOcean is theirs (named in the 25 Aug call's access list alongside GoDaddy and emails). Mistral/Euria remain candidates in the sovereign-AI evaluation, not confirmed subscriptions — verify from the accounts, not from guesses. |
+| **Sources**    | Status report Q3 · `.icm/docs/correspondence/02-onenote-and-tools.md`                                                                                                                                                                                                                           |
 
 ## Problem statement
 

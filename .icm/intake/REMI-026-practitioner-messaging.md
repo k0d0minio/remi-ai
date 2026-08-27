@@ -1,14 +1,16 @@
 # REMI-026 · Quick feedback and group messages
 
-|                |                                                                            |
-| -------------- | -------------------------------------------------------------------------- |
-| Status         | ready once REMI-023 lands                                                  |
-| **Type**       | feature                                                                    |
-| **Priority**   | P1 — Phase D                                                               |
-| **Size**       | Half a week                                                                |
-| **Depends on** | REMI-023                                                                   |
-| **Blocked by** | —                                                                          |
-| **Sources**    | Status report Phase D bullet 4 · `.icm/docs/braindump/roadmap/features.md` |
+> **Deferred (2026-08-27):** practitioner-phase / later-phase work. Per `.icm/docs/new-development-direction.docx`, the patient experience is built and validated first (FunMedDev test 1 Dec, open day 19 Dec); the practitioner space, parser, subscriptions and practitioner beta come after, informed by Morgane's own terrain experience with 10-15 patients. Was higher priority under the retired Phase A-F plan.
+
+|                |                                                                                   |
+| -------------- | --------------------------------------------------------------------------------- |
+| Status         | ready once REMI-023 lands                                                         |
+| **Type**       | feature                                                                           |
+| **Priority**   | P2 — parked until the patient experience is validated (new development direction) |
+| **Size**       | Half a week                                                                       |
+| **Depends on** | REMI-023                                                                          |
+| **Blocked by** | —                                                                                 |
+| **Sources**    | Status report Phase D bullet 4 · `.icm/docs/braindump/roadmap/features.md`        |
 
 ## Problem statement
 

@@ -1,13 +1,18 @@
-# REMI-009 · Decide how much of the six-app estate survives
+# REMI-009 · Execute the estate decision: retire demo and support, keep the rest
+
+> **Decision made (Jamie, 2026-08-27):** keep the product (`apps/web`), the
+> practitioner-facing surfaces when their phase comes, `apps/marketing`,
+> `apps/docs`, and `apps/admin` (REMI-035 builds on it). **Retire `apps/demo` and
+> `apps/support` for the time being** — parked, reversible, not deleted.
 
 |                |                                                                                           |
 | -------------- | ----------------------------------------------------------------------------------------- |
-| Status         | blocked — owner decision                                                                  |
-| **Type**       | decision-support                                                                          |
-| **Priority**   | P1 — Phase A; cheap to defer, expensive to keep paying for                                |
-| **Size**       | Half a day of analysis, then whatever the decision costs                                  |
+| Status         | ready                                                                                     |
+| **Type**       | chore — executing a made decision                                                         |
+| **Priority**   | P1                                                                                        |
+| **Size**       | Half a day                                                                                |
 | **Depends on** | —                                                                                         |
-| **Blocked by** | An owner decision — this ticket prepares it, it does not make it                          |
+| **Blocked by** | —                                                                                         |
 | **Sources**    | Status report Phase A bullet 3 and Part two · `.icm/docs/braindump/roadmap/priorities.md` |
 
 ## Problem statement
