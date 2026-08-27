@@ -1,3 +1,5 @@
+> Dropped: parked practitioner phase — the 2026-08-27 direction of record says the practitioner space will be specified from Morgane's terrain experience, so this braindump-era spec would be re-cut rather than picked up as written. 2026-08-27 estate ticket audit.
+
 # REMI-024 · Per-patient detail view for the practitioner
 
 > **Deferred (2026-08-27):** practitioner-phase / later-phase work. Per `.icm/docs/new-development-direction.docx`, the patient experience is built and validated first (FunMedDev test 1 Dec, open day 19 Dec); the practitioner space, parser, subscriptions and practitioner beta come after, informed by Morgane's own terrain experience with 10-15 patients. Was higher priority under the retired Phase A-F plan.
