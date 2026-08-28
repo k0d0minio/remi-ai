@@ -64,9 +64,9 @@ answer for what it did.
 
 - **What they are trying to do** — know which accounts exist and in what state, see what a
   practitioner or a patient is stuck on, and be able to say what changed and who changed it.
-- **What they can see** — accounts and their status, the support inbox, feature flags and the audit
-  log. A practitioner's roster shows as activity — is anything moving on this account — rather than
-  as plan content.
+- **What they can see** — accounts and their status, the patient roster and the profiles and
+  recommendations behind it, the support inbox, feature flags and the audit log. A practitioner's
+  roster shows as activity — is anything moving on this account — rather than as plan content.
 - **What they can change** — access to an account (suspend, restore, reset) and platform flags, with
   a confirmation and an audit entry on anything destructive. No commercial terms: there are none to
   render, and an operator who could set a price from a table is one mis-click from a term nobody
@@ -76,14 +76,14 @@ answer for what it did.
 
 ## What each role sees, per app
 
-| App                 | Patient                                                              | Practitioner                                         | Operator                                            |
-| ------------------- | -------------------------------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------- |
-| `web` (:3000)       | Their profile, the daily hub, meals, micro-actions, supplements      | Their patients — parked until the patient half lands | Nothing — no operator session exists in the product |
-| `admin` (:3002)     | Nothing — the app has no public route                                | Nothing                                              | The console: accounts, support, flags, audit        |
-| `marketing` (:3001) | The public site, signed out, in English or French                    | The same site, plus the practitioner page            | The same as anyone                                  |
-| `support` (:3004)   | The help centre, anonymously — it never knows who is asking          | The same                                             | The same                                            |
-| `docs` (:3003)      | Not a product surface — this site is reference material for the team | The same                                             | The same                                            |
-| `demo` (:3005)      | Not a product surface — the Design stage's sandbox, mock data only   | The same                                             | The same                                            |
+| App                 | Patient                                                              | Practitioner                                         | Operator                                               |
+| ------------------- | -------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ |
+| `web` (:3000)       | Their profile, the daily hub, meals, micro-actions, supplements      | Their patients — parked until the patient half lands | Nothing — no operator session exists in the product    |
+| `admin` (:3002)     | Nothing — the app has no public route                                | Nothing                                              | The console: accounts, patients, support, flags, audit |
+| `marketing` (:3001) | The public site, signed out, in English or French                    | The same site, plus the practitioner page            | The same as anyone                                     |
+| `support` (:3004)   | The help centre, anonymously — it never knows who is asking          | The same                                             | The same                                               |
+| `docs` (:3003)      | Not a product surface — this site is reference material for the team | The same                                             | The same                                               |
+| `demo` (:3005)      | Not a product surface — the Design stage's sandbox, mock data only   | The same                                             | The same                                               |
 
 Two of those cells matter more than they look. `web` is the only app where the role changes what is
 rendered, and `admin` is the only app no role but the operator can reach at all — that boundary is

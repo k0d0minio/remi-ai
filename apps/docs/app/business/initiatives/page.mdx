@@ -36,27 +36,30 @@ Two consequences follow, and both are scope decisions rather than preferences:
 
 ## Objectives
 
-| Objective                                                      | Measure                                                                                     | Where it stands                                                           |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| The patient loop working end to end for one real patient       | A profile, the practitioner's recommendations, and a first micro-action inside a minute     | Both surfaces built on fixture data — nothing persists yet                |
-| A usable patient version for the partner clinic to test        | Testable by their team on 1 December 2026                                                   | Not started as product; the terrain accompaniment is running              |
-| The database and accounts under it                             | Supabase connected: real accounts, real records, the invite link between them               | Decided and unstarted — storage, email and AI are still uncommitted seams |
-| The data question answered before the first real record exists | EU hosting, processing agreements and retention rules written down before processing        | Trust page live; nothing processes personal data yet                      |
-| The build kept inside what self-funding allows                 | Every feature outside [V2 scope](/business/scope) is a no, and the estate is sized to match | The scope is frozen; the six-app footprint is under review                |
+| Objective                                                      | Measure                                                                                     | Where it stands                                                                                |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| The patient loop working end to end for one real patient       | A profile, the practitioner's recommendations, and a first micro-action inside a minute     | `web` is still fixture-backed; the operator's patient roster is the first screen that persists |
+| A usable patient version for the partner clinic to test        | Testable by their team on 1 December 2026                                                   | Not started as product; the terrain accompaniment is running                                   |
+| The database and accounts under it                             | A real database behind the surfaces: real accounts, real records, real recommendations      | Neon Postgres wired — schema, migrations and the first patient records land in the admin       |
+| The data question answered before the first real record exists | EU hosting, processing agreements and retention rules written down before processing        | Trust page live; nothing processes personal data yet                                           |
+| The build kept inside what self-funding allows                 | Every feature outside [V2 scope](/business/scope) is a no, and the estate is sized to match | The scope is frozen; the six-app footprint is under review                                     |
 
 Where each of those actually stands, in more words than a cell holds:
 
-- **The patient loop.** Today, meals, steps and the plan behind them are built, and so is the
-  practitioner side of the same fixture data. Every screen reads through the query layer:
-  registering a database replaces the body of each query and moves no caller.
+- **The patient loop.** In `web`, today, meals, steps and the plan behind them are built, and so
+  is the practitioner side of the same fixture data; every screen reads through the query layer, so
+  pointing a query at the database moves no caller. The operator console is ahead of it: its
+  patient roster and profiles are real rows, which is what the December version is built out from.
 - **The December version.** The terrain phase has started outside the product — real patients,
   simple tools, real observations. The product work that meets it is the patient core loop:
   onboarding, « améliore mon assiette », the daily hub, the supplement journal, micro-actions.
-- **The database.** Supabase is the decision of record, named in the braindump and adopted here.
-  The code was built so it could be plugged in without rework; that is now the next foundation.
-- **The data question.** The trust posture is published on the public site. Storage, email and AI
-  are still seams in `@remi/services` with no vendor committed — which is exactly what keeps data
-  residency a selection criterion rather than a migration project.
+- **The database.** Neon Postgres, by owner decision on 27 August 2026 — the braindump names
+  Supabase and was settled the other way. The adapter, the schema and the migrations are in the
+  repo, and the operator's patient-profile surface is its first real consumer.
+- **The data question.** The trust posture is published on the public site. The database is now
+  committed, so residency is a live obligation rather than a selection criterion; email and AI are
+  still seams in `@remi/services`, and the protection groundwork has to land before the first real
+  patient record does.
 - **The budget.** V2 is self-funded and deliberately capped, which is why the frozen scope is a
   gate rather than a wish list: anything outside it spends money the project does not have. The
   figure itself is not published here — a stage that needs it asks the owner.
