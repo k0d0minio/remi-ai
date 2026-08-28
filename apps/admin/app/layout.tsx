@@ -26,16 +26,16 @@ const display = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: {
-    default: `${BRAND_NAME} — admin console`,
-    template: `%s · ${BRAND_NAME} admin`,
+    default: `${BRAND_NAME} — console`,
+    template: `%s · console ${BRAND_NAME}`,
   },
-  description: `Internal operations for the ${BRAND_NAME} platform.`,
+  description: `Console interne ${BRAND_NAME} — gestion des profils patients.`,
   robots: { index: false, follow: false },
 };
 
 const RootLayout = ({ children }: { children: ReactNode }) => (
   <html
-    lang="en"
+    lang="fr"
     className={`${inter.variable} ${display.variable}`}
     suppressHydrationWarning
   >

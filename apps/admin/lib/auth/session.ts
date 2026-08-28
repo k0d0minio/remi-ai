@@ -6,6 +6,7 @@ import {
   verifySessionToken,
   type Operator,
 } from "@remi/services/server";
+import { canManageOperators } from "@remi/services/shared";
 import { ensureDatabase } from "@/lib/database";
 
 export const SESSION_COOKIE = "remi-admin-session";
@@ -37,6 +38,23 @@ export const requireOperator = async (): Promise<Operator> => {
   const operator = await getOperatorSession();
   if (!operator) {
     redirect("/sign-in");
+  }
+  return operator;
+};
+
+/**
+ * The second boundary, for anything touching accounts. It redirects rather
+ * than 403s: an operator who followed a link they should not see has made a
+ * navigation mistake, not an attack, and the console has one place to send
+ * them back to.
+ *
+ * Every account action calls this, not just the page — the page decides what
+ * renders, the action decides what happens.
+ */
+export const requireOwner = async (): Promise<Operator> => {
+  const operator = await requireOperator();
+  if (!canManageOperators(operator.role)) {
+    redirect("/");
   }
   return operator;
 };

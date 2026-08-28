@@ -7,11 +7,12 @@ import { cn } from "@remi/ui/utils";
 import { navSections } from "@/components/shell/nav-sections";
 
 type Props = {
+  canManageOperators: boolean;
   /** Fired when a link is chosen, so the mobile panel can close itself. */
   onNavigate?: () => void;
 };
 
-// Overview owns the root, so it matches exactly; every other link owns its
+// Accueil owns the root, so it matches exactly; every other link owns its
 // subtree.
 const matches = (href: string, pathname: string) =>
   href === "/"
@@ -21,13 +22,27 @@ const matches = (href: string, pathname: string) =>
 /**
  * A client island purely because the current route decides which link is
  * highlighted. The sidebar and header around it stay on the server.
+ *
+ * The owner-only rows are filtered by a boolean prop rather than by reading the
+ * session here: a role is not serialisable across the boundary as anything an
+ * operator's browser should be trusted with, and hiding a link is a courtesy in
+ * any case. The route itself is guarded server-side, which is the real check.
  */
-export const NavLinks = ({ onNavigate }: Props) => {
+export const NavLinks = ({ canManageOperators, onNavigate }: Props) => {
   const pathname = usePathname();
+
+  const sections = navSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter(
+        (item) => !item.ownerOnly || canManageOperators,
+      ),
+    }))
+    .filter((section) => section.items.length > 0);
 
   return (
     <div className="flex flex-col gap-6">
-      {navSections.map((section) => (
+      {sections.map((section) => (
         <div key={section.title} className="flex flex-col gap-1">
           <Typography
             as="h2"

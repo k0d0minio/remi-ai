@@ -8,6 +8,13 @@
       "when": 1787872598009,
       "tag": "0000_swift_lizard",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787919654139,
+      "tag": "0001_modern_madelyne_pryor",
+      "breakpoints": true
     }
   ]
 }

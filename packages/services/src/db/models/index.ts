@@ -6,10 +6,17 @@
  * rest of `/db` stays server-only.
  */
 
+export type { AuditAction, AuditEvent } from "./audit-event";
 export type { Consultation } from "./consultation";
 export type { Meal, MealSlot, MealStatus } from "./meal";
-export type { Operator } from "./operator";
-export type { PatientProfile, PatientStatus } from "./patient-profile";
+export type { Operator, OperatorRole } from "./operator";
+export type { OperatorInvitation } from "./operator-invitation";
+export type { PatientNote } from "./patient-note";
+export type {
+  PatientProfile,
+  PatientSex,
+  PatientStatus,
+} from "./patient-profile";
 export type { PatientRecommendation } from "./patient-recommendation";
 export type {
   GenotypeMarker,

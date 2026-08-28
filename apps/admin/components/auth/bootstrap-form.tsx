@@ -12,11 +12,11 @@ export const BootstrapForm = () => {
 
   return (
     <form action={action} className="flex flex-col gap-4">
-      <Field id="name" label="Name">
+      <Field id="name" label="Nom">
         <Input id="name" name="name" autoComplete="name" required />
       </Field>
 
-      <Field id="email" label="Email">
+      <Field id="email" label="Adresse email">
         <Input
           id="email"
           name="email"
@@ -28,8 +28,8 @@ export const BootstrapForm = () => {
 
       <Field
         id="password"
-        label="Password"
-        hint="At least 12 characters. A password manager's suggestion is the right answer here."
+        label="Mot de passe"
+        hint="Au moins 12 caractères. La suggestion d'un gestionnaire de mots de passe est la bonne réponse ici."
       >
         <Input
           id="password"
@@ -48,7 +48,7 @@ export const BootstrapForm = () => {
       ) : null}
 
       <Button type="submit" disabled={pending}>
-        {pending ? "Creating the account…" : "Create account and sign in"}
+        {pending ? "Création du compte…" : "Créer le compte et se connecter"}
       </Button>
     </form>
   );

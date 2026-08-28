@@ -5,7 +5,14 @@ import type { PgTable } from "drizzle-orm/pg-core";
 import { requireEnv } from "../../server/env";
 import type { Id, Page, PageQuery } from "../../types";
 import type { Collection, DatabaseClient } from "../client";
-import { operators, patientProfiles, patientRecommendations } from "../schema";
+import {
+  auditEvents,
+  operatorInvitations,
+  operators,
+  patientNotes,
+  patientProfiles,
+  patientRecommendations,
+} from "../schema";
 
 /**
  * The Neon adapter — the first concrete implementation of the storage seam
@@ -19,7 +26,10 @@ import { operators, patientProfiles, patientRecommendations } from "../schema";
 const tables: Record<string, PgTable> = {
   patient_profiles: patientProfiles,
   patient_recommendations: patientRecommendations,
+  patient_notes: patientNotes,
   operators: operators,
+  operator_invitations: operatorInvitations,
+  audit_events: auditEvents,
 };
 
 const DEFAULT_PAGE_LIMIT = 50;

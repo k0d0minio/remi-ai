@@ -7,6 +7,13 @@
 
 export const patientStatuses = ["active", "paused", "ended"] as const;
 
+/**
+ * Recorded because a nutritional protocol is written against it, not as an
+ * identity statement — hence `unspecified` as the default rather than a
+ * required choice, and `other` as a real option rather than a fallback.
+ */
+export const patientSexes = ["female", "male", "other", "unspecified"] as const;
+
 export const recommendationCategories = [
   "nutrition",
   "habit",

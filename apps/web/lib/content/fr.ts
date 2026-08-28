@@ -307,6 +307,14 @@ export const fr: Content = {
     },
     empty:
       "Vos recommandations apparaîtront ici dès que votre praticienne les aura encodées.",
+    profileTitle: "Votre profil",
+    constraintsTitle: "À éviter",
+    preferencesTitle: "Vos préférences",
+    medicationsTitle: "Traitements en cours",
+    supplementsTitle: "Compléments",
+    ageLabel: "ans",
+    heightLabel: "cm",
+    weightLabel: "kg",
     disclaimer: {
       title: "Votre praticienne reste la référence",
       body: "Cette page reprend ce qui a été convenu en consultation. Elle ne pose pas de diagnostic et ne remplace pas un avis médical.",

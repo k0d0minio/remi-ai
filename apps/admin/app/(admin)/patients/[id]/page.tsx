@@ -1,8 +1,13 @@
 import { ArrowLeft } from "lucide-react";
 import NextLink from "next/link";
 import { notFound } from "next/navigation";
-import { getPatient, listPatientRecommendations } from "@remi/services/server";
-import { appHref } from "@remi/services/shared";
+import {
+  getPatient,
+  listArchivedPatientRecommendations,
+  listPatientNotes,
+  listPatientRecommendations,
+} from "@remi/services/server";
+import { ageInYears, appHref } from "@remi/services/shared";
 import {
   Badge,
   Card,
@@ -13,11 +18,13 @@ import {
   Typography,
 } from "@remi/ui/server";
 import { DeletePatient } from "@/components/patients/delete-patient";
+import { NoteTimeline } from "@/components/patients/note-timeline";
 import { PatientForm } from "@/components/patients/patient-form";
 import { RecommendationAddForm } from "@/components/patients/recommendation-add-form";
-import { RecommendationItem } from "@/components/patients/recommendation-item";
+import { RecommendationGroups } from "@/components/patients/recommendation-groups";
 import { ShareLinkCard } from "@/components/patients/share-link-card";
 import {
+  patientSexLabels,
   patientStatusIntents,
   patientStatusLabels,
 } from "@/components/patients/vocabulary";
@@ -30,9 +37,10 @@ type Params = { id: string };
 
 /**
  * One patient, everything Morgane does with them on one scrolling page: the
- * link she shares, the protocol she encodes, the profile behind it, and — last
- * and behind a dialog — deletion. Ordered by how often each is reached for
- * mid-consultation, phone first.
+ * link she shares, the protocol she encodes, the consultations behind it, the
+ * profile they are all written against, and — last and behind a dialog —
+ * deletion. Ordered by how often each is reached for mid-consultation, phone
+ * first.
  */
 const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
   // The page's own graph, not the layout's — the two render in parallel.
@@ -43,8 +51,19 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
     notFound();
   }
   const patient = result.data;
-  const recommendations = await listPatientRecommendations(patient.id);
+
+  const [recommendations, archived, notes] = await Promise.all([
+    listPatientRecommendations(patient.id),
+    listArchivedPatientRecommendations(patient.id),
+    listPatientNotes(patient.id),
+  ]);
   const shareUrl = appHref("web", `/p/${patient.shareToken}`, patient.locale);
+  const age = ageInYears(patient.birthDate);
+
+  // The default consultation date, resolved server-side: a date input seeded
+  // from the browser's clock disagrees with the server the moment someone is
+  // working across midnight or from another timezone.
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
@@ -68,60 +87,95 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
             {patientStatusLabels[patient.status]}
           </Badge>
         </div>
-        {patient.fullName ? (
-          <Typography size="sm" tone="muted">
-            {patient.fullName}
-          </Typography>
-        ) : null}
+        <Typography size="sm" tone="muted">
+          {[
+            patient.fullName,
+            age !== null ? `${age} ans` : null,
+            patient.sex !== "unspecified"
+              ? patientSexLabels[patient.sex]
+              : null,
+            patient.heightCm ? `${patient.heightCm} cm` : null,
+            patient.weightKg ? `${patient.weightKg} kg` : null,
+          ]
+            .filter((part) => part !== null && part !== "")
+            .join(" · ") || "Profil à compléter"}
+        </Typography>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Patient link</CardTitle>
+          <CardTitle>Lien patient</CardTitle>
           <CardDescription>
-            Their view of the profile and recommendations — for the patient, and
-            for consultants testing the interface.
+            Leur vue du profil et des recommandations — pour la personne suivie,
+            et pour les consultantes et consultants qui testent
+            l&apos;interface.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ShareLinkCard patientId={patient.id} url={shareUrl} />
+          <ShareLinkCard
+            patientId={patient.id}
+            url={shareUrl}
+            email={patient.email}
+            lastOpenedAt={patient.linkLastOpenedAt}
+          />
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Recommendations</CardTitle>
+          <CardTitle>Recommandations</CardTitle>
           <CardDescription>
-            The protocol, encoded entry by entry — this is what the patient link
-            shows.
+            Le protocole, encodé entrée par entrée — c&apos;est ce que montre le
+            lien patient.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           {recommendations.length === 0 ? (
             <Typography size="sm" tone="muted">
-              Nothing encoded yet.
+              Rien d&apos;encodé pour le moment.
             </Typography>
           ) : (
-            <ul className="flex flex-col gap-3">
-              {recommendations.map((recommendation) => (
-                <RecommendationItem
-                  key={recommendation.id}
-                  recommendation={recommendation}
-                />
-              ))}
-            </ul>
+            <RecommendationGroups recommendations={recommendations} />
           )}
 
           <RecommendationAddForm patientId={patient.id} />
         </CardContent>
       </Card>
 
+      {archived.length > 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Recommandations archivées</CardTitle>
+            <CardDescription>
+              Ce qui a été suivi puis arrêté. Invisible sur le lien patient,
+              gardé pour la suite du dossier.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RecommendationGroups recommendations={archived} />
+          </CardContent>
+        </Card>
+      ) : null}
+
       <Card>
         <CardHeader>
-          <CardTitle>Profile</CardTitle>
+          <CardTitle>Consultations</CardTitle>
           <CardDescription>
-            The anamnesis-level picture the recommendations — and later the
-            recipes — are personalised against.
+            Vos notes de séance, de la plus récente à la plus ancienne. Elles ne
+            s&apos;affichent jamais sur le lien patient.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <NoteTimeline patientId={patient.id} notes={notes} today={today} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Profil</CardTitle>
+          <CardDescription>
+            Le tableau de fond contre lequel les recommandations — et plus tard
+            les recettes — sont personnalisées.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -131,10 +185,10 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
 
       <Card variant="error">
         <CardHeader>
-          <CardTitle>Danger zone</CardTitle>
+          <CardTitle>Zone sensible</CardTitle>
           <CardDescription>
-            Deleting removes the profile, its recommendations and the patient
-            link — permanently.
+            La suppression retire le profil, ses recommandations, ses notes et
+            le lien patient — définitivement.
           </CardDescription>
         </CardHeader>
         <CardContent>

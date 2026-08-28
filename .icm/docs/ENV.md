@@ -78,6 +78,11 @@ and an HMAC-signed session cookie, both in `packages/services/src/auth/`. Phase-
 accounts — the patient link's unguessable token is the whole credential (REMI-035); the fuller
 auth question stays with REMI-013.
 
+The console now has more than one account. `OPERATOR_EMAIL` creates the **first** one and stops
+working the moment it exists; every account after that arrives by invitation from an owner, through
+a hashed single-use token in the `operator_invitations` table. There is no second environment
+variable behind that — the invitation is data, not configuration.
+
 | Variable         | Purpose                                                                                         | Where set | Public? |
 | ---------------- | ----------------------------------------------------------------------------------------------- | --------- | ------- |
 | `AUTH_SECRET`    | Signs the admin session cookie (**admin** project). Rotating it signs every operator out        | Vercel    | no      |
@@ -91,16 +96,19 @@ auth question stays with REMI-013.
 | `RESEND_API_KEY` | Resend API key — read by the Resend adapter on every send | Vercel    | no      |
 
 Resend is the registered mail vendor: `packages/services/src/email/adapters/resend.ts` implements
-the `Mailer` seam, and `apps/marketing` registers it for the public contact form.
+the `Mailer` seam. Two apps register it: `apps/marketing` for the public contact form, and
+`apps/admin` for operator invitations and the patient link sent to a patient.
 
-**Both variables are required on the marketing project**, and `EMAIL_FROM` has to be an address on a
-domain verified in Resend — an unverified sender is refused at the API.
+**Both variables are required on the marketing project and on the admin project**, and `EMAIL_FROM`
+has to be an address on a domain verified in Resend — an unverified sender is refused at the API.
+They are the same two variables in both places; nothing new was added for the admin console.
 
 With `RESEND_API_KEY` unset, nothing is registered and `@remi/services/email` keeps its
 `consoleMailer` fallback: it logs and sends nothing. That is deliberate — a preview deploy without
-credentials is loud, not silently dropping mail — and the contact form treats it as a delivery
-failure, telling the sender to write to the founders directly rather than acknowledging a message
-that went nowhere.
+credentials is loud, not silently dropping mail — and every caller treats it as a delivery failure
+rather than acknowledging a message that went nowhere. The contact form tells the sender to write
+to the founders directly; the admin console falls back to a copyable invitation link and says on
+screen that no email will go out, and refuses to claim it emailed a patient their link.
 
 ## AI
 

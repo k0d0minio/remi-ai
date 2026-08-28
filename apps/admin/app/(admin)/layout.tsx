@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
+import { canManageOperators } from "@remi/services/shared";
 import { AdminHeader } from "@/components/shell/admin-header";
 import { AdminSidebar } from "@/components/shell/admin-sidebar";
+import { roleLabels } from "@/components/operators/vocabulary";
 import { requireOperator } from "@/lib/auth/session";
 
 /**
@@ -12,13 +14,16 @@ import { requireOperator } from "@/lib/auth/session";
  */
 const AdminLayout = async ({ children }: { children: ReactNode }) => {
   const operator = await requireOperator();
+  const canManage = canManageOperators(operator.role);
 
   return (
     <div className="min-h-dvh lg:pl-60">
-      <AdminSidebar />
+      <AdminSidebar canManageOperators={canManage} />
       <AdminHeader
         operatorName={operator.name}
         operatorEmail={operator.email}
+        operatorRoleLabel={roleLabels[operator.role]}
+        canManageOperators={canManage}
       />
       <main id="content" className="px-4 py-8 md:px-8">
         {children}

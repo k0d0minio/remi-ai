@@ -1,36 +1,44 @@
 "use client";
 
-import { Check, Copy, RefreshCw } from "lucide-react";
-import { useState } from "react";
-import { Button } from "@remi/ui";
+import { Mail, RefreshCw } from "lucide-react";
+import { useActionState, useState } from "react";
+import { formatDateTime } from "@remi/services/shared";
+import { Button, CopyButton } from "@remi/ui";
 import { Typography } from "@remi/ui/server";
-import { regenerateShareTokenAction } from "@/lib/patients/actions";
+import {
+  emailShareLinkAction,
+  regenerateShareTokenAction,
+  type ShareFormState,
+} from "@/lib/patients/actions";
+
+const initial: ShareFormState = { error: null, sent: false };
 
 type Props = {
   patientId: string;
   /** Built server-side by `appHref`, so only the links catalogue knows the origin. */
   url: string;
+  /** Null until the patient has an address on file — the email button needs one. */
+  email: string | null;
+  lastOpenedAt: Date | null;
 };
 
 /**
- * The shareable patient link — what Morgane sends over WhatsApp, to patients
- * and to the consultants testing the interface. The URL is the whole
- * credential, so regenerating is the recovery move when one leaks, and it
- * takes a second click: the old link dies the moment the new one exists.
+ * The shareable patient link — what Morgane sends to patients and to the
+ * consultants testing the interface. The URL is the whole credential, so
+ * regenerating is the recovery move when one leaks, and it takes a second
+ * click: the old link dies the moment the new one exists.
  */
-export const ShareLinkCard = ({ patientId, url }: Props) => {
-  const [copied, setCopied] = useState(false);
+export const ShareLinkCard = ({
+  patientId,
+  url,
+  email,
+  lastOpenedAt,
+}: Props) => {
   const [confirming, setConfirming] = useState(false);
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Clipboard access denied — the URL stays selectable below.
-    }
-  };
+  const [state, sendEmail, sending] = useActionState(
+    emailShareLinkAction,
+    initial,
+  );
 
   return (
     <div className="flex flex-col gap-3">
@@ -42,10 +50,20 @@ export const ShareLinkCard = ({ patientId, url }: Props) => {
       </Typography>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" size="sm" variant="outline" onClick={copy}>
-          {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
-          {copied ? "Copied" : "Copy link"}
-        </Button>
+        <CopyButton value={url} label="Copier le lien" copiedLabel="Copié" />
+
+        <form action={sendEmail}>
+          <input type="hidden" name="id" value={patientId} />
+          <Button
+            type="submit"
+            size="sm"
+            variant="outline"
+            disabled={sending || !email}
+          >
+            <Mail aria-hidden="true" />
+            {sending ? "Envoi…" : "Envoyer par email"}
+          </Button>
+        </form>
 
         {confirming ? (
           <>
@@ -58,7 +76,7 @@ export const ShareLinkCard = ({ patientId, url }: Props) => {
               <input type="hidden" name="id" value={patientId} />
               <Button type="submit" size="sm" variant="error">
                 <RefreshCw aria-hidden="true" />
-                Replace the link
+                Remplacer le lien
               </Button>
             </form>
             <Button
@@ -67,7 +85,7 @@ export const ShareLinkCard = ({ patientId, url }: Props) => {
               variant="ghost"
               onClick={() => setConfirming(false)}
             >
-              Cancel
+              Annuler
             </Button>
           </>
         ) : (
@@ -78,20 +96,44 @@ export const ShareLinkCard = ({ patientId, url }: Props) => {
             onClick={() => setConfirming(true)}
           >
             <RefreshCw aria-hidden="true" />
-            Regenerate
+            Régénérer
           </Button>
         )}
       </div>
 
+      {state.error ? (
+        <Typography size="sm" className="text-error-text" role="alert">
+          {state.error}
+        </Typography>
+      ) : null}
+      {state.sent && !sending ? (
+        <Typography size="sm" tone="muted" role="status">
+          Lien envoyé à {email}.
+        </Typography>
+      ) : null}
+
+      {!email ? (
+        <Typography size="xs" tone="muted">
+          Ajoutez une adresse email au profil pour pouvoir envoyer le lien
+          directement.
+        </Typography>
+      ) : null}
+
+      <Typography size="xs" tone="muted">
+        {lastOpenedAt
+          ? `Dernière ouverture le ${formatDateTime(lastOpenedAt)}.`
+          : "Le lien n'a pas encore été ouvert."}
+      </Typography>
+
       {confirming ? (
         <Typography size="xs" tone="muted">
-          Regenerating kills the current link — anyone holding it loses access
-          and needs the new one.
+          Régénérer tue le lien actuel : toute personne qui le détient perd
+          l&apos;accès et aura besoin du nouveau.
         </Typography>
       ) : (
         <Typography size="xs" tone="muted">
-          Anyone with this link sees the profile and recommendations. Share it
-          over a private channel only.
+          Toute personne détenant ce lien voit le profil et les recommandations.
+          Ne le transmettez que par un canal privé.
         </Typography>
       )}
     </div>

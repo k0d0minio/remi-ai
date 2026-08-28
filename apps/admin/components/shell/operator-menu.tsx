@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronDown, LogOut, ScrollText, ShieldCheck } from "lucide-react";
+import { ChevronDown, LogOut, UserCog } from "lucide-react";
+import NextLink from "next/link";
 import {
   Avatar,
   AvatarFallback,
@@ -11,26 +12,26 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@remi/ui";
-import { Typography } from "@remi/ui/server";
+import { Badge, Typography } from "@remi/ui/server";
 import { signOutAction } from "@/lib/auth/actions";
 
 type Props = {
   name: string;
   initials: string;
   email: string;
-  role: string;
+  /** Already translated by the caller — this island holds no vocabulary. */
+  roleLabel: string;
 };
 
 /**
- * Who is holding the console. It shows the operator's grant rather than account
- * settings, because the question an operator asks of this menu is "what am I
- * allowed to do from here". Sign out is live; the audit-trail item stays inert
- * until an audit trail exists (REMI-014).
+ * Who is holding the console, and the way out of it. The role is shown because
+ * the question an operator asks of this menu is "what am I allowed to do from
+ * here" — and on this console the answer differs between two people.
  */
-export const OperatorMenu = ({ name, initials, email, role }: Props) => (
+export const OperatorMenu = ({ name, initials, email, roleLabel }: Props) => (
   <DropdownMenu>
     <DropdownMenuTrigger
-      aria-label="Operator menu"
+      aria-label="Menu du compte"
       className="focus-visible:ring-ring/40 hover:bg-accent flex items-center gap-2 rounded-md p-1 pr-2 transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
     >
       <Avatar size="sm">
@@ -40,32 +41,33 @@ export const OperatorMenu = ({ name, initials, email, role }: Props) => (
       <ChevronDown aria-hidden="true" className="size-4 opacity-60" />
     </DropdownMenuTrigger>
 
-    <DropdownMenuContent align="end" className="w-60">
+    <DropdownMenuContent align="end" className="w-64">
       <DropdownMenuLabel>
-        <span className="flex flex-col gap-0.5">
+        <span className="flex flex-col items-start gap-1">
           <Typography as="span" size="sm" weight="medium">
             {name}
           </Typography>
           <Typography as="span" size="xs" tone="muted" weight="normal">
             {email}
           </Typography>
+          <Badge variant="neutral" tone="subtle" size="sm">
+            {roleLabel}
+          </Badge>
         </span>
       </DropdownMenuLabel>
 
       <DropdownMenuSeparator />
-      <DropdownMenuItem disabled>
-        <ShieldCheck aria-hidden="true" />
-        {role}
-      </DropdownMenuItem>
-      <DropdownMenuItem disabled>
-        <ScrollText aria-hidden="true" />
-        My audit trail
+      <DropdownMenuItem asChild>
+        <NextLink href="/account">
+          <UserCog aria-hidden="true" />
+          Mon compte
+        </NextLink>
       </DropdownMenuItem>
 
       <DropdownMenuSeparator />
       <DropdownMenuItem destructive onSelect={() => void signOutAction()}>
         <LogOut aria-hidden="true" />
-        Sign out
+        Se déconnecter
       </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>

@@ -297,6 +297,22 @@ export type Content = {
     recommendationsTitle: string;
     categories: Record<RecommendationCategory, string>;
     empty: string;
+    /**
+     * The profile block. Only the fields written FOR the patient reach this
+     * page — their objective, what they have to avoid, what they like, and the
+     * clinical figures a protocol is built on. The anamnesis and the
+     * consultation notes are the practitioner's working record and stay in the
+     * console.
+     */
+    profileTitle: string;
+    constraintsTitle: string;
+    preferencesTitle: string;
+    medicationsTitle: string;
+    supplementsTitle: string;
+    /** Labels for the measurement row — age, height, weight. */
+    ageLabel: string;
+    heightLabel: string;
+    weightLabel: string;
     disclaimer: PlaceholderContent;
     /** The beta framing consultants read before giving UX feedback. */
     betaNote: string;

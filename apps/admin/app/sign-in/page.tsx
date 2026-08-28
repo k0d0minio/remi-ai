@@ -8,18 +8,20 @@ import { getOperatorSession } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 
 export const metadata: Metadata = {
-  title: "Sign in",
+  title: "Connexion",
 };
 
 /** Reads the database on every hit — never prerendered. */
 export const dynamic = "force-dynamic";
 
 /**
- * The one route outside the `(admin)` group, because it IS the boundary the
- * group enforces: everything else redirects here until a session exists.
+ * The boundary the `(admin)` group enforces: everything else redirects here
+ * until a session exists. It shares that position with `/invitation/[token]`,
+ * the other route reached by someone who has none.
  *
  * First run — no operator in the database yet — it offers account creation
- * instead, guarded by `OPERATOR_EMAIL`; see `bootstrapAction`.
+ * instead, guarded by `OPERATOR_EMAIL`; see `bootstrapAction`. Once one account
+ * exists, new ones arrive by invitation only.
  */
 const SignIn = async () => {
   ensureDatabase();
@@ -35,19 +37,20 @@ const SignIn = async () => {
         <div className="flex flex-col items-center gap-2 text-center">
           <Wordmark />
           <Typography size="sm" tone="muted">
-            Internal operations — operators only.
+            Console interne — accès réservé.
           </Typography>
         </div>
 
         <Card>
           <CardContent className="flex flex-col gap-4">
             <Typography as="h1" size="lg" weight="semibold">
-              {bootstrap ? "Create the operator account" : "Sign in"}
+              {bootstrap ? "Créer le premier compte" : "Connexion"}
             </Typography>
             {bootstrap ? (
               <Typography size="sm" tone="muted">
-                No operator account exists yet. Creating it works once, and only
-                for the email this deployment allows.
+                Aucun compte n&apos;existe encore. Cette création ne fonctionne
+                qu&apos;une fois, et uniquement pour l&apos;adresse autorisée
+                sur ce déploiement.
               </Typography>
             ) : null}
             {bootstrap ? <BootstrapForm /> : <SignInForm />}
