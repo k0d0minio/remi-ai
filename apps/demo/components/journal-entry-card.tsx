@@ -6,10 +6,10 @@ import { JournalRecognitions } from "@/components/journal-recognitions";
 import { slotLabels } from "@/lib/mock/journal";
 import type { JournalEntry } from "@/lib/mock/types";
 
-export type JournalViewer = "person" | "practitioner";
+export type JournalViewer = "patient" | "practitioner";
 
 const copy = {
-  person: {
+  patient: {
     note: "Votre note",
     plan: "Face à votre plan",
     uncertain: "Vous pourrez corriger ce que REMI a lu avant la consultation.",

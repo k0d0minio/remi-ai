@@ -55,7 +55,7 @@ export type Content = {
   };
   roles: {
     practitioner: string;
-    person: string;
+    patient: string;
     /** The dev-only affordance that flips between the two surfaces. */
     switchTo: string;
   };
@@ -92,7 +92,7 @@ export type Content = {
     helpLink: string;
   };
   practitionerNav: NavItem[];
-  personNav: NavItem[];
+  patientNav: NavItem[];
   practice: {
     title: string;
     lead: string;

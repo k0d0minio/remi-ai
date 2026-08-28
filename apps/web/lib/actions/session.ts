@@ -32,7 +32,7 @@ export const signIn = async (formData: FormData) => {
   const locale = formData.get("locale");
 
   await enter(
-    isRole(role) ? role : "person",
+    isRole(role) ? role : "patient",
     typeof locale === "string" && isLocale(locale) ? locale : defaultLocale,
   );
 };

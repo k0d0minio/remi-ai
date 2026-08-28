@@ -8,7 +8,7 @@ import type { JournalEntry } from "./types";
  *
  * The confidences are deliberately imperfect. A recognition that is right every
  * time is not a design worth reviewing: the interesting screens are the ones at
- * 61 %, where the person has to be able to correct REMI without feeling caught.
+ * 61 %, where the patient has to be able to correct REMI without feeling caught.
  */
 export const journalEntries: JournalEntry[] = [
   {
@@ -148,7 +148,7 @@ export const capturedEntry: JournalEntry = {
 
 /**
  * The steps the analysing state walks through. Written out because the point of
- * showing them is that the person can see what is being done to her photo —
+ * showing them is that the patient can see what is being done to her photo —
  * a spinner with no words is where trust in an AI feature goes to die.
  */
 export const analysisSteps = [

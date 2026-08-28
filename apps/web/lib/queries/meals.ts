@@ -17,7 +17,7 @@ export type ShoppingGroup = {
   items: readonly Ingredient[];
 };
 
-/** Reads for the person's surface. See the note in `./clients.ts`. */
+/** Reads for the patient's surface. See the note in `./clients.ts`. */
 export const listPlannedMeals = async (planId: Id): Promise<PlannedMeal[]> =>
   meals
     .filter((meal) => meal.planId === planId)
@@ -71,7 +71,7 @@ const mergeQuantities = (quantities: readonly string[]): string => {
 /**
  * Derived from the week's recipes rather than stored alongside them. A written
  * list is a second source of truth: change a recipe and the two disagree, and
- * the person finds out at the shop.
+ * the patient finds out at the shop.
  */
 export const getShoppingList = async (planId: Id): Promise<ShoppingGroup[]> => {
   const planned = await listPlannedMeals(planId);

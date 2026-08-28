@@ -20,7 +20,7 @@ export const metadata: Metadata = { title: "Aujourd'hui" };
 
 /**
  * Two things, and deliberately not a third: what to cook tonight, and the one
- * habit in flight. The whole product argument is that a person leaving a
+ * habit in flight. The whole product argument is that a patient leaving a
  * consultation is not short of advice — they are short of a next action.
  */
 const Page = () => {
@@ -59,7 +59,7 @@ const Page = () => {
             </div>
 
             <Button asChild variant="outline" className="w-fit">
-              <NextLink href="/person/meals">
+              <NextLink href="/patient/meals">
                 Voir la recette et la semaine
                 <ArrowRight aria-hidden="true" />
               </NextLink>

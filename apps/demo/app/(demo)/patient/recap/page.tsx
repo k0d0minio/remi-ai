@@ -33,13 +33,13 @@ const sectionIcons: Record<
 
 /**
  * The weekly recap, and the one design decision that matters on it: it is
- * addressed to the person but written *for* the practitioner's review, and the
+ * addressed to the patient but written *for* the practitioner's review, and the
  * card says so above the fold rather than in a footnote.
  *
  * A summary an AI sends unread is a second opinion the practitioner never
  * agreed to give. So this screen carries a status — en attente de relecture —
  * and exactly one suggestion, because a recap with six is a to-do list, which
- * is the thing the person already could not act on.
+ * is the thing the patient already could not act on.
  */
 const Page = () => (
   <div className="mx-auto flex max-w-2xl flex-col gap-6">

@@ -38,7 +38,7 @@ export const generateMetadata = async ({
 /**
  * Every card carries the line "because your practitioner recommended…". That is
  * the difference between this and any recipe app: a suggestion here is traceable
- * to a consultation, and the person can see the thread without asking.
+ * to a consultation, and the patient can see the thread without asking.
  *
  * The page stays a server component. `Tabs` is a client primitive, but the cards
  * inside it are passed as children — they render on the server and cross the

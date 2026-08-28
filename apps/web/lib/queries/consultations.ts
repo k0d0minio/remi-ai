@@ -9,7 +9,7 @@ export const getConsultation = async (
   null;
 
 /**
- * The most recent consultation with a person — what the plan composer works
+ * The most recent consultation with a patient — what the plan composer works
  * from. The practitioner comes to that screen from a session they have just
  * held, so the question is always "the last one", never "which one".
  */

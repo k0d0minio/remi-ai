@@ -2,7 +2,7 @@ import type { Id, Practitioner } from "@remi/services/shared";
 import { practitioner } from "@/lib/fixtures/practitioner";
 
 /**
- * Who is behind the plan, read from the person's side. See the note in
+ * Who is behind the plan, read from the patient's side. See the note in
  * `./clients.ts`.
  */
 export const getPractitioner = async (

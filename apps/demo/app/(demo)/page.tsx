@@ -23,7 +23,7 @@ const surfaces = [
     cta: "Ouvrir la console praticien",
   },
   {
-    href: "/person",
+    href: "/patient",
     icon: Sun,
     intent: "success" as const,
     title: "Côté personne accompagnée",

@@ -20,7 +20,7 @@ const adherence: AdherencePoint[] = [
  * The weekly recap, written the way a practitioner would want it read: warm,
  * specific, and never diagnostic. Three movements — ce qui a marché, ce qui a
  * coincé, une seule suggestion — because a summary with six suggestions is a
- * list, and a list is what the person already failed to act on.
+ * list, and a list is what the patient already failed to act on.
  *
  * `reviewStatus` is the whole argument of the screen. The recap is prepared
  * *for* the practitioner, not sent instead of him: nothing here has been

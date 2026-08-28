@@ -15,9 +15,9 @@ page until Morgane and Arnaud answer them.
   migration project. Revisit when approaching the scaling threshold, or when a Supabase-only
   capability (RLS-as-auth, storage buckets) is genuinely needed.
 - **Auth: magic links, kept simple.** One lightweight auth for both roles — no passwords — with
-  the session carrying `practitioner` or `person`. Practitioners additionally get **2FA that must
+  the session carrying `practitioner` or `patient`. Practitioners additionally get **2FA that must
   stay low-friction**; ease of enrolment is a requirement, not a nice-to-have.
-- **Tenancy: the care relationship is the access primitive.** A practitioner↔person relationship
+- **Tenancy: the care relationship is the access primitive.** A practitioner↔patient relationship
   row with a start and an end; every query in the services layer scopes through it, and the end
   date ends access. This maps one-to-one onto RLS policies if Supabase arrives later.
 
@@ -50,7 +50,7 @@ page until Morgane and Arnaud answer them.
 - **Test-driven development wherever possible**, with a hard 75% coverage floor on the database
   layer aiming for 90%. Canonical rule and mechanics: `/CONVENTIONS.md` → Testing.
 - **Mobile: responsive web for the first version; a real app-store presence is a stated goal.** The hedge
-  is architectural, not a framework bet today: the person-facing core loop is built API-first —
+  is architectural, not a framework bet today: the patient-facing core loop is built API-first —
   route handlers / server actions over the same services — so a future native client consumes the
   seam the web app already uses. The wrapper-vs-React-Native choice (Capacitor keeping one
   codebase vs Expo with a second, truly native UI) is deliberately deferred until app-store work
@@ -62,7 +62,7 @@ page until Morgane and Arnaud answer them.
 ## Access control — 2026-08-13
 
 - **Operator access is a role, not a URL.** An `operator` role lands in the database and the backend
-  alongside `practitioner` and `person`, and the admin console sits behind it. This supersedes the
+  alongside `practitioner` and `patient`, and the admin console sits behind it. This supersedes the
   platform decision of 2026-08-06, which leaned on Vercel deployment protection as the interim:
   that tier covers preview deployments but, by design, not a production domain, and extending it to
   production sits behind a paid add-on. The role is the thing that was wanted anyway — the interim

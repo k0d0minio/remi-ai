@@ -6,7 +6,7 @@ import { cn } from "@remi/ui/utils";
 
 const surfaces = [
   { href: "/practitioner", label: "Praticien" },
-  { href: "/person", label: "Personne accompagnée" },
+  { href: "/patient", label: "Patient" },
 ] as const;
 
 /**

@@ -29,7 +29,7 @@ export const conversations: Conversation[] = [
       },
       {
         id: "msg_thomas_2",
-        author: "person",
+        author: "patient",
         day: "Hier",
         time: "22h18",
         body: "Désolé pour le silence. Trois villes en cinq jours, j'ai mangé dans le train ou pas du tout. Je ne vois pas comment tenir un déjeuner assis avec ce rythme-là.",
@@ -48,7 +48,7 @@ export const conversations: Conversation[] = [
     messages: [
       {
         id: "msg_camille_1",
-        author: "person",
+        author: "patient",
         day: "Jeudi 30 juillet",
         time: "08h12",
         body: "Bonjour docteur. Quatrième matin d'affilée avec des œufs, ça passe beaucoup mieux que je ne pensais. Et je n'ai plus le coup de barre de onze heures.",
@@ -62,7 +62,7 @@ export const conversations: Conversation[] = [
       },
       {
         id: "msg_camille_3",
-        author: "person",
+        author: "patient",
         day: "Hier",
         time: "19h42",
         body: "Une question sur la semaine prochaine : je suis en formation à Anvers du 10 au 12, petit-déjeuner à l'hôtel. Est-ce que je laisse tomber ces trois matins, ou est-ce qu'il y a quelque chose à viser sur un buffet ?",
@@ -81,14 +81,14 @@ export const conversations: Conversation[] = [
     messages: [
       {
         id: "msg_naima_1",
-        author: "person",
+        author: "patient",
         day: "Samedi 1er août",
         time: "12h30",
         body: "Troisième fois cette semaine : ballonnements en début d'après-midi, uniquement les jours où je déjeune au bureau. À la maison, rien du tout.",
       },
       {
         id: "msg_naima_2",
-        author: "person",
+        author: "patient",
         day: "Samedi 1er août",
         time: "12h32",
         body: "Je prends le kéfir le matin dans les deux cas, donc je ne pense pas que ça vienne de l'aliment fermenté.",
@@ -97,8 +97,8 @@ export const conversations: Conversation[] = [
   },
 ];
 
-/** The thread the person's side renders — Camille is who that surface is. */
-export const personConversationId = "conv_camille";
+/** The thread the patient's side renders — Camille is who that surface is. */
+export const patientConversationId = "conv_camille";
 
 /**
  * What REMI proposes above the composer, per thread — drawn from the plan in
@@ -168,7 +168,7 @@ export const assistSuggestions: Record<string, QuickReply[]> = {
   ],
 };
 
-/** The person's side of the same row: the two things she writes most often. */
+/** The patient's side of the same row: the two things she writes most often. */
 export const quickReplies: QuickReply[] = [
   {
     id: "quick_question",
