@@ -14,7 +14,7 @@ export const en: Content = {
   },
   roles: {
     practitioner: "Practitioner",
-    person: "Person",
+    patient: "Patient",
     switchTo: "Switch surface",
   },
   userMenu: {
@@ -48,7 +48,7 @@ export const en: Content = {
     { href: "/clients", icon: "clients", label: "Clients" },
     { href: "/frame", icon: "frame", label: "Therapeutic frame" },
   ],
-  personNav: [
+  patientNav: [
     { href: "/today", icon: "today", label: "Today" },
     { href: "/meals", icon: "meals", label: "Meals" },
     { href: "/steps", icon: "steps", label: "Steps" },

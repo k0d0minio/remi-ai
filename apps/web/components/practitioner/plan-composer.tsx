@@ -41,7 +41,7 @@ type Props = {
  * button.
  *
  * The design argument is the tick boxes: REMI proposes a reading of the notes,
- * and nothing crosses to the person until the practitioner has confirmed it.
+ * and nothing crosses to the patient until the practitioner has confirmed it.
  * The drafts arrive with `confirmed` already set, so a suggestion REMI
  * over-reached on comes in unticked — the screen has to look honest in that
  * case, not only in the happy one.

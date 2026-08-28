@@ -19,7 +19,7 @@ import { categoryLabels, draftRecommendations } from "@/lib/mock/plan";
 export const metadata: Metadata = { title: "Mon plan" };
 
 /**
- * The same recommendations the practitioner confirmed, read from the person's
+ * The same recommendations the practitioner confirmed, read from the patient's
  * side. Only the confirmed ones appear — the screen is the proof that what REMI
  * suggests all week traces back to a decision a human made in a consultation.
  */

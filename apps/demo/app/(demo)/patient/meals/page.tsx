@@ -18,7 +18,7 @@ export const metadata: Metadata = { title: "Repas" };
 /**
  * Every card carries the line "parce que votre praticien a recommandé…". That
  * is the difference between this and any recipe app: a suggestion here is
- * traceable to a consultation, and the person can see the thread without asking.
+ * traceable to a consultation, and the patient can see the thread without asking.
  */
 const Page = () => (
   <div className="mx-auto flex max-w-3xl flex-col gap-6">

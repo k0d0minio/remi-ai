@@ -77,7 +77,7 @@ const dimensionIntents = {
  * plan is where a given constraint came from — and the answer is never "the AI
  * decided".
  *
- * The Journal tab is the same logged meals the person sees on `/person/journal`,
+ * The Journal tab is the same logged meals the patient sees on `/patient/journal`,
  * read from this side. It is one fixture rendered twice rather than a
  * practitioner-flavoured copy: the two surfaces disagreeing about what was
  * eaten is the failure mode this feature cannot afford.

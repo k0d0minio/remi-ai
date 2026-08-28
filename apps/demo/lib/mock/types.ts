@@ -96,7 +96,7 @@ export type FramePrinciple = {
   active: boolean;
 };
 
-export type MessageAuthor = "practitioner" | "person";
+export type MessageAuthor = "practitioner" | "patient";
 
 export type Message = {
   id: string;
@@ -161,7 +161,7 @@ export type JournalEntry = {
   time: string;
   slot: MealSlot;
   photoTone: PhotoTone;
-  /** What the recognition returned, as the sentence the person reads. */
+  /** What the recognition returned, as the sentence the patient reads. */
   identified: string;
   items: string[];
   /** How sure the recognition is, 0–100. Always shown, never rounded away. */

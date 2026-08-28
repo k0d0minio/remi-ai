@@ -54,24 +54,24 @@ const practitionerItems: Item[] = [
   },
 ];
 
-const personItems: Item[] = [
-  { href: "/person", label: "Aujourd'hui", icon: Sun },
-  { href: "/person/journal", label: "Journal", icon: Camera, upcoming: true },
-  { href: "/person/meals", label: "Repas", icon: ChefHat },
-  { href: "/person/steps", label: "Étapes", icon: Footprints },
+const patientItems: Item[] = [
+  { href: "/patient", label: "Aujourd'hui", icon: Sun },
+  { href: "/patient/journal", label: "Journal", icon: Camera, upcoming: true },
+  { href: "/patient/meals", label: "Repas", icon: ChefHat },
+  { href: "/patient/steps", label: "Étapes", icon: Footprints },
   {
-    href: "/person/messages",
+    href: "/patient/messages",
     label: "Mes messages",
     icon: MessageCircle,
     upcoming: true,
   },
   {
-    href: "/person/recap",
+    href: "/patient/recap",
     label: "Mon bilan",
     icon: Sparkles,
     upcoming: true,
   },
-  { href: "/person/plan", label: "Mon plan", icon: NotebookPen },
+  { href: "/patient/plan", label: "Mon plan", icon: NotebookPen },
 ];
 
 type Props = {
@@ -80,8 +80,8 @@ type Props = {
 
 export const DemoNav = ({ onNavigate }: Props) => {
   const pathname = usePathname();
-  const items = pathname.startsWith("/person")
-    ? personItems
+  const items = pathname.startsWith("/patient")
+    ? patientItems
     : practitionerItems;
 
   return (
@@ -90,7 +90,7 @@ export const DemoNav = ({ onNavigate }: Props) => {
         const active =
           pathname === item.href ||
           (item.href !== "/practitioner" &&
-            item.href !== "/person" &&
+            item.href !== "/patient" &&
             pathname.startsWith(`${item.href}/`));
         const Icon = item.icon;
 

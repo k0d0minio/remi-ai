@@ -34,7 +34,7 @@ const AppLayout = async ({
   const items =
     session.role === "practitioner"
       ? content.practitionerNav
-      : content.personNav;
+      : content.patientNav;
 
   return (
     <div className="flex min-h-dvh">

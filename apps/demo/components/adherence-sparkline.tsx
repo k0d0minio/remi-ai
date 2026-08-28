@@ -39,7 +39,7 @@ type Props = {
  *
  * The scale is fixed 0–100 because the values are percentages — a sparkline
  * zoomed to its own min and max makes a flat week look dramatic, which is
- * exactly the lie this screen must not tell a person about her own effort. One
+ * exactly the lie this screen must not tell a patient about her own effort. One
  * series, so no legend: the label above says what is plotted. The exact numbers
  * live in the table for anyone reading with a screen reader, so nothing on the
  * chart is gated behind colour or hover.

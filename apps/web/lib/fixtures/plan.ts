@@ -57,7 +57,7 @@ export const plans: readonly Plan[] = [
 /**
  * What REMI structured out of the consultation notes, with the practitioner's
  * sign-off on each one. `rec_magnesium` is deliberately left unconfirmed: it is
- * what proves the person's surface filters drafts out rather than trusting that
+ * what proves the patient's surface filters drafts out rather than trusting that
  * only confirmed ones were ever written.
  */
 export const recommendations: readonly Recommendation[] = [

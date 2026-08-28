@@ -10,7 +10,7 @@ type Props = {
  * what it claims to have seen.
  *
  * Three bands rather than a bare percentage, because "61 %" means nothing until
- * it is named — and the name is what tells the person whether to correct REMI
+ * it is named — and the name is what tells the patient whether to correct REMI
  * before her practitioner reads the entry.
  */
 const band = (confidence: number) => {

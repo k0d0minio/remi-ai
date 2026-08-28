@@ -5,16 +5,16 @@ import type { Actor, Id, Locale } from "@remi/services/shared";
  * the landing route and what the query layer will answer — so it is part of the
  * session rather than something a page looks up.
  */
-export type Role = "practitioner" | "person";
+export type Role = "practitioner" | "patient";
 
 export type Session = {
   actor: Actor;
   role: Role;
   name: string;
   locale: Locale;
-  /** The practitioner's own id, or — for a person — the practitioner supporting them. */
+  /** The practitioner's own id, or — for a patient — the practitioner supporting them. */
   practitionerId: Id;
-  /** Set only when `role` is "person". */
+  /** Set only when `role` is "patient". */
   personId: Id | null;
 };
 

@@ -33,7 +33,7 @@ type Props = {
  *
  * The analysing state is the part worth prototyping: it names each thing being
  * done to the photo instead of spinning silently, because "what did it just do
- * with my lunch" is the question a person asks the first time and never asks
+ * with my lunch" is the question a patient asks the first time and never asks
  * out loud. The capture step takes no photo — the demo has no camera and no
  * backend to send one to, and says so on the screen rather than in a caption.
  */
@@ -214,7 +214,7 @@ export const JournalLogFlow = ({ entries }: Props) => {
 
       <JournalTimeline
         entries={[...logged, ...entries]}
-        viewer="person"
+        viewer="patient"
         freshIds={logged.map((entry) => entry.id)}
       />
     </div>

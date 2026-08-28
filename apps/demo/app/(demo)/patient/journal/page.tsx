@@ -13,7 +13,7 @@ import { journalEntries } from "@/lib/mock/journal";
 export const metadata: Metadata = { title: "Journal" };
 
 /**
- * Photographing a meal is the cheapest honest record a person can keep — no
+ * Photographing a meal is the cheapest honest record a patient can keep — no
  * weighing, no app-shaped vocabulary, no evening spent typing. What makes it
  * worth building here is the third line of every entry: what REMI read, how
  * sure it is, and which of the practitioner's recommendations it lands on.

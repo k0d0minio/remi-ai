@@ -47,7 +47,7 @@ vocabulary: `success | warning | error | info | neutral`.
 app/
   (demo)/     the prototype routes and their shared layout
     practitioner/  the console: practice, clients, client detail, notes→plan, frame
-    person/        the daily surface: today, meals, steps, plan
+    patient/       the daily surface: today, meals, steps, plan
 components/   demo-specific composition — tiles, tables, flows
 lib/mock/     mock data, one file per area, plus the local view shapes in types.ts
 ```
