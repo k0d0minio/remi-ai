@@ -63,3 +63,5 @@ export const isMailerRegistered = () => mailer !== consoleMailer;
 export const sendEmail = (message: EmailMessage) => mailer.send(message);
 
 export { createResendMailer } from "./adapters/resend";
+export { operatorInvitationEmail } from "./templates/operator-invitation";
+export { patientLinkEmail } from "./templates/patient-link";

@@ -28,6 +28,9 @@ type Props = {
  * Always on screen rather than behind an "add" button: encoding a protocol is
  * the most frequent thing Morgane does on this page, often several entries in
  * a row from a phone. The fields clear themselves after each successful add.
+ *
+ * A new entry appends to the end of its category — the service decides that,
+ * not this form. Reordering is a separate act, on the entry itself.
  */
 export const RecommendationAddForm = ({ patientId }: Props) => {
   const [state, action, pending] = useActionState(
@@ -40,7 +43,7 @@ export const RecommendationAddForm = ({ patientId }: Props) => {
       <input type="hidden" name="patientId" value={patientId} />
 
       <div className="grid gap-4 sm:grid-cols-[14rem_1fr]">
-        <Field id="new-recommendation-category" label="Category">
+        <Field id="new-recommendation-category" label="Catégorie">
           <Select name="category" defaultValue="nutrition">
             <SelectTrigger id="new-recommendation-category">
               <SelectValue />
@@ -55,21 +58,21 @@ export const RecommendationAddForm = ({ patientId }: Props) => {
           </Select>
         </Field>
 
-        <Field id="new-recommendation-title" label="Recommendation">
+        <Field id="new-recommendation-title" label="Recommandation">
           <Input
             id="new-recommendation-title"
             name="title"
             required
-            placeholder="e.g. Omega-3 — 2 g daily with a meal"
+            placeholder="ex. Oméga-3 — 2 g par jour, au repas"
           />
         </Field>
       </div>
 
       <Field
         id="new-recommendation-detail"
-        label="Detail"
+        label="Détail"
         optional
-        hint="The full instruction, written as the patient should read it."
+        hint="La consigne complète, écrite telle que la personne doit la lire."
       >
         <Textarea id="new-recommendation-detail" name="detail" rows={3} />
       </Field>
@@ -77,7 +80,7 @@ export const RecommendationAddForm = ({ patientId }: Props) => {
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" size="sm" disabled={pending}>
           <Plus aria-hidden="true" />
-          {pending ? "Adding…" : "Add recommendation"}
+          {pending ? "Ajout…" : "Ajouter une recommandation"}
         </Button>
         {state.error ? (
           <Typography size="sm" className="text-error-text" role="alert">

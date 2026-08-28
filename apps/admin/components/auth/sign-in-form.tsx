@@ -12,7 +12,7 @@ export const SignInForm = () => {
 
   return (
     <form action={action} className="flex flex-col gap-4">
-      <Field id="email" label="Email">
+      <Field id="email" label="Adresse email">
         <Input
           id="email"
           name="email"
@@ -22,7 +22,7 @@ export const SignInForm = () => {
         />
       </Field>
 
-      <Field id="password" label="Password">
+      <Field id="password" label="Mot de passe">
         <Input
           id="password"
           name="password"
@@ -39,7 +39,7 @@ export const SignInForm = () => {
       ) : null}
 
       <Button type="submit" disabled={pending}>
-        {pending ? "Signing in…" : "Sign in"}
+        {pending ? "Connexion…" : "Se connecter"}
       </Button>
     </form>
   );

@@ -1,7 +1,11 @@
 import NextLink from "next/link";
 import { Badge, Separator, Typography, Wordmark } from "@remi/ui/server";
 import { NavLinks } from "@/components/shell/nav-links";
-import { deployment } from "@/lib/fixtures";
+
+type Props = {
+  /** Owners see the accounts section; operators have no route to hide behind. */
+  canManageOperators: boolean;
+};
 
 /**
  * A server component. Only the link list needs the client, and only because it
@@ -10,7 +14,7 @@ import { deployment } from "@/lib/fixtures";
  * Fixed rather than in flow: an operator scrolling a long table should never
  * lose the way back out of it. The main column pays for it with `lg:pl-60`.
  */
-export const AdminSidebar = () => (
+export const AdminSidebar = ({ canManageOperators }: Props) => (
   <aside className="border-border bg-card fixed inset-y-0 left-0 z-40 hidden w-60 flex-col gap-6 overflow-y-auto border-r p-4 lg:flex">
     <div className="flex items-center gap-2 px-2">
       <NextLink
@@ -22,20 +26,16 @@ export const AdminSidebar = () => (
       <Badge variant="warning">admin</Badge>
     </div>
 
-    <nav aria-label="Console sections">
-      <NavLinks />
+    <nav aria-label="Sections de la console">
+      <NavLinks canManageOperators={canManageOperators} />
     </nav>
 
     <div className="mt-auto flex flex-col gap-2 px-2">
       <Separator tone="subtle" />
-      <div className="flex items-center justify-between gap-2">
-        <Typography as="span" size="xs" tone="muted" className="tabular-nums">
-          {deployment.release}
-        </Typography>
-        <Badge variant="neutral" tone="subtle" size="sm">
-          {deployment.environment}
-        </Badge>
-      </div>
+      <Typography as="p" size="xs" tone="muted">
+        Console interne. Les données de cette console sont celles de vraies
+        patientes et de vrais patients.
+      </Typography>
     </div>
   </aside>
 );

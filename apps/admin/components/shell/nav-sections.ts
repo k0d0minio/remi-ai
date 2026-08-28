@@ -1,19 +1,12 @@
-import {
-  FileText,
-  Flag,
-  LayoutDashboard,
-  LifeBuoy,
-  Rocket,
-  ScrollText,
-  Stethoscope,
-  Users,
-} from "lucide-react";
+import { Home, ScrollText, Users, UsersRound } from "lucide-react";
 import type { ComponentType } from "react";
 
 export type NavItem = {
   href: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
+  /** Hidden from anyone who cannot manage accounts. */
+  ownerOnly?: boolean;
 };
 
 export type NavSection = {
@@ -22,14 +15,13 @@ export type NavSection = {
 };
 
 /**
- * The console's whole surface, in the order an operator works through it: the
- * cohort first, then the tooling that acts on it, and last the dossier written
- * for Morgane and Arnaud to review, in French per the working-languages rule in
- * `CONVENTIONS.md`.
+ * The console's whole surface. It is deliberately four rows: this console is
+ * Morgane's patient tool and the accounts that reach it, and nothing else. The
+ * practitioner, pilot, support and flag screens that used to live here were
+ * fixtures with no data behind them — they were deleted rather than hidden.
  *
- * The dossier is one route and one row. It was seven, then five; a document
- * read once before a call earns a single entry, not a section of its own to
- * navigate.
+ * Routes stay English and copy is French, per `CONVENTIONS.md`: a path is an
+ * identifier, a label is what the reader reads.
  *
  * The icon is the component rather than a name, unlike the product app's nav —
  * admin has no locale dictionaries, so there is no serialisable-data constraint
@@ -37,26 +29,17 @@ export type NavSection = {
  */
 export const navSections: readonly NavSection[] = [
   {
-    title: "Operations",
+    title: "Suivi",
     items: [
-      { href: "/", label: "Overview", icon: LayoutDashboard },
+      { href: "/", label: "Accueil", icon: Home },
       { href: "/patients", label: "Patients", icon: Users },
-      { href: "/practitioners", label: "Practitioners", icon: Stethoscope },
-      { href: "/pilot", label: "Pilot", icon: Rocket },
     ],
   },
   {
-    title: "Platform",
+    title: "Console",
     items: [
-      { href: "/support", label: "Support", icon: LifeBuoy },
-      { href: "/flags", label: "Flags", icon: Flag },
-      { href: "/audit", label: "Audit", icon: ScrollText },
-    ],
-  },
-  {
-    title: "Dossier",
-    items: [
-      { href: "/dossier", label: "Préparation de l'appel", icon: FileText },
+      { href: "/team", label: "Équipe", icon: UsersRound, ownerOnly: true },
+      { href: "/audit", label: "Journal", icon: ScrollText },
     ],
   },
 ];

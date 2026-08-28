@@ -60,6 +60,8 @@ export { Typography } from "./server/typography";
 export { VisuallyHidden } from "./server/visually-hidden";
 export { Wordmark } from "./server/wordmark";
 
+export { intents, type Intent } from "./lib/intent";
+
 export {
   BRAND_COLORS,
   BRAND_GLYPH_PATH,

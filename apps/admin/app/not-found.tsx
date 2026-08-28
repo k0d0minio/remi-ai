@@ -10,7 +10,7 @@ import {
 } from "@remi/ui/server";
 
 export const metadata: Metadata = {
-  title: "Not found",
+  title: "Page introuvable",
 };
 
 /**
@@ -37,16 +37,16 @@ const NotFound = () => (
 
         <div className="flex flex-col gap-2">
           <Typography as="h1" size="xl" weight="semibold" balance>
-            No console route lives here
+            Aucune page de la console à cette adresse
           </Typography>
           <Typography size="sm" tone="muted">
-            The address may have moved, or the tool behind it has not been built
-            yet. Nothing was changed by landing on it.
+            L&apos;adresse a peut-être changé, ou l&apos;outil derrière elle
+            n&apos;existe pas encore. Rien n&apos;a été modifié.
           </Typography>
         </div>
 
         <Button asChild size="sm">
-          <NextLink href="/">Back to overview</NextLink>
+          <NextLink href="/">Retour à l&apos;accueil</NextLink>
         </Button>
       </CardContent>
     </Card>
