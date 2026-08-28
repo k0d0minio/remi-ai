@@ -3,69 +3,87 @@
 Who the product serves, what each of them sees, and what each can change. Scope reads this page to
 decide who a change is for; Design reads it for the lens a prototype is drawn through.
 
-Three roles, and only two of them are a session in the product. The product's own vocabulary is
-`practitioner` and `person`; the session carries which one, because it decides the navigation, the
-landing route and what the query layer will answer. The operator is not a product session at all —
-it lives in a separate deployment, with its own URL and its own access control.
+Three roles, and only two of them are a session in the product. The session carries which one,
+because it decides the navigation, the landing route and what the query layer will answer. The
+operator is not a product session at all — it lives in a separate deployment, with its own URL and
+its own access control.
 
-## Person
+> **Vocabulary.** The braindump and the direction of record both say **patient**, and so does this
+> page. The `web` session role is still spelled `person` in code, from an earlier framing; renaming
+> it is a code change nobody has made yet, not a second audience.
 
-The individual being accompanied. "Person" and not "patient": REMI sits beside a clinical
-relationship rather than inside one, and the accompaniment belongs to them, not to a case file.
+## Patient
+
+The individual being accompanied. They are the first audience of V2 and, in this phase, the only
+one with a surface of their own: the patient experience is built and validated before the
+practitioner space is built at all.
 
 - **What they are trying to do** — apply what their practitioner told them, in a week that already
   has a job, a kitchen and a Tuesday at 7pm in it. Not to manage a condition, and not to use an app.
-- **What they can see** — their own accompaniment and nothing else: today, meals, steps, and the
-  plan behind them. No other person's data, nothing about the practice, and no clinical record —
+- **How they arrive** — through their practitioner, who recommends REMI and carries the clinical
+  relationship. Acquisition is the practitioner's, not a marketing funnel's. The terrain cohort
+  Morgane accompanies uses REMI free — their feedback is the payment; patients joining from the
+  December open day onward subscribe. No price is decided.
+- **What they can see** — their own accompaniment and nothing else: their profile, the
+  recommendations they were given, the daily hub, their meals, their micro-actions and their
+  supplement journal. No other patient's data, nothing about the practice, and no clinical record —
   REMI is not the medical record.
 - **What they can change** — what they log, and their own pace and preferences. Never the
   recommendations or the frame those sit in; outside the frame REMI does not improvise, it says so
   and points back to the practitioner.
-- **Which app they live in** — `web`, landing on Today.
+- **Which app they live in** — `web`.
 
 ## Practitioner
 
-The professional whose recommendations REMI extends. They stay the reference throughout: REMI
-applies, it never prescribes.
+The professional whose recommendations REMI extends, and the prescriber: a patient reaches REMI
+because a practitioner sent them. They stay the clinical reference throughout — REMI applies, it
+never prescribes. The braindump also makes them the paying customer through a practitioner-side
+subscription; that model is parked with the practitioner space, and the revenue path in front of the
+December open day is the patient subscription instead.
 
 - **What they are trying to do** — keep their recommendations alive between consultations without
   adding to their workload, and open the next session from what actually happened rather than from
   what anyone remembers.
-- **What they can see** — the people they support, and nobody else. Access follows the care
-  relationship and ends when that relationship does. Their practice overview, their client list, one
-  client's plan and progress, and the therapeutic frame.
-- **What they can change** — the therapeutic frame (what may be suggested, what must be avoided,
-  and for whom) and the plan for a person they support. Tightening the frame is theirs alone and
-  needs nobody else's say-so.
-- **Which app they live in** — `web`, landing on Clients.
+- **What they can do today** — set up a patient and encode that patient's profile and
+  recommendations in the patient's own space. That is deliberate: it is what lets the real product
+  be tested on real patients before a practitioner space exists.
+- **What they will be able to see** — the patients they support, and nobody else: adherence at a
+  glance, one patient's detail, and who is struggling. Access follows the care relationship and ends
+  when that relationship does.
+- **What they will be able to change** — the recommendations and the rules for a patient they
+  support, remotely, with the accompaniment regenerated from them. Tightening what may be suggested
+  is theirs alone and needs nobody else's say-so.
+- **Which app they live in** — `web`. The dashboard and the rest of the practitioner space are
+  parked until the patient experience is validated, and are re-specified from terrain experience
+  when they are picked up; see [V2 scope](/business/scope).
 
 ## Operator
 
-Internal, and today that means the founders. The role exists to run the pilot and to be able to
-answer for it.
+Internal, and today that means the founders. The role exists to run the platform and to be able to
+answer for what it did.
 
-- **What they are trying to do** — know who applied and who is onboarded, see what a practitioner is
-  stuck on, and be able to say what changed and who changed it.
-- **What they can see** — practitioner accounts and their status, the pilot's terms and enrolment,
-  the support inbox, feature flags and the audit log. A practitioner's roster shows as activity — is
-  anything moving on this account — rather than as plan content.
+- **What they are trying to do** — know which accounts exist and in what state, see what a
+  practitioner or a patient is stuck on, and be able to say what changed and who changed it.
+- **What they can see** — accounts and their status, the patient roster and the profiles and
+  recommendations behind it, the support inbox, feature flags and the audit log. A practitioner's
+  roster shows as activity — is anything moving on this account — rather than as plan content.
 - **What they can change** — access to an account (suspend, restore, reset) and platform flags, with
-  a confirmation and an audit entry on anything destructive. Not the pilot terms: those are fixed by
-  a signed document and rendered rather than edited, because an operator who can change the price
-  from a table is one mis-click from a term nobody agreed to.
+  a confirmation and an audit entry on anything destructive. No commercial terms: there are none to
+  render, and an operator who could set a price from a table is one mis-click from a term nobody
+  agreed to.
 - **Which app they live in** — `admin`, a separate deployment. Never a route group inside the
   product, where every operator capability would be one routing mistake away from a customer.
 
 ## What each role sees, per app
 
-| App                 | Person                                                               | Practitioner                                          | Operator                                                 |
-| ------------------- | -------------------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------- |
-| `web` (:3000)       | Today, meals, steps, their plan                                      | Practice, clients, a client's plan, therapeutic frame | Nothing — no operator session exists in the product      |
-| `admin` (:3002)     | Nothing — the app has no public route                                | Nothing                                               | The console: practitioners, pilot, support, flags, audit |
-| `marketing` (:3001) | The public site, signed out, in English or French                    | The same site, plus the pilot application             | The same as anyone                                       |
-| `support` (:3004)   | The help centre, anonymously — it never knows who is asking          | The same                                              | The same                                                 |
-| `docs` (:3003)      | Not a product surface — this site is reference material for the team | The same                                              | The same                                                 |
-| `demo` (:3005)      | Not a product surface — the Design stage's sandbox, mock data only   | The same                                              | The same                                                 |
+| App                 | Patient                                                              | Practitioner                                         | Operator                                               |
+| ------------------- | -------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ |
+| `web` (:3000)       | Their profile, the daily hub, meals, micro-actions, supplements      | Their patients — parked until the patient half lands | Nothing — no operator session exists in the product    |
+| `admin` (:3002)     | Nothing — the app has no public route                                | Nothing                                              | The console: accounts, patients, support, flags, audit |
+| `marketing` (:3001) | The public site, signed out, in English or French                    | The same site, plus the practitioner page            | The same as anyone                                     |
+| `support` (:3004)   | The help centre, anonymously — it never knows who is asking          | The same                                             | The same                                               |
+| `docs` (:3003)      | Not a product surface — this site is reference material for the team | The same                                             | The same                                               |
+| `demo` (:3005)      | Not a product surface — the Design stage's sandbox, mock data only   | The same                                             | The same                                               |
 
 Two of those cells matter more than they look. `web` is the only app where the role changes what is
 rendered, and `admin` is the only app no role but the operator can reach at all — that boundary is
@@ -74,8 +92,8 @@ the reason it is a separate deployment rather than a route group.
 ## Why this page is worth keeping accurate
 
 Decision rights are the most common silent assumption in a scope. Written here once, a scope
-document does not have to re-derive them, and a spec that gives a person something only a
+document does not have to re-derive them, and a spec that gives a patient something only a
 practitioner may change contradicts a page rather than an opinion.
 
 The pipeline's label vocabulary can now grow the `persona:` axis it deferred while this page was a
-stub — `person`, `practitioner`, `operator`, the same three names used above.
+stub — `patient`, `practitioner`, `operator`, the same three names used above.
