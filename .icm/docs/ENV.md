@@ -29,26 +29,60 @@ that app's project.
 | --------------------------- | ---------------------------------------------- | --------- | ------- |
 | `NODE_ENV`                  | `development` \| `test` \| `production`        | toolchain | no      |
 | `APP_URL`                   | Absolute base URL of the app doing the reading | Vercel    | no      |
-| `NEXT_PUBLIC_APP_URL`       | Overrides where `apps/web` answers             | Vercel    | yes     |
-| `NEXT_PUBLIC_MARKETING_URL` | Overrides where `apps/marketing` answers       | Vercel    | yes     |
-| `NEXT_PUBLIC_ADMIN_URL`     | Overrides where `apps/admin` answers           | Vercel    | yes     |
-| `NEXT_PUBLIC_DOCS_URL`      | Overrides where `apps/docs` answers            | Vercel    | yes     |
-| `NEXT_PUBLIC_SUPPORT_URL`   | Overrides where `apps/support` answers         | Vercel    | yes     |
-| `NEXT_PUBLIC_DEMO_URL`      | Overrides where `apps/demo` answers            | Vercel    | yes     |
+| `NEXT_PUBLIC_APP_URL`       | Where `apps/web` answers                       | Vercel    | yes     |
+| `NEXT_PUBLIC_MARKETING_URL` | Where `apps/marketing` answers                 | Vercel    | yes     |
+| `NEXT_PUBLIC_ADMIN_URL`     | Where `apps/admin` answers                     | Vercel    | yes     |
+| `NEXT_PUBLIC_DOCS_URL`      | Where `apps/docs` answers                      | Vercel    | yes     |
+| `NEXT_PUBLIC_SUPPORT_URL`   | Where `apps/support` answers                   | Vercel    | yes     |
+| `NEXT_PUBLIC_DEMO_URL`      | Where `apps/demo` answers                      | Vercel    | yes     |
 
 `NODE_ENV` is the one row nobody sets: Next.js, Turborepo and the test runner set it themselves, and
 it is listed here because it is in the zod schema and in `turbo.json` like every other variable, and
 because `packages/services/src/shared/links.ts` reads it literally to decide between the dev ports
 and the live domain. Never set it by hand.
 
-The six `NEXT_PUBLIC_*_URL` variables are **overrides, and normally unset**. Where each app lives
-is catalogued in `packages/services/src/shared/links.ts` — one table of subdomains under one root
-domain, plus the dev ports — and that file is what every cross-app link, canonical URL and sitemap
-is built from. Moving the whole ecosystem to a new domain is one edit there, not six rows here.
+### The six origin variables
 
-Set one of these only when a deployment has to answer somewhere the catalogue does not describe: a
-staging domain, a preview URL a stakeholder is reviewing against, or a rename that has not landed
-in the catalogue yet.
+`packages/services/src/shared/links.ts` is the one file that knows where each app answers, and every
+cross-app link, canonical URL, sitemap entry, operator invitation and patient share link is built
+from it. It answers in two ways: the `NEXT_PUBLIC_*_URL` variable for that app if it is set,
+otherwise a built-in table of subdomains under one root domain (dev ports when `NODE_ENV` is
+`development`).
+
+**In production the variables are the answer, and the table is not.** Its `rootDomain` is
+`jamienisbet.com`, a placeholder on a personal account that REMI does not own. A project missing a
+variable therefore does not fail — it silently advertises the placeholder, which is exactly how an
+operator invitation went out pointing at `remi-admin.jamienisbet.com`. Treat an unset variable in a
+production project as a defect, not a default.
+
+Two things to know before setting them:
+
+- **They are inlined at build time.** `NEXT_PUBLIC_*` is substituted into the bundle when the app
+  compiles, so saving a value in Vercel changes nothing until that project is **redeployed**.
+- **A project needs a variable for every app it links to, not just for itself.** The console builds
+  patient share links into the product, so the admin project needs `NEXT_PUBLIC_APP_URL` as well as
+  its own.
+
+### Which project needs which
+
+The minimum each Vercel project needs, from the `appHref` / `appOrigin` calls in its own source.
+Setting all six in all six projects is also fine and is the safer habit — these are public URLs,
+there is nothing to leak, and it survives someone adding a cross-app link later.
+
+| Vercel project | Needs                          | Why                                                |
+| -------------- | ------------------------------ | -------------------------------------------------- |
+| `web`          | `MARKETING`, `DOCS`, `SUPPORT` | the product links out to all three                 |
+| `marketing`    | `MARKETING`, `APP`, `SUPPORT`  | own `metadataBase` — canonicals, hreflang, sitemap |
+| `admin`        | `ADMIN`, `APP`                 | operator invitation links; patient share links     |
+| `docs`         | `APP`, `MARKETING`, `SUPPORT`  | the nav leaves for all three                       |
+| `support`      | `SUPPORT`, `MARKETING`, `APP`  | own `metadataBase`; the help centre is a leaf      |
+| `demo`         | none                           | mock data only, no cross-app links                 |
+
+Local development needs none of them: `NODE_ENV=development` makes the catalogue answer with the dev
+ports, so every app runs from a clean checkout. Each app's `.env.example` lists the ones it uses.
+
+The built-in table stays as the last resort and as the dev-port source. Retiring the placeholder
+domain in it is a separate decision — REMI-037 (`remi.be` DNS) and decision D-6 in the audit.
 
 ## Storage
 
