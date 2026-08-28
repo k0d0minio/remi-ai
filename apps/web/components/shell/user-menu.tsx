@@ -47,7 +47,7 @@ const localeLabels: Record<Locale, string> = {
 export const UserMenu = ({ name, initials, role, locale, content }: Props) => {
   const pathname = usePathname();
   const unprefixed = pathname.replace(`/${locale}`, "") || "/";
-  const otherRole: Role = role === "practitioner" ? "person" : "practitioner";
+  const otherRole: Role = role === "practitioner" ? "patient" : "practitioner";
 
   return (
     <DropdownMenu>

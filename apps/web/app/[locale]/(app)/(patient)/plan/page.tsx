@@ -19,7 +19,7 @@ import {
 import { getSession } from "@/lib/auth/session";
 import { getContent } from "@/lib/content";
 import { getConsultation } from "@/lib/queries/consultations";
-import { getPerson } from "@/lib/queries/people";
+import { getPatient } from "@/lib/queries/patients";
 import { getPractitioner } from "@/lib/queries/practitioners";
 import { getActivePlan, listRecommendations } from "@/lib/queries/plans";
 import { resolveLocale, type LocaleParams } from "@/lib/locale-params";
@@ -34,7 +34,7 @@ export const generateMetadata = async ({
 };
 
 /**
- * The same recommendations the practitioner confirmed, read from the person's
+ * The same recommendations the practitioner confirmed, read from the patient's
  * side. Only the confirmed ones arrive — `listRecommendations` drops the drafts
  * — so this screen is the proof that what REMI suggests all week traces back to
  * a decision a human made in a consultation.
@@ -48,7 +48,7 @@ const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
 
   const content = getContent(locale).plan;
   const plan = await getActivePlan(session.personId);
-  const person = await getPerson(session.personId);
+  const patient = await getPatient(session.personId);
   const practitioner = await getPractitioner(session.practitionerId);
   const consultation = plan ? await getConsultation(plan.consultationId) : null;
   const recommendations = plan ? await listRecommendations(plan.id) : [];
@@ -87,7 +87,7 @@ const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
                       : null}
                   </Typography>
                 </div>
-                {person?.nextConsultationAt ? (
+                {patient?.nextConsultationAt ? (
                   <Badge
                     variant="neutral"
                     tone="subtle"
@@ -96,7 +96,7 @@ const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
                   >
                     <CalendarDays aria-hidden="true" />
                     {content.nextReview}{" "}
-                    {formatDate(person.nextConsultationAt, locale)}
+                    {formatDate(patient.nextConsultationAt, locale)}
                   </Badge>
                 ) : null}
               </CardContent>

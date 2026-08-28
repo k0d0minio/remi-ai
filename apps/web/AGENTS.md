@@ -16,7 +16,7 @@ app/[locale]/       every page ships in en and fr; `[locale]/layout.tsx` IS the
   page.tsx          the entry screen — the only route outside the auth boundary
   (app)/            signed-in routes — the route group carries the auth boundary
     (practitioner)/ the console: clients, practice, therapeutic frame
-    (person)/       the daily surface: today, meals, steps, plan
+    (patient)/      the daily surface: today, meals, steps, plan
 app/api/            route handlers (webhooks, cron, uploads) — outside the locale
                     segment, because a machine surface has no language
 components/         composition only, grouped by feature — never primitives

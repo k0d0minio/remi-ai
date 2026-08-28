@@ -38,7 +38,7 @@ const statusVariant: Record<
 
 /**
  * The queue, shown as a queue. The upcoming steps are visible but dimmed and
- * locked — a person should be able to see where this is going without feeling
+ * locked — a patient should be able to see where this is going without feeling
  * they are already behind on four things at once.
  */
 const Page = async ({ params }: { params: Promise<LocaleParams> }) => {

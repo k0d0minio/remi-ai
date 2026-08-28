@@ -5,8 +5,8 @@ import { signIn } from "@/lib/actions/session";
 import type { Role } from "@/lib/auth/session";
 import type { Content } from "@/lib/content/types";
 
-/** Person first: it is the surface most demos open on. */
-const roles: Role[] = ["person", "practitioner"];
+/** Patient first: it is the surface most demos open on. */
+const roles: Role[] = ["patient", "practitioner"];
 
 type Props = {
   locale: Locale;
@@ -60,7 +60,7 @@ export const SignInForm = ({ locale, content }: Props) => (
               type="radio"
               name="role"
               value={role}
-              defaultChecked={role === "person"}
+              defaultChecked={role === "patient"}
               className="peer sr-only"
             />
             <span className="text-muted-foreground peer-checked:bg-card peer-checked:text-foreground peer-focus-visible:ring-ring/40 flex min-h-9 w-full cursor-pointer items-center justify-center rounded-md px-3 py-1.5 text-center text-sm font-medium leading-tight transition-colors duration-[--duration-fast] peer-checked:shadow-sm peer-focus-visible:ring-[3px]">

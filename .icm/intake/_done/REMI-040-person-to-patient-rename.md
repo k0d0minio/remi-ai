@@ -2,7 +2,7 @@
 
 |                |                                                                                                        |
 | -------------- | ------------------------------------------------------------------------------------------------------ |
-| Status         | ready                                                                                                  |
+| Status         | done                                                                                                   |
 | **Type**       | refactor                                                                                               |
 | **Priority**   | P2 — costs nothing today, costs more every week the patient surfaces grow                              |
 | **Size**       | Half a day                                                                                             |

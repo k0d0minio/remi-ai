@@ -1,7 +1,7 @@
 import type { Id, Plan, Recommendation, Step } from "@remi/services/shared";
 import { plans, recommendations, steps } from "@/lib/fixtures/plan";
 
-/** Reads for the person's surface. See the note in `./clients.ts`. */
+/** Reads for the patient's surface. See the note in `./clients.ts`. */
 export const getActivePlan = async (personId: Id): Promise<Plan | null> =>
   plans.find(
     (plan) => plan.personId === personId && plan.status === "published",
@@ -26,7 +26,7 @@ export const getCurrentStep = async (planId: Id): Promise<Step | null> =>
  *
  * The filter belongs here rather than in a screen. An unconfirmed
  * recommendation is a draft REMI proposed and the practitioner has not signed
- * off; "nothing reaches the person until a human confirmed it" is a product
+ * off; "nothing reaches the patient until a human confirmed it" is a product
  * rule, and a rule enforced once at the seam cannot be forgotten by the next
  * surface that reads a plan.
  */
@@ -35,7 +35,7 @@ export const getCurrentStep = async (planId: Id): Promise<Step | null> =>
  *
  * The one read allowed to return `confirmed: false`, and it is the practitioner's
  * — the plan composer is where those drafts are ticked or dropped. Any read on
- * the person's side goes through `listRecommendations` below instead.
+ * the patient's side goes through `listRecommendations` below instead.
  */
 export const listDraftRecommendations = async (
   consultationId: Id,

@@ -10,7 +10,7 @@ type Props = {
   chips: QuickReply[];
   /**
    * `assist` is REMI proposing a reply to the practitioner; `quick` is the
-   * person reaching for a phrase she writes every fortnight. Same mechanic,
+   * patient reaching for a phrase she writes every fortnight. Same mechanic,
    * different claim — so the row says which one it is.
    */
   variant: "assist" | "quick";

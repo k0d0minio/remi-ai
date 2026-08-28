@@ -6,7 +6,7 @@ import {
   AlertTitle,
   Typography,
 } from "@remi/ui/server";
-import { PersonMessages } from "@/components/person-messages";
+import { PatientMessages } from "@/components/patient-messages";
 import { practitionerName } from "@/lib/mock/clients";
 
 export const metadata: Metadata = { title: "Mes messages" };
@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Mes messages" };
 /**
  * The same thread as `/practitioner/messages`, from the other end. The framing
  * is the part that changes: the practitioner is told these messages sit in a
- * file, and the person is told nobody is waiting at the other end of the line —
+ * file, and the patient is told nobody is waiting at the other end of the line —
  * which is the expectation that actually needs setting before she writes.
  */
 const Page = () => (
@@ -42,7 +42,7 @@ const Page = () => (
       </AlertDescription>
     </Alert>
 
-    <PersonMessages practitionerLabel={practitionerName} />
+    <PatientMessages practitionerLabel={practitionerName} />
   </div>
 );
 

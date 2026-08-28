@@ -21,7 +21,7 @@ const firstConversation = conversations[0];
  * comparison you have to navigate away from is not one.
  *
  * Opening a thread clears its unread count and nothing else: no read receipt
- * travels back to the person, which is the behaviour a clinical exchange wants
+ * travels back to the patient, which is the behaviour a clinical exchange wants
  * and a chat app does not.
  */
 export const MessagesInbox = () => {

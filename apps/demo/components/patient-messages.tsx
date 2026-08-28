@@ -5,7 +5,7 @@ import { MessageComposer } from "@/components/message-composer";
 import { MessageThread } from "@/components/message-thread";
 import {
   conversations,
-  personConversationId,
+  patientConversationId,
   quickReplies,
 } from "@/lib/mock/messages";
 import type { Message } from "@/lib/mock/types";
@@ -16,7 +16,7 @@ type Props = {
 };
 
 const conversation =
-  conversations.find((candidate) => candidate.id === personConversationId) ??
+  conversations.find((candidate) => candidate.id === patientConversationId) ??
   conversations[0];
 
 /**
@@ -24,11 +24,11 @@ const conversation =
  * `/practitioner/messages` — same fixture, `viewer` flipped.
  *
  * The one thing this side does not get is a suggestion engine. REMI proposing
- * words to the person would put a machine on both ends of a clinical exchange;
+ * words to the patient would put a machine on both ends of a clinical exchange;
  * the chips here are her own recurring phrases, which is a shortcut rather than
  * a voice.
  */
-export const PersonMessages = ({ practitionerLabel }: Props) => {
+export const PatientMessages = ({ practitionerLabel }: Props) => {
   const [sent, setSent] = useState<Message[]>([]);
 
   const send = (body: string) => {
@@ -36,7 +36,7 @@ export const PersonMessages = ({ practitionerLabel }: Props) => {
       ...current,
       {
         id: `${conversation.id}_sent_${current.length + 1}`,
-        author: "person",
+        author: "patient",
         day: "Aujourd'hui",
         time: "à l'instant",
         body,
@@ -48,7 +48,7 @@ export const PersonMessages = ({ practitionerLabel }: Props) => {
     <div className="flex flex-col gap-4">
       <MessageThread
         messages={[...conversation.messages, ...sent]}
-        viewer="person"
+        viewer="patient"
         counterpartLabel={practitionerLabel}
       />
 
