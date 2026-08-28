@@ -33,14 +33,14 @@ data. They were wiped in one commit and remain recoverable in git history. The s
 
 ### Phase A · Decide & clear the ground
 
-| Ticket                                         | What                                                     |
-| ---------------------------------------------- | -------------------------------------------------------- |
-| [REMI-007](_done/REMI-007-adopt-supabase.md)   | Dropped — the answer is Neon, not Supabase               |
-| [REMI-008](REMI-008-freeze-v2-scope.md)        | Freeze the V2 scope; fix the docs that contradict it     |
-| [REMI-009](REMI-009-estate-footprint.md)       | Decide how much of the six-app estate survives           |
-| [REMI-010](REMI-010-startup-boost-gates.md)    | Startup Boost eligibility gates and go / no-go           |
-| [REMI-011](REMI-011-v1-estate.md)              | Settle the v1 estate — old data first, then the accounts |
-| [REMI-012](REMI-012-tool-and-cost-register.md) | Build the tool and cost register                         |
+| Ticket                                         | What                                                            |
+| ---------------------------------------------- | --------------------------------------------------------------- |
+| [REMI-007](_done/REMI-007-adopt-supabase.md)   | Dropped — the answer is Neon, not Supabase                      |
+| [REMI-008](_done/REMI-008-freeze-v2-scope.md)  | Done — the V2 scope is frozen in `apps/docs/app/business/scope` |
+| [REMI-009](REMI-009-estate-footprint.md)       | Decide how much of the six-app estate survives                  |
+| [REMI-010](REMI-010-startup-boost-gates.md)    | Startup Boost eligibility gates and go / no-go                  |
+| [REMI-011](REMI-011-v1-estate.md)              | Settle the v1 estate — old data first, then the accounts        |
+| [REMI-012](REMI-012-tool-and-cost-register.md) | Build the tool and cost register                                |
 
 ### Phase B · Foundation
 
