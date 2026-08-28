@@ -6,6 +6,7 @@ import {
   Rocket,
   ScrollText,
   Stethoscope,
+  Users,
 } from "lucide-react";
 import type { ComponentType } from "react";
 
@@ -39,6 +40,7 @@ export const navSections: readonly NavSection[] = [
     title: "Operations",
     items: [
       { href: "/", label: "Overview", icon: LayoutDashboard },
+      { href: "/patients", label: "Patients", icon: Users },
       { href: "/practitioners", label: "Practitioners", icon: Stethoscope },
       { href: "/pilot", label: "Pilot", icon: Rocket },
     ],

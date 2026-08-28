@@ -32,9 +32,12 @@ export type DatabaseClient = {
 let client: DatabaseClient | null = null;
 
 /**
- * Register the adapter once, at process start (an app's instrumentation hook is
- * the natural place). Calling it twice with different adapters is a bug, not a
- * swap — it would leave already-resolved callers holding the old one.
+ * Register the adapter once per module graph, lazily at first use — each app's
+ * `ensureDatabase()` helper is the place, mirroring the marketing mailer:
+ * Next.js bundles every route with its own copy of this module, so a boot
+ * hook's registration never reaches the routes. Calling it twice with
+ * different adapters is a bug, not a swap — it would leave already-resolved
+ * callers holding the old one.
  */
 export const registerDatabase = (adapter: DatabaseClient) => {
   if (client && client !== adapter) {

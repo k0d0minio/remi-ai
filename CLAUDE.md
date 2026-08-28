@@ -8,8 +8,9 @@ so nothing is stated in two places that can disagree.
 
 Remi AI is an AI product built as a Turborepo monorepo: six Next.js apps sharing two packages — a
 design system and a services layer. The services layer defines **seams**, not integrations: storage,
-email and AI each have an interface and a registration point, and no vendor is committed yet.
-Choosing one later means writing one adapter, not rewriting the callers.
+email and AI each have an interface and a registration point. Storage runs on Neon Postgres and
+email on Resend, each through one adapter behind its seam; AI has no vendor yet. Choosing or
+changing one means writing one adapter, not rewriting the callers.
 
 ## Monorepo structure
 
@@ -43,7 +44,9 @@ importing an app is a lint error.
 | Packages   | tsup → ESM                                      |
 | Hosting    | Vercel — one project per app                    |
 
-Storage, auth, email and AI are deliberately absent: see `packages/services/AGENTS.md`.
+Storage is Neon Postgres (Drizzle, migrations in the repo), email is Resend, operator auth is
+vendor-free (`packages/services/src/auth/`); AI is deliberately unchosen. See
+`packages/services/AGENTS.md`.
 
 ## Commands
 

@@ -3,18 +3,30 @@
 The global rules in [`/CONVENTIONS.md`](../../CONVENTIONS.md) still apply. This file holds only
 what is specific to this package.
 
-## Storage and AI have no vendor yet — and that is the design
+## Seams, not integrations — AI still has no vendor, and that is the design
 
-Storage, email and AI are **seams**, not integrations. Each one defines an interface and a
-`register*()` call; the concrete adapter is registered once at process start by the app that owns
-the process. Nothing above the seam names a vendor, so choosing one later is a new file plus one
-registration line — never a rewrite of the callers.
+Storage, email and AI are **seams**: each defines an interface and a `register*()` call; the
+concrete adapter is registered by the app that owns the process — **lazily, at first use**, from
+an idempotent `ensure*()` helper beside the code that reads (`apps/marketing/lib/mailer.ts`,
+`apps/admin/lib/database.ts`, `apps/web/lib/database.ts`). Never from `instrumentation.ts`:
+Next.js gives every route its own copy of this package's modules, so a boot hook's registration
+never reaches them — that mistake shipped once and threw "no database adapter registered" in
+production with the variable set. Nothing above a seam names a vendor, so changing one is a new
+file plus one registration line — never a rewrite of the callers.
 
 | Seam    | Interface        | Register with            | Adapter                         | Default if unregistered             |
 | ------- | ---------------- | ------------------------ | ------------------------------- | ----------------------------------- |
-| Storage | `DatabaseClient` | `registerDatabase()`     | none yet                        | throws — a missing DB must be loud  |
+| Storage | `DatabaseClient` | `registerDatabase()`     | Neon (`createNeonDatabase()`)   | throws — a missing DB must be loud  |
 | Email   | `Mailer`         | `registerMailer()`       | Resend (`createResendMailer()`) | `consoleMailer` — logs, never sends |
 | AI      | `TextProvider`   | `registerTextProvider()` | none yet                        | throws                              |
+
+Storage's vendor is **Neon Postgres** (owner decision, 27 Aug 2026 — supersedes the earlier
+Supabase leaning), queried with Drizzle against `src/db/schema.ts`. The schema is the single
+definition the checked-in migrations under `src/db/migrations/` are generated from
+(`pnpm db:generate`); `pnpm db:migrate` applies them, and the admin app's build runs it first.
+Never change the live schema any other way. Services under `src/db/services/` still speak only to
+the seam — the tests run them against an in-memory client (`src/db/test-helpers.ts`), which is the
+proof.
 
 An adapter goes in this package under `src/<seam>/adapters/<vendor>.ts`, the seam's own module is
 the only thing that re-exports it, and `.icm/docs/ENV.md` gains its variables in the same PR. A vendor
@@ -76,7 +88,8 @@ src/
   types/       the storage-agnostic vocabulary everything else is written against
   shared/      isomorphic — no fs, no driver, no secret
   server/      the Node barrel + env
-  db/          client.ts (the seam) · models/ · services/ · migrations/
+  auth/        password hashing + session tokens — vendor-free, `node:crypto` only
+  db/          client.ts (the seam) · schema.ts (Drizzle) · adapters/ · models/ · services/ · migrations/
   email/       the mailer seam + templates
   ai/          model roles + the provider seam
 ```

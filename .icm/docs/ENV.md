@@ -52,21 +52,36 @@ in the catalogue yet.
 
 ## Storage
 
-No database vendor is committed yet — `@remi/services` defines the seam and an adapter registers
-against it (`packages/services/AGENTS.md`). These are the names reserved for it; fill in the rows
-when the adapter lands.
+**Neon Postgres**, by owner decision on 27 August 2026 — it supersedes the repo's earlier
+Supabase leaning (REMI-007/013 ticket texts predate it). The adapter is
+`packages/services/src/db/adapters/neon.ts`, Drizzle over the serverless HTTP driver; checked-in
+migrations live in `packages/services/src/db/migrations/` and are applied by
+`pnpm --filter @remi/services db:migrate`, which runs at the front of the **admin** app's build so
+a deploy migrates before it serves.
 
-| Variable       | Purpose           | Where set | Public? |
-| -------------- | ----------------- | --------- | ------- |
-| `DATABASE_URL` | Connection string | both      | no      |
+| Variable       | Purpose                                                     | Where set | Public? |
+| -------------- | ----------------------------------------------------------- | --------- | ------- |
+| `DATABASE_URL` | Neon connection string — the **admin** and **web** projects | Vercel    | no      |
+
+With it unset nothing is registered and any screen that needs the database fails loudly with "no
+database adapter registered" — a deploy without a database never quietly renders nothing.
+
+**Preview caveat:** the admin build migrates whatever `DATABASE_URL` it is given. Either scope the
+variable to production (previews then show the loud unregistered error), or point preview
+environments at a Neon branch of the database — never previews and production at the same value
+with unmerged schema changes in flight.
 
 ## Auth
 
-No auth vendor is committed yet.
+Operator auth for `apps/admin` is vendor-free: an scrypt password hash in the `operators` table
+and an HMAC-signed session cookie, both in `packages/services/src/auth/`. Phase-1 patients hold no
+accounts — the patient link's unguessable token is the whole credential (REMI-035); the fuller
+auth question stays with REMI-013.
 
-| Variable      | Purpose                      | Where set | Public? |
-| ------------- | ---------------------------- | --------- | ------- |
-| `AUTH_SECRET` | Session/token signing secret | Vercel    | no      |
+| Variable         | Purpose                                                                                         | Where set | Public? |
+| ---------------- | ----------------------------------------------------------------------------------------------- | --------- | ------- |
+| `AUTH_SECRET`    | Signs the admin session cookie (**admin** project). Rotating it signs every operator out        | Vercel    | no      |
+| `OPERATOR_EMAIL` | The one email allowed to create the first operator account (**admin** project) — see `/sign-in` | Vercel    | no      |
 
 ## Email
 
