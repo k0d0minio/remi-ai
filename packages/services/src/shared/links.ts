@@ -22,9 +22,13 @@ export type AppKey =
   "web" | "marketing" | "admin" | "docs" | "support" | "demo";
 
 /**
- * The domain everything hangs off, and the label each app answers on. Buying a
- * real domain is one edit to `rootDomain`; moving one app is one edit to its
- * row. Nothing else in the repo spells an origin out.
+ * The domain everything hangs off, and the label each app answers on. This is
+ * the last resort, not the live answer: production origins come from the
+ * `NEXT_PUBLIC_*_URL` overrides below, and `rootDomain` is a placeholder held
+ * on a personal account. Retiring it is one edit here once the real domain is
+ * settled (REMI-037, and decision D-6 in the audit); until then, nothing in
+ * production should be reaching this line. Nothing else in the repo spells an
+ * origin out.
  */
 const rootDomain = "jamienisbet.com";
 
@@ -48,11 +52,16 @@ const devPorts: Record<AppKey, number> = {
 };
 
 /**
- * A per-environment escape hatch, for the cases the table above cannot know:
- * a preview deployment, a staging domain, a rename that has not landed here yet.
- * Set the variable in Vercel and it wins; leave it unset — which is the normal
- * case — and the table answers. All six are registered in turbo.json's
- * `globalEnv` and .icm/docs/ENV.md.
+ * Where each app actually answers, set per Vercel project. These win over the
+ * table above, and in production they are what should be answering: the table's
+ * `rootDomain` is a placeholder nobody owns, so a project missing its variable
+ * does not fail — it quietly advertises the placeholder, which is how a live
+ * operator invitation once went out pointing at the wrong domain.
+ *
+ * Unset is still legitimate in two places: local development, where the dev
+ * ports below answer, and a preview deployment happy to be described by the
+ * table. All six are registered in turbo.json's `globalEnv`, and
+ * .icm/docs/ENV.md carries the per-project matrix of which app needs which.
  */
 const overrides: Record<AppKey, string | undefined> = {
   web: process.env.NEXT_PUBLIC_APP_URL,
