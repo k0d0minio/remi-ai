@@ -15,4 +15,8 @@ export type PatientRecommendation = Entity & {
   category: RecommendationCategory;
   title: string;
   detail: string;
+  /** Rank within the category, ascending. */
+  position: number;
+  /** Set when the entry leaves the active protocol without leaving the record. */
+  archivedAt: Date | null;
 };

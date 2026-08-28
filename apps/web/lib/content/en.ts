@@ -307,6 +307,14 @@ export const en: Content = {
     },
     empty:
       "Your recommendations will appear here once your practitioner has encoded them.",
+    profileTitle: "Your profile",
+    constraintsTitle: "To avoid",
+    preferencesTitle: "Your preferences",
+    medicationsTitle: "Current medication",
+    supplementsTitle: "Supplements",
+    ageLabel: "years old",
+    heightLabel: "cm",
+    weightLabel: "kg",
     disclaimer: {
       title: "Your practitioner stays the reference",
       body: "This page reflects what was agreed in consultation. It does not diagnose and does not replace medical advice.",

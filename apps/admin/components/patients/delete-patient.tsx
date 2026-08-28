@@ -21,37 +21,39 @@ type Props = {
 
 /**
  * The one truly destructive act on this page, so it takes a dialog, not a
- * second click: the profile, its recommendations and its patient link all go,
- * and there is no undo and — until REMI-014 lands the audit trail — no trace.
+ * second click: the profile, its recommendations, its notes and its patient
+ * link all go, and there is no undo. The audit trail records who did it and
+ * which profile it was, which is the only thing that survives.
  */
 export const DeletePatient = ({ patientId, pseudonym }: Props) => (
   <Dialog>
     <DialogTrigger asChild>
       <Button type="button" variant="error" size="sm">
         <Trash2 aria-hidden="true" />
-        Delete this patient
+        Supprimer ce profil
       </Button>
     </DialogTrigger>
 
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Delete {pseudonym}?</DialogTitle>
+        <DialogTitle>Supprimer {pseudonym} ?</DialogTitle>
         <DialogDescription>
-          This removes the profile, every encoded recommendation and the patient
-          link. Anyone holding the link loses access. There is no undo.
+          Le profil, toutes ses recommandations, ses notes de consultation et
+          son lien patient sont supprimés. Toute personne détenant le lien perd
+          l&apos;accès. Il n&apos;y a pas de retour en arrière.
         </DialogDescription>
       </DialogHeader>
 
       <DialogFooter>
         <DialogClose asChild>
           <Button type="button" variant="outline">
-            Cancel
+            Annuler
           </Button>
         </DialogClose>
         <form action={deletePatientAction}>
           <input type="hidden" name="id" value={patientId} />
           <Button type="submit" variant="error">
-            Delete patient
+            Supprimer le profil
           </Button>
         </form>
       </DialogFooter>

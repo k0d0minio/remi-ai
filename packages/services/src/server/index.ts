@@ -25,28 +25,67 @@ export {
   getPatient,
   getPatientByShareToken,
   listPatients,
+  recordPatientLinkOpened,
   regenerateShareToken,
   updatePatient,
 } from "../db/services/patients";
-export type { PatientInput } from "../db/services/patients";
+export type {
+  PatientInput,
+  PatientQuery,
+  PatientSort,
+} from "../db/services/patients";
 
 export {
   addPatientRecommendation,
+  archivePatientRecommendation,
   deletePatientRecommendation,
+  listArchivedPatientRecommendations,
   listPatientRecommendations,
+  movePatientRecommendation,
   updatePatientRecommendation,
 } from "../db/services/patient-recommendations";
 export type { RecommendationInput } from "../db/services/patient-recommendations";
 
 export {
+  addPatientNote,
+  deletePatientNote,
+  listPatientNotes,
+  updatePatientNote,
+} from "../db/services/patient-notes";
+export type { NoteInput } from "../db/services/patient-notes";
+
+export {
+  changeOperatorPassword,
   createOperator,
+  deleteOperator,
   findOperatorByEmail,
   getOperator,
   hasOperator,
+  listOperators,
+  setOperatorRole,
+  updateOperatorName,
   verifyOperator,
 } from "../db/services/operators";
 export type { OperatorInput } from "../db/services/operators";
-export type { Operator } from "../db/models/operator";
+export type { Operator, OperatorRole } from "../db/models/operator";
+
+export {
+  acceptInvitation,
+  createInvitation,
+  getInvitationByToken,
+  listInvitations,
+  revokeInvitation,
+} from "../db/services/operator-invitations";
+export type {
+  AcceptInput,
+  InvitationInput,
+  IssuedInvitation,
+} from "../db/services/operator-invitations";
+export type { OperatorInvitation } from "../db/models/operator-invitation";
+
+export { listAuditEvents, recordAuditEvent } from "../db/services/audit";
+export type { AuditActor, AuditQuery, AuditRecord } from "../db/services/audit";
+export type { AuditAction, AuditEvent } from "../db/models/audit-event";
 
 export { hashPassword, verifyPassword } from "../auth/password";
 export {
@@ -60,6 +99,8 @@ export {
   createResendMailer,
   getMailer,
   isMailerRegistered,
+  operatorInvitationEmail,
+  patientLinkEmail,
   registerMailer,
   sendEmail,
 } from "../email";

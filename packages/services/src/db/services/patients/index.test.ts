@@ -7,6 +7,7 @@ import {
   getPatient,
   getPatientByShareToken,
   listPatients,
+  recordPatientLinkOpened,
   regenerateShareToken,
   updatePatient,
 } from "./index";
@@ -23,6 +24,13 @@ const unwrapOk = <T>(result: { ok: true; data: T } | { ok: false }): T => {
   return result.data;
 };
 
+/**
+ * `lastEditedAt` is millisecond-resolution, so two writes in the same tick are
+ * indistinguishable. The ordering assertions below need a real gap, not a
+ * faster machine.
+ */
+const tick = () => new Promise((resolve) => setTimeout(resolve, 5));
+
 describe("patient profiles", () => {
   it("creates with defaults and an unguessable share token", async () => {
     const patient = unwrapOk(await createPatient({ pseudonym: "Claire" }));
@@ -31,6 +39,11 @@ describe("patient profiles", () => {
     expect(patient.email).toBeNull();
     expect(patient.locale).toBe("fr");
     expect(patient.status).toBe("active");
+    expect(patient.sex).toBe("unspecified");
+    expect(patient.birthDate).toBeNull();
+    expect(patient.heightCm).toBeNull();
+    expect(patient.weightKg).toBeNull();
+    expect(patient.linkLastOpenedAt).toBeNull();
     expect(patient.shareToken.length).toBeGreaterThanOrEqual(24);
   });
 
@@ -108,5 +121,158 @@ describe("patient profiles", () => {
     expect((await getPatient(created.id)).ok).toBe(false);
     const remaining = await listPatients();
     expect(remaining.some((patient) => patient.id === created.id)).toBe(false);
+  });
+});
+
+describe("clinical fields", () => {
+  it("records a birth date, sex and measurements", async () => {
+    const created = unwrapOk(
+      await createPatient({
+        pseudonym: "Alix",
+        birthDate: "1984-03-11",
+        sex: "female",
+        heightCm: "168",
+        weightKg: "62.5",
+        medications: "levothyroxine 50 µg",
+        supplements: "vitamin D",
+        referral: "Dr Laurent",
+      }),
+    );
+    expect(created.birthDate).toBe("1984-03-11");
+    expect(created.sex).toBe("female");
+    expect(created.heightCm).toBe(168);
+    expect(created.weightKg).toBe(62.5);
+    expect(created.medications).toBe("levothyroxine 50 µg");
+    expect(created.referral).toBe("Dr Laurent");
+  });
+
+  it("rejects a malformed birth date and an out-of-range measurement", async () => {
+    expect(
+      (await createPatient({ pseudonym: "Bad", birthDate: "11/03/1984" })).ok,
+    ).toBe(false);
+    expect(
+      (await createPatient({ pseudonym: "Bad", birthDate: "1984-13-45" })).ok,
+    ).toBe(false);
+    expect((await createPatient({ pseudonym: "Bad", heightCm: "0" })).ok).toBe(
+      false,
+    );
+    expect(
+      (await createPatient({ pseudonym: "Bad", weightKg: "heavy" })).ok,
+    ).toBe(false);
+  });
+
+  it("clears an optional number and date with an empty string", async () => {
+    const created = unwrapOk(
+      await createPatient({
+        pseudonym: "Clear",
+        birthDate: "1990-01-01",
+        heightCm: "170",
+        weightKg: "70",
+      }),
+    );
+    const cleared = unwrapOk(
+      await updatePatient(created.id, {
+        birthDate: "",
+        heightCm: "",
+        weightKg: "",
+      }),
+    );
+    expect(cleared.birthDate).toBeNull();
+    expect(cleared.heightCm).toBeNull();
+    expect(cleared.weightKg).toBeNull();
+  });
+});
+
+describe("the roster query", () => {
+  it("searches the pseudonym, the full name and the email", async () => {
+    await createPatient({
+      pseudonym: "Zephyr",
+      fullName: "Camille Rousseau",
+      email: "camille@example.com",
+    });
+    expect(
+      (await listPatients({ search: "zeph" })).some(
+        (patient) => patient.pseudonym === "Zephyr",
+      ),
+    ).toBe(true);
+    expect(
+      (await listPatients({ search: "ROUSSEAU" })).some(
+        (patient) => patient.pseudonym === "Zephyr",
+      ),
+    ).toBe(true);
+    expect(
+      (await listPatients({ search: "camille@" })).some(
+        (patient) => patient.pseudonym === "Zephyr",
+      ),
+    ).toBe(true);
+    expect(await listPatients({ search: "no such patient" })).toEqual([]);
+  });
+
+  it("filters by status, and 'all' is not a filter", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "Paused one" }));
+    await updatePatient(created.id, { status: "paused" });
+
+    const paused = await listPatients({ status: "paused" });
+    expect(paused.every((patient) => patient.status === "paused")).toBe(true);
+    expect(paused.some((patient) => patient.id === created.id)).toBe(true);
+
+    const active = await listPatients({ status: "active" });
+    expect(active.some((patient) => patient.id === created.id)).toBe(false);
+
+    const all = await listPatients({ status: "all" });
+    expect(all.length).toBeGreaterThan(paused.length);
+  });
+
+  it("sorts by name, and by the last operator edit", async () => {
+    const byName = await listPatients({ sort: "name" });
+    const pseudonyms = byName.map((patient) => patient.pseudonym);
+    expect(pseudonyms).toEqual(
+      [...pseudonyms].sort((a, b) => a.localeCompare(b, "fr")),
+    );
+
+    const target = unwrapOk(await createPatient({ pseudonym: "Most recent" }));
+    await tick();
+    await updatePatient(target.id, { objective: "touched last" });
+    const byRecent = await listPatients({ sort: "recent" });
+    expect(byRecent[0]?.id).toBe(target.id);
+  });
+});
+
+describe("the share link's last-opened stamp", () => {
+  it("records the first open and leaves the operator's edit stamp alone", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "Opened" }));
+    await tick();
+    await recordPatientLinkOpened(created.id);
+
+    const opened = unwrapOk(await getPatient(created.id));
+    expect(opened.linkLastOpenedAt).not.toBeNull();
+    // The whole reason the two timestamps are separate columns: a patient
+    // reading their page must not reorder Morgane's roster.
+    expect(opened.lastEditedAt.getTime()).toBe(created.lastEditedAt.getTime());
+  });
+
+  it("does not rewrite the stamp on a second open inside the interval", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "Hammered" }));
+    await recordPatientLinkOpened(created.id);
+    const first = unwrapOk(await getPatient(created.id)).linkLastOpenedAt;
+
+    await tick();
+    await recordPatientLinkOpened(created.id);
+    const second = unwrapOk(await getPatient(created.id)).linkLastOpenedAt;
+
+    expect(second?.getTime()).toBe(first?.getTime());
+  });
+
+  it("forgets the stamp when the link is regenerated", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "Rotated" }));
+    await recordPatientLinkOpened(created.id);
+    const regenerated = unwrapOk(await regenerateShareToken(created.id));
+    expect(regenerated.linkLastOpenedAt).toBeNull();
+  });
+
+  it("ignores a malformed id rather than throwing", async () => {
+    await expect(
+      recordPatientLinkOpened("not-a-uuid"),
+    ).resolves.toBeUndefined();
   });
 });

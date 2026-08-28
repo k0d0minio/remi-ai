@@ -25,17 +25,17 @@ const ErrorBoundary = ({ error, reset }: Props) => (
       <div className="text-error-text flex items-center gap-2">
         <TriangleAlert aria-hidden="true" className="size-4" />
         <Typography variant="eyebrow" as="span">
-          Error
+          Erreur
         </Typography>
       </div>
 
       <div className="flex flex-col gap-2">
         <Typography as="h1" size="xl" weight="semibold" balance>
-          This view could not be loaded
+          Cette page n&apos;a pas pu être chargée
         </Typography>
         <Typography size="sm" tone="muted">
-          Nothing was changed by the attempt. Retry the view; if it fails again,
-          quote the reference below when you report it.
+          Rien n&apos;a été modifié. Réessayez ; si l&apos;erreur revient,
+          transmettez la référence ci-dessous.
         </Typography>
         {error.digest ? (
           <Typography size="xs" tone="muted">
@@ -46,7 +46,7 @@ const ErrorBoundary = ({ error, reset }: Props) => (
 
       <Button size="sm" onClick={reset}>
         <RotateCcw aria-hidden="true" />
-        Retry
+        Réessayer
       </Button>
     </CardContent>
   </Card>

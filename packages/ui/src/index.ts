@@ -26,6 +26,7 @@ export {
 export { Avatar, AvatarFallback, AvatarImage } from "./components/avatar";
 export { Button } from "./components/button";
 export { Checkbox } from "./components/checkbox";
+export { CopyButton } from "./components/copy-button";
 export {
   Dialog,
   DialogClose,

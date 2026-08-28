@@ -12,18 +12,22 @@ import {
 import { Badge, Wordmark } from "@remi/ui/server";
 import { NavLinks } from "@/components/shell/nav-links";
 
+type Props = {
+  canManageOperators: boolean;
+};
+
 /**
  * The sidebar is fixed and hidden below `lg`, so the same links need a second
- * home on a narrow screen. The console is desktop work, but an operator reading
- * an alert on a phone should still be able to reach the section it names.
+ * home on a narrow screen. Morgane works from her phone between consultations,
+ * so this is not the afterthought it usually is in a console.
  */
-export const MobileNav = () => {
+export const MobileNav = ({ canManageOperators }: Props) => {
   const [open, setOpen] = useState(false);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
-        aria-label="Open the console navigation"
+        aria-label="Ouvrir la navigation"
         className="focus-visible:ring-ring/40 hover:bg-accent rounded-md p-2 transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px] lg:hidden"
       >
         <Menu aria-hidden="true" className="size-5" />
@@ -36,8 +40,11 @@ export const MobileNav = () => {
             <Badge variant="warning">admin</Badge>
           </SheetTitle>
         </SheetHeader>
-        <nav aria-label="Console sections" className="px-3">
-          <NavLinks onNavigate={() => setOpen(false)} />
+        <nav aria-label="Sections de la console" className="px-3">
+          <NavLinks
+            canManageOperators={canManageOperators}
+            onNavigate={() => setOpen(false)}
+          />
         </nav>
       </SheetContent>
     </Sheet>

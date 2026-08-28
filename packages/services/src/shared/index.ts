@@ -8,6 +8,7 @@
  */
 
 export {
+  ageInYears,
   formatCurrency,
   formatDate,
   formatDateTime,
@@ -22,9 +23,17 @@ export {
   pickLocaleFromHeader,
 } from "./i18n";
 export type { Locale } from "./i18n";
+export { auditActions } from "./audit";
+export type { AuditActionName } from "./audit";
 export { appHref, appOrigin } from "./links";
 export type { AppKey } from "./links";
-export { patientStatuses, recommendationCategories } from "./patient";
+export { canManageOperators, isAtLeast, operatorRoles } from "./operator";
+export type { OperatorRoleName } from "./operator";
+export {
+  patientSexes,
+  patientStatuses,
+  recommendationCategories,
+} from "./patient";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
 export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";
@@ -34,6 +43,8 @@ export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";
  * otherwise server-only — costs the browser bundle nothing.
  */
 export type {
+  AuditAction,
+  AuditEvent,
   Consultation,
   FramePrinciple,
   GenotypeMarker,
@@ -42,8 +53,11 @@ export type {
   Meal,
   MealSlot,
   MealStatus,
+  OperatorRole,
+  PatientNote,
   PatientProfile,
   PatientRecommendation,
+  PatientSex,
   PatientStatus,
   PersonalisationDimension,
   PersonalisationProfile,

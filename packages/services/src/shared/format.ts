@@ -46,3 +46,28 @@ export const initials = (name: string) =>
     .slice(0, 2)
     .map((part) => part.charAt(0).toUpperCase())
     .join("");
+
+/**
+ * Whole years since a `YYYY-MM-DD` birth date, or null when there is no date
+ * or the string is not one. Derived at every read site rather than stored: an
+ * age written to a column is wrong from the next birthday onwards.
+ */
+export const ageInYears = (birthDate: string | null): number | null => {
+  if (!birthDate) {
+    return null;
+  }
+  const born = new Date(`${birthDate}T00:00:00Z`);
+  if (Number.isNaN(born.getTime())) {
+    return null;
+  }
+  const now = new Date();
+  let age = now.getUTCFullYear() - born.getUTCFullYear();
+  const monthDelta = now.getUTCMonth() - born.getUTCMonth();
+  if (
+    monthDelta < 0 ||
+    (monthDelta === 0 && now.getUTCDate() < born.getUTCDate())
+  ) {
+    age -= 1;
+  }
+  return age >= 0 && age < 130 ? age : null;
+};
