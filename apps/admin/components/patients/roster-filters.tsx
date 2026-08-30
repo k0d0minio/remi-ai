@@ -17,6 +17,9 @@ import { patientStatusLabels } from "@/components/patients/vocabulary";
 
 type Sort = "recent" | "name" | "created";
 
+/** What has been typed into the search box, and the URL it was typed against. */
+type Typed = { value: string; from: string };
+
 type Props = {
   search: string;
   status: PatientStatus | "all";
@@ -68,13 +71,17 @@ const rosterHref = (q: string, status: string, sort: string) => {
  */
 export const RosterFilters = ({ search, status, sort }: Props) => {
   const router = useRouter();
-  const [query, setQuery] = useState(search);
 
   // The URL is the source of truth: a back navigation has to move the input,
-  // not be overwritten by it.
-  useEffect(() => {
-    setQuery(search);
-  }, [search]);
+  // not be overwritten by it. So what has been typed is not mirrored into
+  // state — it is an override on the URL that lasts exactly as long as the URL
+  // it was typed against. `from` records that URL, and the moment a navigation
+  // moves it — a debounce landing, a back button, a reset — the override stops
+  // applying and the box reads the query string again, in the same render
+  // rather than one effect later.
+  const [typed, setTyped] = useState<Typed>({ value: search, from: search });
+  const query = typed.from === search ? typed.value : search;
+  const setQuery = (value: string) => setTyped({ value, from: search });
 
   // Typing navigates after a pause. The guard is what stops the effect firing
   // on the render that a completed navigation causes.

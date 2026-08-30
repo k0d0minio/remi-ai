@@ -70,6 +70,22 @@ export const listInvitations = async (): Promise<
 };
 
 /**
+ * Only the invitations still worth acting on: unaccepted, and not yet expired.
+ *
+ * It lives here rather than as a filter at the call site because deciding it
+ * means reading the clock, and a React render body may not do that — "pending"
+ * is one predicate, applied once, on the server.
+ */
+export const listPendingInvitations = async (): Promise<
+  readonly OperatorInvitation[]
+> => {
+  const now = Date.now();
+  return (await listInvitations()).filter((invitation) =>
+    isPending(invitation, now),
+  );
+};
+
+/**
  * Issues an invitation, replacing any invitation still pending for the same
  * address. Re-inviting is the normal response to "the mail never arrived", and
  * it must invalidate the previous link rather than leave two working — so the

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { listInvitations, listOperators } from "@remi/services/server";
+import { listOperators, listPendingInvitations } from "@remi/services/server";
 import { Typography } from "@remi/ui/server";
 import { InviteForm } from "@/components/operators/invite-form";
 import { InvitationList } from "@/components/operators/invitation-list";
@@ -26,15 +26,10 @@ const Team = async () => {
   const operator = await requireOwner();
   ensureDatabase();
 
-  const [operators, invitations] = await Promise.all([
+  const [operators, pending] = await Promise.all([
     listOperators(),
-    listInvitations(),
+    listPendingInvitations(),
   ]);
-  const pending = invitations.filter(
-    (invitation) =>
-      invitation.acceptedAt === null &&
-      invitation.expiresAt.getTime() > Date.now(),
-  );
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">

@@ -7,6 +7,7 @@ import {
   createInvitation,
   getInvitationByToken,
   listInvitations,
+  listPendingInvitations,
   revokeInvitation,
 } from "./index";
 
@@ -152,5 +153,22 @@ describe("operator invitations", () => {
     if (firstUsed !== -1) {
       expect(lastPending).toBeLessThan(firstUsed);
     }
+  });
+
+  it("leaves a used invitation out of the pending list", async () => {
+    const issued = unwrapOk(await invite("used@example.com"));
+    unwrapOk(
+      await acceptInvitation(issued.token, {
+        name: "Used Invite",
+        password: "a sufficiently long password",
+      }),
+    );
+
+    const emails = (list: readonly { email: string }[]) =>
+      list.map((invitation) => invitation.email);
+    expect(emails(await listPendingInvitations())).not.toContain(
+      "used@example.com",
+    );
+    expect(emails(await listInvitations())).toContain("used@example.com");
   });
 });
