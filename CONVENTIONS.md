@@ -1,7 +1,7 @@
 # Remi AI — conventions (canonical Layer 3 reference)
 
 The single source of truth for code style, design-system rules, and git conventions across the
-monorepo. `CLAUDE.md` (Layer 0) points here; the pipeline's Build stage loads this file by path;
+monorepo. `AGENTS.md` (Layer 0) points here; the pipeline's Build stage loads this file by path;
 the subtree `AGENTS.md` files link it. **Change a rule here and nowhere else.**
 
 ## Code style
