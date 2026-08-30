@@ -74,6 +74,7 @@ export {
   createInvitation,
   getInvitationByToken,
   listInvitations,
+  listPendingInvitations,
   revokeInvitation,
 } from "../db/services/operator-invitations";
 export type {
