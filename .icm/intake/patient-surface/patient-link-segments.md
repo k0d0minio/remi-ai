@@ -43,7 +43,7 @@ consultation notes — those never leave the console.
 - Phone-first is non-negotiable: patients open this from a WhatsApp message.
 - This surface is the FunMedDev demo candidate for 1 Dec (direction doc: patient experience,
   testable) — favour finished-feeling over feature-count.
-- The `(patient)` route group's fixture pages (today/meals/plan) are *not* this stub's to clean
+- The `(patient)` route group's fixture pages (today/meals/plan) are _not_ this stub's to clean
   up; do not wire the token anywhere near them.
 
 ## Open questions — flag these on pickup

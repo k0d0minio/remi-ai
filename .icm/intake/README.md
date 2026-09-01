@@ -10,10 +10,10 @@
 
 ## The backlog
 
-| Epic                                              | What it is                                                                                                       |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| [`patient-record/`](patient-record/breakdown.md)  | The manual patient record, deepened — consent, § A profile fields, structured anamnesis, goals, summary, supplements. Admin + data layer only. |
-| [`patient-surface/`](patient-surface/breakdown.md) | The content tools and the multi-page patient link — pantry essentials, recipe library, meal journal, `/p/[token]` segments. |
+| Epic                                               | What it is                                                                                                                                     |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`patient-record/`](patient-record/breakdown.md)   | The manual patient record, deepened — consent, § A profile fields, structured anamnesis, goals, summary, supplements. Admin + data layer only. |
+| [`patient-surface/`](patient-surface/breakdown.md) | The content tools and the multi-page patient link — pantry essentials, recipe library, meal journal, `/p/[token]` segments.                    |
 
 Run `patient-record` first: `patient-surface`'s link segments render its tables. Both epics are
 cut from Morgane's v2 structure brainstorm

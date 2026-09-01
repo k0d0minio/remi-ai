@@ -3,7 +3,7 @@
 The second batch cut from
 [`.icm/docs/collaboration/remi-v2-structure-brainstorm.docx`](../../docs/collaboration/remi-v2-structure-brainstorm.docx),
 after [`patient-record`](../patient-record/breakdown.md). That epic deepens what Morgane keeps;
-this one builds what she *hands over*: the pantry essentials, the recipe library, the meal journal
+this one builds what she _hands over_: the pantry essentials, the recipe library, the meal journal
 she transcribes from WhatsApp — and the private link where her patients read it all, at the real
 URL, in `apps/web`. Still **no AI anywhere**: Morgane authors every word; the tables are the
 permanent ones the AI round will later write into.
@@ -17,19 +17,19 @@ ones this epic leans on hardest:
 - **#3 — one token, multi-page.** `/p/[token]` grows sub-pages; the token in the path remains the
   whole credential; segments with nothing to show stay hidden.
 - **#5 — recipes are a shared library with per-patient assignment.** Chosen over per-patient
-  rows: Morgane reuses recipes across her 10–15 patients, personalising the *assignment*, not the
+  rows: Morgane reuses recipes across her 10–15 patients, personalising the _assignment_, not the
   recipe.
 - **#6 — the meal journal is text-only.** Photos stay in WhatsApp until a blob-storage vendor is
   chosen — an owner decision, flagged where it gates, never made in passing.
 
 ## Block map — brainstorm § → stub
 
-| Brainstorm block            | Stub                    | Note                                             |
-| --------------------------- | ----------------------- | ------------------------------------------------ |
-| H. PANTRY_ESSENTIALS        | `pantry-essentials`     | short list, item + why, per patient              |
-| I. RECIPES + WEEKLY_ADAPTATION | `recipe-library`     | library + assignment; the weekly set is the adaptation record |
-| § 5 loop + MEAL_FEEDBACK (+ PROGRESS learnings) | `meal-journal` | text-only entries + Morgane's feedback |
-| J. PATIENT_OUTPUT           | `patient-link-segments` | the multi-page link — a rendering, not a table   |
+| Brainstorm block                                | Stub                    | Note                                                          |
+| ----------------------------------------------- | ----------------------- | ------------------------------------------------------------- |
+| H. PANTRY_ESSENTIALS                            | `pantry-essentials`     | short list, item + why, per patient                           |
+| I. RECIPES + WEEKLY_ADAPTATION                  | `recipe-library`        | library + assignment; the weekly set is the adaptation record |
+| § 5 loop + MEAL_FEEDBACK (+ PROGRESS learnings) | `meal-journal`          | text-only entries + Morgane's feedback                        |
+| J. PATIENT_OUTPUT                               | `patient-link-segments` | the multi-page link — a rendering, not a table                |
 
 PROGRESS is deliberately split across the two epics: goal check-ins live in `patient-record`
 (`goals-and-instruction`); what-works/what-doesn't observations live here on the meal journal.

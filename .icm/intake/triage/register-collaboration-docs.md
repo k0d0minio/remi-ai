@@ -16,7 +16,7 @@ Morgane wants, and cannot know whether it outranks the braindump where they disa
 
 The fix is documentation only: list `collaboration/` in the README's contents and give the
 brainstorm a row in the precedence table. Where it ranks is the owner's call to confirm —
-plausibly with the braindump on *what REMI is* (it is her material, newer and more precise on the
+plausibly with the braindump on _what REMI is_ (it is her material, newer and more precise on the
 V2 structure), still below `new-development-direction.docx` on sequencing — but propose, don't
 decide.
 

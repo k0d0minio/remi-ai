@@ -9,7 +9,7 @@
 
 ## What this is
 
-§ G gives supplements a minimal but *structured* display: name, dose if needed, moment of intake
+§ G gives supplements a minimal but _structured_ display: name, dose if needed, moment of intake
 if needed, reason. Today they live in two prose places at once — the `supplements` free-text field
 on the profile (what the patient already takes) and, sometimes, recommendations under the existing
 `supplement` category (what Morgane prescribes). Neither can render § G's four columns, and the
@@ -30,7 +30,7 @@ Two boundaries hold the scope down:
   No migration, no merge.
 - **The `supplement` recommendation category is settled, not silently duplicated.** Two homes for
   the same prescription is how the link shows a protocol twice. Recommended resolution: the
-  category is retired from the *add* form (existing rows untouched, still rendered) and the new
+  category is retired from the _add_ form (existing rows untouched, still rendered) and the new
   protocol card takes over — but that changes what Morgane's encoding habit, so it is hers to
   confirm, not the build's to assume.
 

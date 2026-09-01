@@ -13,7 +13,7 @@ Today the anamnesis is one text column on the profile. § B structures it into t
 motif et attentes; santé; alimentation; hydratation; digestion; élimination; sommeil / stress /
 énergie; immunité / ORL / respiration; cardiovasculaire / lymphatique; ostéo-articulaire /
 activité; endocrinien / gynéco; contexte de vie — because the eventual model is a questionnaire
-and a consultation transcript *filling these slots automatically*, with Morgane correcting rather
+and a consultation transcript _filling these slots automatically_, with Morgane correcting rather
 than re-typing.
 
 Manual-first version: one free-text body per category, per patient. Morgane types into whichever
@@ -26,7 +26,7 @@ The existing `anamnesis` blob is preserved: it becomes the seed content Morgane 
 hand, and the old field disappears from the form only once she has emptied it (keep the column
 until then — its retirement is a follow-up `tweak`, cut when she is done).
 
-Design the storage so the AI round *writes into the same slots* (a category row gaining
+Design the storage so the AI round _writes into the same slots_ (a category row gaining
 machine-drafted content pending her correction is a new writer, not a new table).
 
 ## Worth knowing

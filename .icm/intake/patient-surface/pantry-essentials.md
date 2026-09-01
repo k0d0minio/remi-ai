@@ -10,7 +10,7 @@
 
 ## What this is
 
-§ H: a short list of foods worth having in the placard and the frigo, chosen for *this* patient —
+§ H: a short list of foods worth having in the placard and the frigo, chosen for _this_ patient —
 each item with a simple, personalised justification ("sardines — oméga-3, et tu aimes ça"). In the
 target model the AI drafts the list and Morgane validates; manual-first, she writes it herself,
 and § H's own warning becomes the design rule: **no per-item fields like quantity, season or

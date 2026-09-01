@@ -23,7 +23,7 @@ belongs to no one patient.
 **The assignment.** Giving a recipe to a patient adds: a personal note ("pourquoi pour toi" —
 § H's justification logic applied to recipes), a date, and a status (active / archived). The
 **weekly refresh is the WEEKLY_ADAPTATION record**: each week Morgane assigns the new
-inspirations, archives what rotates out, and the dated assignment trail *is* the adaptation
+inspirations, archives what rotates out, and the dated assignment trail _is_ the adaptation
 history the AI round will later learn from. On the patient page, an "assign from library" picker
 plus the patient's current and past assignments.
 
@@ -45,7 +45,7 @@ The patient link renders active assignments (title, body, her note) in `patient-
 - Editing an assigned recipe edits it for every patient holding it. Fine for fixing a typo; wrong
   for personalising a variant. Does Morgane want "duplicate to variant" from day one, or accept
   shared edits during the beta? Ask her.
-- Weekly cadence: § I says new inspirations each week. Does she want the tool to *mark* weeks
+- Weekly cadence: § I says new inspirations each week. Does she want the tool to _mark_ weeks
   (assignments grouped by week label) or is the assignment date enough? Don't build a week entity
   without her asking for one.
 - Tags at launch: which, if any?

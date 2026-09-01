@@ -32,7 +32,7 @@ epic's call, not this stub's).
 
 ## Worth knowing
 
-- Regime and budget want to be *light*: free text, or a short suggestion list at most. § 7 of the
+- Regime and budget want to be _light_: free text, or a short suggestion list at most. § 7 of the
   brainstorm forbids fine-grained fields nobody needs; an enum here would also freeze vocabulary
   that is still Morgane's to invent.
 - Vocabulary constants (if any) live in `packages/services/src/shared/patient.ts`; models stay

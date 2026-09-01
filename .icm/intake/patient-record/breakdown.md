@@ -36,14 +36,14 @@ Settled in the session that cut this epic — do not relitigate them at build ti
 
 ## Block map — brainstorm § → stub
 
-| Brainstorm block                | Stub                    | Note                                            |
-| ------------------------------- | ----------------------- | ----------------------------------------------- |
-| A. PATIENT_PROFILE              | `profile-fields`        | regime, allergies/intolerances, cooking, budget |
-| B. ANAMNESIS                    | `anamnesis-structure`   | her 12 categories, structured                   |
-| C. PATIENT_SUMMARY              | `living-summary`        | manual now; the AI drafts into it later         |
-| D. PRIORITY_GOALS + E. INSTRUCTION | `goals-and-instruction` | one stub — both are practitioner steering    |
-| G. SUPPLEMENTS                  | `supplement-protocol`   | must settle the `supplement` category overlap   |
-| (consent / data protection)     | `data-care`             | replaces what purged REMI-015 covered           |
+| Brainstorm block                   | Stub                    | Note                                            |
+| ---------------------------------- | ----------------------- | ----------------------------------------------- |
+| A. PATIENT_PROFILE                 | `profile-fields`        | regime, allergies/intolerances, cooking, budget |
+| B. ANAMNESIS                       | `anamnesis-structure`   | her 12 categories, structured                   |
+| C. PATIENT_SUMMARY                 | `living-summary`        | manual now; the AI drafts into it later         |
+| D. PRIORITY_GOALS + E. INSTRUCTION | `goals-and-instruction` | one stub — both are practitioner steering       |
+| G. SUPPLEMENTS                     | `supplement-protocol`   | must settle the `supplement` category overlap   |
+| (consent / data protection)        | `data-care`             | replaces what purged REMI-015 covered           |
 
 F. RECOMMENDATIONS already exists (`patient_recommendations`). H. PANTRY_ESSENTIALS,
 I. RECIPES, J. PATIENT_OUTPUT and the §5 meal loop are the `patient-surface` epic.

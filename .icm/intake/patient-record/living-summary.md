@@ -25,7 +25,7 @@ start of a consultation.
 
 Because a patient will read it, the admin UI says so where she edits it ("visible sur le lien
 patient une fois les segments en ligne") — the one summary serving both readers is the point:
-writing it *for* the patient is what § C's "pas de ressaisie" becomes without an AI to do the
+writing it _for_ the patient is what § C's "pas de ressaisie" becomes without an AI to do the
 translating.
 
 ## Worth knowing
@@ -33,7 +33,7 @@ translating.
 - One column on `patient_profiles` versus a one-row-per-patient table: the spec decides, but note
   the AI round will want draft-vs-validated states on this content — leave room for that to be a
   column addition, not a re-model.
-- Keep § C's checklist of what a summary covers as *guidance in the UI* (placeholder or helper
+- Keep § C's checklist of what a summary covers as _guidance in the UI_ (placeholder or helper
   text), not as separate fields — § 4's principle: background tables must not become a manual
   entry burden.
 - Writes audit via `lib/audit.ts`.
