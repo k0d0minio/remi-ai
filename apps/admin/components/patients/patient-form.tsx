@@ -2,7 +2,13 @@
 
 import { useActionState } from "react";
 import type { Locale, PatientProfile } from "@remi/services/shared";
-import { locales, patientSexes, patientStatuses } from "@remi/services/shared";
+import {
+  consentChannels,
+  formatDate,
+  locales,
+  patientSexes,
+  patientStatuses,
+} from "@remi/services/shared";
 import {
   Button,
   Select,
@@ -11,12 +17,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@remi/ui";
-import { Field, Input, Separator, Textarea, Typography } from "@remi/ui/server";
+import {
+  Badge,
+  Field,
+  Input,
+  Separator,
+  Textarea,
+  Typography,
+} from "@remi/ui/server";
 import {
   savePatientAction,
   type PatientFormState,
 } from "@/lib/patients/actions";
 import {
+  consentChannelLabels,
   patientSexLabels,
   patientStatusLabels,
 } from "@/components/patients/vocabulary";
@@ -44,6 +58,13 @@ type Props = {
  */
 export const PatientForm = ({ patient }: Props) => {
   const [state, action, pending] = useActionState(savePatientAction, initial);
+
+  // Both halves or neither: a date with no channel says nothing about what the
+  // patient actually agreed through, so it still reads as not recorded.
+  const consent =
+    patient?.consentDate && patient.consentChannel
+      ? { date: patient.consentDate, channel: patient.consentChannel }
+      : null;
 
   return (
     <form action={action} className="flex flex-col gap-6">
@@ -126,6 +147,70 @@ export const PatientForm = ({ patient }: Props) => {
               </Select>
             </Field>
           ) : null}
+        </div>
+      </div>
+
+      <Separator tone="subtle" />
+
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Typography as="h3" variant="eyebrow" tone="muted">
+            Consentement
+          </Typography>
+          {consent ? (
+            <Badge variant="success" tone="subtle" size="sm">
+              {`Recueilli le ${formatDate(consent.date)} · ${consentChannelLabels[consent.channel]}`}
+            </Badge>
+          ) : (
+            <Badge variant="warning" tone="subtle" size="sm">
+              Pas encore enregistré
+            </Badge>
+          )}
+        </div>
+
+        <Typography size="sm" tone="muted">
+          Quand et comment la personne a accepté que REMI conserve son dossier
+          et que le lien patient existe. C&apos;est un fait consigné : rien
+          n&apos;est bloqué tant qu&apos;il manque.
+        </Typography>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            id="consentDate"
+            label="Date du consentement"
+            optional
+            hint="Le jour où la personne a accepté."
+          >
+            <Input
+              id="consentDate"
+              name="consentDate"
+              type="date"
+              defaultValue={patient?.consentDate ?? ""}
+            />
+          </Field>
+
+          <Field
+            id="consentChannel"
+            label="Canal"
+            optional
+            hint="Par quel biais l'accord a été donné."
+          >
+            <Select
+              name="consentChannel"
+              defaultValue={patient?.consentChannel ?? ""}
+            >
+              <SelectTrigger id="consentChannel">
+                <SelectValue placeholder="Non renseigné" />
+              </SelectTrigger>
+              <SelectContent>
+                {consentChannels.map((channel) => (
+                  <SelectItem key={channel} value={channel}>
+                    {consentChannelLabels[channel]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
         </div>
       </div>
 

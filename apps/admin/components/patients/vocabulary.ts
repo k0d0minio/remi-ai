@@ -1,4 +1,5 @@
 import type {
+  ConsentChannel,
   PatientSex,
   PatientStatus,
   RecommendationCategory,
@@ -32,6 +33,13 @@ export const patientSexLabels: Record<PatientSex, string> = {
   male: "homme",
   other: "autre",
   unspecified: "non précisé",
+};
+
+/** How the consent was given — read on the profile and in the select. */
+export const consentChannelLabels: Record<ConsentChannel, string> = {
+  consultation: "en consultation",
+  whatsapp: "WhatsApp",
+  email: "email",
 };
 
 export const categoryLabels: Record<RecommendationCategory, string> = {
