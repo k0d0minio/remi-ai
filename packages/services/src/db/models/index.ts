@@ -13,6 +13,7 @@ export type { Operator, OperatorRole } from "./operator";
 export type { OperatorInvitation } from "./operator-invitation";
 export type { PatientNote } from "./patient-note";
 export type {
+  ConsentChannel,
   PatientProfile,
   PatientSex,
   PatientStatus,

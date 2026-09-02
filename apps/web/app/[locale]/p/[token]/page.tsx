@@ -165,13 +165,23 @@ const PatientLink = async ({ params }: { params: Promise<Params> }) => {
       ) : null}
 
       <Card variant="info">
-        <CardContent className="flex flex-col gap-1.5">
-          <Typography as="h2" size="sm" weight="semibold">
-            {content.disclaimer.title}
-          </Typography>
-          <Typography size="sm" tone="muted">
-            {content.disclaimer.body}
-          </Typography>
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <Typography as="h2" size="sm" weight="semibold">
+              {content.disclaimer.title}
+            </Typography>
+            <Typography size="sm" tone="muted">
+              {content.disclaimer.body}
+            </Typography>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Typography as="h2" size="sm" weight="semibold">
+              {content.privacy.title}
+            </Typography>
+            <Typography size="sm" tone="muted">
+              {content.privacy.body}
+            </Typography>
+          </div>
         </CardContent>
       </Card>
 

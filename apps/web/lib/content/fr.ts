@@ -319,6 +319,10 @@ export const fr: Content = {
       title: "Votre praticienne reste la référence",
       body: "Cette page reprend ce qui a été convenu en consultation. Elle ne pose pas de diagnostic et ne remplace pas un avis médical.",
     },
+    privacy: {
+      title: "Vos données et ce lien",
+      body: "Cette page n'affiche que ce que votre praticienne a encodé pour vous : votre profil et vos recommandations. Elle n'apparaît pas dans les moteurs de recherche, mais elle s'ouvre sans mot de passe — toute personne disposant du lien peut la lire, ne le transmettez donc qu'aux personnes de votre choix. Pour consulter, corriger ou faire supprimer vos données, écrivez à votre praticienne : personne d'autre n'y a accès.",
+    },
     betaNote:
       "REMI est en version bêta — vos retours sont les bienvenus, dites-nous ce qui manque ou ce qui gêne.",
   },
