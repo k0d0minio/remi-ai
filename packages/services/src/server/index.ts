@@ -47,6 +47,17 @@ export {
 export type { RecommendationInput } from "../db/services/patient-recommendations";
 
 export {
+  addPantryEssential,
+  archivePantryEssential,
+  deletePantryEssential,
+  listArchivedPantryEssentials,
+  listPantryEssentials,
+  movePantryEssential,
+  updatePantryEssential,
+} from "../db/services/pantry-essentials";
+export type { PantryEssentialInput } from "../db/services/pantry-essentials";
+
+export {
   addPatientNote,
   deletePatientNote,
   listPatientNotes,
