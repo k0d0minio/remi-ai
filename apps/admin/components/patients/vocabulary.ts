@@ -1,4 +1,5 @@
 import type {
+  AnamnesisCategory,
   ConsentChannel,
   CookingAffinity,
   PatientSex,
@@ -73,3 +74,24 @@ export const dietaryRegimeSuggestions = [
   "halal",
   "casher",
 ] as const;
+
+/**
+ * § B's twelve areas of enquiry, worded as Morgane's brainstorm words them.
+ * The keys are what the database stores, so retitling one — or dropping one
+ * from `anamnesisCategories` — is an edit here and in that constant, never a
+ * migration.
+ */
+export const anamnesisCategoryLabels: Record<AnamnesisCategory, string> = {
+  motive: "Motif et attentes",
+  health: "Santé",
+  nutrition: "Alimentation",
+  hydration: "Hydratation",
+  digestion: "Digestion",
+  elimination: "Élimination",
+  sleep: "Sommeil, stress, énergie",
+  immunity: "Immunité, ORL, respiration",
+  cardiovascular: "Cardiovasculaire, lymphatique",
+  musculoskeletal: "Ostéo-articulaire, activité",
+  endocrine: "Endocrinien, gynéco",
+  context: "Contexte de vie",
+};
