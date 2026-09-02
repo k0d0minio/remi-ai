@@ -319,6 +319,10 @@ export const en: Content = {
       title: "Your practitioner stays the reference",
       body: "This page reflects what was agreed in consultation. It does not diagnose and does not replace medical advice.",
     },
+    privacy: {
+      title: "Your data and this link",
+      body: "This page shows only what your practitioner recorded for you: your profile and your recommendations. It does not appear in search engines, but it opens without a password — anyone holding the link can read it, so pass it on only to people you choose. To see, correct or have your data deleted, write to your practitioner: nobody else has access.",
+    },
     betaNote:
       "REMI is in beta — feedback is welcome, tell us what is missing or in the way.",
   },

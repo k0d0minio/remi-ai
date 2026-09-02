@@ -314,6 +314,12 @@ export type Content = {
     heightLabel: string;
     weightLabel: string;
     disclaimer: PlaceholderContent;
+    /**
+     * What this page is, who can open it, and who to ask about the data.
+     * Sits in the disclaimer card because a patient reading one is reading
+     * the other: both answer "what am I looking at, and who is behind it".
+     */
+    privacy: PlaceholderContent;
     /** The beta framing consultants read before giving UX feedback. */
     betaNote: string;
   };
