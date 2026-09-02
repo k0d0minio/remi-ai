@@ -166,6 +166,36 @@ export const patientNotes = pgTable("patient_notes", {
   ...timestamps,
 });
 
+/**
+ * The short list of foods worth keeping in the placard and the frigo, chosen
+ * for this patient — brainstorm § H. An item is a name and a why, and that is
+ * the whole design: § H warns explicitly against per-item quantity, season or
+ * nutrient fields, so their absence here is the rule, not an omission.
+ *
+ * Placard vs frigo is § H's framing, not its data. The list is flat until
+ * Morgane says she thinks in sections; if she does, that is one optional label
+ * column, never a taxonomy.
+ */
+export const patientPantryEssentials = pgTable("patient_pantry_essentials", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  /** The food, as Morgane writes it — "sardines", not a catalogue entry. */
+  item: text("item").notNull(),
+  /** Why it is on *this* patient's list — "oméga-3, et tu aimes ça". */
+  why: text("why").notNull().default(""),
+  /** Her order for the list. Sparse by design — a reorder rewrites the run. */
+  position: integer("position").notNull().default(0),
+  /**
+   * A list refresh archives what dropped off rather than deleting it: the
+   * trail of what changed between consultations is part of the record, the
+   * same reasoning as the recommendations above.
+   */
+  archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
+
 export const operators = pgTable("operators", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
