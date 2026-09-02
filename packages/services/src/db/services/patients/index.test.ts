@@ -43,6 +43,8 @@ describe("patient profiles", () => {
     expect(patient.birthDate).toBeNull();
     expect(patient.heightCm).toBeNull();
     expect(patient.weightKg).toBeNull();
+    expect(patient.consentDate).toBeNull();
+    expect(patient.consentChannel).toBeNull();
     expect(patient.linkLastOpenedAt).toBeNull();
     expect(patient.shareToken.length).toBeGreaterThanOrEqual(24);
   });
@@ -180,6 +182,79 @@ describe("clinical fields", () => {
     expect(cleared.birthDate).toBeNull();
     expect(cleared.heightCm).toBeNull();
     expect(cleared.weightKg).toBeNull();
+  });
+});
+
+describe("consent", () => {
+  it("records a date and a channel", async () => {
+    const created = unwrapOk(
+      await createPatient({
+        pseudonym: "Consented",
+        consentDate: "2026-08-14",
+        consentChannel: "whatsapp",
+      }),
+    );
+    expect(created.consentDate).toBe("2026-08-14");
+    expect(created.consentChannel).toBe("whatsapp");
+  });
+
+  it("records it after the fact, without touching the rest of the profile", async () => {
+    const created = unwrapOk(
+      await createPatient({ pseudonym: "Later", objective: "sleep better" }),
+    );
+    expect(created.consentDate).toBeNull();
+
+    const updated = unwrapOk(
+      await updatePatient(created.id, {
+        consentDate: "2026-09-01",
+        consentChannel: "consultation",
+      }),
+    );
+    expect(updated.consentDate).toBe("2026-09-01");
+    expect(updated.consentChannel).toBe("consultation");
+    expect(updated.objective).toBe("sleep better");
+  });
+
+  it("rejects a channel outside the closed set and a malformed date", async () => {
+    expect(
+      (
+        await createPatient({
+          pseudonym: "Bad",
+          // The whole point of the enum: "par courrier" is not a channel.
+          consentChannel: "post" as never,
+        })
+      ).ok,
+    ).toBe(false);
+    expect(
+      (await createPatient({ pseudonym: "Bad", consentDate: "14/08/2026" })).ok,
+    ).toBe(false);
+  });
+
+  it("clears both with an empty string", async () => {
+    const created = unwrapOk(
+      await createPatient({
+        pseudonym: "Withdrawn",
+        consentDate: "2026-08-14",
+        consentChannel: "email",
+      }),
+    );
+    const cleared = unwrapOk(
+      await updatePatient(created.id, { consentDate: "", consentChannel: "" }),
+    );
+    expect(cleared.consentDate).toBeNull();
+    expect(cleared.consentChannel).toBeNull();
+  });
+
+  it("blocks nothing: a profile with no consent still saves and still shares", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "No consent" }));
+    const updated = unwrapOk(
+      await updatePatient(created.id, { objective: "more energy" }),
+    );
+    expect(updated.objective).toBe("more energy");
+    expect(updated.consentDate).toBeNull();
+    expect(unwrapOk(await getPatientByShareToken(created.shareToken)).id).toBe(
+      created.id,
+    );
   });
 });
 

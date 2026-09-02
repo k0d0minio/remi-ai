@@ -1,9 +1,14 @@
 import type { Entity } from "../../types";
 import type { Locale } from "../../shared/i18n";
-import type { patientSexes, patientStatuses } from "../../shared/patient";
+import type {
+  consentChannels,
+  patientSexes,
+  patientStatuses,
+} from "../../shared/patient";
 
 export type PatientStatus = (typeof patientStatuses)[number];
 export type PatientSex = (typeof patientSexes)[number];
+export type ConsentChannel = (typeof consentChannels)[number];
 
 /**
  * The profile Morgane creates and maintains for each of her patients — the
@@ -36,6 +41,16 @@ export type PatientProfile = Entity & {
   anamnesis: string;
   /** When an operator last worked on the profile. Not `updatedAt`. */
   lastEditedAt: Date;
+  /**
+   * When and how the patient agreed to REMI holding their record and to the
+   * share link existing. Recorded fact, never a gate: both are null until
+   * Morgane records them, and nothing here refuses to render without them.
+   *
+   * `YYYY-MM-DD` for the same reason as `birthDate` — the day someone agreed
+   * has no timezone, and storing an instant makes it drift across a border.
+   */
+  consentDate: string | null;
+  consentChannel: ConsentChannel | null;
   /** The unguessable capability in the shareable patient link. */
   shareToken: string;
   linkLastOpenedAt: Date | null;

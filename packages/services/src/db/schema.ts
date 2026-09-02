@@ -80,6 +80,18 @@ export const patientProfiles = pgTable("patient_profiles", {
   })
     .notNull()
     .defaultNow(),
+  /**
+   * When the patient agreed to their record being held and to the share link
+   * existing, and through which channel. Both nullable: consent is a recorded
+   * fact, not a gate, and a profile without it renders and saves exactly as
+   * one with it. A stored wording or version, if it is ever wanted, is one
+   * more nullable column here — not a reshape of this table.
+   *
+   * The date is a plain calendar date for the same reason as `birth_date`:
+   * the day someone agreed has no timezone.
+   */
+  consentDate: date("consent_date", { mode: "string" }),
+  consentChannel: text("consent_channel"),
   /** The unguessable capability in the shareable patient link. */
   shareToken: text("share_token").notNull().unique(),
   /**

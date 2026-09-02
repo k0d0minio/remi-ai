@@ -21,7 +21,8 @@ the folder.
 | 4   | [`remi-status-report.html`](remi-status-report.html)               | The 18 Aug plan (Phases A–F). **Its phase ordering is superseded by 1** — the backlog has been re-cut.                                                                         |
 | 5   | [`correspondence/`](correspondence/)                               | What Morgane actually asked for, in her words                                                                                                                                  |
 | 6   | [`ENV.md`](ENV.md)                                                 | Environment variables and secrets — the only catalogue                                                                                                                         |
-| 7   | [`history/`](history/)                                             | Engineering findings and the v1 record. **Superseded wherever it touches direction.**                                                                                          |
+| 7   | [`RETENTION.md`](RETENTION.md)                                     | What is held about a patient, what deleting removes, what the audit trail keeps, and how long ended patients are kept                                                          |
+| 8   | [`history/`](history/)                                             | Engineering findings and the v1 record. **Superseded wherever it touches direction.**                                                                                          |
 
 ## The contents
 
@@ -51,6 +52,13 @@ still needed from her.
 
 - [`01-startup-boost.md`](correspondence/01-startup-boost.md) — the Startup Boost call and its criteria
 - [`02-onenote-and-tools.md`](correspondence/02-onenote-and-tools.md) — the OneNote handover and the tools question (Supabase, DigitalOcean, Mistral, Euria)
+
+### `RETENTION.md`
+
+The written answer to "what do you hold about me, and what happens if I ask you to delete it?" —
+the data a patient profile carries, what the deletion cascade removes, what the audit trail keeps
+on purpose, and how long an `ended` patient is kept. It describes what the code does, so a change
+to the cascade or to the trail changes this file in the same PR.
 
 ### `ENV.md`
 

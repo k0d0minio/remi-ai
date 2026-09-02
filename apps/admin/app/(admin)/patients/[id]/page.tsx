@@ -175,7 +175,8 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
           <CardTitle>Profil</CardTitle>
           <CardDescription>
             Le tableau de fond contre lequel les recommandations — et plus tard
-            les recettes — sont personnalisées.
+            les recettes — sont personnalisées, et le consentement recueilli
+            pour le tenir.
           </CardDescription>
         </CardHeader>
         <CardContent>

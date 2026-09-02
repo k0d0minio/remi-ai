@@ -30,6 +30,7 @@ export type { AppKey } from "./links";
 export { canManageOperators, isAtLeast, operatorRoles } from "./operator";
 export type { OperatorRoleName } from "./operator";
 export {
+  consentChannels,
   patientSexes,
   patientStatuses,
   recommendationCategories,
@@ -45,6 +46,7 @@ export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";
 export type {
   AuditAction,
   AuditEvent,
+  ConsentChannel,
   Consultation,
   FramePrinciple,
   GenotypeMarker,
