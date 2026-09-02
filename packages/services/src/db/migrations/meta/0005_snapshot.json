@@ -1,6 +1,6 @@
 {
-  "id": "97f3d0b1-a099-4639-b3aa-afdcc5e37e6c",
-  "prevId": "a4158cd8-db40-4751-8da5-a1a741ee5a8f",
+  "id": "2f32fdf3-c0d5-416c-9c46-03eeb30996a1",
+  "prevId": "97f3d0b1-a099-4639-b3aa-afdcc5e37e6c",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -238,6 +238,82 @@
           "nullsNotDistinct": false,
           "columns": [
             "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.patient_anamnesis": {
+      "name": "patient_anamnesis",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "patient_id": {
+          "name": "patient_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "body": {
+          "name": "body",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "patient_anamnesis_patient_id_patient_profiles_id_fk": {
+          "name": "patient_anamnesis_patient_id_patient_profiles_id_fk",
+          "tableFrom": "patient_anamnesis",
+          "tableTo": "patient_profiles",
+          "columnsFrom": [
+            "patient_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "patient_anamnesis_patient_id_category_unique": {
+          "name": "patient_anamnesis_patient_id_category_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "patient_id",
+            "category"
           ]
         }
       },

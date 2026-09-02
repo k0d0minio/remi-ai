@@ -60,6 +60,7 @@ export type {
   MealSlot,
   MealStatus,
   OperatorRole,
+  PantryEssential,
   PatientAnamnesis,
   PatientNote,
   PatientProfile,

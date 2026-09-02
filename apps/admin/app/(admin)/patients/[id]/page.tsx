@@ -3,7 +3,9 @@ import NextLink from "next/link";
 import { notFound } from "next/navigation";
 import {
   getPatient,
+  listArchivedPantryEssentials,
   listArchivedPatientRecommendations,
+  listPantryEssentials,
   listPatientAnamnesis,
   listPatientNotes,
   listPatientRecommendations,
@@ -21,6 +23,8 @@ import {
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { DeletePatient } from "@/components/patients/delete-patient";
 import { NoteTimeline } from "@/components/patients/note-timeline";
+import { PantryAddForm } from "@/components/patients/pantry-add-form";
+import { PantryList } from "@/components/patients/pantry-list";
 import { PatientForm } from "@/components/patients/patient-form";
 import { RecommendationAddForm } from "@/components/patients/recommendation-add-form";
 import { RecommendationGroups } from "@/components/patients/recommendation-groups";
@@ -39,10 +43,10 @@ type Params = { id: string };
 
 /**
  * One patient, everything Morgane does with them on one scrolling page: the
- * link she shares, the protocol she encodes, the consultations behind it, the
- * anamnesis under those, the profile they are all written against, and — last
- * and behind a dialog — deletion. Ordered by how often each is reached for
- * mid-consultation, phone first.
+ * link she shares, the protocol she encodes, the essentials she picks for their
+ * placard, the consultations behind it, the anamnesis under those, the profile
+ * they are all written against, and — last and behind a dialog — deletion.
+ * Ordered by how often each is reached for mid-consultation, phone first.
  */
 const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
   // The page's own graph, not the layout's — the two render in parallel.
@@ -54,9 +58,18 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
   }
   const patient = result.data;
 
-  const [recommendations, archived, notes, anamnesis] = await Promise.all([
+  const [
+    recommendations,
+    archived,
+    essentials,
+    archivedEssentials,
+    notes,
+    anamnesis,
+  ] = await Promise.all([
     listPatientRecommendations(patient.id),
     listArchivedPatientRecommendations(patient.id),
+    listPantryEssentials(patient.id),
+    listArchivedPantryEssentials(patient.id),
     listPatientNotes(patient.id),
     listPatientAnamnesis(patient.id),
   ]);
@@ -162,6 +175,42 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
 
       <Card>
         <CardHeader>
+          <CardTitle>Essentiels placard / frigo</CardTitle>
+          <CardDescription>
+            La courte liste d&apos;aliments à avoir sous la main, avec le
+            pourquoi de chacun — pour cette personne.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          {essentials.length === 0 ? (
+            <Typography size="sm" tone="muted">
+              Aucun essentiel pour le moment.
+            </Typography>
+          ) : (
+            <PantryList essentials={essentials} />
+          )}
+
+          <PantryAddForm patientId={patient.id} />
+        </CardContent>
+      </Card>
+
+      {archivedEssentials.length > 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Essentiels archivés</CardTitle>
+            <CardDescription>
+              Ce qui est sorti de la liste lors d&apos;une mise à jour. Gardé
+              pour la suite du dossier.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <PantryList essentials={archivedEssentials} />
+          </CardContent>
+        </Card>
+      ) : null}
+
+      <Card>
+        <CardHeader>
           <CardTitle>Consultations</CardTitle>
           <CardDescription>
             Vos notes de séance, de la plus récente à la plus ancienne. Elles ne
@@ -205,8 +254,9 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
         <CardHeader>
           <CardTitle>Zone sensible</CardTitle>
           <CardDescription>
-            La suppression retire le profil, ses recommandations, ses notes, son
-            anamnèse et le lien patient — définitivement.
+            La suppression retire le profil, ses recommandations, ses
+            essentiels, ses notes, son anamnèse et le lien patient —
+            définitivement.
           </CardDescription>
         </CardHeader>
         <CardContent>

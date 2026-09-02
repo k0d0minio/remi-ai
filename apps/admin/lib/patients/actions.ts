@@ -3,19 +3,24 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
+  addPantryEssential,
   addPatientNote,
   addPatientRecommendation,
+  archivePantryEssential,
   archivePatientRecommendation,
   createPatient,
   deletePatient,
+  deletePantryEssential,
   deletePatientNote,
   deletePatientRecommendation,
   getPatient,
+  movePantryEssential,
   movePatientRecommendation,
   patientLinkEmail,
   regenerateShareToken,
   sendEmail,
   setPatientAnamnesis,
+  updatePantryEssential,
   updatePatient,
   updatePatientNote,
   updatePatientRecommendation,
@@ -53,6 +58,7 @@ import { mailerReady } from "@/lib/mailer";
 
 export type PatientFormState = { error: string | null; saved: boolean };
 export type RecommendationFormState = { error: string | null };
+export type PantryFormState = { error: string | null };
 export type NoteFormState = { error: string | null };
 export type AnamnesisFormState = { error: string | null };
 export type ShareFormState = { error: string | null; sent: boolean };
@@ -333,6 +339,103 @@ export const deleteRecommendationAction = async (formData: FormData) => {
       type: "recommendation",
       id,
       label: field(formData, "title"),
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+/**
+ * The placard/frigo list — brainstorm § H. Two fields and nothing else, so
+ * these actions collect a name and a why and let the service decide the rest.
+ *
+ * Every write here is audited, reordering included. That differs from the
+ * recommendations above, where a reorder is deliberately silent: this list is
+ * short and refreshed as a whole, so the order it was left in is part of what
+ * changed between two consultations rather than an incidental nudge.
+ */
+export const addPantryEssentialAction = async (
+  _previous: PantryFormState,
+  formData: FormData,
+): Promise<PantryFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const result = await addPantryEssential(patientId, {
+    item: field(formData, "item"),
+    why: field(formData, "why"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "pantry.added", {
+    type: "pantry_essential",
+    id: result.data.id,
+    label: result.data.item,
+  });
+  revalidatePatient(patientId);
+  return { error: null };
+};
+
+export const updatePantryEssentialAction = async (
+  _previous: PantryFormState,
+  formData: FormData,
+): Promise<PantryFormState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const result = await updatePantryEssential(id, {
+    item: field(formData, "item"),
+    why: field(formData, "why"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "pantry.updated", {
+    type: "pantry_essential",
+    id,
+    label: result.data.item,
+  });
+  revalidatePatient(field(formData, "patientId"));
+  return { error: null };
+};
+
+export const movePantryEssentialAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const direction = field(formData, "direction") === "up" ? "up" : "down";
+  const result = await movePantryEssential(id, direction);
+  if (result.ok) {
+    await audit(operator, "pantry.reordered", {
+      type: "pantry_essential",
+      id,
+      label: result.data.item,
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+export const archivePantryEssentialAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const archived = field(formData, "archived") === "true";
+  const result = await archivePantryEssential(id, archived);
+  if (result.ok) {
+    await audit(operator, archived ? "pantry.archived" : "pantry.restored", {
+      type: "pantry_essential",
+      id,
+      label: result.data.item,
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+export const deletePantryEssentialAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const removed = await deletePantryEssential(id);
+  if (removed.ok) {
+    await audit(operator, "pantry.deleted", {
+      type: "pantry_essential",
+      id,
+      label: field(formData, "item"),
     });
   }
   revalidatePatient(field(formData, "patientId"));

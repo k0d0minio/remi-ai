@@ -9,7 +9,9 @@ import {
   auditEvents,
   operatorInvitations,
   operators,
+  patientAnamnesis,
   patientNotes,
+  patientPantryEssentials,
   patientProfiles,
   patientRecommendations,
 } from "../schema";
@@ -27,6 +29,8 @@ const tables: Record<string, PgTable> = {
   patient_profiles: patientProfiles,
   patient_recommendations: patientRecommendations,
   patient_notes: patientNotes,
+  patient_anamnesis: patientAnamnesis,
+  patient_pantry_essentials: patientPantryEssentials,
   operators: operators,
   operator_invitations: operatorInvitations,
   audit_events: auditEvents,
