@@ -3,7 +3,9 @@ import NextLink from "next/link";
 import { notFound } from "next/navigation";
 import {
   getPatient,
+  listArchivedPantryEssentials,
   listArchivedPatientRecommendations,
+  listPantryEssentials,
   listPatientNotes,
   listPatientRecommendations,
 } from "@remi/services/server";
@@ -19,6 +21,8 @@ import {
 } from "@remi/ui/server";
 import { DeletePatient } from "@/components/patients/delete-patient";
 import { NoteTimeline } from "@/components/patients/note-timeline";
+import { PantryAddForm } from "@/components/patients/pantry-add-form";
+import { PantryList } from "@/components/patients/pantry-list";
 import { PatientForm } from "@/components/patients/patient-form";
 import { RecommendationAddForm } from "@/components/patients/recommendation-add-form";
 import { RecommendationGroups } from "@/components/patients/recommendation-groups";
@@ -52,11 +56,14 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
   }
   const patient = result.data;
 
-  const [recommendations, archived, notes] = await Promise.all([
-    listPatientRecommendations(patient.id),
-    listArchivedPatientRecommendations(patient.id),
-    listPatientNotes(patient.id),
-  ]);
+  const [recommendations, archived, essentials, archivedEssentials, notes] =
+    await Promise.all([
+      listPatientRecommendations(patient.id),
+      listArchivedPatientRecommendations(patient.id),
+      listPantryEssentials(patient.id),
+      listArchivedPantryEssentials(patient.id),
+      listPatientNotes(patient.id),
+    ]);
   const shareUrl = appHref("web", `/p/${patient.shareToken}`, patient.locale);
   const age = ageInYears(patient.birthDate);
 
@@ -153,6 +160,42 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
           </CardHeader>
           <CardContent>
             <RecommendationGroups recommendations={archived} />
+          </CardContent>
+        </Card>
+      ) : null}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Essentiels placard / frigo</CardTitle>
+          <CardDescription>
+            La courte liste d&apos;aliments à avoir sous la main, avec le
+            pourquoi de chacun — pour cette personne.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          {essentials.length === 0 ? (
+            <Typography size="sm" tone="muted">
+              Aucun essentiel pour le moment.
+            </Typography>
+          ) : (
+            <PantryList essentials={essentials} />
+          )}
+
+          <PantryAddForm patientId={patient.id} />
+        </CardContent>
+      </Card>
+
+      {archivedEssentials.length > 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Essentiels archivés</CardTitle>
+            <CardDescription>
+              Ce qui est sorti de la liste lors d&apos;une mise à jour. Gardé
+              pour la suite du dossier.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <PantryList essentials={archivedEssentials} />
           </CardContent>
         </Card>
       ) : null}

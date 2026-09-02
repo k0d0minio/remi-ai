@@ -58,6 +58,7 @@ export type {
   MealSlot,
   MealStatus,
   OperatorRole,
+  PantryEssential,
   PatientNote,
   PatientProfile,
   PatientRecommendation,
