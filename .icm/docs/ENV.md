@@ -93,17 +93,31 @@ migrations live in `packages/services/src/db/migrations/` and are applied by
 `pnpm --filter @remi/services db:migrate`, which runs at the front of the **admin** app's build so
 a deploy migrates before it serves.
 
-| Variable       | Purpose                                                     | Where set | Public? |
-| -------------- | ----------------------------------------------------------- | --------- | ------- |
-| `DATABASE_URL` | Neon connection string — the **admin** and **web** projects | Vercel    | no      |
+| Variable                          | Purpose                                                                      | Where set | Public? |
+| --------------------------------- | ---------------------------------------------------------------------------- | --------- | ------- |
+| `DATABASE_URL`                    | Neon connection string — the **admin** and **web** projects                  | Vercel    | no      |
+| `ALLOW_NON_PRODUCTION_MIGRATIONS` | `true` lets a preview deploy migrate. Unset everywhere; an escape hatch only | Vercel    | no      |
 
 With it unset nothing is registered and any screen that needs the database fails loudly with "no
 database adapter registered" — a deploy without a database never quietly renders nothing.
 
-**Preview caveat:** the admin build migrates whatever `DATABASE_URL` it is given. Either scope the
-variable to production (previews then show the loud unregistered error), or point preview
-environments at a Neon branch of the database — never previews and production at the same value
-with unmerged schema changes in flight.
+**Preview caveat:** the admin build migrates whatever `DATABASE_URL` it is given, so previews and
+production at the same value means a branch's schema lands in the live database before it merges.
+`scripts/migrate.mjs` now refuses to migrate when `VERCEL_ENV` is anything but `production`, which
+makes that failure impossible by default rather than by discipline — but it is a guard, not the
+answer. The answer is still one of: scope `DATABASE_URL` to production (previews then show the loud
+unregistered error), or point preview environments at a Neon branch of the database.
+
+The guard's cost is that a preview renders against the schema the database already has, so a table
+a branch adds is absent from its own preview until it merges. `ALLOW_NON_PRODUCTION_MIGRATIONS=true`
+overrides it for one project; reach for a Neon branch first.
+
+Why the guard is not optional: drizzle decides what to apply by comparing each migration's journal
+`when` against the newest `created_at` already recorded — never by hash. A migration applied out of
+order raises that high-water mark, and every older migration still unapplied is then skipped
+**silently, forever**. That is not hypothetical: on 2026-09-02 a preview applied a branch's
+migration to the live database, and the next migration to merge — 70 seconds older by timestamp —
+never ran. Nothing reported it.
 
 ## Auth
 
