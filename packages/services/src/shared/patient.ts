@@ -29,3 +29,11 @@ export const recommendationCategories = [
   "activity",
   "monitoring",
 ] as const;
+
+/**
+ * Whether the person likes cooking — § A of the v2 brainstorm asks yes/no, and
+ * the answer drives how simple a recipe suggestion has to be. Kept as a closed
+ * set rather than a boolean so "un peu" costs a constant rather than a
+ * migration; not recorded is `null`, the same shape as the consent channel.
+ */
+export const cookingAffinities = ["yes", "somewhat", "no"] as const;

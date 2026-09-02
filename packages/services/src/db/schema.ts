@@ -54,10 +54,29 @@ export const patientProfiles = pgTable("patient_profiles", {
   weightKg: doublePrecision("weight_kg"),
   /** What the accompaniment is working towards, in Morgane's words. */
   objective: text("objective").notNull().default(""),
-  /** Allergies, intolerances, medical constraints. */
+  /**
+   * A permanent filter on everything suggested — végétarien, sans gluten. Free
+   * text on purpose: an enum here would freeze a vocabulary Morgane has not
+   * finished inventing, and the console offers the common ones as suggestions.
+   */
+  dietaryRegime: text("dietary_regime").notNull().default(""),
+  /**
+   * Split from `constraints` because § A separates them and a recipe filter has
+   * to: an allergy is a mandatory exclusion, an intolerance is comfort. Neither
+   * should have to be recovered from prose.
+   */
+  allergies: text("allergies").notNull().default(""),
+  intolerances: text("intolerances").notNull().default(""),
+  /** What is left once allergies and intolerances have their own columns. */
   constraints: text("constraints").notNull().default(""),
   /** Likes, dislikes, habits, context worth cooking around. */
   preferences: text("preferences").notNull().default(""),
+  /**
+   * How simple a suggestion has to be, and how realistic. Nullable like the
+   * consent channel: not asked yet is a different answer from "no".
+   */
+  likesCooking: text("likes_cooking"),
+  foodBudget: text("food_budget").notNull().default(""),
   /**
    * Kept out of `constraints` on purpose — an interaction has to be legible at
    * a glance, not recovered from a paragraph of prose.

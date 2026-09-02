@@ -258,6 +258,91 @@ describe("consent", () => {
   });
 });
 
+describe("the food profile", () => {
+  it("records the regime, the two exclusion lists, the budget and the affinity", async () => {
+    const created = unwrapOk(
+      await createPatient({
+        pseudonym: "Sana",
+        dietaryRegime: "végétarien, sans gluten",
+        allergies: "arachides",
+        intolerances: "lactose",
+        constraints: "hypothyroïdie",
+        likesCooking: "somewhat",
+        foodBudget: "serré, courses au marché",
+      }),
+    );
+    expect(created.dietaryRegime).toBe("végétarien, sans gluten");
+    // The split is the whole point: an allergy never lands in `constraints`.
+    expect(created.allergies).toBe("arachides");
+    expect(created.intolerances).toBe("lactose");
+    expect(created.constraints).toBe("hypothyroïdie");
+    expect(created.likesCooking).toBe("somewhat");
+    expect(created.foodBudget).toBe("serré, courses au marché");
+  });
+
+  it("leaves them empty, and the affinity not recorded, when nothing is given", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "Blank" }));
+    expect(created.dietaryRegime).toBe("");
+    expect(created.allergies).toBe("");
+    expect(created.intolerances).toBe("");
+    expect(created.foodBudget).toBe("");
+    // Not asked yet is a different answer from "no".
+    expect(created.likesCooking).toBeNull();
+  });
+
+  it("takes each value of the affinity, and refuses one outside the set", async () => {
+    for (const affinity of ["yes", "somewhat", "no"] as const) {
+      const created = unwrapOk(
+        await createPatient({ pseudonym: "Cook", likesCooking: affinity }),
+      );
+      expect(created.likesCooking).toBe(affinity);
+    }
+    expect(
+      (
+        await createPatient({
+          pseudonym: "Bad",
+          likesCooking: "sometimes" as never,
+        })
+      ).ok,
+    ).toBe(false);
+  });
+
+  it("clears a text field and the affinity with an empty string", async () => {
+    const created = unwrapOk(
+      await createPatient({
+        pseudonym: "Revised",
+        allergies: "fruits à coque",
+        likesCooking: "yes",
+      }),
+    );
+    const cleared = unwrapOk(
+      await updatePatient(created.id, { allergies: "", likesCooking: "" }),
+    );
+    expect(cleared.allergies).toBe("");
+    expect(cleared.likesCooking).toBeNull();
+  });
+
+  it("updates one without blanking the others", async () => {
+    const created = unwrapOk(
+      await createPatient({
+        pseudonym: "Partial",
+        dietaryRegime: "sans gluten",
+        allergies: "arachides",
+        likesCooking: "no",
+        foodBudget: "moyen",
+      }),
+    );
+    const updated = unwrapOk(
+      await updatePatient(created.id, { intolerances: "lactose" }),
+    );
+    expect(updated.intolerances).toBe("lactose");
+    expect(updated.dietaryRegime).toBe("sans gluten");
+    expect(updated.allergies).toBe("arachides");
+    expect(updated.likesCooking).toBe("no");
+    expect(updated.foodBudget).toBe("moyen");
+  });
+});
+
 describe("the roster query", () => {
   it("searches the pseudonym, the full name and the email", async () => {
     await createPatient({

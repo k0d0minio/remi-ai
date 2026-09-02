@@ -31,6 +31,7 @@ export { canManageOperators, isAtLeast, operatorRoles } from "./operator";
 export type { OperatorRoleName } from "./operator";
 export {
   consentChannels,
+  cookingAffinities,
   patientSexes,
   patientStatuses,
   recommendationCategories,
@@ -48,6 +49,7 @@ export type {
   AuditEvent,
   ConsentChannel,
   Consultation,
+  CookingAffinity,
   FramePrinciple,
   GenotypeMarker,
   HabitsProfile,

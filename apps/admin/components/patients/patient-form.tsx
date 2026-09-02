@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import type { Locale, PatientProfile } from "@remi/services/shared";
 import {
   consentChannels,
+  cookingAffinities,
   formatDate,
   locales,
   patientSexes,
@@ -31,6 +32,8 @@ import {
 } from "@/lib/patients/actions";
 import {
   consentChannelLabels,
+  cookingAffinityLabels,
+  dietaryRegimeSuggestions,
   patientSexLabels,
   patientStatusLabels,
 } from "@/components/patients/vocabulary";
@@ -338,10 +341,64 @@ export const PatientForm = ({ patient }: Props) => {
         </Field>
 
         <Field
-          id="constraints"
-          label="Contraintes"
+          id="dietaryRegime"
+          label="Régime alimentaire"
           optional
-          hint="Allergies, intolérances, contraintes médicales. Visible sur le lien patient."
+          hint="Végétarien, sans gluten… Écrivez librement ; les propositions ne sont qu'une aide à la saisie."
+        >
+          <Input
+            id="dietaryRegime"
+            name="dietaryRegime"
+            list="dietaryRegimeSuggestions"
+            defaultValue={patient?.dietaryRegime ?? ""}
+          />
+        </Field>
+
+        {/*
+         * Outside the Field: it clones a single child to wire aria-describedby,
+         * and a second element would leave the hint unannounced.
+         */}
+        <datalist id="dietaryRegimeSuggestions">
+          {dietaryRegimeSuggestions.map((regime) => (
+            <option key={regime} value={regime} />
+          ))}
+        </datalist>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            id="allergies"
+            label="Allergies"
+            optional
+            hint="Exclusions absolues. Séparées des intolérances : ce ne sont pas les mêmes conséquences."
+          >
+            <Textarea
+              id="allergies"
+              name="allergies"
+              rows={3}
+              defaultValue={patient?.allergies ?? ""}
+            />
+          </Field>
+
+          <Field
+            id="intolerances"
+            label="Intolérances"
+            optional
+            hint="Ce qui passe mal sans être dangereux."
+          >
+            <Textarea
+              id="intolerances"
+              name="intolerances"
+              rows={3}
+              defaultValue={patient?.intolerances ?? ""}
+            />
+          </Field>
+        </div>
+
+        <Field
+          id="constraints"
+          label="Contraintes médicales"
+          optional
+          hint="Ce qui n'est ni une allergie ni une intolérance. Visible sur le lien patient."
         >
           <Textarea
             id="constraints"
@@ -364,6 +421,44 @@ export const PatientForm = ({ patient }: Props) => {
             defaultValue={patient?.preferences ?? ""}
           />
         </Field>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            id="likesCooking"
+            label="Aime cuisiner"
+            optional
+            hint="Détermine à quel point une suggestion doit rester simple."
+          >
+            <Select
+              name="likesCooking"
+              defaultValue={patient?.likesCooking ?? ""}
+            >
+              <SelectTrigger id="likesCooking">
+                <SelectValue placeholder="Non renseigné" />
+              </SelectTrigger>
+              <SelectContent>
+                {cookingAffinities.map((affinity) => (
+                  <SelectItem key={affinity} value={affinity}>
+                    {cookingAffinityLabels[affinity]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          <Field
+            id="foodBudget"
+            label="Budget alimentaire"
+            optional
+            hint="Ce qui garde les suggestions réalistes. Texte libre."
+          >
+            <Input
+              id="foodBudget"
+              name="foodBudget"
+              defaultValue={patient?.foodBudget ?? ""}
+            />
+          </Field>
+        </div>
 
         <Field
           id="anamnesis"

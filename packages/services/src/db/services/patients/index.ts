@@ -3,16 +3,14 @@ import { z } from "zod";
 import { locales } from "../../../shared/i18n";
 import {
   consentChannels,
+  cookingAffinities,
   patientSexes,
   patientStatuses,
 } from "../../../shared/patient";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase } from "../../client";
-import type {
-  ConsentChannel,
-  PatientProfile,
-} from "../../models/patient-profile";
+import type { PatientProfile } from "../../models/patient-profile";
 
 /**
  * The patient-profile service — the callable surface behind Morgane's admin
@@ -82,8 +80,14 @@ const patientFields = z.object({
   heightCm: optionalNumber(280),
   weightKg: optionalNumber(500),
   objective: text,
+  dietaryRegime: text,
+  allergies: text,
+  intolerances: text,
   constraints: text,
   preferences: text,
+  /** `""` clears it; the enum is what a later recipe filter can branch on. */
+  likesCooking: z.union([z.literal(""), z.enum(cookingAffinities)]),
+  foodBudget: text,
   medications: text,
   supplements: text,
   referral: text,
@@ -114,8 +118,8 @@ const nullableText = (value: string | undefined) =>
 const nullableNumber = (value: number | "" | undefined) =>
   value === undefined ? undefined : value === "" ? null : value;
 
-/** The same shape again, typed so the channel keeps its enum on the way in. */
-const nullableChannel = (value: ConsentChannel | "" | undefined) =>
+/** The same shape again, typed so a closed set keeps its enum on the way in. */
+const nullableEnum = <T extends string>(value: T | "" | undefined) =>
   value === undefined ? undefined : value === "" ? null : value;
 
 const assign = <T extends object, K extends keyof T>(
@@ -206,8 +210,13 @@ export const createPatient = async (
     heightCm: data.heightCm ? data.heightCm : null,
     weightKg: data.weightKg ? data.weightKg : null,
     objective: data.objective ?? "",
+    dietaryRegime: data.dietaryRegime ?? "",
+    allergies: data.allergies ?? "",
+    intolerances: data.intolerances ?? "",
     constraints: data.constraints ?? "",
     preferences: data.preferences ?? "",
+    likesCooking: data.likesCooking ? data.likesCooking : null,
+    foodBudget: data.foodBudget ?? "",
     medications: data.medications ?? "",
     supplements: data.supplements ?? "",
     referral: data.referral ?? "",
@@ -240,6 +249,7 @@ export const updatePatient = async (
     weightKg,
     consentDate,
     consentChannel,
+    likesCooking,
     ...rest
   } = parsed.data;
   const patch: Partial<PatientProfile> = { ...rest, lastEditedAt: new Date() };
@@ -249,7 +259,8 @@ export const updatePatient = async (
   assign(patch, "heightCm", nullableNumber(heightCm));
   assign(patch, "weightKg", nullableNumber(weightKg));
   assign(patch, "consentDate", nullableText(consentDate));
-  assign(patch, "consentChannel", nullableChannel(consentChannel));
+  assign(patch, "consentChannel", nullableEnum(consentChannel));
+  assign(patch, "likesCooking", nullableEnum(likesCooking));
 
   const patient = await patients().update(id, patch);
   return patient ? ok(patient) : err("not_found", "no such patient");
