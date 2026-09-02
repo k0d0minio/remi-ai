@@ -2,6 +2,7 @@ import type { Entity } from "../../types";
 import type { Locale } from "../../shared/i18n";
 import type {
   consentChannels,
+  cookingAffinities,
   patientSexes,
   patientStatuses,
 } from "../../shared/patient";
@@ -9,6 +10,7 @@ import type {
 export type PatientStatus = (typeof patientStatuses)[number];
 export type PatientSex = (typeof patientSexes)[number];
 export type ConsentChannel = (typeof consentChannels)[number];
+export type CookingAffinity = (typeof cookingAffinities)[number];
 
 /**
  * The profile Morgane creates and maintains for each of her patients — the
@@ -33,8 +35,17 @@ export type PatientProfile = Entity & {
   heightCm: number | null;
   weightKg: number | null;
   objective: string;
+  /** végétarien, sans gluten — a permanent filter, free text by design. */
+  dietaryRegime: string;
+  /** Mandatory exclusions. Never merged with the two below. */
+  allergies: string;
+  intolerances: string;
+  /** The medical constraints that are neither allergy nor intolerance. */
   constraints: string;
   preferences: string;
+  /** `null` until Morgane has asked — not the same answer as `"no"`. */
+  likesCooking: CookingAffinity | null;
+  foodBudget: string;
   medications: string;
   supplements: string;
   referral: string;

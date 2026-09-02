@@ -14,6 +14,7 @@ export type { OperatorInvitation } from "./operator-invitation";
 export type { PatientNote } from "./patient-note";
 export type {
   ConsentChannel,
+  CookingAffinity,
   PatientProfile,
   PatientSex,
   PatientStatus,
