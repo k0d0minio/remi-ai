@@ -14,6 +14,14 @@ export const patientStatuses = ["active", "paused", "ended"] as const;
  */
 export const patientSexes = ["female", "male", "other", "unspecified"] as const;
 
+/**
+ * How the patient agreed — a closed set rather than free text, so "how did
+ * people consent?" stays a countable question. `consultation` is in person or
+ * by video during a session; the other two are the channels Morgane already
+ * uses to reach her patients between them.
+ */
+export const consentChannels = ["consultation", "whatsapp", "email"] as const;
+
 export const recommendationCategories = [
   "nutrition",
   "habit",

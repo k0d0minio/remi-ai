@@ -1,11 +1,18 @@
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { locales } from "../../../shared/i18n";
-import { patientSexes, patientStatuses } from "../../../shared/patient";
+import {
+  consentChannels,
+  patientSexes,
+  patientStatuses,
+} from "../../../shared/patient";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase } from "../../client";
-import type { PatientProfile } from "../../models/patient-profile";
+import type {
+  ConsentChannel,
+  PatientProfile,
+} from "../../models/patient-profile";
 
 /**
  * The patient-profile service — the callable surface behind Morgane's admin
@@ -47,6 +54,18 @@ const optionalNumber = (max: number) =>
       ),
   ]);
 
+/** `""` clears the column. Shared by the two calendar dates on the profile. */
+const calendarDate = z.union([
+  z.literal(""),
+  z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "that date is not valid")
+    .refine(
+      (value) => !Number.isNaN(new Date(`${value}T00:00:00Z`).getTime()),
+      "that date is not valid",
+    ),
+]);
+
 /**
  * No `.default()`s here: the same shape validates creates and partial updates,
  * and a default applied during an update would silently blank the fields the
@@ -58,16 +77,7 @@ const patientFields = z.object({
   email: z.union([z.literal(""), z.email("that email address is not valid")]),
   locale: z.enum(locales),
   status: z.enum(patientStatuses),
-  birthDate: z.union([
-    z.literal(""),
-    z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "that date is not valid")
-      .refine(
-        (value) => !Number.isNaN(new Date(`${value}T00:00:00Z`).getTime()),
-        "that date is not valid",
-      ),
-  ]),
+  birthDate: calendarDate,
   sex: z.enum(patientSexes),
   heightCm: optionalNumber(280),
   weightKg: optionalNumber(500),
@@ -78,6 +88,9 @@ const patientFields = z.object({
   supplements: text,
   referral: text,
   anamnesis: text,
+  consentDate: calendarDate,
+  /** `""` clears a recorded channel; the enum is what makes it countable. */
+  consentChannel: z.union([z.literal(""), z.enum(consentChannels)]),
 });
 
 export type PatientInput = Partial<z.input<typeof patientFields>>;
@@ -99,6 +112,10 @@ const nullableText = (value: string | undefined) =>
   value === undefined ? undefined : value === "" ? null : value;
 
 const nullableNumber = (value: number | "" | undefined) =>
+  value === undefined ? undefined : value === "" ? null : value;
+
+/** The same shape again, typed so the channel keeps its enum on the way in. */
+const nullableChannel = (value: ConsentChannel | "" | undefined) =>
   value === undefined ? undefined : value === "" ? null : value;
 
 const assign = <T extends object, K extends keyof T>(
@@ -195,6 +212,8 @@ export const createPatient = async (
     supplements: data.supplements ?? "",
     referral: data.referral ?? "",
     anamnesis: data.anamnesis ?? "",
+    consentDate: data.consentDate ? data.consentDate : null,
+    consentChannel: data.consentChannel ? data.consentChannel : null,
     lastEditedAt: new Date(),
     shareToken: newShareToken(),
     linkLastOpenedAt: null,
@@ -213,14 +232,24 @@ export const updatePatient = async (
   if (!parsed.success) {
     return invalid(parsed.error.issues[0]);
   }
-  const { fullName, email, birthDate, heightCm, weightKg, ...rest } =
-    parsed.data;
+  const {
+    fullName,
+    email,
+    birthDate,
+    heightCm,
+    weightKg,
+    consentDate,
+    consentChannel,
+    ...rest
+  } = parsed.data;
   const patch: Partial<PatientProfile> = { ...rest, lastEditedAt: new Date() };
   assign(patch, "fullName", nullableText(fullName));
   assign(patch, "email", nullableText(email));
   assign(patch, "birthDate", nullableText(birthDate));
   assign(patch, "heightCm", nullableNumber(heightCm));
   assign(patch, "weightKg", nullableNumber(weightKg));
+  assign(patch, "consentDate", nullableText(consentDate));
+  assign(patch, "consentChannel", nullableChannel(consentChannel));
 
   const patient = await patients().update(id, patch);
   return patient ? ok(patient) : err("not_found", "no such patient");
