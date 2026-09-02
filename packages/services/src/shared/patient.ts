@@ -37,3 +37,28 @@ export const recommendationCategories = [
  * migration; not recorded is `null`, the same shape as the consent channel.
  */
 export const cookingAffinities = ["yes", "somewhat", "no"] as const;
+
+/**
+ * § B of the v2 brainstorm: the twelve areas an anamnesis is taken across, in
+ * the order Morgane works through them.
+ *
+ * The keys are English and stable because they are what `patient_anamnesis`
+ * stores per row; the French wording she reads lives in the console's
+ * `vocabulary.ts`. That split is what makes trimming or renaming a category a
+ * two-line edit rather than a migration — and what lets the later AI round
+ * write into the same slots without reshaping anything.
+ */
+export const anamnesisCategories = [
+  "motive",
+  "health",
+  "nutrition",
+  "hydration",
+  "digestion",
+  "elimination",
+  "sleep",
+  "immunity",
+  "cardiovascular",
+  "musculoskeletal",
+  "endocrine",
+  "context",
+] as const;

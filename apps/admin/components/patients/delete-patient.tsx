@@ -21,9 +21,9 @@ type Props = {
 
 /**
  * The one truly destructive act on this page, so it takes a dialog, not a
- * second click: the profile, its recommendations, its notes and its patient
- * link all go, and there is no undo. The audit trail records who did it and
- * which profile it was, which is the only thing that survives.
+ * second click: the profile, its recommendations, its notes, its anamnesis and
+ * its patient link all go, and there is no undo. The audit trail records who
+ * did it and which profile it was, which is the only thing that survives.
  */
 export const DeletePatient = ({ patientId, pseudonym }: Props) => (
   <Dialog>
@@ -38,9 +38,9 @@ export const DeletePatient = ({ patientId, pseudonym }: Props) => (
       <DialogHeader>
         <DialogTitle>Supprimer {pseudonym} ?</DialogTitle>
         <DialogDescription>
-          Le profil, toutes ses recommandations, ses notes de consultation et
-          son lien patient sont supprimés. Toute personne détenant le lien perd
-          l&apos;accès. Il n&apos;y a pas de retour en arrière.
+          Le profil, toutes ses recommandations, ses notes de consultation, son
+          anamnèse et son lien patient sont supprimés. Toute personne détenant
+          le lien perd l&apos;accès. Il n&apos;y a pas de retour en arrière.
         </DialogDescription>
       </DialogHeader>
 

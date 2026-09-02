@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import {
   getPatient,
   listArchivedPatientRecommendations,
+  listPatientAnamnesis,
   listPatientNotes,
   listPatientRecommendations,
 } from "@remi/services/server";
@@ -17,6 +18,7 @@ import {
   CardTitle,
   Typography,
 } from "@remi/ui/server";
+import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { DeletePatient } from "@/components/patients/delete-patient";
 import { NoteTimeline } from "@/components/patients/note-timeline";
 import { PatientForm } from "@/components/patients/patient-form";
@@ -38,9 +40,9 @@ type Params = { id: string };
 /**
  * One patient, everything Morgane does with them on one scrolling page: the
  * link she shares, the protocol she encodes, the consultations behind it, the
- * profile they are all written against, and — last and behind a dialog —
- * deletion. Ordered by how often each is reached for mid-consultation, phone
- * first.
+ * anamnesis under those, the profile they are all written against, and — last
+ * and behind a dialog — deletion. Ordered by how often each is reached for
+ * mid-consultation, phone first.
  */
 const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
   // The page's own graph, not the layout's — the two render in parallel.
@@ -52,10 +54,11 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
   }
   const patient = result.data;
 
-  const [recommendations, archived, notes] = await Promise.all([
+  const [recommendations, archived, notes, anamnesis] = await Promise.all([
     listPatientRecommendations(patient.id),
     listArchivedPatientRecommendations(patient.id),
     listPatientNotes(patient.id),
+    listPatientAnamnesis(patient.id),
   ]);
   const shareUrl = appHref("web", `/p/${patient.shareToken}`, patient.locale);
   const age = ageInYears(patient.birthDate);
@@ -172,6 +175,20 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
 
       <Card>
         <CardHeader>
+          <CardTitle>Anamnèse</CardTitle>
+          <CardDescription>
+            Le terrain, catégorie par catégorie. Ce que vous n&apos;avez pas
+            encore exploré reste visiblement vide. Ne s&apos;affiche jamais sur
+            le lien patient.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AnamnesisBlock patientId={patient.id} entries={anamnesis} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Profil</CardTitle>
           <CardDescription>
             Le tableau de fond contre lequel les recommandations — et plus tard
@@ -188,8 +205,8 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
         <CardHeader>
           <CardTitle>Zone sensible</CardTitle>
           <CardDescription>
-            La suppression retire le profil, ses recommandations, ses notes et
-            le lien patient — définitivement.
+            La suppression retire le profil, ses recommandations, ses notes, son
+            anamnèse et le lien patient — définitivement.
           </CardDescription>
         </CardHeader>
         <CardContent>
