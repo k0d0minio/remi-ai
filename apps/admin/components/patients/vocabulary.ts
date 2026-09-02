@@ -1,5 +1,6 @@
 import type {
   ConsentChannel,
+  CookingAffinity,
   PatientSex,
   PatientStatus,
   RecommendationCategory,
@@ -49,3 +50,26 @@ export const categoryLabels: Record<RecommendationCategory, string> = {
   activity: "Activité",
   monitoring: "Suivi",
 };
+
+/** Whether the person likes cooking — read on the profile and in the select. */
+export const cookingAffinityLabels: Record<CookingAffinity, string> = {
+  yes: "oui",
+  somewhat: "un peu",
+  no: "non",
+};
+
+/**
+ * Typing aids, not a closed set: the regime field takes anything Morgane
+ * writes, and these are only the ones she reaches for often enough to be worth
+ * one keystroke. Adding one here changes nothing about what can be stored.
+ */
+export const dietaryRegimeSuggestions = [
+  "végétarien",
+  "végétalien",
+  "sans gluten",
+  "sans lactose",
+  "pescétarien",
+  "flexitarien",
+  "halal",
+  "casher",
+] as const;

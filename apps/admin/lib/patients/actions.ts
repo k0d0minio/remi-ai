@@ -23,11 +23,13 @@ import {
 import {
   appHref,
   consentChannels,
+  cookingAffinities,
   isLocale,
   patientSexes,
   patientStatuses,
   recommendationCategories,
   type ConsentChannel,
+  type CookingAffinity,
   type PatientSex,
   type PatientStatus,
   type RecommendationCategory,
@@ -72,6 +74,12 @@ const asConsentChannel = (value: string): ConsentChannel | "" =>
     ? (value as ConsentChannel)
     : "";
 
+/** `""` is a real answer here too — it is how Morgane clears a recorded one. */
+const asCookingAffinity = (value: string): CookingAffinity | "" =>
+  (cookingAffinities as readonly string[]).includes(value)
+    ? (value as CookingAffinity)
+    : "";
+
 const asCategory = (value: string): RecommendationCategory =>
   (recommendationCategories as readonly string[]).includes(value)
     ? (value as RecommendationCategory)
@@ -89,8 +97,13 @@ const patientInputFrom = (formData: FormData): PatientInput => {
     heightCm: field(formData, "heightCm"),
     weightKg: field(formData, "weightKg"),
     objective: field(formData, "objective"),
+    dietaryRegime: field(formData, "dietaryRegime"),
+    allergies: field(formData, "allergies"),
+    intolerances: field(formData, "intolerances"),
     constraints: field(formData, "constraints"),
     preferences: field(formData, "preferences"),
+    likesCooking: asCookingAffinity(field(formData, "likesCooking")),
+    foodBudget: field(formData, "foodBudget"),
     medications: field(formData, "medications"),
     supplements: field(formData, "supplements"),
     referral: field(formData, "referral"),
