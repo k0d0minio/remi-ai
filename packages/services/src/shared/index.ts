@@ -73,6 +73,7 @@ export type {
   PatientRecommendation,
   PatientSex,
   PatientStatus,
+  PatientSummary,
   PersonalisationDimension,
   PersonalisationProfile,
   Person,

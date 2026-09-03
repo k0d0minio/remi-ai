@@ -32,6 +32,7 @@ export type {
   PatientStatus,
 } from "./patient-profile";
 export type { PatientRecommendation } from "./patient-recommendation";
+export type { PatientSummary } from "./patient-summary";
 export type {
   GenotypeMarker,
   HabitsProfile,
