@@ -10,13 +10,16 @@
 
 ## The backlog
 
-| Epic                                               | What it is                                                                                                                                     |
-| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`patient-record/`](patient-record/breakdown.md)   | The manual patient record, deepened — consent, § A profile fields, structured anamnesis, goals, summary, supplements. Admin + data layer only. |
-| [`patient-surface/`](patient-surface/breakdown.md) | The content tools and the multi-page patient link — pantry essentials, recipe library, meal journal, `/p/[token]` segments.                    |
+| Epic                                                   | What it is                                                                                                                                     |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`patient-record/`](patient-record/breakdown.md)       | The manual patient record, deepened — consent, § A profile fields, structured anamnesis, goals, summary, supplements. Admin + data layer only. |
+| [`patient-surface/`](patient-surface/breakdown.md)     | The content tools and the multi-page patient link — pantry essentials, recipe library, meal journal, `/p/[token]` segments.                    |
+| [`patient-workspace/`](patient-workspace/breakdown.md) | The admin patient page re-laid for desktop and phone — wide frame, banner, rail, segments, folds, add surfaces. Layout only.                   |
 
-Run `patient-record` first: `patient-surface`'s link segments render its tables. Both epics are
-cut from Morgane's v2 structure brainstorm
+Run `patient-record` first: `patient-surface`'s link segments render its tables.
+`patient-workspace` is independent of both in the data layer and re-frames the page the first
+epic's remaining cards land on; its `breakdown.md` carries the UI/UX research it rests on. The
+first two epics are cut from Morgane's v2 structure brainstorm
 ([`.icm/docs/collaboration/remi-v2-structure-brainstorm.docx`](../docs/collaboration/remi-v2-structure-brainstorm.docx)),
 manual-first — **no AI in this round**; the decisions of record that bind both live in
 [`patient-record/breakdown.md § Decisions`](patient-record/breakdown.md).
