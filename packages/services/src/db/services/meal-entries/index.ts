@@ -110,10 +110,12 @@ export const getMealEntry = async (id: Id): Promise<Result<MealEntry>> => {
  * feedback with no timestamp reads as unanswered forever, and a timestamp with
  * no feedback marks a meal answered that nobody answered.
  */
+type FeedbackPatch = Partial<Pick<MealEntry, "feedback" | "feedbackWrittenAt">>;
+
 const feedbackPatch = (
   feedback: string | undefined,
   existing: MealEntry | null,
-) => {
+): FeedbackPatch => {
   if (feedback === undefined) {
     return {};
   }
@@ -150,6 +152,10 @@ export const addMealEntry = async (
     return err("not_found", "no such patient");
   }
 
+  // Feedback at transcription time is unusual but legal — she sometimes
+  // answers as she logs — so the stamp is decided here on the same rule the
+  // patch uses, rather than left for a second write to set.
+  const feedback = parsed.data.feedback ?? "";
   const created = await entries().insert({
     patientId,
     eatenOn: parsed.data.eatenOn,
@@ -157,10 +163,9 @@ export const addMealEntry = async (
     description: parsed.data.description,
     patientComment: parsed.data.patientComment ?? "",
     learning: parsed.data.learning ?? "",
-    feedback: "",
-    feedbackWrittenAt: null,
+    feedback,
+    feedbackWrittenAt: feedback === "" ? null : new Date(),
     archivedAt: null,
-    ...feedbackPatch(parsed.data.feedback, null),
   });
   await touchPatient(patientId);
   return ok(created);
