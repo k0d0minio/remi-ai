@@ -49,14 +49,14 @@ token and carries the navigation, and one page per segment that renders only wha
 
 French paths, because the reader is francophone and the URL is part of what she sends:
 
-| Route                        | Segment          | Reads                                                     |
-| ---------------------------- | ---------------- | --------------------------------------------------------- |
-| `/p/[token]`                 | Home             | the patient, the active living summary, the active goals   |
-| `/p/[token]/recommandations` | Recommandations  | the active recommendations, by category                    |
-| `/p/[token]/complements`     | Compléments      | the active supplement protocol                             |
-| `/p/[token]/placard-frigo`   | Placard & frigo  | the active pantry essentials — item + « pourquoi pour toi »|
-| `/p/[token]/recettes`        | Recettes         | the active recipe assignments — title, body, her note      |
-| `/p/[token]/repas`           | Repas            | the meal entries, her feedback beneath each one            |
+| Route                        | Segment         | Reads                                                       |
+| ---------------------------- | --------------- | ----------------------------------------------------------- |
+| `/p/[token]`                 | Home            | the patient, the active living summary, the active goals    |
+| `/p/[token]/recommandations` | Recommandations | the active recommendations, by category                     |
+| `/p/[token]/complements`     | Compléments     | the active supplement protocol                              |
+| `/p/[token]/placard-frigo`   | Placard & frigo | the active pantry essentials — item + « pourquoi pour toi » |
+| `/p/[token]/recettes`        | Recettes        | the active recipe assignments — title, body, her note       |
+| `/p/[token]/repas`           | Repas           | the meal entries, her feedback beneath each one             |
 
 Every route keeps every property the current page has, and this is the non-negotiable part of the
 change: `force-dynamic`, both locales through the typed content dictionaries, the real name when
