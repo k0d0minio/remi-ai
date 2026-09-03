@@ -185,6 +185,7 @@ instruction travels with the profile — not only as a visual check on the page.
 - The living summary and the supplement protocol — stubs 5 and 6 of the epic.
 
 ## Open questions
+
 All three are the stub's, raised rather than answered, and none blocks a criterion above. Each is
 designed to be cheap to change once Morgane answers it — that is the point of raising them here
 rather than guessing quietly.
