@@ -85,11 +85,21 @@ export const visibleSegments = (
   data: PatientLinkData,
 ): readonly PatientLinkSegment[] => {
   const present: PatientLinkSegment[] = ["home"];
-  if (data.recommendations.length > 0) present.push("recommandations");
-  if (data.supplements.length > 0) present.push("complements");
-  if (data.essentials.length > 0) present.push("placard-frigo");
-  if (data.recipes.length > 0) present.push("recettes");
-  if (data.meals.length > 0) present.push("repas");
+  if (data.recommendations.length > 0) {
+    present.push("recommandations");
+  }
+  if (data.supplements.length > 0) {
+    present.push("complements");
+  }
+  if (data.essentials.length > 0) {
+    present.push("placard-frigo");
+  }
+  if (data.recipes.length > 0) {
+    present.push("recettes");
+  }
+  if (data.meals.length > 0) {
+    present.push("repas");
+  }
   return present;
 };
 
