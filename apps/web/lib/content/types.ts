@@ -6,14 +6,13 @@
  * It covers chrome — navigation, labels, headings, empty states — for both
  * surfaces.
  *
- * Note what is NOT here: a step's title, a recipe's method, a recommendation's
- * detail. Those are data, not chrome — they come from the query layer in the
+ * Note what is NOT here: a step's title, a recommendation's detail. Those are
+ * data, not chrome — they come from the query layer in the
  * language they were written in, and translating them is a question for the
  * practitioner, not for a dictionary.
  */
 
 import type {
-  MealSlot,
   PersonalisationDimension,
   RecommendationCategory,
   SignalKind,
@@ -208,7 +207,7 @@ export type Content = {
     dialog: {
       /** "Publish {name}'s plan?" */
       title: string;
-      /** "{count} recommendations become meals and steps in their space…" */
+      /** "{count} recommendations become steps in their space…" */
       body: string;
       cancel: string;
       confirm: string;
@@ -253,24 +252,6 @@ export type Content = {
     nextReview: string;
     categories: Record<RecommendationCategory, string>;
     disclaimer: PlaceholderContent;
-    empty: PlaceholderContent;
-  };
-  meals: {
-    title: string;
-    lead: string;
-    tabs: {
-      week: string;
-      shopping: string;
-    };
-    slots: Record<MealSlot, string>;
-    /** Follows the number in each badge: "12 min", "4 servings". */
-    minutes: string;
-    servings: string;
-    /** The attribution line above every recipe's list of what it honours. */
-    because: string;
-    /** The disclosure that opens ingredients and method. */
-    details: string;
-    shopping: PlaceholderContent;
     empty: PlaceholderContent;
   };
   steps: {

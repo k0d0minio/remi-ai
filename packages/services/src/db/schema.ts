@@ -227,6 +227,75 @@ export const patientPantryEssentials = pgTable("patient_pantry_essentials", {
   ...timestamps,
 });
 
+/**
+ * The shared recipe library — brainstorm § I.
+ *
+ * The one table in the estate that belongs to no patient, and that is the
+ * decision of record (#5): Morgane reuses the same dish across her 10-15
+ * patients and personalises the *giving*, not the dish. Per-patient rows would
+ * have her retyping the same recipe five times and leave five versions of it to
+ * fix when one changes.
+ *
+ * `body` is prose, one field, no structure imposed: she writes ingredients and
+ * steps as a paragraph in chat today, and § 7 bans the dozen-field form that
+ * would replace it. There is no `minutes`, `servings`, `ingredients[]` or
+ * `method[]` here — those were v1's fields, and their absence is the spec.
+ */
+export const recipes = pgTable("recipes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  /** Ingredients and steps as she writes them — prose, not a structure. */
+  body: text("body").notNull().default(""),
+  /**
+   * Free text, and deliberately no taxonomy. § I mentions season and régime as
+   * things she filters on, but which tags she actually uses is hers to answer,
+   * so the library filters on whatever exists rather than on an enum invented
+   * here. A stable set can be promoted to a closed vocabulary later.
+   */
+  tags: text("tags").array().notNull().default([]),
+  /**
+   * A recipe patients hold cannot be removed from the record, so the library
+   * archives and never deletes — the restrict below is what enforces it.
+   */
+  archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
+
+/**
+ * One recipe given to one patient — the half of § I that is personal.
+ *
+ * The weekly refresh is this table: each week Morgane assigns the new
+ * inspirations and archives what rotates out, and the dated trail *is* the
+ * WEEKLY_ADAPTATION record (§ 8) the AI round will later learn from. So the
+ * same recipe may be assigned to the same patient many times over the months —
+ * that repetition is the history, not a duplicate — and no unique constraint
+ * stands in its way. What the service refuses is a second *active* assignment
+ * of one recipe to one patient.
+ *
+ * The two foreign keys differ on purpose: deleting a patient takes their
+ * assignments with them, while a recipe cannot be deleted at all while anyone
+ * holds it.
+ */
+export const patientRecipeAssignments = pgTable("patient_recipe_assignments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  recipeId: uuid("recipe_id")
+    .notNull()
+    .references(() => recipes.id, { onDelete: "restrict" }),
+  /** « Pourquoi pour toi » — § H's justification logic, applied to recipes. */
+  note: text("note").notNull().default(""),
+  /**
+   * The day she gave it, as a calendar date rather than an instant: "the week
+   * of the 8th" is the unit here, and a timestamp would drift across a border.
+   */
+  assignedOn: date("assigned_on", { mode: "string" }).notNull(),
+  /** Set when the recipe rotates out, which is the refresh, not a deletion. */
+  archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
+
 export const operators = pgTable("operators", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),

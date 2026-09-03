@@ -8,7 +8,6 @@
 
 export type { AuditAction, AuditEvent } from "./audit-event";
 export type { Consultation } from "./consultation";
-export type { Meal, MealSlot, MealStatus } from "./meal";
 export type { Operator, OperatorRole } from "./operator";
 export type { OperatorInvitation } from "./operator-invitation";
 export type { PantryEssential } from "./pantry-essential";
@@ -39,7 +38,8 @@ export type {
   SignalKind,
   SignalSeverity,
 } from "./progress-signal";
-export type { Ingredient, Recipe } from "./recipe";
+export type { Recipe } from "./recipe";
+export type { AssignedRecipe, RecipeAssignment } from "./recipe-assignment";
 export type { Recommendation, RecommendationCategory } from "./recommendation";
 export type { Step, StepStatus } from "./step";
 export type { FramePrinciple, TherapeuticFrame } from "./therapeutic-frame";
