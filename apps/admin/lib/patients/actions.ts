@@ -8,6 +8,8 @@ import {
   addPatientRecommendation,
   archivePantryEssential,
   archivePatientRecommendation,
+  archiveRecipeAssignment,
+  assignRecipe,
   createPatient,
   deletePatient,
   deletePantryEssential,
@@ -18,12 +20,14 @@ import {
   movePatientRecommendation,
   patientLinkEmail,
   regenerateShareToken,
+  removeRecipeAssignment,
   sendEmail,
   setPatientAnamnesis,
   updatePantryEssential,
   updatePatient,
   updatePatientNote,
   updatePatientRecommendation,
+  updateRecipeAssignment,
   type PatientInput,
 } from "@remi/services/server";
 import {
@@ -59,6 +63,7 @@ import { mailerReady } from "@/lib/mailer";
 export type PatientFormState = { error: string | null; saved: boolean };
 export type RecommendationFormState = { error: string | null };
 export type PantryFormState = { error: string | null };
+export type AssignmentFormState = { error: string | null };
 export type NoteFormState = { error: string | null };
 export type AnamnesisFormState = { error: string | null };
 export type ShareFormState = { error: string | null; sent: boolean };
@@ -436,6 +441,97 @@ export const deletePantryEssentialAction = async (formData: FormData) => {
       type: "pantry_essential",
       id,
       label: field(formData, "item"),
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+/**
+ * Giving a recipe, and the weekly refresh that follows it.
+ *
+ * The refresh is archive-then-assign rather than a replace: what she gave in
+ * September stays a row with its date on it, because that trail is the
+ * WEEKLY_ADAPTATION record (§ 8) and not an intermediate state.
+ *
+ * The recipe itself is never edited from here — that is the library's, and one
+ * edit there changes the recipe for everyone holding it.
+ */
+export const assignRecipeAction = async (
+  _previous: AssignmentFormState,
+  formData: FormData,
+): Promise<AssignmentFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const result = await assignRecipe(patientId, field(formData, "recipeId"), {
+    note: field(formData, "note"),
+    assignedOn: field(formData, "assignedOn"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "recipe.assigned", {
+    type: "recipe_assignment",
+    id: result.data.id,
+    label: field(formData, "title"),
+  });
+  revalidatePatient(patientId);
+  return { error: null };
+};
+
+export const updateRecipeAssignmentAction = async (
+  _previous: AssignmentFormState,
+  formData: FormData,
+): Promise<AssignmentFormState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const result = await updateRecipeAssignment(id, {
+    note: field(formData, "note"),
+    assignedOn: field(formData, "assignedOn"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "recipe.assignment_updated", {
+    type: "recipe_assignment",
+    id,
+    label: field(formData, "title"),
+  });
+  revalidatePatient(field(formData, "patientId"));
+  return { error: null };
+};
+
+export const archiveRecipeAssignmentAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const archived = field(formData, "archived") === "true";
+  const result = await archiveRecipeAssignment(id, archived);
+  if (result.ok) {
+    await audit(
+      operator,
+      archived ? "recipe.assignment_archived" : "recipe.assignment_restored",
+      {
+        type: "recipe_assignment",
+        id,
+        label: field(formData, "title"),
+      },
+    );
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+/**
+ * The permanent one, for the assignment written against the wrong patient.
+ * Archiving is the everyday move — this is not how a recipe rotates out.
+ */
+export const removeRecipeAssignmentAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const removed = await removeRecipeAssignment(id);
+  if (removed.ok) {
+    await audit(operator, "recipe.assignment_removed", {
+      type: "recipe_assignment",
+      id,
+      label: field(formData, "title"),
     });
   }
   revalidatePatient(field(formData, "patientId"));

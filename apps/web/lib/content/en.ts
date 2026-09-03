@@ -50,7 +50,6 @@ export const en: Content = {
   ],
   patientNav: [
     { href: "/today", icon: "today", label: "Today" },
-    { href: "/meals", icon: "meals", label: "Meals" },
     { href: "/steps", icon: "steps", label: "Steps" },
     { href: "/plan", icon: "plan", label: "My plan" },
   ],
@@ -181,13 +180,13 @@ export const en: Content = {
     },
     dialog: {
       title: "Publish {name}'s plan?",
-      body: "{count} recommendations become meals and steps in their space. The previous plan is replaced.",
+      body: "{count} recommendations become steps in their space. The previous plan is replaced.",
       cancel: "Cancel",
       confirm: "Publish",
     },
     published: {
       title: "Plan published",
-      body: "{name} will see {count} recommendations in their space, turned into meals and steps.",
+      body: "{name} will see {count} recommendations in their space, turned into steps.",
     },
     empty: {
       title: "No consultation yet",
@@ -248,32 +247,6 @@ export const en: Content = {
     empty: {
       title: "No plan yet",
       body: "Your practitioner has not published a plan for you. It will appear here as soon as they do.",
-    },
-  },
-  meals: {
-    title: "Meals",
-    lead: "Ideas that follow your plan, adapted to your tastes, your time and what you have in the kitchen.",
-    tabs: {
-      week: "The week",
-      shopping: "Shopping list",
-    },
-    slots: {
-      breakfast: "breakfast",
-      lunch: "lunch",
-      dinner: "dinner",
-      snack: "snack",
-    },
-    minutes: "min",
-    servings: "servings",
-    because: "Because your practitioner recommended",
-    details: "Ingredients and method",
-    shopping: {
-      title: "Before the shop",
-      body: "Sorted the way the shop is laid out, not the way the recipes are written.",
-    },
-    empty: {
-      title: "No meals yet",
-      body: "Meal ideas appear here once your practitioner has published a plan.",
     },
   },
   steps: {

@@ -43,6 +43,13 @@
       "when": 1788383757253,
       "tag": "0005_misty_hedge_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788396779339,
+      "tag": "0006_good_nicolaos",
+      "breakpoints": true
     }
   ]
 }

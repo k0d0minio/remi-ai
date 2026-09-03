@@ -22,16 +22,6 @@ export const formatDate = (value: Date | string, locale = DEFAULT_LOCALE) =>
     typeof value === "string" ? new Date(value) : value,
   );
 
-/**
- * The weekday on its own — what a meal in a person's week is labelled with. The
- * date itself is noise there: "Monday · dinner" is how someone reads a plan for
- * the week ahead, not "3 Aug 2026 · dinner".
- */
-export const formatWeekday = (value: Date | string, locale = DEFAULT_LOCALE) =>
-  new Intl.DateTimeFormat(locale, { weekday: "long" }).format(
-    typeof value === "string" ? new Date(value) : value,
-  );
-
 export const formatDateTime = (value: Date | string, locale = DEFAULT_LOCALE) =>
   new Intl.DateTimeFormat(locale, {
     dateStyle: "medium",

@@ -12,7 +12,6 @@ export {
   formatCurrency,
   formatDate,
   formatDateTime,
-  formatWeekday,
   initials,
 } from "./format";
 export {
@@ -47,6 +46,7 @@ export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";
  */
 export type {
   AnamnesisCategory,
+  AssignedRecipe,
   AuditAction,
   AuditEvent,
   ConsentChannel,
@@ -55,10 +55,6 @@ export type {
   FramePrinciple,
   GenotypeMarker,
   HabitsProfile,
-  Ingredient,
-  Meal,
-  MealSlot,
-  MealStatus,
   OperatorRole,
   PantryEssential,
   PatientAnamnesis,
@@ -77,6 +73,7 @@ export type {
   ProgressSignal,
   PsychologyProfile,
   Recipe,
+  RecipeAssignment,
   Recommendation,
   RecommendationCategory,
   RhythmProfile,

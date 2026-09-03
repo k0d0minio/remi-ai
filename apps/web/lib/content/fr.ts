@@ -50,7 +50,6 @@ export const fr: Content = {
   ],
   patientNav: [
     { href: "/today", icon: "today", label: "Aujourd'hui" },
-    { href: "/meals", icon: "meals", label: "Repas" },
     { href: "/steps", icon: "steps", label: "Étapes" },
     { href: "/plan", icon: "plan", label: "Mon plan" },
   ],
@@ -181,13 +180,13 @@ export const fr: Content = {
     },
     dialog: {
       title: "Publier le plan de {name} ?",
-      body: "{count} recommandations deviendront des repas et des étapes dans son espace. Le plan précédent sera remplacé.",
+      body: "{count} recommandations deviendront des étapes dans son espace. Le plan précédent sera remplacé.",
       cancel: "Annuler",
       confirm: "Publier",
     },
     published: {
       title: "Plan publié",
-      body: "{name} verra {count} recommandations dans son espace, traduites en repas et en étapes.",
+      body: "{name} verra {count} recommandations dans son espace, traduites en étapes.",
     },
     empty: {
       title: "Pas encore de consultation",
@@ -248,32 +247,6 @@ export const fr: Content = {
     empty: {
       title: "Pas encore de plan",
       body: "Votre praticien n'a pas encore publié de plan pour vous. Il apparaîtra ici dès qu'il l'aura fait.",
-    },
-  },
-  meals: {
-    title: "Repas",
-    lead: "Des idées qui suivent votre plan, adaptées à vos goûts, votre temps et ce que vous avez en cuisine.",
-    tabs: {
-      week: "La semaine",
-      shopping: "Liste de courses",
-    },
-    slots: {
-      breakfast: "petit-déjeuner",
-      lunch: "déjeuner",
-      dinner: "dîner",
-      snack: "collation",
-    },
-    minutes: "min",
-    servings: "portions",
-    because: "Parce que votre praticien a recommandé",
-    details: "Ingrédients et préparation",
-    shopping: {
-      title: "Avant les courses",
-      body: "Rangée comme le magasin, pas comme les recettes.",
-    },
-    empty: {
-      title: "Pas encore de repas",
-      body: "Les idées de repas apparaîtront ici une fois que votre praticien aura publié un plan.",
     },
   },
   steps: {
