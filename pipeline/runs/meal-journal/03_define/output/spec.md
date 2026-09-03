@@ -161,9 +161,9 @@ appearance there is `patient-link-segments`, which will read `feedback_written_a
 ## Open questions
 
 - **Slot vocabulary — pending Morgane's confirmation.** The four keys are the brainstorm's, and
-  Jamie chose the optional-fixed-vocabulary shape (2026-09-03). Whether *petit-déjeuner /
-  déjeuner / dîner / collation* are the words she uses, and whether she wants a slot at all, is
-  still hers to confirm. Non-blocking: the labels are a vocabulary file, adding a fifth key is a
+  Jamie chose the optional-fixed-vocabulary shape (2026-09-03). Whether _petit-déjeuner_,
+  _déjeuner_, _dîner_ and _collation_ are the words she uses, and whether she wants a slot at all,
+  is still hers to confirm. Non-blocking: the labels are a vocabulary file, adding a fifth key is a
   one-line change, and null is already a first-class value if she never fills it.
 - **Should the patient see all entries, or only entries where she wrote feedback?** Raised by the
   stub, and Morgane's call — an unanswered meal on the patient's own page may read as neglect.
