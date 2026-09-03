@@ -50,6 +50,13 @@
       "when": 1788396779339,
       "tag": "0006_good_nicolaos",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788438297984,
+      "tag": "0007_yielding_banshee",
+      "breakpoints": true
     }
   ]
 }

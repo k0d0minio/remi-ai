@@ -2,6 +2,7 @@ import type {
   AnamnesisCategory,
   ConsentChannel,
   CookingAffinity,
+  GoalDirection,
   PatientSex,
   PatientStatus,
   RecommendationCategory,
@@ -94,4 +95,25 @@ export const anamnesisCategoryLabels: Record<AnamnesisCategory, string> = {
   musculoskeletal: "Ostéo-articulaire, activité",
   endocrine: "Endocrinien, gynéco",
   context: "Contexte de vie",
+};
+
+/**
+ * § D's check-in words, as Morgane says them. The keys are what
+ * `patient_goal_check_ins` stores, so rewording one is an edit here alone.
+ */
+export const goalDirectionLabels: Record<GoalDirection, string> = {
+  better: "mieux",
+  stable: "stable",
+  worse: "moins bien",
+};
+
+/**
+ * Only a worsening earns a warning colour. A trail where every row is tinted
+ * reads as noise; the row that should catch her eye is the one going the wrong
+ * way.
+ */
+export const goalDirectionIntents: Record<GoalDirection, Intent> = {
+  better: "success",
+  stable: "neutral",
+  worse: "warning",
 };

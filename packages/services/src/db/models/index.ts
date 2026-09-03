@@ -12,6 +12,12 @@ export type { Operator, OperatorRole } from "./operator";
 export type { OperatorInvitation } from "./operator-invitation";
 export type { PantryEssential } from "./pantry-essential";
 export type { AnamnesisCategory, PatientAnamnesis } from "./patient-anamnesis";
+export type {
+  GoalDirection,
+  PatientGoalCheckIn,
+} from "./patient-goal-check-in";
+export type { PatientGoal } from "./patient-goal";
+export type { PatientInstruction } from "./patient-instruction";
 export type { PatientNote } from "./patient-note";
 export type {
   ConsentChannel,
