@@ -23,6 +23,8 @@ import {
   listPatientNotes,
   listPatientRecipes,
   listPatientRecommendations,
+  listArchivedPatientSupplements,
+  listPatientSupplements,
   listRecipes,
 } from "@remi/services/server";
 import { ageInYears, appHref } from "@remi/services/shared";
@@ -57,6 +59,8 @@ import { RecommendationAddForm } from "@/components/patients/recommendation-add-
 import { RecommendationGroups } from "@/components/patients/recommendation-groups";
 import { ShareLinkCard } from "@/components/patients/share-link-card";
 import { SummaryBlock } from "@/components/patients/summary-block";
+import { SupplementAddForm } from "@/components/patients/supplement-add-form";
+import { SupplementProtocol } from "@/components/patients/supplement-protocol";
 import {
   patientSexLabels,
   patientStatusIntents,
@@ -89,6 +93,8 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
   const [
     recommendations,
     archived,
+    supplements,
+    archivedSupplements,
     essentials,
     archivedEssentials,
     assignedRecipes,
@@ -109,6 +115,8 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
   ] = await Promise.all([
     listPatientRecommendations(patient.id),
     listArchivedPatientRecommendations(patient.id),
+    listPatientSupplements(patient.id),
+    listArchivedPatientSupplements(patient.id),
     listPantryEssentials(patient.id),
     listArchivedPantryEssentials(patient.id),
     listPatientRecipes(patient.id),
@@ -311,6 +319,39 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
 
       <Card>
         <CardHeader>
+          <CardTitle>Protocole de compléments</CardTitle>
+          <CardDescription>
+            Les compléments que vous prescrivez, avec dose, moment et raison.
+            Ceux que la personne prend déjà d&apos;elle-même se notent dans le
+            profil.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          {supplements.length === 0 ? (
+            <Typography size="sm" tone="muted">
+              Aucun complément prescrit pour le moment.
+            </Typography>
+          ) : (
+            <SupplementProtocol supplements={supplements} />
+          )}
+
+          <SupplementAddForm patientId={patient.id} />
+
+          {archivedSupplements.length > 0 ? (
+            <details className="border-border flex flex-col gap-3 border-t pt-6">
+              <summary className="text-muted-foreground hover:text-foreground cursor-pointer text-sm">
+                {`Compléments arrêtés (${archivedSupplements.length})`}
+              </summary>
+              <div className="pt-3">
+                <SupplementProtocol supplements={archivedSupplements} />
+              </div>
+            </details>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Essentiels placard / frigo</CardTitle>
           <CardDescription>
             La courte liste d&apos;aliments à avoir sous la main, avec le
@@ -504,11 +545,12 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
         <CardHeader>
           <CardTitle>Zone sensible</CardTitle>
           <CardDescription>
-            La suppression retire le profil, ses recommandations, ses
-            essentiels, ses notes, son anamnèse, ses objectifs et leurs points
-            d&apos;étape, ses consignes, ses recettes attribuées, son journal
-            des repas, ses observations et le lien patient — définitivement. Les
-            recettes elles-mêmes restent dans la bibliothèque.
+            La suppression retire le profil, ses recommandations, son protocole
+            de compléments, ses essentiels, ses notes, son anamnèse, ses
+            objectifs et leurs points d&apos;étape, ses consignes, ses recettes
+            attribuées, son journal des repas, ses observations et le lien
+            patient — définitivement. Les recettes elles-mêmes restent dans la
+            bibliothèque.
           </CardDescription>
         </CardHeader>
         <CardContent>

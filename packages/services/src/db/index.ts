@@ -77,6 +77,14 @@ export {
 } from "./services/patient-summaries";
 
 export {
+  addPatientSupplement,
+  deletePatientSupplement,
+  listPatientSupplements,
+  updatePatientSupplement,
+} from "./services/patient-supplements";
+export type { SupplementInput } from "./services/patient-supplements";
+
+export {
   createOperator,
   findOperatorByEmail,
   getOperator,

@@ -1,5 +1,5 @@
 {
-  "id": "64c52057-208a-40ee-b6c5-13e8e3ca47bd",
+  "id": "ef892333-747b-4a5a-98a5-d5204c9b16c3",
   "prevId": "ca891c15-ccef-48cf-a060-d500f0d6f529",
   "version": "7",
   "dialect": "postgresql",
@@ -1276,8 +1276,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.patient_summaries": {
-      "name": "patient_summaries",
+    "public.patient_supplements": {
+      "name": "patient_supplements",
       "schema": "",
       "columns": {
         "id": {
@@ -1293,11 +1293,45 @@
           "primaryKey": false,
           "notNull": true
         },
-        "body": {
-          "name": "body",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "dose": {
+          "name": "dose",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "timing": {
+          "name": "timing",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -1316,9 +1350,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "patient_summaries_patient_id_patient_profiles_id_fk": {
-          "name": "patient_summaries_patient_id_patient_profiles_id_fk",
-          "tableFrom": "patient_summaries",
+        "patient_supplements_patient_id_patient_profiles_id_fk": {
+          "name": "patient_supplements_patient_id_patient_profiles_id_fk",
+          "tableFrom": "patient_supplements",
           "tableTo": "patient_profiles",
           "columnsFrom": [
             "patient_id"
@@ -1331,15 +1365,7 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "patient_summaries_patient_id_unique": {
-          "name": "patient_summaries_patient_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "patient_id"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

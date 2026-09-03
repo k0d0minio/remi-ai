@@ -71,6 +71,7 @@ export type {
   PatientObservation,
   PatientProfile,
   PatientRecommendation,
+  PatientSupplement,
   PatientSex,
   PatientStatus,
   PatientSummary,
