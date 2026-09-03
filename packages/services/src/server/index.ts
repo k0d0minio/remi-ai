@@ -58,6 +58,33 @@ export {
 export type { PantryEssentialInput } from "../db/services/pantry-essentials";
 
 export {
+  archiveRecipe,
+  countRecipeAssignments,
+  createRecipe,
+  getRecipe,
+  listArchivedRecipes,
+  listRecipeTags,
+  listRecipes,
+  updateRecipe,
+} from "../db/services/recipes";
+export type { RecipeInput } from "../db/services/recipes";
+
+export {
+  archiveRecipeAssignment,
+  assignRecipe,
+  listArchivedPatientRecipes,
+  listPatientRecipes,
+  removeRecipeAssignment,
+  updateRecipeAssignment,
+} from "../db/services/recipe-assignments";
+export type { AssignmentInput } from "../db/services/recipe-assignments";
+export type {
+  AssignedRecipe,
+  RecipeAssignment,
+} from "../db/models/recipe-assignment";
+export type { Recipe } from "../db/models/recipe";
+
+export {
   addPatientNote,
   deletePatientNote,
   listPatientNotes,

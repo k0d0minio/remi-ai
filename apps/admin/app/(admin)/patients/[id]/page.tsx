@@ -4,10 +4,13 @@ import { notFound } from "next/navigation";
 import {
   getPatient,
   listArchivedPantryEssentials,
+  listArchivedPatientRecipes,
   listArchivedPatientRecommendations,
   listPantryEssentials,
   listPatientNotes,
+  listPatientRecipes,
   listPatientRecommendations,
+  listRecipes,
 } from "@remi/services/server";
 import { ageInYears, appHref } from "@remi/services/shared";
 import {
@@ -23,7 +26,9 @@ import { DeletePatient } from "@/components/patients/delete-patient";
 import { NoteTimeline } from "@/components/patients/note-timeline";
 import { PantryAddForm } from "@/components/patients/pantry-add-form";
 import { PantryList } from "@/components/patients/pantry-list";
+import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
 import { PatientForm } from "@/components/patients/patient-form";
+import { RecipeAssignments } from "@/components/patients/recipe-assignments";
 import { RecommendationAddForm } from "@/components/patients/recommendation-add-form";
 import { RecommendationGroups } from "@/components/patients/recommendation-groups";
 import { ShareLinkCard } from "@/components/patients/share-link-card";
@@ -56,14 +61,27 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
   }
   const patient = result.data;
 
-  const [recommendations, archived, essentials, archivedEssentials, notes] =
-    await Promise.all([
-      listPatientRecommendations(patient.id),
-      listArchivedPatientRecommendations(patient.id),
-      listPantryEssentials(patient.id),
-      listArchivedPantryEssentials(patient.id),
-      listPatientNotes(patient.id),
-    ]);
+  const [
+    recommendations,
+    archived,
+    essentials,
+    archivedEssentials,
+    assignedRecipes,
+    pastRecipes,
+    library,
+    notes,
+  ] = await Promise.all([
+    listPatientRecommendations(patient.id),
+    listArchivedPatientRecommendations(patient.id),
+    listPantryEssentials(patient.id),
+    listArchivedPantryEssentials(patient.id),
+    listPatientRecipes(patient.id),
+    listArchivedPatientRecipes(patient.id),
+    // The picker offers the active library only — an archived recipe is out of
+    // circulation, which is exactly what archiving it meant.
+    listRecipes(),
+    listPatientNotes(patient.id),
+  ]);
   const shareUrl = appHref("web", `/p/${patient.shareToken}`, patient.locale);
   const age = ageInYears(patient.birthDate);
 
@@ -202,6 +220,47 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
 
       <Card>
         <CardHeader>
+          <CardTitle>Recettes</CardTitle>
+          <CardDescription>
+            Les recettes que cette personne a en ce moment, avec le mot qui va
+            avec chacune. Elles s&apos;écrivent une fois dans « Recettes » et
+            s&apos;attribuent ici.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          {assignedRecipes.length === 0 ? (
+            <Typography size="sm" tone="muted">
+              Aucune recette attribuée pour le moment.
+            </Typography>
+          ) : (
+            <RecipeAssignments entries={assignedRecipes} />
+          )}
+
+          <AssignRecipeForm
+            patientId={patient.id}
+            recipes={library}
+            today={today}
+          />
+        </CardContent>
+      </Card>
+
+      {pastRecipes.length > 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Recettes précédentes</CardTitle>
+            <CardDescription>
+              Ce qui est sorti du lot au fil des semaines, avec sa date.
+              C&apos;est l&apos;historique des adaptations, pas une corbeille.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RecipeAssignments entries={pastRecipes} />
+          </CardContent>
+        </Card>
+      ) : null}
+
+      <Card>
+        <CardHeader>
           <CardTitle>Consultations</CardTitle>
           <CardDescription>
             Vos notes de séance, de la plus récente à la plus ancienne. Elles ne
@@ -217,9 +276,8 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
         <CardHeader>
           <CardTitle>Profil</CardTitle>
           <CardDescription>
-            Le tableau de fond contre lequel les recommandations — et plus tard
-            les recettes — sont personnalisées, et le consentement recueilli
-            pour le tenir.
+            Le tableau de fond contre lequel les recommandations et les recettes
+            sont personnalisées, et le consentement recueilli pour le tenir.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -231,8 +289,9 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
         <CardHeader>
           <CardTitle>Zone sensible</CardTitle>
           <CardDescription>
-            La suppression retire le profil, ses recommandations, ses notes et
-            le lien patient — définitivement.
+            La suppression retire le profil, ses recommandations, ses notes, ses
+            recettes attribuées et le lien patient — définitivement. Les
+            recettes elles-mêmes restent dans la bibliothèque.
           </CardDescription>
         </CardHeader>
         <CardContent>
