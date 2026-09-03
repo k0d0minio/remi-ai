@@ -20,9 +20,9 @@ living summary per patient, written by Morgane, revised at each consultation** �
 per-consultation history, because the consultation notes already carry that; this is the current
 state of the file, not a log of its versions.
 
-It is also the first record block that is patient-visible *by design*: § J puts it on the patient
+It is also the first record block that is patient-visible _by design_: § J puts it on the patient
 link alongside the goals. Writing one document that serves both readers is the point — writing it
-*for* the patient is what § C's "pas de ressaisie" becomes while there is no AI to do the
+_for_ the patient is what § C's "pas de ressaisie" becomes while there is no AI to do the
 translating. This is stub 5 of 6 of the `patient-record` epic, built as permanent data layer now
 (`business/initiatives`: terrain-first, manual before AI); the epic's decisions bind it — admin and
 data layer only, no AI, and no patient-facing render this round (that render is the
@@ -36,7 +36,7 @@ profile would do. It gets its own table for two reasons the stub names. First, i
 timestamp: the "reviewed at" / "updated at" question (open, below) is about *when the summary last
 moved*, and a column on `patient_profiles` would have the summary's freshness tracked by a
 `updated_at` that also bumps every time she edits an allergy or a budget. A row of its own carries
-its own `updated_at`. Second, the AI round wants draft-vs-validated state on *this* content; that
+its own `updated_at`. Second, the AI round wants draft-vs-validated state on _this_ content; that
 belongs beside the summary body, not spread across the profile table. Either shape supports the
 future as a **column addition, not a re-model** (the stub's constraint) — the dedicated row keeps
 that addition local to the summary.
@@ -73,7 +73,7 @@ that summarises why they were chosen. The card holds:
   the page's established per-block idiom (`InstructionBlock`) so saving the summary never touches a
   sibling row.
 - **A label that says it is patient-visible** — "visible sur le lien patient une fois les segments
-  en ligne" — stated plainly on the card, because writing it *for* the patient is the point and she
+  en ligne" — stated plainly on the card, because writing it _for_ the patient is the point and she
   should know a patient will read it. It also names honestly that the render is not live yet, so the
   card does not imply a capability that does not exist this round.
 - **§ C's checklist as helper text, not fields.** The eight things a summary covers (context and
@@ -164,13 +164,13 @@ guessing quietly.
 
 - **A lightweight "reviewed at" stamp she bumps when she re-reads without editing, or is
   `updated_at` enough?** Built with `updated_at` alone: the row's timestamp moves when the body
-  changes, so a summary she read but did not touch does not *look* refreshed. If she wants staleness
-  to reflect *review* and not just *edit* — so an untouched-but-re-read summary stops reading as
+  changes, so a summary she read but did not touch does not _look_ refreshed. If she wants staleness
+  to reflect _review_ and not just _edit_ — so an untouched-but-re-read summary stops reading as
   stale — that is one nullable `reviewed_at` column beside `body` and one "j'ai relu" control on the
   card. A column addition, not a re-model, which is exactly the room the dedicated table was chosen
   to leave. Worth confirming before the edit-only stamp is treated as settled.
 - **Sections within the summary as headings she types, or truly free text?** Built as free text with
-  § C's checklist as helper guidance, per the stub's *Worth knowing* and § 4's no-manual-entry-burden
+  § C's checklist as helper guidance, per the stub's _Worth knowing_ and § 4's no-manual-entry-burden
   principle. If she wants the eight § C areas as consistent typed headings (so the eventual patient
   render and the eventual AI draft can align to them), that is a UI-and-convention change over the
   same free-text column — a template she fills, or light structure in the render — not a migration.
