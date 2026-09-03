@@ -111,6 +111,34 @@ export type {
 export type { Recipe } from "../db/models/recipe";
 
 export {
+  addMealEntry,
+  archiveMealEntry,
+  countMealEntriesAwaitingFeedback,
+  deleteMealEntry,
+  getMealEntry,
+  listArchivedMealEntries,
+  listMealEntries,
+  updateMealEntry,
+} from "../db/services/meal-entries";
+export type { MealEntryInput } from "../db/services/meal-entries";
+export type { MealEntry, MealSlot } from "../db/models/meal-entry";
+
+export {
+  addPatientObservation,
+  archivePatientObservation,
+  deletePatientObservation,
+  listArchivedPatientObservations,
+  listPatientLearnings,
+  listPatientObservations,
+  updatePatientObservation,
+} from "../db/services/patient-observations";
+export type { PatientObservationInput } from "../db/services/patient-observations";
+export type {
+  PatientLearning,
+  PatientObservation,
+} from "../db/models/patient-observation";
+
+export {
   addPatientNote,
   deletePatientNote,
   listPatientNotes,

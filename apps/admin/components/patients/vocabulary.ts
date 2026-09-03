@@ -3,6 +3,7 @@ import type {
   ConsentChannel,
   CookingAffinity,
   GoalDirection,
+  MealSlot,
   PatientSex,
   PatientStatus,
   RecommendationCategory,
@@ -58,6 +59,20 @@ export const cookingAffinityLabels: Record<CookingAffinity, string> = {
   yes: "oui",
   somewhat: "un peu",
   no: "non",
+};
+
+/**
+ * The moments of a day, as Morgane writes them.
+ *
+ * Pending her confirmation — both the words and whether she wants a slot at
+ * all. Because the row stores the stable keys, changing either is an edit here
+ * or one line in `mealSlots`, never a migration.
+ */
+export const mealSlotLabels: Record<MealSlot, string> = {
+  petit_dejeuner: "petit-déjeuner",
+  dejeuner: "déjeuner",
+  diner: "dîner",
+  collation: "collation",
 };
 
 /**

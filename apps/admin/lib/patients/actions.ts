@@ -4,21 +4,27 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
   addGoalCheckIn,
+  addMealEntry,
   addPantryEssential,
   addPatientGoal,
   addPatientNote,
+  addPatientObservation,
   addPatientRecommendation,
+  archiveMealEntry,
   archivePantryEssential,
   archivePatientGoal,
+  archivePatientObservation,
   archivePatientRecommendation,
   archiveRecipeAssignment,
   assignRecipe,
   createPatient,
-  deletePatient,
   deleteGoalCheckIn,
+  deleteMealEntry,
   deletePantryEssential,
+  deletePatient,
   deletePatientGoal,
   deletePatientNote,
+  deletePatientObservation,
   deletePatientRecommendation,
   getPatient,
   getPatientInstruction,
@@ -32,10 +38,12 @@ import {
   setPatientAnamnesis,
   setPatientInstruction,
   updateGoalCheckIn,
+  updateMealEntry,
   updatePantryEssential,
-  updatePatientGoal,
   updatePatient,
+  updatePatientGoal,
   updatePatientNote,
+  updatePatientObservation,
   updatePatientRecommendation,
   updateRecipeAssignment,
   type PatientInput,
@@ -46,12 +54,14 @@ import {
   cookingAffinities,
   goalDirections,
   isLocale,
+  mealSlots,
   patientSexes,
   patientStatuses,
   recommendationCategories,
   type ConsentChannel,
   type CookingAffinity,
   type GoalDirection,
+  type MealSlot,
   type PatientSex,
   type PatientStatus,
   type RecommendationCategory,
@@ -76,6 +86,8 @@ export type PatientFormState = { error: string | null; saved: boolean };
 export type RecommendationFormState = { error: string | null };
 export type PantryFormState = { error: string | null };
 export type AssignmentFormState = { error: string | null };
+export type MealFormState = { error: string | null };
+export type ObservationFormState = { error: string | null };
 export type NoteFormState = { error: string | null };
 export type AnamnesisFormState = { error: string | null };
 export type GoalFormState = { error: string | null };
@@ -90,6 +102,13 @@ const asStatus = (value: string): PatientStatus =>
   (patientStatuses as readonly string[]).includes(value)
     ? (value as PatientStatus)
     : "active";
+
+/**
+ * An empty select is a slot she left blank, which is a real answer rather
+ * than a missing one — so it narrows to `null`, not to a default meal.
+ */
+const asMealSlot = (value: string): MealSlot | null =>
+  (mealSlots as readonly string[]).includes(value) ? (value as MealSlot) : null;
 
 const asSex = (value: string): PatientSex =>
   (patientSexes as readonly string[]).includes(value)
@@ -462,6 +481,216 @@ export const deletePantryEssentialAction = async (formData: FormData) => {
       type: "pantry_essential",
       id,
       label: field(formData, "item"),
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+/**
+ * The meal journal — § 5's loop, and the learnings it leaves behind.
+ *
+ * Transcription and answer are two separate moments and two separate actions:
+ * she logs the meal from the WhatsApp thread, and writes the feedback later,
+ * often in a batch at the end of the week. `writeMealFeedbackAction` carries
+ * both the feedback and the learning because that is the pass she makes over an
+ * entry — reading it, answering it, and noting what it taught her, in one go.
+ *
+ * The audit distinguishes writing feedback from clearing it: "answered" is the
+ * fact the journal, and later the patient link, read off an entry, so losing it
+ * is a change worth its own row.
+ */
+const summarise = (description: string) =>
+  description.length > 60 ? `${description.slice(0, 60)}…` : description;
+
+export const addMealEntryAction = async (
+  _previous: MealFormState,
+  formData: FormData,
+): Promise<MealFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const result = await addMealEntry(patientId, {
+    eatenOn: field(formData, "eatenOn"),
+    slot: asMealSlot(field(formData, "slot")),
+    description: field(formData, "description"),
+    patientComment: field(formData, "patientComment"),
+    feedback: field(formData, "feedback"),
+    learning: field(formData, "learning"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "meal.logged", {
+    type: "meal_entry",
+    id: result.data.id,
+    label: summarise(result.data.description),
+    detail: result.data.eatenOn,
+  });
+  revalidatePatient(patientId);
+  return { error: null };
+};
+
+/** The transcription itself — the meal, its day, its slot, their comment. */
+export const updateMealEntryAction = async (
+  _previous: MealFormState,
+  formData: FormData,
+): Promise<MealFormState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const result = await updateMealEntry(id, {
+    eatenOn: field(formData, "eatenOn"),
+    slot: asMealSlot(field(formData, "slot")),
+    description: field(formData, "description"),
+    patientComment: field(formData, "patientComment"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "meal.updated", {
+    type: "meal_entry",
+    id,
+    label: summarise(result.data.description),
+  });
+  revalidatePatient(field(formData, "patientId"));
+  return { error: null };
+};
+
+/** Her answer, and what the meal taught her — the second pass over an entry. */
+export const writeMealFeedbackAction = async (
+  _previous: MealFormState,
+  formData: FormData,
+): Promise<MealFormState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const feedback = field(formData, "feedback");
+  const result = await updateMealEntry(id, {
+    feedback,
+    learning: field(formData, "learning"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(
+    operator,
+    feedback.trim() === "" ? "meal.feedback_cleared" : "meal.feedback_written",
+    {
+      type: "meal_entry",
+      id,
+      label: summarise(result.data.description),
+    },
+  );
+  revalidatePatient(field(formData, "patientId"));
+  return { error: null };
+};
+
+export const archiveMealEntryAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const archived = field(formData, "archived") === "true";
+  const result = await archiveMealEntry(id, archived);
+  if (result.ok) {
+    await audit(operator, archived ? "meal.archived" : "meal.restored", {
+      type: "meal_entry",
+      id,
+      label: summarise(result.data.description),
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+export const deleteMealEntryAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const removed = await deleteMealEntry(id);
+  if (removed.ok) {
+    await audit(operator, "meal.deleted", {
+      type: "meal_entry",
+      id,
+      label: summarise(field(formData, "description")),
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+/**
+ * Observations that belong to the patient rather than to one meal.
+ *
+ * The second write path into the learnings view. Both exist because a week's
+ * review produces both kinds, and hanging a week-level remark off whichever
+ * entry happened to be on screen would record it as coming from a meal it did
+ * not come from.
+ */
+export const addObservationAction = async (
+  _previous: ObservationFormState,
+  formData: FormData,
+): Promise<ObservationFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const result = await addPatientObservation(patientId, {
+    body: field(formData, "body"),
+    observedOn: field(formData, "observedOn"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "observation.added", {
+    type: "patient_observation",
+    id: result.data.id,
+    label: summarise(result.data.body),
+  });
+  revalidatePatient(patientId);
+  return { error: null };
+};
+
+export const updateObservationAction = async (
+  _previous: ObservationFormState,
+  formData: FormData,
+): Promise<ObservationFormState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const result = await updatePatientObservation(id, {
+    body: field(formData, "body"),
+    observedOn: field(formData, "observedOn"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "observation.updated", {
+    type: "patient_observation",
+    id,
+    label: summarise(result.data.body),
+  });
+  revalidatePatient(field(formData, "patientId"));
+  return { error: null };
+};
+
+export const archiveObservationAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const archived = field(formData, "archived") === "true";
+  const result = await archivePatientObservation(id, archived);
+  if (result.ok) {
+    await audit(
+      operator,
+      archived ? "observation.archived" : "observation.restored",
+      {
+        type: "patient_observation",
+        id,
+        label: summarise(result.data.body),
+      },
+    );
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+export const deleteObservationAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const removed = await deletePatientObservation(id);
+  if (removed.ok) {
+    await audit(operator, "observation.deleted", {
+      type: "patient_observation",
+      id,
+      label: summarise(field(formData, "body")),
     });
   }
   revalidatePatient(field(formData, "patientId"));
