@@ -74,6 +74,7 @@ export type {
   PatientSupplement,
   PatientSex,
   PatientStatus,
+  PatientSummary,
   PersonalisationDimension,
   PersonalisationProfile,
   Person,

@@ -317,6 +317,33 @@ export const patientInstructions = pgTable("patient_instructions", {
 });
 
 /**
+ * The living summary — brainstorm § C's PATIENT_SUMMARY, written by Morgane
+ * now and drafted by the AI later.
+ *
+ * One row per patient, revised in place: § C's synthesis is the current state
+ * of the file, and the consultation notes already carry its history, so there
+ * is no archive here (owner decision, `.icm/intake/patient-record/breakdown.md`
+ * § Decisions #7). The `patient_id` unique constraint is that "one living
+ * summary per patient" rule expressed in the schema — a second write updates
+ * the row rather than adding one.
+ *
+ * It is the first record block patient-visible by design (§ J), but nothing
+ * renders it at the link this round — that is the `patient-surface` epic's. The
+ * AI round wants draft-vs-validated state on this content; that lands as columns
+ * beside `body`, not a re-model, which is why the summary has its own row rather
+ * than a column on `patient_profiles`.
+ */
+export const patientSummaries = pgTable("patient_summaries", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .unique()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  body: text("body").notNull(),
+  ...timestamps,
+});
+
+/**
  * The short list of foods worth keeping in the placard and the frigo, chosen
  * for this patient — brainstorm § H. An item is a name and a why, and that is
  * the whole design: § H warns explicitly against per-item quantity, season or

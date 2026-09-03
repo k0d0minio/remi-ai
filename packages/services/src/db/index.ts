@@ -72,6 +72,11 @@ export {
 export type { RecommendationInput } from "./services/patient-recommendations";
 
 export {
+  getPatientSummary,
+  setPatientSummary,
+} from "./services/patient-summaries";
+
+export {
   addPatientSupplement,
   deletePatientSupplement,
   listPatientSupplements,
