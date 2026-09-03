@@ -31,7 +31,11 @@ export const MealEntryItem = ({ entry }: Props) => {
   const [editing, setEditing] = useState(false);
   const [answering, setAnswering] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // One error slot per form, not one for the component: the two forms open
+  // independently, and a shared slot renders the feedback form's error inside
+  // the transcription form.
+  const [editError, setEditError] = useState<string | null>(null);
+  const [answerError, setAnswerError] = useState<string | null>(null);
   const archived = entry.archivedAt !== null;
   const answered = entry.feedbackWrittenAt !== null;
 
@@ -44,7 +48,7 @@ export const MealEntryItem = ({ entry }: Props) => {
               { error: null },
               formData,
             );
-            setError(result.error);
+            setEditError(result.error);
             if (!result.error) {
               setEditing(false);
             }
@@ -99,9 +103,9 @@ export const MealEntryItem = ({ entry }: Props) => {
           <FormControls
             onCancel={() => {
               setEditing(false);
-              setError(null);
+              setEditError(null);
             }}
-            error={error}
+            error={editError}
           />
         </form>
       </li>
@@ -146,7 +150,7 @@ export const MealEntryItem = ({ entry }: Props) => {
               { error: null },
               formData,
             );
-            setError(result.error);
+            setAnswerError(result.error);
             if (!result.error) {
               setAnswering(false);
             }
@@ -183,9 +187,9 @@ export const MealEntryItem = ({ entry }: Props) => {
           <FormControls
             onCancel={() => {
               setAnswering(false);
-              setError(null);
+              setAnswerError(null);
             }}
-            error={error}
+            error={answerError}
           />
         </form>
       ) : (

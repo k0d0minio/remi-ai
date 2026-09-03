@@ -6,6 +6,7 @@ import {
   getPatient,
   listArchivedMealEntries,
   listArchivedPantryEssentials,
+  listArchivedPatientObservations,
   listArchivedPatientRecipes,
   listArchivedPatientRecommendations,
   listMealEntries,
@@ -30,7 +31,10 @@ import {
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
 import { DeletePatient } from "@/components/patients/delete-patient";
-import { LearningsList } from "@/components/patients/learnings-list";
+import {
+  ArchivedObservations,
+  LearningsList,
+} from "@/components/patients/learnings-list";
 import { MealAddForm } from "@/components/patients/meal-add-form";
 import { MealJournal } from "@/components/patients/meal-journal";
 import { NoteTimeline } from "@/components/patients/note-timeline";
@@ -83,6 +87,7 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
     archivedMealEntries,
     awaitingFeedback,
     learnings,
+    archivedObservations,
     notes,
     anamnesis,
   ] = await Promise.all([
@@ -99,6 +104,7 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
     listArchivedMealEntries(patient.id),
     countMealEntriesAwaitingFeedback(patient.id),
     listPatientLearnings(patient.id),
+    listArchivedPatientObservations(patient.id),
     listPatientNotes(patient.id),
     listPatientAnamnesis(patient.id),
   ]);
@@ -341,6 +347,15 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
           )}
 
           <ObservationAddForm patientId={patient.id} today={today} />
+
+          {archivedObservations.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              <Typography size="sm" tone="muted">
+                Observations archivées
+              </Typography>
+              <ArchivedObservations observations={archivedObservations} />
+            </div>
+          ) : null}
         </CardContent>
       </Card>
 
