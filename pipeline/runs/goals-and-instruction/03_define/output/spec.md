@@ -62,7 +62,7 @@ goal's history, newest first.
   she reads (mieux / stable / moins bien) lives in `apps/admin/components/patients/vocabulary.ts`.
   No French string is hard-coded in a component.
 - `measure` is a first-class free-text field beside the note rather than folded into it. § D gives
-  the two forms of check-in as alternatives — a direction *or* a simple measure — so a measure that
+  the two forms of check-in as alternatives — a direction _or_ a simple measure — so a measure that
   can only be typed into prose would make the numeric half of § D unreadable by anything. Free text,
   not a number: "3/10", "2 réveils", "presque plus" are all measures she writes, and a numeric
   column would force a scale nobody has agreed. This is a design call on an open question, flagged
@@ -185,7 +185,6 @@ instruction travels with the profile — not only as a visual check on the page.
 - The living summary and the supplement protocol — stubs 5 and 6 of the epic.
 
 ## Open questions
-
 All three are the stub's, raised rather than answered, and none blocks a criterion above. Each is
 designed to be cheap to change once Morgane answers it — that is the point of raising them here
 rather than guessing quietly.
@@ -197,11 +196,12 @@ rather than guessing quietly.
   wants a real scale, it is a column beside `measure`, not a reshape. What her answer cannot cheaply
   change is the decision to give the measure its own field at all — folding it back into the note
   later would mean rewriting rows.
-- **Hard cap at three active goals, or warn-but-allow?** Built as the refusal the stub's *Worth
-  knowing* directs — the service returns `conflict` and the form disappears at three. If she wants a
-  warning instead, it is one branch in `addPatientGoal` and one line in the form; no migration, no
-  data to fix. Worth confirming with her before the refusal is treated as settled, because a refusal
-  she disagrees with mid-consultation is the kind of thing that sends her back to paper.
+- **Hard cap at three active goals, or warn-but-allow?** Built as the refusal the stub's
+  _Worth knowing_ section directs — the service returns `conflict` and the form disappears at
+  three. If she wants a warning instead, it is one branch in `addPatientGoal` and one line in the
+  form; no migration, no data to fix. Worth confirming with her before the refusal is treated as
+  settled, because a refusal she disagrees with mid-consultation is the kind of thing that sends
+  her back to paper.
 - **One standing consigne, or a dated log of several concurrent ones?** Built as standing-and-
   replaced, per the stub's prompt and § E's "ponctuelle". The table already holds many rows per
   patient — the "one active" rule lives in the service, not in a unique index — so a concurrent log
