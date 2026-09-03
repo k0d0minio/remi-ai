@@ -62,6 +62,23 @@ describe("the standing instruction", () => {
     expect(await listArchivedPatientInstructions(patientId)).toHaveLength(2);
   });
 
+  it("treats re-saving the same words as a no-op, not a replacement", async () => {
+    const before = await getPatientInstruction(patientId);
+    const archivedBefore = await listArchivedPatientInstructions(patientId);
+    if (!before) {
+      throw new Error("expected a standing instruction");
+    }
+
+    const again = await setPatientInstruction(patientId, before.body);
+    expect(again.ok).toBe(true);
+    if (again.ok) {
+      expect(again.data?.id).toBe(before.id);
+    }
+    expect(await listArchivedPatientInstructions(patientId)).toHaveLength(
+      archivedBefore.length,
+    );
+  });
+
   it("clears to none, keeping the trail", async () => {
     const cleared = await setPatientInstruction(patientId, "   ");
     expect(cleared.ok).toBe(true);

@@ -21,6 +21,7 @@ import {
   deletePatientNote,
   deletePatientRecommendation,
   getPatient,
+  getPatientInstruction,
   movePantryEssential,
   movePatientGoal,
   movePatientRecommendation,
@@ -646,19 +647,27 @@ export const setInstructionAction = async (
   const operator = await requireOperator();
   const patientId = field(formData, "patientId");
   const body = field(formData, "body");
+  // Read before the write so the trail can tell a clearing from a save on a
+  // patient who never had a consigne — the second changes nothing, and an
+  // audit row for a non-event is worse than none.
+  const before = await getPatientInstruction(patientId);
   const result = await setPatientInstruction(patientId, body);
   if (!result.ok) {
     return { error: result.message, saved: false };
   }
-  await audit(
-    operator,
-    result.data ? "instruction.updated" : "instruction.cleared",
-    {
+  if (result.data && result.data.id !== before?.id) {
+    await audit(operator, "instruction.updated", {
       type: "patient_instruction",
-      id: result.data?.id ?? null,
+      id: result.data.id,
       label: field(formData, "pseudonym"),
-    },
-  );
+    });
+  } else if (!result.data && before) {
+    await audit(operator, "instruction.cleared", {
+      type: "patient_instruction",
+      id: before.id,
+      label: field(formData, "pseudonym"),
+    });
+  }
   revalidatePatient(patientId);
   return { error: null, saved: true };
 };

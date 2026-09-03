@@ -58,6 +58,16 @@ export type GoalCheckInInput = Partial<
   direction?: string | null;
 };
 
+/**
+ * Zod's `.partial()` keeps a key that was handed to it as `undefined`, and
+ * spreading that over the stored row clears the column. A patch carries only
+ * what the caller actually supplied.
+ */
+const supplied = <T extends object>(value: T): Partial<T> =>
+  Object.fromEntries(
+    Object.entries(value).filter((entry) => entry[1] !== undefined),
+  ) as Partial<T>;
+
 /** Her order, with creation time as the tiebreak for rows that predate it. */
 const byPosition = (a: PatientGoal, b: PatientGoal) => {
   if (a.position !== b.position) {
@@ -137,7 +147,7 @@ export const updatePatientGoal = async (
   if (!uuidSchema.safeParse(id).success) {
     return err("not_found", "no such goal");
   }
-  const parsed = goalFields.partial().safeParse(input);
+  const parsed = goalFields.partial().safeParse(supplied(input));
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
   }
@@ -267,16 +277,6 @@ export const listGoalCheckIns = async (
     return b.createdAt.getTime() - a.createdAt.getTime();
   });
 };
-
-/**
- * Zod's `.partial()` keeps a key that was handed to it as `undefined`, and
- * spreading that over the stored row clears the column. A patch carries only
- * what the caller actually supplied.
- */
-const supplied = <T extends object>(value: T): Partial<T> =>
-  Object.fromEntries(
-    Object.entries(value).filter((entry) => entry[1] !== undefined),
-  ) as Partial<T>;
 
 /** A direction, a measure or a note — one of the three is what makes it a record. */
 const saysSomething = (entry: {

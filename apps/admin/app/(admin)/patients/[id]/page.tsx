@@ -201,7 +201,7 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
             <GoalAddForm patientId={patient.id} />
           ) : (
             <Typography size="sm" tone="muted">
-              Trois objectifs actifs — archivez-en un pour en ajouter un autre.
+              {`${MAX_ACTIVE_GOALS} objectifs actifs — archivez-en un pour en ajouter un autre.`}
             </Typography>
           )}
 

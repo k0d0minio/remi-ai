@@ -84,12 +84,22 @@ export const setPatientInstruction = async (
   }
 
   const current = await getPatientInstruction(patientId);
+
+  // Saving the same words is not a replacement. Without this, re-saving an
+  // untouched textarea would archive the row, insert an identical one, and
+  // reset "en vigueur depuis" to today — turning a no-op into history.
+  if (current?.body === parsed.data) {
+    return ok(current);
+  }
+
   if (current) {
     await instructions().update(current.id, { archivedAt: new Date() });
   }
 
   if (parsed.data === "") {
-    await touchPatient(patientId);
+    if (current) {
+      await touchPatient(patientId);
+    }
     return ok(null);
   }
 

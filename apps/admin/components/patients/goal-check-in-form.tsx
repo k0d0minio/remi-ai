@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState } from "react";
 import type { PatientGoalCheckIn } from "@remi/services/shared";
 import { goalDirections } from "@remi/services/shared";
 import {
@@ -12,14 +12,8 @@ import {
   SelectValue,
 } from "@remi/ui";
 import { Field, Input, Textarea, Typography } from "@remi/ui/server";
-import {
-  addCheckInAction,
-  updateCheckInAction,
-  type CheckInFormState,
-} from "@/lib/patients/actions";
+import { addCheckInAction, updateCheckInAction } from "@/lib/patients/actions";
 import { goalDirectionLabels } from "@/components/patients/vocabulary";
-
-const initial: CheckInFormState = { error: null };
 
 /**
  * Radix refuses `""` as an item value, so "no direction" needs a token of its
@@ -37,7 +31,8 @@ type Props = {
   today: string;
   /** Present when correcting an entry rather than adding one. */
   entry?: PatientGoalCheckIn;
-  onDone?: () => void;
+  /** Closes the panel — called on a successful save as well as on cancel. */
+  onDone: () => void;
 };
 
 /**
@@ -56,14 +51,23 @@ export const GoalCheckInForm = ({
   entry,
   onDone,
 }: Props) => {
-  const [state, action, pending] = useActionState(
-    entry ? updateCheckInAction : addCheckInAction,
-    initial,
-  );
+  const [error, setError] = useState<string | null>(null);
   const idPrefix = entry ? `check-in-${entry.id}` : `new-check-in-${goalId}`;
 
+  // The panel closes on success rather than staying open with its inputs still
+  // populated: an uncontrolled form left open is a second click away from
+  // writing the same check-in twice. Same shape as `PantryItem`'s edit form.
+  const save = async (formData: FormData) => {
+    const action = entry ? updateCheckInAction : addCheckInAction;
+    const result = await action({ error: null }, formData);
+    setError(result.error);
+    if (!result.error) {
+      onDone();
+    }
+  };
+
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <form action={save} className="flex flex-col gap-3">
       <input type="hidden" name="goalId" value={goalId} />
       <input type="hidden" name="patientId" value={patientId} />
       <input type="hidden" name="title" value={title} />
@@ -123,17 +127,23 @@ export const GoalCheckInForm = ({
       </Field>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="submit" size="sm" disabled={pending}>
-          {pending ? "Enregistrement…" : "Enregistrer le point d'étape"}
+        <Button type="submit" size="sm">
+          Enregistrer le point d&apos;étape
         </Button>
-        {onDone ? (
-          <Button type="button" size="sm" variant="ghost" onClick={onDone}>
-            Annuler
-          </Button>
-        ) : null}
-        {state.error ? (
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          onClick={() => {
+            setError(null);
+            onDone();
+          }}
+        >
+          Annuler
+        </Button>
+        {error ? (
           <Typography size="sm" className="text-error-text" role="alert">
-            {state.error}
+            {error}
           </Typography>
         ) : null}
       </div>
