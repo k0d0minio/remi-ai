@@ -10,11 +10,13 @@ import {
   addPatientNote,
   addPatientObservation,
   addPatientRecommendation,
+  addPatientSupplement,
   archiveMealEntry,
   archivePantryEssential,
   archivePatientGoal,
   archivePatientObservation,
   archivePatientRecommendation,
+  archivePatientSupplement,
   archiveRecipeAssignment,
   assignRecipe,
   createPatient,
@@ -26,17 +28,21 @@ import {
   deletePatientNote,
   deletePatientObservation,
   deletePatientRecommendation,
+  deletePatientSupplement,
   getPatient,
   getPatientInstruction,
+  getPatientSummary,
   movePantryEssential,
   movePatientGoal,
   movePatientRecommendation,
+  movePatientSupplement,
   patientLinkEmail,
   regenerateShareToken,
   removeRecipeAssignment,
   sendEmail,
   setPatientAnamnesis,
   setPatientInstruction,
+  setPatientSummary,
   updateGoalCheckIn,
   updateMealEntry,
   updatePantryEssential,
@@ -45,6 +51,7 @@ import {
   updatePatientNote,
   updatePatientObservation,
   updatePatientRecommendation,
+  updatePatientSupplement,
   updateRecipeAssignment,
   type PatientInput,
 } from "@remi/services/server";
@@ -84,6 +91,7 @@ import { mailerReady } from "@/lib/mailer";
 
 export type PatientFormState = { error: string | null; saved: boolean };
 export type RecommendationFormState = { error: string | null };
+export type SupplementFormState = { error: string | null };
 export type PantryFormState = { error: string | null };
 export type AssignmentFormState = { error: string | null };
 export type MealFormState = { error: string | null };
@@ -93,6 +101,7 @@ export type AnamnesisFormState = { error: string | null };
 export type GoalFormState = { error: string | null };
 export type CheckInFormState = { error: string | null };
 export type InstructionFormState = { error: string | null; saved: boolean };
+export type SummaryFormState = { error: string | null; saved: boolean };
 export type ShareFormState = { error: string | null; sent: boolean };
 
 const field = (formData: FormData, name: string) =>
@@ -384,6 +393,99 @@ export const deleteRecommendationAction = async (formData: FormData) => {
       type: "recommendation",
       id,
       label: field(formData, "title"),
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+/**
+ * The prescribed supplement protocol — brainstorm § G. Four fields and a flat
+ * order: these collect them and let the service validate the name and place the
+ * row. A reorder is silent, like the recommendations' and unlike the pantry's:
+ * the order a protocol reads in is a presentation choice, not a change to what
+ * it prescribes, and a journal full of nudges is a journal nobody reads.
+ */
+export const addSupplementAction = async (
+  _previous: SupplementFormState,
+  formData: FormData,
+): Promise<SupplementFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const result = await addPatientSupplement(patientId, {
+    name: field(formData, "name"),
+    dose: field(formData, "dose"),
+    timing: field(formData, "timing"),
+    reason: field(formData, "reason"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "supplement.added", {
+    type: "patient_supplement",
+    id: result.data.id,
+    label: result.data.name,
+  });
+  revalidatePatient(patientId);
+  return { error: null };
+};
+
+export const updateSupplementAction = async (
+  _previous: SupplementFormState,
+  formData: FormData,
+): Promise<SupplementFormState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const result = await updatePatientSupplement(id, {
+    name: field(formData, "name"),
+    dose: field(formData, "dose"),
+    timing: field(formData, "timing"),
+    reason: field(formData, "reason"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "supplement.updated", {
+    type: "patient_supplement",
+    id,
+    label: result.data.name,
+  });
+  revalidatePatient(field(formData, "patientId"));
+  return { error: null };
+};
+
+export const moveSupplementAction = async (formData: FormData) => {
+  await requireOperator();
+  const direction = field(formData, "direction") === "up" ? "up" : "down";
+  await movePatientSupplement(field(formData, "id"), direction);
+  // Not audited, like the recommendations: reordering changes how a protocol
+  // reads, never what it prescribes.
+  revalidatePatient(field(formData, "patientId"));
+};
+
+export const archiveSupplementAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const archived = field(formData, "archived") === "true";
+  const result = await archivePatientSupplement(id, archived);
+  if (result.ok) {
+    await audit(
+      operator,
+      archived ? "supplement.archived" : "supplement.restored",
+      { type: "patient_supplement", id, label: result.data.name },
+    );
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+export const deleteSupplementAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const removed = await deletePatientSupplement(id);
+  if (removed.ok) {
+    await audit(operator, "supplement.deleted", {
+      type: "patient_supplement",
+      id,
+      label: field(formData, "name"),
     });
   }
   revalidatePatient(field(formData, "patientId"));
@@ -893,6 +995,41 @@ export const setInstructionAction = async (
   } else if (!result.data && before) {
     await audit(operator, "instruction.cleared", {
       type: "patient_instruction",
+      id: before.id,
+      label: field(formData, "pseudonym"),
+    });
+  }
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
+/**
+ * The living summary — § C's synthesis, written for the patient and revised at
+ * each consultation. It upserts one row: reading the state before the write is
+ * what lets the trail tell a first draft and an edit (both `summary.updated`)
+ * from a clearing (`summary.cleared`) and from a no-op that changed nothing.
+ */
+export const setSummaryAction = async (
+  _previous: SummaryFormState,
+  formData: FormData,
+): Promise<SummaryFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const body = field(formData, "body");
+  const before = await getPatientSummary(patientId);
+  const result = await setPatientSummary(patientId, body);
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  if (result.data && (!before || result.data.body !== before.body)) {
+    await audit(operator, "summary.updated", {
+      type: "patient_summary",
+      id: result.data.id,
+      label: field(formData, "pseudonym"),
+    });
+  } else if (!result.data && before) {
+    await audit(operator, "summary.cleared", {
+      type: "patient_summary",
       id: before.id,
       label: field(formData, "pseudonym"),
     });

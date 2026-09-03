@@ -72,6 +72,19 @@ export {
 export type { RecommendationInput } from "./services/patient-recommendations";
 
 export {
+  getPatientSummary,
+  setPatientSummary,
+} from "./services/patient-summaries";
+
+export {
+  addPatientSupplement,
+  deletePatientSupplement,
+  listPatientSupplements,
+  updatePatientSupplement,
+} from "./services/patient-supplements";
+export type { SupplementInput } from "./services/patient-supplements";
+
+export {
   createOperator,
   findOperatorByEmail,
   getOperator,

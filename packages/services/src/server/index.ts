@@ -62,6 +62,11 @@ export {
 } from "../db/services/patient-instructions";
 
 export {
+  getPatientSummary,
+  setPatientSummary,
+} from "../db/services/patient-summaries";
+
+export {
   addPatientRecommendation,
   archivePatientRecommendation,
   deletePatientRecommendation,
@@ -71,6 +76,17 @@ export {
   updatePatientRecommendation,
 } from "../db/services/patient-recommendations";
 export type { RecommendationInput } from "../db/services/patient-recommendations";
+
+export {
+  addPatientSupplement,
+  archivePatientSupplement,
+  deletePatientSupplement,
+  listArchivedPatientSupplements,
+  listPatientSupplements,
+  movePatientSupplement,
+  updatePatientSupplement,
+} from "../db/services/patient-supplements";
+export type { SupplementInput } from "../db/services/patient-supplements";
 
 export {
   addPantryEssential,
