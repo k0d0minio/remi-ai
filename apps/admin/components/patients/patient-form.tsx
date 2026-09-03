@@ -295,7 +295,12 @@ export const PatientForm = ({ patient }: Props) => {
             />
           </Field>
 
-          <Field id="supplements" label="Compléments" optional>
+          <Field
+            id="supplements"
+            label="Compléments déjà pris, hors protocole"
+            optional
+            hint="Ce que la personne prend déjà d'elle-même — le protocole prescrit se tient plus haut."
+          >
             <Textarea
               id="supplements"
               name="supplements"

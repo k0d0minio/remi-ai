@@ -73,6 +73,17 @@ export {
 export type { RecommendationInput } from "../db/services/patient-recommendations";
 
 export {
+  addPatientSupplement,
+  archivePatientSupplement,
+  deletePatientSupplement,
+  listArchivedPatientSupplements,
+  listPatientSupplements,
+  movePatientSupplement,
+  updatePatientSupplement,
+} from "../db/services/patient-supplements";
+export type { SupplementInput } from "../db/services/patient-supplements";
+
+export {
   addPantryEssential,
   archivePantryEssential,
   deletePantryEssential,

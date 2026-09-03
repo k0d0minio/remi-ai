@@ -2,7 +2,6 @@
 
 import { Plus } from "lucide-react";
 import { useActionState } from "react";
-import { recommendationCategories } from "@remi/services/shared";
 import {
   Button,
   Select,
@@ -16,7 +15,10 @@ import {
   addRecommendationAction,
   type RecommendationFormState,
 } from "@/lib/patients/actions";
-import { categoryLabels } from "@/components/patients/vocabulary";
+import {
+  addableRecommendationCategories,
+  categoryLabels,
+} from "@/components/patients/vocabulary";
 
 const initial: RecommendationFormState = { error: null };
 
@@ -49,7 +51,7 @@ export const RecommendationAddForm = ({ patientId }: Props) => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {recommendationCategories.map((category) => (
+              {addableRecommendationCategories.map((category) => (
                 <SelectItem key={category} value={category}>
                   {categoryLabels[category]}
                 </SelectItem>
