@@ -35,6 +35,7 @@ export const auditActions = [
   "note.added",
   "note.updated",
   "note.deleted",
+  "anamnesis.updated",
   "share_link.regenerated",
   "share_link.emailed",
   "operator.invited",

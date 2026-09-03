@@ -5,6 +5,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -165,6 +166,36 @@ export const patientNotes = pgTable("patient_notes", {
   authorName: text("author_name").notNull().default(""),
   ...timestamps,
 });
+
+/**
+ * One row per (patient, category) across § B's twelve areas of enquiry — the
+ * anamnesis as twelve addressable slots rather than one paragraph.
+ *
+ * A category with nothing recorded has NO row: the service deletes rather than
+ * storing an empty body, so "never explored" and "explored, nothing to note"
+ * are the same cheap state, which is what Morgane means by leaving a category
+ * blank. Never rendered on the patient link, under the same rule as
+ * `patient_notes`.
+ *
+ * The category is stored as its key rather than modelled as twelve columns, so
+ * trimming or renaming one is a constants edit and not a migration — and so the
+ * later AI round can write a drafted body into the same row a correction
+ * overwrites.
+ */
+export const patientAnamnesis = pgTable(
+  "patient_anamnesis",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    /** A key from `anamnesisCategories` in `shared/patient.ts`. */
+    category: text("category").notNull(),
+    body: text("body").notNull().default(""),
+    ...timestamps,
+  },
+  (table) => [unique().on(table.patientId, table.category)],
+);
 
 /**
  * The short list of foods worth keeping in the placard and the frigo, chosen

@@ -93,6 +93,11 @@ export {
 export type { NoteInput } from "../db/services/patient-notes";
 
 export {
+  listPatientAnamnesis,
+  setPatientAnamnesis,
+} from "../db/services/patient-anamnesis";
+
+export {
   changeOperatorPassword,
   createOperator,
   deleteOperator,

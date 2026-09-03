@@ -29,6 +29,7 @@ export type { AppKey } from "./links";
 export { canManageOperators, isAtLeast, operatorRoles } from "./operator";
 export type { OperatorRoleName } from "./operator";
 export {
+  anamnesisCategories,
   consentChannels,
   cookingAffinities,
   patientSexes,
@@ -44,6 +45,7 @@ export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";
  * otherwise server-only — costs the browser bundle nothing.
  */
 export type {
+  AnamnesisCategory,
   AssignedRecipe,
   AuditAction,
   AuditEvent,
@@ -55,6 +57,7 @@ export type {
   HabitsProfile,
   OperatorRole,
   PantryEssential,
+  PatientAnamnesis,
   PatientNote,
   PatientProfile,
   PatientRecommendation,
