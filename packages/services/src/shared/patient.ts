@@ -62,3 +62,20 @@ export const anamnesisCategories = [
   "endocrine",
   "context",
 ] as const;
+
+/**
+ * § 5's meal slots, in the order of a day.
+ *
+ * A closed set so the journal can group and filter on it, but the column is
+ * nullable and null is a first-class value: an entry with no slot is normal,
+ * not incomplete. The keys are stable ASCII because they are what the row
+ * stores; the accented French Morgane reads lives in the console's
+ * `vocabulary.ts`, so her words can change without a migration — and whether
+ * she wants a slot at all is still hers to confirm.
+ */
+export const mealSlots = [
+  "petit_dejeuner",
+  "dejeuner",
+  "diner",
+  "collation",
+] as const;

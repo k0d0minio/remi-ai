@@ -296,6 +296,82 @@ export const patientRecipeAssignments = pgTable("patient_recipe_assignments", {
   ...timestamps,
 });
 
+/**
+ * One meal, transcribed — the § 5 loop, with both halves of the exchange on one
+ * row.
+ *
+ * Text only, and that is decision #6 rather than a gap: photos stay in WhatsApp
+ * until a blob-storage vendor is chosen, which is an owner decision and creates
+ * a files seam when it is made. There is deliberately no `photo_url` here
+ * waiting to be filled — a column nothing writes is a promise the schema cannot
+ * keep. When the vendor exists, a nullable reference is an additive migration.
+ *
+ * The feedback lives here rather than in a table of its own because it is 1:1
+ * with the meal and always Morgane's. A second table would buy a draft/published
+ * split that nothing needs yet; when the AI round drafts feedback it adds a
+ * column or a drafts table beside this one, which is additive either way.
+ */
+export const patientMealEntries = pgTable("patient_meal_entries", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  /**
+   * The day of the meal, not of the transcription: she logs Tuesday's lunch on
+   * Thursday evening, and it is Tuesday the entry belongs to. A calendar date
+   * rather than an instant, the same reasoning as `assigned_on` above.
+   */
+  eatenOn: date("eaten_on", { mode: "string" }).notNull(),
+  /**
+   * Nullable, and null is a first-class state rather than missing data — an
+   * entry with no slot renders and sorts like any other. The four keys are
+   * stable; their French labels live in the console's `vocabulary.ts`, so
+   * changing Morgane's words is an edit there, never a migration.
+   */
+  slot: text("slot"),
+  /** What was eaten, her transcription of the photo or the message. */
+  description: text("description").notNull(),
+  /** The patient's own words when there were any — their voice, not hers. */
+  patientComment: text("patient_comment").notNull().default(""),
+  /** § 5 step 3: what is already good, plus one or two priorities. Short. */
+  feedback: text("feedback").notNull().default(""),
+  /**
+   * Set when feedback is first written, cleared when it is emptied. It is what
+   * marks the week's backlog in the console, and what `patient-link-segments`
+   * will read to decide whether an unanswered meal appears on the link.
+   */
+  feedbackWrittenAt: timestamp("feedback_written_at", {
+    withTimezone: true,
+    mode: "date",
+  }),
+  /** § 5 step 4's « mémorisation utile », noticed on this meal. */
+  learning: text("learning").notNull().default(""),
+  /** Archive, never delete: a meal she answered stays in the record. */
+  archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
+
+/**
+ * What Morgane notices about a patient that belongs to no single meal.
+ *
+ * Reviewing a week produces both kinds — "elle prend toujours des yaourts
+ * sucrés le matin" attaches to nothing in particular — and forcing those onto
+ * an arbitrary entry would falsify where they came from. So the learnings view
+ * reads two tables, and the only difference visible in it is whether a learning
+ * carries its meal.
+ */
+export const patientObservations = pgTable("patient_observations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  body: text("body").notNull(),
+  /** The day she noticed it — backdatable, like a meal. */
+  observedOn: date("observed_on", { mode: "string" }).notNull(),
+  archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
+
 export const operators = pgTable("operators", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),

@@ -3,5 +3,6 @@
 // a new entry goes at the top of this object, which is what puts newest first.
 export default {
   index: "Overview",
+  "2026-09-03-meal-journal": "The meal journal, out of the chat thread",
   "2026-08-03-brand-foundation": "One REMI, wherever you land",
 };

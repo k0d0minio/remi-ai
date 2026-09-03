@@ -10,9 +10,14 @@ export type { AuditAction, AuditEvent } from "./audit-event";
 export type { Consultation } from "./consultation";
 export type { Operator, OperatorRole } from "./operator";
 export type { OperatorInvitation } from "./operator-invitation";
+export type { MealEntry, MealSlot } from "./meal-entry";
 export type { PantryEssential } from "./pantry-essential";
 export type { AnamnesisCategory, PatientAnamnesis } from "./patient-anamnesis";
 export type { PatientNote } from "./patient-note";
+export type {
+  PatientLearning,
+  PatientObservation,
+} from "./patient-observation";
 export type {
   ConsentChannel,
   CookingAffinity,
