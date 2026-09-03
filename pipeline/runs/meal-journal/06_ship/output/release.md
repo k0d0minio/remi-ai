@@ -13,7 +13,12 @@
 - business docs: no impact.
 - release notes: both — changelog entry live at
   `/changelog/2026-09-03-meal-journal`, ship note below.
-- sent: ship note sent 2026-09-03.
+- sent: **not sent** — none of `RESEND_API_KEY`, `SHIP_NOTE_RECIPIENTS`,
+  `SHIP_NOTE_FROM` or `EMAIL_FROM` is set in this session's environment, so
+  `send-ship-note.sh --send` had nothing to send with and was not run. The note
+  is written and its links are live; sending it is one command once those are
+  configured. Claiming a delivery that did not happen is the one thing the
+  mail rules forbid.
 
 ## Acceptance check (vs spec)
 
