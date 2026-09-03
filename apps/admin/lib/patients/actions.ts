@@ -28,6 +28,7 @@ import {
   deletePatientRecommendation,
   getPatient,
   getPatientInstruction,
+  getPatientSummary,
   movePantryEssential,
   movePatientGoal,
   movePatientRecommendation,
@@ -37,6 +38,7 @@ import {
   sendEmail,
   setPatientAnamnesis,
   setPatientInstruction,
+  setPatientSummary,
   updateGoalCheckIn,
   updateMealEntry,
   updatePantryEssential,
@@ -93,6 +95,7 @@ export type AnamnesisFormState = { error: string | null };
 export type GoalFormState = { error: string | null };
 export type CheckInFormState = { error: string | null };
 export type InstructionFormState = { error: string | null; saved: boolean };
+export type SummaryFormState = { error: string | null; saved: boolean };
 export type ShareFormState = { error: string | null; sent: boolean };
 
 const field = (formData: FormData, name: string) =>
@@ -893,6 +896,41 @@ export const setInstructionAction = async (
   } else if (!result.data && before) {
     await audit(operator, "instruction.cleared", {
       type: "patient_instruction",
+      id: before.id,
+      label: field(formData, "pseudonym"),
+    });
+  }
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
+/**
+ * The living summary — § C's synthesis, written for the patient and revised at
+ * each consultation. It upserts one row: reading the state before the write is
+ * what lets the trail tell a first draft and an edit (both `summary.updated`)
+ * from a clearing (`summary.cleared`) and from a no-op that changed nothing.
+ */
+export const setSummaryAction = async (
+  _previous: SummaryFormState,
+  formData: FormData,
+): Promise<SummaryFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const body = field(formData, "body");
+  const before = await getPatientSummary(patientId);
+  const result = await setPatientSummary(patientId, body);
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  if (result.data && (!before || result.data.body !== before.body)) {
+    await audit(operator, "summary.updated", {
+      type: "patient_summary",
+      id: result.data.id,
+      label: field(formData, "pseudonym"),
+    });
+  } else if (!result.data && before) {
+    await audit(operator, "summary.cleared", {
+      type: "patient_summary",
       id: before.id,
       label: field(formData, "pseudonym"),
     });

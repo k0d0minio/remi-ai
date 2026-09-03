@@ -132,3 +132,21 @@ export const goalDirectionIntents: Record<GoalDirection, Intent> = {
   stable: "neutral",
   worse: "warning",
 };
+
+/**
+ * The living summary is written *for* the patient — § C's synthesis, the one
+ * thing Morgane re-reads first. This note says so on the card: it becomes
+ * visible on the patient link once the patient-surface segments are online, and
+ * naming that now is how she remembers a patient will read it. French, because
+ * the console's operators are Morgane and Arnaud.
+ */
+export const summaryVisibilityNote =
+  "Écrit pour la personne suivie : visible sur le lien patient une fois les segments en ligne.";
+
+/**
+ * § C's checklist of what a summary covers, offered as guidance beside the
+ * textarea rather than as separate fields — § 4's principle that a background
+ * table must not become a manual entry burden. The body stays free text.
+ */
+export const summaryChecklistHint =
+  "Contexte et motif, points de vigilance, médicaments en cours, principales difficultés, habitudes et contraintes utiles, ce qui va déjà bien, ce qui reste à clarifier.";
