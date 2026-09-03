@@ -36,6 +36,32 @@ export type {
 } from "../db/services/patients";
 
 export {
+  addGoalCheckIn,
+  addPatientGoal,
+  archivePatientGoal,
+  deleteGoalCheckIn,
+  deletePatientGoal,
+  listArchivedPatientGoals,
+  listGoalCheckIns,
+  listPatientGoals,
+  movePatientGoal,
+  updateGoalCheckIn,
+  updatePatientGoal,
+  MAX_ACTIVE_GOALS,
+} from "../db/services/patient-goals";
+export type {
+  GoalCheckInInput,
+  PatientGoalInput,
+} from "../db/services/patient-goals";
+
+export {
+  deletePatientInstruction,
+  getPatientInstruction,
+  listArchivedPatientInstructions,
+  setPatientInstruction,
+} from "../db/services/patient-instructions";
+
+export {
   addPatientRecommendation,
   archivePatientRecommendation,
   deletePatientRecommendation,

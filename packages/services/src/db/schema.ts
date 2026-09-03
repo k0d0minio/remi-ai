@@ -198,6 +198,88 @@ export const patientAnamnesis = pgTable(
 );
 
 /**
+ * The two or three things this accompaniment is working on — brainstorm § D.
+ *
+ * A goal is her words plus an optional starting point, and its rank in her
+ * priority order. `archived_at` is the everyday exit: § D's philosophy is the
+ * recommendations' one, so "pourquoi on a arrêté celui-là" is answered by a
+ * row rather than by a memory.
+ *
+ * The 2-3 active maximum § D states is enforced in the service, not by a
+ * constraint here: it counts active rows per patient, which is a query, and a
+ * rule Morgane may want relaxed should not need a migration to relax.
+ */
+export const patientGoals = pgTable("patient_goals", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  /** The goal as she says it — "améliorer l'énergie". */
+  title: text("title").notNull(),
+  /**
+   * The simple starting point to compare against later — "énergie 3/10", "3
+   * réveils par nuit". Free text, not a number: § D's measure is whatever she
+   * writes, and a numeric column would freeze a scale nobody has agreed.
+   */
+  baseline: text("baseline").notNull().default(""),
+  /** Her priority order. Sparse by design — a reorder rewrites the run. */
+  position: integer("position").notNull().default(0),
+  archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
+
+/**
+ * One dated observation against one goal — the manual seed of § D's evolution
+ * trail, and of the PROGRESS block the later AI round writes into.
+ *
+ * `checked_on` is a plain calendar date for the same reason as `birth_date`:
+ * the day of a follow-up has no timezone, and storing one is how a check-in
+ * drifts across a border.
+ *
+ * All three content columns are optional because § D gives the direction and
+ * the measure as alternatives; that at least one is present is the service's
+ * rule, since "a row that says nothing" is a validation question, not a shape.
+ */
+export const patientGoalCheckIns = pgTable("patient_goal_check_ins", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  goalId: uuid("goal_id")
+    .notNull()
+    .references(() => patientGoals.id, { onDelete: "cascade" }),
+  checkedOn: date("checked_on", { mode: "string" }).notNull(),
+  /** A key from `goalDirections` in `shared/patient.ts`, or nothing. */
+  direction: text("direction"),
+  /** The simple measure on the day — "4/10", "presque plus de réveils". */
+  measure: text("measure").notNull().default(""),
+  note: text("note").notNull().default(""),
+  ...timestamps,
+});
+
+/**
+ * The standing consigne Morgane steers by — brainstorm § E.
+ *
+ * Many rows per patient, exactly one of them active: replacing the instruction
+ * archives the current row and inserts a new one, so "what was I steering by in
+ * October" survives the November rewrite. That one-active rule lives in the
+ * service rather than in a partial unique index, because § E's shape is the
+ * open question — if she turns out to want several concurrent consignes, this
+ * table already holds them.
+ *
+ * Today nothing reads it but the console. In the AI round it becomes the
+ * generation prompt's practitioner line, which is a new reader of the same
+ * column, not a new table.
+ */
+export const patientInstructions = pgTable("patient_instructions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  body: text("body").notNull(),
+  /** Set when a replacement supersedes it. Null on the one in force. */
+  archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
+
+/**
  * The short list of foods worth keeping in the placard and the frigo, chosen
  * for this patient — brainstorm § H. An item is a name and a why, and that is
  * the whole design: § H warns explicitly against per-item quantity, season or
