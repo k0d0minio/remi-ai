@@ -57,6 +57,13 @@
       "when": 1788438306698,
       "tag": "0007_big_wendell_vaughn",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788441153910,
+      "tag": "0008_colossal_ozymandias",
+      "breakpoints": true
     }
   ]
 }

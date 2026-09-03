@@ -2,15 +2,21 @@ import { ArrowLeft } from "lucide-react";
 import NextLink from "next/link";
 import { notFound } from "next/navigation";
 import {
+  MAX_ACTIVE_GOALS,
   countMealEntriesAwaitingFeedback,
   getPatient,
+  getPatientInstruction,
   listArchivedMealEntries,
   listArchivedPantryEssentials,
+  listArchivedPatientGoals,
+  listArchivedPatientInstructions,
   listArchivedPatientObservations,
   listArchivedPatientRecipes,
   listArchivedPatientRecommendations,
+  listGoalCheckIns,
   listMealEntries,
   listPantryEssentials,
+  listPatientGoals,
   listPatientAnamnesis,
   listPatientLearnings,
   listPatientNotes,
@@ -31,6 +37,9 @@ import {
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
 import { DeletePatient } from "@/components/patients/delete-patient";
+import { GoalAddForm } from "@/components/patients/goal-add-form";
+import { GoalList } from "@/components/patients/goal-list";
+import { InstructionBlock } from "@/components/patients/instruction-block";
 import {
   ArchivedObservations,
   LearningsList,
@@ -90,6 +99,10 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
     archivedObservations,
     notes,
     anamnesis,
+    goals,
+    archivedGoals,
+    instruction,
+    supersededInstructions,
   ] = await Promise.all([
     listPatientRecommendations(patient.id),
     listArchivedPatientRecommendations(patient.id),
@@ -107,7 +120,23 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
     listArchivedPatientObservations(patient.id),
     listPatientNotes(patient.id),
     listPatientAnamnesis(patient.id),
+    listPatientGoals(patient.id),
+    listArchivedPatientGoals(patient.id),
+    getPatientInstruction(patient.id),
+    listArchivedPatientInstructions(patient.id),
   ]);
+
+  // One trail per goal, active and archived alike: two or three goals plus
+  // what has been set down is a handful of reads, and they run together.
+  const trails = await Promise.all(
+    [...goals, ...archivedGoals].map(async (goal) => ({
+      id: goal.id,
+      entries: await listGoalCheckIns(goal.id),
+    })),
+  );
+  const checkIns = Object.fromEntries(
+    trails.map((trail) => [trail.id, trail.entries]),
+  );
   const shareUrl = appHref("web", `/p/${patient.shareToken}`, patient.locale);
   const age = ageInYears(patient.birthDate);
 
@@ -169,6 +198,57 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
             email={patient.email}
             lastOpenedAt={patient.linkLastOpenedAt}
           />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Objectifs et consigne</CardTitle>
+          <CardDescription>
+            Deux ou trois priorités, dans votre ordre, avec leur évolution — et
+            la consigne que vous vous donnez pour cet accompagnement. Rien de
+            tout cela ne s&apos;affiche sur le lien patient.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          {goals.length === 0 ? (
+            <Typography size="sm" tone="muted">
+              Aucun objectif pour le moment.
+            </Typography>
+          ) : (
+            <GoalList goals={goals} checkIns={checkIns} ranked today={today} />
+          )}
+
+          {goals.length < MAX_ACTIVE_GOALS ? (
+            <GoalAddForm patientId={patient.id} />
+          ) : (
+            <Typography size="sm" tone="muted">
+              {`${MAX_ACTIVE_GOALS} objectifs actifs — archivez-en un pour en ajouter un autre.`}
+            </Typography>
+          )}
+
+          {archivedGoals.length > 0 ? (
+            <div className="border-border flex flex-col gap-3 border-t pt-6">
+              <Typography as="h3" size="sm" weight="medium" tone="muted">
+                Objectifs archivés
+              </Typography>
+              <GoalList
+                goals={archivedGoals}
+                checkIns={checkIns}
+                ranked={false}
+                today={today}
+              />
+            </div>
+          ) : null}
+
+          <div className="border-border flex flex-col gap-3 border-t pt-6">
+            <InstructionBlock
+              patientId={patient.id}
+              pseudonym={patient.pseudonym}
+              instruction={instruction}
+              superseded={supersededInstructions}
+            />
+          </div>
         </CardContent>
       </Card>
 
@@ -404,10 +484,10 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
           <CardTitle>Zone sensible</CardTitle>
           <CardDescription>
             La suppression retire le profil, ses recommandations, ses
-            essentiels, ses notes, son anamnèse, ses recettes attribuées, son
-            journal des repas, ses observations et le lien patient —
-            définitivement. Les recettes elles-mêmes restent dans la
-            bibliothèque.
+            essentiels, ses notes, son anamnèse, ses objectifs et leurs points
+            d&apos;étape, ses consignes, ses recettes attribuées, son journal
+            des repas, ses observations et le lien patient — définitivement. Les
+            recettes elles-mêmes restent dans la bibliothèque.
           </CardDescription>
         </CardHeader>
         <CardContent>

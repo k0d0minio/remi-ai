@@ -13,6 +13,12 @@ export type { OperatorInvitation } from "./operator-invitation";
 export type { MealEntry, MealSlot } from "./meal-entry";
 export type { PantryEssential } from "./pantry-essential";
 export type { AnamnesisCategory, PatientAnamnesis } from "./patient-anamnesis";
+export type {
+  GoalDirection,
+  PatientGoalCheckIn,
+} from "./patient-goal-check-in";
+export type { PatientGoal } from "./patient-goal";
+export type { PatientInstruction } from "./patient-instruction";
 export type { PatientNote } from "./patient-note";
 export type {
   PatientLearning,
