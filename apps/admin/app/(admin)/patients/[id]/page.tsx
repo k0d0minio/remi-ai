@@ -6,6 +6,7 @@ import {
   countMealEntriesAwaitingFeedback,
   getPatient,
   getPatientInstruction,
+  getPatientSummary,
   listArchivedMealEntries,
   listArchivedPantryEssentials,
   listArchivedPatientGoals,
@@ -57,6 +58,7 @@ import { RecipeAssignments } from "@/components/patients/recipe-assignments";
 import { RecommendationAddForm } from "@/components/patients/recommendation-add-form";
 import { RecommendationGroups } from "@/components/patients/recommendation-groups";
 import { ShareLinkCard } from "@/components/patients/share-link-card";
+import { SummaryBlock } from "@/components/patients/summary-block";
 import { SupplementAddForm } from "@/components/patients/supplement-add-form";
 import { SupplementProtocol } from "@/components/patients/supplement-protocol";
 import {
@@ -109,6 +111,7 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
     archivedGoals,
     instruction,
     supersededInstructions,
+    summary,
   ] = await Promise.all([
     listPatientRecommendations(patient.id),
     listArchivedPatientRecommendations(patient.id),
@@ -132,6 +135,7 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
     listArchivedPatientGoals(patient.id),
     getPatientInstruction(patient.id),
     listArchivedPatientInstructions(patient.id),
+    getPatientSummary(patient.id),
   ]);
 
   // One trail per goal, active and archived alike: two or three goals plus
@@ -205,6 +209,23 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
             url={shareUrl}
             email={patient.email}
             lastOpenedAt={patient.linkLastOpenedAt}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Résumé vivant</CardTitle>
+          <CardDescription>
+            La synthèse de la personne — ce que vous relisez en premier. Une
+            seule, révisée à chaque consultation.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SummaryBlock
+            patientId={patient.id}
+            pseudonym={patient.pseudonym}
+            summary={summary}
           />
         </CardContent>
       </Card>
