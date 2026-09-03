@@ -2,12 +2,17 @@ import { ArrowLeft } from "lucide-react";
 import NextLink from "next/link";
 import { notFound } from "next/navigation";
 import {
+  countMealEntriesAwaitingFeedback,
   getPatient,
+  listArchivedMealEntries,
   listArchivedPantryEssentials,
+  listArchivedPatientObservations,
   listArchivedPatientRecipes,
   listArchivedPatientRecommendations,
+  listMealEntries,
   listPantryEssentials,
   listPatientAnamnesis,
+  listPatientLearnings,
   listPatientNotes,
   listPatientRecipes,
   listPatientRecommendations,
@@ -26,7 +31,14 @@ import {
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
 import { DeletePatient } from "@/components/patients/delete-patient";
+import {
+  ArchivedObservations,
+  LearningsList,
+} from "@/components/patients/learnings-list";
+import { MealAddForm } from "@/components/patients/meal-add-form";
+import { MealJournal } from "@/components/patients/meal-journal";
 import { NoteTimeline } from "@/components/patients/note-timeline";
+import { ObservationAddForm } from "@/components/patients/observation-add-form";
 import { PantryAddForm } from "@/components/patients/pantry-add-form";
 import { PantryList } from "@/components/patients/pantry-list";
 import { PatientForm } from "@/components/patients/patient-form";
@@ -71,6 +83,11 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
     assignedRecipes,
     pastRecipes,
     library,
+    mealEntries,
+    archivedMealEntries,
+    awaitingFeedback,
+    learnings,
+    archivedObservations,
     notes,
     anamnesis,
   ] = await Promise.all([
@@ -83,6 +100,11 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
     // The picker offers the active library only — an archived recipe is out of
     // circulation, which is exactly what archiving it meant.
     listRecipes(),
+    listMealEntries(patient.id),
+    listArchivedMealEntries(patient.id),
+    countMealEntriesAwaitingFeedback(patient.id),
+    listPatientLearnings(patient.id),
+    listArchivedPatientObservations(patient.id),
     listPatientNotes(patient.id),
     listPatientAnamnesis(patient.id),
   ]);
@@ -265,6 +287,80 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
 
       <Card>
         <CardHeader>
+          <CardTitle>Journal des repas</CardTitle>
+          <CardDescription>
+            Ce que la personne a envoyé, transcrit ici, avec votre retour sous
+            chaque repas. Texte seulement pour l&apos;instant — les photos
+            restent sur WhatsApp.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          {awaitingFeedback > 0 ? (
+            <Typography size="sm" tone="muted">
+              {awaitingFeedback === 1
+                ? "1 repas attend un retour."
+                : `${awaitingFeedback} repas attendent un retour.`}
+            </Typography>
+          ) : null}
+
+          {mealEntries.length === 0 ? (
+            <Typography size="sm" tone="muted">
+              Aucun repas noté pour le moment.
+            </Typography>
+          ) : (
+            <MealJournal entries={mealEntries} />
+          )}
+
+          <MealAddForm patientId={patient.id} today={today} />
+        </CardContent>
+      </Card>
+
+      {archivedMealEntries.length > 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Repas archivés</CardTitle>
+            <CardDescription>
+              Sortis du journal, gardés pour la suite du dossier.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <MealJournal entries={archivedMealEntries} />
+          </CardContent>
+        </Card>
+      ) : null}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>À retenir</CardTitle>
+          <CardDescription>
+            Ce que les semaines vous apprennent sur cette personne : ce qui est
+            noté sur un repas, et ce que vous observez en dehors.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          {learnings.length === 0 ? (
+            <Typography size="sm" tone="muted">
+              Rien à retenir pour le moment.
+            </Typography>
+          ) : (
+            <LearningsList learnings={learnings} />
+          )}
+
+          <ObservationAddForm patientId={patient.id} today={today} />
+
+          {archivedObservations.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              <Typography size="sm" tone="muted">
+                Observations archivées
+              </Typography>
+              <ArchivedObservations observations={archivedObservations} />
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Consultations</CardTitle>
           <CardDescription>
             Vos notes de séance, de la plus récente à la plus ancienne. Elles ne
@@ -308,9 +404,10 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
           <CardTitle>Zone sensible</CardTitle>
           <CardDescription>
             La suppression retire le profil, ses recommandations, ses
-            essentiels, ses notes, son anamnèse, ses recettes attribuées et le
-            lien patient — définitivement. Les recettes elles-mêmes restent dans
-            la bibliothèque.
+            essentiels, ses notes, son anamnèse, ses recettes attribuées, son
+            journal des repas, ses observations et le lien patient —
+            définitivement. Les recettes elles-mêmes restent dans la
+            bibliothèque.
           </CardDescription>
         </CardHeader>
         <CardContent>
