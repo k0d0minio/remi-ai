@@ -145,6 +145,43 @@ export const patientRecommendations = pgTable("patient_recommendations", {
 });
 
 /**
+ * The prescribed supplement protocol — brainstorm § G. What Morgane prescribes,
+ * as structured rows rather than the prose that lived in the profile's
+ * `supplements` column (which is now "what the patient already takes, outside
+ * the protocol") or, before this, in a `supplement`-category recommendation.
+ *
+ * One flat ordered list per patient — § G is not category-grouped the way the
+ * recommendations are, so there is no `category` column, only `position`. The
+ * four content columns are § G's: the supplement, the dose if one is needed,
+ * the moment of intake if it matters, and why. Only `name` is required; the
+ * other three default to empty, exactly as an unfilled recommendation `detail`.
+ *
+ * `archived_at` is the everyday exit, the recommendations' philosophy applied
+ * here: a stopped supplement is history worth keeping — "pourquoi on a arrêté
+ * le magnésium" is answered by a row, not by a memory. There is deliberately no
+ * `started_on` column: created-at is enough, and a start date can arrive later
+ * as a nullable column with no reshape if Morgane wants "depuis octobre".
+ */
+export const patientSupplements = pgTable("patient_supplements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  /** The supplement, as Morgane prescribes it — "Magnésium bisglycinate". */
+  name: text("name").notNull(),
+  /** The dose, if one is needed — "300 mg". */
+  dose: text("dose").notNull().default(""),
+  /** The moment of intake, if it matters — "le soir, au coucher". */
+  timing: text("timing").notNull().default(""),
+  /** Why it is prescribed — the § G justification. */
+  reason: text("reason").notNull().default(""),
+  /** Rank within the patient's protocol. Sparse — a reorder rewrites the run. */
+  position: integer("position").notNull().default(0),
+  archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
+
+/**
  * One dated note per consultation — the history that accumulates before the
  * December launch. Never rendered on the patient link: this is Morgane's
  * working record, written in clinical shorthand for herself.
