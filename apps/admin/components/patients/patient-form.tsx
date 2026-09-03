@@ -464,7 +464,7 @@ export const PatientForm = ({ patient }: Props) => {
           id="anamnesis"
           label="Anamnèse"
           optional
-          hint="Vos notes de fond. Ne s'affiche pas sur le lien patient."
+          hint="L'ancien bloc unique. À redistribuer dans les catégories d'anamnèse de la fiche, puis à vider. Ne s'affiche pas sur le lien patient."
         >
           <Textarea
             id="anamnesis"

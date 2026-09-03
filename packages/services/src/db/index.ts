@@ -33,6 +33,11 @@ export {
 export type { PatientInput } from "./services/patients";
 
 export {
+  listPatientAnamnesis,
+  setPatientAnamnesis,
+} from "./services/patient-anamnesis";
+
+export {
   addPatientRecommendation,
   deletePatientRecommendation,
   listPatientRecommendations,

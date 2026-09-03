@@ -19,6 +19,7 @@ import {
   patientLinkEmail,
   regenerateShareToken,
   sendEmail,
+  setPatientAnamnesis,
   updatePantryEssential,
   updatePatient,
   updatePatientNote,
@@ -59,6 +60,7 @@ export type PatientFormState = { error: string | null; saved: boolean };
 export type RecommendationFormState = { error: string | null };
 export type PantryFormState = { error: string | null };
 export type NoteFormState = { error: string | null };
+export type AnamnesisFormState = { error: string | null };
 export type ShareFormState = { error: string | null; sent: boolean };
 
 const field = (formData: FormData, name: string) =>
@@ -498,4 +500,34 @@ export const deleteNoteAction = async (formData: FormData) => {
     });
   }
   revalidatePatient(field(formData, "patientId"));
+};
+
+/**
+ * One category of the anamnesis, written on its own. The other eleven are not
+ * read and not sent, so a save mid-consultation touches exactly the area she
+ * just asked about — and an empty body is how she clears one, which the service
+ * turns into the row's deletion.
+ */
+export const saveAnamnesisAction = async (
+  _previous: AnamnesisFormState,
+  formData: FormData,
+): Promise<AnamnesisFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const category = field(formData, "category");
+  const result = await setPatientAnamnesis(
+    patientId,
+    category,
+    field(formData, "body"),
+  );
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "anamnesis.updated", {
+    type: "anamnesis",
+    id: result.data?.id ?? null,
+    label: category,
+  });
+  revalidatePatient(patientId);
+  return { error: null };
 };
