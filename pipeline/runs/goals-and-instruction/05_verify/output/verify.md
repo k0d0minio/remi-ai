@@ -18,7 +18,7 @@ that needs the console open is the operator's and is **not yet demonstrated**.
 
 - [x] The migration is additive — three `CREATE TABLE`s plus their FKs, no `ALTER` of
       an existing table, so it applies over existing rows untouched (agent: read
-      `0007_yielding_banshee.sql`)
+      `0008_colossal_ozymandias.sql`)
 - [x] The cap refuses a fourth active goal and a restore into a full list, with
       `conflict` and no row written (agent: service tests)
 - [x] A check-in carrying no direction, no measure and no note is refused; an unknown
@@ -61,7 +61,7 @@ that needs the console open is the operator's and is **not yet demonstrated**.
   — latent, no caller passes an explicit `undefined` today. Fixed for symmetry.
 - **No `down` migration** — accepted, and it is not this run's to change: drizzle-kit
   generates forward-only migrations and no migration in this repo has ever carried a
-  down. Reversing `0007` by hand is three `DROP TABLE`s. Making downs a convention is a
+  down. Reversing `0008` by hand is three `DROP TABLE`s. Making downs a convention is a
   chore of its own.
 - **The direction select uses a `none` sentinel** because Radix refuses `""` as an item
   value. Anything outside `goalDirections` narrows to null in the action, so it needs no
