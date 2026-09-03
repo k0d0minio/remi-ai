@@ -62,6 +62,11 @@ export {
 } from "../db/services/patient-instructions";
 
 export {
+  getPatientSummary,
+  setPatientSummary,
+} from "../db/services/patient-summaries";
+
+export {
   addPatientRecommendation,
   archivePatientRecommendation,
   deletePatientRecommendation,
