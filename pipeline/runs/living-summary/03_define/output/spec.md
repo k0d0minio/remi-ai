@@ -33,8 +33,8 @@ data layer only, no AI, and no patient-facing render this round (that render is 
 **One row per patient in a dedicated `patient_summaries` table, not a column on `patient_profiles`.**
 The summary has one living value with no history (decision #7), so at first glance a column on the
 profile would do. It gets its own table for two reasons the stub names. First, it needs its own
-timestamp: the "reviewed at" / "updated at" question (open, below) is about *when the summary last
-moved*, and a column on `patient_profiles` would have the summary's freshness tracked by a
+timestamp: the "reviewed at" / "updated at" question (open, below) is about _when the summary last
+moved_, and a column on `patient_profiles` would have the summary's freshness tracked by a
 `updated_at` that also bumps every time she edits an allergy or a budget. A row of its own carries
 its own `updated_at`. Second, the AI round wants draft-vs-validated state on _this_ content; that
 belongs beside the summary body, not spread across the profile table. Either shape supports the
