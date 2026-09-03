@@ -1,3 +1,4 @@
+import { recommendationCategories } from "@remi/services/shared";
 import type {
   AnamnesisCategory,
   ConsentChannel,
@@ -53,6 +54,17 @@ export const categoryLabels: Record<RecommendationCategory, string> = {
   activity: "Activité",
   monitoring: "Suivi",
 };
+
+/**
+ * The categories the recommendation add form offers — every one except
+ * `supplement`, which the supplement protocol now owns (§ G). The full
+ * `recommendationCategories` is untouched, so an existing `supplement`-category
+ * recommendation still validates, groups and renders, and can still be
+ * re-categorised from the edit form; only new entries are steered away from it.
+ */
+export const addableRecommendationCategories = recommendationCategories.filter(
+  (category) => category !== "supplement",
+);
 
 /** Whether the person likes cooking — read on the profile and in the select. */
 export const cookingAffinityLabels: Record<CookingAffinity, string> = {
