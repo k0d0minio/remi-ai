@@ -3,38 +3,55 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
+  addGoalCheckIn,
   addMealEntry,
   addPantryEssential,
-  addPatientObservation,
+  addPatientGoal,
   addPatientNote,
+  addPatientObservation,
   addPatientRecommendation,
+  addPatientSupplement,
   archiveMealEntry,
   archivePantryEssential,
+  archivePatientGoal,
   archivePatientObservation,
   archivePatientRecommendation,
+  archivePatientSupplement,
   archiveRecipeAssignment,
   assignRecipe,
   createPatient,
-  deletePatient,
+  deleteGoalCheckIn,
   deleteMealEntry,
   deletePantryEssential,
-  deletePatientObservation,
+  deletePatient,
+  deletePatientGoal,
   deletePatientNote,
+  deletePatientObservation,
   deletePatientRecommendation,
+  deletePatientSupplement,
   getPatient,
+  getPatientInstruction,
+  getPatientSummary,
   movePantryEssential,
+  movePatientGoal,
   movePatientRecommendation,
+  movePatientSupplement,
   patientLinkEmail,
   regenerateShareToken,
   removeRecipeAssignment,
   sendEmail,
   setPatientAnamnesis,
+  setPatientInstruction,
+  setPatientSummary,
+  updateGoalCheckIn,
   updateMealEntry,
   updatePantryEssential,
-  updatePatientObservation,
   updatePatient,
+  updatePatientGoal,
   updatePatientNote,
+  updatePatientObservation,
   updatePatientRecommendation,
+  updatePatientSupplement,
   updateRecipeAssignment,
   type PatientInput,
 } from "@remi/services/server";
@@ -42,6 +59,7 @@ import {
   appHref,
   consentChannels,
   cookingAffinities,
+  goalDirections,
   isLocale,
   mealSlots,
   patientSexes,
@@ -49,6 +67,7 @@ import {
   recommendationCategories,
   type ConsentChannel,
   type CookingAffinity,
+  type GoalDirection,
   type MealSlot,
   type PatientSex,
   type PatientStatus,
@@ -72,12 +91,17 @@ import { mailerReady } from "@/lib/mailer";
 
 export type PatientFormState = { error: string | null; saved: boolean };
 export type RecommendationFormState = { error: string | null };
+export type SupplementFormState = { error: string | null };
 export type PantryFormState = { error: string | null };
 export type AssignmentFormState = { error: string | null };
 export type MealFormState = { error: string | null };
 export type ObservationFormState = { error: string | null };
 export type NoteFormState = { error: string | null };
 export type AnamnesisFormState = { error: string | null };
+export type GoalFormState = { error: string | null };
+export type CheckInFormState = { error: string | null };
+export type InstructionFormState = { error: string | null; saved: boolean };
+export type SummaryFormState = { error: string | null; saved: boolean };
 export type ShareFormState = { error: string | null; sent: boolean };
 
 const field = (formData: FormData, name: string) =>
@@ -104,6 +128,12 @@ const asSex = (value: string): PatientSex =>
 const asConsentChannel = (value: string): ConsentChannel | "" =>
   (consentChannels as readonly string[]).includes(value)
     ? (value as ConsentChannel)
+    : "";
+
+/** `""` is a real answer: § D lets a check-in carry a measure and no direction. */
+const asGoalDirection = (value: string): GoalDirection | "" =>
+  (goalDirections as readonly string[]).includes(value)
+    ? (value as GoalDirection)
     : "";
 
 /** `""` is a real answer here too — it is how Morgane clears a recorded one. */
@@ -363,6 +393,99 @@ export const deleteRecommendationAction = async (formData: FormData) => {
       type: "recommendation",
       id,
       label: field(formData, "title"),
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+/**
+ * The prescribed supplement protocol — brainstorm § G. Four fields and a flat
+ * order: these collect them and let the service validate the name and place the
+ * row. A reorder is silent, like the recommendations' and unlike the pantry's:
+ * the order a protocol reads in is a presentation choice, not a change to what
+ * it prescribes, and a journal full of nudges is a journal nobody reads.
+ */
+export const addSupplementAction = async (
+  _previous: SupplementFormState,
+  formData: FormData,
+): Promise<SupplementFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const result = await addPatientSupplement(patientId, {
+    name: field(formData, "name"),
+    dose: field(formData, "dose"),
+    timing: field(formData, "timing"),
+    reason: field(formData, "reason"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "supplement.added", {
+    type: "patient_supplement",
+    id: result.data.id,
+    label: result.data.name,
+  });
+  revalidatePatient(patientId);
+  return { error: null };
+};
+
+export const updateSupplementAction = async (
+  _previous: SupplementFormState,
+  formData: FormData,
+): Promise<SupplementFormState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const result = await updatePatientSupplement(id, {
+    name: field(formData, "name"),
+    dose: field(formData, "dose"),
+    timing: field(formData, "timing"),
+    reason: field(formData, "reason"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "supplement.updated", {
+    type: "patient_supplement",
+    id,
+    label: result.data.name,
+  });
+  revalidatePatient(field(formData, "patientId"));
+  return { error: null };
+};
+
+export const moveSupplementAction = async (formData: FormData) => {
+  await requireOperator();
+  const direction = field(formData, "direction") === "up" ? "up" : "down";
+  await movePatientSupplement(field(formData, "id"), direction);
+  // Not audited, like the recommendations: reordering changes how a protocol
+  // reads, never what it prescribes.
+  revalidatePatient(field(formData, "patientId"));
+};
+
+export const archiveSupplementAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const archived = field(formData, "archived") === "true";
+  const result = await archivePatientSupplement(id, archived);
+  if (result.ok) {
+    await audit(
+      operator,
+      archived ? "supplement.archived" : "supplement.restored",
+      { type: "patient_supplement", id, label: result.data.name },
+    );
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+export const deleteSupplementAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const removed = await deletePatientSupplement(id);
+  if (removed.ok) {
+    await audit(operator, "supplement.deleted", {
+      type: "patient_supplement",
+      id,
+      label: field(formData, "name"),
     });
   }
   revalidatePatient(field(formData, "patientId"));
@@ -673,6 +796,246 @@ export const deleteObservationAction = async (formData: FormData) => {
     });
   }
   revalidatePatient(field(formData, "patientId"));
+};
+
+/**
+ * The steering — § D's priority goals with their check-ins, and § E's standing
+ * consigne.
+ *
+ * The cap on active goals is the service's; these actions surface its refusal
+ * rather than repeating the count, so the form and the rule can never disagree.
+ */
+export const addGoalAction = async (
+  _previous: GoalFormState,
+  formData: FormData,
+): Promise<GoalFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const result = await addPatientGoal(patientId, {
+    title: field(formData, "title"),
+    baseline: field(formData, "baseline"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "goal.added", {
+    type: "patient_goal",
+    id: result.data.id,
+    label: result.data.title,
+  });
+  revalidatePatient(patientId);
+  return { error: null };
+};
+
+export const updateGoalAction = async (
+  _previous: GoalFormState,
+  formData: FormData,
+): Promise<GoalFormState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const result = await updatePatientGoal(id, {
+    title: field(formData, "title"),
+    baseline: field(formData, "baseline"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "goal.updated", {
+    type: "patient_goal",
+    id,
+    label: result.data.title,
+  });
+  revalidatePatient(field(formData, "patientId"));
+  return { error: null };
+};
+
+export const moveGoalAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const direction = field(formData, "direction") === "up" ? "up" : "down";
+  const result = await movePatientGoal(id, direction);
+  if (result.ok) {
+    await audit(operator, "goal.reordered", {
+      type: "patient_goal",
+      id,
+      label: result.data.title,
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+/**
+ * Archiving and restoring share a form, and restoring can be refused: the cap
+ * counts active goals, so a restore into a full list is the same conflict an
+ * add would hit. The refusal is silent here — the list re-renders unchanged,
+ * which is what the operator sees — because this form posts without a state.
+ */
+export const archiveGoalAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const archived = field(formData, "archived") === "true";
+  const result = await archivePatientGoal(id, archived);
+  if (result.ok) {
+    await audit(operator, archived ? "goal.archived" : "goal.restored", {
+      type: "patient_goal",
+      id,
+      label: result.data.title,
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+export const deleteGoalAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const removed = await deletePatientGoal(id);
+  if (removed.ok) {
+    await audit(operator, "goal.deleted", {
+      type: "patient_goal",
+      id,
+      label: field(formData, "title"),
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+export const addCheckInAction = async (
+  _previous: CheckInFormState,
+  formData: FormData,
+): Promise<CheckInFormState> => {
+  const operator = await requireOperator();
+  const goalId = field(formData, "goalId");
+  const direction = asGoalDirection(field(formData, "direction"));
+  const result = await addGoalCheckIn(goalId, {
+    checkedOn: field(formData, "checkedOn"),
+    direction: direction === "" ? null : direction,
+    measure: field(formData, "measure"),
+    note: field(formData, "note"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "goal.checked_in", {
+    type: "patient_goal_check_in",
+    id: result.data.id,
+    label: field(formData, "title"),
+    detail: result.data.checkedOn,
+  });
+  revalidatePatient(field(formData, "patientId"));
+  return { error: null };
+};
+
+export const updateCheckInAction = async (
+  _previous: CheckInFormState,
+  formData: FormData,
+): Promise<CheckInFormState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const direction = asGoalDirection(field(formData, "direction"));
+  const result = await updateGoalCheckIn(id, {
+    checkedOn: field(formData, "checkedOn"),
+    direction: direction === "" ? null : direction,
+    measure: field(formData, "measure"),
+    note: field(formData, "note"),
+  });
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "goal.check_in_updated", {
+    type: "patient_goal_check_in",
+    id,
+    label: field(formData, "title"),
+    detail: result.data.checkedOn,
+  });
+  revalidatePatient(field(formData, "patientId"));
+  return { error: null };
+};
+
+export const deleteCheckInAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const removed = await deleteGoalCheckIn(id);
+  if (removed.ok) {
+    await audit(operator, "goal.check_in_deleted", {
+      type: "patient_goal_check_in",
+      id,
+      label: field(formData, "title"),
+      detail: field(formData, "checkedOn"),
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+/**
+ * Replacing the consigne archives the one it replaces — that is the service's
+ * doing, not a second call from here. An empty body is how Morgane says there
+ * is no standing instruction, so it is a save, not a validation error.
+ */
+export const setInstructionAction = async (
+  _previous: InstructionFormState,
+  formData: FormData,
+): Promise<InstructionFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const body = field(formData, "body");
+  // Read before the write so the trail can tell a clearing from a save on a
+  // patient who never had a consigne — the second changes nothing, and an
+  // audit row for a non-event is worse than none.
+  const before = await getPatientInstruction(patientId);
+  const result = await setPatientInstruction(patientId, body);
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  if (result.data && result.data.id !== before?.id) {
+    await audit(operator, "instruction.updated", {
+      type: "patient_instruction",
+      id: result.data.id,
+      label: field(formData, "pseudonym"),
+    });
+  } else if (!result.data && before) {
+    await audit(operator, "instruction.cleared", {
+      type: "patient_instruction",
+      id: before.id,
+      label: field(formData, "pseudonym"),
+    });
+  }
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
+/**
+ * The living summary — § C's synthesis, written for the patient and revised at
+ * each consultation. It upserts one row: reading the state before the write is
+ * what lets the trail tell a first draft and an edit (both `summary.updated`)
+ * from a clearing (`summary.cleared`) and from a no-op that changed nothing.
+ */
+export const setSummaryAction = async (
+  _previous: SummaryFormState,
+  formData: FormData,
+): Promise<SummaryFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const body = field(formData, "body");
+  const before = await getPatientSummary(patientId);
+  const result = await setPatientSummary(patientId, body);
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  if (result.data && (!before || result.data.body !== before.body)) {
+    await audit(operator, "summary.updated", {
+      type: "patient_summary",
+      id: result.data.id,
+      label: field(formData, "pseudonym"),
+    });
+  } else if (!result.data && before) {
+    await audit(operator, "summary.cleared", {
+      type: "patient_summary",
+      id: before.id,
+      label: field(formData, "pseudonym"),
+    });
+  }
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
 };
 
 /**

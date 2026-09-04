@@ -145,6 +145,43 @@ export const patientRecommendations = pgTable("patient_recommendations", {
 });
 
 /**
+ * The prescribed supplement protocol — brainstorm § G. What Morgane prescribes,
+ * as structured rows rather than the prose that lived in the profile's
+ * `supplements` column (which is now "what the patient already takes, outside
+ * the protocol") or, before this, in a `supplement`-category recommendation.
+ *
+ * One flat ordered list per patient — § G is not category-grouped the way the
+ * recommendations are, so there is no `category` column, only `position`. The
+ * four content columns are § G's: the supplement, the dose if one is needed,
+ * the moment of intake if it matters, and why. Only `name` is required; the
+ * other three default to empty, exactly as an unfilled recommendation `detail`.
+ *
+ * `archived_at` is the everyday exit, the recommendations' philosophy applied
+ * here: a stopped supplement is history worth keeping — "pourquoi on a arrêté
+ * le magnésium" is answered by a row, not by a memory. There is deliberately no
+ * `started_on` column: created-at is enough, and a start date can arrive later
+ * as a nullable column with no reshape if Morgane wants "depuis octobre".
+ */
+export const patientSupplements = pgTable("patient_supplements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  /** The supplement, as Morgane prescribes it — "Magnésium bisglycinate". */
+  name: text("name").notNull(),
+  /** The dose, if one is needed — "300 mg". */
+  dose: text("dose").notNull().default(""),
+  /** The moment of intake, if it matters — "le soir, au coucher". */
+  timing: text("timing").notNull().default(""),
+  /** Why it is prescribed — the § G justification. */
+  reason: text("reason").notNull().default(""),
+  /** Rank within the patient's protocol. Sparse — a reorder rewrites the run. */
+  position: integer("position").notNull().default(0),
+  archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
+
+/**
  * One dated note per consultation — the history that accumulates before the
  * December launch. Never rendered on the patient link: this is Morgane's
  * working record, written in clinical shorthand for herself.
@@ -196,6 +233,115 @@ export const patientAnamnesis = pgTable(
   },
   (table) => [unique().on(table.patientId, table.category)],
 );
+
+/**
+ * The two or three things this accompaniment is working on — brainstorm § D.
+ *
+ * A goal is her words plus an optional starting point, and its rank in her
+ * priority order. `archived_at` is the everyday exit: § D's philosophy is the
+ * recommendations' one, so "pourquoi on a arrêté celui-là" is answered by a
+ * row rather than by a memory.
+ *
+ * The 2-3 active maximum § D states is enforced in the service, not by a
+ * constraint here: it counts active rows per patient, which is a query, and a
+ * rule Morgane may want relaxed should not need a migration to relax.
+ */
+export const patientGoals = pgTable("patient_goals", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  /** The goal as she says it — "améliorer l'énergie". */
+  title: text("title").notNull(),
+  /**
+   * The simple starting point to compare against later — "énergie 3/10", "3
+   * réveils par nuit". Free text, not a number: § D's measure is whatever she
+   * writes, and a numeric column would freeze a scale nobody has agreed.
+   */
+  baseline: text("baseline").notNull().default(""),
+  /** Her priority order. Sparse by design — a reorder rewrites the run. */
+  position: integer("position").notNull().default(0),
+  archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
+
+/**
+ * One dated observation against one goal — the manual seed of § D's evolution
+ * trail, and of the PROGRESS block the later AI round writes into.
+ *
+ * `checked_on` is a plain calendar date for the same reason as `birth_date`:
+ * the day of a follow-up has no timezone, and storing one is how a check-in
+ * drifts across a border.
+ *
+ * All three content columns are optional because § D gives the direction and
+ * the measure as alternatives; that at least one is present is the service's
+ * rule, since "a row that says nothing" is a validation question, not a shape.
+ */
+export const patientGoalCheckIns = pgTable("patient_goal_check_ins", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  goalId: uuid("goal_id")
+    .notNull()
+    .references(() => patientGoals.id, { onDelete: "cascade" }),
+  checkedOn: date("checked_on", { mode: "string" }).notNull(),
+  /** A key from `goalDirections` in `shared/patient.ts`, or nothing. */
+  direction: text("direction"),
+  /** The simple measure on the day — "4/10", "presque plus de réveils". */
+  measure: text("measure").notNull().default(""),
+  note: text("note").notNull().default(""),
+  ...timestamps,
+});
+
+/**
+ * The standing consigne Morgane steers by — brainstorm § E.
+ *
+ * Many rows per patient, exactly one of them active: replacing the instruction
+ * archives the current row and inserts a new one, so "what was I steering by in
+ * October" survives the November rewrite. That one-active rule lives in the
+ * service rather than in a partial unique index, because § E's shape is the
+ * open question — if she turns out to want several concurrent consignes, this
+ * table already holds them.
+ *
+ * Today nothing reads it but the console. In the AI round it becomes the
+ * generation prompt's practitioner line, which is a new reader of the same
+ * column, not a new table.
+ */
+export const patientInstructions = pgTable("patient_instructions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  body: text("body").notNull(),
+  /** Set when a replacement supersedes it. Null on the one in force. */
+  archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
+
+/**
+ * The living summary — brainstorm § C's PATIENT_SUMMARY, written by Morgane
+ * now and drafted by the AI later.
+ *
+ * One row per patient, revised in place: § C's synthesis is the current state
+ * of the file, and the consultation notes already carry its history, so there
+ * is no archive here (owner decision, `.icm/intake/patient-record/breakdown.md`
+ * § Decisions #7). The `patient_id` unique constraint is that "one living
+ * summary per patient" rule expressed in the schema — a second write updates
+ * the row rather than adding one.
+ *
+ * It is the first record block patient-visible by design (§ J), but nothing
+ * renders it at the link this round — that is the `patient-surface` epic's. The
+ * AI round wants draft-vs-validated state on this content; that lands as columns
+ * beside `body`, not a re-model, which is why the summary has its own row rather
+ * than a column on `patient_profiles`.
+ */
+export const patientSummaries = pgTable("patient_summaries", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .unique()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  body: text("body").notNull(),
+  ...timestamps,
+});
 
 /**
  * The short list of foods worth keeping in the placard and the frigo, chosen

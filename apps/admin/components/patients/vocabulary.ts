@@ -1,7 +1,9 @@
+import { recommendationCategories } from "@remi/services/shared";
 import type {
   AnamnesisCategory,
   ConsentChannel,
   CookingAffinity,
+  GoalDirection,
   MealSlot,
   PatientSex,
   PatientStatus,
@@ -52,6 +54,17 @@ export const categoryLabels: Record<RecommendationCategory, string> = {
   activity: "Activité",
   monitoring: "Suivi",
 };
+
+/**
+ * The categories the recommendation add form offers — every one except
+ * `supplement`, which the supplement protocol now owns (§ G). The full
+ * `recommendationCategories` is untouched, so an existing `supplement`-category
+ * recommendation still validates, groups and renders, and can still be
+ * re-categorised from the edit form; only new entries are steered away from it.
+ */
+export const addableRecommendationCategories = recommendationCategories.filter(
+  (category) => category !== "supplement",
+);
 
 /** Whether the person likes cooking — read on the profile and in the select. */
 export const cookingAffinityLabels: Record<CookingAffinity, string> = {
@@ -110,3 +123,42 @@ export const anamnesisCategoryLabels: Record<AnamnesisCategory, string> = {
   endocrine: "Endocrinien, gynéco",
   context: "Contexte de vie",
 };
+
+/**
+ * § D's check-in words, as Morgane says them. The keys are what
+ * `patient_goal_check_ins` stores, so rewording one is an edit here alone.
+ */
+export const goalDirectionLabels: Record<GoalDirection, string> = {
+  better: "mieux",
+  stable: "stable",
+  worse: "moins bien",
+};
+
+/**
+ * Only a worsening earns a warning colour. A trail where every row is tinted
+ * reads as noise; the row that should catch her eye is the one going the wrong
+ * way.
+ */
+export const goalDirectionIntents: Record<GoalDirection, Intent> = {
+  better: "success",
+  stable: "neutral",
+  worse: "warning",
+};
+
+/**
+ * The living summary is written *for* the patient — § C's synthesis, the one
+ * thing Morgane re-reads first. This note says so on the card: it becomes
+ * visible on the patient link once the patient-surface segments are online, and
+ * naming that now is how she remembers a patient will read it. French, because
+ * the console's operators are Morgane and Arnaud.
+ */
+export const summaryVisibilityNote =
+  "Écrit pour la personne suivie : visible sur le lien patient une fois les segments en ligne.";
+
+/**
+ * § C's checklist of what a summary covers, offered as guidance beside the
+ * textarea rather than as separate fields — § 4's principle that a background
+ * table must not become a manual entry burden. The body stays free text.
+ */
+export const summaryChecklistHint =
+  "Contexte et motif, points de vigilance, médicaments en cours, principales difficultés, habitudes et contraintes utiles, ce qui va déjà bien, ce qui reste à clarifier.";

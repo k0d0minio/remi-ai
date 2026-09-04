@@ -79,3 +79,13 @@ export const mealSlots = [
   "diner",
   "collation",
 ] as const;
+
+/**
+ * § D's check-in vocabulary — how a goal moved since the last one.
+ *
+ * English keys because they are what `patient_goal_check_ins` stores; the
+ * French Morgane reads (mieux / stable / moins bien) lives in the console's
+ * `vocabulary.ts`. A check-in may carry no direction at all: § D offers the
+ * direction *or* a simple measure, and one of the two is enough.
+ */
+export const goalDirections = ["better", "stable", "worse"] as const;

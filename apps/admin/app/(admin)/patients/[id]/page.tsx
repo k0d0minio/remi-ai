@@ -2,20 +2,29 @@ import { ArrowLeft } from "lucide-react";
 import NextLink from "next/link";
 import { notFound } from "next/navigation";
 import {
+  MAX_ACTIVE_GOALS,
   countMealEntriesAwaitingFeedback,
   getPatient,
+  getPatientInstruction,
+  getPatientSummary,
   listArchivedMealEntries,
   listArchivedPantryEssentials,
+  listArchivedPatientGoals,
+  listArchivedPatientInstructions,
   listArchivedPatientObservations,
   listArchivedPatientRecipes,
   listArchivedPatientRecommendations,
+  listGoalCheckIns,
   listMealEntries,
   listPantryEssentials,
+  listPatientGoals,
   listPatientAnamnesis,
   listPatientLearnings,
   listPatientNotes,
   listPatientRecipes,
   listPatientRecommendations,
+  listArchivedPatientSupplements,
+  listPatientSupplements,
   listRecipes,
 } from "@remi/services/server";
 import { ageInYears, appHref } from "@remi/services/shared";
@@ -31,6 +40,9 @@ import {
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
 import { DeletePatient } from "@/components/patients/delete-patient";
+import { GoalAddForm } from "@/components/patients/goal-add-form";
+import { GoalList } from "@/components/patients/goal-list";
+import { InstructionBlock } from "@/components/patients/instruction-block";
 import {
   ArchivedObservations,
   LearningsList,
@@ -46,6 +58,9 @@ import { RecipeAssignments } from "@/components/patients/recipe-assignments";
 import { RecommendationAddForm } from "@/components/patients/recommendation-add-form";
 import { RecommendationGroups } from "@/components/patients/recommendation-groups";
 import { ShareLinkCard } from "@/components/patients/share-link-card";
+import { SummaryBlock } from "@/components/patients/summary-block";
+import { SupplementAddForm } from "@/components/patients/supplement-add-form";
+import { SupplementProtocol } from "@/components/patients/supplement-protocol";
 import {
   patientSexLabels,
   patientStatusIntents,
@@ -78,6 +93,8 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
   const [
     recommendations,
     archived,
+    supplements,
+    archivedSupplements,
     essentials,
     archivedEssentials,
     assignedRecipes,
@@ -90,9 +107,16 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
     archivedObservations,
     notes,
     anamnesis,
+    goals,
+    archivedGoals,
+    instruction,
+    supersededInstructions,
+    summary,
   ] = await Promise.all([
     listPatientRecommendations(patient.id),
     listArchivedPatientRecommendations(patient.id),
+    listPatientSupplements(patient.id),
+    listArchivedPatientSupplements(patient.id),
     listPantryEssentials(patient.id),
     listArchivedPantryEssentials(patient.id),
     listPatientRecipes(patient.id),
@@ -107,7 +131,24 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
     listArchivedPatientObservations(patient.id),
     listPatientNotes(patient.id),
     listPatientAnamnesis(patient.id),
+    listPatientGoals(patient.id),
+    listArchivedPatientGoals(patient.id),
+    getPatientInstruction(patient.id),
+    listArchivedPatientInstructions(patient.id),
+    getPatientSummary(patient.id),
   ]);
+
+  // One trail per goal, active and archived alike: two or three goals plus
+  // what has been set down is a handful of reads, and they run together.
+  const trails = await Promise.all(
+    [...goals, ...archivedGoals].map(async (goal) => ({
+      id: goal.id,
+      entries: await listGoalCheckIns(goal.id),
+    })),
+  );
+  const checkIns = Object.fromEntries(
+    trails.map((trail) => [trail.id, trail.entries]),
+  );
   const shareUrl = appHref("web", `/p/${patient.shareToken}`, patient.locale);
   const age = ageInYears(patient.birthDate);
 
@@ -174,6 +215,74 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
 
       <Card>
         <CardHeader>
+          <CardTitle>Résumé vivant</CardTitle>
+          <CardDescription>
+            La synthèse de la personne — ce que vous relisez en premier. Une
+            seule, révisée à chaque consultation.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SummaryBlock
+            patientId={patient.id}
+            pseudonym={patient.pseudonym}
+            summary={summary}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Objectifs et consigne</CardTitle>
+          <CardDescription>
+            Deux ou trois priorités, dans votre ordre, avec leur évolution — et
+            la consigne que vous vous donnez pour cet accompagnement. Rien de
+            tout cela ne s&apos;affiche sur le lien patient.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          {goals.length === 0 ? (
+            <Typography size="sm" tone="muted">
+              Aucun objectif pour le moment.
+            </Typography>
+          ) : (
+            <GoalList goals={goals} checkIns={checkIns} ranked today={today} />
+          )}
+
+          {goals.length < MAX_ACTIVE_GOALS ? (
+            <GoalAddForm patientId={patient.id} />
+          ) : (
+            <Typography size="sm" tone="muted">
+              {`${MAX_ACTIVE_GOALS} objectifs actifs — archivez-en un pour en ajouter un autre.`}
+            </Typography>
+          )}
+
+          {archivedGoals.length > 0 ? (
+            <div className="border-border flex flex-col gap-3 border-t pt-6">
+              <Typography as="h3" size="sm" weight="medium" tone="muted">
+                Objectifs archivés
+              </Typography>
+              <GoalList
+                goals={archivedGoals}
+                checkIns={checkIns}
+                ranked={false}
+                today={today}
+              />
+            </div>
+          ) : null}
+
+          <div className="border-border flex flex-col gap-3 border-t pt-6">
+            <InstructionBlock
+              patientId={patient.id}
+              pseudonym={patient.pseudonym}
+              instruction={instruction}
+              superseded={supersededInstructions}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Recommandations</CardTitle>
           <CardDescription>
             Le protocole, encodé entrée par entrée — c&apos;est ce que montre le
@@ -207,6 +316,39 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
           </CardContent>
         </Card>
       ) : null}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Protocole de compléments</CardTitle>
+          <CardDescription>
+            Les compléments que vous prescrivez, avec dose, moment et raison.
+            Ceux que la personne prend déjà d&apos;elle-même se notent dans le
+            profil.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          {supplements.length === 0 ? (
+            <Typography size="sm" tone="muted">
+              Aucun complément prescrit pour le moment.
+            </Typography>
+          ) : (
+            <SupplementProtocol supplements={supplements} />
+          )}
+
+          <SupplementAddForm patientId={patient.id} />
+
+          {archivedSupplements.length > 0 ? (
+            <details className="border-border flex flex-col gap-3 border-t pt-6">
+              <summary className="text-muted-foreground hover:text-foreground cursor-pointer text-sm">
+                {`Compléments arrêtés (${archivedSupplements.length})`}
+              </summary>
+              <div className="pt-3">
+                <SupplementProtocol supplements={archivedSupplements} />
+              </div>
+            </details>
+          ) : null}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -403,10 +545,11 @@ const PatientDetail = async ({ params }: { params: Promise<Params> }) => {
         <CardHeader>
           <CardTitle>Zone sensible</CardTitle>
           <CardDescription>
-            La suppression retire le profil, ses recommandations, ses
-            essentiels, ses notes, son anamnèse, ses recettes attribuées, son
-            journal des repas, ses observations et le lien patient —
-            définitivement. Les recettes elles-mêmes restent dans la
+            La suppression retire le profil, ses recommandations, son protocole
+            de compléments, ses essentiels, ses notes, son anamnèse, ses
+            objectifs et leurs points d&apos;étape, ses consignes, ses recettes
+            attribuées, son journal des repas, ses observations et le lien
+            patient — définitivement. Les recettes elles-mêmes restent dans la
             bibliothèque.
           </CardDescription>
         </CardHeader>

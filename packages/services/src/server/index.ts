@@ -36,6 +36,37 @@ export type {
 } from "../db/services/patients";
 
 export {
+  addGoalCheckIn,
+  addPatientGoal,
+  archivePatientGoal,
+  deleteGoalCheckIn,
+  deletePatientGoal,
+  listArchivedPatientGoals,
+  listGoalCheckIns,
+  listPatientGoals,
+  movePatientGoal,
+  updateGoalCheckIn,
+  updatePatientGoal,
+  MAX_ACTIVE_GOALS,
+} from "../db/services/patient-goals";
+export type {
+  GoalCheckInInput,
+  PatientGoalInput,
+} from "../db/services/patient-goals";
+
+export {
+  deletePatientInstruction,
+  getPatientInstruction,
+  listArchivedPatientInstructions,
+  setPatientInstruction,
+} from "../db/services/patient-instructions";
+
+export {
+  getPatientSummary,
+  setPatientSummary,
+} from "../db/services/patient-summaries";
+
+export {
   addPatientRecommendation,
   archivePatientRecommendation,
   deletePatientRecommendation,
@@ -45,6 +76,17 @@ export {
   updatePatientRecommendation,
 } from "../db/services/patient-recommendations";
 export type { RecommendationInput } from "../db/services/patient-recommendations";
+
+export {
+  addPatientSupplement,
+  archivePatientSupplement,
+  deletePatientSupplement,
+  listArchivedPatientSupplements,
+  listPatientSupplements,
+  movePatientSupplement,
+  updatePatientSupplement,
+} from "../db/services/patient-supplements";
+export type { SupplementInput } from "../db/services/patient-supplements";
 
 export {
   addPantryEssential,

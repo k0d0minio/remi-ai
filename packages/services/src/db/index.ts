@@ -38,12 +38,51 @@ export {
 } from "./services/patient-anamnesis";
 
 export {
+  addGoalCheckIn,
+  addPatientGoal,
+  archivePatientGoal,
+  deleteGoalCheckIn,
+  deletePatientGoal,
+  listArchivedPatientGoals,
+  listGoalCheckIns,
+  listPatientGoals,
+  movePatientGoal,
+  updateGoalCheckIn,
+  updatePatientGoal,
+  MAX_ACTIVE_GOALS,
+} from "./services/patient-goals";
+export type {
+  GoalCheckInInput,
+  PatientGoalInput,
+} from "./services/patient-goals";
+
+export {
+  deletePatientInstruction,
+  getPatientInstruction,
+  listArchivedPatientInstructions,
+  setPatientInstruction,
+} from "./services/patient-instructions";
+
+export {
   addPatientRecommendation,
   deletePatientRecommendation,
   listPatientRecommendations,
   updatePatientRecommendation,
 } from "./services/patient-recommendations";
 export type { RecommendationInput } from "./services/patient-recommendations";
+
+export {
+  getPatientSummary,
+  setPatientSummary,
+} from "./services/patient-summaries";
+
+export {
+  addPatientSupplement,
+  deletePatientSupplement,
+  listPatientSupplements,
+  updatePatientSupplement,
+} from "./services/patient-supplements";
+export type { SupplementInput } from "./services/patient-supplements";
 
 export {
   createOperator,
