@@ -25,11 +25,17 @@ import * as schema from "../schema";
  * collection for any name asked of it, so only production had the list.
  * Deriving it leaves nothing to forget.
  */
-const tables: Record<string, PgTable> = Object.fromEntries(
-  Object.values(schema)
-    .filter((value): value is PgTable => is(value, PgTable))
-    .map((table) => [getTableName(table), table]),
-);
+const tables: Record<string, PgTable> = {};
+
+// `is()` narrows against the class, which is the only way to tell a table from
+// any other export; a `.filter()` type predicate cannot say it, because
+// `PgTable` is the supertype of what `Object.values(schema)` is typed as
+// (TS2677) — hence the loop.
+for (const value of Object.values(schema)) {
+  if (is(value, PgTable)) {
+    tables[getTableName(value)] = value;
+  }
+}
 
 const DEFAULT_PAGE_LIMIT = 50;
 

@@ -15,9 +15,13 @@ beforeAll(() => {
     "postgresql://user:password@localhost:5432/never-connected";
 });
 
-const schemaTableNames = Object.values(schema)
-  .filter((value): value is PgTable => is(value, PgTable))
-  .map((table) => getTableName(table));
+const schemaTableNames: string[] = [];
+
+for (const value of Object.values(schema)) {
+  if (is(value, PgTable)) {
+    schemaTableNames.push(getTableName(value));
+  }
+}
 
 describe("neon adapter", () => {
   it("builds a client without connecting", () => {
