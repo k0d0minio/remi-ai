@@ -13,6 +13,7 @@
  */
 
 import type {
+  MealSlot,
   PersonalisationDimension,
   RecommendationCategory,
   SignalKind,
@@ -274,26 +275,48 @@ export type Content = {
     /** Precedes the patient's name: "Bonjour Claire". */
     greeting: string;
     lead: string;
-    objectiveTitle: string;
+    /**
+     * The segment navigation. One label per route, so a segment cannot be
+     * added without both locales naming it.
+     */
+    /** Accessible name for the segment nav element. */
+    navLabel: string;
+    nav: {
+      home: string;
+      recommandations: string;
+      complements: string;
+      "placard-frigo": string;
+      recettes: string;
+      repas: string;
+    };
+    /** Home: the living summary and the priority goals, in her order. */
+    summaryTitle: string;
+    goalsTitle: string;
+    /** Precedes a goal's starting point: "Point de départ : ...". */
+    baselineLabel: string;
     recommendationsTitle: string;
     categories: Record<RecommendationCategory, string>;
-    empty: string;
+    /** Compléments: the validated protocol, never the profile free text. */
+    complementsTitle: string;
+    doseLabel: string;
+    timingLabel: string;
+    reasonLabel: string;
     /**
-     * The profile block. Only the fields written FOR the patient reach this
-     * page — their objective, what they have to avoid, what they like, and the
-     * clinical figures a protocol is built on. The anamnesis and the
-     * consultation notes are the practitioner's working record and stay in the
-     * console.
+     * Placard & frigo. The why is the point of the list rather than a
+     * decoration — § H is justification logic, so an item renders with its
+     * reason attached rather than in a bare checklist.
      */
-    profileTitle: string;
-    constraintsTitle: string;
-    preferencesTitle: string;
-    medicationsTitle: string;
-    supplementsTitle: string;
-    /** Labels for the measurement row — age, height, weight. */
-    ageLabel: string;
-    heightLabel: string;
-    weightLabel: string;
+    pantryTitle: string;
+    whyLabel: string;
+    /** Recettes: her per-patient « pourquoi pour toi » note. */
+    recipesTitle: string;
+    recipeNoteLabel: string;
+    /** Repas: the journal, with her feedback beneath an entry when written. */
+    mealsTitle: string;
+    mealSlots: Record<MealSlot, string>;
+    mealCommentLabel: string;
+    mealFeedbackLabel: string;
+    empty: string;
     disclaimer: PlaceholderContent;
     /**
      * What this page is, who can open it, and who to ask about the data.
