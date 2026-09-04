@@ -1,4 +1,7 @@
+import { getTableName, is } from "drizzle-orm";
+import { PgTable } from "drizzle-orm/pg-core";
 import { beforeAll, describe, expect, it } from "vitest";
+import * as schema from "../schema";
 import { createNeonDatabase } from "./neon";
 
 /**
@@ -12,17 +15,33 @@ beforeAll(() => {
     "postgresql://user:password@localhost:5432/never-connected";
 });
 
+const schemaTableNames: string[] = [];
+
+for (const value of Object.values(schema)) {
+  if (is(value, PgTable)) {
+    schemaTableNames.push(getTableName(value));
+  }
+}
+
 describe("neon adapter", () => {
   it("builds a client without connecting", () => {
     const db = createNeonDatabase();
     expect(db.driver).toBe("neon");
   });
 
-  it("serves the known collections", () => {
+  /**
+   * The service tests all run on `createMemoryDatabase()`, which invents a
+   * collection for any name asked of it — so a table missing from this adapter
+   * is invisible to every one of them and shows up only in production. It did:
+   * `patient_supplements` was absent, and the admin patient page threw for
+   * every patient. This is the check that stands in for those tests.
+   */
+  it("serves every table the schema declares", () => {
     const db = createNeonDatabase();
-    expect(db.collection("patient_profiles")).toBeDefined();
-    expect(db.collection("patient_recommendations")).toBeDefined();
-    expect(db.collection("operators")).toBeDefined();
+    expect(schemaTableNames).toContain("patient_supplements");
+    for (const name of schemaTableNames) {
+      expect(db.collection(name)).toBeDefined();
+    }
   });
 
   it("throws by name for an unknown collection", () => {

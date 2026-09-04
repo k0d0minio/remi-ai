@@ -1,56 +1,41 @@
 import { neon } from "@neondatabase/serverless";
-import { and, desc, eq, getTableColumns } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, getTableName, is } from "drizzle-orm";
 import { drizzle, type NeonHttpDatabase } from "drizzle-orm/neon-http";
-import type { PgTable } from "drizzle-orm/pg-core";
+import { PgTable } from "drizzle-orm/pg-core";
 import { requireEnv } from "../../server/env";
 import type { Id, Page, PageQuery } from "../../types";
 import type { Collection, DatabaseClient } from "../client";
-import {
-  auditEvents,
-  operatorInvitations,
-  operators,
-  patientAnamnesis,
-  patientGoalCheckIns,
-  patientGoals,
-  patientInstructions,
-  patientNotes,
-  patientPantryEssentials,
-  patientProfiles,
-  patientRecipeAssignments,
-  patientRecommendations,
-  patientSummaries,
-  patientMealEntries,
-  patientObservations,
-  recipes,
-} from "../schema";
+import * as schema from "../schema";
 
 /**
  * The Neon adapter — the first concrete implementation of the storage seam
  * (`DatabaseClient` in ../client.ts). Neon Postgres over the serverless HTTP
  * driver, queries built with Drizzle against ../schema.ts.
  *
- * The seam speaks in collections keyed by name; this table keeps the mapping in
- * one place, so a service reaching for a collection the schema does not carry
- * fails by name at the first call rather than 404ing at the database.
+ * The seam speaks in collections keyed by name, and the mapping is DERIVED
+ * from the schema rather than typed out: every `pgTable` exported by
+ * ../schema.ts is served under the name it declares, so a table is registered
+ * the moment it is defined.
+ *
+ * It was a hand-kept list until `patient_supplements` — defined, migrated,
+ * queried by the supplement protocol, and never added to it. Every read of it
+ * threw `unknown collection`, which is one of the twenty-one reads the admin
+ * patient page fans out, so the page rendered its error boundary for every
+ * patient. The service tests never saw it: `createMemoryDatabase()` makes a
+ * collection for any name asked of it, so only production had the list.
+ * Deriving it leaves nothing to forget.
  */
-const tables: Record<string, PgTable> = {
-  patient_profiles: patientProfiles,
-  patient_recommendations: patientRecommendations,
-  patient_notes: patientNotes,
-  patient_anamnesis: patientAnamnesis,
-  patient_goals: patientGoals,
-  patient_goal_check_ins: patientGoalCheckIns,
-  patient_instructions: patientInstructions,
-  patient_summaries: patientSummaries,
-  patient_pantry_essentials: patientPantryEssentials,
-  recipes: recipes,
-  patient_recipe_assignments: patientRecipeAssignments,
-  patient_meal_entries: patientMealEntries,
-  patient_observations: patientObservations,
-  operators: operators,
-  operator_invitations: operatorInvitations,
-  audit_events: auditEvents,
-};
+const tables: Record<string, PgTable> = {};
+
+// `is()` narrows against the class, which is the only way to tell a table from
+// any other export; a `.filter()` type predicate cannot say it, because
+// `PgTable` is the supertype of what `Object.values(schema)` is typed as
+// (TS2677) — hence the loop.
+for (const value of Object.values(schema)) {
+  if (is(value, PgTable)) {
+    tables[getTableName(value)] = value;
+  }
+}
 
 const DEFAULT_PAGE_LIMIT = 50;
 
@@ -162,7 +147,7 @@ export const createNeonDatabase = (): DatabaseClient => {
       const table = tables[name];
       if (!table) {
         throw new Error(
-          `unknown collection "${name}" — add the table to src/db/schema.ts and the registry in src/db/adapters/neon.ts`,
+          `unknown collection "${name}" — no table of that name is exported from src/db/schema.ts`,
         );
       }
       return makeCollection<T>(db, table);
