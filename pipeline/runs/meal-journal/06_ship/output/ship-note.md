@@ -6,4 +6,4 @@
 
 Photos stay in WhatsApp for now.
 
-Dig deeper: <merged-PR URL> · <changelog entry URL>
+Dig deeper: https://github.com/k0d0minio/remi-ai/pull/74 · https://remi-docs.jamienisbet.com/changelog/2026-09-03-meal-journal
