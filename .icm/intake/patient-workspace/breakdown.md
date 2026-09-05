@@ -2,12 +2,13 @@
 
 The admin patient page grew, one card at a time, from "a profile and a link" into the whole of
 what Morgane does with one patient: link, recommendations, pantry essentials, recipes, meal
-journal, learnings, consultations, anamnesis, profile, deletion — fourteen cards today, three more
-queued in [`patient-record`](../patient-record/breakdown.md) (living summary, goals and
-instruction, supplement protocol). It was cut phone-first, as one scrolling column, and that was
-right when it had four cards. It is now a 672px column of stacked cards on a desktop shell that
-reserves a 240px sidebar: on a 1440px screen more than half the width is margin, and on a phone
-the same stack is fourteen cards deep with an open form under every list.
+journal, learnings, consultations, anamnesis, profile, deletion — seventeen cards today, the last
+three of them (living summary, goals and instruction, supplement protocol) landing from
+[`patient-record`](../patient-record/breakdown.md) while this epic was being cut. It was cut
+phone-first, as one scrolling column, and that was right when it had four cards. It is now a 672px
+column of stacked cards on a desktop shell that reserves a 240px sidebar: on a 1440px screen more
+than half the width is margin, and on a phone the same stack is seventeen cards deep with an open
+form under every list.
 
 This epic re-lays the page — nothing in what it stores, nothing on the patient link — so that it
 **uses the whole desktop screen** and **spends phone space on the block she is working in**. It is
@@ -165,9 +166,9 @@ open under every list.
 
 **Every size.** Archived rows fold into their parent section with a count (R16) — four conditional
 "archivées" cards disappear. Targets ≥ 44 px on touch (R24). Reduced motion honoured (R28). The
-sticky pieces never cover an anchor target (`scroll-margin-top`, R10, R28). The three `patient-record`
-cards still to ship (summary, goals, supplements) register in the same section list, so they land
-in the frame rather than beside it.
+sticky pieces never cover an anchor target (`scroll-margin-top`, R10, R28). All seventeen sections
+register in the same list, the three that arrived from `patient-record` included — the registry has
+no "landing later" case to design for.
 
 The prototype comes first because a layout is the one thing a stub cannot describe well enough to
 approve from a paragraph: Morgane and Jamie approve it from the live demo URL (Design-stage rule),

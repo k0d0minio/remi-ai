@@ -72,3 +72,69 @@ only, on realistic mock data covering every current and queued section, shipped 
 URL via demo PRs under the Design-stage rules, with a closing throwaway-vs-seed declaration.
 Nothing outside `apps/demo/**` and this epic's intake files. Raise the stub's open questions on
 the live URL rather than answering them in the prototype.
+
+---
+
+## Closing note — the prototype, and what it is for
+
+Built in `apps/demo` and merged to the live demo URL under the Design-stage rules. Nothing outside
+`apps/demo/**` and this epic's intake files was touched: no `apps/admin`, no `packages/ui`, no
+service, nothing on the patient link.
+
+**Where to look**
+
+- Desktop and medium: <https://remi-demo.jamienisbet.com/practitioner/clients/camille>
+- Phone segments (the segment is in the URL): `?vue=suivi` · `?vue=journal` · `?vue=dossier` ·
+  `?vue=profil` · `?vue=brief`
+- The early case, to check the frame holds on an almost-empty record:
+  `/practitioner/clients/pierre`
+- Two other records, half-full: `/practitioner/clients/thomas` · `/practitioner/clients/naima`
+
+**Throwaway vs seed: seed.** The section compositions — the shell that drops its frame on a phone,
+the homogeneous row list, the archived fold with its count, the section registry the index and the
+segments both read — are what `page-frame` re-implements against the real components. It is a
+**visual** seed only: `apps/demo` has no services and no auth, so nothing here ports; the mock
+record in `apps/demo/lib/mock/workspace.ts` is view-shaped and is not a schema proposal.
+
+**What the prototype proves**
+
+- One tree holds. The thirteen sections render once, on the server, in one DOM order; `lg` places
+  that list in a work column beside a sticky rail, `md` stacks it under a scrolling anchor row, and
+  a phone shows one segment of it at a time. Nothing is rendered twice for a second screen size,
+  and no JS media query decides what the server renders (decision #2). The one piece of state that
+  cannot be CSS — the phone segment — lives in the URL and is read server-side, so a shared link
+  lands on its segment and the back button restores the previous one.
+- The rail, the medium "En bref" fold and the phone's "En bref" segment are one element placed
+  three ways, not three blocks.
+- Container queries carry the two-column row layouts (essentials, recipes, anamnesis, profile), so
+  a section lays itself out from its own width rather than the window's.
+
+**Findings for `page-frame`**
+
+1. **`Card` is not polymorphic.** It renders a `div` and takes no `as`, so a section landmark needs
+   a wrapping `<section>` around it. Either the frame keeps that wrapper or `packages/ui` gains an
+   `as` prop on `Card` — a `packages/ui` change is out of this stub's remit, so it is recorded here
+   rather than made.
+2. **A sticky anchor row at `md` needs its own grid slot.** Nested inside the rail element it is
+   pinned to a short containing block and unsticks immediately. The prototype ships the medium
+   anchor row non-sticky; making it sticky means lifting it out of the rail, which changes the grid,
+   so it is a decision for the frame rather than a detail.
+3. **The three "queued" sections are no longer queued.** The living summary, the goals with their
+   check-ins and the supplement protocol all shipped from `patient-record` (#80, #73, #79). The
+   prototype renders thirteen sections, all of them current — `page-frame`'s section registry has no
+   "landing later" case to design for. `breakdown.md` is corrected accordingly.
+4. **The cut stands.** Prototyping did not resplit the work: `page-frame`, `phone-segments`,
+   `history-folds`, `add-surfaces` and `rail-at-a-glance` each still map to a distinct part of what
+   was built, in the order the breakdown gives.
+
+**The open questions are still open.** They were raised on the live URL, not answered here. The
+prototype shows the provisional set so there is something concrete to react to:
+
+- Segment names and grouping — shown as _En bref · Suivi · Journal · Dossier · Profil_.
+- The rail's at-a-glance — shown with all five candidates, in the breakdown's order.
+- The recommendation form — shown open on desktop, behind a trigger on the phone, which is what
+  today's page does.
+- Archived material — folded everywhere, recipes included.
+- The sensitive zone — left as the last section.
+
+Whichever way each is answered, the answer belongs in `page-frame`'s spec, not in this prototype.

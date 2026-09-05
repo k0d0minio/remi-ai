@@ -1,4 +1,4 @@
-import type { Client, Dimension } from "./types";
+import type { Client } from "./types";
 
 export const practitionerName = "Dr Hélène Vasseur";
 export const clinicName = "Cabinet Vasseur";
@@ -56,63 +56,5 @@ export const clients: Client[] = [
     lastActive: "jamais",
     currentStep: "—",
     attention: "Invitation envoyée il y a trois jours, pas encore acceptée.",
-  },
-];
-
-/**
- * The five axes a plan is adapted along ("personnalisation à 360°"). Four
- * describe Camille; the fifth is not hers to hold — it comes from her
- * practitioner's frame, which is why its source line names the practitioner
- * rather than Camille.
- */
-export const dimensions: Dimension[] = [
-  {
-    key: "genotype",
-    label: "Génotype",
-    source: "Rapport génétique — mars 2026",
-    points: [
-      "MTHFR C677T hétérozygote",
-      "Privilégier les légumes riches en folates",
-    ],
-  },
-  {
-    key: "preceptes",
-    label: "Préceptes du praticien",
-    source: `Cadre thérapeutique — ${practitionerName}`,
-    points: [
-      "Les causes avant les symptômes",
-      "Un seul changement à la fois",
-      "Terrain digestif en premier",
-    ],
-  },
-  {
-    key: "psychology",
-    label: "Profil psychologique",
-    source: "Questionnaire d'entrée + consultation du 22 juillet",
-    points: [
-      "Engagée, mais se juge durement en cas d'écart",
-      "Motivée par : dormir d'une traite, suivre ses fils",
-      "Frein : les soirées finissent tard",
-    ],
-  },
-  {
-    key: "habits",
-    label: "Habitudes alimentaires",
-    source: "Déclaré par Camille",
-    points: [
-      "Cuisine pour quatre",
-      "N'aime pas : le foie, les anchois",
-      "Allergie : noix",
-    ],
-  },
-  {
-    key: "rhythm",
-    label: "Rythme de vie",
-    source: "Déclaré par Camille",
-    points: [
-      "30 minutes en cuisine en semaine",
-      "Deux repas dehors par semaine",
-      "Courses le samedi",
-    ],
   },
 ];
