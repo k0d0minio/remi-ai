@@ -29,13 +29,6 @@ export type Client = {
   attention: string | null;
 };
 
-export type Dimension = {
-  key: "genotype" | "preceptes" | "psychology" | "habits" | "rhythm";
-  label: string;
-  source: string;
-  points: string[];
-};
-
 export type Signal = {
   id: string;
   clientName: string;
@@ -324,4 +317,149 @@ export type GenotypeMarker = {
   gene: string;
   variant: string;
   note: string;
+};
+
+/* ---------------------------------------------------------------------------
+ * The patient workspace — the admin patient page, laid out for the screen it
+ * is on (`.icm/intake/patient-workspace/`). One record carries every section
+ * the real page has, so the three views can be judged on a full page rather
+ * than a skeleton.
+ * ------------------------------------------------------------------------ */
+
+/**
+ * The phone segments. `brief` is the rail's content — a segment on a phone, a
+ * fold under the banner at `md`, the sticky rail at `lg`. Five at most (R11).
+ */
+export type WorkspaceSegment =
+  "brief" | "suivi" | "journal" | "dossier" | "profil";
+
+export type WorkspaceSectionId =
+  | "lien"
+  | "resume"
+  | "objectifs"
+  | "recommandations"
+  | "complements"
+  | "essentiels"
+  | "recettes"
+  | "repas"
+  | "retenir"
+  | "consultations"
+  | "anamnese"
+  | "profil"
+  | "zone-sensible";
+
+/**
+ * The homogeneous row every list section renders. One shape rather than seven
+ * near-identical ones: what differs between a supplement and a pantry
+ * essential is the words in it, not the layout it needs (R13).
+ */
+export type WorkspaceRow = {
+  id: string;
+  title: string;
+  detail: string;
+  /** Right-hand column — a dose, a moment, a date. Kept short on purpose. */
+  meta: string | null;
+  badge: { label: string; variant: Intent } | null;
+};
+
+export type WorkspaceList = {
+  rows: WorkspaceRow[];
+  /** Folded behind a count everywhere (R16) — never a second card. */
+  archived: WorkspaceRow[];
+};
+
+export type WorkspaceLink = {
+  url: string;
+  sharedOn: string;
+  lastOpenedAt: string | null;
+  segments: string[];
+};
+
+export type WorkspaceSummary = {
+  text: string;
+  revisedOn: string;
+  revisionCount: number;
+};
+
+export type GoalCheckIn = {
+  on: string;
+  note: string;
+  direction: "up" | "flat" | "down";
+};
+
+export type WorkspaceGoal = {
+  id: string;
+  title: string;
+  why: string;
+  reached: boolean;
+  checkIns: GoalCheckIn[];
+};
+
+export type WorkspaceInstruction = {
+  text: string;
+  setOn: string;
+  superseded: { id: string; text: string; setOn: string }[];
+};
+
+export type RecommendationGroup = {
+  category: string;
+  rows: WorkspaceRow[];
+};
+
+export type WorkspaceMeal = {
+  id: string;
+  on: string;
+  slot: MealSlot;
+  text: string;
+  /** `null` is the whole point of the section — it is what she owes a reply. */
+  feedback: string | null;
+};
+
+export type AnamnesisCategory = {
+  id: string;
+  label: string;
+  /** An unexplored category stays visibly empty rather than disappearing. */
+  entries: { label: string; value: string }[];
+};
+
+export type ProfileField = {
+  label: string;
+  value: string | null;
+};
+
+/**
+ * The rail's at-a-glance strip. Which of these she actually wants, and in what
+ * order, is one of the questions the live prototype is there to collect.
+ */
+export type GlanceItem = {
+  id: string;
+  label: string;
+  value: string;
+  hint: string | null;
+  intent: Intent | null;
+};
+
+export type PatientRecord = {
+  clientId: string;
+  pseudonym: string;
+  fullName: string;
+  status: ClientStatus;
+  identity: string;
+  link: WorkspaceLink;
+  summary: WorkspaceSummary | null;
+  goals: WorkspaceGoal[];
+  archivedGoals: WorkspaceGoal[];
+  instruction: WorkspaceInstruction | null;
+  recommendations: RecommendationGroup[];
+  archivedRecommendations: WorkspaceRow[];
+  supplements: WorkspaceList;
+  essentials: WorkspaceList;
+  recipes: WorkspaceList;
+  meals: { entries: WorkspaceMeal[]; archived: WorkspaceMeal[] };
+  learnings: WorkspaceList;
+  consultations: WorkspaceRow[];
+  anamnesis: AnamnesisCategory[];
+  profile: ProfileField[];
+  consent: string;
+  glance: GlanceItem[];
 };
