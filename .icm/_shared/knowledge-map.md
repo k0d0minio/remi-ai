@@ -1,0 +1,58 @@
+# Knowledge map (Layer 3 routing)
+
+Project knowledge — **what Remi AI is, who it serves, how it's built** — is canonical in the docs
+app (`apps/docs`). This file is the router: it says which doc pages each stage reads and writes, so
+a stage loads a small, named slice instead of the whole site. That scoping is the whole payoff —
+**never load "all of `apps/docs`".**
+
+Read the `.mdx` source under `apps/docs/app/` directly; there is no need to run the site. Business
+knowledge lives under `app/business/`, technical reference under `app/technical/`.
+
+> Code conventions are **not** here — they stay canonical in [`/CONVENTIONS.md`](../../CONVENTIONS.md)
+> plus the subtree `AGENTS.md` files. This map covers product direction and architecture only.
+
+## Where things live in the docs
+
+### Direction and product — `apps/docs/app/business/`
+
+- `initiatives/` — the strategy a feature ladders up to, and the current objectives
+- `scope/` — the frozen V2 feature list, and what is explicitly out of it
+- `roles/` — who the product serves, what each role sees, and what they can change
+
+All three are written, and they are reconciled with `.icm/docs/` — the braindump and the direction
+of record. Quote them rather than paraphrasing: Ship takes its initiative tie-in verbatim from
+`initiatives/`, a request that is not on `scope/` is not in this build, and a spec that contradicts
+`roles/` contradicts a documented decision right, not an opinion. Where a page says a thing is not
+decided, that is the answer; a stage does not fill the gap by inventing one.
+
+`.icm/docs/` remains the source of truth for direction, and its precedence order is in
+[`.icm/docs/README.md`](../../.icm/docs/README.md). These pages restate it for the stages; if one
+ever drifts from it again, `.icm/docs/` wins and the docs page is the thing to fix.
+
+### Technical reference — `apps/docs/app/technical/`
+
+- `architecture/` — repository structure, technology stack, how a request flows
+- `applications/` — the six apps, their ports, their boundaries
+- `packages/` — `@remi/ui` and `@remi/services`: the build units, the seams, and which entrypoint
+  to import (the full rules live in each package's `AGENTS.md`, which the page points at)
+- `development/` — getting started, the factory, CI/CD, delivery
+- `decisions/` — the technical decision log: set choices a spec cites instead of reopening
+
+## What each stage reads and writes
+
+| Stage      | Reads from docs                                                                                                  | Writes to docs                                                                                                          |
+| ---------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **Scope**  | `business/roles`, `business/initiatives`, `business/scope` — the who, the why-now and the frozen list            | — (its artifacts are `scope.md` + `.icm/intake/<slug>/`)                                                                |
+| **Design** | `business/roles` for the lens; `technical/applications` for what `apps/demo` may do                              | —                                                                                                                       |
+| **Define** | `business/initiatives`, `business/scope`, `business/roles`, `technical/architecture`, `technical/decisions`      | —                                                                                                                       |
+| **Build**  | `technical/architecture`, the relevant `technical/packages` page, `technical/development`, `technical/decisions` | —                                                                                                                       |
+| **Verify** | — (works from the spec, the diff, and its own contract)                                                          | —                                                                                                                       |
+| **Ship**   | `business/initiatives` (the ship note's tie-in) + the page(s) the change affects                                 | **updates** the affected `technical/**` and `business/**` page(s), in the same feature PR, and adds the changelog entry |
+
+Load only the page(s) named for the stage.
+
+## Also in `_shared/`
+
+- `github.md` — the two PR regimes, the CLI calls, the gates, the label vocabulary.
+- `stage-preamble.md` — the one canonical "resolve the run or STOP" procedure.
+- `conventions.md` — a redirect to `/CONVENTIONS.md`.

@@ -9,7 +9,7 @@
 - slug: <slug>
 - apps: <web | admin | marketing | docs | support | demo | packages>
 - complexity: trivial | standard | complex
-- Full spec (canonical — read here): <link to pipeline/runs/<slug>/03_define/output/spec.md on this branch>
+- Full spec (canonical — read here): <link to .icm/runs/<slug>/03_define/output/spec.md on this branch>
 
 ## Acceptance criteria
 

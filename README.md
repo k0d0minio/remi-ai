@@ -16,7 +16,7 @@ apps/
 packages/
   ui/           @remi/ui — the design system; the only home for primitives
   services/     @remi/services — storage, email, AI, env; seams, not integrations
-pipeline/       the delivery pipeline — stages, lanes, runs, scripts
+.icm/           the work layer — intake, docs, and the delivery pipeline
 ```
 
 The dependency arrow points **app → package**, only ever. No app imports another app; a package
@@ -56,7 +56,7 @@ bug | tweak | chore                                     the fast lanes (one merg
 
 Five human gates, two of them PR checkboxes — **Spec approved** and **Ready to merge**. An agent
 reads them and never ticks them. Start with `/pipeline scope "<topic>"`, or `/pipeline status` to
-see where everything stands. The map is [`pipeline/CONTEXT.md`](pipeline/CONTEXT.md).
+see where everything stands. The map is [`.icm/CONTEXT.md`](.icm/CONTEXT.md).
 
 ## Where the rules live
 
@@ -64,7 +64,7 @@ see where everything stands. The map is [`pipeline/CONTEXT.md`](pipeline/CONTEXT
 | --------------------------------- | -------------------------------------------------------- |
 | Code style, design system, git    | [`CONVENTIONS.md`](CONVENTIONS.md)                       |
 | Repo identity and routing         | [`AGENTS.md`](AGENTS.md)                                 |
-| The delivery pipeline             | [`pipeline/CONTEXT.md`](pipeline/CONTEXT.md)             |
+| The delivery pipeline             | [`.icm/CONTEXT.md`](.icm/CONTEXT.md)                     |
 | Environment variables and secrets | [`.icm/docs/ENV.md`](.icm/docs/ENV.md)                   |
 | Rules for one app or package      | that subtree's `AGENTS.md`                               |
 | What the product is and does      | `apps/docs` — business direction and technical reference |

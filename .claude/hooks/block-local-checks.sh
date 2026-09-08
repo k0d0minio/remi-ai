@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # block-local-checks.sh — PreToolUse(Bash) guard that keeps deterministic checks out of the session.
 #
-# The doctrine (CONVENTIONS.md → "The factory owns the checks"; pipeline/stages/04_build/CONTEXT.md)
+# The doctrine (CONVENTIONS.md → "The factory owns the checks"; .icm/stages/04_build/CONTEXT.md)
 # is that format/lint/typecheck/build belong to the factory, not to an agent's context window:
 #   • format             → Husky pre-commit (lint-staged) + CI .github/workflows/quality.yaml
 #   • lint / typecheck   → CI .github/workflows/quality.yaml
@@ -52,7 +52,7 @@ Blocked ($hit): the factory owns deterministic checks, not this session.
   • lint/types → CI quality.yaml
   • build      → the Vercel preview deploy
 Commit and push, then read the results back from the PR's check runs. See
-CONVENTIONS.md → "The factory owns the checks" and pipeline/stages/04_build/CONTEXT.md.
+CONVENTIONS.md → "The factory owns the checks" and .icm/stages/04_build/CONTEXT.md.
 If you must reproduce a specific CI failure locally, ask the user to run it for you.
 EOF
 exit 2

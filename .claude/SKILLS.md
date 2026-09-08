@@ -2,7 +2,7 @@
 
 ## The model this serves
 
-The pipeline (`pipeline/`) is a context workspace: **folder structure is the orchestration.** One
+The pipeline (`.icm/`) is a context workspace: **folder structure is the orchestration.** One
 `/pipeline` router skill routes between gated stages, and the stages call flat, **one-job capability
 skills** in `.claude/skills/`.
 
