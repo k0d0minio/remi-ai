@@ -1,7 +1,7 @@
 # Label vocabulary for the delivery pipeline.
 #
 # Labels attach to the feature PR, projected ONE WAY from the run's spec.md (see
-# pipeline/_shared/github.md). This file is documentation plus one-time repo setup: create any
+# .icm/_shared/github.md). This file is documentation plus one-time repo setup: create any
 # missing label once, via `gh label create` or the GitHub UI.
 #
 # Keep this list small and fixed — it powers at-a-glance observability, not free-form tagging.

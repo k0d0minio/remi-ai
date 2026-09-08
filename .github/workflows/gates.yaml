@@ -1,6 +1,6 @@
 name: Gates
 
-# The pipeline's two human gates are checkboxes in the PR body (`pipeline/_shared/github.md` →
+# The pipeline's two human gates are checkboxes in the PR body (`.icm/_shared/github.md` →
 # "Gates"). This job is the machinery that makes them binding: a gate that is present and unticked
 # is a red check, so branch protection can hold the merge until a human ticks it. Nothing here
 # ticks a box — it only reads.
