@@ -1,23 +1,22 @@
-# Stage 04 — Build (contract)
+# Stage 03 — Build (contract)
 
 Invoked via `/pipeline build <slug>`. Your job: turn the approved spec into working code on the
-run's branch, then flip the draft PR to open. Verification is Verify's job; merging is Ship's.
+run's branch, prove it with CI, then flip the draft PR to open. The review passes and the merge
+belong to Release; requirement gathering belongs to Define.
 
 ## Inputs (read only these)
 
 - `.icm/_shared/stage-preamble.md` — run it **first**: it resolves the run into the working tree
   or STOPs. Never recreate a missing run.
-- `.icm/runs/<slug>/03_define/output/spec.md` — the canonical spec you implement against.
+- `.icm/runs/<slug>/02_define/output/spec.md` — the canonical spec you implement against.
 - `.icm/runs/<slug>/run.md` — branch and PR pointers.
-- If the spec says `demo: seed`: the demo code under `apps/demo`. It is **reference material, not a
-  port** — `apps/demo` has no services and no auth, so the real implementation is written against
-  the real stack. `demo: throwaway` means look, don't copy.
 - `/CONVENTIONS.md` plus the relevant `apps/*/AGENTS.md` or `packages/*/AGENTS.md` — the canonical
   code rules you must follow.
 - `.icm/_shared/knowledge-map.md` — routes to `apps/docs` technical reference. Read only what
   you need: `technical/architecture` (where code lives, which entrypoint to import), the relevant
   `technical/packages` page, `technical/development`.
 - `.icm/_shared/github.md` — the gate read and the draft → open flip.
+- `.icm/_shared/ci.md` — what green means.
 - The specific source files named in the spec's `touches:` — those, not the whole monorepo.
 
 Context budget: the Inputs above are the budget (`.icm/CONTEXT.md` → Layers) — everything except
@@ -58,29 +57,42 @@ the source files you actually edit. Record overruns on a one-line `Context budge
    spec's. To reword a criterion, edit `spec.md` and reconcile.
 
 7. **Commit and push — the factory verifies, not you.** Don't run `pnpm format`, `pnpm lint`, or
-   `tsc` (see Verify below). Husky formats on commit; CI runs format, lint and typecheck; the Vercel
-   preview builds the PR. Spend your turns on code.
+   `tsc` (see "Verify" below). Husky formats on commit; CI runs format, lint and typecheck; the
+   Vercel preview builds the PR. Spend your turns on code.
 
 8. **Write build notes.** Commit the run files alongside the code and push, so the PR reflects
    current state.
 
-9. **Flip the draft PR to open** (`gh pr ready <n>`). Open means "reviewable"; it is not merge
-   authorisation.
+9. **Establish green — one blocking call, not a poll:**
 
-10. **Stop.** Say Build is done, the PR is open, and the next step is `/pipeline verify <slug>` — the
-    quality gate before anything ships.
+   ```bash
+   .icm/scripts/ci-status.sh <slug>
+   ```
+
+   `RESULT: GREEN` → hand off. `RED` is **Build's to fix**: read the failing job, fix on this
+   branch, push, and re-run the call — a fresh push means a fresh verdict. `PENDING` → re-run it;
+   not-yet-red is not green (`.icm/_shared/ci.md`). Release inherits whatever you hand it, so
+   handing off unsettled work just moves the failure one stage later.
+
+10. **Flip the draft PR to open** (`gh pr ready <n>`). Open means "reviewable"; it is not merge
+    authorisation.
+
+11. **Stop, and say what to test.** Build is done, the PR is open, CI is green. Tell the owner
+    exactly what to exercise on the preview — every acceptance criterion, the signed-in paths
+    included. **Their Ready-to-merge tick attests that testing**, and it is the one gate Release
+    reads; `/pipeline release <slug>` runs after it. Tick nothing yourself.
 
 ## Outputs
 
 - Code on the run's branch, in small conventional commits (`feat: <slug> — <what>`).
 - The PR flipped from draft to open, with satisfied acceptance criteria ticked.
-- `.icm/runs/<slug>/04_build/output/notes.md`:
+- `.icm/runs/<slug>/03_build/output/notes.md`:
 
 ```md
 # Build notes: <slug>
 
 - commits: <short list>
-- demo: <used the seed as reference | re-implemented (throwaway) | none>
+- ci: GREEN on <sha> (ci-status.sh, after the last push)
 
 ## What changed
 
@@ -91,9 +103,10 @@ the source files you actually edit. Record overruns on a one-line `Context budge
 - [x] <criterion> — <how it's met>
 - [ ] <criterion> — <blocked because…>
 
-## Notes for Verify
+## Notes for Release
 
-- <anything the reviews should look at closely; a check you already know will fail, and why>
+- <anything the review passes should look at closely; what the owner needs to smoke-test before
+  ticking Ready to merge>
 ```
 
 ## Verify (owned by the factory, not this agent)
@@ -108,6 +121,7 @@ Vercel preview), not to your context window. **Do not run `pnpm format`, `pnpm l
 - **Gates** — `.github/workflows/gates.yaml` reads the PR body's gate checkboxes. It is red while a
   gate is unticked, which is its job, not a failure to fix.
 
-Verify and Ship gate on these via the PR's check runs. The one local exception: if you _already
-know_ an edit introduced a type error, fix it before pushing rather than burning a CI round-trip —
-but don't kick off a full-repo sweep to go looking.
+Step 9 reads the whole picture back through `ci-status.sh`, and Release re-establishes it on the
+head it merges (`.icm/_shared/ci.md`). The one local exception: if you _already know_ an edit
+introduced a type error, fix it before pushing rather than burning a CI round-trip — but don't kick
+off a full-repo sweep to go looking.

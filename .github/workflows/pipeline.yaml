@@ -4,6 +4,13 @@ name: Pipeline
 #   1. labels     — project a run's labels (type/app/complexity + the stage:* it is now at) from
 #                   spec.md and which run outputs exist, so no stage has to advance stage:* by hand.
 #                   Pushing a stage's output is what moves the board.
+#
+#                   The spine is four stages (Scope -> Define -> Build -> Release), so the outputs
+#                   live at 02_define/ . 03_build/ . 04_release/. The runs archived under
+#                   .icm/runs/ were written by the six-stage pipeline and still carry the old
+#                   layout (03_define/ . 04_build/ . 05_verify/ . 06_ship/); both are matched here
+#                   and in project-labels.sh, which maps verify and ship onto stage:release.
+#                   Nothing new writes the legacy paths.
 #   2. spec-check — a NON-BLOCKING structural backstop on spec.md. Define still runs
 #                   validate-spec.sh before its gate (that is the real check); this only flags drift
 #                   on later pushes via the job summary, and never red-blocks the PR.
@@ -49,7 +56,9 @@ jobs:
             | grep -oE '^\.icm/runs/[^/]+/' | cut -d/ -f3 | sort -u || true)"
           if [ -z "$slugs" ]; then echo "No changed runs — nothing to label."; exit 0; fi
           for slug in $slugs; do
-            spec=".icm/runs/$slug/03_define/output/spec.md"
+            spec=".icm/runs/$slug/02_define/output/spec.md"
+            # Legacy six-stage layout — the archived runs.
+            [ -f "$spec" ] || spec=".icm/runs/$slug/03_define/output/spec.md"
             if [ ! -f "$spec" ]; then
               echo "::notice::run '$slug' changed but has no spec.md (lane run?) — skipping labels"
               continue
@@ -77,7 +86,7 @@ jobs:
         run: |
           set -uo pipefail
           specs="$(git diff --name-only "$BASE_SHA" HEAD \
-            | grep -E '^\.icm/runs/[^/]+/03_define/output/spec.md$' | sort -u || true)"
+            | grep -E '^\.icm/runs/[^/]+/0[23]_define/output/spec\.md$' | sort -u || true)"
           if [ -z "$specs" ]; then echo "No spec.md changed — nothing to validate."; exit 0; fi
           for spec in $specs; do
             echo "::group::validate $spec"
