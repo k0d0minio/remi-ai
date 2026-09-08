@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # send-ship-note.sh — send a feature's ship note as an email via Resend.
 #
-# The Ship-stage draft IS the email: .icm/runs/<slug>/06_ship/output/ship-note.md. Its first
-# `# ` heading becomes the subject; the rest becomes a plain-text body, sent verbatim. Ship runs
-# this with --send immediately after the merge — running the Ship stage is the send authorisation;
+# The Release-stage draft IS the email: .icm/runs/<slug>/04_release/output/ship-note.md. Its first
+# `# ` heading becomes the subject; the rest becomes a plain-text body, sent verbatim. Release runs
+# this with --send immediately after the merge — running the Release stage is the send authorisation;
 # the no-flag dry run exists for debugging.
 #
 # The recipient is normally ONE address: a channel's inbound email, so the note lands where the
@@ -45,7 +45,9 @@ done
 
 # --- draft → subject + body ---------------------------------------------------------------------
 
-draft="$repo_root/.icm/runs/$slug/06_ship/output/ship-note.md"
+draft="$repo_root/.icm/runs/$slug/04_release/output/ship-note.md"
+# Legacy six-stage layout — the archived runs keep their note at 06_ship/.
+[ -f "$draft" ] || draft="$repo_root/.icm/runs/$slug/06_ship/output/ship-note.md"
 [ -f "$draft" ] || die "no ship note at $draft"
 
 subject="$(grep -m1 '^# ' "$draft" | sed 's/^# //' | sed 's/[[:space:]]*$//' || true)"

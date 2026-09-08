@@ -1,7 +1,8 @@
 # Stage preamble — resolve the run, or STOP (Layer 3 reference)
 
-The single canonical procedure for **adopting** an existing run into the working tree. Build, Verify
-and Ship (and `status <slug>`) run it before anything else. **The front never runs it** — Scope
+The single canonical procedure for **adopting** an existing run into the working tree. Build and
+Release (and `status <slug>`, and a lane resumed by slug) run it before anything else. **The front
+never runs it** — Scope
 creates the run folder and Define creates the branch and PR; the guard below applies only to the
 adopting stages.
 

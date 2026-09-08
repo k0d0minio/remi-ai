@@ -20,6 +20,7 @@ pipeline pushes exactly those steps out, and keeps the agent for the parts that 
 | Projecting labels                       | `project-labels.sh` + CI | A pure function of the spec header and which outputs exist       |
 | Checking the spec's structure           | `validate-spec.sh`       | Header fields and checkbox shape are mechanical                  |
 | Sending the ship note                   | `send-ship-note.sh`      | The draft is the email; nothing to decide                        |
+| Reading the factory's verdict           | `ci-status.sh`           | Two surfaces, newest attempt wins — a rule, not a judgement      |
 | Writing the spec, the code, the reviews | The agent                | Judgement — this is the whole point                              |
 
 ## 1 · Blocking local checks
@@ -46,20 +47,24 @@ red-blocks the PR.
 
 ## 3 · What is deliberately not automated
 
-- **The gates.** Five human gates, two of them PR checkboxes. Automating any of them would remove
-  the only thing standing between a plausible-looking spec and a merged one.
-- **The merge.** Ship reads the checkbox and the check runs, then merges once. It never polls, never
-  retries in a loop, and never merges on red — a merge that "eventually succeeded" hides the reason
-  it failed the first time.
-- **Tests.** There is no test suite yet, which is why Verify's Definition of Done leans on a manual
-  smoke pass on the preview, split explicitly between what the agent can check and what only the
-  operator can. When a Playwright suite exists, that split moves into CI and Verify gets shorter.
+- **The gates.** Three human gates, two of them PR checkboxes. Automating either checkbox would
+  remove the only thing standing between a plausible-looking spec and a merged one.
+- **The merge.** Release reads the checkbox and one settled `ci-status.sh` verdict, then merges
+  once. It never polls, never retries in a loop, and never merges on red — a merge that "eventually
+  succeeded" hides the reason it failed the first time.
+- **The manual smoke pass.** There is no test suite yet, and the collapse to four stages made that
+  explicit rather than ceremonial: the **owner's Ready-to-merge tick is the smoke test's record.**
+  Verify used to walk a Definition-of-Done checklist split between agent and operator, then hand to
+  a second stage that gated on it again — two stages and two gates for one person's testing. Release
+  asks for none of it: the tick attests the manual and signed-in testing, and the agent's job is the
+  factory's verdict and the review passes. When a Playwright suite exists, the automatable half of
+  that testing moves into CI and the tick means less work, not a shorter contract.
 
 ## 4 · Open items
 
 - **Error tracking.** Until a DSN is wired (`.icm/docs/ENV.md` → Not wired yet), a production exception
-  is invisible, and Verify's readiness pass has nothing to point at. Top unstarted ops item.
-- **A smoke suite.** Sign-in, each app's landing route, one write path. Would convert half of
-  Verify's DoD checklist from operator-demonstrated to CI-enforced.
+  is invisible, and Release's readiness pass has nothing to point at. Top unstarted ops item.
+- **A smoke suite.** Sign-in, each app's landing route, one write path. Would convert most of what
+  the Ready-to-merge tick currently attests from operator-demonstrated to CI-enforced.
 - **A `persona:` label axis.** Blocked on `apps/docs/app/business/roles` being written. `app:` is
   the honest dimension until then.

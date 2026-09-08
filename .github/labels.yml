@@ -8,20 +8,20 @@
 # Gates are NOT labels: they are checkboxes in the PR body.
 
 # --- Stage — exactly one, moving with the work along the spine -----------------------------------
+#
+# The spine is four stages: Scope (no PR — its artifacts go straight to main) then
+# define → build → release. Only the last three project a label, because only they have a PR.
 - name: "stage:define"
   color: "c5def5"
   description: "Define — spec being agreed (draft PR)"
 - name: "stage:build"
   color: "1d76db"
-  description: "Build — implementation in progress on the run's branch"
-- name: "stage:verify"
-  color: "0e8a16"
-  description: "Verify — quality gate: readiness/review/security + DoD smoke on the preview"
-- name: "stage:ship"
+  description: "Build — implementation in progress on the run's branch; CI green before hand-off"
+- name: "stage:release"
   color: "5319e7"
-  description: "Ship — docs + changelog → gated squash-merge → ship note"
+  description: "Release — review passes + docs + changelog → gated squash-merge → ship note"
 
-# --- Type — spine features, the fast lanes, and the Design front's demo PRs -----------------------
+# --- Type — spine features and the fast lanes ----------------------------------------------------
 - name: "type:feature"
   color: "a2eeef"
   description: "A spec'd feature run through the pipeline spine"
@@ -34,11 +34,28 @@
 - name: "type:chore"
   color: "cfd3d7"
   description: "Fast lane — refactor / dep bump / migration, no user-facing behaviour change"
+
+# --- Retired — HISTORICAL ONLY, never projected again ---------------------------------------------
+#
+# The six-stage pipeline (Scope → Design → Define → Build → Verify → Ship) was collapsed to four:
+# Release absorbed Verify and Ship, and Design was retired outright — prototyping in apps/demo
+# is Build's, and the app keeps its own rules in apps/demo/AGENTS.md.
+#
+# These three labels stay in this file, and on the repo, so the merged PRs of the runs archived
+# under .icm/runs/ keep valid labels and their history stays readable. NOTHING projects them:
+# project-labels.sh maps the legacy 05_verify/ and 06_ship/ layouts onto `stage:release`, and no
+# stage writes `type:design` at all. Do not delete them, and do not reuse them for new work.
+- name: "stage:verify"
+  color: "0e8a16"
+  description: "HISTORICAL — the retired Verify stage; absorbed into stage:release"
+- name: "stage:ship"
+  color: "5319e7"
+  description: "HISTORICAL — the retired Ship stage; absorbed into stage:release"
 - name: "type:design"
   color: "f9d0c4"
-  description: "Design-front demo PR — apps/demo only, merges to the live demo URL"
+  description: "HISTORICAL — the retired Design front's demo PRs (apps/demo only)"
 
-# --- Complexity — mirrors the spec header, and sets Verify's code-review effort -------------------
+# --- Complexity — mirrors the spec header, and sets Release's code-review effort ------------------
 - name: "complexity:trivial"
   color: "fef2c0"
   description: "Trivial — small, low-risk change (code review at low effort)"
@@ -72,7 +89,7 @@
   description: "apps/support — the public help centre"
 - name: "app:demo"
   color: "ededed"
-  description: "apps/demo — the prototype sandbox"
+  description: "apps/demo — the mock-data prototype sandbox"
 - name: "app:packages"
   color: "ededed"
   description: "packages/ui or packages/services — the shared layer"

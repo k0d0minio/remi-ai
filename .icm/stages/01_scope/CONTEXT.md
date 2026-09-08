@@ -61,8 +61,7 @@ a one-line `Context budget:` note in `scope.md`.
 ## Process
 
 1. **Pick the slug** — short kebab-case (`csv-export`). It names everything from here on: the scope
-   file, the intake folder, the demo work, the branch and PR. One string traces the feature end to
-   end. Reuse the given slug if revising.
+   file, the intake folder, the branch and PR. One string traces the feature end to end. Reuse the given slug if revising.
 
 2. **Work out the business logic — then interrogate it, two lanes.** Push the brief to a **proposal
    the owner can react to line by line**. They are the domain expert; your job is to put a detailed,
@@ -165,9 +164,9 @@ questions. Sections 1, 2, 4 and 5 stay as they are.
    fall back to a tiny docs-only PR merged green (`_shared/github.md` → the front regime) — never
    leave the front's artifacts local-only.
 
-7. **Stop.** Report the scope path, the intake folder with its stub count and order, and that the
-   next step is `/pipeline design <slug>` — or `/pipeline new` to walk the batch straight into
-   Define if no prototype is needed.
+7. **Stop.** Report the scope path, the intake folder with its stub count and order, and that
+   `/pipeline new` walks the batch into Define, one stub at a time. Running it is what closes this
+   gate.
 
 ## Outputs
 
