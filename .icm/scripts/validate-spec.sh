@@ -11,7 +11,7 @@
 # but only as an advisory job-summary note — it never red-blocks the PR.
 #
 # Usage:
-#   .icm/scripts/validate-spec.sh <slug>             # resolves .icm/runs/<slug>/03_define/output/spec.md
+#   .icm/scripts/validate-spec.sh <slug>             # resolves .icm/runs/<slug>/02_define/output/spec.md
 #   .icm/scripts/validate-spec.sh <path-to-spec.md>  # or validate a file directly
 #
 # Verdict (stdout, last line):
@@ -40,7 +40,9 @@ done
 if [ -f "$arg" ]; then
   spec="$arg"
 else
-  spec="$repo_root/.icm/runs/$arg/03_define/output/spec.md"
+  spec="$repo_root/.icm/runs/$arg/02_define/output/spec.md"
+  # Legacy six-stage layout — the archived runs keep their spec at 03_define/.
+  [ -f "$spec" ] || spec="$repo_root/.icm/runs/$arg/03_define/output/spec.md"
 fi
 [ -f "$spec" ] || die "no spec at $spec (write spec.md first, or pass an explicit path)"
 

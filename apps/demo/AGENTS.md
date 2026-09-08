@@ -5,10 +5,14 @@ what is specific to this app.
 
 ## What this app is
 
-The Design stage's sandbox (`.icm/stages/02_design/`). A feature is prototyped here first,
-merged to the live demo URL through small demo PRs, and reviewed by the stakeholder on the real
-deployed thing rather than a screenshot. Then it is either re-implemented in `apps/web` (a
-throwaway) or used as reference material (a seed).
+The prototype sandbox. A feature can be made tangible here — on the live demo URL, so a stakeholder
+reviews the real deployed thing rather than a screenshot — and then either re-implemented in
+`apps/web` (a throwaway) or used as reference material (a seed).
+
+**It is not a pipeline stage.** The Design stage that used to own this app was retired when the
+pipeline collapsed to four stages (`/AGENTS.md` → How work gets done here); prototyping is now
+Build's, or a `/pipeline tweak`, whenever a change actually wants one. Nothing forces a run through
+here.
 
 ## It can never reach a backend
 

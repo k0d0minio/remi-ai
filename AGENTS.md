@@ -21,7 +21,7 @@ apps/
   admin/        internal operations — operator-only, separate deployment (:3002)
   docs/         the reference site — Nextra (:3003)
   support/      the public help centre — unauthenticated, indexable (:3004)
-  demo/         the Design stage's prototype sandbox — mock data only (:3005)
+  demo/         the prototype sandbox — mock data only, no backend (:3005)
 packages/
   ui/           @remi/ui — the design system; the only home for primitives
   services/     @remi/services — storage, email, AI, env; seams, not integrations
@@ -69,7 +69,7 @@ Nothing below is restated here. Each rule lives once, and loads on demand.
 - **[`CONVENTIONS.md`](CONVENTIONS.md)** — code style, design-system rules, leanness rules,
   working languages, git.
   The canonical code rules: the Build stage loads it by path. Read it before editing code.
-- **[`.icm/CONTEXT.md`](.icm/CONTEXT.md)** — the delivery pipeline. The map of its gated
+- **[`.icm/CONTEXT.md`](.icm/CONTEXT.md)** — the delivery pipeline. The map of its four gated
   stages; each stage's contract is `.icm/stages/NN_*/CONTEXT.md`.
 - **[`.icm/docs/ENV.md`](.icm/docs/ENV.md)** — the single catalogue of environment variables and secrets.
   Bus-factor insurance: the setup is never trapped in one person's head.
@@ -91,10 +91,39 @@ Nothing below is restated here. Each rule lives once, and loads on demand.
 
 ## How work gets done here
 
-Through the pipeline, not ad hoc. `/pipeline scope "<topic>"` for a new capability;
-`/pipeline bug | tweak | chore "<request>"` for the fast lanes; `/pipeline status` to see where
-everything stands. Every stage has a human gate at its boundary and the agent never crosses one on
-its own.
+Through the pipeline, not ad hoc. The spine is **four stages — Scope → Define → Build → Release**,
+the estate's standard set (`_system/template/icm-pipeline/` in icm-board):
+
+| Stage       | What it owns                                                                   |
+| ----------- | ------------------------------------------------------------------------------ |
+| **Scope**   | interrogate the business logic → `scope.md` → cut the intake batch. No PR.     |
+| **Define**  | one stub → an approvable `spec.md`; opens the run's **one** feature PR (draft) |
+| **Build**   | implement the spec on the branch, prove CI green, flip the PR draft → open     |
+| **Release** | review passes · docs + changelog in-PR → gated squash-merge → ship note        |
+
+`/pipeline scope "<topic>"` for a new capability; `/pipeline bug | tweak | chore "<request>"` for the
+fast lanes; `/pipeline status` to see where everything stands. Every stage has a human gate at its
+boundary and the agent never crosses one on its own.
+
+**Two binding gates, both PR checkboxes, both the owner's to tick.** **Spec approved** before Build;
+**Ready to merge** before the squash-merge. Ticking the second one **attests your own manual and
+signed-in testing of the change** — that is why Release has no quality gate of its own and never
+asks you to re-test. Once it is ticked, only three things may still stop the merge: a blocking CI
+failure, a security-critical finding introduced by the diff, or a deploy-breaking config finding.
+Everything else is parked as a stub in `.icm/intake/triage/` and the merge proceeds.
+
+**`apps/demo` is not a pipeline stage.** The six-stage pipeline had a **Design** stage that made a
+prototype in `apps/demo` mandatory between Scope and Define. In twelve runs it was never once used,
+so it was **dropped** rather than folded into Scope or kept as a lane (Jamie's call, 2026-09-08).
+Prototyping is Build's when a change wants one; `apps/demo` survives as an ordinary app with its own
+[`AGENTS.md`](apps/demo/AGENTS.md) and its own guards, reachable by any lane or run that needs it.
+`stage:verify`, `stage:ship` and `type:design` remain in [`.github/labels.yml`](.github/labels.yml)
+as **historical only**, so the archived runs' merged PRs keep valid labels.
+
+**CI is the source of truth.** Never run local checks; push and read the verdict back through
+`.icm/scripts/ci-status.sh` — one blocking call per push ([`.icm/_shared/ci.md`](.icm/_shared/ci.md)).
+And **no PR in this repository is subscribed to**: a single push produces a dozen-plus deploy and
+job events, none of them a verdict ([`.icm/_shared/github.md`](.icm/_shared/github.md) § PR events).
 
 The ordered backlog lives in [`.icm/intake/`](.icm/intake/README.md) (estate ticket standard,
 formerly `ISSUES/`): one markdown ticket per unit of work, each with a pasteable agent prompt.

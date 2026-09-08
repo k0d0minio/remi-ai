@@ -3,8 +3,8 @@
 Active `/pipeline` runs live here — one folder per feature slug, while the feature is in flight.
 
 A run folder is created by Scope (or by Define for work that skips the front), committed to git from
-the start, and carried onto `main` by Ship's squash-merge. That merge is what makes it the durable
-record of what was specced, built and verified.
+the start, and carried onto `main` by Release's squash-merge. That merge is what makes it the
+durable record of what was specced, built and released.
 
 **Completed runs are archived.** Once a run is shipped and no longer being referenced, move its
 folder to `apps/docs/archive/` — unlisted, excluded from navigation, never canonical. This folder

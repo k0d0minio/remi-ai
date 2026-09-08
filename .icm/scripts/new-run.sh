@@ -2,7 +2,7 @@
 # new-run.sh — scaffold a pipeline run: commit it, open its PR, label it, consume the stub.
 #
 # Two modes:
-#   • Spine (default) — the mechanical half of Define (.icm/stages/03_define/CONTEXT.md).
+#   • Spine (default) — the mechanical half of Define (.icm/stages/02_define/CONTEXT.md).
 #     Define writes spec.md and hands the one-line PR Summary in via --summary; this script commits
 #     the run + pushes, opens the DRAFT PR with a body projected from spec.md (template headings,
 #     both gate anchors, acceptance criteria mirrored UNTICKED), writes/extends run.md, projects the
@@ -64,11 +64,11 @@ run_md="$run_dir/run.md"
 
 spec=""
 if [ -z "$lane" ]; then
-  spec="$run_dir/03_define/output/spec.md"
+  spec="$run_dir/02_define/output/spec.md"
   [ -f "$spec" ] || die "no spec at $spec — Define must write spec.md first"
 fi
 
-# Guard the "exactly one PR per run" rule. A run.md written by Scope/Design (demo:/preview-prs:
+# Guard the "exactly one PR per run" rule. A run.md written by Scope (no branch:/pr: lines yet
 # lines, no `- pr:`) is fine — we extend it.
 if [ -f "$run_md" ] && grep -Eq '^- pr:[[:space:]]*#?[0-9]+' "$run_md"; then
   die "run.md already records a PR for '$slug' — use '/pipeline define $slug' to revise, not new-run.sh"
@@ -136,7 +136,7 @@ if [ -z "$lane" ]; then
   [ -n "$steps" ] || steps=$'1. Open the deploy preview\n2. Exercise each acceptance criterion above'
 
   spec_rel="${spec#"$repo_root/"}"
-  # A branch link, so the spec is readable while the PR is open. Ship repoints it to blob/main right
+  # A branch link, so the spec is readable while the PR is open. Release repoints it to blob/main right
   # after the squash-merge — the branch, and this link, die with the merge.
   spec_link="https://github.com/${repo}/blob/${branch}/${spec_rel}"
 
@@ -172,7 +172,8 @@ ${steps}
 
 <!-- gate:ready-to-merge -->
 
-- [ ] Ready to merge (Ship gate — a human ticks this to authorise the squash-merge)
+- [ ] Ready to merge (Release gate — a human ticks this to authorise the squash-merge; ticking it
+      attests your own testing of the change)
 EOF
 )"
   draft=true
@@ -258,7 +259,7 @@ pr_url="$(printf '%s' "$pr_json" | jq -r '.html_url')"
 [ -n "$pr_number" ] && [ "$pr_number" != "null" ] || die "PR create returned no number"
 
 # --- write / extend run.md (branch + pr pointers), commit, push --------------------------------
-# A front run already has a run.md (lane:/demo:/preview-prs: lines) — append, never clobber.
+# A front run already has a run.md (its lane: line) — append, never clobber.
 
 mkdir -p "$run_dir"
 if [ ! -f "$run_md" ]; then

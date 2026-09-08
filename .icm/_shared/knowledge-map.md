@@ -20,7 +20,7 @@ knowledge lives under `app/business/`, technical reference under `app/technical/
 - `roles/` — who the product serves, what each role sees, and what they can change
 
 All three are written, and they are reconciled with `.icm/docs/` — the braindump and the direction
-of record. Quote them rather than paraphrasing: Ship takes its initiative tie-in verbatim from
+of record. Quote them rather than paraphrasing: Release takes its initiative tie-in verbatim from
 `initiatives/`, a request that is not on `scope/` is not in this build, and a spec that contradicts
 `roles/` contradicts a documented decision right, not an opinion. Where a page says a thing is not
 decided, that is the answer; a stage does not fill the gap by inventing one.
@@ -40,14 +40,12 @@ ever drifts from it again, `.icm/docs/` wins and the docs page is the thing to f
 
 ## What each stage reads and writes
 
-| Stage      | Reads from docs                                                                                                  | Writes to docs                                                                                                          |
-| ---------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| **Scope**  | `business/roles`, `business/initiatives`, `business/scope` — the who, the why-now and the frozen list            | — (its artifacts are `scope.md` + `.icm/intake/<slug>/`)                                                                |
-| **Design** | `business/roles` for the lens; `technical/applications` for what `apps/demo` may do                              | —                                                                                                                       |
-| **Define** | `business/initiatives`, `business/scope`, `business/roles`, `technical/architecture`, `technical/decisions`      | —                                                                                                                       |
-| **Build**  | `technical/architecture`, the relevant `technical/packages` page, `technical/development`, `technical/decisions` | —                                                                                                                       |
-| **Verify** | — (works from the spec, the diff, and its own contract)                                                          | —                                                                                                                       |
-| **Ship**   | `business/initiatives` (the ship note's tie-in) + the page(s) the change affects                                 | **updates** the affected `technical/**` and `business/**` page(s), in the same feature PR, and adds the changelog entry |
+| Stage       | Reads from docs                                                                                                  | Writes to docs                                                                                                          |
+| ----------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **Scope**   | `business/roles`, `business/initiatives`, `business/scope` — the who, the why-now and the frozen list            | — (its artifacts are `scope.md` + `.icm/intake/<slug>/`)                                                                |
+| **Define**  | `business/initiatives`, `business/scope`, `business/roles`, `technical/architecture`, `technical/decisions`      | —                                                                                                                       |
+| **Build**   | `technical/architecture`, the relevant `technical/packages` page, `technical/development`, `technical/decisions` | —                                                                                                                       |
+| **Release** | `business/initiatives` (the ship note's tie-in) + the page(s) the change affects                                 | **updates** the affected `technical/**` and `business/**` page(s), in the same feature PR, and adds the changelog entry |
 
 Load only the page(s) named for the stage.
 

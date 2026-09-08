@@ -18,10 +18,13 @@
 #   GITHUB_API_URL   (optional)  API base. Default: https://api.github.com.
 #
 # Usage:
-#   .icm/scripts/project-labels.sh <slug> --stage <define|build|verify|ship|auto> [--pr <n>]
+#   .icm/scripts/project-labels.sh <slug> --stage <define|build|release|auto> [--pr <n>]
 #
 #   --stage auto   derive the stage from which run outputs exist on disk, so an automated caller
-#                  does not have to know it.
+#                  does not have to know it. It reads the current four-stage layout AND the
+#                  legacy six-stage one, so the runs archived under .icm/runs/ keep projecting:
+#                  05_verify and 06_ship both map onto stage:release, which is the stage that
+#                  absorbed them. Nothing new writes those paths.
 #   --pr <n>       use this PR number instead of reading it from run.md — for CI, where the number
 #                  comes from the event.
 #
@@ -50,23 +53,31 @@ while [ $# -gt 0 ]; do
     *)       [ -z "$slug" ] && slug="$1" || die "unexpected argument: $1"; shift ;;
   esac
 done
-[ -n "$slug" ]  || die "usage: project-labels.sh <slug> --stage <define|build|verify|ship|auto> [--pr <n>]"
-[ -n "$stage" ] || die "--stage <define|build|verify|ship|auto> is required"
+[ -n "$slug" ]  || die "usage: project-labels.sh <slug> --stage <define|build|release|auto> [--pr <n>]"
+[ -n "$stage" ] || die "--stage <define|build|release|auto> is required"
 
 run_dir="$repo_root/.icm/runs/$slug"
-spec="$run_dir/03_define/output/spec.md"
-[ -f "$spec" ] || die "no spec at $spec"
+# Current layout first, legacy second — a run written by the six-stage pipeline still has its
+# spec at 03_define/. Both are read; only the first is ever written.
+spec="$run_dir/02_define/output/spec.md"
+[ -f "$spec" ] || spec="$run_dir/03_define/output/spec.md"
+[ -f "$spec" ] || die "no spec at $run_dir/02_define/output/spec.md (nor the legacy 03_define/ path)"
 
 # --stage auto: derive the current stage from which outputs exist on disk. Newest wins — pushing a
 # stage's output is what moves the board.
 if [ "$stage" = "auto" ]; then
-  if   [ -f "$run_dir/06_ship/output/release.md" ];  then stage="ship"
-  elif [ -f "$run_dir/05_verify/output/verify.md" ]; then stage="verify"
-  elif [ -f "$run_dir/04_build/output/notes.md" ];   then stage="build"
+  if   [ -f "$run_dir/04_release/output/release.md" ]; then stage="release"
+  elif [ -f "$run_dir/03_build/output/notes.md" ];     then stage="build"
+  # Legacy six-stage layouts — the archived runs. Verify and Ship both land on the stage that
+  # absorbed them, so an old PR reads as `stage:release` rather than as a vocabulary that no
+  # longer exists.
+  elif [ -f "$run_dir/06_ship/output/release.md" ];    then stage="release"
+  elif [ -f "$run_dir/05_verify/output/verify.md" ];   then stage="release"
+  elif [ -f "$run_dir/04_build/output/notes.md" ];     then stage="build"
   else stage="define"
   fi
 fi
-case "$stage" in define|build|verify|ship) : ;; *) die "--stage must be define|build|verify|ship|auto, got: $stage" ;; esac
+case "$stage" in define|build|release) : ;; *) die "--stage must be define|build|release|auto, got: $stage" ;; esac
 
 run_md="$run_dir/run.md"
 if [ -z "$pr_override" ]; then

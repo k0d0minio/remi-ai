@@ -2,7 +2,7 @@
 # resolve-run.sh — adopt an existing pipeline run into the working tree, or STOP.
 #
 # The single canonical "resolve the run or STOP" procedure (.icm/_shared/stage-preamble.md), made
-# into one deterministic call so Build / Verify / Ship / `status` spend no model tokens resolving a
+# into one deterministic call so Build / Release / `status` spend no model tokens resolving a
 # run. It reads run.md if it is already in the working tree, otherwise it searches the run's PR by
 # slug via the GitHub REST API, then fetches and checks out the run's branch.
 #

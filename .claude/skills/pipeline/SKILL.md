@@ -1,6 +1,6 @@
 ---
 name: pipeline
-description: The delivery pipeline. Routes work through the six-stage spine — Scope, Design, Define, Build, Verify, Ship — plus the bug/tweak/chore fast lanes, each with a human gate at its boundary. Use when the user types /pipeline, or asks to scope an idea, design a prototype, start/spec/build/verify/ship a feature, fix a bug, make a tweak, run a chore, or check a feature's status. Subcommands - "scope" <topic>, "design" <slug>, "new"/"define" <request|stub>, "build" <slug>, "verify" <slug>, "ship" <slug>, "bug"/"tweak"/"chore" <request>, "status" [slug].
+description: The delivery pipeline. Routes work through the four-stage spine — Scope, Define, Build, Release — plus the bug/tweak/chore fast lanes, each with a human gate at its boundary. Use when the user types /pipeline, or asks to scope an idea, start/spec/build/release a feature, fix a bug, make a tweak, run a chore, or check a feature's status. Subcommands - "scope" <topic>, "new"/"define" <request|stub>, "build" <slug>, "release" <slug>, "bug"/"tweak"/"chore" <request>, "status" [slug].
 ---
 
 # /pipeline — the delivery pipeline router
@@ -16,12 +16,10 @@ Argument form: `<subcommand> [slug, "request", or stub path]`. The argument is: 
 | Subcommand                             | Contract to read & follow             |
 | -------------------------------------- | ------------------------------------- |
 | `scope "<topic>"` / `scope <slug>`     | `.icm/stages/01_scope/CONTEXT.md`     |
-| `design <slug>`                        | `.icm/stages/02_design/CONTEXT.md`    |
-| `new` (all forms — see below)          | `.icm/stages/03_define/CONTEXT.md`    |
-| `define "<request>"` / `define <slug>` | `.icm/stages/03_define/CONTEXT.md`    |
-| `build <slug>`                         | `.icm/stages/04_build/CONTEXT.md`     |
-| `verify <slug>`                        | `.icm/stages/05_verify/CONTEXT.md`    |
-| `ship <slug>`                          | `.icm/stages/06_ship/CONTEXT.md`      |
+| `new` (all forms — see below)          | `.icm/stages/02_define/CONTEXT.md`    |
+| `define "<request>"` / `define <slug>` | `.icm/stages/02_define/CONTEXT.md`    |
+| `build <slug>`                         | `.icm/stages/03_build/CONTEXT.md`     |
+| `release <slug>`                       | `.icm/stages/04_release/CONTEXT.md`   |
 | `bug "<report>"` / `bug <slug>`        | `.icm/lanes/bug/CONTEXT.md`           |
 | `tweak "<change>"` / `tweak <slug>`    | `.icm/lanes/tweak/CONTEXT.md`         |
 | `chore "<task>"` / `chore <slug>`      | `.icm/lanes/chore/CONTEXT.md`         |
@@ -36,16 +34,16 @@ maps to the `<name>` part. Lanes likewise under `.icm/lanes/`.
 1. Read `.icm/CONTEXT.md` once this session if you haven't — the workspace map (Layer 1).
 2. Resolve the `<slug>` (kebab-case). Scope picks new slugs; `new` / `define "<request>"` picks one
    only when no front exists behind the request.
-3. For the **adopting** stages — `build`, `verify`, `ship`, and a lane resumed by slug — run the
+3. For the **adopting** stages — `build`, `release`, and a lane resumed by slug — run the
    shared preamble first: `.icm/_shared/stage-preamble.md` ("resolve the run or STOP"). Never
    recreate a missing run.
 4. **Read the matching contract in full and follow it exactly.** Inputs / Process / Outputs / Verify
    are the instructions. Load only the files its Inputs section names.
-5. **Respect gates — never auto-advance.** The five: scope agreed (conversation), design approved
-   (the live demo URL — recorded by the operator proceeding), **Spec approved** (PR checkbox),
-   Verify passed (conversation), **Ready to merge** (PR checkbox). You only ever **read** the
-   checkboxes (`.icm/_shared/github.md`) — never tick one, and never start the next stage on
-   your own.
+5. **Respect gates — never auto-advance.** The three: scope agreed (conversation), **Spec
+   approved** (PR checkbox), **Ready to merge** (PR checkbox). The last one is the only gate
+   Release reads, and **ticking it attests the owner's own manual and signed-in testing** — so
+   Release never re-asks for that testing. You only ever **read** the checkboxes
+   (`.icm/_shared/github.md`) — never tick one, and never start the next stage on your own.
 
    After each stage, say what's done, where the output is, and which `/pipeline <next>` comes when
    the human is ready.
@@ -90,10 +88,10 @@ Either way, Define pre-seeds the spec from the stub and `new-run.sh --stub` mark
 All GitHub reads per `.icm/_shared/github.md` — narrow queries, small limits.
 
 - **`status <slug>`** → resolve the PR from `.icm/runs/<slug>/run.md` (shared preamble first if
-  the run isn't in the checkout). One `gh pr view --json state,isDraft,labels,body` plus one
-  `gh pr checks`. Report: lane, stage label, each gate's state (the two checkboxes from the body;
-  the conversational gates from which outputs exist — `scope.md` → agreed, `design-notes.md` →
-  approved, `verify.md` → pending confirmation), PR state, CI rollup.
+  the run isn't in the checkout). One `gh pr view --json state,isDraft,labels,body` plus one CI
+  read. Report: lane, stage label, each gate's state (the two checkboxes from the body;
+  the scope gate from whether `scope.md` exists), PR state, and the CI rollup from one
+  `ci-status.sh <slug> --no-wait` (reporting only — never gate on `--no-wait`).
 - **`status`** (no slug) → the board: `gh pr list --state open --label type:feature` (repeat per
   lane label if lanes are in flight), plus `gh pr list --state merged --limit 5`. One line per PR:
   title, type and stage labels, draft/open, checks. Then list `.icm/intake/*/` folders with
@@ -105,12 +103,10 @@ All GitHub reads per `.icm/_shared/github.md` — narrow queries, small limits.
 /pipeline — delivery pipeline
   Spine (one scope → N feature PRs):
   /pipeline scope "<topic>"     interrogate + write the scope + cut the intake batch (gate: agreed)
-  /pipeline design <slug>       prototype in apps/demo, live via demo PRs (gate: signed off from the URL)
   /pipeline new                 take the next pending stub into Define (also: new <name> | <path> | "<request>")
   /pipeline define <slug>       revise an existing spec
-  /pipeline build <slug>        implement the approved spec (needs the Spec-approved tick)
-  /pipeline verify <slug>       quality gate: readiness · review · security · DoD smoke (gate: you confirm)
-  /pipeline ship <slug>         docs + changelog → gated squash-merge → ship note
+  /pipeline build <slug>        implement the approved spec, prove it green (needs the Spec-approved tick)
+  /pipeline release <slug>      reviews · docs + changelog → gated squash-merge → ship note
   Fast lanes (single merge gate):
   /pipeline bug "<report>"      reproduce → fix → PR
   /pipeline tweak "<change>"    tiny adjustment → small PR

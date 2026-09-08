@@ -9,7 +9,7 @@
 - slug: <slug>
 - apps: <web | admin | marketing | docs | support | demo | packages>
 - complexity: trivial | standard | complex
-- Full spec (canonical — read here): <link to .icm/runs/<slug>/03_define/output/spec.md on this branch>
+- Full spec (canonical — read here): <link to .icm/runs/<slug>/02_define/output/spec.md on this branch>
 
 ## Acceptance criteria
 
@@ -31,4 +31,5 @@
 
 <!-- gate:ready-to-merge -->
 
-- [ ] Ready to merge (Ship gate — a human ticks this to authorise the squash-merge)
+- [ ] Ready to merge (Release gate — a human ticks this to authorise the squash-merge; ticking it
+      attests your own testing of the change)
