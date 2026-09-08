@@ -25,7 +25,7 @@ apps/
 packages/
   ui/           @remi/ui — the design system; the only home for primitives
   services/     @remi/services — storage, email, AI, env; seams, not integrations
-pipeline/       the delivery pipeline — stages, lanes, runs, scripts
+.icm/           the work layer — intake, docs, and the delivery pipeline
 ```
 
 The dependency arrow points **app → package**, only ever. No app imports another app; a package
@@ -69,8 +69,8 @@ Nothing below is restated here. Each rule lives once, and loads on demand.
 - **[`CONVENTIONS.md`](CONVENTIONS.md)** — code style, design-system rules, leanness rules,
   working languages, git.
   The canonical code rules: the Build stage loads it by path. Read it before editing code.
-- **[`pipeline/CONTEXT.md`](pipeline/CONTEXT.md)** — the delivery pipeline. The map of its gated
-  stages; each stage's contract is `pipeline/stages/NN_*/CONTEXT.md`.
+- **[`.icm/CONTEXT.md`](.icm/CONTEXT.md)** — the delivery pipeline. The map of its gated
+  stages; each stage's contract is `.icm/stages/NN_*/CONTEXT.md`.
 - **[`.icm/docs/ENV.md`](.icm/docs/ENV.md)** — the single catalogue of environment variables and secrets.
   Bus-factor insurance: the setup is never trapped in one person's head.
 - **[`.claude/skills/`](.claude/skills/)** — one-job capability skills, called by pipeline stages.
@@ -84,7 +84,7 @@ Nothing below is restated here. Each rule lives once, and loads on demand.
   direction.
 - **Product knowledge** — `apps/docs/app/technical/**` (architecture) and
   `app/business/**` (direction), routed per stage by
-  [`pipeline/_shared/knowledge-map.md`](pipeline/_shared/knowledge-map.md). Load the named page,
+  [`.icm/_shared/knowledge-map.md`](.icm/_shared/knowledge-map.md). Load the named page,
   never the whole site. The business pages are reconciled with the braindump and the direction of
   record; `.icm/docs/` still outranks them, so where one drifts, `.icm/docs/` wins and the page is
   the thing to fix.

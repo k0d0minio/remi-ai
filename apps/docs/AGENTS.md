@@ -24,7 +24,7 @@ importing the design system is what "off the design system" means.
 | `app/business/`  | direction, initiatives, the V2 scope, roles    | Scope, Define, Ship |
 | `app/technical/` | architecture, applications, packages, workflow | Build, Ship         |
 
-`pipeline/_shared/knowledge-map.md` routes each stage to a **named page**, not to "the docs" — that
+`.icm/_shared/knowledge-map.md` routes each stage to a **named page**, not to "the docs" — that
 scoping is what keeps a stage's context small. When you add a page, add its row to the knowledge
 map, or no stage will ever find it.
 
@@ -64,5 +64,5 @@ before deleting either.
 
 ## Archive
 
-`archive/` holds completed pipeline runs once they are moved off `pipeline/runs/`. Unlisted, not in
+`archive/` holds completed pipeline runs once they are moved off `.icm/runs/`. Unlisted, not in
 navigation, never canonical — the durable paper trail, nothing more.

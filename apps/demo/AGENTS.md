@@ -5,7 +5,7 @@ what is specific to this app.
 
 ## What this app is
 
-The Design stage's sandbox (`pipeline/stages/02_design/`). A feature is prototyped here first,
+The Design stage's sandbox (`.icm/stages/02_design/`). A feature is prototyped here first,
 merged to the live demo URL through small demo PRs, and reviewed by the stakeholder on the real
 deployed thing rather than a screenshot. Then it is either re-implemented in `apps/web` (a
 throwaway) or used as reference material (a seed).
@@ -68,5 +68,5 @@ is exploring what a screen needs rather than committing to a schema. When a desi
 
 ## Demo PRs
 
-A demo PR touches `apps/demo/**` plus its run's `pipeline/` files and nothing else. That path guard
-is what makes autonomous merge safe — see `pipeline/_shared/github.md` → the front regime.
+A demo PR touches `apps/demo/**` plus its run's `.icm/runs/` files and nothing else. That path guard
+is what makes autonomous merge safe — see `.icm/_shared/github.md` → the front regime.
