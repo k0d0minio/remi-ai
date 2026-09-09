@@ -22,7 +22,7 @@
 - change: `.icm/scripts/{resolve-run,ci-status,send-ship-note,project-labels}.sh` — each now reads
   `.icm/runs/_done/<slug>/` when the live folder is gone. Without this the close-out breaks the
   three steps that follow it: Release re-establishes green (`ci-status.sh`) and sends the ship note
-  (`send-ship-note.sh`) *after* the folder has moved, and `project-labels.sh` re-projects on the
+  (`send-ship-note.sh`) _after_ the folder has moved, and `project-labels.sh` re-projects on the
   close-out push. The fallback is the pattern `close-out.sh` already uses for its sibling lookups.
 
 - change: `.github/workflows/pipeline.yaml` — the labels job derived its slug with

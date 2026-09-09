@@ -144,13 +144,13 @@ a one-line `Context budget:` note in `release.md`.
    all keep working across the move.
 
 10. **Re-establish green on the head you just pushed**, then merge. Re-run `ci-status.sh <slug>` —
-   one settled verdict per push, and the last one is the verdict that authorises the merge. Re-read
-   the gate (it must still be `[x]`), then squash-merge, attempted **once**. Never on RED, never on
-   PENDING. The squash carries the run record, the docs and the changelog onto `main` — the
-   changelog is live with this merge.
+    one settled verdict per push, and the last one is the verdict that authorises the merge. Re-read
+    the gate (it must still be `[x]`), then squash-merge, attempted **once**. Never on RED, never on
+    PENDING. The squash carries the run record, the docs and the changelog onto `main` — the
+    changelog is live with this merge.
 
-   **The stage ends at the merge.** Steps 11 and 12 are the only things that happen after it, and
-   both exist because they need a URL that does not exist until the squash lands.
+**The stage ends at the merge.** Steps 11 and 12 are the only things that happen after it, and
+both exist because they need a URL that does not exist until the squash lands.
 
 11. **Fill the links.** The merged-PR URL and the changelog entry's live URL into `ship-note.md`,
     and repoint the PR body's spec link to its `blob/main/` URL — the branch link dies with the
