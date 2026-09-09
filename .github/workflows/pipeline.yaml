@@ -52,13 +52,29 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           set -uo pipefail
+          # The optional `_done/` segment is Release's close-out: it moves the run folder into the
+          # archive on the branch, so the final push of a run reports it under both paths. Both
+          # normalise to the same slug, and sort -u collapses them.
           slugs="$(git diff --name-only "$BASE_SHA" HEAD \
-            | grep -oE '^\.icm/runs/[^/]+/' | cut -d/ -f3 | sort -u || true)"
+            | sed -nE 's#^\.icm/runs/(_done/)?([^/]+)/.*#\2#p' | sort -u || true)"
           if [ -z "$slugs" ]; then echo "No changed runs — nothing to label."; exit 0; fi
           for slug in $slugs; do
-            spec=".icm/runs/$slug/02_define/output/spec.md"
+            run_dir=".icm/runs/$slug"
+            [ -d "$run_dir" ] || run_dir=".icm/runs/_done/$slug"
+            # Only ever project a run's labels onto its OWN PR. A PR can touch runs that are not
+            # its own — a migration or a sweep moving archived folders — and stamping their
+            # type/complexity/app set onto this PR would misdescribe it. A run.md with no `- pr:`
+            # line yet is this PR's own run mid-scaffold (new-run.sh commits the run before it
+            # opens the PR), so it passes.
+            run_pr="$(grep -m1 '^- pr:' "$run_dir/run.md" 2>/dev/null \
+              | sed -E 's/^- pr:[[:space:]]*//; s/[[:space:]]+#.*$//; s#^.*/pull/##; s/^#//; s/[^0-9].*$//' || true)"
+            if [ -n "$run_pr" ] && [ "$run_pr" != "$PR_NUMBER" ]; then
+              echo "::notice::run '$slug' changed but belongs to PR #$run_pr — not this one; skipping labels"
+              continue
+            fi
+            spec="$run_dir/02_define/output/spec.md"
             # Legacy six-stage layout — the archived runs.
-            [ -f "$spec" ] || spec=".icm/runs/$slug/03_define/output/spec.md"
+            [ -f "$spec" ] || spec="$run_dir/03_define/output/spec.md"
             if [ ! -f "$spec" ]; then
               echo "::notice::run '$slug' changed but has no spec.md (lane run?) — skipping labels"
               continue
@@ -86,7 +102,8 @@ jobs:
         run: |
           set -uo pipefail
           specs="$(git diff --name-only "$BASE_SHA" HEAD \
-            | grep -E '^\.icm/runs/[^/]+/0[23]_define/output/spec\.md$' | sort -u || true)"
+            | grep -E '^\.icm/runs/(_done/)?[^/]+/0[23]_define/output/spec\.md$' \
+            | while read -r f; do [ -f "$f" ] && echo "$f"; done | sort -u || true)"
           if [ -z "$specs" ]; then echo "No spec.md changed — nothing to validate."; exit 0; fi
           for spec in $specs; do
             echo "::group::validate $spec"

@@ -23,7 +23,8 @@
 #   .icm/scripts/resolve-run.sh <slug>
 #
 # Verdict (stdout, last line):
-#   RESULT: READY   exit 0  — .icm/runs/<slug>/run.md is in the working tree and its branch is
+#   RESULT: READY   exit 0  — the run's run.md is in the working tree (.icm/runs/<slug>/, or
+#                             .icm/runs/_done/<slug>/ once Release closed it out) and its branch is
 #                             checked out. The caller proceeds to load the stage contract.
 #   RESULT: STOP    exit 3  — no run resolved. Do NOT fabricate it; send the user to
 #                             `/pipeline new "<request>"`.
@@ -49,7 +50,17 @@ while [ $# -gt 0 ]; do
 done
 [ -n "$slug" ] || die "usage: resolve-run.sh <slug>"
 
-run_md="$repo_root/.icm/runs/$slug/run.md"
+# Live first, archive second. Release closes the run out on its own branch before the merge, so
+# from that commit on the run.md a later `status <slug>` reads sits under runs/_done/.
+resolve_run_md() {
+  local live="$repo_root/.icm/runs/$slug/run.md"
+  local done="$repo_root/.icm/runs/_done/$slug/run.md"
+  [ -f "$live" ] && { echo "$live"; return 0; }
+  [ -f "$done" ] && { echo "$done"; return 0; }
+  echo "$live"
+}
+
+run_md="$(resolve_run_md)"
 
 # --- config from env --------------------------------------------------------------------------
 
@@ -122,6 +133,7 @@ fi
 # After checkout the run folder must be present. If it still isn't, Define genuinely never produced
 # this run — STOP rather than fabricate it.
 
+run_md="$(resolve_run_md)"
 [ -f "$run_md" ] || stop "Still no run.md for '$slug' after checkout — Define has not produced this run. Do not create it; run '/pipeline new'."
 
 branch="$(git -C "$repo_root" rev-parse --abbrev-ref HEAD)"

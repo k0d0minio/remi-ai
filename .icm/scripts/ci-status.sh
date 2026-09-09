@@ -110,7 +110,10 @@ api() { # api <path> <what> -> body on stdout, dies on non-200
 
 if [ -z "$pr_number" ]; then
   run_md="$repo_root/.icm/runs/$slug/run.md"
-  [ -f "$run_md" ] || die "no .icm/runs/$slug/run.md in the working tree — run resolve-run.sh $slug first, or pass --pr <number>"
+  # Release closes the run out before the merge, so the last green it establishes is read from the
+  # archive rather than the live folder.
+  [ -f "$run_md" ] || run_md="$repo_root/.icm/runs/_done/$slug/run.md"
+  [ -f "$run_md" ] || die "no run.md for '$slug' in the working tree (.icm/runs/$slug/ nor .icm/runs/_done/$slug/) — run resolve-run.sh $slug first, or pass --pr <number>"
   pr_number="$(grep -m1 '^- pr:' "$run_md" \
     | sed -E 's/^- pr:[[:space:]]*//; s/[[:space:]]+#.*$//; s#^.*/pull/##; s/^#//; s/[^0-9].*$//' || true)"
   [ -n "$pr_number" ] || die "run.md for '$slug' has no usable '- pr:' line — the PR isn't open yet (or pass --pr <number>)"

@@ -61,8 +61,3 @@ but one of them lives in the root manifest, so it is written down here rather th
 
 Neither is cosmetic: without them `pnpm docs:build` fails outright. Verify against a real build
 before deleting either.
-
-## Archive
-
-`archive/` holds completed pipeline runs once they are moved off `.icm/runs/`. Unlisted, not in
-navigation, never canonical — the durable paper trail, nothing more.

@@ -45,10 +45,18 @@ done
 
 # --- draft → subject + body ---------------------------------------------------------------------
 
-draft="$repo_root/.icm/runs/$slug/04_release/output/ship-note.md"
-# Legacy six-stage layout — the archived runs keep their note at 06_ship/.
-[ -f "$draft" ] || draft="$repo_root/.icm/runs/$slug/06_ship/output/ship-note.md"
-[ -f "$draft" ] || die "no ship note at $draft"
+# Release closes the run out before the merge, and the ship note is sent after it — so the note
+# is normally read from the archive by the time this runs. Live folder first all the same, for a
+# note sent by hand mid-run.
+for draft in \
+  "$repo_root/.icm/runs/$slug/04_release/output/ship-note.md" \
+  "$repo_root/.icm/runs/_done/$slug/04_release/output/ship-note.md" \
+  "$repo_root/.icm/runs/$slug/06_ship/output/ship-note.md" \
+  "$repo_root/.icm/runs/_done/$slug/06_ship/output/ship-note.md"; do
+  # The last two are the legacy six-stage layout — the runs written before the collapse.
+  [ -f "$draft" ] && break
+done
+[ -f "$draft" ] || die "no ship note for '$slug' under .icm/runs/$slug/ or .icm/runs/_done/$slug/"
 
 subject="$(grep -m1 '^# ' "$draft" | sed 's/^# //' | sed 's/[[:space:]]*$//' || true)"
 [ -n "$subject" ] || die "ship-note.md has no \`# \` heading to use as the email subject"

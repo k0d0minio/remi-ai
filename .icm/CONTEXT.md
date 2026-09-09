@@ -23,7 +23,7 @@ makes this repo receive and be checked against the run spine. Canonical contract
 | `scope "<topic>"`           | `stages/01_scope/`   | interrogate the business logic → `scope.md` → cut the intake batch | ✅ scope agreed (in conversation) |
 | `new` / `define` (per stub) | `stages/02_define/`  | stub → approvable `spec.md`; opens the run's **one** feature PR    | ✅ **Spec approved** PR checkbox  |
 | `build <slug>`              | `stages/03_build/`   | implement the spec on the branch; prove CI green; draft PR → open  | ✅ **Ready to merge** PR checkbox |
-| `release <slug>`            | `stages/04_release/` | reviews · docs + changelog in-PR → gated squash-merge → ship note  | — (the stage ends at the merge)   |
+| `release <slug>`            | `stages/04_release/` | reviews · docs + changelog in-PR → close out → gated squash-merge  | — (the stage ends at the merge)   |
 
 Two gates are PR checkboxes — **Spec approved** (before Build) and **Ready to merge** (before the
 squash-merge). Those two are the only **binding** approvals in the system, and both are the owner's
@@ -95,16 +95,16 @@ table is what prevents the lost-in-the-middle failure. Don't reload the monorepo
   _design/                 # human-only notes, never loaded at runtime
   scripts/                 # the deterministic factory — one job each, one RESULT line, env config
     resolve-run.sh  new-run.sh  project-labels.sh  validate-spec.sh  ci-status.sh
-    send-ship-note.sh
-  runs/<slug>/             # L4 working artifacts
+    send-ship-note.sh  close-out.sh
+  runs/<slug>/             # L4 working artifacts — in-flight runs only
     run.md                   # pointer index
     01_scope/output/scope.md          02_define/output/spec.md
     03_build/output/notes.md          04_release/output/{release,changelog,ship-note}.md
     lane/output/notes.md              # fast-lane runs use this instead of the numbered folders
-
-    # Runs archived here from the six-stage pipeline keep their old layout
-    # (03_define/ · 04_build/ · 05_verify/ · 06_ship/). project-labels.sh, validate-spec.sh,
-    # send-ship-note.sh and pipeline.yaml all still read it; nothing new writes it.
+  runs/_done/<slug>/       # the archive — same layout, moved here by close-out.sh before the merge
+    # Runs written by the six-stage pipeline keep their old layout (03_define/ · 04_build/ ·
+    # 05_verify/ · 06_ship/). project-labels.sh, validate-spec.sh, send-ship-note.sh and
+    # pipeline.yaml all still read it; nothing new writes it.
 ```
 
 ## State lives in two homes
@@ -145,9 +145,10 @@ theirs at once).
 - Slugs are short and kebab-case (`csv-export`).
 - Outputs are markdown; **editing an output file is how you steer the next stage.**
 - Nothing runs end to end automatically — you invoke each stage; the gates are the boundaries.
-- **Runs are tracked in git** and ride in the feature PR from Define onward. The squash-merge in
-  Release carries the completed run onto `main` as the durable record; completed runs are
-  periodically archived to `apps/docs/archive/` (see `runs/README.md`).
+- **Runs are tracked in git** and ride in the feature PR from Define onward. Release's
+  `close-out.sh` archives the run into `runs/_done/` as the **last commit on the branch**, so the
+  squash-merge carries both the completed run and its archival onto `main` in one move — nothing
+  runs after the merge, and `runs/` holds only what is still in flight (see `runs/README.md`).
 - **GitHub issues are not an agent drop-zone.** Specs, audits and findings live in `scope.md`,
   `spec.md`, and the PR — never in issues.
 
@@ -172,5 +173,6 @@ theirs at once).
 | Run adoption                                | `.icm/_shared/stage-preamble.md`                   |
 | Factory scripts / CI offload                | `.icm/scripts/` + `_design/automation-offload.md`  |
 | The Definition of Ready / the scope freeze  | `.icm/stages/01_scope/CONTEXT.md`                  |
+| The run lifecycle / when a run is archived  | `.icm/runs/README.md` + `scripts/close-out.sh`     |
 | The Definition of Done / what stops a merge | `.icm/stages/04_release/CONTEXT.md`                |
 | Code rules                                  | `/CONVENTIONS.md` + the subtree `AGENTS.md` files  |

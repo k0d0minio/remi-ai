@@ -128,8 +128,10 @@ Pushing a stage's output is what moves the label. `new-run.sh` projects the init
 opens; the script stays the manual fallback.
 
 The script also reads the **legacy six-stage layouts** (`03_define` / `04_build` / `05_verify` /
-`06_ship`) so the archived runs under `.icm/runs/` keep projecting, mapping `verify` and `ship` onto
-`stage:release`. Nothing new writes those paths.
+`06_ship`) so the archived runs under `.icm/runs/_done/` keep projecting, mapping `verify` and
+`ship` onto `stage:release`. Nothing new writes those paths. It reads `_done/` as well as the live
+folder for the same reason Release closes a run out before the merge: from that commit on, the run
+is only there.
 
 - `stage:` — exactly one of `define → build → release`.
 - `type:feature` on spine PRs · `type:{bug,tweak,chore}` on lane PRs.
