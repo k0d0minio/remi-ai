@@ -37,8 +37,18 @@ upstream and the reconciliation of this copy afterwards. Until it lands, `icm-ch
 
 ## Verify
 
-- Parse, exercised directly: `Format, lint, typecheck` parses as **one** required name, and a
-  two-line value parses as two (leading/trailing whitespace trimmed per line).
-- On this PR's head, `ci-status.sh --no-wait` with the variable set reads `PENDING` while the
-  `Format, lint, typecheck` check has not completed, and `GREEN` only once it has — recorded on the
-  PR.
+- **Parse**, exercised directly: `Format, lint, typecheck` parses as **one** required name, and a
+  two-line value parses as two, with leading/trailing whitespace trimmed per line.
+- **PENDING, not GREEN, on a fresh push.** With the variable set, `ci-status.sh --pr 90 --no-wait`
+  on the head seconds after the push reported
+  `run is unsettled (never registered: Format, lint, typecheck)` — the name quoted whole, not split
+  into three phantoms — and `RESULT: PENDING`. The blocking call then held through two passes where
+  every Vercel status had already settled and only the quality check had not; it returned
+  `RESULT: GREEN` on the pass where `Format, lint, typecheck` completed. Under the old parse that
+  same head would have been `PENDING` forever; with the variable unset, as it was before this
+  change, the deploy statuses alone would have carried it to `GREEN`.
+- **CI on this PR is green**, established by `.icm/scripts/ci-status.sh --pr 90`.
+
+One caveat for whoever picks this up: `.claude/settings.json` → `env` is read when a session
+starts, so a session already open when this merges will not have `PIPELINE_REQUIRED_CHECKS` until
+it restarts. The verification above set it with `export` for that reason.
