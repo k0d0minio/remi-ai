@@ -57,6 +57,9 @@ done
 [ -n "$stage" ] || die "--stage <define|build|release|auto> is required"
 
 run_dir="$repo_root/.icm/runs/$slug"
+# A closed-out run projects from the archive — Release's close-out commit moves the folder while
+# the PR is still open, and a re-projection after it must not read as "run gone".
+[ -d "$run_dir" ] || run_dir="$repo_root/.icm/runs/_done/$slug"
 # Current layout first, legacy second — a run written by the six-stage pipeline still has its
 # spec at 03_define/. Both are read; only the first is ever written.
 spec="$run_dir/02_define/output/spec.md"

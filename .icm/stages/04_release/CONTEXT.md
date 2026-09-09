@@ -93,7 +93,7 @@ a one-line `Context budget:` note in `release.md`.
    - User-facing change → **both** notes.
    - Infra, security, performance, internal → **ship note only**, framed as reliability, trust or
      velocity; record "no end-user note".
-   - Nothing worth announcing → record "no release notes" and skip the send in step 11.
+   - Nothing worth announcing → record "no release notes" and skip the send in step 12.
 
    The two artifacts:
 
@@ -102,7 +102,7 @@ a one-line `Context budget:` note in `release.md`.
      not a suggestion. The initiative tie-in is one line, taken verbatim from `business/initiatives`
      — if that page is still a stub, say so plainly rather than inventing a strategy. Sent as
      **plain text**, so markdown links render as literal characters. `Dig deeper` links are filled
-     after the merge (step 10).
+     after the merge (step 11).
 
      ```md
      # <Outcome in one line — what's now possible>
@@ -125,20 +125,38 @@ a one-line `Context budget:` note in `release.md`.
    and push. Pushing `release.md` is what advances the PR to `stage:release` — the labels job
    derives it from the outputs on disk, so there is nothing to set by hand.
 
-9. **Re-establish green on the head you just pushed**, then merge. Re-run `ci-status.sh <slug>` —
-   one settled verdict per push, and the last one is the verdict that authorises the merge. Re-read
-   the gate (it must still be `[x]`), then squash-merge, attempted **once**. Never on RED, never on
-   PENDING. The squash carries the run record, the docs and the changelog onto `main` — the
-   changelog is live with this merge.
+9. **Close out the run — the last commit on the branch:**
 
-   **The stage ends at the merge.** Steps 10 and 11 are the only things that happen after it, and
-   both exist because they need a URL that does not exist until the squash lands.
+   ```bash
+   .icm/scripts/close-out.sh <slug>
+   ```
 
-10. **Fill the links.** The merged-PR URL and the changelog entry's live URL into `ship-note.md`,
+   `RESULT: CLOSED` → it has `git mv`'d `.icm/runs/<slug>/` into `.icm/runs/_done/`, and the
+   intake epic into `.icm/intake/_done/` if this run was the last unshipped stub in it, and
+   committed both on this branch. Push. The squash-merge in step 10 is what publishes the archive,
+   so **nothing runs after the merge and nothing is ever pushed to `main`** — branch protection
+   refuses a direct push, and an archive commit stranded on an unmerged branch leaves every
+   shipped run sitting in `.icm/runs/` forever. `RESULT: STOP` → read the reason and stop; do not
+   move the folder by hand.
+
+   From here on the run's files are under `.icm/runs/_done/<slug>/`. The factory scripts read the
+   archive as well as the live folder, so `ci-status.sh`, `send-ship-note.sh` and the labels job
+   all keep working across the move.
+
+10. **Re-establish green on the head you just pushed**, then merge. Re-run `ci-status.sh <slug>` —
+    one settled verdict per push, and the last one is the verdict that authorises the merge. Re-read
+    the gate (it must still be `[x]`), then squash-merge, attempted **once**. Never on RED, never on
+    PENDING. The squash carries the run record, the docs and the changelog onto `main` — the
+    changelog is live with this merge.
+
+    **The stage ends at the merge.** Steps 11 and 12 are the only things that happen after it,
+    and both exist because they need a URL that does not exist until the squash lands.
+
+11. **Fill the links.** The merged-PR URL and the changelog entry's live URL into `ship-note.md`,
     and repoint the PR body's spec link to its `blob/main/` URL — the branch link dies with the
     squash-merge, and the record has to survive it.
 
-11. **Send the ship note — no approval prompt.** Unless the audience cut in step 7 was "none":
+12. **Send the ship note — no approval prompt.** Unless the audience cut in step 7 was "none":
 
     ```bash
     .icm/scripts/send-ship-note.sh <slug> --send
@@ -146,14 +164,17 @@ a one-line `Context budget:` note in `release.md`.
 
     Config from the environment (`RESEND_API_KEY`, `SHIP_NOTE_RECIPIENTS`, `SHIP_NOTE_FROM` /
     `EMAIL_FROM` — see `.icm/docs/ENV.md`). Running Release is the authorisation; the no-flag dry
-    run exists for debugging.
+    run exists for debugging. The script reads the note from the archive as readily as the live
+    folder, so the close-out in step 9 costs it nothing.
 
-12. **Report.** What merged (SHA), what was parked in triage (by stub name), what was announced.
-    The run folder stays on `main` as the durable record.
+13. **Report.** What merged (SHA), what was parked in triage (by stub name), what was announced,
+    and what the close-out archived. The run folder is the durable record on `main` — it now lives
+    under `.icm/runs/_done/<slug>/`, so `.icm/runs/` holds only what is still in flight.
 
 ## Outputs
 
-`.icm/runs/<slug>/04_release/output/release.md`:
+`.icm/runs/<slug>/04_release/output/release.md` — written before the close-out, so it is authored
+at the live path and reaches `main` under `.icm/runs/_done/<slug>/`:
 
 ```md
 # Release: <slug>
@@ -169,13 +190,14 @@ a one-line `Context budget:` note in `release.md`.
 - business docs: <pages updated in this PR · or "no business docs impact">
 - release notes: <both · ship-note-only · none>
 - sent: <none | ship note sent <YYYY-MM-DD>>
+- closed out: <RESULT: CLOSED — run archived; epic <name> archived / no epic finished by this run>
 
 ## Acceptance check (vs spec)
 
 - [x] <criterion> — <met, per Build's notes / demonstrated where>
 ```
 
-Plus `04_release/output/ship-note.md` (sent verbatim by step 11) and the live changelog entry at
+Plus `04_release/output/ship-note.md` (sent verbatim by step 12) and the live changelog entry at
 `apps/docs/app/changelog/<date>-<slug>/page.mdx` (run copy at `04_release/output/changelog.md`).
 
 ## Verify (before declaring released)
@@ -186,7 +208,10 @@ Plus `04_release/output/ship-note.md` (sent verbatim by step 11) and the live ch
   never assumed, never a bare check-runs read.
 - The only holds applied were the three stop classes; every other finding is a named triage stub.
   Conditional passes that didn't run say why.
-- Everything shipped in the **one PR** — code, docs, changelog, cleanup. No second branch or PR.
+- Everything shipped in the **one PR** — code, docs, changelog, cleanup, **and the close-out**. No
+  second branch or PR, and nothing pushed to `main` after the merge.
+- `close-out.sh` ran **before** the merge and its commit is on the branch: `.icm/runs/<slug>/` is
+  gone from the live folder and present under `.icm/runs/_done/<slug>/`.
 - The changelog reads in the user's voice; the ship note fits the template and the 60-word cap;
   every claim traces to the spec or the build notes; any initiative named is real.
 - The ship note, if sent, ends with working links to the merged PR and the live changelog entry,

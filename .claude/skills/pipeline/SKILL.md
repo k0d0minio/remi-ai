@@ -87,15 +87,16 @@ Either way, Define pre-seeds the spec from the stub and `new-run.sh --stub` mark
 
 All GitHub reads per `.icm/_shared/github.md` — narrow queries, small limits.
 
-- **`status <slug>`** → resolve the PR from `.icm/runs/<slug>/run.md` (shared preamble first if
-  the run isn't in the checkout). One `gh pr view --json state,isDraft,labels,body` plus one CI
+- **`status <slug>`** → resolve the PR from `.icm/runs/<slug>/run.md`, or `_done/<slug>/run.md`
+  once Release closed the run out (shared preamble first if the run isn't in the checkout). One `gh pr view --json state,isDraft,labels,body` plus one CI
   read. Report: lane, stage label, each gate's state (the two checkboxes from the body;
   the scope gate from whether `scope.md` exists), PR state, and the CI rollup from one
   `ci-status.sh <slug> --no-wait` (reporting only — never gate on `--no-wait`).
 - **`status`** (no slug) → the board: `gh pr list --state open --label type:feature` (repeat per
   lane label if lanes are in flight), plus `gh pr list --state merged --limit 5`. One line per PR:
   title, type and stage labels, draft/open, checks. Then list `.icm/intake/*/` folders with
-  stubs remaining vs `_done/` — the filesystem _is_ the intake state.
+  stubs remaining vs `_done/` — the filesystem _is_ the intake state. `.icm/runs/` reads the same
+  way: every folder in it is a run that has not shipped, since Release archives into `_done/`.
 
 ## Help (when the subcommand is empty or unclear)
 
