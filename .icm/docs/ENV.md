@@ -10,7 +10,8 @@ in one person's head.
 
 ## How to read the columns
 
-- **Where set** — `Vercel` (app runtime), `Actions` (CI secret), or `both`.
+- **Where set** — `Vercel` (app runtime), `Actions` (CI secret), `both`, `local` (a developer's
+  own shell), or `repo` (checked in, so every clone and every agent session already has it).
 - **Public?** — a `NEXT_PUBLIC_*` variable is in the browser bundle. Treat everything else as secret.
 
 ## Getting the values onto a machine
@@ -188,6 +189,14 @@ unless a second analytics vendor arrives with a reader to go with it.
 | `TURBO_TEAM`           | Turborepo team slug (a repo **variable**, not a secret)                                                                    | Actions   | no      |
 | `SHIP_NOTE_FROM`       | From-address for the Ship stage's note (`send-ship-note.sh`)                                                               | local     | no      |
 | `SHIP_NOTE_RECIPIENTS` | Where the ship note goes — normally one channel inbox address                                                              | local     | no      |
+| `PIPELINE_REQUIRED_CHECKS` | Check-run names `ci-status.sh` must see completed before GREEN — **newline-separated**. Set in-repo by `.claude/settings.json` → `env`; export it by hand for a plain shell | repo      | no      |
+
+`PIPELINE_REQUIRED_CHECKS` is the one row here with a checked-in home: it names check runs, not a
+secret, so `.claude/settings.json` → `env` carries it and every agent session in this repo has it
+without anyone setting anything up. Its value today is this repo's one blocking Actions check,
+`Format, lint, typecheck` — **one name per line, never comma-separated**, because that name
+contains commas. `Pipeline gates` is deliberately absent; the reasoning is in
+[`.icm/_shared/ci.md`](../_shared/ci.md).
 
 ## Not wired yet
 

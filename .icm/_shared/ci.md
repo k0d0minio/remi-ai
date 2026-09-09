@@ -52,21 +52,35 @@ is PENDING, not GREEN**: GitHub takes 10–30 seconds to register a workflow, so
 that reads the moment after `git push` reads an empty list and, without this rule, calls
 it clean.
 
-`PIPELINE_REQUIRED_CHECKS` (newline/comma-separated check-run names) names the checks that must be
-present and completed before GREEN, so a head missing one can never settle green. **It is
-deliberately unset here**, for two repo-specific reasons:
+`PIPELINE_REQUIRED_CHECKS` names the check runs that must be **present and completed** before
+GREEN, so a head missing one can never settle green. In this repo it is set to exactly one name:
 
-- This repo's one blocking Actions check is named `Format, lint, typecheck` — the name contains
-  commas, and the variable splits on commas, so the name cannot be expressed in it. Parked as a
-  triage stub (`.icm/intake/triage/ci-required-checks-comma.md`) rather than worked around by
-  renaming a check that branch protection is configured against.
-- `Pipeline gates` must never be listed: it is a projection of the PR body's checkboxes and is red
-  for the whole of Build by design. `ci-status.sh` classifies it as noise for the same reason it
+```text
+Format, lint, typecheck
+```
+
+`.claude/settings.json` → `env` carries it, so every agent session in this repo already has it; a
+plain shell exports it by hand (`.icm/docs/ENV.md`). **The value is newline-separated — one check
+name per line, never commas.** A comma is a legal character inside a GitHub check-run name, and
+this repo's blocking check proves it: splitting on commas would turn `Format, lint, typecheck` into
+three phantom checks that never register, and every verdict would be `PENDING` forever.
+
+What is in the list, and what is deliberately not:
+
+- **`Format, lint, typecheck`** (`.github/workflows/quality.yaml`) — the one blocking Actions check,
+  the same one branch protection requires. Listing it is what makes a fresh push read `PENDING`
+  rather than `GREEN` on a head where only the deploy statuses have registered so far.
+- **`Pipeline gates` must never be listed.** It is a projection of the PR body's checkboxes and is
+  red for the whole of Build by design. `ci-status.sh` classifies it as noise for the same reason it
   discards the Vercel marker — it says nothing about whether anything compiled. The gate is still
   read, twice: by the stage contracts out of the PR body, and by branch protection at the merge.
+- **Vercel previews are not listed** either. Six projects each with an ignore step means a target
+  the diff never touched produces no status at all; requiring one would hang every verdict that does
+  not touch that app.
 
-Unset, the script still refuses GREEN while _zero_ signals exist — which is the rule that matters
-most on a fresh push.
+Even with the list empty, the script still refuses GREEN while _zero_ signals exist — the rule that
+matters most on a fresh push. The list is what covers the next case up: a head where the deploys
+have reported but the quality workflow has not registered yet.
 
 ## The rules the script encodes
 
