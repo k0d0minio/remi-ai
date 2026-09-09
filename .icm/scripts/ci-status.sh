@@ -3,6 +3,12 @@
 # Seeded from the estate pipeline template (icm-board _system/template/icm-pipeline/scripts/),
 # with one repo-specific rule added — see "Pipeline gates" below.
 #
+# The PIPELINE_REQUIRED_CHECKS parse below splits on NEWLINES ONLY. That is a template fix
+# landed here first (.icm/intake/triage/icm-template-required-checks-newline.md tracks the port
+# upstream): commas are legal inside a GitHub check-run name — this repo's own blocking check is
+# named "Format, lint, typecheck" — so comma-splitting cannot express the very names the variable
+# exists to hold, and would silently invent phantom required checks that never register.
+#
 # The deterministic answer to "is this PR green?" (.icm/_shared/ci.md). It reads BOTH
 # surfaces a commit's health lives on — GitHub Actions check runs AND commit statuses
 # (deploy providers land there) — discards the known noise, and blocks until the run
@@ -29,9 +35,10 @@
 #   GITHUB_TOKEN / GH_TOKEN     (one required)
 #   GITHUB_REPO                 (optional)  owner/repo; default: derived from `origin`.
 #   GITHUB_API_URL              (optional)  API base. Default: https://api.github.com.
-#   PIPELINE_REQUIRED_CHECKS    (optional)  Newline/comma-separated check-run names that
-#                                           must be present and completed before GREEN.
-#                                           Set this to the repo's own CI check names.
+#   PIPELINE_REQUIRED_CHECKS    (optional)  Newline-separated check-run names that must be
+#                                           present and completed before GREEN. Newlines only —
+#                                           a check name may itself contain a comma. Set this to
+#                                           the repo's own blocking CI check names.
 #
 # Usage:
 #   .icm/scripts/ci-status.sh <slug> [--timeout <seconds>] [--interval <seconds>] [--no-wait]
@@ -79,7 +86,8 @@ gh_token="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
 [ -n "$gh_token" ] || die "GITHUB_TOKEN (or GH_TOKEN) is not set — needed to read the PR's checks"
 
 required_raw="${PIPELINE_REQUIRED_CHECKS:-}"
-required_checks="$(printf '%s' "$required_raw" | tr ',' '\n' | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' | grep -v '^$' || true)"
+# One name per line. Never split on commas: "Format, lint, typecheck" is one check, not three.
+required_checks="$(printf '%s' "$required_raw" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' | grep -v '^$' || true)"
 
 gh_get() {
   curl -sS -m 30 -w $'\n%{http_code}' \
