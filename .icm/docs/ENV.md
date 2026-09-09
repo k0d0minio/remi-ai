@@ -179,16 +179,16 @@ unless a second analytics vendor arrives with a reader to go with it.
 
 ## Pipeline & CI (GitHub Actions)
 
-| Variable               | Purpose                                                                                                                    | Where set | Public? |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
-| `GITHUB_TOKEN`         | Injected automatically by Actions — do **not** add it                                                                      | Actions   | no      |
-| `GH_TOKEN`             | Local alternative for the pipeline scripts (`resolve-run.sh`, `new-run.sh`, `project-labels.sh`)                           | local     | no      |
-| `GITHUB_REPO`          | Optional `owner/repo` override for the pipeline scripts. Default: `k0d0minio/remi-ai`                                      | local     | no      |
-| `GITHUB_API_URL`       | API base for the same scripts — Actions injects it; set it locally only for an override. Default: `https://api.github.com` | both      | no      |
-| `TURBO_TOKEN`          | Turborepo remote cache token — shares the cache between CI and Vercel                                                      | Actions   | no      |
-| `TURBO_TEAM`           | Turborepo team slug (a repo **variable**, not a secret)                                                                    | Actions   | no      |
-| `SHIP_NOTE_FROM`       | From-address for the Ship stage's note (`send-ship-note.sh`)                                                               | local     | no      |
-| `SHIP_NOTE_RECIPIENTS` | Where the ship note goes — normally one channel inbox address                                                              | local     | no      |
+| Variable                   | Purpose                                                                                                                                                                     | Where set | Public? |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
+| `GITHUB_TOKEN`             | Injected automatically by Actions — do **not** add it                                                                                                                       | Actions   | no      |
+| `GH_TOKEN`                 | Local alternative for the pipeline scripts (`resolve-run.sh`, `new-run.sh`, `project-labels.sh`)                                                                            | local     | no      |
+| `GITHUB_REPO`              | Optional `owner/repo` override for the pipeline scripts. Default: `k0d0minio/remi-ai`                                                                                       | local     | no      |
+| `GITHUB_API_URL`           | API base for the same scripts — Actions injects it; set it locally only for an override. Default: `https://api.github.com`                                                  | both      | no      |
+| `TURBO_TOKEN`              | Turborepo remote cache token — shares the cache between CI and Vercel                                                                                                       | Actions   | no      |
+| `TURBO_TEAM`               | Turborepo team slug (a repo **variable**, not a secret)                                                                                                                     | Actions   | no      |
+| `SHIP_NOTE_FROM`           | From-address for the Ship stage's note (`send-ship-note.sh`)                                                                                                                | local     | no      |
+| `SHIP_NOTE_RECIPIENTS`     | Where the ship note goes — normally one channel inbox address                                                                                                               | local     | no      |
 | `PIPELINE_REQUIRED_CHECKS` | Check-run names `ci-status.sh` must see completed before GREEN — **newline-separated**. Set in-repo by `.claude/settings.json` → `env`; export it by hand for a plain shell | repo      | no      |
 
 `PIPELINE_REQUIRED_CHECKS` is the one row here with a checked-in home: it names check runs, not a
