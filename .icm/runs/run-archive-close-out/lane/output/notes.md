@@ -30,6 +30,14 @@
   optional `_done/` segment away and looks for the spec under both roots. The advisory spec-check
   matches archived paths too, and skips a path the diff lists but the tree no longer has.
 
+  Making archived runs resolvable exposed a second defect the job always had: it projects **every**
+  changed run's labels onto the current PR. A PR that touches runs other than its own — this
+  migration, or any sweep — was stamped with their `type:`/`complexity:`/`app:` set. It now reads
+  the run's `run.md` and skips a run whose `- pr:` line names a different PR. A run.md with no
+  `- pr:` line yet is this PR's own run mid-scaffold, so it still projects. Caught on this branch:
+  the first push labelled PR #91 `type:feature stage:build complexity:standard app:admin
+app:packages` from the twelve archived runs; the labels were reset to `type:chore` by hand.
+
 - change: `.icm/runs/README.md` · `.icm/CONTEXT.md` · `.icm/_shared/github.md` ·
   `.claude/skills/pipeline/SKILL.md` — reconciled with the new lifecycle. The old instruction to
   move a finished run to `apps/docs/archive/` "once it is no longer being referenced" was a sweep
