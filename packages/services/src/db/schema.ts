@@ -89,6 +89,13 @@ export const patientProfiles = pgTable("patient_profiles", {
   /** The anamnesis-level notes behind the profile. */
   anamnesis: text("anamnesis").notNull().default(""),
   /**
+   * What Morgane wants to remember to cover at the next consultation — set on
+   * the working view, cleared or revised when the consultation happens
+   * (`consultation-update` owns that step). Nullable: not set is the common
+   * state, and the empty string is never used.
+   */
+  nextConsultationPrep: text("next_consultation_prep"),
+  /**
    * When an operator last worked on this patient — a different fact from
    * `updated_at`, which the seam bumps on any row write including a patient
    * opening their own link. The roster sorts on this one, so a consultant

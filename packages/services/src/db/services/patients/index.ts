@@ -221,6 +221,7 @@ export const createPatient = async (
     supplements: data.supplements ?? "",
     referral: data.referral ?? "",
     anamnesis: data.anamnesis ?? "",
+    nextConsultationPrep: null,
     consentDate: data.consentDate ? data.consentDate : null,
     consentChannel: data.consentChannel ? data.consentChannel : null,
     lastEditedAt: new Date(),
@@ -315,6 +316,31 @@ export const regenerateShareToken = async (
   const patient = await patients().update(id, {
     shareToken: newShareToken(),
     linkLastOpenedAt: null,
+    lastEditedAt: new Date(),
+  });
+  return patient ? ok(patient) : err("not_found", "no such patient");
+};
+
+/**
+ * Sets the "à préparer pour la prochaine consultation" note — the one field the
+ * working view edits directly, before `consultation-update` owns the clear /
+ * revise flow. `""` clears it back to `null`. Writing it counts as working on
+ * the patient, so `lastEditedAt` moves like any operator edit.
+ */
+export const setPatientNextConsultationPrep = async (
+  id: Id,
+  value: string,
+): Promise<Result<PatientProfile>> => {
+  if (!isValidId(id)) {
+    return err("not_found", "no such patient");
+  }
+  const parsed = text.safeParse(value);
+  if (!parsed.success) {
+    return err("invalid_input", "that note is too long");
+  }
+  const prep = parsed.data === "" ? null : parsed.data;
+  const patient = await patients().update(id, {
+    nextConsultationPrep: prep,
     lastEditedAt: new Date(),
   });
   return patient ? ok(patient) : err("not_found", "no such patient");
