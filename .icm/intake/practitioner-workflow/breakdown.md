@@ -75,9 +75,9 @@ says so; the rest of that list still stands, as does the brainstorm's § 7 what-
 
 ## Feedback § → stub
 
-| Feedback section                                            | Stub                  | Note                                                              |
-| ----------------------------------------------------------- | --------------------- | ----------------------------------------------------------------- |
-| § 4 first screen · § 9.1                                    | `at-a-glance-page`    | the page opens on the working view; details behind it             |
+| Feedback section                                            | Stub                  | Note                                                               |
+| ----------------------------------------------------------- | --------------------- | ------------------------------------------------------------------ |
+| § 4 first screen · § 9.1                                    | `at-a-glance-page`    | the page opens on the working view; details behind it              |
 | § 5 bulk entry · § 2 row 2 · § 9.3                          | `bulk-entry`          | several rows per save for recommendations, supplements, essentials |
 | § 2 row 5 · § 7 "attribuer directement" · § 9.4             | `recipe-in-place`     | create + assign from the patient page; duplicate as variant        |
 | § 5 "duplication / réutilisation"                           | `reuse-and-duplicate` | copy a protocol block from another patient or a personal template  |

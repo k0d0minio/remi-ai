@@ -21,8 +21,8 @@ time comes:
 1. **Practitioner accounts and the request flow** — "Je suis praticien" → a request form → a
    `pending` practitioner → the console's back-office list with Accepter / Refuser → emails
    through the mailer seam → `approved` / `rejected`. Vendor-free auth as for operators.
-2. **Billing** — Stripe Checkout from the approval email, a webhook flipping `approved →
-   active`, `awaiting_payment` for the rest; only `active` sees the app. A payments seam (one
+2. **Billing** — Stripe Checkout from the approval email, a webhook flipping `approved` to
+   `active`, `awaiting_payment` for the rest; only `active` sees the app. A payments seam (one
    adapter, one webhook route), `STRIPE_*` under the three-list rule. Pricing tiers are proposals
    in the braindump, not decisions.
 3. **The practitioner app** — `apps/web`'s practitioner group, today on fixtures, becomes the

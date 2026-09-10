@@ -15,13 +15,13 @@ Re-cut 2026-09-10 from Morgane's feedback on the first version
 precedence row 1). The decisions of record that bind all five epics live in
 [`practitioner-workflow/breakdown.md § Decisions`](practitioner-workflow/breakdown.md).
 
-| Epic                                                       | What it is                                                                                                                                                       |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`practitioner-workflow/`](practitioner-workflow/breakdown.md) | The console follows the consultation — at-a-glance page, bulk entry, recipes in place, reuse, one post-consultation screen, details behind the working view. |
-| [`patient-loop/`](patient-loop/breakdown.md)               | The link the patient writes into — token read + write, today's home, « Je vais manger / J'ai mangé », recipe feedback, profile edit, check-ins and progression. |
-| [`nutrition-knowledge/`](nutrition-knowledge/breakdown.md) | What REMI knows about food — CIQUAL imported and queryable, Morgane's own nutrition rules authored, validated and retrieved by tag.                               |
-| [`ai-assist/`](ai-assist/breakdown.md)                     | The model arrives — Mistral behind the seam, meal suggestions to the patient, recipe generation into the library, a summary draft for Morgane; one P2 parked.    |
-| [`beyond-december/`](beyond-december/breakdown.md)         | The old version's flows that are right and not for now — accounts, autonomous patient + PDF, practitioner space, photos, groups, genotype. All P2.               |
+| Epic                                                           | What it is                                                                                                                                                      |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`practitioner-workflow/`](practitioner-workflow/breakdown.md) | The console follows the consultation — at-a-glance page, bulk entry, recipes in place, reuse, one post-consultation screen, details behind the working view.    |
+| [`patient-loop/`](patient-loop/breakdown.md)                   | The link the patient writes into — token read + write, today's home, « Je vais manger / J'ai mangé », recipe feedback, profile edit, check-ins and progression. |
+| [`nutrition-knowledge/`](nutrition-knowledge/breakdown.md)     | What REMI knows about food — CIQUAL imported and queryable, Morgane's own nutrition rules authored, validated and retrieved by tag.                             |
+| [`ai-assist/`](ai-assist/breakdown.md)                         | The model arrives — Mistral behind the seam, meal suggestions to the patient, recipe generation into the library, a summary draft for Morgane; one P2 parked.   |
+| [`beyond-december/`](beyond-december/breakdown.md)             | The old version's flows that are right and not for now — accounts, autonomous patient + PDF, practitioner space, photos, groups, genotype. All P2.              |
 
 Order: **`practitioner-workflow` → `patient-loop` → `ai-assist`**; `nutrition-knowledge` runs
 alongside the first two and gates `ai-assist/recipe-generation`. `practitioner-workflow` and

@@ -30,8 +30,8 @@ missing gestures:
 - **Assign several at once.** The assign form takes a multi-select over the active library with
   one note, instead of one recipe per submit (the bulk principle from `bulk-entry`, applied here).
 
-Generation (`ai-assist/recipe-generation`) writes into exactly this path — library row + assignment
-+ automated check — so this stub is its manual twin and its prerequisite.
+Generation (`ai-assist/recipe-generation`) writes into exactly this path — library row, assignment
+and automated check — so this stub is its manual twin and its prerequisite.
 
 ## Worth knowing
 

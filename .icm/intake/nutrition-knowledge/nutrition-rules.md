@@ -19,8 +19,8 @@ write it once, and the model a way to find it:
 
 - **A rules corpus**: `nutrition_rules` rows — title, body (markdown, a paragraph to a page),
   **tags** (the recommendation vocabulary: protéines, oméga-3, fibres, magnésium, sucres raffinés,
-  anti-inflammatoire, saison, petit-déjeuner …), a kind (`principle | food-list | seasonality |
-  safety | house-rule`), status (`draft | validated`), version and who validated it. Only
+  anti-inflammatoire, saison, petit-déjeuner …), a kind (`principle`, `food-list`, `seasonality`,
+  `safety`, `house-rule`), a status (`draft`, `validated`), version and who validated it. Only
   `validated` rows are ever retrieved by a prompt — brainstorm § 6's "puis les valider avant
   intégration", made structural.
 - **A console page** « Connaissances » (owner and operators): list, filter by tag and kind,

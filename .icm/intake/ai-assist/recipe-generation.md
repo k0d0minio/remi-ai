@@ -7,9 +7,9 @@
 - size: L
 - sources: feedback § 7 (the whole section: inputs, food selection, generation "tel un chef",
   control before display, patient feedback, "Pour la V2", "Vision finale") · § 9.4 · brainstorm
-  § I · decisions #5, #6, #7 · cross-epic: `practitioner-workflow/recipe-in-place` (the library
-  + assignment write path), `patient-loop/patient-profile-edit` (time available, budget, likes
-  cooking), `patient-loop/recipe-feedback-and-favourites` (the feedback signal),
+  § I · decisions #5, #6, #7 · cross-epic: `practitioner-workflow/recipe-in-place` (the library-and-assignment write path),
+  `patient-loop/patient-profile-edit` (time available, budget, likes cooking),
+  `patient-loop/recipe-feedback-and-favourites` (the feedback signal),
   `nutrition-knowledge/ciqual-import` and `nutrition-rules`
 
 ## What this is

@@ -37,14 +37,14 @@ in `ai-assist`), #9 (check-ins in-page, no outbound channel), #12 (text-only mea
 
 ## Feedback § / V2 flow → stub
 
-| Source                                                       | Stub                             |
-| ------------------------------------------------------------ | -------------------------------- |
-| decision #2 · RETENTION                                      | `link-writes`                    |
-| § 6 "Aujourd'hui / cette semaine", recommandations, essentiels | `patient-home-today`           |
-| § 6 « Je vais manger » / « J'ai mangé » · § 8                | `meal-entry`                     |
+| Source                                                                               | Stub                             |
+| ------------------------------------------------------------------------------------ | -------------------------------- |
+| decision #2 · RETENTION                                                              | `link-writes`                    |
+| § 6 "Aujourd'hui / cette semaine", recommandations, essentiels                       | `patient-home-today`             |
+| § 6 « Je vais manger » / « J'ai mangé » · § 8                                        | `meal-entry`                     |
 | § 7 patient feedback (J'aime / Pas pour moi / Trop long / À refaire) · V2 favourites | `recipe-feedback-and-favourites` |
-| V2 patient onboarding (profile the patient completes) · § 7 profile inputs | `patient-profile-edit`  |
-| V2 "feedback régulier" + "Ma progression" · decision #9      | `check-in-and-progression`       |
+| V2 patient onboarding (profile the patient completes) · § 7 profile inputs           | `patient-profile-edit`           |
+| V2 "feedback régulier" + "Ma progression" · decision #9                              | `check-in-and-progression`       |
 
 ## Build order
 
