@@ -87,6 +87,8 @@ Admin is a tool, not a showcase. Density over polish: rows that show everything,
 fast, states that say what is actually happening. It uses the same design system as the product — so
 the two never drift — but it is allowed to be plainer.
 
-**Phone-usable is a requirement, not a nicety.** Morgane works from consultations, so the patient
-page is one scrolling column ordered by how often each block is reached, and the mobile nav carries
-the same links as the sidebar rather than a reduced set.
+**Phone-usable is a requirement, not a nicety.** Morgane works from consultations. The patient page
+opens on a working view — status, goals, instruction, summary head, last meals, main
+recommendations, a preparation note, and quick actions. Every other section is behind navigation: a
+section index on desktop, a segmented control on phone (Suivi · Journal · Dossier · Profil). Bodies
+of secondary sections are untouched.

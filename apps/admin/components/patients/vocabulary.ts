@@ -40,6 +40,28 @@ export const patientSexLabels: Record<PatientSex, string> = {
   unspecified: "non précisé",
 };
 
+/**
+ * The phone layout's four segments (R7, R11) — at most five per the spec, four
+ * here. They name the groups the secondary sections fall into, never content
+ * stored in the database, so they live as one local array with labels beside
+ * them. The keys ride in the URL (`?segment=…`); the labels are what Morgane
+ * reads.
+ */
+export const patientSegments = [
+  "suivi",
+  "journal",
+  "dossier",
+  "profil",
+] as const;
+export type PatientSegment = (typeof patientSegments)[number];
+
+export const segmentLabels: Record<PatientSegment, string> = {
+  suivi: "Suivi",
+  journal: "Journal",
+  dossier: "Dossier",
+  profil: "Profil",
+};
+
 /** How the consent was given — read on the profile and in the select. */
 export const consentChannelLabels: Record<ConsentChannel, string> = {
   consultation: "en consultation",
