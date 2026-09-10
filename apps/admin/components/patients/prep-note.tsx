@@ -1,6 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import {
+  useActionState,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
 import { Pencil } from "lucide-react";
 import { Input, Typography } from "@remi/ui/server";
 import { Button } from "@remi/ui";
@@ -17,6 +23,8 @@ type Props = {
 
 const EMPTY_PROMPT = "Ajouter une note pour la prochaine consultation.";
 
+const initial: PrepFormState = { error: null, saved: false };
+
 /**
  * The "à préparer pour la prochaine consultation" note — a nullable free-text
  * field on `patient_profiles`, written between consultations and revised at
@@ -29,13 +37,17 @@ export const PrepNote = ({ patientId, pseudonym, value }: Props) => {
   const [draft, setDraft] = useState(value ?? "");
   const [state, formAction, pending] = useActionState(
     updateNextConsultationPrepAction,
-    { error: null, saved: false },
+    initial,
   );
   const formRef = useRef<HTMLFormElement>(null);
 
+  const onSaved = useEffectEvent(() => {
+    setEditing(false);
+  });
+
   useEffect(() => {
     if (state.saved) {
-      setEditing(false);
+      onSaved();
     }
   }, [state.saved]);
 
