@@ -48,9 +48,11 @@ export const WorkingMeals = ({ entries, awaitingFeedback }: Props) => {
                 <Typography size="sm" tone="muted">
                   {formatDate(entry.eatenOn)}
                 </Typography>
-                <Badge variant="neutral" tone="subtle" size="sm">
-                  {mealSlotLabels[entry.slot]}
-                </Badge>
+                {entry.slot ? (
+                  <Badge variant="neutral" tone="subtle" size="sm">
+                    {mealSlotLabels[entry.slot]}
+                  </Badge>
+                ) : null}
                 {!answered ? (
                   <Badge variant="warning" tone="subtle" size="sm">
                     sans retour
