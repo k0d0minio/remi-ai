@@ -1,10 +1,9 @@
 import { Badge, Typography } from "@remi/ui/server";
-import { formatDate } from "@remi/services/shared";
-import type { PatientMealEntry } from "@remi/services/shared";
+import { formatDate, type MealEntry } from "@remi/services/shared";
 import { mealSlotLabels } from "@/components/patients/vocabulary";
 
 type Props = {
-  entries: readonly PatientMealEntry[];
+  entries: readonly MealEntry[];
   /** Already loaded for the journal card — re-read here, not listed again. */
   awaitingFeedback: number;
 };
