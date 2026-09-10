@@ -27,6 +27,7 @@ export {
   listPatients,
   recordPatientLinkOpened,
   regenerateShareToken,
+  setPatientNextConsultationPrep,
   updatePatient,
 } from "../db/services/patients";
 export type {
