@@ -1,3 +1,5 @@
+> Dropped: superseded by Morgane's feedback on the first version (2026-09-10) — the page is rebuilt around her consultation workflow in `practitioner-workflow/`, not re-laid as it stands. Research R1–R30 in this epic's `breakdown.md` still applies and is cited there.
+
 # Stub: Add surfaces — forms behind triggers, inline on desktop, a bottom sheet on the phone
 
 - feature-slug: add-surfaces
