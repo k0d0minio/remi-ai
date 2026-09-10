@@ -28,6 +28,7 @@ export {
   getPatientByShareToken,
   listPatients,
   regenerateShareToken,
+  setPatientNextConsultationPrep,
   updatePatient,
 } from "./services/patients";
 export type { PatientInput } from "./services/patients";

@@ -67,6 +67,7 @@ export const auditActions = [
   "instruction.cleared",
   "summary.updated",
   "summary.cleared",
+  "next_consultation_prep.updated",
   "share_link.regenerated",
   "share_link.emailed",
   "operator.invited",

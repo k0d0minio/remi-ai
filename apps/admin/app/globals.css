@@ -4,3 +4,20 @@
 /* Tell Tailwind to scan the shared package too — its class names live outside
    this app's tree, so without this the primitives ship unstyled. */
 @source "../../../packages/ui/src";
+
+/* The patient page's phone layout: four segments, one DOM order. Switching a
+   segment (from the segmented control, the URL, or a quick action) flips the
+   `data-segment` attribute on the page root; this media query turns that
+   attribute into show/hide. The sections always all render — on md and up these
+   rules stop applying and the single scroll is the layout. */
+@media (max-width: 767px) {
+  .patient-page [data-segment] {
+    display: none;
+  }
+  .patient-page[data-segment="suivi"] [data-segment="suivi"],
+  .patient-page[data-segment="journal"] [data-segment="journal"],
+  .patient-page[data-segment="dossier"] [data-segment="dossier"],
+  .patient-page[data-segment="profil"] [data-segment="profil"] {
+    display: block;
+  }
+}

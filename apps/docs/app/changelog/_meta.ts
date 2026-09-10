@@ -3,6 +3,7 @@
 // a new entry goes at the top of this object, which is what puts newest first.
 export default {
   index: "Overview",
+  "2026-09-10-at-a-glance-page": "The patient page, at a glance",
   "2026-09-03-goals-and-instruction":
     "Two or three goals, and the instruction that stands",
   "2026-09-03-meal-journal": "The meal journal, out of the chat thread",

@@ -50,6 +50,11 @@ export type PatientProfile = Entity & {
   supplements: string;
   referral: string;
   anamnesis: string;
+  /**
+   * What to remember to cover at the next consultation. Set from the working
+   * view; `null` = not set, the empty string is never stored.
+   */
+  nextConsultationPrep: string | null;
   /** When an operator last worked on the profile. Not `updatedAt`. */
   lastEditedAt: Date;
   /**

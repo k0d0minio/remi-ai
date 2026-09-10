@@ -42,6 +42,7 @@ import {
   sendEmail,
   setPatientAnamnesis,
   setPatientInstruction,
+  setPatientNextConsultationPrep,
   setPatientSummary,
   updateGoalCheckIn,
   updateMealEntry,
@@ -102,6 +103,7 @@ export type GoalFormState = { error: string | null };
 export type CheckInFormState = { error: string | null };
 export type InstructionFormState = { error: string | null; saved: boolean };
 export type SummaryFormState = { error: string | null; saved: boolean };
+export type PrepFormState = { error: string | null; saved: boolean };
 export type ShareFormState = { error: string | null; sent: boolean };
 
 const field = (formData: FormData, name: string) =>
@@ -1031,6 +1033,41 @@ export const setSummaryAction = async (
     await audit(operator, "summary.cleared", {
       type: "patient_summary",
       id: before.id,
+      label: field(formData, "pseudonym"),
+    });
+  }
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
+/**
+ * The "à préparer pour la prochaine consultation" note on the working view.
+ * Read-before-write mirrors the instruction and summary actions so a no-op
+ * save — same text, or an empty one on a patient who never had a note — does
+ * not mint an audit row for a non-event. `consultation-update` owns the
+ * clear-and-revise flow; this stays a minimal single-field update.
+ */
+export const updateNextConsultationPrepAction = async (
+  _previous: PrepFormState,
+  formData: FormData,
+): Promise<PrepFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const before = await getPatient(patientId);
+  const result = await setPatientNextConsultationPrep(
+    patientId,
+    field(formData, "body"),
+  );
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  const changed =
+    !before.ok ||
+    before.data.nextConsultationPrep !== result.data.nextConsultationPrep;
+  if (changed) {
+    await audit(operator, "next_consultation_prep.updated", {
+      type: "patient",
+      id: patientId,
       label: field(formData, "pseudonym"),
     });
   }

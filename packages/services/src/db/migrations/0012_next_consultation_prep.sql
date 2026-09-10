@@ -1,0 +1,1 @@
+ALTER TABLE "patient_profiles" ADD COLUMN "next_consultation_prep" text;

@@ -1,0 +1,20 @@
+# The patient page, at a glance
+
+_10 September 2026_
+
+Opening a patient's page used to mean scrolling one long column to find where the conversation
+actually stood. It now opens on what matters: the status line, the goals you're following with the
+most recent measure first, the instruction you set, the head of the living summary, the last meals,
+the main recommendations, and a note for the next consultation.
+
+What you will notice:
+
+- Goals read measure-first: the latest check-in's number, then whether it moved — mieux, stable,
+  moins bien — then the date.
+- A preparation note, « À préparer pour la prochaine consultation », right on the working view —
+  written inline, saved on blur, yours again at the next session.
+- Four quick actions at the bottom of the view — a consultation, a recommendation, a recipe, a
+  meal feedback — each drops you on the section it belongs to.
+- Everything else is behind navigation: a section index on desktop, a segmented control
+  (Suivi · Journal · Dossier · Profil) on phone. Segments live in the URL, so a link lands where
+  you left it.
