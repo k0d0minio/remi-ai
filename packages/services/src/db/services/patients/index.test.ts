@@ -9,6 +9,7 @@ import {
   listPatients,
   recordPatientLinkOpened,
   regenerateShareToken,
+  setPatientNextConsultationPrep,
   updatePatient,
 } from "./index";
 
@@ -434,5 +435,67 @@ describe("the share link's last-opened stamp", () => {
     await expect(
       recordPatientLinkOpened("not-a-uuid"),
     ).resolves.toBeUndefined();
+  });
+});
+
+describe("the next-consultation prep note", () => {
+  it("defaults to null on create", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "Prep" }));
+    expect(created.nextConsultationPrep).toBeNull();
+  });
+
+  it("sets the note and moves the operator edit stamp", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "Prep set" }));
+    const before = created.lastEditedAt.getTime();
+    await tick();
+
+    const updated = unwrapOk(
+      await setPatientNextConsultationPrep(
+        created.id,
+        "Revoir le petit déjeuner",
+      ),
+    );
+    expect(updated.nextConsultationPrep).toBe("Revoir le petit déjeuner");
+    expect(updated.lastEditedAt.getTime()).toBeGreaterThan(before);
+  });
+
+  it("clears with an empty string back to null", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "Prep clear" }));
+    await setPatientNextConsultationPrep(created.id, "quelque chose");
+    const cleared = unwrapOk(
+      await setPatientNextConsultationPrep(created.id, ""),
+    );
+    expect(cleared.nextConsultationPrep).toBeNull();
+  });
+
+  it("writes only the prep field and no sibling fields", async () => {
+    const created = unwrapOk(
+      await createPatient({ pseudonym: "Prep narrow", objective: "keep me" }),
+    );
+    const updated = unwrapOk(
+      await setPatientNextConsultationPrep(created.id, "noter la pesée"),
+    );
+    expect(updated.objective).toBe("keep me");
+    expect(updated.nextConsultationPrep).toBe("noter la pesée");
+  });
+
+  it("rejects an over-long note", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "Prep long" }));
+    const result = await setPatientNextConsultationPrep(
+      created.id,
+      "x".repeat(10_001),
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toBe("invalid_input");
+    }
+  });
+
+  it("ignores a malformed id", async () => {
+    const result = await setPatientNextConsultationPrep("not-a-uuid", "nope");
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toBe("not_found");
+    }
   });
 });
