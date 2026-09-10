@@ -4,4 +4,4 @@
 **What shipped:** A patient's page lands on the essentials — status, goals, instruction, summary head, last meals, main recommendations, a preparation note — everything else behind a section index (desktop) and a segmented control (phone).
 **Why it matters:** does REMI actually help a patient apply what their practitioner told them — the patient file is readable at a glance between consultations.
 
-Dig deeper: <merged-PR URL> · <changelog entry URL>
+Dig deeper: https://github.com/k0d0minio/remi-ai/pull/93 · https://documentation-r4lqk3hmw-remi21.vercel.app/changelog/2026-09-10-at-a-glance-page
