@@ -1,7 +1,7 @@
 # Stub: Bulk entry — several rows per save for recommendations, supplements and essentials
 
 - feature-slug: bulk-entry
-- sequence: 2 of 6
+- sequence: 3 of 7
 - depends-on: none
 - priority: P1
 - size: L

@@ -1,7 +1,7 @@
 # Stub: The at-a-glance page — a patient opens on the four questions, not on the schema
 
 - feature-slug: at-a-glance-page
-- sequence: 1 of 6
+- sequence: 1 of 7
 - depends-on: none
 - priority: P1
 - size: L

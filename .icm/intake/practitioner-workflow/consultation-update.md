@@ -1,7 +1,7 @@
 # Stub: Consultation update — one screen after the consultation, one save, a few minutes
 
 - feature-slug: consultation-update
-- sequence: 5 of 6
+- sequence: 6 of 7
 - depends-on: at-a-glance-page
 - priority: P1
 - size: M

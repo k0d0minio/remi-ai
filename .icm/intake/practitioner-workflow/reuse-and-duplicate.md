@@ -1,7 +1,7 @@
 # Stub: Reuse and duplicate — a protocol block copied from another patient or a template
 
 - feature-slug: reuse-and-duplicate
-- sequence: 4 of 6
+- sequence: 5 of 7
 - depends-on: bulk-entry, recipe-in-place
 - priority: P1
 - size: M

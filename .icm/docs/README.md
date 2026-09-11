@@ -115,6 +115,7 @@ still needed from her.
 - [`01-startup-boost.md`](correspondence/01-startup-boost.md) — the Startup Boost call and its criteria
 - [`02-onenote-and-tools.md`](correspondence/02-onenote-and-tools.md) — the OneNote handover and the tools question (Supabase, DigitalOcean, Mistral, Euria)
 - [`03-feedback-on-first-version.md`](correspondence/03-feedback-on-first-version.md) — the covering message for row 1: the console is unusable as it stands, the old version's logic is to be learned from not reproduced, AI-carried features tested now
+- [`04-reply-on-the-old-version.md`](correspondence/04-reply-on-the-old-version.md) — Jamie's answer to her four questions about the old version (keep / simplify / drop / rebuild), prepared for the 11 September call; draft until sent
 
 ### `RETENTION.md`
 

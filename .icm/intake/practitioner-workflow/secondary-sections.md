@@ -1,7 +1,7 @@
 # Stub: Secondary sections — anamnesis, profile, consent and history behind the working view
 
 - feature-slug: secondary-sections
-- sequence: 6 of 6
+- sequence: 7 of 7
 - depends-on: at-a-glance-page
 - priority: P1
 - size: S

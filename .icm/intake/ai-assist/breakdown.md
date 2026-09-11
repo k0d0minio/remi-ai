@@ -38,6 +38,13 @@ before it acts (summary draft, recipe check) and consciously set aside for meal 
 - **Every output is labelled** where a person sees it (« proposé par REMI ») and correctable by
   Morgane.
 
+## When it starts
+
+Mid-October (decision #14, 2026-09-11): after `patient-loop/link-writes` and `meal-entry`, so the
+first call has a slot to land in. The context block every prompt opens with is built earlier by
+`practitioner-workflow/copy-context` and reused here unchanged. Milestones in
+[`../README.md § Milestones`](../README.md): suggestions by 31 October, generation by 15 November.
+
 ## Build order
 
 1. `mistral-adapter` — the adapter, `generateJson`, the generation log, the env variable —

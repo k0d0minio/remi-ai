@@ -32,6 +32,29 @@ test on 1 December.
 
 One-off findings sit in [`triage/`](triage/); finished ones in its `_done/`.
 
+## Milestones
+
+Dated 2026-09-11 (decision #15 in
+[`practitioner-workflow/breakdown.md`](practitioner-workflow/breakdown.md)), for the call with
+Morgane and Arnaud that day. The two fixed points come from the direction letter: FunMedDev's team
+tests on **1 December**, the open day is **19 December**. Everything else is derived backwards at
+one stub a day, one person, agents in parallel where the epics allow it. A missed date is reported
+on the Friday call, not absorbed silently.
+
+| By           | Milestone                                                   | Stubs                                                                                                                               |
+| ------------ | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| 30 September | **Console usable for Morgane** — her § 9.1 to 9.4           | `practitioner-workflow/*` (copy-context, bulk-entry, recipe-in-place, reuse-and-duplicate, consultation-update, secondary-sections) |
+| 15 October   | **The patient writes into the link** — home, meals, recipes | `patient-loop/link-writes`, `patient-home-today`, `meal-entry`, `recipe-feedback-and-favourites`                                    |
+| 31 October   | **REMI answers a meal** — Mistral live, her knowledge in    | `nutrition-knowledge/*`, `ai-assist/mistral-adapter`, `meal-suggestions` · `free-text-to-rows` P2 re-examined here                  |
+| 15 November  | **REMI proposes recipes** — the loop closes                 | `ai-assist/recipe-generation`, `summary-draft`, `patient-loop/patient-profile-edit`, `check-in-and-progression`                     |
+| 30 November  | **Freeze** — fixes only until the open day                  | triage                                                                                                                              |
+| 1 December   | FunMedDev's team tests                                      | —                                                                                                                                   |
+| 19 December  | Open day                                                    | —                                                                                                                                   |
+
+Mistral starts mid-October by choice, not by capacity (decision #14): a suggestion needs a meal
+entry to land in, and a generated recipe needs the library-and-assign path. Until then Morgane
+tests generation through `copy-context` with the model she already uses.
+
 ## Open questions are deliberate
 
 Every stub carries an **"Open questions — flag these on pickup"** section, and every prompt ends
