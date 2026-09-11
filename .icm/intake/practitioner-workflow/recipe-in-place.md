@@ -1,7 +1,7 @@
 # Stub: Recipes in place — create, adapt and assign from the patient page
 
 - feature-slug: recipe-in-place
-- sequence: 3 of 6
+- sequence: 4 of 7
 - depends-on: none
 - priority: P1
 - size: M

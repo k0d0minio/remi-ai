@@ -8,8 +8,9 @@
 - sources: feedback § 5 ("Ensuite, l'IA pourra améliorer ce fonctionnement" — the omega-3 /
   magnesium / vitamin D example) · braindump `developpement-produit/ai.md` (the recommendations
   parser) · decision #8 (**excluded from the first AI round, Jamie 2026-09-10** — parked here so
-  it is not lost; lifting the P2 is an owner decision, not a pickup) · cross-epic:
-  `practitioner-workflow/bulk-entry` (the grid it fills)
+  it is not lost; lifting the P2 is an owner decision, not a pickup) · decision #14 (2026-09-11:
+  the reason is "grid first so the model has a slot to fill"; re-examined at the 31 October
+  milestone) · cross-epic: `practitioner-workflow/bulk-entry` (the grid it fills)
 
 ## What this is
 
