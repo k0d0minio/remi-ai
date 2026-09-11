@@ -98,7 +98,7 @@ preparation of that call:
 | Feedback section                                            | Stub                  | Note                                                               |
 | ----------------------------------------------------------- | --------------------- | ------------------------------------------------------------------ |
 | § 4 first screen · § 9.1                                    | `at-a-glance-page`    | the page opens on the working view; details behind it              |
-| § 9.4 aside · covering message "dès maintenant"              | `copy-context`        | the patient's context as a prompt, one button, no model            |
+| § 9.4 aside · covering message "dès maintenant"             | `copy-context`        | the patient's context as a prompt, one button, no model            |
 | § 5 bulk entry · § 2 row 2 · § 9.3                          | `bulk-entry`          | several rows per save for recommendations, supplements, essentials |
 | § 2 row 5 · § 7 "attribuer directement" · § 9.4             | `recipe-in-place`     | create + assign from the patient page; duplicate as variant        |
 | § 5 "duplication / réutilisation"                           | `reuse-and-duplicate` | copy a protocol block from another patient or a personal template  |
