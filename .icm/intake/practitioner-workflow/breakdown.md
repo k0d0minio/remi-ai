@@ -73,11 +73,32 @@ says so; the rest of that list still stands, as does the brainstorm's § 7 what-
 12. **The meal journal stays text-only** (2026-09-01 #6 stands); photos are parked pending a blob
     vendor — an owner decision, never made in passing.
 
+## Decisions of record (Jamie, 2026-09-11 — before the call with Morgane and Arnaud)
+
+The twelve above were taken the day the feedback arrived and had not left the repository; the
+call of 11 September is where Morgane and Arnaud confirm or overturn them. Three more, from the
+preparation of that call:
+
+13. **A bridge for "tester dès maintenant" that calls no model: `copy-context`.** Her § 9.4 aside
+    — she already generates with ChatGPT from a hand-typed profile — becomes one button that
+    exports the patient's pseudonymous context as a prompt. Its assembler is the context block
+    every `ai-assist` prompt opens with, built first and reused, so the bridge is not throwaway.
+    Sequence 2 of this epic; the rest renumbered.
+14. **The AI order stands, with its reason written down.** Grids and slots first so the model has
+    somewhere to fill; `free-text-to-rows` stays P2 for that reason and is re-examined at the
+    31 October milestone, not before. Mistral starts mid-October, once `patient-loop/link-writes`
+    and `meal-entry` exist for suggestions to land in. Not "AI later" — "AI into slots that exist".
+15. **The backlog carries dates.** Five milestones to 1 December are in
+    [`.icm/intake/README.md § Milestones`](../README.md); a stub's epic tells the milestone it
+    serves. One person runs the agents, in parallel where the epics allow it and serially where
+    they do not; the dates assume yesterday's pace, one stub a day.
+
 ## Feedback § → stub
 
 | Feedback section                                            | Stub                  | Note                                                               |
 | ----------------------------------------------------------- | --------------------- | ------------------------------------------------------------------ |
 | § 4 first screen · § 9.1                                    | `at-a-glance-page`    | the page opens on the working view; details behind it              |
+| § 9.4 aside · covering message "dès maintenant"             | `copy-context`        | the patient's context as a prompt, one button, no model            |
 | § 5 bulk entry · § 2 row 2 · § 9.3                          | `bulk-entry`          | several rows per save for recommendations, supplements, essentials |
 | § 2 row 5 · § 7 "attribuer directement" · § 9.4             | `recipe-in-place`     | create + assign from the patient page; duplicate as variant        |
 | § 5 "duplication / réutilisation"                           | `reuse-and-duplicate` | copy a protocol block from another patient or a personal template  |
@@ -87,26 +108,31 @@ says so; the rest of that list still stands, as does the brainstorm's § 7 what-
 ## Build order
 
 1. `at-a-glance-page` — the working view Morgane opens on; the frame every other stub lands in —
-   depends-on: none
-2. `bulk-entry` — multi-row editing with one save per section — depends-on: none
-3. `recipe-in-place` — create, adapt and assign a recipe from the patient page — depends-on: none
-4. `reuse-and-duplicate` — copy recommendations, supplements, essentials and recipes across
+   depends-on: none — **shipped 2026-09-10 (#93)**
+2. `copy-context` — the patient's context exported as a prompt, one button; the context assembler
+   `ai-assist` reuses — depends-on: none
+3. `bulk-entry` — multi-row editing with one save per section — depends-on: none
+4. `recipe-in-place` — create, adapt and assign a recipe from the patient page — depends-on: none
+5. `reuse-and-duplicate` — copy recommendations, supplements, essentials and recipes across
    patients — depends-on: bulk-entry, recipe-in-place
-5. `consultation-update` — the "Nouvelle consultation" flow: note, check-ins, instruction, summary
+6. `consultation-update` — the "Nouvelle consultation" flow: note, check-ins, instruction, summary
    revision, next-time prep in one screen — depends-on: at-a-glance-page
-6. `secondary-sections` — anamnesis, full profile, consent, sensitive zone behind the working view;
+7. `secondary-sections` — anamnesis, full profile, consent, sensitive zone behind the working view;
    archived rows folded with counts — depends-on: at-a-glance-page
+
+Milestone: the whole epic by **30 September** (README § Milestones).
 
 ## Parallelizable
 
-1, 2 and 3 are independent and can run in three sessions at once; they touch different components
-(`page.tsx` + a new working view; the three add forms + batch actions; the recipe forms). 4 waits
-for 2 and 3 because it reuses their multi-row and variant surfaces. 5 and 6 wait for 1 because
-they are placed by it.
+2, 3 and 4 are independent and can run in three sessions at once; they touch different components
+(a quick action + a services function; the three add forms + batch actions; the recipe forms). 5
+waits for 3 and 4 because it reuses their multi-row and variant surfaces. 6 and 7 wait for 1,
+which has shipped.
 
 ## Out of scope (whole epic)
 
 - Anything the patient sees (`patient-loop`), anything AI (`ai-assist`).
 - A practitioner app, practitioner accounts, sign-up, billing (`beyond-december`).
 - The roster (`/patients`) beyond a link into the new first screen.
-- "Free text → structured rows" — decision #8.
+- "Free text → structured rows" — decisions #8 and #14. `copy-context` is not it: the text goes
+  out to a model of her choosing and nothing comes back into a field.

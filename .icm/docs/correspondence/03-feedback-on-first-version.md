@@ -58,5 +58,6 @@ after the manual base is complete.
 
 The decisions of record that turned this feedback into the backlog live in
 [`.icm/intake/practitioner-workflow/breakdown.md § Decisions`](../../intake/practitioner-workflow/breakdown.md)
-and bind every epic cut that day. The reply to her four questions about the old version was sent
-in the conversation, not filed here.
+and bind every epic cut that day. The reply to her four questions about the old version was given
+in a Claude session and never sent; it is now filed as [04](04-reply-on-the-old-version.md), a
+draft for the 11 September call.
