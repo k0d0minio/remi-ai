@@ -1,7 +1,8 @@
 # Build notes: recipe-in-place
 
-- commits: see the branch — services layer, migration, admin surfaces, tests
-- ci: established with `ci-status.sh recipe-in-place` after the last push (below)
+- commits: bbaf6be (services layer, migration, admin surfaces, tests) · 2b293a9 (prettier)
+- ci: GREEN on 2b293a9 (ci-status.sh, after the last push) — 8 blocking checks, all pass
+- tests: 218 passed across 19 files (`pnpm --filter @remi/services test`)
 
 ## What changed
 
