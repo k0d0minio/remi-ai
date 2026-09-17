@@ -35,6 +35,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
+    "ciqual:import": "node scripts/ciqual-import.mjs",
+    "ciqual:fixture": "node scripts/ciqual-fixture.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node scripts/migrate.mjs",
     "lint": "eslint .",
