@@ -21,7 +21,8 @@
   new actions guard with `requireOperator()`; every input is validated by zod in the service layer;
   no new route, no `app/api/` change; the audit label carries the patient's pseudonym, which is the
   non-identifying handle the console already uses for `patient.created`.
-- parked: neon-websocket-driver-transactions.md · db-migrate-connection-retry.md
+- parked: neon-websocket-driver-transactions.md · db-migrate-connection-retry.md ·
+  previews-migrate-the-shared-database.md
 - technical docs: no technical docs impact — no page enumerates tables or migrations, and the
   entrypoint catalogue in `technical/packages` is unchanged by adding one shared symbol.
 - business docs: `business/initiatives` — the "practitioner space is parked" bullet was false as of
@@ -84,6 +85,31 @@
 - `apps/docs/app/changelog/_meta.ts` — four entries dated 2026-09-17 now; kept all four.
 
 252 tests pass on the merged tree, and the audit vocabulary covers all 73 actions.
+
+## The admin preview, diagnosed properly
+
+It failed twice, and my first reading of it was wrong. Recorded because the wrong reading is the
+instructive part.
+
+**First failure (`b2af5e1`)** was a genuine connection drop — `Error: Connection terminated
+unexpectedly` out of the Neon websocket, with no SQL named. I called it transient and, on that
+evidence, it was.
+
+**Second failure (`1915c92`)** landed at the same step with no connection error at all, which
+falsified "transient". The cause was this branch's own doing: the preview deploy of `2b293a9` had
+already applied `variant_of_id` to the **shared** database under the migration's first number.
+Merging `main` forced a regeneration to `0014` with a fresh `when`; drizzle decides by high-water
+mark and never by hash, so it read as unapplied, re-ran `ADD COLUMN` against a column that already
+existed, and failed with 42701 before `next build` ran.
+
+Fixed the way `migrate.mjs` prescribes for exactly this: the migration is now idempotent —
+`ADD COLUMN IF NOT EXISTS` plus a `duplicate_object` catch on the constraint. It no-ops where the
+column landed early and applies in full to a database that has never seen it.
+
+That repairs this PR. The thing underneath it is parked as
+`previews-migrate-the-shared-database.md`: `migrate.mjs` carries a guard against previews migrating,
+the admin project does not have it in force, and a preview that pollutes the database is the one
+that goes green — the cost lands on someone else's build later.
 
 ## Why this run stopped short of the merge
 
