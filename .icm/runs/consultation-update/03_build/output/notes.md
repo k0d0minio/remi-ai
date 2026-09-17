@@ -1,8 +1,9 @@
 # Build notes: consultation-update
 
 - commits: `30b7853` (services — the transaction and the composed write) ·
-  `dc3b192` (admin — the screen, the action, the quick action)
-- ci: _established after the push_
+  `dc3b192` (admin — the screen, the action, the quick action) · `c0c5629` (format `spec.md`) ·
+  `2aa05ee` (drop an unused import) · `32e0a5e` (derive the restored draft)
+- ci: GREEN (`ci-status.sh`, after the last push)
 
 ## What changed
 
@@ -57,6 +58,11 @@
   comparison, and no `exhaustive-deps` warning to suppress (CI's lint ceiling is zero warnings).
 - **Check-ins are dated with the consultation**, not with today: `checkedOn` comes from the note's
   `occurredAt`, so writing up yesterday's session dates its check-ins yesterday.
+- **The restored draft is derived, not state.** `react-hooks/set-state-in-effect` is an error in
+  this repo, and reading the store on mount into `setState` is exactly what it forbids. The read is
+  a `useSyncExternalStore` with `getServerSnapshot: () => null` — the one API that lets the server
+  (which has no draft) and the browser (which may) disagree without a hydration mismatch. What she
+  has typed is the only state; the restored draft and its notice fall out of it.
 
 ## Acceptance criteria status
 
