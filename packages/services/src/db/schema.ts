@@ -1,6 +1,7 @@
 import {
   date,
   doublePrecision,
+  index,
   integer,
   pgTable,
   text,
@@ -631,6 +632,90 @@ export const auditEvents = pgTable("audit_events", {
   /** How the target read at the time — a pseudonym, an email, a title. */
   targetLabel: text("target_label").notNull().default(""),
   detail: text("detail").notNull().default(""),
+  ...timestamps,
+});
+
+/**
+ * CIQUAL — ANSES's food-composition table, imported as reference data.
+ *
+ * Not patient data: no care-relationship scoping, no audit trail, no cascade.
+ * It is a public dataset (Etalab 2.0) that the recipe step queries, and the
+ * three tables below are shaped by the one constraint the storage seam imposes:
+ * `Collection.findMany` takes an exact-match filter and nothing else, so there
+ * is no join to lean on. Group and component names are therefore denormalised
+ * onto the rows that display them. That is the seam's shape, not a shortcut.
+ */
+export const foods = pgTable("foods", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  /** CIQUAL's own `alim_code` — the natural key the import upserts on. */
+  code: text("code").notNull().unique(),
+  nameFr: text("name_fr").notNull(),
+  nameEn: text("name_en").notNull().default(""),
+  /**
+   * `name_fr` lowercased with its accents stripped. Search matches on this
+   * rather than on a Postgres collation or the `unaccent` extension, so the
+   * in-memory client the service tests run against behaves identically to Neon
+   * — the seam is only honest if both sides answer the same question.
+   */
+  searchName: text("search_name").notNull(),
+  groupCode: text("group_code").notNull(),
+  groupNameFr: text("group_name_fr").notNull(),
+  subGroupCode: text("sub_group_code").notNull().default(""),
+  subGroupNameFr: text("sub_group_name_fr").notNull().default(""),
+  ...timestamps,
+});
+
+/**
+ * One food's value for one component, per 100 g.
+ *
+ * CIQUAL's `teneur` is not always a number: 83 246 cells read `-` (not
+ * determined), 2 514 read `traces`, and some seventeen thousand read `< x`
+ * (below the limit of quantification). Coercing those to 0 would silently rank
+ * an unmeasured food alongside a measured one, so the marker is stored beside
+ * the value and `raw_value` keeps the publisher's own string.
+ */
+export const foodNutrients = pgTable(
+  "food_nutrients",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** CIQUAL's `alim_code`, not our uuid — the importer works in CIQUAL's keys. */
+    foodCode: text("food_code").notNull(),
+    componentCode: text("component_code").notNull(),
+    componentNameFr: text("component_name_fr").notNull(),
+    unit: text("unit").notNull().default(""),
+    /** Null when the marker is `not_determined` — absent, not zero. */
+    value: doublePrecision("value"),
+    /** `exact` | `traces` | `less_than` | `not_determined`. */
+    marker: text("marker").notNull().default("exact"),
+    rawValue: text("raw_value").notNull().default(""),
+    /** CIQUAL's confidence code: A, B, C or D. */
+    confidence: text("confidence").notNull().default(""),
+    ...timestamps,
+  },
+  (table) => [
+    unique().on(table.foodCode, table.componentCode),
+    // A rank reads one component's column across every food — 3 484 rows out
+    // of 257 816. Without this it is a sequential scan per ranked component.
+    index().on(table.componentCode),
+  ],
+);
+
+/**
+ * One row per run of the import script: which edition landed, how much of it,
+ * and the checksums of the files it came from.
+ *
+ * The console reads the newest row to say « N aliments importés », and the
+ * checksums are what tells a later operator whether the database holds the
+ * export they have in their hands.
+ */
+export const ciqualImports = pgTable("ciqual_imports", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  /** The publisher's edition label, e.g. "Ciqual 2025". */
+  edition: text("edition").notNull(),
+  foodCount: integer("food_count").notNull().default(0),
+  nutrientCount: integer("nutrient_count").notNull().default(0),
+  /** `<file>:<sha256>` per source file, newline-separated. */
+  sourceChecksums: text("source_checksums").notNull().default(""),
   ...timestamps,
 });
 

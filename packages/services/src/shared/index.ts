@@ -12,6 +12,7 @@ export {
   formatCurrency,
   formatDate,
   formatDateTime,
+  formatNumber,
   initials,
 } from "./format";
 export {
@@ -38,6 +39,13 @@ export {
   patientStatuses,
   recommendationCategories,
 } from "./patient";
+export {
+  componentsForRecommendation,
+  normaliseNutritionText,
+  nutrientComponentByKey,
+  nutrientComponents,
+} from "./nutrition";
+export type { NutrientComponent, NutrientDirection } from "./nutrition";
 export { variantTitle, VARIANT_SUFFIX } from "./recipe";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
@@ -52,15 +60,20 @@ export type {
   AssignedRecipe,
   AuditAction,
   AuditEvent,
+  CiqualImport,
+  ConfidenceCode,
   ConsentChannel,
   Consultation,
   CookingAffinity,
+  Food,
+  FoodNutrient,
   FramePrinciple,
   GenotypeMarker,
   GoalDirection,
   HabitsProfile,
   MealEntry,
   MealSlot,
+  NutrientMarker,
   OperatorRole,
   PantryEssential,
   PatientAnamnesis,
