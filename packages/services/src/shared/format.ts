@@ -17,6 +17,28 @@ export const formatCurrency = (
     amountInMinorUnits / 100,
   );
 
+/**
+ * A number with its locale's grouping — `3 484` in French, `3,484` in English.
+ *
+ * `fractionDigits` is fixed rather than maximum, because a column of nutrient
+ * values that alternates between `0,5` and `12` reads as noise; the console
+ * passes the precision the component's unit deserves.
+ */
+export const formatNumber = (
+  value: number,
+  locale = DEFAULT_LOCALE,
+  fractionDigits?: number,
+) =>
+  new Intl.NumberFormat(
+    locale,
+    fractionDigits === undefined
+      ? {}
+      : {
+          minimumFractionDigits: fractionDigits,
+          maximumFractionDigits: fractionDigits,
+        },
+  ).format(value);
+
 export const formatDate = (value: Date | string, locale = DEFAULT_LOCALE) =>
   new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
     typeof value === "string" ? new Date(value) : value,

@@ -1,4 +1,11 @@
-import { ChefHat, Home, ScrollText, Users, UsersRound } from "lucide-react";
+import {
+  Carrot,
+  ChefHat,
+  Home,
+  ScrollText,
+  Users,
+  UsersRound,
+} from "lucide-react";
 import type { ComponentType } from "react";
 
 export type NavItem = {
@@ -15,7 +22,7 @@ export type NavSection = {
 };
 
 /**
- * The console's whole surface. It is deliberately five rows: this console is
+ * The console's whole surface. It is deliberately six rows: this console is
  * Morgane's patient tool and the accounts that reach it, and nothing else. The
  * practitioner, pilot, support and flag screens that used to live here were
  * fixtures with no data behind them — they were deleted rather than hidden.
@@ -36,6 +43,9 @@ export const navSections: readonly NavSection[] = [
       // Beside Patients rather than under one: the library belongs to no
       // patient, which is the whole reason it is a library.
       { href: "/recipes", label: "Recettes", icon: ChefHat },
+      // Reference data rather than a patient's: the CIQUAL table, read-only,
+      // so a number the recipe step will use can be checked by hand.
+      { href: "/aliments", label: "Aliments", icon: Carrot },
     ],
   },
   {

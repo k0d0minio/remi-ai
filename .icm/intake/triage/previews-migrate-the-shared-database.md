@@ -9,6 +9,28 @@
 
 ## Problem
 
+> **Second confirmation, 2026-09-17 — `ciqual-import` (#102).** The same thing happened again,
+> independently: that branch's preview created `foods`, `food_nutrients` and `ciqual_imports` in the
+> shared database before anything merged, and they are there now. Its own duplicate of this stub
+> was folded in here rather than kept beside it. Two details it adds:
+>
+> - Vercel's « set on your Vercel project, but missing from turbo.json » warning in those builds
+>   lists the `POSTGRES_*` / `PG*` / `NEON_*` names but **not** `VERCEL_ENV`, and both `VERCEL_ENV`
+>   and `ALLOW_NON_PRODUCTION_MIGRATIONS` are in `turbo.json`'s `globalEnv`. That narrows it: either
+>   `VERCEL_ENV` is absent from the environment the turbo task spawns, or the opt-out is set on the
+>   project and `.icm/docs/ENV.md`'s « Unset everywhere » is stale. One screen in Vercel decides it.
+> - Whichever it is, the guard should **fail closed**. It currently reads an absent `VERCEL_ENV` as
+>   "not on Vercel, so this is a developer's own database — go ahead"; on Vercel that reasoning
+>   inverts, because absent means the variable did not arrive and migrating is the dangerous branch.
+> - Two PRs have now been renumbered by this, which means the high-water mark moves far more often
+>   than merges alone would — so this makes
+>   [`parallel-migrations-journal-ordering`](parallel-migrations-journal-ordering.md) fire more,
+>   rather than being a separate nuisance.
+>
+> Still open on either side: whether the tables `ciqual-import`'s preview created ahead of its merge
+> were deliberate. They are empty and their migration is written `IF NOT EXISTS`, so they are
+> harmless — the point is that nobody chose them.
+
 `scripts/migrate.mjs` carries a guard that refuses to migrate from a non-production Vercel deploy,
 and its header explains why in the strongest terms — a preview writing the branch's schema into the
 live database is how, on 2026-09-02, a table appeared there and pushed drizzle's high-water mark
