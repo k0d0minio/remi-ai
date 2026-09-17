@@ -1,8 +1,25 @@
 # Build notes: copy-context
 
-- commits: see the branch — one for the assembler + its test, one for the console surface, one for
-  the docs and retention paragraph
-- ci: pending the first push (this file is what moves the board to `stage:build`)
+- commits: `fbaa399` the assembler + its test · `6a8f233` the console surface · `b378d3a` the docs,
+  the entrypoint rule and the retention line · `b6c0780` format `spec.md` · `f1229b3` label the new
+  audit action
+- ci: GREEN on `f1229b3` (`ci-status.sh`, after the last push)
+
+## Two red rounds, and what they were
+
+Worth reading, because neither was a flake and one of them was the codebase
+catching me:
+
+1. **`format:check`** failed on `.icm/runs/copy-context/02_define/output/spec.md`. `new-run.sh`
+   commits the run without going through lint-staged, so the spec it committed at Define had never
+   met prettier — nothing to do with this build's code. Fixed by staging the file so Husky
+   formatted it; the diff is the block table's column alignment and nothing else. **This will
+   recur on every run** unless `new-run.sh` formats what it commits; I have not changed the script,
+   since that is a factory change outside this spec.
+2. **`typecheck`** failed on `apps/admin/components/audit/vocabulary.ts`: adding `context.exported`
+   to the closed `auditActions` list without adding its label and intent is a type error. That is
+   the closed list doing exactly what its own comment says it is for, and the fix is the two
+   entries it wanted.
 
 ## What changed
 
