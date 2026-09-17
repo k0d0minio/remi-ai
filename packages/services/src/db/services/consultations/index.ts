@@ -1,4 +1,4 @@
-import { err, ok, type Result } from "../../../shared/result";
+import { ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase } from "../../client";
 import type { PatientGoalCheckIn } from "../../models/patient-goal-check-in";
