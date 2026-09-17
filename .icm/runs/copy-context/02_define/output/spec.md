@@ -52,15 +52,15 @@ patientContextText(input: PatientContextInput, options?: PatientContextOptions):
 
 ### The blocks
 
-| Block                | Source                                                    | Default |
-| -------------------- | --------------------------------------------------------- | ------- |
-| `profil`             | pseudonym · age · sex · `objective` · `dietaryRegime` · `allergies` · `intolerances` · `constraints` · `preferences` · `likesCooking` · `foodBudget` · `medications` · `supplements` (the prose field — what the patient takes outside the protocol) | on |
-| `objectifs`          | active `PatientGoal[]` — title, and `baseline` where set  | on      |
-| `consigne`           | the active `PatientInstruction.body`                      | on      |
-| `recommandations`    | active `PatientRecommendation[]`, grouped by category in the existing category order, each `title` with its `detail` | on |
-| `complements`        | active `PatientSupplement[]` — « nom · dose · moment », `reason` where set | on |
-| `essentiels`         | active `PantryEssential[]` — `item`, and `why` where set   | on      |
-| `resume`             | `PatientSummary.body`, whole                               | **off** |
+| Block             | Source                                                                                                                                                                                                                                               | Default |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `profil`          | pseudonym · age · sex · `objective` · `dietaryRegime` · `allergies` · `intolerances` · `constraints` · `preferences` · `likesCooking` · `foodBudget` · `medications` · `supplements` (the prose field — what the patient takes outside the protocol) | on      |
+| `objectifs`       | active `PatientGoal[]` — title, and `baseline` where set                                                                                                                                                                                             | on      |
+| `consigne`        | the active `PatientInstruction.body`                                                                                                                                                                                                                 | on      |
+| `recommandations` | active `PatientRecommendation[]`, grouped by category in the existing category order, each `title` with its `detail`                                                                                                                                 | on      |
+| `complements`     | active `PatientSupplement[]` — « nom · dose · moment », `reason` where set                                                                                                                                                                           | on      |
+| `essentiels`      | active `PantryEssential[]` — `item`, and `why` where set                                                                                                                                                                                             | on      |
+| `resume`          | `PatientSummary.body`, whole                                                                                                                                                                                                                         | **off** |
 
 Seven blocks, six on by default: the default paste is the protocol, not the file. `resume` is the
 one block off by default — it is the longest and the most clinical, and a recipe prompt rarely
