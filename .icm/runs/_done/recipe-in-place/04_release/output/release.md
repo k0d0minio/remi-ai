@@ -18,7 +18,7 @@
   new actions guard with `requireOperator()`; every input is validated by zod in the service layer;
   no new route, no `app/api/` change; the audit label carries the patient's pseudonym, which is the
   non-identifying handle the console already uses for `patient.created`.
-- parked: neon-websocket-driver-transactions.md
+- parked: neon-websocket-driver-transactions.md · db-migrate-connection-retry.md
 - technical docs: no technical docs impact — no page enumerates tables or migrations, and the
   entrypoint catalogue in `technical/packages` is unchanged by adding one shared symbol.
 - business docs: `business/initiatives` — the "practitioner space is parked" bullet was false as of
@@ -62,6 +62,14 @@
       pass-through `transaction` on both adapters, a rollback test passes without proving
       anything, so it was not written rather than written to mislead. It is in the triage stub's
       acceptance list. 221 tests pass across 20 files.
+
+## Note on the admin preview failure
+
+The admin deploy of `b2af5e1` failed before `next build` ran: `pnpm db:migrate` lost its websocket
+to Neon (`Error: Connection terminated unexpectedly`). Not this diff's — the identical migration
+set had applied cleanly on `2b293a9` against the same database an hour earlier, the other five
+previews passed, and no SQL statement is named in the failure. Parked as
+`db-migrate-connection-retry.md`, which is a real gap: `migrate.mjs` retries nothing.
 
 ## Note on the two unmet criteria
 
