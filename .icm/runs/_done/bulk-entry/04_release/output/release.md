@@ -1,7 +1,8 @@
 # Release: bulk-entry
 
 - gate: Ready to merge ticked — merge authorised
-- ci: GREEN on `f26fdf3` (ci-status.sh, after the close-out push)
+- ci: GREEN on `5771b53` (ci-status.sh, after the last push — a second `main` merge landed
+  after the close-out, so the archived run carries it)
 - pr: [#97](https://github.com/k0d0minio/remi-ai/pull/97) · merged: yes — squash, 2026-09-17
 - code-review: high (complexity: complex) — 3 findings, all fixed on this branch; none parked
 - production-readiness: run — no new environment variable, no migration, no adapter registration
