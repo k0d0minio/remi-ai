@@ -3,6 +3,7 @@
 // a new entry goes at the top of this object, which is what puts newest first.
 export default {
   index: "Overview",
+  "2026-09-17-bulk-entry": "A whole protocol in one save, not thirty",
   "2026-09-17-recipe-in-place": "Recipes, written and given where you are",
   "2026-09-17-consultation-update": "Writing up a consultation, in one go",
   "2026-09-17-link-writes": "The patient link is no longer read-only",
