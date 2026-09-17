@@ -25,10 +25,11 @@ const ACTIONS: readonly Action[] = [
   },
   { label: "Proposer une recette", targetId: "recipes", segment: "dossier" },
   { label: "Ajouter un retour repas", targetId: "meals", segment: "journal" },
+  { label: "Copier le contexte", targetId: "copy-context", segment: "suivi" },
 ];
 
 /**
- * The working view's four quick actions. Each lands on its section's add form;
+ * The working view's five quick actions. Each lands on its section's add form;
  * when that section lives in another phone segment, it switches the segment
  * first (same mechanism as the segmented control — the URL and the root's
  * data-segment) and scrolls once the section is back in the layout.

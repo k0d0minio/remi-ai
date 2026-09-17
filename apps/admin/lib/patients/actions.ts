@@ -1256,3 +1256,26 @@ export const saveAnamnesisAction = async (
   revalidatePatient(patientId);
   return { error: null };
 };
+
+/**
+ * Records that a patient's context left the console. Nothing is written to the
+ * patient's record and nothing is revalidated — the only effect is the trail
+ * line, which is why this takes the blocks rather than returning anything: what
+ * left matters as much as that something left.
+ *
+ * `recordAuditEvent` swallows its own failures, so a copy is never blocked by a
+ * trail that cannot be written (see the service).
+ */
+export const recordContextExportAction = async (
+  patientId: string,
+  blocks: readonly string[],
+) => {
+  const operator = await requireOperator();
+  const found = await getPatient(patientId);
+  await audit(operator, "context.exported", {
+    type: "patient",
+    id: patientId,
+    label: found.ok ? found.data.pseudonym : "",
+    detail: blocks.join(", "),
+  });
+};
