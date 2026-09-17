@@ -39,6 +39,9 @@ import {
   patientLinkEmail,
   regenerateShareToken,
   removeRecipeAssignment,
+  savePantryEssentials,
+  savePatientRecommendations,
+  savePatientSupplements,
   sendEmail,
   setPatientAnamnesis,
   setPatientInstruction,
@@ -55,6 +58,7 @@ import {
   updatePatientSupplement,
   updateRecipeAssignment,
   type PatientInput,
+  type SectionSaveCounts,
 } from "@remi/services/server";
 import {
   appHref,
@@ -1255,4 +1259,151 @@ export const saveAnamnesisAction = async (
   });
   revalidatePatient(patientId);
   return { error: null };
+};
+
+/**
+ * The whole-section saves — one submit per section, against the batch service
+ * functions. The single-row actions above stay exactly as they are: they are
+ * the quick-add Morgane uses from a phone between two patients, and the
+ * patient-loop writes through them too.
+ */
+export type SectionSaveState = { error: string | null; saved: boolean };
+
+/**
+ * Read the submitted rows out of a section form.
+ *
+ * Every row emits one input per field — including an empty `row-id` for a row
+ * the operator just added — so `getAll` hands back each column in DOM order
+ * and the columns line up index for index. That is what lets the order of the
+ * rows in the form *be* the order she chose, with no index bookkeeping in the
+ * field names and nothing that breaks when a row is removed from the middle.
+ */
+const sectionRows = <TField extends string>(
+  formData: FormData,
+  fields: readonly TField[],
+): Record<TField, string>[] => {
+  const columns = new Map<TField, string[]>(
+    fields.map((name) => [
+      name,
+      formData.getAll(`row-${name}`).map((value) => String(value)),
+    ]),
+  );
+  const height = Math.min(
+    ...fields.map((name) => columns.get(name)?.length ?? 0),
+  );
+  return Array.from({ length: height }, (_unused, index) =>
+    Object.fromEntries(
+      fields.map((name) => [name, columns.get(name)?.[index] ?? ""]),
+    ),
+  ) as Record<TField, string>[];
+};
+
+/** An id is only an id once there is one — a new row submits an empty string. */
+const rowId = (value: string) => (value.length > 0 ? value : undefined);
+
+/** How the save reads in the journal: the counts, in the console's language. */
+const countsSummary = (counts: SectionSaveCounts) =>
+  [
+    counts.added > 0 ? `${counts.added} ajoutée(s)` : null,
+    counts.updated > 0 ? `${counts.updated} modifiée(s)` : null,
+    counts.archived > 0 ? `${counts.archived} archivée(s)` : null,
+    counts.reordered > 0 ? `${counts.reordered} déplacée(s)` : null,
+  ]
+    .filter((part) => part !== null)
+    .join(", ") || "aucun changement";
+
+export const saveRecommendationSectionAction = async (
+  _previous: SectionSaveState,
+  formData: FormData,
+): Promise<SectionSaveState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const rows = sectionRows(formData, ["id", "category", "title", "detail"]);
+
+  const result = await savePatientRecommendations(
+    patientId,
+    rows.map((row) => ({
+      id: rowId(row.id),
+      category: asCategory(row.category),
+      title: row.title,
+      detail: row.detail,
+    })),
+  );
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  await audit(operator, "recommendation.batch_saved", {
+    type: "patient",
+    id: patientId,
+    label: field(formData, "pseudonym"),
+    detail: countsSummary(result.data),
+  });
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
+export const saveSupplementSectionAction = async (
+  _previous: SectionSaveState,
+  formData: FormData,
+): Promise<SectionSaveState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const rows = sectionRows(formData, [
+    "id",
+    "name",
+    "dose",
+    "timing",
+    "reason",
+  ]);
+
+  const result = await savePatientSupplements(
+    patientId,
+    rows.map((row) => ({
+      id: rowId(row.id),
+      name: row.name,
+      dose: row.dose,
+      timing: row.timing,
+      reason: row.reason,
+    })),
+  );
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  await audit(operator, "supplement.batch_saved", {
+    type: "patient",
+    id: patientId,
+    label: field(formData, "pseudonym"),
+    detail: countsSummary(result.data),
+  });
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
+export const savePantrySectionAction = async (
+  _previous: SectionSaveState,
+  formData: FormData,
+): Promise<SectionSaveState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const rows = sectionRows(formData, ["id", "item", "why"]);
+
+  const result = await savePantryEssentials(
+    patientId,
+    rows.map((row) => ({
+      id: rowId(row.id),
+      item: row.item,
+      why: row.why,
+    })),
+  );
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  await audit(operator, "pantry.batch_saved", {
+    type: "patient",
+    id: patientId,
+    label: field(formData, "pseudonym"),
+    detail: countsSummary(result.data),
+  });
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
 };

@@ -83,7 +83,9 @@ bury a half-applied protocol behind a green test.
       add-row, and offers no `supplement` category for new rows.
 - [ ] A recommendation already stored with category `supplement` still renders and still saves
       through the section's batch without being silently re-categorised.
-- [ ] Supplements edit mode shows nom, dose, moment and raison for every row at once.
+- [ ] Supplements edit mode shows every prescribed row at once, each with nom, dose, moment
+      and raison editable — nom and dose on the row itself, moment and raison behind that
+      row's fold, so the criterion below about optional fields and this one do not contradict.
 - [ ] Pasting multiple lines into the essentials section produces one row per non-empty line, the
       line as the item and "pourquoi" blank, before any save is made — the operator can edit or
       remove the parsed rows first.

@@ -74,9 +74,13 @@ export {
   listArchivedPatientRecommendations,
   listPatientRecommendations,
   movePatientRecommendation,
+  savePatientRecommendations,
   updatePatientRecommendation,
 } from "../db/services/patient-recommendations";
-export type { RecommendationInput } from "../db/services/patient-recommendations";
+export type {
+  RecommendationInput,
+  RecommendationRow,
+} from "../db/services/patient-recommendations";
 
 export {
   addPatientSupplement,
@@ -85,9 +89,13 @@ export {
   listArchivedPatientSupplements,
   listPatientSupplements,
   movePatientSupplement,
+  savePatientSupplements,
   updatePatientSupplement,
 } from "../db/services/patient-supplements";
-export type { SupplementInput } from "../db/services/patient-supplements";
+export type {
+  SupplementInput,
+  SupplementRow,
+} from "../db/services/patient-supplements";
 
 export {
   addPantryEssential,
@@ -96,9 +104,15 @@ export {
   listArchivedPantryEssentials,
   listPantryEssentials,
   movePantryEssential,
+  savePantryEssentials,
   updatePantryEssential,
 } from "../db/services/pantry-essentials";
-export type { PantryEssentialInput } from "../db/services/pantry-essentials";
+export type {
+  PantryEssentialInput,
+  PantryEssentialRow,
+} from "../db/services/pantry-essentials";
+
+export type { SectionSaveCounts } from "../db/services/section-save";
 
 export {
   archiveRecipe,

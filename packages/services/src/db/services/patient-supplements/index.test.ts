@@ -10,6 +10,7 @@ import {
   listArchivedPatientSupplements,
   listPatientSupplements,
   movePatientSupplement,
+  savePatientSupplements,
   updatePatientSupplement,
 } from "./index";
 
@@ -142,5 +143,112 @@ describe("patient supplements", () => {
     expect((await archivePatientSupplement("not-a-uuid", true)).ok).toBe(false);
     expect((await updatePatientSupplement("not-a-uuid", {})).ok).toBe(false);
     expect((await deletePatientSupplement("not-a-uuid")).ok).toBe(false);
+  });
+});
+
+describe("saving the whole protocol at once", () => {
+  // Its own patient: this suite asserts on the entire section, so it cannot
+  // share the rows the single-row tests above leave behind.
+  let sectionPatientId: string;
+
+  beforeAll(async () => {
+    const created = await createPatient({ pseudonym: "Margaux" });
+    if (!created.ok) {
+      throw new Error("test patient not created");
+    }
+    sectionPatientId = created.data.id;
+  });
+
+  it("writes the four columns of several rows in one call", async () => {
+    const saved = await savePatientSupplements(sectionPatientId, [
+      {
+        name: "Oméga-3",
+        dose: "2 g",
+        timing: "au repas",
+        reason: "inflammation",
+      },
+      {
+        name: "Magnésium bisglycinate",
+        dose: "300 mg",
+        timing: "le soir",
+        reason: "sommeil",
+      },
+    ]);
+
+    expect(saved.ok && saved.data.added).toBe(2);
+    const protocol = await listPatientSupplements(sectionPatientId);
+    expect(protocol.map((row) => row.name)).toEqual([
+      "Oméga-3",
+      "Magnésium bisglycinate",
+    ]);
+    expect(protocol[1]).toMatchObject({ dose: "300 mg", timing: "le soir" });
+  });
+
+  it("applies an edit, an addition, a removal and a reorder in one save", async () => {
+    const before = await listPatientSupplements(sectionPatientId);
+
+    const saved = await savePatientSupplements(sectionPatientId, [
+      {
+        id: before[1].id,
+        name: before[1].name,
+        dose: "400 mg",
+        timing: before[1].timing,
+        reason: before[1].reason,
+      },
+      { name: "Vitamine D", dose: "2 000 UI", timing: "matin", reason: "" },
+    ]);
+
+    expect(saved.ok && saved.data).toEqual({
+      added: 1,
+      updated: 1,
+      archived: 1,
+      reordered: 1,
+    });
+
+    const after = await listPatientSupplements(sectionPatientId);
+    expect(after.map((row) => row.name)).toEqual([
+      "Magnésium bisglycinate",
+      "Vitamine D",
+    ]);
+    expect(after[0].dose).toBe("400 mg");
+    expect(
+      (await listArchivedPatientSupplements(sectionPatientId)).map(
+        (row) => row.name,
+      ),
+    ).toContain("Oméga-3");
+  });
+
+  it("refuses the whole save on a bad row, naming which one", async () => {
+    const before = await listPatientSupplements(sectionPatientId);
+
+    const saved = await savePatientSupplements(sectionPatientId, [
+      { name: "Zinc", dose: "", timing: "", reason: "" },
+      { name: "", dose: "15 mg", timing: "", reason: "" },
+    ]);
+
+    expect(!saved.ok && saved.message).toContain("row 2");
+    expect(await listPatientSupplements(sectionPatientId)).toEqual(before);
+  });
+
+  it("does nothing when the section comes back unchanged", async () => {
+    const before = await listPatientSupplements(sectionPatientId);
+
+    const saved = await savePatientSupplements(
+      sectionPatientId,
+      before.map((row) => ({
+        id: row.id,
+        name: row.name,
+        dose: row.dose,
+        timing: row.timing,
+        reason: row.reason,
+      })),
+    );
+
+    expect(saved.ok && saved.data.added).toBe(0);
+    expect(await listPatientSupplements(sectionPatientId)).toEqual(before);
+  });
+
+  it("treats a malformed patient id as not found", async () => {
+    expect((await savePatientSupplements("not-a-uuid", [])).ok).toBe(false);
   });
 });

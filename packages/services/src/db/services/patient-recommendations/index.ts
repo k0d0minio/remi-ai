@@ -6,6 +6,12 @@ import { getDatabase } from "../../client";
 import type { PatientRecommendation } from "../../models/patient-recommendation";
 import type { RecommendationCategory } from "../../models/recommendation";
 import { touchPatient } from "../patients";
+import {
+  countSectionPlan,
+  isEmptySave,
+  planSectionSave,
+  type SectionSaveCounts,
+} from "../section-save";
 
 /**
  * The recommendations Morgane encodes into a patient profile — the protocol,
@@ -234,4 +240,105 @@ export const deletePatientRecommendation = async (
     await touchPatient(existing.patientId);
   }
   return ok(true);
+};
+
+/**
+ * One row of the whole-section edit mode. `id` is present for a row already in
+ * force and absent for one the operator just added; the order of the rows
+ * within their category is the order she put them in.
+ */
+export type RecommendationRow = {
+  id?: Id;
+  category: RecommendationCategory;
+  title: string;
+  detail: string;
+};
+
+/**
+ * Save the whole protocol in one act — the desk path, beside the single-row
+ * calls above that remain the phone's quick-add.
+ *
+ * What is submitted is what is in force: rows are inserted, updated and
+ * reordered to match, and an active row that is not submitted is archived.
+ * Every row is validated before the first write, so a bad row costs nothing
+ * and the section is never left half-said.
+ *
+ * `position` is per category, matching `byCategoryThenPosition` above: the
+ * category order is the vocabulary's, and the only rank Morgane sets is the one
+ * inside a category.
+ */
+export const savePatientRecommendations = async (
+  patientId: Id,
+  rows: readonly RecommendationRow[],
+): Promise<Result<SectionSaveCounts>> => {
+  if (!uuidSchema.safeParse(patientId).success) {
+    return err("not_found", "no such patient");
+  }
+
+  const parsedRows: RecommendationRow[] = [];
+  for (const [index, row] of rows.entries()) {
+    const parsed = recommendationFields.partial({ detail: true }).safeParse(row);
+    if (!parsed.success) {
+      return err(
+        "invalid_input",
+        `row ${index + 1}: ${parsed.error.issues[0].message}`,
+      );
+    }
+    parsedRows.push({
+      id: row.id,
+      category: parsed.data.category,
+      title: parsed.data.title,
+      detail: parsed.data.detail ?? "",
+    });
+  }
+
+  const existing = await listPatientRecommendations(patientId);
+  const plan = planSectionSave<RecommendationRow, PatientRecommendation>({
+    existing,
+    // One group per category, in the vocabulary's reading order, so a row's
+    // index is its rank within the run it actually belongs to.
+    groups: recommendationCategories.map((category) =>
+      parsedRows.filter((row) => row.category === category),
+    ),
+    idOf: (row) => row.id,
+    changed: (row, stored) =>
+      row.category !== stored.category ||
+      row.title !== stored.title ||
+      row.detail !== stored.detail,
+  });
+
+  const counts = countSectionPlan(plan);
+  if (isEmptySave(counts)) {
+    return ok(counts);
+  }
+
+  return getDatabase().transaction(async () => {
+    const archivedAt = new Date();
+    for (const id of plan.archives) {
+      await recommendations().update(id, { archivedAt });
+    }
+    for (const update of plan.updates) {
+      if (!update.fieldsChanged && !update.moved) {
+        continue;
+      }
+      await recommendations().update(update.id, {
+        category: update.row.category,
+        title: update.row.title,
+        detail: update.row.detail,
+        position: update.position,
+      });
+    }
+    for (const insert of plan.inserts) {
+      await recommendations().insert({
+        patientId,
+        category: insert.row.category,
+        title: insert.row.title,
+        detail: insert.row.detail,
+        position: insert.position,
+        archivedAt: null,
+      });
+    }
+    await touchPatient(patientId);
+    return ok(counts);
+  });
 };
