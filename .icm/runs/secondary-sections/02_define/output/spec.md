@@ -49,12 +49,12 @@ compléter" list alone; when all twelve are filled the list is absent.
 The `profile` section renders a **read summary** by default. Its fields are the stub's list, in
 three groups:
 
-| Group             | Fields                                                                         |
-| ----------------- | ------------------------------------------------------------------------------ |
-| Identité          | pseudonym, full name, email, language, status                                  |
-| Mesures           | birth date (as age), sex, height, weight                                       |
-| Alimentation      | dietary regime, allergies, intolerances, food budget, likes cooking            |
-| Consentement      | consent date + channel, or "Pas encore enregistré"                             |
+| Group        | Fields                                                              |
+| ------------ | ------------------------------------------------------------------- |
+| Identité     | pseudonym, full name, email, language, status                       |
+| Mesures      | birth date (as age), sex, height, weight                            |
+| Alimentation | dietary regime, allergies, intolerances, food budget, likes cooking |
+| Consentement | consent date + channel, or "Pas encore enregistré"                  |
 
 Below it, `« Modifié le <date> »` from `patient.lastEditedAt`.
 
@@ -78,12 +78,12 @@ component; it does not fork it.
 
 Four conditional sections disappear into their parents:
 
-| Today's section              | Folds into        | Fold label                    |
-| ---------------------------- | ----------------- | ----------------------------- |
-| `archived-recommendations`   | `recommendations` | Recommandations archivées · n |
-| `archived-pantry`            | `pantry`          | Essentiels archivés · n       |
-| `past-recipes`               | `recipes`         | Recettes précédentes · n      |
-| `archived-meals`             | `meals`           | Repas archivés · n            |
+| Today's section            | Folds into        | Fold label                    |
+| -------------------------- | ----------------- | ----------------------------- |
+| `archived-recommendations` | `recommendations` | Recommandations archivées · n |
+| `archived-pantry`          | `pantry`          | Essentiels archivés · n       |
+| `past-recipes`             | `recipes`         | Recettes précédentes · n      |
+| `archived-meals`           | `meals`           | Repas archivés · n            |
 
 Three groupings that already sit inside their section are normalised onto the same fold, so the
 page has one way of showing history rather than three: archived supplements (a raw `<details>`
@@ -152,7 +152,7 @@ not a page away), so no route is added and the working view links nowhere new.
   anamnesis textarea are moved and re-composed, not rewritten. The legacy `anamnesis` free-text
   field keeps its place and its "à redistribuer" hint inside the form.
 - **Row density (R13)** — turning homogeneous rows into hairline list rows. The archived folds wrap
-  `RecommendationGroups`, `PantryList`, `RecipeAssignments` and `MealJournal`, which the *active*
+  `RecommendationGroups`, `PantryList`, `RecipeAssignments` and `MealJournal`, which the _active_
   lists also use, so changing them is a page-wide sweep. The stub says do it where a section is
   touched anyway and do not sweep; no section this run touches is a nested-card list.
 - **"Dernière archivée en août" on a closed fold** — the count is the whole read this run.
