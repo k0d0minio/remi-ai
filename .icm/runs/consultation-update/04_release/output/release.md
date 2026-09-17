@@ -1,7 +1,8 @@
 # Release: consultation-update
 
 - gate: Ready to merge ticked — merge authorised
-- ci: GREEN on <sha> (ci-status.sh, after the last push)
+- ci: GREEN on `07ced9e` — the last code-bearing push, all six previews built — and re-established
+  by `ci-status.sh` on the close-out head immediately before the merge
 - pr: [#99](https://github.com/k0d0minio/remi-ai/pull/99) · merged: <yes — when / no>
 - code-review: high (spec complexity: complex) — 5 findings, all introduced by this diff, all fixed
   on the branch; see below
