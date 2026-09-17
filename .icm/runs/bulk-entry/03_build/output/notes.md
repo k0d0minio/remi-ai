@@ -33,12 +33,16 @@
 - [x] Add, remove and reorder locally, with no server call until the save.
 - [x] One save applies a mixed edit — covered by a test per service asserting exactly that
       (two changed, one added, one removed, order altered, in a single call).
-- [ ] **One transaction — NOT MET, and it cannot be on this branch.** The services call
-      `getDatabase().transaction()`, which is the right call and becomes atomic the moment the
-      adapter moves; the Neon HTTP driver behind it today runs `fn` with no isolation
-      (`adapters/neon.ts`). This is the spec's **Dependency** section and
-      `.icm/intake/triage/neon-websocket-transactions.md`. Nothing here fakes it and no test
-      asserts it.
+- [x] **One transaction — met, after two corrections.** The adapter arrived on `main` from
+      PR #99 (see the spec's Dependency section), so `getDatabase().transaction()` now opens a
+      real `BEGIN` / `COMMIT` / `ROLLBACK`. That exposed a second, real defect in this run: the
+      three batch saves called `getDatabase()` _inside_ the transaction callback, which hands
+      back the pool-bound client — so every write would have landed **outside** the unit while
+      looking atomic. The adapter's own comment names that exact trap. Fixed by threading the
+      `tx` client through, the pattern `recipe-assignments` established: the collection accessor
+      now takes a `DatabaseClient`, and the batch save passes `tx` to every write and to
+      `touchPatient`. Proven by a test that fails a write part-way and asserts the section is
+      byte-identical afterwards.
 - [x] One audit event per save, naming operator, patient and counts — not one per row.
 - [x] Recommendations edit mode is one block per category, each with its own add-row, and offers
       no `supplement` category for new rows.
@@ -58,9 +62,13 @@
 
 ## Notes for Release
 
-- **The merge is blocked on the Neon chore, by the spec's own Dependency section.** Criterion 4
-  is unticked deliberately. `.icm/intake/triage/neon-websocket-transactions.md` is the ticket;
-  it is on this branch and not yet on `main`.
+- **The tx-threading fix is the thing to look at closely.** A batch save that reaches for
+  `getDatabase()` inside its own transaction writes outside it, silently. All three services are
+  fixed and one is covered by an injected-failure test; a reviewer should confirm the other two
+  read the same way. The duplicate triage stub this session cut for the adapter has been removed
+  from this branch — `main`'s `neon-websocket-driver-transactions` is the real one.
+- **`main`'s `neon-websocket-driver-transactions` stub is still active though the work shipped**
+  in PR #99. Bookkeeping drift on `main`, not this run's to fix, but worth retiring.
 - **Concurrency is last-write-wins**, as the stub allows for the beta: two operators editing the
   same section race, the later save wins, and the audit event names who did it and what changed.
   No locking, no conflict detection.

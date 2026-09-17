@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { registerDatabase } from "../../client";
+import { registerDatabase, type DatabaseClient } from "../../client";
 import { createMemoryDatabase } from "../../test-helpers";
 import type { PatientRecommendation } from "../../models/patient-recommendation";
 import { createPatient } from "../patients";
@@ -16,8 +16,43 @@ import {
 
 let patientId: string;
 
+/**
+ * Updates left before the next one throws, or `null` for none.
+ *
+ * The only way to observe atomicity is to fail a save part-way, and the only
+ * way to fail one deliberately is from underneath. This counts down through
+ * the writes a save makes and throws where it lands.
+ */
+let updatesBeforeFailure: number | null = null;
+
+/**
+ * The memory client with that failure spliced in — including the client handed
+ * to a `transaction()` callback, because that is the one a batch save writes
+ * through. The rollback itself is the harness's, untouched.
+ */
+const withInjectedFailure = (base: DatabaseClient): DatabaseClient => ({
+  driver: base.driver,
+  close: base.close,
+  transaction: (fn) => base.transaction(() => fn(withInjectedFailure(base))),
+  collection: (name) => {
+    const inner = base.collection(name);
+    return {
+      ...inner,
+      update: async (id, patch) => {
+        if (updatesBeforeFailure !== null) {
+          if (updatesBeforeFailure === 0) {
+            throw new Error("injected write failure");
+          }
+          updatesBeforeFailure -= 1;
+        }
+        return inner.update(id, patch);
+      },
+    };
+  },
+});
+
 beforeAll(async () => {
-  registerDatabase(createMemoryDatabase());
+  registerDatabase(withInjectedFailure(createMemoryDatabase()));
   const created = await createPatient({ pseudonym: "Claire" });
   if (!created.ok) {
     throw new Error("test patient not created");
@@ -338,5 +373,40 @@ describe("saving the whole protocol at once", () => {
 
   it("treats a malformed patient id as not found", async () => {
     expect((await savePatientRecommendations("not-a-uuid", [])).ok).toBe(false);
+  });
+
+  it("leaves the section untouched when a write fails part-way", async () => {
+    const created = await createPatient({ pseudonym: "Solène" });
+    if (!created.ok) {
+      throw new Error("test patient not created");
+    }
+    await savePatientRecommendations(created.data.id, [
+      { category: "nutrition", title: "Première", detail: "" },
+      { category: "nutrition", title: "Deuxième", detail: "" },
+    ]);
+    const before = await listPatientRecommendations(created.data.id);
+
+    // Two rows renamed and one added: the failure lands on the second update,
+    // after the first has already been written.
+    updatesBeforeFailure = 1;
+    const save = savePatientRecommendations(
+      created.data.id,
+      before
+        .map((entry) => ({
+          id: entry.id,
+          category: entry.category,
+          title: `${entry.title} modifiée`,
+          detail: entry.detail,
+        }))
+        .concat([
+          { id: "", category: "nutrition", title: "Ajoutée", detail: "" },
+        ]),
+    );
+
+    await expect(save).rejects.toThrow("injected write failure");
+    updatesBeforeFailure = null;
+
+    // The first rename did happen before the throw; the transaction undid it.
+    expect(await listPatientRecommendations(created.data.id)).toEqual(before);
   });
 });

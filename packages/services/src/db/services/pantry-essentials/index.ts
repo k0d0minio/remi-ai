@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
-import { getDatabase } from "../../client";
+import { getDatabase, type DatabaseClient } from "../../client";
 import type { PantryEssential } from "../../models/pantry-essential";
 import { touchPatient } from "../patients";
 import {
@@ -24,8 +24,13 @@ import {
  * is a short name, and a why is one line, not a paragraph.
  */
 
-const essentials = () =>
-  getDatabase().collection<PantryEssential>("patient_pantry_essentials");
+/**
+ * Takes the client so the whole-section save at the bottom of this file can
+ * hand every write the one `transaction()` gave it. A write that reaches for
+ * the global instead lands on the pool, outside the unit.
+ */
+const essentials = (db: DatabaseClient = getDatabase()) =>
+  db.collection<PantryEssential>("patient_pantry_essentials");
 
 const uuidSchema = z.uuid();
 
@@ -262,23 +267,23 @@ export const savePantryEssentials = async (
     return ok(counts);
   }
 
-  return getDatabase().transaction(async () => {
+  return getDatabase().transaction(async (tx) => {
     const archivedAt = new Date();
     for (const id of plan.archives) {
-      await essentials().update(id, { archivedAt });
+      await essentials(tx).update(id, { archivedAt });
     }
     for (const update of plan.updates) {
       if (!update.fieldsChanged && !update.moved) {
         continue;
       }
-      await essentials().update(update.id, {
+      await essentials(tx).update(update.id, {
         item: update.row.item,
         why: update.row.why,
         position: update.position,
       });
     }
     for (const insert of plan.inserts) {
-      await essentials().insert({
+      await essentials(tx).insert({
         patientId,
         item: insert.row.item,
         why: insert.row.why,
@@ -286,7 +291,7 @@ export const savePantryEssentials = async (
         archivedAt: null,
       });
     }
-    await touchPatient(patientId);
+    await touchPatient(patientId, tx);
     return ok(counts);
   });
 };

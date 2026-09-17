@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
-import { getDatabase } from "../../client";
+import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientSupplement } from "../../models/patient-supplement";
 import { touchPatient } from "../patients";
 import {
@@ -22,8 +22,13 @@ import {
  * we stop it".
  */
 
-const supplements = () =>
-  getDatabase().collection<PatientSupplement>("patient_supplements");
+/**
+ * Takes the client so the whole-section save at the bottom of this file can
+ * hand every write the one `transaction()` gave it. A write that reaches for
+ * the global instead lands on the pool, outside the unit.
+ */
+const supplements = (db: DatabaseClient = getDatabase()) =>
+  db.collection<PatientSupplement>("patient_supplements");
 
 const uuidSchema = z.uuid();
 
@@ -276,16 +281,16 @@ export const savePatientSupplements = async (
     return ok(counts);
   }
 
-  return getDatabase().transaction(async () => {
+  return getDatabase().transaction(async (tx) => {
     const archivedAt = new Date();
     for (const id of plan.archives) {
-      await supplements().update(id, { archivedAt });
+      await supplements(tx).update(id, { archivedAt });
     }
     for (const update of plan.updates) {
       if (!update.fieldsChanged && !update.moved) {
         continue;
       }
-      await supplements().update(update.id, {
+      await supplements(tx).update(update.id, {
         name: update.row.name,
         dose: update.row.dose,
         timing: update.row.timing,
@@ -294,7 +299,7 @@ export const savePatientSupplements = async (
       });
     }
     for (const insert of plan.inserts) {
-      await supplements().insert({
+      await supplements(tx).insert({
         patientId,
         name: insert.row.name,
         dose: insert.row.dose,
@@ -304,7 +309,7 @@ export const savePatientSupplements = async (
         archivedAt: null,
       });
     }
-    await touchPatient(patientId);
+    await touchPatient(patientId, tx);
     return ok(counts);
   });
 };

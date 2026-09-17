@@ -52,20 +52,24 @@ Two operators editing the same section at once (Morgane on a phone, an operator 
 **last-write-wins**: the batch applies what was submitted, and the audit event names the operator
 and the counts. That is accepted for the beta and is stated in the PR.
 
-## Dependency
+## Dependency — resolved on `main`, not by this run
 
-The batch actions' single-transaction requirement is **not satisfiable on the current storage
-adapter**. `packages/services/src/db/adapters/neon.ts` runs the Neon **HTTP** driver, whose
-`transaction()` is a pass-through — `transaction: async (fn) => fn(client)` — with a comment
-saying the first service that writes across a unit must move the adapter to the WebSocket driver.
-This run is that first service.
+When this spec was written, `packages/services/src/db/adapters/neon.ts` ran the Neon **HTTP**
+driver, whose `transaction()` was a pass-through, so the single-transaction criterion below was
+not satisfiable. The owner's call (2026-09-17) was that the adapter move is its own chore ahead of
+this run.
 
-On the owner's call (2026-09-17) the adapter move is **its own chore, ahead of this run**, not a
-side-effect of a UI change: it alters database access for all six apps.
-[`.icm/intake/triage/neon-websocket-transactions.md`](../../../../intake/triage/neon-websocket-transactions.md)
-is cut for it. **Build does not start here until that chore is merged** — without it the
-"one transaction" criterion below cannot be met, and building the batch on a pass-through would
-bury a half-applied protocol behind a green test.
+It landed on `main` while this run was in Build, carried by
+[`consultation-update` (#99)](https://github.com/k0d0minio/remi-ai/pull/99) against the triage
+stub [`neon-websocket-driver-transactions`](../../../../intake/triage/neon-websocket-driver-transactions.md),
+which `recipe-in-place` had cut the same day for the same reason. `main` now runs the pooled
+WebSocket driver with a real `BEGIN` / `COMMIT` / `ROLLBACK`, so the criterion is met here by
+merging `main` in — not by anything this run builds.
+
+A separate chore branch opened by this session for the same work
+([#103](https://github.com/k0d0minio/remi-ai/pull/103)) is **redundant and must not be merged**:
+its two-driver design would revert `main`'s, which handles the pool's idle-error case that this
+one does not.
 
 ## Acceptance criteria
 

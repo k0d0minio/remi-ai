@@ -2,7 +2,7 @@ import { z } from "zod";
 import { recommendationCategories } from "../../../shared/patient";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
-import { getDatabase } from "../../client";
+import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientRecommendation } from "../../models/patient-recommendation";
 import type { RecommendationCategory } from "../../models/recommendation";
 import { touchPatient } from "../patients";
@@ -24,8 +24,13 @@ import {
  * recommendation that stopped is the answer to "why did we stop it".
  */
 
-const recommendations = () =>
-  getDatabase().collection<PatientRecommendation>("patient_recommendations");
+/**
+ * Takes the client so the whole-section save at the bottom of this file can
+ * hand every write the one `transaction()` gave it. A write that reaches for
+ * the global instead lands on the pool, outside the unit.
+ */
+const recommendations = (db: DatabaseClient = getDatabase()) =>
+  db.collection<PatientRecommendation>("patient_recommendations");
 
 const uuidSchema = z.uuid();
 
@@ -314,16 +319,16 @@ export const savePatientRecommendations = async (
     return ok(counts);
   }
 
-  return getDatabase().transaction(async () => {
+  return getDatabase().transaction(async (tx) => {
     const archivedAt = new Date();
     for (const id of plan.archives) {
-      await recommendations().update(id, { archivedAt });
+      await recommendations(tx).update(id, { archivedAt });
     }
     for (const update of plan.updates) {
       if (!update.fieldsChanged && !update.moved) {
         continue;
       }
-      await recommendations().update(update.id, {
+      await recommendations(tx).update(update.id, {
         category: update.row.category,
         title: update.row.title,
         detail: update.row.detail,
@@ -331,7 +336,7 @@ export const savePatientRecommendations = async (
       });
     }
     for (const insert of plan.inserts) {
-      await recommendations().insert({
+      await recommendations(tx).insert({
         patientId,
         category: insert.row.category,
         title: insert.row.title,
@@ -340,7 +345,7 @@ export const savePatientRecommendations = async (
         archivedAt: null,
       });
     }
-    await touchPatient(patientId);
+    await touchPatient(patientId, tx);
     return ok(counts);
   });
 };
