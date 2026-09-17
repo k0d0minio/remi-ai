@@ -56,7 +56,12 @@
 - [x] One audit event per gesture, naming the recipe and the patient, under a new action in
       `auditActions`; the journal filter is keyed off the same list.
 - [x] The migration adds the nullable self-reference; pre-existing rows read as having no origin.
-- [x] Services tests cover the three gestures, the already-held refusal and the variant link.
+- [ ] **Services tests cover the three gestures, the already-held refusal and the variant link —
+      but not "the rollback on failure" the criterion also names.** Same root cause as the
+      transaction criterion above, and left unticked for the same reason: with `transaction`
+      a pass-through on both adapters, a rollback test passes without proving anything. The
+      triage stub's acceptance list carries that test, so it lands with the driver move.
+      218 tests pass across 19 files.
 
 ## Notes for Release
 
