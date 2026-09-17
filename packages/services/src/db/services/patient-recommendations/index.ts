@@ -275,6 +275,8 @@ export type RecommendationRow = {
 export const savePatientRecommendations = async (
   patientId: Id,
   rows: readonly RecommendationRow[],
+  /** The ids the editor was seeded with — see `planSectionSave`'s `known`. */
+  known?: readonly Id[],
 ): Promise<Result<SectionSaveCounts>> => {
   if (!uuidSchema.safeParse(patientId).success) {
     return err("not_found", "no such patient");
@@ -308,6 +310,7 @@ export const savePatientRecommendations = async (
       parsedRows.filter((row) => row.category === category),
     ),
     idOf: (row) => row.id,
+    known,
     changed: (row, stored) =>
       row.category !== stored.category ||
       row.title !== stored.title ||

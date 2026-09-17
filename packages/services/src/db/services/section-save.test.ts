@@ -15,12 +15,17 @@ const stored = (id: string, position: number, title: string): Stored => ({
   title,
 });
 
-const plan = (existing: readonly Stored[], groups: readonly Row[][]) =>
+const plan = (
+  existing: readonly Stored[],
+  groups: readonly Row[][],
+  known?: readonly string[],
+) =>
   planSectionSave<Row, Stored>({
     existing,
     groups,
     idOf: (row) => row.id,
     changed: (row, match) => row.title !== match.title,
+    known,
   });
 
 describe("section save planning", () => {
@@ -107,6 +112,28 @@ describe("section save planning", () => {
       archived: 0,
       reordered: 2,
     });
+  });
+
+  it("leaves a row the editor never saw alone instead of archiving it", () => {
+    // "b" arrived after the editor opened — the quick-add form beside it, or
+    // another operator. The save was seeded with "a" alone, so only "a" is
+    // its to take off the list.
+    const result = plan(
+      [stored("a", 0, "first"), stored("b", 1, "arrived later")],
+      [[{ title: "replacement" }]],
+      ["a"],
+    );
+
+    expect(result.archives).toEqual(["a"]);
+  });
+
+  it("archives everything not submitted when no seed is given", () => {
+    const result = plan(
+      [stored("a", 0, "first"), stored("b", 1, "second")],
+      [[]],
+    );
+
+    expect(result.archives).toEqual(["a", "b"]);
   });
 
   it("reports a section resubmitted unchanged as nothing to do", () => {

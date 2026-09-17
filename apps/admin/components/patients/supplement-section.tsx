@@ -59,6 +59,9 @@ export const SupplementSection = ({
   children,
 }: Props) => {
   const [editing, setEditing] = useState(false);
+  // The ids on screen when edit mode opened. A row that appears after that
+  // — the quick-add form, another operator — is not this save's to archive.
+  const [seeded, setSeeded] = useState<readonly string[]>([]);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -81,6 +84,8 @@ export const SupplementSection = ({
 
   const open = useCallback(() => {
     reset(supplements.map(toRow));
+    setSeeded(supplements.map((row) => row.id));
+    setError(null);
     setEditing(true);
   }, [reset, supplements]);
 
@@ -98,6 +103,10 @@ export const SupplementSection = ({
       readView={children}
     >
       <div className="flex flex-col gap-3">
+        {seeded.map((id) => (
+          <input key={id} type="hidden" name="seeded-id" value={id} />
+        ))}
+
         {rows.length === 0 ? (
           <Typography size="sm" tone="muted">
             Aucun complément. Ajoutez une ligne.

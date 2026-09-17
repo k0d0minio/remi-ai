@@ -69,6 +69,9 @@ export const RecommendationSection = ({
   children,
 }: Props) => {
   const [editing, setEditing] = useState(false);
+  // The ids on screen when edit mode opened. A row that appears after that
+  // — the quick-add form, another operator — is not this save's to archive.
+  const [seeded, setSeeded] = useState<readonly string[]>([]);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -96,6 +99,8 @@ export const RecommendationSection = ({
 
   const open = useCallback(() => {
     reset(recommendations.map(toRow));
+    setSeeded(recommendations.map((row) => row.id));
+    setError(null);
     setEditing(true);
   }, [recommendations, reset]);
 
@@ -120,6 +125,10 @@ export const RecommendationSection = ({
       readView={children}
     >
       <div className="flex flex-col gap-6">
+        {seeded.map((id) => (
+          <input key={id} type="hidden" name="seeded-id" value={id} />
+        ))}
+
         {blocks.map((category) => {
           const group = rows.filter((row) => row.category === category);
 

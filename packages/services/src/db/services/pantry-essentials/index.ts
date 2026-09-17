@@ -232,6 +232,8 @@ export type PantryEssentialRow = {
 export const savePantryEssentials = async (
   patientId: Id,
   rows: readonly PantryEssentialRow[],
+  /** The ids the editor was seeded with — see `planSectionSave`'s `known`. */
+  known?: readonly Id[],
 ): Promise<Result<SectionSaveCounts>> => {
   if (!uuidSchema.safeParse(patientId).success) {
     return err("not_found", "no such patient");
@@ -258,6 +260,7 @@ export const savePantryEssentials = async (
     existing,
     groups: [parsedRows],
     idOf: (row) => row.id,
+    known,
     changed: (row, stored) =>
       row.item !== stored.item || row.why !== stored.why,
   });

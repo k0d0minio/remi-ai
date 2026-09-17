@@ -54,6 +54,15 @@ type PlanArgs<TRow, TStored extends { id: Id; position: number }> = {
   idOf: (row: TRow) => Id | undefined;
   /** Whether the submitted row says anything different from the stored one. */
   changed: (row: TRow, stored: TStored) => boolean;
+  /**
+   * The rows the editor was seeded with, when it can say. Only these are
+   * candidates for archiving, so a row that appeared *after* the operator
+   * opened the editor — through the quick-add form beside it, or another
+   * operator's save — is left alone rather than silently taken off the list by
+   * a save that never saw it. Omit it and every row in force is a candidate,
+   * which is what a caller with no editor behind it means.
+   */
+  known?: readonly Id[];
 };
 
 /**
@@ -74,6 +83,7 @@ export const planSectionSave = <
   groups,
   idOf,
   changed,
+  known,
 }: PlanArgs<TRow, TStored>): SectionPlan<TRow> => {
   const storedById = new Map(existing.map((stored) => [stored.id, stored]));
   const inserts: { row: TRow; position: number }[] = [];
@@ -104,6 +114,7 @@ export const planSectionSave = <
     updates,
     archives: existing
       .filter((stored) => !kept.has(stored.id))
+      .filter((stored) => known === undefined || known.includes(stored.id))
       .map((stored) => stored.id),
   };
 };

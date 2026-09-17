@@ -635,9 +635,8 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 ) : (
                   <RecommendationGroups recommendations={recommendations} />
                 )}
+                <RecommendationAddForm patientId={patient.id} />
               </RecommendationSection>
-
-              <RecommendationAddForm patientId={patient.id} />
             </CardContent>
           </Card>
         </section>
@@ -686,9 +685,8 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 ) : (
                   <SupplementProtocol supplements={supplements} />
                 )}
+                <SupplementAddForm patientId={patient.id} />
               </SupplementSection>
-
-              <SupplementAddForm patientId={patient.id} />
 
               {archivedSupplements.length > 0 ? (
                 <details className="border-border flex flex-col gap-3 border-t pt-6">
@@ -726,9 +724,8 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 ) : (
                   <PantryList essentials={essentials} />
                 )}
+                <PantryAddForm patientId={patient.id} />
               </PantrySection>
-
-              <PantryAddForm patientId={patient.id} />
             </CardContent>
           </Card>
         </section>

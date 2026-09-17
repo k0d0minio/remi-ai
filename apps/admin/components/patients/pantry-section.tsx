@@ -46,6 +46,9 @@ export const PantrySection = ({
   children,
 }: Props) => {
   const [editing, setEditing] = useState(false);
+  // The ids on screen when edit mode opened. A row that appears after that
+  // — the quick-add form, another operator — is not this save's to archive.
+  const [seeded, setSeeded] = useState<readonly string[]>([]);
   const [pasted, setPasted] = useState("");
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +74,8 @@ export const PantrySection = ({
     // Re-seed from the current props rather than from whatever the last
     // editing session left behind: these are the rows in force right now.
     reset(essentials.map(toRow));
+    setSeeded(essentials.map((row) => row.id));
+    setError(null);
     setPasted("");
     setEditing(true);
   }, [essentials, reset]);
@@ -135,6 +140,10 @@ export const PantrySection = ({
       }
     >
       <div className="flex flex-col gap-3">
+        {seeded.map((id) => (
+          <input key={id} type="hidden" name="seeded-id" value={id} />
+        ))}
+
         {rows.length === 0 ? (
           <Typography size="sm" tone="muted">
             La liste est vide. Ajoutez une ligne, ou collez-en plusieurs.
