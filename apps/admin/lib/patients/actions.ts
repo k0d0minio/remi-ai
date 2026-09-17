@@ -59,6 +59,7 @@ import {
 import {
   appHref,
   consentChannels,
+  contextBlocks,
   cookingAffinities,
   goalDirections,
   isLocale,
@@ -1255,4 +1256,37 @@ export const saveAnamnesisAction = async (
   });
   revalidatePatient(patientId);
   return { error: null };
+};
+
+/**
+ * Records that a patient's context left the console. Nothing is written to the
+ * patient's record and nothing is revalidated — the only effect is the trail
+ * line, which is why this takes the blocks rather than returning anything: what
+ * left matters as much as that something left.
+ *
+ * `recordAuditEvent` swallows its own failures, so a copy is never blocked by a
+ * trail that cannot be written (see the service).
+ */
+/**
+ * A server action is an endpoint, so what the client sends is narrowed against
+ * the closed list before it reaches the trail — same rule as `asStatus` and
+ * `asCategory` above. Filtering the vocabulary rather than the argument also
+ * bounds the length and canonicalises the order, so a row reads the same
+ * whichever order the checkboxes were clicked in.
+ */
+const asContextBlocks = (values: readonly string[]): string[] =>
+  contextBlocks.filter((block) => values.includes(block));
+
+export const recordContextExportAction = async (
+  patientId: string,
+  blocks: readonly string[],
+) => {
+  const operator = await requireOperator();
+  const found = await getPatient(patientId);
+  await audit(operator, "context.exported", {
+    type: "patient",
+    id: patientId,
+    label: found.ok ? found.data.pseudonym : "",
+    detail: asContextBlocks(blocks).join(", "),
+  });
 };

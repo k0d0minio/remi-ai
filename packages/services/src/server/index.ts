@@ -230,5 +230,22 @@ export {
 } from "../ai";
 export type { GenerateOptions, ModelRole, TextProvider } from "../ai";
 
+export {
+  DEFAULT_CONTEXT_PREAMBLE,
+  contextBlocks,
+  defaultContextBlocks,
+  patientContextText,
+} from "../ai";
+export type {
+  ContextBlock,
+  ContextEssential,
+  ContextGoal,
+  ContextProfile,
+  ContextRecommendationGroup,
+  ContextSupplement,
+  PatientContextInput,
+  PatientContextOptions,
+} from "../ai";
+
 export { env, requireEnv } from "./env";
 export type { ServerEnv } from "./env";
