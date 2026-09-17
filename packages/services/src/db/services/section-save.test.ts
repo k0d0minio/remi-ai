@@ -27,12 +27,7 @@ describe("section save planning", () => {
   it("inserts a row the operator added, at its place in the run", () => {
     const result = plan(
       [stored("a", 0, "first")],
-      [
-        [
-          { id: "a", title: "first" },
-          { title: "second" },
-        ],
-      ],
+      [[{ id: "a", title: "first" }, { title: "second" }]],
     );
 
     expect(result.inserts).toEqual([{ row: { title: "second" }, position: 1 }]);
@@ -77,10 +72,7 @@ describe("section save planning", () => {
     const result = plan(
       [],
       [
-        [
-          { title: "nutrition one" },
-          { title: "nutrition two" },
-        ],
+        [{ title: "nutrition one" }, { title: "nutrition two" }],
         [{ title: "habit one" }],
       ],
     );
