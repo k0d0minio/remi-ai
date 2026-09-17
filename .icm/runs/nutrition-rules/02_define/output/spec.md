@@ -58,8 +58,8 @@ actually say.
 - `supersededBy: Id | null` — set on the old row when a revision replaces it.
 - `archivedAt: Date | null` — withdrawn with no replacement.
 
-Three separate "not current" states, because they answer three different questions: `draft` is *not
-yet trusted*, `supersededBy` is *replaced by a newer wording*, `archivedAt` is *withdrawn*. Nothing
+Three separate "not current" states, because they answer three different questions: `draft` is _not
+yet trusted_, `supersededBy` is _replaced by a newer wording_, `archivedAt` is _withdrawn_. Nothing
 is ever deleted — there is no hard delete in the service or on the page, the same rule the recipe
 library holds.
 
@@ -155,7 +155,7 @@ polyphénols, fibres, magnésium and anti-inflammatoire across it returns nothin
 rules she has already written in the braindump" is not there to seed. The real sources are
 `remi-v2-structure-brainstorm.docx` §§ G–I and `correspondence/03`.
 
-And those name the *categories* without giving their contents: § H asks REMI to complete a selection
+And those name the _categories_ without giving their contents: § H asks REMI to complete a selection
 with « sources d'oméga-3, fibres, polyphénols, diversité végétale » but lists no foods. So the seed
 splits in two, and each row's body ends with the line it came from:
 
