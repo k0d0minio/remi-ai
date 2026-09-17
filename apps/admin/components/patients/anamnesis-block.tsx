@@ -2,7 +2,10 @@
 
 import { Pencil, Plus } from "lucide-react";
 import { useState } from "react";
-import type { AnamnesisCategory, PatientAnamnesis } from "@remi/services/shared";
+import type {
+  AnamnesisCategory,
+  PatientAnamnesis,
+} from "@remi/services/shared";
 import { anamnesisCategories } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Textarea, Typography } from "@remi/ui/server";
