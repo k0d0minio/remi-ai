@@ -2,10 +2,15 @@ import type { Metadata } from "next";
 import { Plus } from "lucide-react";
 import NextLink from "next/link";
 import {
+  getCiqualImport,
   listPatientRecommendations,
   listPatients,
 } from "@remi/services/server";
-import { formatDate, type PatientStatus } from "@remi/services/shared";
+import {
+  formatDate,
+  formatNumber,
+  type PatientStatus,
+} from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import {
   Badge,
@@ -42,7 +47,10 @@ const PREVIEW = 5;
  */
 const Accueil = async () => {
   ensureDatabase();
-  const patients = await listPatients({ sort: "recent" });
+  const [patients, ciqual] = await Promise.all([
+    listPatients({ sort: "recent" }),
+    getCiqualImport(),
+  ]);
 
   // One query per patient, at a roster of ten to fifteen. Worth revisiting the
   // day it is not — the seam would need a count-by-parent to do better.
@@ -70,6 +78,23 @@ const Accueil = async () => {
           </Typography>
           <Typography size="sm" tone="muted">
             Où en est le suivi, et ce qui attend une action.
+          </Typography>
+          {/*
+            What the recipe step has to work with. One line, not a tile: the
+            table is reference data and it either is there or it is not.
+          */}
+          <Typography size="xs" tone="muted">
+            {ciqual ? (
+              <>
+                {formatNumber(ciqual.foodCount, "fr-FR")} aliments importés —{" "}
+                {ciqual.edition} (ANSES) ·{" "}
+                <NextLink href="/aliments" className="underline">
+                  consulter la table
+                </NextLink>
+              </>
+            ) : (
+              "Table CIQUAL non importée — aucune composition d'aliment disponible."
+            )}
           </Typography>
         </div>
 
