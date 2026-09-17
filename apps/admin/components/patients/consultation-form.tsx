@@ -1,6 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import {
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import type { PatientGoal, PatientGoalCheckIn } from "@remi/services/shared";
@@ -73,6 +79,41 @@ const emptyCheckIn: CheckInDraft = { direction: NONE, measure: "", note: "" };
  * that a tab closed mid-sentence loses at most the word in progress. */
 const AUTOSAVE_DELAY_MS = 400;
 
+const readDraft = (patientId: string) => {
+  try {
+    return window.localStorage.getItem(draftKey(patientId));
+  } catch {
+    // A disabled or blocked store costs the safety net, not the screen.
+    return null;
+  }
+};
+
+const clearDraft = (patientId: string) => {
+  try {
+    window.localStorage.removeItem(draftKey(patientId));
+  } catch {
+    // As above — nothing here is worth failing a save over.
+  }
+};
+
+/** Cross-tab only: our own writes are followed by a state change of their own. */
+const subscribeToDraft = (onChange: () => void) => {
+  window.addEventListener("storage", onChange);
+  return () => window.removeEventListener("storage", onChange);
+};
+
+/** A draft that will not parse is one she never sees again, silently. */
+const parseDraft = (raw: string | null, blank: Draft): Draft | null => {
+  if (!raw) {
+    return null;
+  }
+  try {
+    return { ...blank, ...(JSON.parse(raw) as Partial<Draft>) };
+  } catch {
+    return null;
+  }
+};
+
 /**
  * The "Nouvelle consultation" screen — Morgane's post-consultation write-up in
  * her own order (comprendre · décider · agir · suivre) and one save.
@@ -112,34 +153,30 @@ export const ConsultationForm = ({
     nextConsultationPrep,
   };
 
-  const [draft, setDraft] = useState<Draft>(blank);
-  const [restored, setRestored] = useState(false);
+  // The stored draft is read through the store rather than in an effect: the
+  // server has none and the browser may, and this is the one API that lets the
+  // two disagree without a hydration mismatch — and without a setState the
+  // React compiler rightly refuses in an effect body.
+  const stored = useSyncExternalStore(
+    subscribeToDraft,
+    () => readDraft(patientId),
+    () => null,
+  );
+
+  // Once she types, her edit wins over what was stored; until then the stored
+  // draft is the form. Nothing is written until she types, so a stored draft
+  // existing is the whole test for the "restored" notice — both are derived,
+  // and neither needs state of its own.
+  const [edited, setEdited] = useState<Draft | null>(null);
   const pendingWrite = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Read on mount rather than in the initial state so the server-rendered
-  // markup and the first client render agree; a restored draft seeded into the
-  // first render would be a hydration mismatch. A stored draft always means
-  // she typed — nothing is written until she does — so its presence is the
-  // whole test for the notice.
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(draftKey(patientId));
-      if (!stored) {
-        return;
-      }
-      const parsed = JSON.parse(stored) as Partial<Draft>;
-      setDraft((current) => ({ ...current, ...parsed }));
-      setRestored(true);
-    } catch {
-      // A malformed or unreadable draft is one she never sees again, not an
-      // error on a screen she opened to write a note.
-      window.localStorage.removeItem(draftKey(patientId));
-    }
-  }, [patientId]);
+  const restoredDraft = parseDraft(stored, blank);
+  const draft = edited ?? restoredDraft ?? blank;
+  const restored = edited === null && restoredDraft !== null;
 
   useEffect(() => {
     if (state.saved) {
-      window.localStorage.removeItem(draftKey(patientId));
+      clearDraft(patientId);
       router.push(`/patients/${patientId}`);
     }
   }, [state.saved, patientId, router]);
@@ -157,8 +194,7 @@ export const ConsultationForm = ({
 
   const update = (patch: Partial<Draft>) => {
     const next = { ...draft, ...patch };
-    setDraft(next);
-    setRestored(false);
+    setEdited(next);
     if (pendingWrite.current) {
       clearTimeout(pendingWrite.current);
     }
@@ -183,9 +219,8 @@ export const ConsultationForm = ({
     if (pendingWrite.current) {
       clearTimeout(pendingWrite.current);
     }
-    setDraft(blank);
-    setRestored(false);
-    window.localStorage.removeItem(draftKey(patientId));
+    setEdited(blank);
+    clearDraft(patientId);
   };
 
   return (
