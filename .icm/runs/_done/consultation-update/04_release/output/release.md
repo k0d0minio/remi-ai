@@ -3,7 +3,7 @@
 - gate: Ready to merge ticked — merge authorised
 - ci: GREEN on `07ced9e` — the last code-bearing push, all six previews built — and re-established
   by `ci-status.sh` on the close-out head immediately before the merge
-- pr: [#99](https://github.com/k0d0minio/remi-ai/pull/99) · merged: <yes — when / no>
+- pr: [#99](https://github.com/k0d0minio/remi-ai/pull/99) · merged: yes — squash `b16f080`, 2026-09-17
 - code-review: high (spec complexity: complex) — 5 findings, all introduced by this diff, all fixed
   on the branch; see below
 - production-readiness: run (the diff changes the storage adapter) — no new environment variable,
@@ -29,8 +29,13 @@
 - business docs: no business docs impact — the change is a practitioner workflow already described
   by `business/roles`, and it alters no documented user-facing behaviour outside the console
 - release notes: both
-- sent: <none | ship note sent YYYY-MM-DD>
-- closed out: <RESULT: CLOSED — run archived; epic … / no epic finished by this run>
+- sent: **not sent** — this session's environment carries no mail configuration (`RESEND_API_KEY`,
+  `SHIP_NOTE_RECIPIENTS` and `EMAIL_FROM` / `SHIP_NOTE_FROM` are all unset), so
+  `send-ship-note.sh` refuses before it composes anything. The note is written and its links are
+  filled; sending it is one command in an environment that has the three variables:
+  `.icm/scripts/send-ship-note.sh consultation-update --send`
+- closed out: RESULT: CLOSED — run archived to `.icm/runs/_done/consultation-update/`; the
+  `practitioner-workflow` epic keeps five stubs, so no epic was finished by this run
 
 ## Findings and what was done with each
 
