@@ -2,9 +2,11 @@
 
 - commits: `82c6888` components · `712fba7` page re-composition + `AGENTS.md` ·
   `a8b3616` format fix
-- ci: `Format, lint, typecheck` passes on `a8b3616`. The admin preview was still building
-  when these notes were committed, so the run's verdict is the `ci-status.sh` call on the
-  head that carries them — recorded below once it settles.
+- ci: `Format, lint, typecheck` passes from `a8b3616` onward. The **admin preview deployed
+  successfully on `a8b3616`** — the only Vercel target this diff compiles, the other five
+  reporting "Skipped - Not affected". Heads after it carry markdown only, so Vercel's ignore
+  step cancels the admin build there: a green `ci-status.sh` on a later head means the checks
+  passed, not that the app was rebuilt. `a8b3616` is the sha that proves the code.
 
 ## What changed
 
@@ -62,7 +64,9 @@
 - Two CI rounds: the first push was red on `format:check` alone (a type import one column over
   the print width). Lint and typecheck never ran on that head because the job stops at the first
   failing step; they pass on `a8b3616`. The admin preview is the only target that compiles this
-  diff — the other five apps are untouched by it and pass without exercising anything.
+  diff — the other five apps are untouched by it and pass without exercising anything. Vercel's
+  queue ran slow on the notes head: two `ci-status.sh` calls timed out at `PENDING` with the five
+  untouched previews still building, which is not a pass and was re-run rather than read past.
 - **What to smoke-test on the preview**, signed in, on a patient that has archived rows:
   Dossier → Anamnèse (complete an empty area, watch it move up); Profil (read summary, consent,
   « Modifier » → « Fermer », then a real save); each of the four sections with an archived fold;
