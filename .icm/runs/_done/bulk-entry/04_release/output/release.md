@@ -1,8 +1,8 @@
 # Release: bulk-entry
 
 - gate: Ready to merge ticked — merge authorised
-- ci: GREEN on <sha> (ci-status.sh, after the last push)
-- pr: [#97](https://github.com/k0d0minio/remi-ai/pull/97) · merged: <yes — when / no>
+- ci: GREEN on `f26fdf3` (ci-status.sh, after the close-out push)
+- pr: [#97](https://github.com/k0d0minio/remi-ai/pull/97) · merged: yes — squash, 2026-09-17
 - code-review: high (complexity: complex) — 3 findings, all fixed on this branch; none parked
 - production-readiness: run — no new environment variable, no migration, no adapter registration
   changed. The pooled WebSocket adapter this run depends on arrived on `main` from PR #99 and is
@@ -22,8 +22,9 @@
 - business docs: no business docs impact — `business/scope` already carries the practitioner
   console; this is the workflow inside it.
 - release notes: both
-- sent: <none | ship note sent YYYY-MM-DD>
-- closed out: <RESULT: CLOSED — run archived>
+- sent: ship note sent 2026-09-17
+- closed out: RESULT: CLOSED — run archived to `.icm/runs/_done/bulk-entry/`; the
+  `practitioner-workflow` epic still has stubs, so it stays open
 
 ## Acceptance check (vs spec)
 
