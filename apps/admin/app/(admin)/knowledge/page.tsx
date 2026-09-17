@@ -4,12 +4,12 @@ import {
   listNutritionRuleTags,
   listNutritionRules,
   type NutritionRuleQuery,
+  type NutritionRuleShelf,
 } from "@remi/services/server";
 import {
   nutritionRuleKinds,
   nutritionRuleStatuses,
   type NutritionRuleKind,
-  type NutritionRuleShelf,
   type NutritionRuleStatus,
 } from "@remi/services/shared";
 import {
