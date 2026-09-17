@@ -59,7 +59,7 @@ export const readCiqualSource = async (dir) => {
   for (const [key, name] of Object.entries(found)) {
     // The BOM the publisher ships would otherwise land inside the first tag.
     const text = await readFile(join(dir, name), "utf8");
-    source[key] = text.replace(/^﻿/, "");
+    source[key] = text.replace(/^\uFEFF/, "");
     checksums.push(
       `${name}:${createHash("sha256").update(source[key]).digest("hex")}`,
     );
