@@ -8,4 +8,4 @@ apply what their practitioner told them?
 
 No form yet — the meal entry and the check-in land next.
 
-Dig deeper: <merged-PR URL> · <changelog entry URL>
+Dig deeper: https://github.com/k0d0minio/remi-ai/pull/98 · https://github.com/k0d0minio/remi-ai/blob/main/apps/docs/app/changelog/2026-09-17-link-writes/page.mdx

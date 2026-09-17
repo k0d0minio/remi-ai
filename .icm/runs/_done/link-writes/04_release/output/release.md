@@ -1,8 +1,9 @@
 # Release: link-writes
 
 - gate: Ready to merge ticked — merge authorised
-- ci: GREEN on <sha> (ci-status.sh, after the last push)
-- pr: #98 · https://github.com/k0d0minio/remi-ai/pull/98 · merged: <yes — when / no>
+- ci: GREEN, established by ci-status.sh on the head that was merged — the last push before the
+  squash. PR #98's check runs are the record of it.
+- pr: #98 · https://github.com/k0d0minio/remi-ai/pull/98 · merged: yes — 2026-09-17, squashed
 - code-review: high (spec complexity: complex) — 6 findings; 5 fixed on the branch, 1 parked
 - production-readiness: run — no env var added, no adapter added, migration additive and
   roll-back-safe; one cross-PR hazard found and parked (see below)
@@ -14,8 +15,11 @@
 - business docs: `business/roles` — what a patient can change, through which credential, with what
   ceiling, and that a link reaches its own record and no other
 - release notes: both
-- sent: <none | ship note sent 2026-09-17>
-- closed out: <RESULT: CLOSED — run archived; epic still has 5 open stubs>
+- sent: no — `RESEND_API_KEY` and `SHIP_NOTE_RECIPIENTS` are both unset in this environment, so
+  `send-ship-note.sh --send` cannot deliver. The note is written and ready at
+  `04_release/output/ship-note.md`; whoever has those secrets can send it unchanged.
+- closed out: RESULT: CLOSED — run archived to `.icm/runs/_done/link-writes/`; the `patient-loop`
+  epic keeps its folder, 5 stubs still open
 
 ## Acceptance check (vs spec)
 
@@ -86,6 +90,14 @@ code and three of them made the spec's own claims untrue:
   second with an older `when` is skipped silently, shipping code that queries columns that do not
   exist. This PR is safe to merge now (its `when` is later than everything on `main`); the others
   must be rebased and **regenerated**, never renumbered by hand.
+
+## A note on the ship note's second link
+
+It points at the changelog entry's **source** on `main`, not at the live page. The live origin
+comes from `NEXT_PUBLIC_DOCS_URL`, which is set in Vercel; `shared/links.ts`'s fallback domain is
+documented there as a placeholder that nothing in production should reach, and this session has no
+Vercel read access to confirm the real one. A source link that works beats a guessed link that
+404s. Swap it for the live URL when sending, if you know it.
 
 ## Context budget
 
