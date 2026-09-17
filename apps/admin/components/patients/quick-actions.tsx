@@ -1,7 +1,7 @@
 "use client";
 
 import NextLink from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@remi/ui";
 import type { PatientSegment } from "@/components/patients/vocabulary";
 import { scrollTo } from "@/components/patients/patient-navigation";
@@ -40,6 +40,7 @@ type Props = {
 export const QuickActions = ({ patientId }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const go = (action: Action) => {
     const current =
@@ -49,7 +50,11 @@ export const QuickActions = ({ patientId }: Props) => {
       document
         .getElementById("patient-page")
         ?.setAttribute("data-segment", action.segment);
-      router.replace(`${pathname}?segment=${action.segment}`);
+      // Every other param is kept — `from=consultation` above all, which is
+      // what puts the way back on the page.
+      const params = new URLSearchParams(searchParams);
+      params.set("segment", action.segment);
+      router.replace(`${pathname}?${params}`);
       window.setTimeout(() => scrollTo(action.targetId), 60);
     } else {
       scrollTo(action.targetId);

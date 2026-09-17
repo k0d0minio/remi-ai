@@ -144,17 +144,33 @@ const makeCollection = <T extends { id: Id }>(
 };
 
 /**
- * Build the client from `DATABASE_URL`. Register it once at process start —
- * each app's `ensureDatabase()` helper is the place — via `registerDatabase()`.
+ * Build the client from `DATABASE_URL`. Register it via `registerDatabase()`
+ * from the app's `ensureDatabase()` helper, lazily at first use.
  *
- * The pool is created once per process and deliberately not closed per
- * request: on Vercel a function instance serves many requests, and tearing the
- * WebSocket down after each one would pay the connection cost every time.
+ * **One pool per module graph, not per process.** Next.js bundles every route
+ * with its own copy of this package, so `registerDatabase()` runs once per
+ * graph and each one builds a pool of its own — the same fact that puts
+ * registration in `ensureDatabase()` rather than in a boot hook. They are
+ * sized on that basis: a small ceiling and an idle timeout, so a handful of
+ * route bundles cannot between them hold more connections than the database
+ * will give. A pool is never closed per request — on Vercel one function
+ * instance serves many, and tearing the WebSocket down after each would pay
+ * the connection cost every time.
  */
 export const createNeonDatabase = (): DatabaseClient => {
   const pool = new Pool({
     connectionString: requireEnv("DATABASE_URL", "createNeonDatabase()"),
+    max: 5,
+    idleTimeoutMillis: 30_000,
   });
+
+  // Neon drops idle connections, and a pool with no `error` listener turns
+  // that into an unhandled `'error'` event, which ends the process. The HTTP
+  // driver this replaced held no sockets and could not do it; this one can.
+  pool.on("error", (cause) => {
+    console.error("[database] idle client error", cause);
+  });
+
   const db = drizzle(pool);
 
   const clientOn = (queryable: Queryable): DatabaseClient => ({

@@ -1,9 +1,13 @@
-import { ok, type Result } from "../../../shared/result";
+import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase } from "../../client";
 import type { PatientGoalCheckIn } from "../../models/patient-goal-check-in";
 import type { PatientNote } from "../../models/patient-note";
-import { addGoalCheckIn, type GoalCheckInInput } from "../patient-goals";
+import {
+  addGoalCheckIn,
+  listPatientGoals,
+  type GoalCheckInInput,
+} from "../patient-goals";
 import {
   getPatientInstruction,
   setPatientInstruction,
@@ -94,6 +98,18 @@ export const recordConsultation = async (
     return patient;
   }
 
+  // The goal ids arrive from the form, so they are checked against this
+  // patient's own goals before anything is written. `addGoalCheckIn` resolves a
+  // goal by id alone; without this, a tampered form could hang a check-in off
+  // another patient's goal while the single audit row named this one.
+  const ownGoals = new Set(
+    (await listPatientGoals(patientId)).map((goal) => goal.id),
+  );
+  const submitted = (input.checkIns ?? []).filter(saysSomething);
+  if (submitted.some((entry) => !ownGoals.has(entry.goalId))) {
+    return err("not_found", "no such goal for this patient");
+  }
+
   try {
     return ok(
       await getDatabase().transaction(async (tx) => {
@@ -104,10 +120,7 @@ export const recordConsultation = async (
         );
 
         const checkIns: PatientGoalCheckIn[] = [];
-        for (const entry of input.checkIns ?? []) {
-          if (!saysSomething(entry)) {
-            continue;
-          }
+        for (const entry of submitted) {
           const checkIn: GoalCheckInInput = {
             checkedOn: input.note.occurredAt,
             direction: entry.direction ?? null,

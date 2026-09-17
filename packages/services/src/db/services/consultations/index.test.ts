@@ -155,6 +155,22 @@ describe("recording a consultation", () => {
     expect(await getPatientInstruction(patientId)).toBeNull();
   });
 
+  it("refuses a check-in on a goal that is not this patient's, and writes nothing", async () => {
+    const otherPatient = unwrapOk(await createPatient({ pseudonym: "Alix" }));
+    const otherGoal = unwrapOk(
+      await addPatientGoal(otherPatient.id, { title: "Bouger plus" }),
+    );
+
+    const result = await recordConsultation(patientId, {
+      note: { occurredAt: "2026-09-17", body: "Le sommeil s'améliore." },
+      checkIns: [{ goalId: otherGoal.id, measure: "9/10" }],
+    });
+
+    expect(result.ok).toBe(false);
+    expect(await listPatientNotes(patientId)).toHaveLength(0);
+    expect(await listGoalCheckIns(otherGoal.id)).toHaveLength(0);
+  });
+
   it("does not touch a field the form did not send", async () => {
     await recordConsultation(patientId, {
       note: { occurredAt: "2026-09-01", body: "Première." },

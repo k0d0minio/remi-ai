@@ -470,7 +470,10 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
             </CardContent>
           </Card>
 
-          <QuickActions patientId={patient.id} />
+          {/* It reads the segment from the URL, same as the navigation. */}
+          <Suspense fallback={null}>
+            <QuickActions patientId={patient.id} />
+          </Suspense>
         </section>
 
         {/* Secondary sections — each registered once above, body untouched. */}

@@ -60,6 +60,9 @@ type Props = {
 type CheckInDraft = { direction: string; measure: string; note: string };
 
 type Draft = {
+  /** When the draft was last written — epoch ms. Absent on one written before
+   * drafts were stamped, which reads as stale and is dropped. */
+  savedAt?: number;
   occurredAt: string;
   title: string;
   body: string;
@@ -78,6 +81,18 @@ const emptyCheckIn: CheckInDraft = { direction: NONE, measure: "", note: "" };
 /** Long enough that typing never queues a write per keystroke, short enough
  * that a tab closed mid-sentence loses at most the word in progress. */
 const AUTOSAVE_DELAY_MS = 400;
+
+/**
+ * How long an abandoned draft stays readable.
+ *
+ * A draft is consultation notes — the most sensitive free text in the product
+ * — sitting in the browser's own storage, where it outlives the session that
+ * wrote it: a tab closed mid-consultation leaves it there for whoever opens
+ * that browser profile next, signed in or not. Long enough to survive a
+ * consultation and the walk back to the desk; short enough that it is not
+ * still there tomorrow. A save clears it outright.
+ */
+const DRAFT_TTL_MS = 12 * 60 * 60 * 1000;
 
 const readDraft = (patientId: string) => {
   try {
@@ -102,13 +117,17 @@ const subscribeToDraft = (onChange: () => void) => {
   return () => window.removeEventListener("storage", onChange);
 };
 
-/** A draft that will not parse is one she never sees again, silently. */
+/** A draft that will not parse, or has gone stale, is one she never sees again. */
 const parseDraft = (raw: string | null, blank: Draft): Draft | null => {
   if (!raw) {
     return null;
   }
   try {
-    return { ...blank, ...(JSON.parse(raw) as Partial<Draft>) };
+    const parsed = JSON.parse(raw) as Partial<Draft>;
+    if (!parsed.savedAt || Date.now() - parsed.savedAt > DRAFT_TTL_MS) {
+      return null;
+    }
+    return { ...blank, ...parsed };
   } catch {
     return null;
   }
@@ -176,6 +195,13 @@ export const ConsultationForm = ({
 
   useEffect(() => {
     if (state.saved) {
+      // Before the clear, not after: a keystroke while the save was in flight
+      // leaves a write queued, and it would otherwise land on an emptied store
+      // and restore the consultation she has just saved as a fresh draft.
+      if (pendingWrite.current) {
+        clearTimeout(pendingWrite.current);
+        pendingWrite.current = null;
+      }
       clearDraft(patientId);
       router.push(`/patients/${patientId}`);
     }
@@ -200,7 +226,10 @@ export const ConsultationForm = ({
     }
     pendingWrite.current = setTimeout(() => {
       try {
-        window.localStorage.setItem(draftKey(patientId), JSON.stringify(next));
+        window.localStorage.setItem(
+          draftKey(patientId),
+          JSON.stringify({ ...next, savedAt: Date.now() }),
+        );
       } catch {
         // A full or disabled store costs the safety net, not the save.
       }
@@ -218,6 +247,7 @@ export const ConsultationForm = ({
   const discard = () => {
     if (pendingWrite.current) {
       clearTimeout(pendingWrite.current);
+      pendingWrite.current = null;
     }
     setEdited(blank);
     clearDraft(patientId);
