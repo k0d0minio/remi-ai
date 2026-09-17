@@ -512,6 +512,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 url={shareUrl}
                 email={patient.email}
                 lastOpenedAt={patient.linkLastOpenedAt}
+                lastWroteAt={patient.linkLastWroteAt}
               />
             </CardContent>
           </Card>

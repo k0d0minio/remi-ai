@@ -313,7 +313,7 @@ export const fr: Content = {
     },
     privacy: {
       title: "Vos données et ce lien",
-      body: "Cette page montre uniquement ce que votre praticienne a enregistré pour vous. Elle n'apparaît pas dans les moteurs de recherche, mais elle s'ouvre sans mot de passe — toute personne qui possède le lien peut la lire, ne le transmettez donc qu'aux personnes de votre choix. Pour consulter, corriger ou faire supprimer vos données, écrivez à votre praticienne : personne d'autre n'y a accès.",
+      body: "Cette page montre ce que votre praticienne a enregistré pour vous, et ce que vous y écrivez vous-même. Ce que vous écrivez est conservé, rattaché à votre lien et lu par votre praticienne — c'est ce qui lui permet de vous suivre entre deux consultations. La page n'apparaît pas dans les moteurs de recherche, mais elle s'ouvre sans mot de passe : toute personne qui possède le lien peut la lire et y écrire à votre place, ne le transmettez donc qu'aux personnes de votre choix. Pour consulter, corriger ou faire supprimer vos données, ou pour obtenir un nouveau lien, écrivez à votre praticienne : personne d'autre n'y a accès.",
     },
     betaNote:
       "REMI est en bêta — vos retours sont les bienvenus, dites-nous ce qui manque ou ce qui gêne.",

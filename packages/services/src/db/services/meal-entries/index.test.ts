@@ -63,6 +63,9 @@ describe("meal entries", () => {
     expect(entry.description).toBe("Saumon, riz complet, courgettes");
     expect(entry.patientComment).toBe("J'avais très faim");
     expect(entry.learning).toBe("Aime le saumon");
+    // The console's form is Morgane transcribing. A patient's own entry comes
+    // through the link and says so — `patient-loop/meal-entry`.
+    expect(entry.writtenBy).toBe("practitioner");
   });
 
   it("treats a missing slot as a first-class entry, not an incomplete one", async () => {
