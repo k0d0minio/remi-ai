@@ -95,9 +95,15 @@ export const PatientNavigation = ({ sections }: Props) => {
     return () => observer.disconnect();
   }, [sections]);
 
+  // Rewritten from the params in hand rather than built from scratch: the
+  // consultation screen sends `from=consultation` so the page can offer a way
+  // back to it, and a segment change that dropped it would end the round trip
+  // at the first tap.
   const setSegment = (next: PatientSegment) => {
     document.getElementById(ROOT_ID)?.setAttribute("data-segment", next);
-    router.replace(`${pathname}?segment=${next}`);
+    const params = new URLSearchParams(searchParams);
+    params.set("segment", next);
+    router.replace(`${pathname}?${params}`);
   };
 
   return (

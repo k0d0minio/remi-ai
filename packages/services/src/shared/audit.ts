@@ -7,6 +7,18 @@
  * first, which is the point.
  */
 
+/**
+ * Who took the action. `operator` is Morgane or a founder in the console, and
+ * was the only possibility until the patient link began accepting writes
+ * (`link-writes`): a patient holding their token is an actor with no account,
+ * so the trail records the kind explicitly rather than leaving it inferred
+ * from an empty email — an empty email is also what a system write would
+ * leave, and "nobody" and "the patient" are not the same answer.
+ */
+export const auditActorKinds = ["operator", "patient"] as const;
+
+export type AuditActorKindName = (typeof auditActorKinds)[number];
+
 export const auditActions = [
   "patient.created",
   "patient.updated",
@@ -37,6 +49,9 @@ export const auditActions = [
   "recipe.archived",
   "recipe.restored",
   "recipe.assigned",
+  "recipe.created_and_assigned",
+  "recipe.duplicated_as_variant",
+  "recipe.assigned_bulk",
   "recipe.assignment_updated",
   "recipe.assignment_archived",
   "recipe.assignment_restored",
@@ -53,6 +68,7 @@ export const auditActions = [
   "observation.archived",
   "observation.restored",
   "observation.deleted",
+  "consultation.recorded",
   "note.added",
   "note.updated",
   "note.deleted",
@@ -73,6 +89,12 @@ export const auditActions = [
   "next_consultation_prep.updated",
   "share_link.regenerated",
   "share_link.emailed",
+  /**
+   * The patient's pseudonymous context copied out of the console to be pasted
+   * into a model of the operator's choosing. Health data leaving the console is
+   * worth a line in the trail even when what leaves carries no real identity.
+   */
+  "context.exported",
   "operator.invited",
   "operator.invite_revoked",
   "operator.joined",

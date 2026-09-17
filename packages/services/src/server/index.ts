@@ -36,6 +36,9 @@ export type {
   PatientSort,
 } from "../db/services/patients";
 
+export { writeThroughPatientLink } from "../db/services/patient-link-writes";
+export type { PatientLinkWriteRequest } from "../db/services/patient-link-writes";
+
 export {
   addGoalCheckIn,
   addPatientGoal,
@@ -118,6 +121,7 @@ export {
   archiveRecipe,
   countRecipeAssignments,
   createRecipe,
+  duplicateRecipe,
   getRecipe,
   listArchivedRecipes,
   listRecipeTags,
@@ -128,13 +132,18 @@ export type { RecipeInput } from "../db/services/recipes";
 
 export {
   archiveRecipeAssignment,
-  assignRecipe,
+  assignRecipes,
+  createAndAssignRecipe,
+  duplicateAndAssignRecipe,
   listArchivedPatientRecipes,
   listPatientRecipes,
   removeRecipeAssignment,
   updateRecipeAssignment,
 } from "../db/services/recipe-assignments";
-export type { AssignmentInput } from "../db/services/recipe-assignments";
+export type {
+  AssignmentInput,
+  GivenRecipe,
+} from "../db/services/recipe-assignments";
 export type {
   AssignedRecipe,
   RecipeAssignment,
@@ -181,6 +190,16 @@ export {
   listPatientAnamnesis,
   setPatientAnamnesis,
 } from "../db/services/patient-anamnesis";
+
+export {
+  describeConsultation,
+  recordConsultation,
+} from "../db/services/consultations";
+export type {
+  ConsultationCheckInInput,
+  ConsultationInput,
+  ConsultationRecord,
+} from "../db/services/consultations";
 
 export {
   changeOperatorPassword,
@@ -243,6 +262,23 @@ export {
   resolveModel,
 } from "../ai";
 export type { GenerateOptions, ModelRole, TextProvider } from "../ai";
+
+export {
+  DEFAULT_CONTEXT_PREAMBLE,
+  contextBlocks,
+  defaultContextBlocks,
+  patientContextText,
+} from "../ai";
+export type {
+  ContextBlock,
+  ContextEssential,
+  ContextGoal,
+  ContextProfile,
+  ContextRecommendationGroup,
+  ContextSupplement,
+  PatientContextInput,
+  PatientContextOptions,
+} from "../ai";
 
 export { env, requireEnv } from "./env";
 export type { ServerEnv } from "./env";

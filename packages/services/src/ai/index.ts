@@ -54,3 +54,25 @@ export const getTextProvider = (): TextProvider => {
 };
 
 export const resolveModel = (role: ModelRole = DEFAULTS.role) => MODELS[role];
+
+/**
+ * The patient context block — the plain-French text every prompt here opens
+ * with, and the one part of `ai-assist` that needs no vendor. `copy-context`
+ * is its first consumer; the adapter will be its second.
+ */
+export {
+  DEFAULT_CONTEXT_PREAMBLE,
+  contextBlocks,
+  defaultContextBlocks,
+  patientContextText,
+} from "./context";
+export type {
+  ContextBlock,
+  ContextEssential,
+  ContextGoal,
+  ContextProfile,
+  ContextRecommendationGroup,
+  ContextSupplement,
+  PatientContextInput,
+  PatientContextOptions,
+} from "./context";

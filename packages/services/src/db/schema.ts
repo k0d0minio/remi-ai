@@ -7,6 +7,7 @@ import {
   timestamp,
   unique,
   uuid,
+  type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -126,6 +127,19 @@ export const patientProfiles = pgTable("patient_profiles", {
    * actually asks of it — did they look — without a page-view table behind it.
    */
   linkLastOpenedAt: timestamp("link_last_opened_at", {
+    withTimezone: true,
+    mode: "date",
+  }),
+  /**
+   * When the patient last WROTE through the link, which is a different fact
+   * from having opened it and one Morgane acts on differently: a page that was
+   * read tells her nothing happened yet, a page that was written into is a
+   * meal or a check-in waiting for her. Deliberately not `last_edited_at` —
+   * that column means she worked on this patient and sorts her roster, and a
+   * patient logging a meal must not push their own record above the one she
+   * spent the morning encoding.
+   */
+  linkLastWroteAt: timestamp("link_last_wrote_at", {
     withTimezone: true,
     mode: "date",
   }),
@@ -295,6 +309,13 @@ export const patientGoalCheckIns = pgTable("patient_goal_check_ins", {
   /** The simple measure on the day — "4/10", "presque plus de réveils". */
   measure: text("measure").notNull().default(""),
   note: text("note").notNull().default(""),
+  /**
+   * A key from `writtenByKinds`. Morgane's consultation check-in and the
+   * patient's own in-page answer share this table, and the console needs to
+   * tell them apart; the default is what every row predating the link's write
+   * path was.
+   */
+  writtenBy: text("written_by").notNull().default("practitioner"),
   ...timestamps,
 });
 
@@ -411,6 +432,19 @@ export const recipes = pgTable("recipes", {
    * archives and never deletes — the restrict below is what enforces it.
    */
   archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  /**
+   * Where a variant came from. Null for a recipe written from scratch, and for
+   * every row that predates the column — provenance is not reconstructible, so
+   * a blank here means "unknown", never "original".
+   *
+   * `restrict` for the same reason the assignment's recipe FK is: the library
+   * never deletes, and a row that other rows point back to is exactly the kind
+   * the rule exists for. The self-reference needs the `AnyPgColumn` annotation
+   * because the table is still being defined at this point.
+   */
+  variantOfId: uuid("variant_of_id").references((): AnyPgColumn => recipes.id, {
+    onDelete: "restrict",
+  }),
   ...timestamps,
 });
 
@@ -501,6 +535,13 @@ export const patientMealEntries = pgTable("patient_meal_entries", {
   learning: text("learning").notNull().default(""),
   /** Archive, never delete: a meal she answered stays in the record. */
   archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  /**
+   * A key from `writtenByKinds` — her transcription, or the patient's own
+   * entry through the link. `description` is prose either way, so without this
+   * column nothing downstream can tell whose words they are, and the AI round
+   * has to.
+   */
+  writtenBy: text("written_by").notNull().default("practitioner"),
   ...timestamps,
 });
 
@@ -574,6 +615,13 @@ export const operatorInvitations = pgTable("operator_invitations", {
  */
 export const auditEvents = pgTable("audit_events", {
   id: uuid("id").primaryKey().defaultRandom(),
+  /**
+   * A key from `auditActorKinds`. Explicit rather than inferred: a patient
+   * writing through their link has no account and so no email, and an empty
+   * email is exactly what a system write leaves too. The default is what every
+   * row written before the link accepted writes was.
+   */
+  actorKind: text("actor_kind").notNull().default("operator"),
   actorId: uuid("actor_id"),
   actorEmail: text("actor_email").notNull().default(""),
   actorName: text("actor_name").notNull().default(""),
@@ -583,5 +631,29 @@ export const auditEvents = pgTable("audit_events", {
   /** How the target read at the time — a pseudonym, an email, a title. */
   targetLabel: text("target_label").notNull().default(""),
   detail: text("detail").notNull().default(""),
+  ...timestamps,
+});
+
+/**
+ * One row per write accepted through a patient link — the ledger the per-token
+ * rate limit counts.
+ *
+ * A ledger rather than a counter column because the limit is a ROLLING window:
+ * a counter with a window start resets at a boundary, so ten writes at 10:59
+ * and ten more at 11:00 pass a "ten per hour" rule that means nothing. Counting
+ * rows inside the window has no such edge, and the table stays small because
+ * every accepted write prunes what has fallen out of the longest window — the
+ * day ceiling is also the row ceiling, about a hundred per patient.
+ *
+ * It holds when, and nothing else: no body, no action, no address. What was
+ * written is the row the write created, and who did it is the audit trail —
+ * duplicating either here would be a second copy of health data whose only job
+ * is arithmetic.
+ */
+export const patientLinkWrites = pgTable("patient_link_writes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
   ...timestamps,
 });

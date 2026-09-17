@@ -40,6 +40,7 @@ import {
 } from "@remi/ui/server";
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
+import { CopyContextCard } from "@/components/patients/copy-context-card";
 import { DeletePatient } from "@/components/patients/delete-patient";
 import { GoalAddForm } from "@/components/patients/goal-add-form";
 import { GoalList } from "@/components/patients/goal-list";
@@ -82,6 +83,7 @@ import {
   patientStatusLabels,
   type PatientSegment,
 } from "@/components/patients/vocabulary";
+import { patientContextInput } from "@/lib/patients/context";
 import { ensureDatabase } from "@/lib/database";
 
 /** Reads the database on every hit — never prerendered. */
@@ -91,7 +93,7 @@ type Params = { id: string };
 
 type PageProps = {
   params: Promise<Params>;
-  searchParams: Promise<{ segment?: string | string[] }>;
+  searchParams: Promise<{ segment?: string | string[]; from?: string }>;
 };
 
 const isPatientSegment = (value: string): value is PatientSegment =>
@@ -111,7 +113,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   // The page's own graph, not the layout's — the two render in parallel.
   ensureDatabase();
   const { id } = await params;
-  const segmentParam = (await searchParams).segment;
+  const query = await searchParams;
+  const segmentParam = query.segment;
+  // Set by the consultation screen's protocol links: leaving the write-up to
+  // add a recommendation is a round trip, so the way back is on the page she
+  // lands on rather than in her browser history.
+  const fromConsultation = query.from === "consultation";
   const segmentValue = Array.isArray(segmentParam)
     ? segmentParam[0]
     : segmentParam;
@@ -308,11 +315,15 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
         {/* Status banner — above every section, stays put on desktop. */}
         <div className="bg-background flex flex-col gap-2 lg:sticky lg:top-14 lg:z-20">
           <NextLink
-            href="/patients"
+            href={
+              fromConsultation
+                ? `/patients/${patient.id}/consultation`
+                : "/patients"
+            }
             className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/40 inline-flex w-fit items-center gap-1.5 rounded-sm text-sm transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
           >
             <ArrowLeft aria-hidden="true" className="size-4" />
-            Patients
+            {fromConsultation ? "Retour à la consultation" : "Patients"}
           </NextLink>
           <div className="flex flex-wrap items-center gap-3">
             <Typography as="h1" size="2xl" weight="semibold">
@@ -464,7 +475,35 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
             </CardContent>
           </Card>
 
-          <QuickActions />
+          <Card id="copy-context" className="scroll-mt-32">
+            <CardHeader>
+              <CardTitle>Copier le contexte</CardTitle>
+              <CardDescription>
+                Le contexte de la personne en texte clair, à coller dans le
+                modèle de votre choix. Pseudonyme uniquement, aucun appel au
+                modèle depuis REMI.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CopyContextCard
+                patientId={patient.id}
+                context={patientContextInput({
+                  patient,
+                  goals,
+                  instruction,
+                  recommendations,
+                  supplements,
+                  essentials,
+                  summary,
+                })}
+              />
+            </CardContent>
+          </Card>
+
+          {/* It reads the segment from the URL, same as the navigation. */}
+          <Suspense fallback={null}>
+            <QuickActions patientId={patient.id} />
+          </Suspense>
         </section>
 
         {/* Secondary sections — each registered once above, body untouched. */}
@@ -488,6 +527,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 url={shareUrl}
                 email={patient.email}
                 lastOpenedAt={patient.linkLastOpenedAt}
+                lastWroteAt={patient.linkLastWroteAt}
               />
             </CardContent>
           </Card>
@@ -720,8 +760,9 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               <CardTitle>Recettes</CardTitle>
               <CardDescription>
                 Les recettes que cette personne a en ce moment, avec le mot qui
-                va avec chacune. Elles s&apos;écrivent une fois dans « Recettes
-                » et s&apos;attribuent ici.
+                va avec chacune. Attribuez-en plusieurs d&apos;un coup,
+                écrivez-en une ici, ou adaptez-en une en variante — la
+                bibliothèque « Recettes » garde tout.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
@@ -730,7 +771,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                   Aucune recette attribuée pour le moment.
                 </Typography>
               ) : (
-                <RecipeAssignments entries={assignedRecipes} />
+                <RecipeAssignments entries={assignedRecipes} today={today} />
               )}
 
               <AssignRecipeForm
@@ -758,7 +799,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <RecipeAssignments entries={pastRecipes} />
+                <RecipeAssignments entries={pastRecipes} today={today} />
               </CardContent>
             </Card>
           </section>

@@ -27,6 +27,20 @@ quick actions. Everything else sits behind navigation: a section index in the ri
 desktop, a segmented control (Suivi · Journal · Dossier · Profil) on phone, and a horizontal row
 of anchors in between. One DOM order, three views — the secondary sections' bodies are unchanged.
 
+### Writing up a consultation
+
+The first quick action leaves the page: `/patients/[id]/consultation` is the post-consultation
+write-up, laid out in the order the work happens — the note, a check-in per active goal, the
+standing instruction and the living summary prefilled with what is in force, links into the
+recommendation, supplement and essentials sections, and the preparation note for next time. One
+save writes all of it in a single transaction and records a single audit event naming what changed;
+the per-card actions on the patient page remain the between-consultation edit path.
+
+The form is kept in the browser's local storage while it is typed and restored when the screen
+reopens — the links into the protocol sections leave the page and come back, and a draft that
+survives only the note would lose the rest. It is cleared once a save succeeds, and nothing about it
+reaches the server or another device.
+
 ## Why demo can never reach a backend
 
 The Design stage merges demo work straight to the live URL so a stakeholder reviews the real
