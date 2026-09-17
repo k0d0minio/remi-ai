@@ -2,7 +2,7 @@
 
 - commits: see the branch — schema + migration, parser, query service, scripts + fixture, console
   surface, decisions page
-- ci: GREEN on c77ef7f — every blocking check and all six Vercel deploys, admin included
+- ci: GREEN on 3036e0e — every blocking check and all six Vercel deploys, admin included
 
 ## What changed
 
@@ -52,7 +52,7 @@ and the food stays searchable. There is a test for it.
 - **`pnpm ciqual:fixture`** run against the same export; the committed subset is its output.
 - **249 tests pass** (`pnpm test`), 48 of them new.
 - **`pnpm db:generate`** reports no drift.
-- **The admin preview builds**, and its `db:migrate` step created the three tables in the database.
+- **The admin preview builds**, and its `db:migrate` step applied `0014` to the database.
 
 ## The migration failure, and what it cost
 
@@ -62,18 +62,26 @@ pass — the verification step added after the same failure cost two days in pro
 
 The cause is the one that script's own header describes. Drizzle decides what to apply by comparing
 a journal entry's timestamp against the newest `created_at` in `drizzle.__drizzle_migrations`,
-**never by hash**. The first migration was generated at 12:05:30Z; the database's mark already
+**never by hash**. This branch's migration was generated at 12:05:30Z; the database's mark already
 stood at **12:07:51Z**. So it was recorded as applied, its SQL never ran, and drizzle would never
 have revisited it.
 
-It was regenerated past the mark and written with `IF NOT EXISTS`, which is the repair the script
-prescribes. The admin deploy on `c77ef7f` then applied it for real: `foods`, `food_nutrients` and
-`ciqual_imports` are now in the database with 11, 11 and 7 columns, and all three are empty.
+The mark turned out to belong to `link-writes` (#98): its `0013_gray_charles_xavier` carries
+`when: 1789646871306`, exactly the mark, and it merged to main two minutes after this branch's
+migration was generated. Merging main in confirmed it — and conflicted, because both branches had
+added a `0013` and both had appended a table to `schema.ts`. Both tables are kept; the migration is
+**regenerated as `0014_broad_shinobi_shaw`** rather than renumbered by hand, which is what
+`.icm/intake/triage/parallel-migrations-journal-ordering.md` — filed from that release pass, naming
+this PR — asks for.
 
-**The mark moved because something outside this branch migrated that database.** It holds sixteen
-applied rows where this branch's journal holds fourteen, and `migrate.mjs`'s non-production guard
-did not fire on the preview at all. That is a live defect affecting every future migration, not
-this run's to fix, and it is raised as `.icm/intake/triage/preview-deploys-migrate-production.md`.
+It keeps `IF NOT EXISTS`, and now necessarily so: the first repair attempt did create the three
+tables, in the database production shares, from this branch's preview. A plain `CREATE` would fail
+there. As of `3036e0e` the database holds 17 applied migrations with `0014` as the newest, and
+`foods`, `food_nutrients` and `ciqual_imports` exist with 11, 11 and 7 columns — all three empty.
+
+**That a preview deploy could write to that database at all is a separate defect**, and the half
+the sibling stub does not cover: `migrate.mjs`'s non-production guard did not fire.
+`.icm/intake/triage/preview-deploys-migrate-production.md` is that stub.
 
 ## Not verified here — four criteria need a database and a signed-in pass
 
@@ -113,7 +121,7 @@ Dropping the commit costs nothing but the next session's ability to run the CIQU
   accents, the group filter, a food's full composition page, and that `traces`, `< x` and « — »
   render as themselves rather than as numbers. Sign out and confirm `/aliments` is unreachable.
 - The import must run against the database before any of that shows real rows. The tables are
-  there and empty as of `c77ef7f`.
+  there and empty as of `3036e0e`.
 - The licence attribution is a condition of use, not decoration: it appears on the home line, both
   `/aliments` pages and the decisions page. If a surface loses it, that is a blocker.
 - Open question carried from the stub, unchanged: which components Morgane wants beyond the twelve.
