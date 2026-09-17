@@ -149,11 +149,7 @@ export const PantrySection = ({
             <input type="hidden" name="row-id" value={row.id} />
 
             <div className="flex items-end gap-2">
-              <Field
-                id={`${row.key}-item`}
-                label="Aliment"
-                className="flex-1"
-              >
+              <Field id={`${row.key}-item`} label="Aliment" className="flex-1">
                 <Input
                   id={`${row.key}-item`}
                   name="row-item"

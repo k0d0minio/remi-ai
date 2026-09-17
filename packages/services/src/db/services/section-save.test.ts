@@ -27,7 +27,12 @@ describe("section save planning", () => {
   it("inserts a row the operator added, at its place in the run", () => {
     const result = plan(
       [stored("a", 0, "first")],
-      [[{ id: "a", title: "first" }, { title: "second" }]],
+      [
+        [
+          { id: "a", title: "first" },
+          { title: "second" },
+        ],
+      ],
     );
 
     expect(result.inserts).toEqual([
@@ -49,7 +54,12 @@ describe("section save planning", () => {
   it("separates a changed row from a merely moved one", () => {
     const result = plan(
       [stored("a", 0, "first"), stored("b", 1, "second")],
-      [[{ id: "b", title: "second" }, { id: "a", title: "renamed" }]],
+      [
+        [
+          { id: "b", title: "second" },
+          { id: "a", title: "renamed" },
+        ],
+      ],
     );
 
     const byId = new Map(result.updates.map((update) => [update.id, update]));
@@ -69,7 +79,10 @@ describe("section save planning", () => {
     const result = plan(
       [],
       [
-        [{ title: "nutrition one" }, { title: "nutrition two" }],
+        [
+          { title: "nutrition one" },
+          { title: "nutrition two" },
+        ],
         [{ title: "habit one" }],
       ],
     );

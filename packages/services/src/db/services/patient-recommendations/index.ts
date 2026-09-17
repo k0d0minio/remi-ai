@@ -277,7 +277,9 @@ export const savePatientRecommendations = async (
 
   const parsedRows: RecommendationRow[] = [];
   for (const [index, row] of rows.entries()) {
-    const parsed = recommendationFields.partial({ detail: true }).safeParse(row);
+    const parsed = recommendationFields
+      .partial({ detail: true })
+      .safeParse(row);
     if (!parsed.success) {
       return err(
         "invalid_input",

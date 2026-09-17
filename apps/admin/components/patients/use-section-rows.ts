@@ -35,7 +35,7 @@ export type SectionRows<T> = {
   reset: (values: readonly T[]) => void;
 };
 
-export const useSectionRows = <T,>(
+export const useSectionRows = <T>(
   initial: readonly T[],
   blank: () => T,
 ): SectionRows<T> => {
