@@ -40,6 +40,7 @@ import {
 } from "@remi/ui/server";
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
+import { CopyContextCard } from "@/components/patients/copy-context-card";
 import { DeletePatient } from "@/components/patients/delete-patient";
 import { GoalAddForm } from "@/components/patients/goal-add-form";
 import { GoalList } from "@/components/patients/goal-list";
@@ -79,6 +80,7 @@ import {
   patientStatusLabels,
   type PatientSegment,
 } from "@/components/patients/vocabulary";
+import { patientContextInput } from "@/lib/patients/context";
 import { ensureDatabase } from "@/lib/database";
 
 /** Reads the database on every hit — never prerendered. */
@@ -470,6 +472,31 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
             </CardContent>
           </Card>
 
+          <Card id="copy-context" className="scroll-mt-32">
+            <CardHeader>
+              <CardTitle>Copier le contexte</CardTitle>
+              <CardDescription>
+                Le contexte de la personne en texte clair, à coller dans le
+                modèle de votre choix. Pseudonyme uniquement, aucun appel au
+                modèle depuis REMI.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CopyContextCard
+                patientId={patient.id}
+                context={patientContextInput({
+                  patient,
+                  goals,
+                  instruction,
+                  recommendations,
+                  supplements,
+                  essentials,
+                  summary,
+                })}
+              />
+            </CardContent>
+          </Card>
+
           {/* It reads the segment from the URL, same as the navigation. */}
           <Suspense fallback={null}>
             <QuickActions patientId={patient.id} />
@@ -497,6 +524,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 url={shareUrl}
                 email={patient.email}
                 lastOpenedAt={patient.linkLastOpenedAt}
+                lastWroteAt={patient.linkLastWroteAt}
               />
             </CardContent>
           </Card>

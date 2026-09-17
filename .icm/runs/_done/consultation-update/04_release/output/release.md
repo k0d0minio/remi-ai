@@ -17,6 +17,13 @@
   `requireOperator()`; every query goes through the Drizzle builder with literal filter keys;
   `describeConsultation` emits field names and counts, never clinical text.
 - parked: `check-in-goal-not-scoped-to-patient.md` · `consultation-draft-clear-on-sign-out.md`
+- base merge: `copy-context` (#96) and `link-writes` (#98) merged to `main` during this run and the
+  PR went un-mergeable. `main` was merged in — never rebased, the branch is shared — and four
+  conflicts resolved by hand: the changelog index (all three entries, newest first), the quick
+  actions' docblock (five actions now, one of which leaves the page), the patient page's working
+  view (both the copy-context card and the quick actions), and `addGoalCheckIn`, which gained
+  `writtenBy` from #98 and the transaction's client from this run — it now takes both, and the
+  composed write passes `"practitioner"` explicitly. 232 service tests pass on the merged tree.
 - technical docs: `technical/decisions` (a new "Storage driver — 2026-09-17" block) ·
   `technical/applications` (the consultation screen under the operator's patient page)
 - business docs: no business docs impact — the change is a practitioner workflow already described

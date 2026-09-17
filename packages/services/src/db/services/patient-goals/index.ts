@@ -4,6 +4,7 @@ import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientGoal } from "../../models/patient-goal";
+import type { WrittenBy } from "../../models/meal-entry";
 import type { PatientGoalCheckIn } from "../../models/patient-goal-check-in";
 import { touchPatient } from "../patients";
 
@@ -295,9 +296,11 @@ const parseCheckIn = (input: GoalCheckInInput) =>
       direction: input.direction === "" ? null : (input.direction ?? null),
     });
 
+/** `writtenBy` is set by the code path, never by the payload — see `addMealEntry`. */
 export const addGoalCheckIn = async (
   goalId: Id,
   input: GoalCheckInInput,
+  writtenBy: WrittenBy = "practitioner",
   db?: DatabaseClient,
 ): Promise<Result<PatientGoalCheckIn>> => {
   if (!uuidSchema.safeParse(goalId).success) {
@@ -323,7 +326,7 @@ export const addGoalCheckIn = async (
       "a check-in needs a direction, a measure or a note",
     );
   }
-  const created = await checkIns(db).insert({ goalId, ...entry });
+  const created = await checkIns(db).insert({ goalId, ...entry, writtenBy });
   await touchPatient(goal.patientId, db);
   return ok(created);
 };

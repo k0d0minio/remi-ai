@@ -21,6 +21,7 @@ const ACTIONS: readonly Action[] = [
   },
   { label: "Proposer une recette", targetId: "recipes", segment: "dossier" },
   { label: "Ajouter un retour repas", targetId: "meals", segment: "journal" },
+  { label: "Copier le contexte", targetId: "copy-context", segment: "suivi" },
 ];
 
 type Props = {
@@ -28,14 +29,14 @@ type Props = {
 };
 
 /**
- * The working view's four quick actions.
+ * The working view's five quick actions.
  *
  * « Nouvelle consultation » is the one that leaves the page: it opens the
  * write-up screen, where the note, the check-ins, the consigne, the résumé and
- * the preparation note are one form and one save. The other three land on
- * their section's add form; when that section lives in another phone segment,
- * they switch the segment first (same mechanism as the segmented control — the
- * URL and the root's data-segment) and scroll once it is back in the layout.
+ * the preparation note are one form and one save. The other four land on their
+ * section's add form; when that section lives in another phone segment, they
+ * switch the segment first (same mechanism as the segmented control — the URL
+ * and the root's data-segment) and scroll once it is back in the layout.
  */
 export const QuickActions = ({ patientId }: Props) => {
   const router = useRouter();

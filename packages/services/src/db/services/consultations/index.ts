@@ -128,7 +128,11 @@ export const recordConsultation = async (
             note: entry.note ?? "",
           };
           checkIns.push(
-            orRollback(await addGoalCheckIn(entry.goalId, checkIn, tx)),
+            orRollback(
+              // Written by Morgane at the consultation, not by the patient
+              // through their link — the same default the single-row path uses.
+              await addGoalCheckIn(entry.goalId, checkIn, "practitioner", tx),
+            ),
           );
         }
 

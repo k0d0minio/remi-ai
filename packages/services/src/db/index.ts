@@ -33,6 +33,9 @@ export {
 } from "./services/patients";
 export type { PatientInput } from "./services/patients";
 
+export { writeThroughPatientLink } from "./services/patient-link-writes";
+export type { PatientLinkWriteRequest } from "./services/patient-link-writes";
+
 export {
   listPatientAnamnesis,
   setPatientAnamnesis,
