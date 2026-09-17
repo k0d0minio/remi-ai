@@ -46,7 +46,11 @@
   layer because decision #7 post-dates it; `.icm/docs/` outranks the page, so this is recorded as
   drift on the spec's open questions rather than silently rewritten here.
 - release notes: both
-- sent: ship note sent 2026-09-17
+- sent: **not sent.** `send-ship-note.sh --send` refused: none of `RESEND_API_KEY`,
+  `SHIP_NOTE_RECIPIENTS`, `SHIP_NOTE_FROM` or `EMAIL_FROM` is set in the session Release ran in, so
+  even the dry run cannot render a sender. The note is written and its links are filled — it is
+  ready to send from anywhere those variables exist. Recorded rather than quietly dropped, and
+  raised as `.icm/intake/triage/ship-note-unsendable-from-remote-sessions.md`.
 - closed out: RESULT: CLOSED — run archived. The `nutrition-knowledge` epic is not finished by this
   run; `nutrition-rules` is still open in it.
 
