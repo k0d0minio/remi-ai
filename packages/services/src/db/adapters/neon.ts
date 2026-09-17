@@ -1,7 +1,7 @@
-import { neon } from "@neondatabase/serverless";
+import { Pool } from "@neondatabase/serverless";
 import { and, desc, eq, getTableColumns, getTableName, is } from "drizzle-orm";
-import { drizzle, type NeonHttpDatabase } from "drizzle-orm/neon-http";
-import { PgTable } from "drizzle-orm/pg-core";
+import { drizzle, type NeonQueryResultHKT } from "drizzle-orm/neon-serverless";
+import { PgDatabase, PgTable } from "drizzle-orm/pg-core";
 import { requireEnv } from "../../server/env";
 import type { Id, Page, PageQuery } from "../../types";
 import type { Collection, DatabaseClient } from "../client";
@@ -9,8 +9,8 @@ import * as schema from "../schema";
 
 /**
  * The Neon adapter — the first concrete implementation of the storage seam
- * (`DatabaseClient` in ../client.ts). Neon Postgres over the serverless HTTP
- * driver, queries built with Drizzle against ../schema.ts.
+ * (`DatabaseClient` in ../client.ts). Neon Postgres over the serverless
+ * WebSocket driver, queries built with Drizzle against ../schema.ts.
  *
  * The seam speaks in collections keyed by name, and the mapping is DERIVED
  * from the schema rather than typed out: every `pgTable` exported by
@@ -40,6 +40,15 @@ for (const value of Object.values(schema)) {
 const DEFAULT_PAGE_LIMIT = 50;
 
 /**
+ * What a collection issues its queries against: the pooled database, or a
+ * transaction opened on it. `PgTransaction` extends `PgDatabase` with the same
+ * result type, so naming the base class here is what lets one `makeCollection`
+ * serve both — and what makes `transaction()` below hand services a client
+ * bound to the open transaction rather than to the pool.
+ */
+type Queryable = PgDatabase<NeonQueryResultHKT>;
+
+/**
  * The generic `Collection<T>` contract meets Drizzle's per-table inference
  * here, and the two cannot be reconciled without repeating every query three
  * times — so this helper is the one place rows are cast. The casts are sound
@@ -47,7 +56,7 @@ const DEFAULT_PAGE_LIMIT = 50;
  * which is the pairing every entity in this package maintains by rule.
  */
 const makeCollection = <T extends { id: Id }>(
-  db: NeonHttpDatabase,
+  db: Queryable,
   table: PgTable,
 ): Collection<T> => {
   const columns = getTableColumns(table);
@@ -136,12 +145,19 @@ const makeCollection = <T extends { id: Id }>(
 
 /**
  * Build the client from `DATABASE_URL`. Register it once at process start —
- * each app's `instrumentation.ts` is the place — via `registerDatabase()`.
+ * each app's `ensureDatabase()` helper is the place — via `registerDatabase()`.
+ *
+ * The pool is created once per process and deliberately not closed per
+ * request: on Vercel a function instance serves many requests, and tearing the
+ * WebSocket down after each one would pay the connection cost every time.
  */
 export const createNeonDatabase = (): DatabaseClient => {
-  const db = drizzle(neon(requireEnv("DATABASE_URL", "createNeonDatabase()")));
+  const pool = new Pool({
+    connectionString: requireEnv("DATABASE_URL", "createNeonDatabase()"),
+  });
+  const db = drizzle(pool);
 
-  const client: DatabaseClient = {
+  const clientOn = (queryable: Queryable): DatabaseClient => ({
     driver: "neon",
     collection: <T extends { id: Id }>(name: string): Collection<T> => {
       const table = tables[name];
@@ -150,17 +166,25 @@ export const createNeonDatabase = (): DatabaseClient => {
           `unknown collection "${name}" — no table of that name is exported from src/db/schema.ts`,
         );
       }
-      return makeCollection<T>(db, table);
+      return makeCollection<T>(queryable, table);
     },
     /**
-     * The HTTP driver has no interactive transactions, so `fn` runs without
-     * isolation. Nothing in the phase-1 slice writes across tables in one unit;
-     * the first service that does must move this adapter to the WebSocket
-     * driver (REMI-013 is the place that decision lands).
+     * A real `BEGIN` / `COMMIT` / `ROLLBACK`: the WebSocket driver supports
+     * interactive transactions, which the HTTP one did not — the reason this
+     * adapter moved to it. `fn` receives a client whose collections issue
+     * their queries on the transaction, so a service handed `tx` writes inside
+     * it; one handed the pooled client does not. Nesting reuses the open
+     * transaction rather than opening a second one, since Postgres has no
+     * second `BEGIN` to give.
      */
-    transaction: async (fn) => fn(client),
-    close: async () => {},
-  };
+    transaction: async (fn) =>
+      queryable === db
+        ? db.transaction(async (tx) => fn(clientOn(tx)))
+        : fn(clientOn(queryable)),
+    close: async () => {
+      await pool.end();
+    },
+  });
 
-  return client;
+  return clientOn(db);
 };

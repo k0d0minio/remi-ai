@@ -169,6 +169,16 @@ export {
 } from "../db/services/patient-anamnesis";
 
 export {
+  describeConsultation,
+  recordConsultation,
+} from "../db/services/consultations";
+export type {
+  ConsultationCheckInInput,
+  ConsultationInput,
+  ConsultationRecord,
+} from "../db/services/consultations";
+
+export {
   changeOperatorPassword,
   createOperator,
   deleteOperator,

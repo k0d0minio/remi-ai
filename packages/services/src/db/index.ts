@@ -39,6 +39,15 @@ export {
 } from "./services/patient-anamnesis";
 
 export {
+  describeConsultation,
+  recordConsultation,
+} from "./services/consultations";
+export type {
+  ConsultationInput,
+  ConsultationRecord,
+} from "./services/consultations";
+
+export {
   addGoalCheckIn,
   addPatientGoal,
   archivePatientGoal,

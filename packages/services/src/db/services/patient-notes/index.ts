@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
-import { getDatabase } from "../../client";
+import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientNote } from "../../models/patient-note";
 import { touchPatient } from "../patients";
 
@@ -15,7 +15,9 @@ import { touchPatient } from "../patients";
  * default that leaked.
  */
 
-const notes = () => getDatabase().collection<PatientNote>("patient_notes");
+/** On the pooled client, or on a transaction when one is handed in. */
+const notes = (db: DatabaseClient = getDatabase()) =>
+  db.collection<PatientNote>("patient_notes");
 
 const uuidSchema = z.uuid();
 
@@ -58,6 +60,7 @@ export const listPatientNotes = async (
 export const addPatientNote = async (
   patientId: Id,
   input: NoteInput & { authorName?: string },
+  db?: DatabaseClient,
 ): Promise<Result<PatientNote>> => {
   if (!uuidSchema.safeParse(patientId).success) {
     return err("not_found", "no such patient");
@@ -74,14 +77,14 @@ export const addPatientNote = async (
       "a note needs a title or something written in it",
     );
   }
-  const created = await notes().insert({
+  const created = await notes(db).insert({
     patientId,
     occurredAt: parsed.data.occurredAt,
     title: parsed.data.title ?? "",
     body: parsed.data.body ?? "",
     authorName: input.authorName?.trim() ?? "",
   });
-  await touchPatient(patientId);
+  await touchPatient(patientId, db);
   return ok(created);
 };
 

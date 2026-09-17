@@ -2,7 +2,7 @@ import { z } from "zod";
 import { goalDirections } from "../../../shared/patient";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
-import { getDatabase } from "../../client";
+import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientGoal } from "../../models/patient-goal";
 import type { PatientGoalCheckIn } from "../../models/patient-goal-check-in";
 import { touchPatient } from "../patients";
@@ -22,10 +22,12 @@ import { touchPatient } from "../patients";
 /** § D's "2-3 maximum", enforced at the top of the range. */
 export const MAX_ACTIVE_GOALS = 3;
 
-const goals = () => getDatabase().collection<PatientGoal>("patient_goals");
+const goals = (db: DatabaseClient = getDatabase()) =>
+  db.collection<PatientGoal>("patient_goals");
 
-const checkIns = () =>
-  getDatabase().collection<PatientGoalCheckIn>("patient_goal_check_ins");
+/** On the pooled client, or on a transaction when one is handed in. */
+const checkIns = (db: DatabaseClient = getDatabase()) =>
+  db.collection<PatientGoalCheckIn>("patient_goal_check_ins");
 
 const uuidSchema = z.uuid();
 
@@ -296,11 +298,12 @@ const parseCheckIn = (input: GoalCheckInInput) =>
 export const addGoalCheckIn = async (
   goalId: Id,
   input: GoalCheckInInput,
+  db?: DatabaseClient,
 ): Promise<Result<PatientGoalCheckIn>> => {
   if (!uuidSchema.safeParse(goalId).success) {
     return err("not_found", "no such goal");
   }
-  const goal = await goals().findById(goalId);
+  const goal = await goals(db).findById(goalId);
   if (!goal) {
     return err("not_found", "no such goal");
   }
@@ -320,8 +323,8 @@ export const addGoalCheckIn = async (
       "a check-in needs a direction, a measure or a note",
     );
   }
-  const created = await checkIns().insert({ goalId, ...entry });
-  await touchPatient(goal.patientId);
+  const created = await checkIns(db).insert({ goalId, ...entry });
+  await touchPatient(goal.patientId, db);
   return ok(created);
 };
 
