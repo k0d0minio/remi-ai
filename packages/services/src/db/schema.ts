@@ -8,6 +8,7 @@ import {
   timestamp,
   unique,
   uuid,
+  type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -432,6 +433,19 @@ export const recipes = pgTable("recipes", {
    * archives and never deletes — the restrict below is what enforces it.
    */
   archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  /**
+   * Where a variant came from. Null for a recipe written from scratch, and for
+   * every row that predates the column — provenance is not reconstructible, so
+   * a blank here means "unknown", never "original".
+   *
+   * `restrict` for the same reason the assignment's recipe FK is: the library
+   * never deletes, and a row that other rows point back to is exactly the kind
+   * the rule exists for. The self-reference needs the `AnyPgColumn` annotation
+   * because the table is still being defined at this point.
+   */
+  variantOfId: uuid("variant_of_id").references((): AnyPgColumn => recipes.id, {
+    onDelete: "restrict",
+  }),
   ...timestamps,
 });
 
