@@ -1,5 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { registerDatabase, type DatabaseClient } from "../../client";
+import {
+  registerDatabase,
+  type Collection,
+  type DatabaseClient,
+} from "../../client";
+import type { Id } from "../../../types";
 import { createMemoryDatabase } from "../../test-helpers";
 import type { PatientRecommendation } from "../../models/patient-recommendation";
 import { createPatient } from "../patients";
@@ -34,11 +39,11 @@ const withInjectedFailure = (base: DatabaseClient): DatabaseClient => ({
   driver: base.driver,
   close: base.close,
   transaction: (fn) => base.transaction(() => fn(withInjectedFailure(base))),
-  collection: (name) => {
-    const inner = base.collection(name);
+  collection: <T extends { id: Id }>(name: string): Collection<T> => {
+    const inner = base.collection<T>(name);
     return {
       ...inner,
-      update: async (id, patch) => {
+      update: async (id: Id, patch: Partial<T>) => {
         if (updatesBeforeFailure !== null) {
           if (updatesBeforeFailure === 0) {
             throw new Error("injected write failure");
