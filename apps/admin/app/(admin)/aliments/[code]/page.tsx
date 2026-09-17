@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import NextLink from "next/link";
 import {
@@ -26,14 +27,26 @@ export const dynamic = "force-dynamic";
 
 type Params = Promise<{ code: string }>;
 
+/**
+ * One read per request, not two.
+ *
+ * `generateMetadata` and the page both need the food, and Next calls them
+ * separately; `cache()` is what makes the second call the same call. It dedupes
+ * per request only, so this is request memoisation, not a cache with a lifetime
+ * anyone has to reason about.
+ */
+const foodByCode = cache(async (code: string) => {
+  ensureDatabase();
+  return getFood(code);
+});
+
 export const generateMetadata = async ({
   params,
 }: {
   params: Params;
 }): Promise<Metadata> => {
-  ensureDatabase();
   const { code } = await params;
-  const result = await getFood(code);
+  const result = await foodByCode(code);
   return { title: result.ok ? result.data.nameFr : "Aliment" };
 };
 
@@ -68,7 +81,7 @@ const Aliment = async ({ params }: { params: Params }) => {
   const { code } = await params;
 
   const [result, imported] = await Promise.all([
-    getFood(code),
+    foodByCode(code),
     getCiqualImport(),
   ]);
   if (!result.ok) {
