@@ -18,7 +18,8 @@ import {
   archivePatientRecommendation,
   archivePatientSupplement,
   archiveRecipeAssignment,
-  assignRecipe,
+  assignRecipes,
+  createAndAssignRecipe,
   createPatient,
   deleteGoalCheckIn,
   deleteMealEntry,
@@ -29,6 +30,7 @@ import {
   deletePatientObservation,
   deletePatientRecommendation,
   deletePatientSupplement,
+  duplicateAndAssignRecipe,
   getPatient,
   getPatientInstruction,
   getPatientSummary,
@@ -1085,25 +1087,100 @@ export const updateNextConsultationPrepAction = async (
  * The recipe itself is never edited from here — that is the library's, and one
  * edit there changes the recipe for everyone holding it.
  */
-export const assignRecipeAction = async (
+/**
+ * The three recipe gestures share this shape: the service writes the whole
+ * thing in one unit, and one audit row names both halves — the recipe and the
+ * person — because "recette attribuée" on its own does not say to whom.
+ */
+const recipeAudited = async (patientId: string, recipes: string) => {
+  const patient = await getPatient(patientId);
+  return patient.ok ? `${recipes} → ${patient.data.pseudonym}` : recipes;
+};
+
+export const assignRecipesAction = async (
   _previous: AssignmentFormState,
   formData: FormData,
 ): Promise<AssignmentFormState> => {
   const operator = await requireOperator();
   const patientId = field(formData, "patientId");
-  const result = await assignRecipe(patientId, field(formData, "recipeId"), {
+  // One checkbox per recipe, so the selection arrives as repeats of one name.
+  const recipeIds = formData.getAll("recipeId").map(String).filter(Boolean);
+  const result = await assignRecipes(patientId, recipeIds, {
     note: field(formData, "note"),
     assignedOn: field(formData, "assignedOn"),
   });
   if (!result.ok) {
     return { error: result.message };
   }
-  await audit(operator, "recipe.assigned", {
+  await audit(operator, "recipe.assigned_bulk", {
     type: "recipe_assignment",
-    id: result.data.id,
-    label: field(formData, "title"),
+    id: result.data[0]?.id ?? null,
+    label: await recipeAudited(patientId, field(formData, "titles")),
+    detail: `${result.data.length} attribution(s)`,
   });
   revalidatePatient(patientId);
+  return { error: null };
+};
+
+/** Writes the library row and the giving in one save — no trip to /recipes. */
+export const createAndAssignRecipeAction = async (
+  _previous: AssignmentFormState,
+  formData: FormData,
+): Promise<AssignmentFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const result = await createAndAssignRecipe(
+    patientId,
+    // No tags here on purpose: the in-place form is the fast path, and a
+    // recipe written mid-consultation is tagged later from /recipes if at all.
+    { title: field(formData, "title"), body: field(formData, "body") },
+    {
+      note: field(formData, "note"),
+      assignedOn: field(formData, "assignedOn"),
+    },
+  );
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "recipe.created_and_assigned", {
+    type: "recipe",
+    id: result.data.recipe.id,
+    label: await recipeAudited(patientId, result.data.recipe.title),
+  });
+  revalidatePatient(patientId);
+  revalidatePath("/recipes");
+  return { error: null };
+};
+
+/**
+ * Copy, adapt, hand over, and retire what it replaces — for this person only.
+ */
+export const duplicateAndAssignRecipeAction = async (
+  _previous: AssignmentFormState,
+  formData: FormData,
+): Promise<AssignmentFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const result = await duplicateAndAssignRecipe(
+    patientId,
+    field(formData, "recipeId"),
+    { title: field(formData, "title"), body: field(formData, "body") },
+    {
+      note: field(formData, "note"),
+      assignedOn: field(formData, "assignedOn"),
+    },
+  );
+  if (!result.ok) {
+    return { error: result.message };
+  }
+  await audit(operator, "recipe.duplicated_as_variant", {
+    type: "recipe",
+    id: result.data.recipe.id,
+    label: await recipeAudited(patientId, result.data.recipe.title),
+    detail: `variante de ${field(formData, "originTitle")}`,
+  });
+  revalidatePatient(patientId);
+  revalidatePath("/recipes");
   return { error: null };
 };
 

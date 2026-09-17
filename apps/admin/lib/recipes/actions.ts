@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import {
   archiveRecipe,
   createRecipe,
+  duplicateRecipe,
   updateRecipe,
 } from "@remi/services/server";
 import { audit } from "@/lib/audit";
@@ -105,4 +106,25 @@ export const archiveRecipeAction = async (formData: FormData) => {
     });
   }
   revalidateLibrary(id);
+};
+
+/**
+ * The library's half of « dupliquer en variante ». No patient is in context
+ * here, so nothing is assigned: this is a copy opened for editing, and the
+ * giving happens from a patient's page as it always has.
+ */
+export const duplicateRecipeAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const result = await duplicateRecipe(field(formData, "id"));
+  if (!result.ok) {
+    return;
+  }
+  await audit(operator, "recipe.duplicated_as_variant", {
+    type: "recipe",
+    id: result.data.id,
+    label: result.data.title,
+    detail: `variante de ${field(formData, "title")}`,
+  });
+  revalidateLibrary(result.data.id);
+  redirect(`/recipes/${result.data.id}`);
 };

@@ -1,19 +1,22 @@
 "use client";
 
-import { ArchiveRestore, ArchiveX, Pencil } from "lucide-react";
+import { ArchiveRestore, ArchiveX, Copy, Pencil, X } from "lucide-react";
 import NextLink from "next/link";
 import { useState } from "react";
 import { formatDate, type AssignedRecipe } from "@remi/services/shared";
 import { Button } from "@remi/ui";
-import { Badge, Field, Input, Typography } from "@remi/ui/server";
+import { Badge, Field, Input, Textarea, Typography } from "@remi/ui/server";
 import {
   archiveRecipeAssignmentAction,
+  duplicateAndAssignRecipeAction,
   removeRecipeAssignmentAction,
   updateRecipeAssignmentAction,
 } from "@/lib/patients/actions";
 
 type Props = {
   entry: AssignedRecipe;
+  /** Today, resolved on the server so a date input never disagrees with it. */
+  today: string;
 };
 
 /**
@@ -26,13 +29,123 @@ type Props = {
  * Archiving is the prominent control: it is how a recipe rotates out at the
  * weekly refresh, and the dated row it leaves behind is the record of what she
  * gave and when.
+ *
+ * « Dupliquer en variante » is the other way out of that constraint: rather
+ * than editing what everyone holds, it copies the recipe, gives the copy to
+ * this person, and retires this row — all in one save.
  */
-export const RecipeAssignmentItem = ({ entry }: Props) => {
+export const RecipeAssignmentItem = ({ entry, today }: Props) => {
   const [editing, setEditing] = useState(false);
+  const [duplicating, setDuplicating] = useState(false);
   const [confirmingRemove, setConfirmingRemove] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { assignment, recipe } = entry;
+  const { assignment, recipe, origin } = entry;
   const archived = assignment.archivedAt !== null;
+
+  if (duplicating) {
+    return (
+      <li className="border-border flex flex-col gap-4 rounded-lg border p-4">
+        <form
+          action={async (formData: FormData) => {
+            const result = await duplicateAndAssignRecipeAction(
+              { error: null },
+              formData,
+            );
+            setError(result.error);
+            if (!result.error) {
+              setDuplicating(false);
+            }
+          }}
+          className="flex flex-col gap-4"
+        >
+          <input type="hidden" name="patientId" value={assignment.patientId} />
+          <input type="hidden" name="recipeId" value={recipe.id} />
+          <input type="hidden" name="originTitle" value={recipe.title} />
+
+          <div className="flex flex-col gap-1">
+            <Typography as="h4" size="sm" weight="medium">
+              Adapter pour cette personne
+            </Typography>
+            <Typography size="sm" tone="muted">
+              Une copie part dans la bibliothèque et remplace « {recipe.title} »
+              ici. Les autres personnes qui l&apos;ont gardent la version
+              d&apos;origine.
+            </Typography>
+          </div>
+
+          <Field id={`variant-title-${assignment.id}`} label="Titre">
+            <Input
+              id={`variant-title-${assignment.id}`}
+              name="title"
+              required
+              maxLength={140}
+              defaultValue={`${recipe.title} (variante)`}
+            />
+          </Field>
+
+          <Field id={`variant-body-${assignment.id}`} label="La recette">
+            <Textarea
+              id={`variant-body-${assignment.id}`}
+              name="body"
+              required
+              rows={10}
+              maxLength={4000}
+              defaultValue={recipe.body}
+            />
+          </Field>
+
+          <div className="grid gap-4 sm:grid-cols-[1fr_10rem]">
+            <Field
+              id={`variant-note-${assignment.id}`}
+              label="Pourquoi pour cette personne"
+              optional
+            >
+              <Input
+                id={`variant-note-${assignment.id}`}
+                name="note"
+                maxLength={500}
+                defaultValue={assignment.note}
+              />
+            </Field>
+
+            <Field id={`variant-date-${assignment.id}`} label="Date">
+              <Input
+                id={`variant-date-${assignment.id}`}
+                name="assignedOn"
+                type="date"
+                required
+                defaultValue={today}
+              />
+            </Field>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="submit" size="sm">
+              <Copy aria-hidden="true" />
+              Créer la variante et attribuer
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                setDuplicating(false);
+                setError(null);
+              }}
+            >
+              <X aria-hidden="true" />
+              Annuler
+            </Button>
+            {error ? (
+              <Typography size="sm" className="text-error-text" role="alert">
+                {error}
+              </Typography>
+            ) : null}
+          </div>
+        </form>
+      </li>
+    );
+  }
 
   if (editing) {
     return (
@@ -126,6 +239,18 @@ export const RecipeAssignmentItem = ({ entry }: Props) => {
         ) : null}
       </div>
 
+      {origin ? (
+        <Typography size="sm" tone="muted">
+          variante de{" "}
+          <NextLink
+            href={`/recipes/${origin.id}`}
+            className="hover:text-foreground underline underline-offset-2"
+          >
+            {origin.title}
+          </NextLink>
+        </Typography>
+      ) : null}
+
       {assignment.note ? (
         <Typography size="sm" tone="muted">
           {assignment.note}
@@ -146,6 +271,18 @@ export const RecipeAssignmentItem = ({ entry }: Props) => {
           <Pencil aria-hidden="true" />
           Modifier le mot
         </Button>
+
+        {archived ? null : (
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onClick={() => setDuplicating(true)}
+          >
+            <Copy aria-hidden="true" />
+            Dupliquer en variante
+          </Button>
+        )}
 
         <form action={archiveRecipeAssignmentAction}>
           <input type="hidden" name="id" value={assignment.id} />
