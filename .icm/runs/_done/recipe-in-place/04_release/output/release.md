@@ -1,8 +1,11 @@
 # Release: recipe-in-place
 
 - gate: Ready to merge ticked — merge authorised
-- ci: GREEN on <merge-head sha> (ci-status.sh, after the last push)
-- pr: #95 — https://github.com/k0d0minio/remi-ai/pull/95 · merged: <yes — when>
+- ci: **not established on the merge head.** GREEN on 2b293a9 (the last head that built every
+  affected app). On 5311350 the required `Format, lint, typecheck` never registered — zero
+  Actions runs dispatched for that push after 900s, which `.icm/_shared/ci.md` calls a broken
+  workflow, not a pass — so `ci-status.sh` returns PENDING.
+- pr: #95 — https://github.com/k0d0minio/remi-ai/pull/95 · merged: **no — blocked, see below**
 - code-review: high (spec complexity: complex) — 4 findings, all in this run's own code, all fixed
   on the branch: the bulk selection not clearing after a save, a variant title pre-filled by a
   naive concat instead of the shared rule, a batch order left to the adapter, and a `pending` flag
@@ -26,8 +29,10 @@
   actually decided. `business/scope`'s recipe lines are the patient-facing V2 features and are
   untouched by this practitioner-side change.
 - release notes: both
-- sent: <none | ship note sent 2026-09-17>
-- closed out: <RESULT — filled by close-out.sh>
+- sent: not sent — the ship note's links need the merge commit and the live changelog URL,
+  neither of which exists yet.
+- closed out: RESULT: CLOSED — run archived to `.icm/runs/_done/recipe-in-place/`. The
+  practitioner-workflow epic keeps its five remaining stubs, so it was not archived.
 
 ## Acceptance check (vs spec)
 
@@ -62,6 +67,25 @@
       pass-through `transaction` on both adapters, a rollback test passes without proving
       anything, so it was not written rather than written to mislead. It is in the triage stub's
       acceptance list. 221 tests pass across 20 files.
+
+## Why this run stopped short of the merge
+
+Two infrastructure failures, neither of them this diff's, and both outside an agent's reach:
+
+1. **The admin preview of `b2af5e1` failed** before `next build` ran — see below. That was the
+   last head on which the admin app actually built, so the review fixes in `e0a1712` have never
+   been compiled by Next. A `.icm`-only push cannot re-trigger it: turbo-ignore skips the app,
+   and a skipped deploy is not a pass.
+2. **GitHub Actions stopped dispatching.** The push of `5311350` produced zero workflow runs —
+   not queued, not cancelled, absent — so the one required check never registered and the verdict
+   is PENDING. Every earlier push on this branch dispatched normally.
+
+The merge is the only remaining step. What it needs is one real admin build and one registered
+quality run, both of which need a human: redeploy the admin preview from Vercel, and re-run the
+Quality workflow (it carries `workflow_dispatch`). Then `/pipeline release recipe-in-place` picks
+up from step 10 — re-establish green, re-read the gate, squash-merge.
+
+Nothing was merged on an unestablished verdict, which is the rule this stage exists to hold.
 
 ## Note on the admin preview failure
 
