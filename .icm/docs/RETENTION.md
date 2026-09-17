@@ -57,6 +57,14 @@ pseudonym existed and was deleted on that date by that operator; the record itse
 If a patient asks for that line to go too, it is a manual database operation and a deliberate one —
 not something the console offers, and not something it should offer by accident.
 
+**A context export is one of those rows.** « Copier le contexte » puts a patient's context on the
+operator's clipboard to be pasted into an AI model of her choosing, and writes a
+`context.exported` row naming the patient, the moment and which blocks went. Read it for what it
+is: generating recipes from a hand-typed profile is Morgane's practice **today**, outside REMI and
+with the patient's real name typed in by hand. The export carries the pseudonym and never the
+name, the email or the share link, so what it changes about the exposure is that it reduces it —
+and that there is now a line in the trail saying it happened. REMI itself calls no model here.
+
 ## How long an ended patient is kept
 
 **Indefinitely, until Morgane deletes them.** Setting a patient to `ended` changes how they sort
