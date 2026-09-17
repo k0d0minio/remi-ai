@@ -113,7 +113,9 @@ const AssignExistingForm = ({ patientId, recipes, today }: Props) => {
                 name="recipeId"
                 value={recipe.id}
                 checked={chosen.includes(recipe.id)}
-                onCheckedChange={(checked) => toggle(recipe.id, checked === true)}
+                onCheckedChange={(checked) =>
+                  toggle(recipe.id, checked === true)
+                }
               />
               <Typography size="sm">{recipe.title}</Typography>
             </label>
@@ -142,7 +144,11 @@ const AssignExistingForm = ({ patientId, recipes, today }: Props) => {
       </Field>
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" size="sm" disabled={pending || chosen.length === 0}>
+        <Button
+          type="submit"
+          size="sm"
+          disabled={pending || chosen.length === 0}
+        >
           <Plus aria-hidden="true" />
           {pending
             ? "Attribution…"

@@ -136,7 +136,9 @@ describe("the recipe library", () => {
     }
 
     expect(await countRecipeAssignments(recipe.id)).toBe(0);
-    await assignRecipes(claire.data.id, [recipe.id], { assignedOn: "2026-09-01" });
+    await assignRecipes(claire.data.id, [recipe.id], {
+      assignedOn: "2026-09-01",
+    });
     await assignRecipes(luc.data.id, [recipe.id], { assignedOn: "2026-09-01" });
     expect(await countRecipeAssignments(recipe.id)).toBe(2);
   });

@@ -364,7 +364,9 @@ describe("adapting a recipe for one person", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data.recipe.variantOfId).toBe(shared);
-      expect(result.data.recipe.title).toBe("Curry de pois chiches sans piment");
+      expect(result.data.recipe.title).toBe(
+        "Curry de pois chiches sans piment",
+      );
     }
 
     // Hers is the variant now, and the original is in her history.

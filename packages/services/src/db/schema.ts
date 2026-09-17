@@ -422,10 +422,9 @@ export const recipes = pgTable("recipes", {
    * the rule exists for. The self-reference needs the `AnyPgColumn` annotation
    * because the table is still being defined at this point.
    */
-  variantOfId: uuid("variant_of_id").references(
-    (): AnyPgColumn => recipes.id,
-    { onDelete: "restrict" },
-  ),
+  variantOfId: uuid("variant_of_id").references((): AnyPgColumn => recipes.id, {
+    onDelete: "restrict",
+  }),
   ...timestamps,
 });
 
