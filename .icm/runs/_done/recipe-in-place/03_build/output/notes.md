@@ -6,7 +6,7 @@
 
 ## What changed
 
-- `packages/services/src/db/models/recipe.ts` + `schema.ts` + `migrations/0013_recipe_variants.sql`:
+- `packages/services/src/db/models/recipe.ts` + `schema.ts` + `migrations/0014_numerous_norman_osborn.sql`:
   a nullable self-reference `variantOfId` on `recipes`, `on delete restrict` like the assignment's
   recipe FK. Set once, on duplicate, never afterwards — `updateRecipe` cannot reach it because it
   is not in `recipeFields`. Every pre-existing row reads as having no origin.
@@ -72,10 +72,13 @@
 - `assignRecipe` (singular) was **deleted**, not left beside `assignRecipes` — leanness rule,
   superseding deletes the superseded. Its barrel line went with it and both test files were
   migrated to the bulk call.
-- The migration, its snapshot and the journal entry were **hand-written** to match what
-  `pnpm db:generate` emits: this session has no `node_modules`, and the factory owns the checks.
-  Worth a glance at `meta/0013_snapshot.json` against the schema — that pairing is what keeps the
-  next `db:generate` from producing a spurious diff.
+- The migration was hand-written at Build (no `node_modules` in that session) and **regenerated
+  with `pnpm db:generate` at Release**, after `main` moved: `link-writes` had taken `0013`, so this
+  one is now `0014_numerous_norman_osborn`. The regenerated SQL is byte-identical to the
+  hand-written version, and the generated `when` is later than every migration already applied —
+  which is the thing that matters, per `.icm/intake/triage/parallel-migrations-journal-ordering.md`
+  and `migrate.mjs`'s own header: drizzle applies by high-water mark, never by hash, so a
+  renumbered entry keeping its original `when` would be skipped forever.
 - `business/initiatives` still reads "the practitioner space is parked", which decisions #1 and #5
   of 2026-09-10 supersede. The spec flagged it; it is Release's page to fix.
 - Smoke-test list for the Ready-to-merge tick is the PR's "Steps to test", plus one that is easy to

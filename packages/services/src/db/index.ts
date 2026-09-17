@@ -33,10 +33,22 @@ export {
 } from "./services/patients";
 export type { PatientInput } from "./services/patients";
 
+export { writeThroughPatientLink } from "./services/patient-link-writes";
+export type { PatientLinkWriteRequest } from "./services/patient-link-writes";
+
 export {
   listPatientAnamnesis,
   setPatientAnamnesis,
 } from "./services/patient-anamnesis";
+
+export {
+  describeConsultation,
+  recordConsultation,
+} from "./services/consultations";
+export type {
+  ConsultationInput,
+  ConsultationRecord,
+} from "./services/consultations";
 
 export {
   addGoalCheckIn,

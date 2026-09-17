@@ -30,6 +30,7 @@ import {
   deletePatientObservation,
   deletePatientRecommendation,
   deletePatientSupplement,
+  describeConsultation,
   duplicateAndAssignRecipe,
   getPatient,
   getPatientInstruction,
@@ -39,6 +40,7 @@ import {
   movePatientRecommendation,
   movePatientSupplement,
   patientLinkEmail,
+  recordConsultation,
   regenerateShareToken,
   removeRecipeAssignment,
   sendEmail,
@@ -56,11 +58,13 @@ import {
   updatePatientRecommendation,
   updatePatientSupplement,
   updateRecipeAssignment,
+  type ConsultationCheckInInput,
   type PatientInput,
 } from "@remi/services/server";
 import {
   appHref,
   consentChannels,
+  contextBlocks,
   cookingAffinities,
   goalDirections,
   isLocale,
@@ -106,10 +110,18 @@ export type CheckInFormState = { error: string | null };
 export type InstructionFormState = { error: string | null; saved: boolean };
 export type SummaryFormState = { error: string | null; saved: boolean };
 export type PrepFormState = { error: string | null; saved: boolean };
+export type ConsultationFormState = { error: string | null; saved: boolean };
 export type ShareFormState = { error: string | null; sent: boolean };
 
 const field = (formData: FormData, name: string) =>
   String(formData.get(name) ?? "");
+
+/**
+ * `undefined` when the form did not carry the field at all, which is a
+ * different statement from `""` — the latter is how a textarea is cleared.
+ */
+const optionalField = (formData: FormData, name: string) =>
+  formData.has(name) ? String(formData.get(name) ?? "") : undefined;
 
 const asStatus = (value: string): PatientStatus =>
   (patientStatuses as readonly string[]).includes(value)
@@ -1267,6 +1279,66 @@ export const addNoteAction = async (
   return { error: null };
 };
 
+/**
+ * The "Nouvelle consultation" screen's one save: the note, the check-ins that
+ * carry something, and the consigne, the résumé and the preparation note when
+ * their text changed — one transaction, one audit row.
+ *
+ * The five single-field actions above stay exactly as they are; they remain the
+ * between-consultation edit path from the patient page. What this adds is the
+ * unit: a failure part-way through leaves the record as it was, which is what
+ * `recordConsultation` owns, and one `consultation.recorded` row naming the
+ * fields that moved, which is what replaces five separate trails for one visit.
+ */
+export const recordConsultationAction = async (
+  _previous: ConsultationFormState,
+  formData: FormData,
+): Promise<ConsultationFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+
+  // One hidden id per rendered goal, with its three fields named after it: a
+  // goal she left blank still arrives, and the service is what decides it
+  // records nothing.
+  const checkIns: ConsultationCheckInInput[] = formData
+    .getAll("checkInGoalId")
+    .map((value) => String(value))
+    .map((goalId) => ({
+      goalId,
+      direction: asGoalDirection(field(formData, `direction-${goalId}`)),
+      measure: field(formData, `measure-${goalId}`),
+      note: field(formData, `note-${goalId}`),
+    }));
+
+  const result = await recordConsultation(patientId, {
+    note: {
+      occurredAt: field(formData, "occurredAt"),
+      title: field(formData, "title"),
+      body: field(formData, "body"),
+      authorName: operator.name,
+    },
+    checkIns,
+    // A field the form did not send is a field this save must not touch, which
+    // `""` would not say — that is how the consigne and the résumé are cleared.
+    instruction: optionalField(formData, "instruction"),
+    summary: optionalField(formData, "summary"),
+    nextConsultationPrep: optionalField(formData, "nextConsultationPrep"),
+  });
+
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+
+  await audit(operator, "consultation.recorded", {
+    type: "note",
+    id: result.data.note.id,
+    label: field(formData, "pseudonym"),
+    detail: describeConsultation(result.data),
+  });
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
 export const updateNoteAction = async (
   _previous: NoteFormState,
   formData: FormData,
@@ -1332,4 +1404,37 @@ export const saveAnamnesisAction = async (
   });
   revalidatePatient(patientId);
   return { error: null };
+};
+
+/**
+ * Records that a patient's context left the console. Nothing is written to the
+ * patient's record and nothing is revalidated — the only effect is the trail
+ * line, which is why this takes the blocks rather than returning anything: what
+ * left matters as much as that something left.
+ *
+ * `recordAuditEvent` swallows its own failures, so a copy is never blocked by a
+ * trail that cannot be written (see the service).
+ */
+/**
+ * A server action is an endpoint, so what the client sends is narrowed against
+ * the closed list before it reaches the trail — same rule as `asStatus` and
+ * `asCategory` above. Filtering the vocabulary rather than the argument also
+ * bounds the length and canonicalises the order, so a row reads the same
+ * whichever order the checkboxes were clicked in.
+ */
+const asContextBlocks = (values: readonly string[]): string[] =>
+  contextBlocks.filter((block) => values.includes(block));
+
+export const recordContextExportAction = async (
+  patientId: string,
+  blocks: readonly string[],
+) => {
+  const operator = await requireOperator();
+  const found = await getPatient(patientId);
+  await audit(operator, "context.exported", {
+    type: "patient",
+    id: patientId,
+    label: found.ok ? found.data.pseudonym : "",
+    detail: asContextBlocks(blocks).join(", "),
+  });
 };

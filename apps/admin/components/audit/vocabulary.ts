@@ -55,6 +55,7 @@ export const actionLabels: Record<AuditActionName, string> = {
   "observation.archived": "observation archivée",
   "observation.restored": "observation réactivée",
   "observation.deleted": "observation supprimée",
+  "consultation.recorded": "consultation enregistrée",
   "note.added": "note ajoutée",
   "note.updated": "note modifiée",
   "note.deleted": "note supprimée",
@@ -75,6 +76,7 @@ export const actionLabels: Record<AuditActionName, string> = {
   "next_consultation_prep.updated": "note de préparation modifiée",
   "share_link.regenerated": "lien patient régénéré",
   "share_link.emailed": "lien patient envoyé",
+  "context.exported": "contexte copié",
   "operator.invited": "invitation envoyée",
   "operator.invite_revoked": "invitation retirée",
   "operator.joined": "compte créé",
@@ -134,6 +136,7 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "observation.archived": "neutral",
   "observation.restored": "neutral",
   "observation.deleted": "error",
+  "consultation.recorded": "neutral",
   "note.added": "neutral",
   "note.updated": "neutral",
   "note.deleted": "error",
@@ -154,6 +157,9 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "next_consultation_prep.updated": "neutral",
   "share_link.regenerated": "warning",
   "share_link.emailed": "info",
+  // Health data left the console, pseudonymous but real — worth the eye, not an
+  // alarm: it is the operator doing her job with the tool built for it.
+  "context.exported": "warning",
   "operator.invited": "info",
   "operator.invite_revoked": "warning",
   "operator.joined": "info",

@@ -68,6 +68,23 @@
       anything, so it was not written rather than written to mislead. It is in the triage stub's
       acceptance list. 221 tests pass across 20 files.
 
+## Merge with `main` (2026-09-17)
+
+`main` moved four commits while this run was open — `copy-context` (#96), `link-writes` (#98) and
+`consultation-update` (#99). Merged in and resolved:
+
+- **A migration number collision.** `link-writes` also generated an `0013`. This run's migration
+  was **regenerated** with `pnpm db:generate` rather than renumbered by hand, per
+  `.icm/intake/triage/parallel-migrations-journal-ordering.md` — which names this PR — so its
+  `when` (1789661806329) is later than everything already applied. The regenerated SQL is
+  byte-identical to the original; only the number and the stamp changed. It is now
+  `0014_numerous_norman_osborn`, and its snapshot carries `link-writes`' tables as well as this
+  run's column.
+- `apps/admin/lib/patients/actions.ts` — both sides added an import; kept both.
+- `apps/docs/app/changelog/_meta.ts` — four entries dated 2026-09-17 now; kept all four.
+
+252 tests pass on the merged tree, and the audit vocabulary covers all 73 actions.
+
 ## Why this run stopped short of the merge
 
 Two infrastructure failures, neither of them this diff's, and both outside an agent's reach:

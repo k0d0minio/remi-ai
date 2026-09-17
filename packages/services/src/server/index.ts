@@ -36,6 +36,9 @@ export type {
   PatientSort,
 } from "../db/services/patients";
 
+export { writeThroughPatientLink } from "../db/services/patient-link-writes";
+export type { PatientLinkWriteRequest } from "../db/services/patient-link-writes";
+
 export {
   addGoalCheckIn,
   addPatientGoal,
@@ -175,6 +178,16 @@ export {
 } from "../db/services/patient-anamnesis";
 
 export {
+  describeConsultation,
+  recordConsultation,
+} from "../db/services/consultations";
+export type {
+  ConsultationCheckInInput,
+  ConsultationInput,
+  ConsultationRecord,
+} from "../db/services/consultations";
+
+export {
   changeOperatorPassword,
   createOperator,
   deleteOperator,
@@ -235,6 +248,23 @@ export {
   resolveModel,
 } from "../ai";
 export type { GenerateOptions, ModelRole, TextProvider } from "../ai";
+
+export {
+  DEFAULT_CONTEXT_PREAMBLE,
+  contextBlocks,
+  defaultContextBlocks,
+  patientContextText,
+} from "../ai";
+export type {
+  ContextBlock,
+  ContextEssential,
+  ContextGoal,
+  ContextProfile,
+  ContextRecommendationGroup,
+  ContextSupplement,
+  PatientContextInput,
+  PatientContextOptions,
+} from "../ai";
 
 export { env, requireEnv } from "./env";
 export type { ServerEnv } from "./env";
