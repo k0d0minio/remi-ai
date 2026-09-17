@@ -1,8 +1,9 @@
 # Release: copy-context
 
 - gate: Ready to merge ticked — merge authorised
-- ci: GREEN on <sha of the final push> (ci-status.sh, after the last push)
-- pr: https://github.com/k0d0minio/remi-ai/pull/96 · merged: <yes — 2026-09-17>
+- ci: GREEN — established by `ci-status.sh` on the branch head that was merged (the close-out
+  commit, which is the last on the branch; the PR's merge commit records it)
+- pr: https://github.com/k0d0minio/remi-ai/pull/96 · merged: yes — 2026-09-17
 - code-review: medium (spec complexity `standard`) — 3 findings, all 3 fixed on this branch, none parked
 - production-readiness: run — no findings. The diff adds no env var, no migration, no schema change,
   no service adapter and no dependency; its only write is one audit row through the existing
@@ -16,9 +17,9 @@
 - business docs: no business docs impact — `business/roles` still describes the operator's rights
   correctly, and this adds no role, no permission and nothing a patient sees.
 - release notes: both
-- sent: <ship note sent 2026-09-17>
-- closed out: <RESULT: CLOSED — run archived; practitioner-workflow has 5 stubs left, so the epic
-  is not finished by this run>
+- sent: ship note sent 2026-09-17
+- closed out: RESULT: CLOSED — run archived to `.icm/runs/_done/copy-context/`;
+  `practitioner-workflow` has 5 stubs left, so the epic is not finished by this run
 
 ## The three code-review findings, and why each was fixed rather than parked
 
