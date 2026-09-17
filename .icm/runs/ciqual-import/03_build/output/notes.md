@@ -2,7 +2,7 @@
 
 - commits: see the branch — schema + migration, parser, query service, scripts + fixture, console
   surface, decisions page
-- ci: established after the last push (see below)
+- ci: GREEN on c77ef7f — every blocking check and all six Vercel deploys, admin included
 
 ## What changed
 
@@ -52,18 +52,46 @@ and the food stays searchable. There is a test for it.
 - **`pnpm ciqual:fixture`** run against the same export; the committed subset is its output.
 - **249 tests pass** (`pnpm test`), 48 of them new.
 - **`pnpm db:generate`** reports no drift.
+- **The admin preview builds**, and its `db:migrate` step created the three tables in the database.
 
-## Not verified here — needs a database
+## The migration failure, and what it cost
 
-Two criteria describe what happens when rows are written, and this session has no `DATABASE_URL`:
+The first admin preview build failed, and it is worth recording why rather than only that it was
+fixed. `migrate.mjs` reported all three tables applied and absent, and refused to let the build
+pass — the verification step added after the same failure cost two days in production.
+
+The cause is the one that script's own header describes. Drizzle decides what to apply by comparing
+a journal entry's timestamp against the newest `created_at` in `drizzle.__drizzle_migrations`,
+**never by hash**. The first migration was generated at 12:05:30Z; the database's mark already
+stood at **12:07:51Z**. So it was recorded as applied, its SQL never ran, and drizzle would never
+have revisited it.
+
+It was regenerated past the mark and written with `IF NOT EXISTS`, which is the repair the script
+prescribes. The admin deploy on `c77ef7f` then applied it for real: `foods`, `food_nutrients` and
+`ciqual_imports` are now in the database with 11, 11 and 7 columns, and all three are empty.
+
+**The mark moved because something outside this branch migrated that database.** It holds sixteen
+applied rows where this branch's journal holds fourteen, and `migrate.mjs`'s non-production guard
+did not fire on the preview at all. That is a live defect affecting every future migration, not
+this run's to fix, and it is raised as `.icm/intake/triage/preview-deploys-migrate-production.md`.
+
+## Not verified here — four criteria need a database and a signed-in pass
+
+Left **unticked on the PR** rather than claimed. Two need rows written:
 
 - the import landing 3 484 / 257 816 rows and writing the `ciqual_imports` row;
 - re-running it leaving every row unchanged.
 
 Both hold by construction — `foods.code` and `(food_code, component_code)` are unique constraints
-and every write is `insert … on conflict (…) do update`, so a second run rewrites the same values —
-but construction is an argument, not an observation. **Run `pnpm ciqual:import <dir>` twice against
-your database before ticking Ready to merge**, and check the console home line both times.
+and every write is `insert … on conflict (…) do update` — but construction is an argument, not an
+observation. **Run `pnpm ciqual:import <dir>` twice before ticking Ready to merge.**
+
+Two more cannot be true until that import has run, because they describe what the console shows:
+the home's « N aliments importés » line, and `/aliments` listing anything.
+
+One further note: the criterion about the db-layer coverage floor is ticked on the strength of 48
+new tests over the new code, not on a measurement — there is no coverage gate in CI yet
+(`CONVENTIONS.md` says the harness arrives with the first db adapter PR, and it has not).
 
 ## A change outside the spec, for you to decide on
 
@@ -84,7 +112,8 @@ Dropping the commit costs nothing but the next session's ability to run the CIQU
   import it should read « Table CIQUAL non importée »), `/aliments` search with and without
   accents, the group filter, a food's full composition page, and that `traces`, `< x` and « — »
   render as themselves rather than as numbers. Sign out and confirm `/aliments` is unreachable.
-- The import must run against the database before any of that shows real rows.
+- The import must run against the database before any of that shows real rows. The tables are
+  there and empty as of `c77ef7f`.
 - The licence attribution is a condition of use, not decoration: it appears on the home line, both
   `/aliments` pages and the decisions page. If a surface loses it, that is a blocker.
 - Open question carried from the stub, unchanged: which components Morgane wants beyond the twelve.
