@@ -137,6 +137,24 @@ export type {
 export type { Recipe } from "../db/models/recipe";
 
 export {
+  getCiqualImport,
+  getFood,
+  getFoodNutrients,
+  listFoodGroups,
+  rankFoodsByComponent,
+  refreshFoodCatalogue,
+  searchFoods,
+} from "../db/services/foods";
+export type { FoodSearch, RankQuery, RankedFood } from "../db/services/foods";
+export type {
+  CiqualImport,
+  ConfidenceCode,
+  Food,
+  FoodNutrient,
+  NutrientMarker,
+} from "../db/models/food";
+
+export {
   addMealEntry,
   archiveMealEntry,
   countMealEntriesAwaitingFeedback,
