@@ -167,7 +167,9 @@ export const createNeonDatabase = (): DatabaseClient => {
   // Neon drops idle connections, and a pool with no `error` listener turns
   // that into an unhandled `'error'` event, which ends the process. The HTTP
   // driver this replaced held no sockets and could not do it; this one can.
-  pool.on("error", (cause) => {
+  // Annotated because Neon's `Pool` narrows every `on` overload's listener to
+  // `any`, so the handler's parameter has no contextual type to infer from.
+  pool.on("error", (cause: Error) => {
     console.error("[database] idle client error", cause);
   });
 
