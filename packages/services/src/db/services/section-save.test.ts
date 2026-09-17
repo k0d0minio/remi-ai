@@ -35,9 +35,7 @@ describe("section save planning", () => {
       ],
     );
 
-    expect(result.inserts).toEqual([
-      { row: { title: "second" }, position: 1 },
-    ]);
+    expect(result.inserts).toEqual([{ row: { title: "second" }, position: 1 }]);
     expect(result.archives).toEqual([]);
   });
 
