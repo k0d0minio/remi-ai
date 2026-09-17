@@ -28,7 +28,7 @@ import {
   listPatientSupplements,
   listRecipes,
 } from "@remi/services/server";
-import { ageInYears, appHref } from "@remi/services/shared";
+import { ageInYears, appHref, formatDate } from "@remi/services/shared";
 import {
   Badge,
   Card,
@@ -58,12 +58,13 @@ import {
 } from "@/components/patients/patient-navigation";
 import { PantryAddForm } from "@/components/patients/pantry-add-form";
 import { PantryList } from "@/components/patients/pantry-list";
-import { PatientForm } from "@/components/patients/patient-form";
+import { ProfileSummary } from "@/components/patients/profile-summary";
 import { PrepNote } from "@/components/patients/prep-note";
 import { QuickActions } from "@/components/patients/quick-actions";
 import { RecipeAssignments } from "@/components/patients/recipe-assignments";
 import { RecommendationAddForm } from "@/components/patients/recommendation-add-form";
 import { RecommendationGroups } from "@/components/patients/recommendation-groups";
+import { SectionFold } from "@/components/patients/section-fold";
 import { ShareLinkCard } from "@/components/patients/share-link-card";
 import { SummaryBlock } from "@/components/patients/summary-block";
 import { SummaryHead } from "@/components/patients/summary-head";
@@ -205,16 +206,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
       segment: "suivi",
       count: recommendations.length,
     },
-    ...(archived.length > 0
-      ? [
-          {
-            id: "archived-recommendations",
-            label: "Recommandations archivées",
-            segment: "suivi" as const,
-            count: archived.length,
-          },
-        ]
-      : []),
     {
       id: "supplements",
       label: "Protocole de compléments",
@@ -227,48 +218,18 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
       segment: "suivi",
       count: essentials.length,
     },
-    ...(archivedEssentials.length > 0
-      ? [
-          {
-            id: "archived-pantry",
-            label: "Essentiels archivés",
-            segment: "suivi" as const,
-            count: archivedEssentials.length,
-          },
-        ]
-      : []),
     {
       id: "recipes",
       label: "Recettes",
       segment: "dossier",
       count: assignedRecipes.length,
     },
-    ...(pastRecipes.length > 0
-      ? [
-          {
-            id: "past-recipes",
-            label: "Recettes précédentes",
-            segment: "dossier" as const,
-            count: pastRecipes.length,
-          },
-        ]
-      : []),
     {
       id: "meals",
       label: "Journal des repas",
       segment: "journal",
       count: mealEntries.length,
     },
-    ...(archivedMealEntries.length > 0
-      ? [
-          {
-            id: "archived-meals",
-            label: "Repas archivés",
-            segment: "journal" as const,
-            count: archivedMealEntries.length,
-          },
-        ]
-      : []),
     {
       id: "retain",
       label: "À retenir",
@@ -288,7 +249,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
       count: anamnesis.length,
     },
     { id: "profile", label: "Profil", segment: "profil" },
-    { id: "danger-zone", label: "Zone sensible", segment: "profil" },
   ];
 
   return (
@@ -540,20 +500,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 </Typography>
               )}
 
-              {archivedGoals.length > 0 ? (
-                <div className="border-border flex flex-col gap-3 border-t pt-6">
-                  <Typography as="h3" size="sm" weight="medium" tone="muted">
-                    Objectifs archivés
-                  </Typography>
-                  <GoalList
-                    goals={archivedGoals}
-                    checkIns={checkIns}
-                    ranked={false}
-                    today={today}
-                  />
-                </div>
-              ) : null}
-
               <div className="border-border flex flex-col gap-3 border-t pt-6">
                 <InstructionBlock
                   patientId={patient.id}
@@ -562,6 +508,21 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                   superseded={supersededInstructions}
                 />
               </div>
+
+              {archivedGoals.length > 0 ? (
+                <SectionFold
+                  id="archived-goals"
+                  label="Objectifs archivés"
+                  count={archivedGoals.length}
+                >
+                  <GoalList
+                    goals={archivedGoals}
+                    checkIns={checkIns}
+                    ranked={false}
+                    today={today}
+                  />
+                </SectionFold>
+              ) : null}
             </CardContent>
           </Card>
         </section>
@@ -589,30 +550,19 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               )}
 
               <RecommendationAddForm patientId={patient.id} />
+
+              {archived.length > 0 ? (
+                <SectionFold
+                  id="archived-recommendations"
+                  label="Recommandations archivées"
+                  count={archived.length}
+                >
+                  <RecommendationGroups recommendations={archived} />
+                </SectionFold>
+              ) : null}
             </CardContent>
           </Card>
         </section>
-
-        {archived.length > 0 ? (
-          <section
-            id="archived-recommendations"
-            data-segment="suivi"
-            className="scroll-mt-32"
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle>Recommandations archivées</CardTitle>
-                <CardDescription>
-                  Ce qui a été suivi puis arrêté. Invisible sur le lien patient,
-                  gardé pour la suite du dossier.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RecommendationGroups recommendations={archived} />
-              </CardContent>
-            </Card>
-          </section>
-        ) : null}
 
         <section id="supplements" data-segment="suivi" className="scroll-mt-32">
           <Card>
@@ -636,14 +586,13 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               <SupplementAddForm patientId={patient.id} />
 
               {archivedSupplements.length > 0 ? (
-                <details className="border-border flex flex-col gap-3 border-t pt-6">
-                  <summary className="text-muted-foreground hover:text-foreground cursor-pointer text-sm">
-                    {`Compléments arrêtés (${archivedSupplements.length})`}
-                  </summary>
-                  <div className="pt-3">
-                    <SupplementProtocol supplements={archivedSupplements} />
-                  </div>
-                </details>
+                <SectionFold
+                  id="archived-supplements"
+                  label="Compléments arrêtés"
+                  count={archivedSupplements.length}
+                >
+                  <SupplementProtocol supplements={archivedSupplements} />
+                </SectionFold>
               ) : null}
             </CardContent>
           </Card>
@@ -668,30 +617,19 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               )}
 
               <PantryAddForm patientId={patient.id} />
+
+              {archivedEssentials.length > 0 ? (
+                <SectionFold
+                  id="archived-pantry"
+                  label="Essentiels archivés"
+                  count={archivedEssentials.length}
+                >
+                  <PantryList essentials={archivedEssentials} />
+                </SectionFold>
+              ) : null}
             </CardContent>
           </Card>
         </section>
-
-        {archivedEssentials.length > 0 ? (
-          <section
-            id="archived-pantry"
-            data-segment="suivi"
-            className="scroll-mt-32"
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle>Essentiels archivés</CardTitle>
-                <CardDescription>
-                  Ce qui est sorti de la liste lors d&apos;une mise à jour.
-                  Gardé pour la suite du dossier.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PantryList essentials={archivedEssentials} />
-              </CardContent>
-            </Card>
-          </section>
-        ) : null}
 
         <section id="recipes" data-segment="dossier" className="scroll-mt-32">
           <Card>
@@ -717,31 +655,19 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 recipes={library}
                 today={today}
               />
+
+              {pastRecipes.length > 0 ? (
+                <SectionFold
+                  id="past-recipes"
+                  label="Recettes précédentes"
+                  count={pastRecipes.length}
+                >
+                  <RecipeAssignments entries={pastRecipes} />
+                </SectionFold>
+              ) : null}
             </CardContent>
           </Card>
         </section>
-
-        {pastRecipes.length > 0 ? (
-          <section
-            id="past-recipes"
-            data-segment="dossier"
-            className="scroll-mt-32"
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle>Recettes précédentes</CardTitle>
-                <CardDescription>
-                  Ce qui est sorti du lot au fil des semaines, avec sa date.
-                  C&apos;est l&apos;historique des adaptations, pas une
-                  corbeille.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RecipeAssignments entries={pastRecipes} />
-              </CardContent>
-            </Card>
-          </section>
-        ) : null}
 
         <section id="meals" data-segment="journal" className="scroll-mt-32">
           <Card>
@@ -771,29 +697,19 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               )}
 
               <MealAddForm patientId={patient.id} today={today} />
+
+              {archivedMealEntries.length > 0 ? (
+                <SectionFold
+                  id="archived-meals"
+                  label="Repas archivés"
+                  count={archivedMealEntries.length}
+                >
+                  <MealJournal entries={archivedMealEntries} />
+                </SectionFold>
+              ) : null}
             </CardContent>
           </Card>
         </section>
-
-        {archivedMealEntries.length > 0 ? (
-          <section
-            id="archived-meals"
-            data-segment="journal"
-            className="scroll-mt-32"
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle>Repas archivés</CardTitle>
-                <CardDescription>
-                  Sortis du journal, gardés pour la suite du dossier.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <MealJournal entries={archivedMealEntries} />
-              </CardContent>
-            </Card>
-          </section>
-        ) : null}
 
         <section id="retain" data-segment="journal" className="scroll-mt-32">
           <Card>
@@ -816,12 +732,13 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               <ObservationAddForm patientId={patient.id} today={today} />
 
               {archivedObservations.length > 0 ? (
-                <div className="flex flex-col gap-3">
-                  <Typography size="sm" tone="muted">
-                    Observations archivées
-                  </Typography>
+                <SectionFold
+                  id="archived-observations"
+                  label="Observations archivées"
+                  count={archivedObservations.length}
+                >
                   <ArchivedObservations observations={archivedObservations} />
-                </div>
+                </SectionFold>
               ) : null}
             </CardContent>
           </Card>
@@ -855,9 +772,9 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
             <CardHeader>
               <CardTitle>Anamnèse</CardTitle>
               <CardDescription>
-                Le terrain, catégorie par catégorie. Ce que vous n&apos;avez pas
-                encore exploré reste visiblement vide. Ne s&apos;affiche jamais
-                sur le lien patient.
+                Le terrain, catégorie par catégorie : ce qui est renseigné
+                d&apos;abord, le reste à compléter en dessous. Ne s&apos;affiche
+                jamais sur le lien patient.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -876,34 +793,28 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 le tenir.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <PatientForm patient={patient} />
-            </CardContent>
-          </Card>
-        </section>
-
-        <section
-          id="danger-zone"
-          data-segment="profil"
-          className="scroll-mt-32"
-        >
-          <Card variant="error">
-            <CardHeader>
-              <CardTitle>Zone sensible</CardTitle>
-              <CardDescription>
-                La suppression retire le profil, ses recommandations, son
-                protocole de compléments, ses essentiels, ses notes, son
-                anamnèse, ses objectifs et leurs points d&apos;étape, ses
-                consignes, ses recettes attribuées, son journal des repas, ses
-                observations et le lien patient — définitivement. Les recettes
-                elles-mêmes restent dans la bibliothèque.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DeletePatient
-                patientId={patient.id}
-                pseudonym={patient.pseudonym}
+            <CardContent className="flex flex-col gap-6">
+              <ProfileSummary
+                patient={patient}
+                lastEditedAt={formatDate(patient.lastEditedAt)}
               />
+
+              <SectionFold id="danger-zone" label="Zone sensible" tone="error">
+                <div className="flex flex-col gap-4">
+                  <Typography size="sm" tone="muted">
+                    La suppression retire le profil, ses recommandations, son
+                    protocole de compléments, ses essentiels, ses notes, son
+                    anamnèse, ses objectifs et leurs points d&apos;étape, ses
+                    consignes, ses recettes attribuées, son journal des repas,
+                    ses observations et le lien patient — définitivement. Les
+                    recettes elles-mêmes restent dans la bibliothèque.
+                  </Typography>
+                  <DeletePatient
+                    patientId={patient.id}
+                    pseudonym={patient.pseudonym}
+                  />
+                </div>
+              </SectionFold>
             </CardContent>
           </Card>
         </section>
