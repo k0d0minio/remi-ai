@@ -2,11 +2,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { registerDatabase } from "../../client";
 import { createMemoryDatabase } from "../../test-helpers";
 import { createPatient } from "../patients";
-import { assignRecipe } from "../recipe-assignments";
+import { assignRecipes } from "../recipe-assignments";
 import {
   archiveRecipe,
   countRecipeAssignments,
   createRecipe,
+  duplicateRecipe,
   getRecipe,
   listArchivedRecipes,
   listRecipeTags,
@@ -135,8 +136,10 @@ describe("the recipe library", () => {
     }
 
     expect(await countRecipeAssignments(recipe.id)).toBe(0);
-    await assignRecipe(claire.data.id, recipe.id, { assignedOn: "2026-09-01" });
-    await assignRecipe(luc.data.id, recipe.id, { assignedOn: "2026-09-01" });
+    await assignRecipes(claire.data.id, [recipe.id], {
+      assignedOn: "2026-09-01",
+    });
+    await assignRecipes(luc.data.id, [recipe.id], { assignedOn: "2026-09-01" });
     expect(await countRecipeAssignments(recipe.id)).toBe(2);
   });
 
@@ -147,6 +150,86 @@ describe("the recipe library", () => {
     expect(updated.ok).toBe(false);
     if (!updated.ok) {
       expect(updated.error).toBe("not_found");
+    }
+  });
+});
+
+describe("duplicating a recipe as a variant", () => {
+  it("copies the body and tags, suffixes the title and records the origin", async () => {
+    const origin = await created("Gratin de courge", ["Hiver", "végétarien"]);
+    const variant = await duplicateRecipe(origin.id);
+    expect(variant.ok).toBe(true);
+    if (variant.ok) {
+      expect(variant.data.title).toBe("Gratin de courge (variante)");
+      expect(variant.data.body).toBe(origin.body);
+      expect([...variant.data.tags]).toEqual([...origin.tags]);
+      expect(variant.data.variantOfId).toBe(origin.id);
+      expect(variant.data.archivedAt).toBeNull();
+      // A new library row, not a fork — it stands on its own id.
+      expect(variant.data.id).not.toBe(origin.id);
+    }
+  });
+
+  it("takes the adapted title and body when she has already edited them", async () => {
+    const origin = await created("Dahl classique");
+    const variant = await duplicateRecipe(origin.id, {
+      title: "Dahl sans piment",
+      body: "Comme le classique, sans piment.",
+    });
+    expect(variant.ok).toBe(true);
+    if (variant.ok) {
+      expect(variant.data.title).toBe("Dahl sans piment");
+      expect(variant.data.body).toBe("Comme le classique, sans piment.");
+      expect(variant.data.variantOfId).toBe(origin.id);
+    }
+  });
+
+  it("does not stack the suffix when duplicating a variant", async () => {
+    const origin = await created("Soupe de poireaux");
+    const first = await duplicateRecipe(origin.id);
+    if (!first.ok) {
+      throw new Error("first variant not created");
+    }
+    const second = await duplicateRecipe(first.data.id);
+    expect(second.ok).toBe(true);
+    if (second.ok) {
+      expect(second.data.title).toBe("Soupe de poireaux (variante)");
+      // The link is to what it was copied from, not to the root.
+      expect(second.data.variantOfId).toBe(first.data.id);
+    }
+  });
+
+  it("leaves the origin's holder count alone", async () => {
+    const claire = await createPatient({ pseudonym: "Manon" });
+    if (!claire.ok) {
+      throw new Error("patient not created");
+    }
+    const origin = await created("Quiche aux poireaux");
+    await assignRecipes(claire.data.id, [origin.id], {
+      assignedOn: "2026-09-01",
+    });
+    expect(await countRecipeAssignments(origin.id)).toBe(1);
+
+    const variant = await duplicateRecipe(origin.id);
+    expect(variant.ok).toBe(true);
+    // A variant is held by nobody until it is given, and never by proxy.
+    expect(await countRecipeAssignments(origin.id)).toBe(1);
+    if (variant.ok) {
+      expect(await countRecipeAssignments(variant.data.id)).toBe(0);
+    }
+  });
+
+  it("gives a recipe written from scratch no origin at all", async () => {
+    const plain = await created("Compote de rhubarbe");
+    expect(plain.variantOfId).toBeNull();
+  });
+
+  it("reports a missing recipe rather than throwing", async () => {
+    const missing = "00000000-0000-4000-8000-000000000000";
+    const result = await duplicateRecipe(missing);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toBe("not_found");
     }
   });
 });

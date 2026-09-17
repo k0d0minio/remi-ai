@@ -739,8 +739,9 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               <CardTitle>Recettes</CardTitle>
               <CardDescription>
                 Les recettes que cette personne a en ce moment, avec le mot qui
-                va avec chacune. Elles s&apos;écrivent une fois dans « Recettes
-                » et s&apos;attribuent ici.
+                va avec chacune. Attribuez-en plusieurs d&apos;un coup,
+                écrivez-en une ici, ou adaptez-en une en variante — la
+                bibliothèque « Recettes » garde tout.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
@@ -749,7 +750,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                   Aucune recette attribuée pour le moment.
                 </Typography>
               ) : (
-                <RecipeAssignments entries={assignedRecipes} />
+                <RecipeAssignments entries={assignedRecipes} today={today} />
               )}
 
               <AssignRecipeForm
@@ -777,7 +778,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <RecipeAssignments entries={pastRecipes} />
+                <RecipeAssignments entries={pastRecipes} today={today} />
               </CardContent>
             </Card>
           </section>

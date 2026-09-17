@@ -33,4 +33,11 @@ export type RecipeAssignment = Entity & {
 export type AssignedRecipe = {
   assignment: RecipeAssignment;
   recipe: Recipe;
+  /**
+   * The recipe this one was adapted from, when it is a variant — just enough
+   * to render « variante de … » and link to it. The whole origin is not
+   * carried: the card shows the variant's own body, and the origin is a
+   * destination, not content.
+   */
+  origin: { id: Id; title: string } | null;
 };

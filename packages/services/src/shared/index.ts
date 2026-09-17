@@ -38,6 +38,7 @@ export {
   patientStatuses,
   recommendationCategories,
 } from "./patient";
+export { variantTitle, VARIANT_SUFFIX } from "./recipe";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
 export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";
