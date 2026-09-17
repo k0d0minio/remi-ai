@@ -1,4 +1,4 @@
-import type { Entity } from "../../types";
+import type { Entity, Id } from "../../types";
 
 /**
  * One entry in the shared recipe library — brainstorm § I.
@@ -24,4 +24,16 @@ export type Recipe = Entity & {
   tags: readonly string[];
   /** Set when the recipe leaves the library without leaving the record. */
   archivedAt: Date | null;
+  /**
+   * The recipe this one was duplicated from, when it was. Set once, on the
+   * duplicate, and never afterwards: it records where a variant came from, not
+   * a relationship that can be re-pointed.
+   *
+   * A variant is a full library row rather than a fork of an assignment, so
+   * adapting a recipe for one person leaves every other holder of the original
+   * untouched — and this is the only thread back, which is why it could not be
+   * added later: provenance for rows written before the column cannot be
+   * recovered.
+   */
+  variantOfId: Id | null;
 };

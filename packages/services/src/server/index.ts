@@ -107,6 +107,7 @@ export {
   archiveRecipe,
   countRecipeAssignments,
   createRecipe,
+  duplicateRecipe,
   getRecipe,
   listArchivedRecipes,
   listRecipeTags,
@@ -117,13 +118,18 @@ export type { RecipeInput } from "../db/services/recipes";
 
 export {
   archiveRecipeAssignment,
-  assignRecipe,
+  assignRecipes,
+  createAndAssignRecipe,
+  duplicateAndAssignRecipe,
   listArchivedPatientRecipes,
   listPatientRecipes,
   removeRecipeAssignment,
   updateRecipeAssignment,
 } from "../db/services/recipe-assignments";
-export type { AssignmentInput } from "../db/services/recipe-assignments";
+export type {
+  AssignmentInput,
+  GivenRecipe,
+} from "../db/services/recipe-assignments";
 export type {
   AssignedRecipe,
   RecipeAssignment,

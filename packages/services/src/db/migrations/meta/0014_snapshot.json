@@ -1,6 +1,6 @@
 {
-  "id": "492cbc77-bd82-4059-a22a-66b05e1921b9",
-  "prevId": "6dfd2e95-9c12-420e-af4c-85c5eff2a461",
+  "id": "b20d56b9-264f-4f8f-af70-4b423d07b5c4",
+  "prevId": "492cbc77-bd82-4059-a22a-66b05e1921b9",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1562,6 +1562,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "variant_of_id": {
+          "name": "variant_of_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -1578,7 +1584,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "recipes_variant_of_id_recipes_id_fk": {
+          "name": "recipes_variant_of_id_recipes_id_fk",
+          "tableFrom": "recipes",
+          "tableTo": "recipes",
+          "columnsFrom": [
+            "variant_of_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Copy } from "lucide-react";
 import NextLink from "next/link";
 import { notFound } from "next/navigation";
 import { countRecipeAssignments, getRecipe } from "@remi/services/server";
+import { Button } from "@remi/ui";
 import {
   Badge,
   Card,
@@ -15,6 +16,7 @@ import {
 import { ArchiveRecipe } from "@/components/recipes/archive-recipe";
 import { RecipeForm } from "@/components/recipes/recipe-form";
 import { ensureDatabase } from "@/lib/database";
+import { duplicateRecipeAction } from "@/lib/recipes/actions";
 
 export const metadata: Metadata = {
   title: "Recette",
@@ -26,12 +28,13 @@ export const dynamic = "force-dynamic";
 type Params = { id: string };
 
 /**
- * One recipe, and the number of people currently holding it.
+ * One recipe, its provenance, and the number of people currently holding it.
  *
  * That count is the honest part of a shared library: an edit here reaches every
- * one of them. Whether Morgane wants a « dupliquer en variante » escape hatch
- * instead is hers to answer, so this run states the consequence rather than
- * guessing at a mechanism she has not asked for.
+ * one of them. « Dupliquer en variante » is the way out of it — a copy is a new
+ * library row, so adapting a recipe for one person leaves every other holder
+ * with what they were given. The count is per row, which is why a variant never
+ * adds to its origin's.
  */
 const RecipeDetail = async ({ params }: { params: Promise<Params> }) => {
   // The page's own graph, not the layout's — the two render in parallel.
@@ -42,7 +45,12 @@ const RecipeDetail = async ({ params }: { params: Promise<Params> }) => {
     notFound();
   }
   const recipe = result.data;
-  const holders = await countRecipeAssignments(recipe.id);
+  const [holders, origin] = await Promise.all([
+    countRecipeAssignments(recipe.id),
+    // A variant whose origin has gone renders as an ordinary recipe rather
+    // than as a broken link — the same tolerance the patient card applies.
+    recipe.variantOfId ? getRecipe(recipe.variantOfId) : null,
+  ]);
   const archived = recipe.archivedAt !== null;
 
   return (
@@ -65,6 +73,17 @@ const RecipeDetail = async ({ params }: { params: Promise<Params> }) => {
             </Badge>
           ) : null}
         </div>
+        {origin?.ok ? (
+          <Typography size="sm" tone="muted">
+            variante de{" "}
+            <NextLink
+              href={`/recipes/${origin.data.id}`}
+              className="hover:text-foreground underline underline-offset-2"
+            >
+              {origin.data.title}
+            </NextLink>
+          </Typography>
+        ) : null}
         <Typography size="sm" tone="muted">
           {holders === 0
             ? "Personne ne l'a pour l'instant."
@@ -84,6 +103,28 @@ const RecipeDetail = async ({ params }: { params: Promise<Params> }) => {
         </CardHeader>
         <CardContent>
           <RecipeForm recipe={recipe} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Dupliquer en variante</CardTitle>
+          <CardDescription>
+            Une copie, à adapter librement — l&apos;original ne bouge pas et les
+            personnes qui l&apos;ont gardent ce qu&apos;elles ont reçu. Rien
+            n&apos;est attribué ici : la copie s&apos;ouvre pour édition, et
+            l&apos;attribution se fait depuis la fiche d&apos;une personne.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form action={duplicateRecipeAction}>
+            <input type="hidden" name="id" value={recipe.id} />
+            <input type="hidden" name="title" value={recipe.title} />
+            <Button type="submit" size="sm" variant="secondary">
+              <Copy aria-hidden="true" />
+              Dupliquer en variante
+            </Button>
+          </form>
         </CardContent>
       </Card>
 
