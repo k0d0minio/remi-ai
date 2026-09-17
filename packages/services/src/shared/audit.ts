@@ -62,6 +62,7 @@ export const auditActions = [
   "observation.archived",
   "observation.restored",
   "observation.deleted",
+  "consultation.recorded",
   "note.added",
   "note.updated",
   "note.deleted",
