@@ -25,6 +25,8 @@ export type { Locale } from "./i18n";
 export { auditActions } from "./audit";
 export type { AuditActionName } from "./audit";
 export { appHref, appOrigin } from "./links";
+export { nutritionRuleKinds, nutritionRuleStatuses } from "./nutrition";
+export type { NutritionRuleKind, NutritionRuleStatus } from "./nutrition";
 export type { AppKey } from "./links";
 export { canManageOperators, isAtLeast, operatorRoles } from "./operator";
 export type { OperatorRoleName } from "./operator";
@@ -60,6 +62,7 @@ export type {
   HabitsProfile,
   MealEntry,
   MealSlot,
+  NutritionRule,
   OperatorRole,
   PantryEssential,
   PatientAnamnesis,

@@ -1,4 +1,11 @@
-import { ChefHat, Home, ScrollText, Users, UsersRound } from "lucide-react";
+import {
+  BookOpen,
+  ChefHat,
+  Home,
+  ScrollText,
+  Users,
+  UsersRound,
+} from "lucide-react";
 import type { ComponentType } from "react";
 
 export type NavItem = {
@@ -36,6 +43,9 @@ export const navSections: readonly NavSection[] = [
       // Beside Patients rather than under one: the library belongs to no
       // patient, which is the whole reason it is a library.
       { href: "/recipes", label: "Recettes", icon: ChefHat },
+      // Beside the library for the same reason: the nutrition corpus belongs to
+      // no patient either. It is what REMI knows, not what anyone was told.
+      { href: "/knowledge", label: "Connaissances", icon: BookOpen },
     ],
   },
   {
