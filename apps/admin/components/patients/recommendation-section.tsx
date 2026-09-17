@@ -41,8 +41,11 @@ const toRow = (recommendation: PatientRecommendation): Row => ({
   detail: recommendation.detail,
 });
 
+// `some` rather than `includes`: the addable list is narrowed to the four
+// categories it offers, so `includes` refuses the wider argument this is asked
+// about — `supplement` being exactly the case that has to be answerable.
 const isAddable = (category: RecommendationCategory) =>
-  addableRecommendationCategories.includes(category);
+  addableRecommendationCategories.some((addable) => addable === category);
 
 /**
  * The protocol, edited whole — one block per category, rows under each.

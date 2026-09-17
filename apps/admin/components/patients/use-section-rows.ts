@@ -98,9 +98,10 @@ export const useSectionRows = <T>(
           if (row.key !== key) {
             return row;
           }
-          const next: Keyed<T> = { ...row };
-          next[name] = value;
-          return next;
+          // `Keyed<T>[K]` and `T[K]` are the same type for every `K extends
+          // keyof T`, but TypeScript cannot see that through the intersection
+          // while `T` is still generic.
+          return { ...row, [name]: value } as Keyed<T>;
         }),
       );
     },
