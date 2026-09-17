@@ -59,6 +59,7 @@ import {
 import {
   appHref,
   consentChannels,
+  contextBlocks,
   cookingAffinities,
   goalDirections,
   isLocale,
@@ -1266,6 +1267,16 @@ export const saveAnamnesisAction = async (
  * `recordAuditEvent` swallows its own failures, so a copy is never blocked by a
  * trail that cannot be written (see the service).
  */
+/**
+ * A server action is an endpoint, so what the client sends is narrowed against
+ * the closed list before it reaches the trail — same rule as `asStatus` and
+ * `asCategory` above. Filtering the vocabulary rather than the argument also
+ * bounds the length and canonicalises the order, so a row reads the same
+ * whichever order the checkboxes were clicked in.
+ */
+const asContextBlocks = (values: readonly string[]): string[] =>
+  contextBlocks.filter((block) => values.includes(block));
+
 export const recordContextExportAction = async (
   patientId: string,
   blocks: readonly string[],
@@ -1276,6 +1287,6 @@ export const recordContextExportAction = async (
     type: "patient",
     id: patientId,
     label: found.ok ? found.data.pseudonym : "",
-    detail: blocks.join(", "),
+    detail: asContextBlocks(blocks).join(", "),
   });
 };

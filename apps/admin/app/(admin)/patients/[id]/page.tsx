@@ -193,7 +193,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   // and the medium anchor row all read. Every rendered section, in DOM order.
   const sections: PatientSectionEntry[] = [
     { id: "working-view", label: "Vue de travail", segment: "suivi" },
-    { id: "copy-context", label: "Copier le contexte", segment: "suivi" },
     { id: "patient-link", label: "Lien patient", segment: "dossier" },
     { id: "summary", label: "Résumé vivant", segment: "suivi" },
     {

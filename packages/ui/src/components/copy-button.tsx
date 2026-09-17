@@ -62,17 +62,21 @@ export const CopyButton = ({
   );
 
   const copy = async () => {
+    // Only the write is guarded. Everything after it runs on the success path,
+    // so a caller's `onCopied` throwing is not mistaken for a denied clipboard
+    // and swallowed — which would defeat the one thing that prop is for.
     try {
       await navigator.clipboard.writeText(value);
-      setCopied(true);
-      if (timer.current) {
-        clearTimeout(timer.current);
-      }
-      timer.current = setTimeout(() => setCopied(false), CONFIRMATION_MS);
-      onCopied?.();
     } catch {
       // Clipboard access denied — the value stays selectable beside the button.
+      return;
     }
+    setCopied(true);
+    if (timer.current) {
+      clearTimeout(timer.current);
+    }
+    timer.current = setTimeout(() => setCopied(false), CONFIRMATION_MS);
+    onCopied?.();
   };
 
   return (
