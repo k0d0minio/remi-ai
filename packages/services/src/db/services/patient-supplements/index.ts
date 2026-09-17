@@ -1,9 +1,15 @@
 import { z } from "zod";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
-import { getDatabase } from "../../client";
+import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientSupplement } from "../../models/patient-supplement";
 import { touchPatient } from "../patients";
+import {
+  countSectionPlan,
+  isEmptySave,
+  planSectionSave,
+  type SectionSaveCounts,
+} from "../section-save";
 
 /**
  * The prescribed supplement protocol — brainstorm § G. What Morgane prescribes,
@@ -16,8 +22,13 @@ import { touchPatient } from "../patients";
  * we stop it".
  */
 
-const supplements = () =>
-  getDatabase().collection<PatientSupplement>("patient_supplements");
+/**
+ * Takes the client so the whole-section save at the bottom of this file can
+ * hand every write the one `transaction()` gave it. A write that reaches for
+ * the global instead lands on the pool, outside the unit.
+ */
+const supplements = (db: DatabaseClient = getDatabase()) =>
+  db.collection<PatientSupplement>("patient_supplements");
 
 const uuidSchema = z.uuid();
 
@@ -203,4 +214,105 @@ export const deletePatientSupplement = async (
     await touchPatient(existing.patientId);
   }
   return ok(true);
+};
+
+/**
+ * One row of the whole-section edit mode — § G's four columns. `id` is present
+ * for a row already in force and absent for one just added.
+ */
+export type SupplementRow = {
+  id?: Id;
+  name: string;
+  dose: string;
+  timing: string;
+  reason: string;
+};
+
+/**
+ * Save the whole protocol in one act, beside the single-row calls above that
+ * remain the phone's quick-add.
+ *
+ * What is submitted is what is in force: an active row that is not submitted is
+ * archived, never deleted. Every row is validated before the first write, so a
+ * bad row costs nothing. One flat run, so a row's rank is its index.
+ */
+export const savePatientSupplements = async (
+  patientId: Id,
+  rows: readonly SupplementRow[],
+  /** The ids the editor was seeded with — see `planSectionSave`'s `known`. */
+  known?: readonly Id[],
+): Promise<Result<SectionSaveCounts>> => {
+  if (!uuidSchema.safeParse(patientId).success) {
+    return err("not_found", "no such patient");
+  }
+
+  const parsedRows: SupplementRow[] = [];
+  for (const [index, row] of rows.entries()) {
+    const parsed = supplementFields
+      .partial({ dose: true, timing: true, reason: true })
+      .safeParse(row);
+    if (!parsed.success) {
+      return err(
+        "invalid_input",
+        `row ${index + 1}: ${parsed.error.issues[0].message}`,
+      );
+    }
+    parsedRows.push({
+      id: row.id,
+      name: parsed.data.name,
+      dose: parsed.data.dose ?? "",
+      timing: parsed.data.timing ?? "",
+      reason: parsed.data.reason ?? "",
+    });
+  }
+
+  const existing = await listPatientSupplements(patientId);
+  const plan = planSectionSave<SupplementRow, PatientSupplement>({
+    existing,
+    groups: [parsedRows],
+    idOf: (row) => row.id,
+    known,
+    changed: (row, stored) =>
+      row.name !== stored.name ||
+      row.dose !== stored.dose ||
+      row.timing !== stored.timing ||
+      row.reason !== stored.reason,
+  });
+
+  const counts = countSectionPlan(plan);
+  if (isEmptySave(counts)) {
+    return ok(counts);
+  }
+
+  return getDatabase().transaction(async (tx) => {
+    const archivedAt = new Date();
+    for (const id of plan.archives) {
+      await supplements(tx).update(id, { archivedAt });
+    }
+    for (const update of plan.updates) {
+      if (!update.fieldsChanged && !update.moved) {
+        continue;
+      }
+      await supplements(tx).update(update.id, {
+        name: update.row.name,
+        dose: update.row.dose,
+        timing: update.row.timing,
+        reason: update.row.reason,
+        position: update.position,
+      });
+    }
+    for (const insert of plan.inserts) {
+      await supplements(tx).insert({
+        patientId,
+        name: insert.row.name,
+        dose: insert.row.dose,
+        timing: insert.row.timing,
+        reason: insert.row.reason,
+        position: insert.position,
+        archivedAt: null,
+      });
+    }
+    await touchPatient(patientId, tx);
+    return ok(counts);
+  });
 };

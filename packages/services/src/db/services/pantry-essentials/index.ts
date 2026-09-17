@@ -1,9 +1,15 @@
 import { z } from "zod";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
-import { getDatabase } from "../../client";
+import { getDatabase, type DatabaseClient } from "../../client";
 import type { PantryEssential } from "../../models/pantry-essential";
 import { touchPatient } from "../patients";
+import {
+  countSectionPlan,
+  isEmptySave,
+  planSectionSave,
+  type SectionSaveCounts,
+} from "../section-save";
 
 /**
  * The placard/frigo list Morgane keeps per patient — brainstorm § H.
@@ -18,8 +24,13 @@ import { touchPatient } from "../patients";
  * is a short name, and a why is one line, not a paragraph.
  */
 
-const essentials = () =>
-  getDatabase().collection<PantryEssential>("patient_pantry_essentials");
+/**
+ * Takes the client so the whole-section save at the bottom of this file can
+ * hand every write the one `transaction()` gave it. A write that reaches for
+ * the global instead lands on the pool, outside the unit.
+ */
+const essentials = (db: DatabaseClient = getDatabase()) =>
+  db.collection<PantryEssential>("patient_pantry_essentials");
 
 const uuidSchema = z.uuid();
 
@@ -197,4 +208,93 @@ export const deletePantryEssential = async (id: Id): Promise<Result<true>> => {
     await touchPatient(existing.patientId);
   }
   return ok(true);
+};
+
+/**
+ * One row of the whole-section edit mode — § H's two fields and no more. `id`
+ * is present for a row already on the list and absent for one just added.
+ */
+export type PantryEssentialRow = {
+  id?: Id;
+  item: string;
+  why: string;
+};
+
+/**
+ * Save the whole list in one act, beside the single-row calls above that remain
+ * the phone's quick-add.
+ *
+ * This is the section Morgane pastes into: a dozen items off her own notes,
+ * one line each. What is submitted is what is in force — an item that is not
+ * submitted drops off the list by being archived, which is what makes "why did
+ * we stop buying the sardines" still answerable.
+ */
+export const savePantryEssentials = async (
+  patientId: Id,
+  rows: readonly PantryEssentialRow[],
+  /** The ids the editor was seeded with — see `planSectionSave`'s `known`. */
+  known?: readonly Id[],
+): Promise<Result<SectionSaveCounts>> => {
+  if (!uuidSchema.safeParse(patientId).success) {
+    return err("not_found", "no such patient");
+  }
+
+  const parsedRows: PantryEssentialRow[] = [];
+  for (const [index, row] of rows.entries()) {
+    const parsed = essentialFields.partial({ why: true }).safeParse(row);
+    if (!parsed.success) {
+      return err(
+        "invalid_input",
+        `row ${index + 1}: ${parsed.error.issues[0].message}`,
+      );
+    }
+    parsedRows.push({
+      id: row.id,
+      item: parsed.data.item,
+      why: parsed.data.why ?? "",
+    });
+  }
+
+  const existing = await listPantryEssentials(patientId);
+  const plan = planSectionSave<PantryEssentialRow, PantryEssential>({
+    existing,
+    groups: [parsedRows],
+    idOf: (row) => row.id,
+    known,
+    changed: (row, stored) =>
+      row.item !== stored.item || row.why !== stored.why,
+  });
+
+  const counts = countSectionPlan(plan);
+  if (isEmptySave(counts)) {
+    return ok(counts);
+  }
+
+  return getDatabase().transaction(async (tx) => {
+    const archivedAt = new Date();
+    for (const id of plan.archives) {
+      await essentials(tx).update(id, { archivedAt });
+    }
+    for (const update of plan.updates) {
+      if (!update.fieldsChanged && !update.moved) {
+        continue;
+      }
+      await essentials(tx).update(update.id, {
+        item: update.row.item,
+        why: update.row.why,
+        position: update.position,
+      });
+    }
+    for (const insert of plan.inserts) {
+      await essentials(tx).insert({
+        patientId,
+        item: insert.row.item,
+        why: insert.row.why,
+        position: insert.position,
+        archivedAt: null,
+      });
+    }
+    await touchPatient(patientId, tx);
+    return ok(counts);
+  });
 };

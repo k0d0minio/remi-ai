@@ -59,17 +59,20 @@ import {
 } from "@/components/patients/patient-navigation";
 import { PantryAddForm } from "@/components/patients/pantry-add-form";
 import { PantryList } from "@/components/patients/pantry-list";
+import { PantrySection } from "@/components/patients/pantry-section";
 import { PatientForm } from "@/components/patients/patient-form";
 import { PrepNote } from "@/components/patients/prep-note";
 import { QuickActions } from "@/components/patients/quick-actions";
 import { RecipeAssignments } from "@/components/patients/recipe-assignments";
 import { RecommendationAddForm } from "@/components/patients/recommendation-add-form";
 import { RecommendationGroups } from "@/components/patients/recommendation-groups";
+import { RecommendationSection } from "@/components/patients/recommendation-section";
 import { ShareLinkCard } from "@/components/patients/share-link-card";
 import { SummaryBlock } from "@/components/patients/summary-block";
 import { SummaryHead } from "@/components/patients/summary-head";
 import { SupplementAddForm } from "@/components/patients/supplement-add-form";
 import { SupplementProtocol } from "@/components/patients/supplement-protocol";
+import { SupplementSection } from "@/components/patients/supplement-section";
 import { WorkingGoals } from "@/components/patients/working-goals";
 import { WorkingMeals } from "@/components/patients/working-meals";
 import { WorkingRecommendations } from "@/components/patients/working-recommendations";
@@ -620,15 +623,20 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
-              {recommendations.length === 0 ? (
-                <Typography size="sm" tone="muted">
-                  Rien d&apos;encodé pour le moment.
-                </Typography>
-              ) : (
-                <RecommendationGroups recommendations={recommendations} />
-              )}
-
-              <RecommendationAddForm patientId={patient.id} />
+              <RecommendationSection
+                patientId={patient.id}
+                pseudonym={patient.pseudonym}
+                recommendations={recommendations}
+              >
+                {recommendations.length === 0 ? (
+                  <Typography size="sm" tone="muted">
+                    Rien d&apos;encodé pour le moment.
+                  </Typography>
+                ) : (
+                  <RecommendationGroups recommendations={recommendations} />
+                )}
+                <RecommendationAddForm patientId={patient.id} />
+              </RecommendationSection>
             </CardContent>
           </Card>
         </section>
@@ -665,15 +673,20 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
-              {supplements.length === 0 ? (
-                <Typography size="sm" tone="muted">
-                  Aucun complément prescrit pour le moment.
-                </Typography>
-              ) : (
-                <SupplementProtocol supplements={supplements} />
-              )}
-
-              <SupplementAddForm patientId={patient.id} />
+              <SupplementSection
+                patientId={patient.id}
+                pseudonym={patient.pseudonym}
+                supplements={supplements}
+              >
+                {supplements.length === 0 ? (
+                  <Typography size="sm" tone="muted">
+                    Aucun complément prescrit pour le moment.
+                  </Typography>
+                ) : (
+                  <SupplementProtocol supplements={supplements} />
+                )}
+                <SupplementAddForm patientId={patient.id} />
+              </SupplementSection>
 
               {archivedSupplements.length > 0 ? (
                 <details className="border-border flex flex-col gap-3 border-t pt-6">
@@ -699,15 +712,20 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
-              {essentials.length === 0 ? (
-                <Typography size="sm" tone="muted">
-                  Aucun essentiel pour le moment.
-                </Typography>
-              ) : (
-                <PantryList essentials={essentials} />
-              )}
-
-              <PantryAddForm patientId={patient.id} />
+              <PantrySection
+                patientId={patient.id}
+                pseudonym={patient.pseudonym}
+                essentials={essentials}
+              >
+                {essentials.length === 0 ? (
+                  <Typography size="sm" tone="muted">
+                    Aucun essentiel pour le moment.
+                  </Typography>
+                ) : (
+                  <PantryList essentials={essentials} />
+                )}
+                <PantryAddForm patientId={patient.id} />
+              </PantrySection>
             </CardContent>
           </Card>
         </section>
