@@ -2,11 +2,7 @@
 
 - slug: ciqual-import
 - apps: packages, admin
-- touches: packages/services/src/db/schema.ts, packages/services/src/db/migrations,
-  packages/services/src/db/models, packages/services/src/db/services/foods,
-  packages/services/src/db/fixtures, packages/services/src/shared,
-  packages/services/scripts, apps/admin/app/(admin)/page.tsx,
-  apps/admin/app/(admin)/aliments, apps/docs/app/technical/decisions/page.mdx
+- touches: packages/services/src/db/schema.ts, packages/services/src/db/migrations, packages/services/src/db/models, packages/services/src/db/services/foods, packages/services/src/db/fixtures, packages/services/src/shared, packages/services/scripts, apps/admin/app/(admin)/page.tsx, apps/admin/app/(admin)/aliments, apps/docs/app/technical/decisions/page.mdx
 - complexity: complex
 
 ## Verified at pickup
@@ -14,15 +10,15 @@
 The stub deliberately left the edition, format and licence to be checked rather than assumed. All
 of the below was read from the publisher on 2026-09-17, not from memory:
 
-| Fact              | Value                                                                                                         |
-| ----------------- | ------------------------------------------------------------------------------------------------------------- |
-| Current edition   | **Table Ciqual 2025** — the newest; there is no 2026 edition. Data files dated 2025-11-03, published 2025-11-19 |
-| Publisher         | ANSES, unité Observatoire des Aliments (Du Chaffaut, Oseredczuk, Gauvreau-Béziat)                              |
-| DOI               | `10.57745/RDMHWY`, on Recherche Data Gouv — `ciqual.anses.fr` is the browse UI over the same data              |
-| Licence           | **Etalab 2.0** (Licence Ouverte 2.0, SPDX `etalab-2.0`) — reuse and redistribution allowed, attribution required |
-| Size              | **3 484 foods**, **74 constituents**, **257 816** composition rows, 11 groups / 66 sub-groups                  |
-| Formats           | XML (`alim`, `alim_grp`, `compo`, `const`, `sources`) and XLS/XLSX. The XML set is what the importer reads      |
-| Largest file      | `compo_2025_11_03.xml`, 69 MB — the reason the raw export is not committed                                     |
+| Fact            | Value                                                                                                            |
+| --------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Current edition | **Table Ciqual 2025** — the newest; there is no 2026 edition. Data files dated 2025-11-03, published 2025-11-19  |
+| Publisher       | ANSES, unité Observatoire des Aliments (Du Chaffaut, Oseredczuk, Gauvreau-Béziat)                                |
+| DOI             | `10.57745/RDMHWY`, on Recherche Data Gouv — `ciqual.anses.fr` is the browse UI over the same data                |
+| Licence         | **Etalab 2.0** (Licence Ouverte 2.0, SPDX `etalab-2.0`) — reuse and redistribution allowed, attribution required |
+| Size            | **3 484 foods**, **74 constituents**, **257 816** composition rows, 11 groups / 66 sub-groups                    |
+| Formats         | XML (`alim`, `alim_grp`, `compo`, `const`, `sources`) and XLS/XLSX. The XML set is what the importer reads       |
+| Largest file    | `compo_2025_11_03.xml`, 69 MB — the reason the raw export is not committed                                       |
 
 The XML shape, confirmed against the real files:
 
@@ -65,7 +61,7 @@ primitive; it calls no model and touches no patient data.
 ## Proposed change
 
 **1 — Three tables behind the storage seam.** `foods` (CIQUAL code, French and English name, group
-and sub-group codes *and names*, an accent-stripped search name), `food_nutrients` (food code,
+and sub-group codes _and names_, an accent-stripped search name), `food_nutrients` (food code,
 component code, component French name, unit, value, marker, confidence), and `ciqual_imports` (one
 row per import: edition label, food and nutrient counts, source checksums, imported at). The seam
 has no joins, so group names and component names are denormalised onto the rows that need them —
