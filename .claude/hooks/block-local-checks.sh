@@ -16,6 +16,14 @@
 #
 # It only matches runner invocations at a command-segment boundary (start, `;`, `&&`, `||`, `|`), so
 # a blocked word inside a quoted string — `git commit -m "fix lint"` — is never caught.
+#
+# ONE ALLOWANCE: building `@remi/ui` and `@remi/services`.
+# `pnpm packages:build` is not a check — it is the prerequisite artifact `AGENTS.md` names as step
+# one, and the package scripts under `packages/services/scripts/` import the package from `dist/`,
+# so a session that cannot produce it cannot run them at all. The doctrine is about not spending a
+# context window asking the factory's questions ("does it compile?", "does it lint?"); producing a
+# build output the next command consumes is a different act. Everything else stays blocked — lint,
+# typecheck, format, and any app build, which is still the Vercel preview's job.
 set -euo pipefail
 
 input="$(cat 2>/dev/null || true)"
@@ -43,6 +51,22 @@ printf '%s' "$cmd" | grep -Eq "${b}turbo[[:space:]]+(run[[:space:]]+)?${verb}" &
 # The direct binaries the scripts wrap — bare, or behind an npx/bunx/pnpm exec|dlx/yarn runner.
 runner='(npx|bunx|pnpm[[:space:]]+(exec|dlx)|yarn([[:space:]]+exec)?)[[:space:]]+'
 printf '%s' "$cmd" | grep -Eq "${b}(${runner})?(tsc|next[[:space:]]+build|prettier|eslint)([[:space:]]|$|[;&|])" && hit="tsc / next build / prettier / eslint"
+
+# The allowance above. Deliberately literal rather than a pattern: it names the two package builds
+# and nothing else, so it cannot widen by accident into `pnpm build` or an app's build.
+if [ -n "$hit" ]; then
+  for allowed in \
+    "pnpm packages:build" \
+    "pnpm ui:build" \
+    "pnpm services:build" \
+    "pnpm --filter @remi/ui build" \
+    "pnpm --filter @remi/services build"; do
+    if [ "$(printf '%s' "$cmd" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')" = "$allowed" ]; then
+      hit=""
+      break
+    fi
+  done
+fi
 
 [ -n "$hit" ] || exit 0
 
