@@ -108,6 +108,7 @@ sixteen service folders, the composed write is **one new service**,
 `db/services/consultations/recordConsultation()`, which takes the whole payload and performs the
 five writes against the `tx` client it is handed. The single-field services stay exactly as they
 are; nothing above the seam learns a new shape.
+
 - This is an estate-wide change behind one file, so it is proven the way everything else here is:
   CI green, plus the six previews exercised by the owner's own testing before the merge gate.
 
