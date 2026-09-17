@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { variantTitle } from "../../../shared/recipe";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
@@ -143,20 +144,6 @@ export const createRecipe = async (
       variantOfId: null,
     }),
   );
-};
-
-/** What a duplicate is called before she renames it. */
-const VARIANT_SUFFIX = " (variante)";
-
-/**
- * Suffix without ever exceeding the column, and without stacking: duplicating
- * a variant of a variant reads « … (variante) », not « … (variante) (variante) ».
- */
-const variantTitle = (title: string) => {
-  const base = title.endsWith(VARIANT_SUFFIX)
-    ? title.slice(0, -VARIANT_SUFFIX.length)
-    : title;
-  return `${base.slice(0, 140 - VARIANT_SUFFIX.length)}${VARIANT_SUFFIX}`;
 };
 
 /**

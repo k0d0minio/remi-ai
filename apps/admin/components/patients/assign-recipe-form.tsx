@@ -1,7 +1,7 @@
 "use client";
 
 import { NotebookPen, Plus, X } from "lucide-react";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import type { Recipe } from "@remi/services/shared";
 import { Button, Checkbox } from "@remi/ui";
 import { Field, Input, Textarea, Typography } from "@remi/ui/server";
@@ -80,7 +80,8 @@ export const AssignRecipeForm = ({ patientId, recipes, today }: Props) => {
  * row — so the action reads a list, not this state.
  */
 const AssignExistingForm = ({ patientId, recipes, today }: Props) => {
-  const [state, action, pending] = useActionState(assignRecipesAction, initial);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
   const [chosen, setChosen] = useState<readonly string[]>([]);
 
   const toggle = (id: string, checked: boolean) => {
@@ -95,7 +96,24 @@ const AssignExistingForm = ({ patientId, recipes, today }: Props) => {
     .join(", ");
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form
+      action={async (formData: FormData) => {
+        setPending(true);
+        try {
+          const result = await assignRecipesAction(initial, formData);
+          setError(result.error);
+          // Clearing the ticks is part of the save, not cosmetics: React resets
+          // the form's own fields, so a selection left ticked would post a
+          // different set than the one on screen.
+          if (!result.error) {
+            setChosen([]);
+          }
+        } finally {
+          setPending(false);
+        }
+      }}
+      className="flex flex-col gap-4"
+    >
       <input type="hidden" name="patientId" value={patientId} />
       <input type="hidden" name="titles" value={titles} />
 
@@ -156,9 +174,9 @@ const AssignExistingForm = ({ patientId, recipes, today }: Props) => {
               ? `Attribuer ${chosen.length} recettes`
               : "Attribuer"}
         </Button>
-        {state.error ? (
+        {error ? (
           <Typography size="sm" className="text-error-text" role="alert">
-            {state.error}
+            {error}
           </Typography>
         ) : null}
       </div>
@@ -189,11 +207,16 @@ const RecipeInPlaceForm = ({ patientId, today, onDone }: InPlaceProps) => {
     <form
       action={async (formData: FormData) => {
         setPending(true);
-        const result = await createAndAssignRecipeAction(initial, formData);
-        setPending(false);
-        setError(result.error);
-        if (!result.error) {
-          onDone();
+        try {
+          const result = await createAndAssignRecipeAction(initial, formData);
+          setError(result.error);
+          if (!result.error) {
+            onDone();
+          }
+        } finally {
+          // Without this the form stays disabled at "Enregistrement…" on a
+          // throw, and the only way out discards what she just typed.
+          setPending(false);
         }
       }}
       className="border-border flex flex-col gap-4 rounded-lg border p-4"

@@ -3,7 +3,11 @@
 import { ArchiveRestore, ArchiveX, Copy, Pencil, X } from "lucide-react";
 import NextLink from "next/link";
 import { useState } from "react";
-import { formatDate, type AssignedRecipe } from "@remi/services/shared";
+import {
+  formatDate,
+  variantTitle,
+  type AssignedRecipe,
+} from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Badge, Field, Input, Textarea, Typography } from "@remi/ui/server";
 import {
@@ -79,7 +83,7 @@ export const RecipeAssignmentItem = ({ entry, today }: Props) => {
               name="title"
               required
               maxLength={140}
-              defaultValue={`${recipe.title} (variante)`}
+              defaultValue={variantTitle(recipe.title)}
             />
           </Field>
 

@@ -103,6 +103,19 @@ const withRecipes = async (
   return joined.filter((entry) => entry !== null);
 };
 
+/**
+ * Newest giving first, and within one date the order she chose them in.
+ *
+ * The tiebreak is not cosmetic. A bulk assignment writes several rows under one
+ * `assignedOn`, so sorting on the date alone leaves their order to whatever the
+ * adapter happens to return — which is not the same between the HTTP driver and
+ * the in-memory test client, and so would be a list that reorders itself
+ * between test and production. `createdAt` ascending is the selection order.
+ */
+const byGiving = (a: RecipeAssignment, b: RecipeAssignment) =>
+  b.assignedOn.localeCompare(a.assignedOn) ||
+  a.createdAt.getTime() - b.createdAt.getTime();
+
 /** What the patient currently holds — newest giving first. */
 export const listPatientRecipes = async (
   patientId: Id,
@@ -110,7 +123,7 @@ export const listPatientRecipes = async (
   withRecipes(
     [...(await forPatient(patientId))]
       .filter((assignment) => assignment.archivedAt === null)
-      .sort((a, b) => b.assignedOn.localeCompare(a.assignedOn)),
+      .sort(byGiving),
   );
 
 /** What rotated out, newest archive first — the weeks before this one. */
