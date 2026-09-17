@@ -54,8 +54,17 @@ export const refreshFoodCatalogue = () => {
   rankedComponents.clear();
 };
 
+/**
+ * An empty read is never cached.
+ *
+ * The tables exist before the import has ever run, so the first request on a
+ * fresh deployment reads nothing — and memoising that would leave the instance
+ * answering « nothing » for its whole life, past the import, until a cold
+ * start. An empty catalogue is cheap to re-read; a stale empty one is a support
+ * ticket.
+ */
 const allFoods = async (): Promise<readonly Food[]> => {
-  if (catalogue === null) {
+  if (catalogue === null || catalogue.length === 0) {
     const page = await foods().findMany({}, { limit: CATALOGUE_LIMIT });
     catalogue = page.items;
   }
@@ -65,8 +74,10 @@ const allFoods = async (): Promise<readonly Food[]> => {
 const componentColumn = async (
   componentCode: string,
 ): Promise<readonly FoodNutrient[]> => {
+  // Same reasoning as `allFoods`: an empty column before the import is not an
+  // answer worth keeping.
   const cached = rankedComponents.get(componentCode);
-  if (cached) {
+  if (cached && cached.length > 0) {
     return cached;
   }
   const page = await nutrients().findMany(

@@ -8,7 +8,6 @@ import {
   getFoodNutrients,
   type FoodNutrient,
 } from "@remi/services/server";
-import { formatNumber } from "@remi/services/shared";
 import {
   Badge,
   Table,
@@ -51,22 +50,24 @@ export const generateMetadata = async ({
 };
 
 /**
- * How a value reads when it is not a plain measurement.
+ * How a value reads.
  *
- * CIQUAL's own notation is kept rather than translated into a number: `traces`
- * and `< 0,01` mean different things from `0`, and « - » means the constituent
- * was never determined for this food. Flattening them would let the page state
- * something the table does not.
+ * The publisher's own string, verbatim — already French, already at the
+ * precision ANSES measured to. Reformatting the parsed float instead looks
+ * tidier and is wrong: `Intl` defaults to three fraction digits, which renders
+ * DHA at 0,00012 g as « 0 ». Forty-seven values in the committed subset alone
+ * round to nothing that way, and one of them is a component the recommendation
+ * map ranks on — the page would state « contains none » where the table says
+ * otherwise, which is the exact failure this function exists to prevent.
+ *
+ * `traces`, `< 0,01` and « - » already carry their meaning in that string;
+ * only the dash is swapped for a typographic one.
  */
 const readValue = (nutrient: FoodNutrient) => {
   if (nutrient.marker === "not_determined") {
     return "—";
   }
-  if (nutrient.marker === "traces") {
-    return "traces";
-  }
-  const value = formatNumber(nutrient.value ?? 0, "fr-FR");
-  return nutrient.marker === "less_than" ? `< ${value}` : value;
+  return nutrient.rawValue;
 };
 
 const markerLabels: Record<FoodNutrient["marker"], string> = {

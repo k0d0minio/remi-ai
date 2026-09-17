@@ -41,6 +41,23 @@ reopens — the links into the protocol sections leave the page and come back, a
 survives only the note would lose the rest. It is cleared once a save succeeds, and nothing about it
 reaches the server or another device.
 
+## The food table in the console
+
+`/aliments` is the one surface in admin that is not about a particular person. It reads the ANSES
+Ciqual 2025 composition table — 3 484 foods, 74 constituents — imported into `foods` and
+`food_nutrients` by `pnpm ciqual:import`, a maintenance script pointed at the export downloaded
+from ANSES. The raw export is not in the repository; a derived subset of it is, as the service
+tests' fixture.
+
+The page is read-only, so it has no server action to guard twice and writes nothing to the audit
+trail. It still lives inside the `(admin)` group, which is what makes it operator-only. Values are
+shown in the publisher's own notation — `traces`, `< 0,01`, and « — » where a constituent was never
+determined — because a page that rounds those into numbers states something the table does not.
+
+The licence (Licence Ouverte 2.0, Etalab) requires the source to be named wherever its data is
+shown, so the console home line and both `/aliments` pages carry it. The edition, the DOI and the
+terms are in [decisions](/technical/decisions).
+
 ## Why demo can never reach a backend
 
 The Design stage merges demo work straight to the live URL so a stakeholder reviews the real

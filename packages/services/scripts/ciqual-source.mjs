@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFile, readdir } from "node:fs/promises";
-import { join } from "node:path";
+import { isAbsolute, join, resolve } from "node:path";
 
 /**
  * Finding and reading an unpacked CIQUAL export.
@@ -28,7 +28,18 @@ const FILES = [
   { key: "alim", stem: "alim" },
 ];
 
-export const readCiqualSource = async (dir) => {
+/**
+ * `pnpm ciqual:import <dir>` from the repo root reaches this through a
+ * `--filter`, which runs the script with the PACKAGE as its working directory —
+ * so a relative path the operator typed at the root would resolve under
+ * `packages/services` and appear not to exist. pnpm sets `INIT_CWD` to where the
+ * command was actually typed, which is the directory a relative path means.
+ */
+const fromInvocationDir = (dir) =>
+  isAbsolute(dir) ? dir : resolve(process.env.INIT_CWD ?? process.cwd(), dir);
+
+export const readCiqualSource = async (given) => {
+  const dir = fromInvocationDir(given);
   let entries;
   try {
     entries = (await readdir(dir)).filter((name) => name.endsWith(".xml"));
@@ -57,12 +68,16 @@ export const readCiqualSource = async (dir) => {
   const checksums = [];
 
   for (const [key, name] of Object.entries(found)) {
-    // The BOM the publisher ships would otherwise land inside the first tag.
-    const text = await readFile(join(dir, name), "utf8");
-    source[key] = text.replace(/^\uFEFF/, "");
+    const raw = await readFile(join(dir, name));
+    // Hashed as shipped, before anything is stripped, so the recorded checksum
+    // is the one `sha256sum <file>` prints. A hash of our own post-processing
+    // would answer a question nobody asked — the point of storing it is that an
+    // operator can confirm the database holds the export in their hands.
     checksums.push(
-      `${name}:${createHash("sha256").update(source[key]).digest("hex")}`,
+      `${name}:${createHash("sha256").update(raw).digest("hex")}`,
     );
+    // The BOM the publisher ships would otherwise land inside the first tag.
+    source[key] = raw.toString("utf8").replace(/^\uFEFF/, "");
   }
 
   return { source, checksums: checksums.sort() };
