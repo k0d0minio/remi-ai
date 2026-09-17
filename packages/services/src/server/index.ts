@@ -36,6 +36,9 @@ export type {
   PatientSort,
 } from "../db/services/patients";
 
+export { writeThroughPatientLink } from "../db/services/patient-link-writes";
+export type { PatientLinkWriteRequest } from "../db/services/patient-link-writes";
+
 export {
   addGoalCheckIn,
   addPatientGoal,

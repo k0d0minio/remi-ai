@@ -227,6 +227,7 @@ export const createPatient = async (
     lastEditedAt: new Date(),
     shareToken: newShareToken(),
     linkLastOpenedAt: null,
+    linkLastWroteAt: null,
   });
   return ok(patient);
 };
@@ -306,6 +307,50 @@ export const recordPatientLinkOpened = async (id: Id): Promise<void> => {
   await patients().update(id, { linkLastOpenedAt: new Date() });
 };
 
+/**
+ * Puts back the roster timestamp a patient's write moved.
+ *
+ * The console services bump `lastEditedAt` on every write, correctly: encoding
+ * a protocol entry IS working on that patient. A patient writing through their
+ * own link is not, and the later stubs of `patient-loop` reach those same
+ * services — so the rule is enforced once, where every patient write passes,
+ * rather than five times in five callers that each have to remember it.
+ *
+ * It compares before it writes, so a write that never touched the column costs
+ * nothing. An operator edit landing inside the same few milliseconds would be
+ * put back a second early; with one practitioner and a roster of fifteen that
+ * is a stale sort order nobody sees, and the alternative — a patient's meal
+ * jumping their record above the one she spent the morning on — is the failure
+ * that would actually be noticed.
+ */
+export const restorePatientLastEdited = async (
+  id: Id,
+  previous: Date,
+): Promise<void> => {
+  const patient = await patients().findById(id);
+  if (!patient || patient.lastEditedAt.getTime() === previous.getTime()) {
+    return;
+  }
+  await patients().update(id, { lastEditedAt: previous });
+};
+
+/**
+ * Records that the patient wrote through their link. Unlike the open above it
+ * is not rate-limited and never skipped: a write is already ceilinged by
+ * `writeThroughPatientLink`, and this is the timestamp Morgane reads to know
+ * something is waiting for her — a stale one would be worse than none.
+ *
+ * It never touches `lastEditedAt` either. The roster sorts on that, and it
+ * means she worked on this patient; a patient logging a meal must not push
+ * their own record above the one she spent the morning encoding.
+ */
+export const recordPatientLinkWrote = async (id: Id): Promise<void> => {
+  if (!isValidId(id)) {
+    return;
+  }
+  await patients().update(id, { linkLastWroteAt: new Date() });
+};
+
 /** Cuts off the old link — the recovery move when a share URL leaks. */
 export const regenerateShareToken = async (
   id: Id,
@@ -316,6 +361,7 @@ export const regenerateShareToken = async (
   const patient = await patients().update(id, {
     shareToken: newShareToken(),
     linkLastOpenedAt: null,
+    linkLastWroteAt: null,
     lastEditedAt: new Date(),
   });
   return patient ? ok(patient) : err("not_found", "no such patient");

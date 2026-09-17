@@ -320,7 +320,13 @@ export const addGoalCheckIn = async (
       "a check-in needs a direction, a measure or a note",
     );
   }
-  const created = await checkIns().insert({ goalId, ...entry });
+  // Morgane's consultation check-in. The patient's own in-page answer shares
+  // this table and is attributed to them — `patient-loop/check-in-and-progression`.
+  const created = await checkIns().insert({
+    goalId,
+    ...entry,
+    writtenBy: "practitioner",
+  });
   await touchPatient(goal.patientId);
   return ok(created);
 };

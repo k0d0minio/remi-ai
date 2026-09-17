@@ -27,6 +27,16 @@ practitioner space is built at all.
 - **What they can change** — what they log, and their own pace and preferences. Never the
   recommendations or the frame those sit in; outside the frame REMI does not improvise, it says so
   and points back to the practitioner.
+- **How they are identified** — by the link itself. The unguessable token in `/p/[token]` is the
+  whole credential: it now accepts writes as well as reads (decision #2, 10 September 2026), and
+  there is still no account, no password and no session. Everything written through it is
+  attributed to that link's patient, marked `written_by: patient` on the tables the practitioner
+  also writes, and recorded in the audit trail with a `patient` actor. Two consequences the page
+  states rather than implies: anyone holding the link can write as the patient, which the page says
+  to them in their own language so they can choose who to forward it to; and the link is ceilinged
+  — ten writes a minute, a hundred a day, text only, no uploads. Patient accounts are parked in
+  `beyond-december`, and that is where the question of whether a URL is a good enough credential
+  for health-data writes gets answered.
 - **Which app they live in** — `web`.
 
 ## Practitioner
@@ -78,7 +88,7 @@ answer for what it did.
 
 | App                 | Patient                                                              | Practitioner                                         | Operator                                               |
 | ------------------- | -------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ |
-| `web` (:3000)       | Their profile, the daily hub, meals, micro-actions, supplements      | Their patients — parked until the patient half lands | Nothing — no operator session exists in the product    |
+| `web` (:3000)       | Their profile, the daily hub, meals, micro-actions, supplements — read and write, on their link | Their patients — parked until the patient half lands | Nothing — no operator session exists in the product    |
 | `admin` (:3002)     | Nothing — the app has no public route                                | Nothing                                              | The console: accounts, patients, support, flags, audit |
 | `marketing` (:3001) | The public site, signed out, in English or French                    | The same site, plus the practitioner page            | The same as anyone                                     |
 | `support` (:3004)   | The help centre, anonymously — it never knows who is asking          | The same                                             | The same                                               |

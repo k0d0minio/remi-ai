@@ -166,6 +166,9 @@ export const addMealEntry = async (
     feedback,
     feedbackWrittenAt: feedback === "" ? null : new Date(),
     archivedAt: null,
+    // The console's own form. A patient's entry arrives through
+    // `writeThroughPatientLink` and says so — `patient-loop/meal-entry`.
+    writtenBy: "practitioner",
   });
   await touchPatient(patientId);
   return ok(created);
