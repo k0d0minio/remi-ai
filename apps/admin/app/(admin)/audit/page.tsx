@@ -99,7 +99,12 @@ const Audit = async ({ searchParams }: { searchParams: SearchParams }) => {
 
               <span className="ml-auto flex flex-wrap items-center gap-3">
                 <Typography as="span" size="xs" tone="muted">
-                  {event.actorName || event.actorEmail || "compte supprimé"}
+                  {/* A patient has no account, so their name alone would read
+                      exactly like an operator's. The kind is recorded rather
+                      than inferred; the journal says it out loud. */}
+                  {event.actorKind === "patient"
+                    ? `${event.actorName || "patiente"} — depuis son lien`
+                    : event.actorName || event.actorEmail || "compte supprimé"}
                 </Typography>
                 <Typography
                   as="span"
