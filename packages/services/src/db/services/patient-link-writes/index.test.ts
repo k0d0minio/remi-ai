@@ -122,6 +122,66 @@ describe("writing through a patient link", () => {
     ).toBe(false);
   });
 
+  it("refuses a row belonging to someone else, in the words of a dead token", async () => {
+    const mine = await newPatient("Awa");
+    const theirs = await newPatient("Zineb");
+    let ran = false;
+
+    // The shape stub 3 will use: a row id posted with the form, and the
+    // resolver that says whose row it is.
+    const result = await writeThroughPatientLink({
+      token: mine.shareToken,
+      action: "goal.checked_in",
+      text: {},
+      target: {
+        type: "goal",
+        id: "a-goal-of-theirs",
+        ownerOf: async () => theirs.id,
+      },
+      write: async () => {
+        ran = true;
+        return ok("written");
+      },
+    });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      // Not "that is not yours" — the caller learns nothing about whose it is.
+      expect(result.error).toBe("not_found");
+      expect(result.message).toBe("no such patient link");
+    }
+    expect(ran).toBe(false);
+
+    // Nothing was written and nothing was recorded against either patient.
+    for (const patient of [mine, theirs]) {
+      const after = await getPatient(patient.id);
+      expect(after.ok && after.data.linkLastWroteAt).toBeNull();
+    }
+    expect(
+      (await listAuditEvents({ actorKind: "patient" })).some(
+        (event) => event.actorId === mine.id,
+      ),
+    ).toBe(false);
+  });
+
+  it("allows a row the token does own", async () => {
+    const patient = await newPatient("Hind");
+
+    const result = await writeThroughPatientLink({
+      token: patient.shareToken,
+      action: "goal.checked_in",
+      text: {},
+      target: {
+        type: "goal",
+        id: "a-goal-of-theirs",
+        ownerOf: async () => patient.id,
+      },
+      write: noop,
+    });
+
+    expect(result.ok).toBe(true);
+  });
+
   it("refuses a body or a short field over its cap before touching the seam", async () => {
     const patient = await newPatient("Lena");
     let ran = false;

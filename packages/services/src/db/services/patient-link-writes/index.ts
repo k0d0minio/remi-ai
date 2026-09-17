@@ -20,9 +20,10 @@ import {
  * `beyond-december`, so there is no session to check and nothing else to
  * trust. Every rule that follows from that lives here rather than in each
  * caller, because five callers enforcing it five ways is five chances to miss
- * one: the token is resolved exactly as the loader resolves it, the ceilings
- * are checked before any row is created, the write is attributed to the
- * patient, and the trail records that a patient — not Morgane — did it.
+ * one: the token is resolved exactly as the loader resolves it, a row the
+ * token does not own is refused, the ceilings are checked before any row is
+ * created, the write is attributed to the patient, and the trail records that
+ * a patient — not Morgane — did it.
  *
  * The rules live in this package rather than in the app's server action so
  * they can be tested against the in-memory client. `apps/web` holds the thin
@@ -76,19 +77,47 @@ export type PatientLinkWriteText = {
   shorts?: readonly string[];
 };
 
+/**
+ * What the write is about.
+ *
+ * A union, and that is the whole guard: naming an existing row makes `ownerOf`
+ * mandatory, so a caller cannot target a row without saying how to find out
+ * whose it is. The type is the enforcement — a rule this helper merely
+ * documented would be a rule five callers can each forget once.
+ *
+ * It matters because the patient is bound to the token, but most writes in this
+ * model are keyed by a CHILD row: a goal id, a meal id. Those ids are plain
+ * uuids that travel — a screenshot, a support export, a pasted link — and the
+ * services that own them answer "does this row exist", not "is it yours". A
+ * patient posting their own form with someone else's goal id would otherwise
+ * write health data into another person's record, under `writtenBy: patient`,
+ * and the trail would read as if they had written it about themselves.
+ */
+export type PatientLinkWriteTarget =
+  | {
+      type?: string;
+      id?: null;
+      /** How the target read at the time — a pseudonym, a title. */
+      label?: string;
+      detail?: string;
+    }
+  | {
+      type?: string;
+      /** An existing row this write touches. Checked against the token's patient. */
+      id: string;
+      label?: string;
+      detail?: string;
+      /** Whose row is it? `null` when the row does not exist. */
+      ownerOf: (id: string) => Promise<Id | null>;
+    };
+
 export type PatientLinkWriteRequest<T> = {
   /** Straight from the route. Never a patient id — see the note below. */
   token: string;
   action: AuditAction;
   /** What the caller is about to write, by length class. `{}` when none. */
   text: PatientLinkWriteText;
-  target?: {
-    type?: string;
-    id?: string | null;
-    /** How the target read at the time — a pseudonym, a title. */
-    label?: string;
-    detail?: string;
-  };
+  target?: PatientLinkWriteTarget;
   /**
    * The actual write, run only once the token resolved and the ceilings
    * allowed it. It receives the resolved patient, which is the only way a
@@ -217,6 +246,18 @@ export const writeThroughPatientLink = async <T>(
     );
   }
 
+  // A row this token does not own is refused in the same words as a token that
+  // never existed: the caller learns nothing about whose it was, or whether it
+  // was anyone's. It costs the attempt its slot, which is right — guessing at
+  // other people's ids is exactly what the ceiling is for.
+  const { target } = request;
+  if (target?.id) {
+    const owner = await target.ownerOf(target.id);
+    if (owner !== patient.id) {
+      return err("not_found", "no such patient link");
+    }
+  }
+
   const result = await request.write(patient);
   if (!result.ok) {
     return result;
@@ -237,7 +278,8 @@ export const writeThroughPatientLink = async <T>(
       action: request.action,
       targetType: request.target?.type,
       targetId: request.target?.id,
-      targetLabel: request.target?.label ?? patient.pseudonym,
+      targetLabel:
+        request.target?.label ?? (target?.id ? "" : patient.pseudonym),
       detail: request.target?.detail,
     });
     await recordPatientLinkWrote(patient.id);
