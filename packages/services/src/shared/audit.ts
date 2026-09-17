@@ -70,6 +70,12 @@ export const auditActions = [
   "next_consultation_prep.updated",
   "share_link.regenerated",
   "share_link.emailed",
+  /**
+   * The patient's pseudonymous context copied out of the console to be pasted
+   * into a model of the operator's choosing. Health data leaving the console is
+   * worth a line in the trail even when what leaves carries no real identity.
+   */
+  "context.exported",
   "operator.invited",
   "operator.invite_revoked",
   "operator.joined",
