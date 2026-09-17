@@ -47,8 +47,11 @@
     "clsx": "^2.1.1",
     "lucide-react": "catalog:",
     "motion": "catalog:",
-    "react-markdown": "catalog:",
+    "hast-util-to-jsx-runtime": "catalog:",
     "remark-gfm": "catalog:",
+    "remark-parse": "catalog:",
+    "remark-rehype": "catalog:",
+    "unified": "catalog:",
     "tailwind-merge": "^3.3.1"
   },
   "peerDependencies": {

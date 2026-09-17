@@ -30,11 +30,11 @@ forgotten; this run is the first one to benefit.
 ### `packages/ui`
 
 - `src/server/markdown.tsx` (new) + `src/server.ts`: the `Markdown` primitive, server-safe.
-- `pnpm-workspace.yaml` + `packages/ui/package.json`: `react-markdown` and `remark-gfm` via the
-  catalog; no app pins its own.
-- `tsup.config.ts`: both are **external** on the server entry, so the consuming app bundles them
-  into the one route that renders markdown rather than every app paying for micromark the moment it
-  imports a `<Badge>`.
+- `pnpm-workspace.yaml` + `packages/ui/package.json`: `unified`, `remark-parse`, `remark-gfm`,
+  `remark-rehype` and `hast-util-to-jsx-runtime` via the catalog; no app pins its own. **Not
+  `react-markdown` — see below.**
+- `tsup.config.ts` is unchanged: tsup externalises a package's own `dependencies` by default, so
+  nothing had to be said.
 
 ### `apps/admin`
 
@@ -78,8 +78,10 @@ whole of what there was to seed is the brainstorm and the correspondence.
 - [x] Any signed-in operator can create, edit, validate, archive and restore; each writes an audit
       row; every new action name has a French label (the closed map makes a miss a type error).
 - [x] « Connaissances » is in the `Suivi` nav section beside « Recettes », no `ownerOnly`.
-- [x] `react-markdown` and `remark-gfm` are in the catalog, consumed only by `packages/ui`, raw HTML
-      not enabled, no app pinning its own.
+- [x] The renderer's packages are in the catalog, consumed only by `packages/ui`, raw HTML not
+      enabled, no app pinning its own. **The criterion named `react-markdown` and now does not** —
+      `spec.md` carries the revision and the reason; the component's placement, API and behaviour
+      are unchanged.
 - [x] The migration seeds nine draft rows as described; no food list or nutrient claim was written
       by us.
 - [x] No model, provider or AI call anywhere in the diff.
@@ -98,11 +100,23 @@ whole of what there was to seed is the brainstorm and the correspondence.
   `migrate.mjs` refuses to migrate from a non-production Vercel deploy. On a preview pointed at a
   migrated database the nine drafts will be there; on one without, `/knowledge` renders its empty
   state, which is correct rather than broken.
-- **`react-markdown` under RSC.** Its module imports `useEffect`/`useState` for `MarkdownHooks`,
-  which the `react-server` build of React does not export; the `Markdown` export we use is
-  synchronous and calls neither. Bundlers bind the unused specifiers to `undefined` and warn. If
-  the preview turns that into a hard error, the fix is one line — drop the two from `external` in
-  `packages/ui/tsup.config.ts` so esbuild tree-shakes `MarkdownHooks` and the imports with it.
+- **The renderer changed underneath, and it cost a CI round.** The first push used
+  `react-markdown`. Its module imports `useEffect`/`useState` at the top level to build its
+  `MarkdownHooks` export, and React's `react-server` build exports neither, so the module cannot
+  link in a server component's graph — importing it is enough. Five previews passed and `admin`,
+  the only app that renders markdown, failed.
+
+  The two remedies I expected both failed on inspection: bundling it does **not** tree-shake the
+  unused hook import (it survives, and `dist/server.js` goes from 33 KB to 457 KB), and the default
+  import was correct all along. The pipeline `react-markdown` itself wraps is used directly
+  instead, none of it importing React outside `react/jsx-runtime`.
+
+  Proved rather than assumed, and worth re-running if this area is touched again: load the built
+  bundle under the failing condition —
+  `node --conditions=react-server -e 'import("./packages/ui/dist/server.js")'`. Before the change it
+  threw on the missing specifiers; after it, `Markdown` renders, raw HTML is dropped and GFM tables
+  come through.
+
 - **Two open questions are still open, by design** (spec § Open questions): her tag vocabulary, and
   whether the corpus is house-wide or per-practitioner. Neither blocks anything here. The four
   « à compléter » rows are the first thing to put in front of her.

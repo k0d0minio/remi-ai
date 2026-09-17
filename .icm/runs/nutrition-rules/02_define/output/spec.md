@@ -130,11 +130,23 @@ not a thing that exists. Instead:
 - A `Markdown` primitive at `packages/ui/src/server/markdown.tsx`, exported from
   `@remi/ui/server` — it is pure markup with no hook, event handler or browser API, which is exactly
   what that entrypoint is for.
-- Built on `react-markdown` + `remark-gfm`, added to the pnpm `catalog:` and to
-  `packages/ui/package.json` (apps never pin their own — `CONVENTIONS.md` → leanness).
-- **Raw HTML stays off.** `react-markdown` disallows embedded HTML unless `rehype-raw` is added, and
-  it is not added: a rule body is prose, and the corpus is destined for a prompt and, later, a
-  patient's screen.
+- Built on the remark/hast pipeline — `unified`, `remark-parse`, `remark-gfm`, `remark-rehype` and
+  `hast-util-to-jsx-runtime` — added to the pnpm `catalog:` and to `packages/ui/package.json` (apps
+  never pin their own — `CONVENTIONS.md` → leanness).
+
+  > **Revised during Build, 2026-09-17.** This said `react-markdown`, and that cannot work here.
+  > That package's module imports `useEffect`/`useState` at the top level to build its
+  > `MarkdownHooks` export, and the `react-server` build of React exports neither — so the module
+  > cannot link inside a server component's graph at all. Importing it is enough; calling it is not
+  > required. It failed exactly one Vercel preview, `admin`, the only app that renders markdown, and
+  > bundling does not rescue it because the unused import survives tree-shaking. The four packages
+  > `react-markdown` itself wraps are used directly instead. Nothing about the component's
+  > placement, its API, or its behaviour changes — only what is underneath it.
+
+- **Raw HTML stays off**, and structurally rather than by a flag: without `allowDangerousHtml`,
+  `remark-rehype` discards raw HTML nodes on the way to hast, so an `<img onerror>` typed into the
+  form never reaches the renderer. A rule body is prose, and the corpus is destined for a prompt
+  and, later, a patient's screen.
 - Styling comes from the existing tokens and Tailwind typography utilities in the component; no new
   token is introduced.
 
@@ -203,7 +215,7 @@ the exact failure this corpus exists to prevent.
       `apps/admin/components/audit/vocabulary.ts`.
 - [ ] « Connaissances » appears in the console's `Suivi` nav section beside « Recettes », with no
       `ownerOnly` flag.
-- [ ] `react-markdown` and `remark-gfm` are added to the pnpm `catalog:` and consumed only by
+- [ ] The markdown renderer's packages are added to the pnpm `catalog:` and consumed only by
       `packages/ui`; raw HTML is not enabled; no app pins its own copy.
 - [ ] The migration seeds the draft rows described above — every one `status: draft`, each body
       ending with the source line it came from, the four unfilled food lists marked « à compléter »,

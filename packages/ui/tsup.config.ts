@@ -48,10 +48,7 @@ export default defineConfig([
     ...shared,
     entry: ["src/server.ts"],
     clean: false,
-    // `react-markdown` and its remark/micromark tree stay external so the
-    // consuming app bundles them into the one route that renders markdown,
-    // instead of every app paying for them the moment it imports a <Badge>.
-    external: ["react", "react-dom", "react-markdown", "remark-gfm"],
+    external: ["react", "react-dom"],
   },
   {
     ...shared,
