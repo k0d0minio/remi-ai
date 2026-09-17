@@ -56,10 +56,38 @@ export const createMemoryDatabase = (): DatabaseClient => {
     };
   };
 
+  /**
+   * Roll back by restoring a snapshot of every store.
+   *
+   * The harness models the seam's contract rather than merely satisfying its
+   * signature: a service that says its writes are one unit is only testable if
+   * the test double can fail one part-way. Rows are replaced wholesale on
+   * update, never mutated, so copying each store's map is enough — and the
+   * restore writes back into the live maps rather than swapping them, because a
+   * `Collection` captured one by reference when it was made.
+   */
   const client: DatabaseClient = {
     driver: "memory",
     collection,
-    transaction: async (fn) => fn(client),
+    transaction: async (fn) => {
+      const snapshot = new Map(
+        [...stores].map(([name, rows]) => [name, new Map(rows)]),
+      );
+      try {
+        return await fn(client);
+      } catch (error) {
+        for (const [name, rows] of stores) {
+          const before = snapshot.get(name);
+          rows.clear();
+          if (before) {
+            for (const [id, row] of before) {
+              rows.set(id, row);
+            }
+          }
+        }
+        throw error;
+      }
+    },
     close: async () => {},
   };
   return client;

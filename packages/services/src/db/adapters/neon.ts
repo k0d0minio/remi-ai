@@ -1,7 +1,12 @@
-import { neon } from "@neondatabase/serverless";
+import { neon, Pool } from "@neondatabase/serverless";
 import { and, desc, eq, getTableColumns, getTableName, is } from "drizzle-orm";
-import { drizzle, type NeonHttpDatabase } from "drizzle-orm/neon-http";
-import { PgTable } from "drizzle-orm/pg-core";
+import { drizzle } from "drizzle-orm/neon-http";
+import { drizzle as drizzlePooled } from "drizzle-orm/neon-serverless";
+import {
+  PgTable,
+  type PgDatabase,
+  type PgQueryResultHKT,
+} from "drizzle-orm/pg-core";
 import { requireEnv } from "../../server/env";
 import type { Id, Page, PageQuery } from "../../types";
 import type { Collection, DatabaseClient } from "../client";
@@ -46,8 +51,10 @@ const DEFAULT_PAGE_LIMIT = 50;
  * as long as the model type in `models/` matches the table in `schema.ts`,
  * which is the pairing every entity in this package maintains by rule.
  */
+type Queryable = PgDatabase<PgQueryResultHKT>;
+
 const makeCollection = <T extends { id: Id }>(
-  db: NeonHttpDatabase,
+  db: Queryable,
   table: PgTable,
 ): Collection<T> => {
   const columns = getTableColumns(table);
@@ -135,13 +142,35 @@ const makeCollection = <T extends { id: Id }>(
 };
 
 /**
- * Build the client from `DATABASE_URL`. Register it once at process start —
- * each app's `instrumentation.ts` is the place — via `registerDatabase()`.
+ * Build the client from `DATABASE_URL`. Register it once per module graph —
+ * each app's `ensureDatabase()` helper is the place — via `registerDatabase()`.
+ *
+ * **Two drivers, on purpose.** Ordinary reads and writes go over the HTTP
+ * driver, which is one request per statement and needs no connection: that is
+ * what every screen in the estate has always used, and the admin patient page
+ * alone fans out twenty-one reads that would otherwise each wait on a socket.
+ * `transaction()` is the one thing HTTP cannot do — it has no interactive
+ * session, so statements sent through it cannot roll back together — and it is
+ * the only path that opens a pooled WebSocket connection.
+ *
+ * The alternative was to move every query onto the pooled driver. It would have
+ * given the same guarantee and changed the latency and connection count of
+ * every read in six apps to do it. Confining the pool to the callers that
+ * actually need atomicity keeps that blast radius at three batch saves.
  */
 export const createNeonDatabase = (): DatabaseClient => {
-  const db = drizzle(neon(requireEnv("DATABASE_URL", "createNeonDatabase()")));
+  const connectionString = requireEnv("DATABASE_URL", "createNeonDatabase()");
+  const db = drizzle(neon(connectionString));
 
-  const client: DatabaseClient = {
+  /**
+   * A client whose collections run on one Drizzle handle — the HTTP one for
+   * the registered client, a transaction handle for the client handed to a
+   * `transaction()` callback. Only the outer one owns a pool.
+   */
+  const clientOn = (
+    handle: Queryable,
+    inTransaction: boolean,
+  ): DatabaseClient => ({
     driver: "neon",
     collection: <T extends { id: Id }>(name: string): Collection<T> => {
       const table = tables[name];
@@ -150,17 +179,35 @@ export const createNeonDatabase = (): DatabaseClient => {
           `unknown collection "${name}" — no table of that name is exported from src/db/schema.ts`,
         );
       }
-      return makeCollection<T>(db, table);
+      return makeCollection<T>(handle, table);
     },
-    /**
-     * The HTTP driver has no interactive transactions, so `fn` runs without
-     * isolation. Nothing in the phase-1 slice writes across tables in one unit;
-     * the first service that does must move this adapter to the WebSocket
-     * driver (REMI-013 is the place that decision lands).
-     */
-    transaction: async (fn) => fn(client),
-    close: async () => {},
-  };
 
-  return client;
+    transaction: async (fn) => {
+      // Already inside one: Drizzle turns a nested transaction into a
+      // savepoint, so the inner unit rolls back without taking the outer with
+      // it, and no second connection is opened.
+      if (inTransaction) {
+        return handle.transaction(async (tx) => fn(clientOn(tx, true)));
+      }
+
+      // The pool lives exactly as long as the transaction. A serverless
+      // invocation that saves one section opens one connection and closes it,
+      // rather than holding a pool open across a function's idle life and
+      // spending Neon's connection budget on nothing.
+      const pool = new Pool({ connectionString });
+      try {
+        return await drizzlePooled(pool).transaction(async (tx) =>
+          fn(clientOn(tx, true)),
+        );
+      } finally {
+        await pool.end();
+      }
+    },
+
+    // Nothing to close on the HTTP driver, and a transaction's pool is closed
+    // by the `finally` that opened it.
+    close: async () => {},
+  });
+
+  return clientOn(db, false);
 };
