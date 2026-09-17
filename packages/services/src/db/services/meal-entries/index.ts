@@ -3,7 +3,7 @@ import { err, ok, type Result } from "../../../shared/result";
 import { mealSlots } from "../../../shared/patient";
 import type { Id } from "../../../types";
 import { getDatabase } from "../../client";
-import type { MealEntry } from "../../models/meal-entry";
+import type { MealEntry, WrittenBy } from "../../models/meal-entry";
 import { getPatient, touchPatient } from "../patients";
 
 /**
@@ -130,9 +130,18 @@ const feedbackPatch = (
   };
 };
 
+/**
+ * `writtenBy` is a third argument rather than a field of `input`, and that is
+ * the point: `input` is parsed from what a form posted, so an attribution
+ * living there could be claimed by whoever posts it. This one is set by the
+ * code path — the console's form leaves the default, and a patient's entry
+ * arrives through `writeThroughPatientLink`, which is the only caller that
+ * knows the token resolved.
+ */
 export const addMealEntry = async (
   patientId: Id,
   input: MealEntryInput,
+  writtenBy: WrittenBy = "practitioner",
 ): Promise<Result<MealEntry>> => {
   if (!uuidSchema.safeParse(patientId).success) {
     return err("not_found", "no such patient");
@@ -166,9 +175,7 @@ export const addMealEntry = async (
     feedback,
     feedbackWrittenAt: feedback === "" ? null : new Date(),
     archivedAt: null,
-    // The console's own form. A patient's entry arrives through
-    // `writeThroughPatientLink` and says so — `patient-loop/meal-entry`.
-    writtenBy: "practitioner",
+    writtenBy,
   });
   await touchPatient(patientId);
   return ok(created);

@@ -62,8 +62,14 @@ const ledger = () =>
   getDatabase().collection<PatientLinkWrite>("patient_link_writes");
 
 /**
- * The text a write carries, declared by length class so the caller never has
- * to remember which cap applies to which field.
+ * The text a write carries, declared by length class so the caller never has to
+ * remember which cap applies to which field.
+ *
+ * Required, and `{}` is a legitimate value for a write that carries no text at
+ * all. It is required because a generic helper cannot read an opaque
+ * callback's payload: the cap applies to what the caller declares, so leaving
+ * the field optional would make "I forgot" and "there is none" the same
+ * gesture. Declaring is the caller's one obligation here.
  */
 export type PatientLinkWriteText = {
   bodies?: readonly string[];
@@ -74,7 +80,8 @@ export type PatientLinkWriteRequest<T> = {
   /** Straight from the route. Never a patient id — see the note below. */
   token: string;
   action: AuditAction;
-  text?: PatientLinkWriteText;
+  /** What the caller is about to write, by length class. `{}` when none. */
+  text: PatientLinkWriteText;
   target?: {
     type?: string;
     id?: string | null;
@@ -92,22 +99,44 @@ export type PatientLinkWriteRequest<T> = {
   write: (patient: PatientProfile) => Promise<Result<T>>;
 };
 
-const tooLong = (values: readonly string[] | undefined, max: number): boolean =>
-  (values ?? []).some((value) => value.length > max);
+const tooLong = (values: readonly string[], max: number): boolean =>
+  values.some((value) => value.length > max);
+
+type Claim = { granted: true } | { granted: false; window: "minute" | "day" };
 
 /**
- * Prunes what has fallen out of the longest window and counts what has not.
+ * Takes a slot under both ceilings, or refuses — without a transaction, and
+ * correctly under concurrency.
  *
- * Rows are read newest first (the seam orders by `createdAt`), so the count
- * walks forward and the tail is what gets deleted. Pruning on every write is
- * what keeps the ledger at roughly one day per patient rather than growing
- * forever — there is no cron in this product, so a table nobody prunes is a
- * table that never stops.
+ * The obvious shape is count-then-insert, and it is wrong here: the HTTP driver
+ * this package registers has no interactive transactions (`adapters/neon.ts`
+ * says so, and its `transaction()` is a passthrough), so two requests carrying
+ * the same token read the same pre-write count and both pass. A ceiling that
+ * only holds against a serial script is not a ceiling — the script that would
+ * abuse a leaked link is the one that fans out.
+ *
+ * So the row goes in FIRST, and the count that follows includes it and every
+ * row a racing request has already inserted. Over the ceiling, the claim hands
+ * its slot back and refuses. Serially this is exact: the tenth write of a
+ * minute counts ten and passes, the eleventh counts eleven and does not. Under
+ * a genuine simultaneous burst it errs toward refusing — several claims can see
+ * the same over-limit total and all stand down — which is the safe direction,
+ * costs a human nothing (nobody fires ten parallel writes by hand) and costs a
+ * script exactly what it should.
+ *
+ * Note what it deliberately does NOT do: rank rows against each other. Ordering
+ * by timestamp needs a tie-break once two rows share an instant, and any
+ * tie-break that is not insertion order (a uuid, say) makes the last write of a
+ * serial run rank mid-pack and slip through. Counting has no such edge.
+ *
+ * The same pass prunes what has fallen out of the longest window — there is no
+ * cron in this product, so a table nobody prunes is a table that never stops.
+ * Pruning holds the ledger at roughly the day ceiling per patient, which is why
+ * `LEDGER_READ_LIMIT` is comfortably above it and the read never has to page.
  */
-const countRecentWrites = async (
-  patientId: Id,
-  now: number,
-): Promise<{ inMinute: number; inDay: number }> => {
+const claimWriteSlot = async (patientId: Id): Promise<Claim> => {
+  const mine = await ledger().insert({ patientId });
+  const reference = mine.createdAt.getTime();
   const page = await ledger().findMany(
     { patientId },
     { limit: LEDGER_READ_LIMIT },
@@ -117,7 +146,7 @@ const countRecentWrites = async (
   let inDay = 0;
   const stale: Id[] = [];
   for (const row of page.items) {
-    const age = now - row.createdAt.getTime();
+    const age = reference - row.createdAt.getTime();
     if (age >= DAY_MS) {
       stale.push(row.id);
       continue;
@@ -127,34 +156,45 @@ const countRecentWrites = async (
       inMinute += 1;
     }
   }
-
   await Promise.all(stale.map((id) => ledger().remove(id)));
-  return { inMinute, inDay };
+
+  const window =
+    inMinute > PATIENT_LINK_WRITES_PER_MINUTE
+      ? "minute"
+      : inDay > PATIENT_LINK_WRITES_PER_DAY
+        ? "day"
+        : null;
+  if (window) {
+    // Hand the slot back, so a refusal does not spend a place in the window.
+    await ledger().remove(mine.id);
+    return { granted: false, window };
+  }
+  return { granted: true };
 };
 
 /**
- * Resolve, check, write, attribute, record — in that order, and the order is
+ * Resolve, claim, write, attribute, record — in that order, and the order is
  * the point.
  *
  * Length is checked first because it is pure: an oversized body is refused
  * without the database being touched at all. The token comes next, so an
  * unknown or regenerated one is "no such patient link" whatever it carried.
- * Only then is the ledger consulted, and a row is written to it BEFORE the
- * caller's write runs: an attempt that reaches the seam has cost work whether
- * or not the payload turns out to be valid, and a limit that only counted
- * successes would let a valid token retry rejected writes forever.
+ * Only then is a slot claimed, and it is claimed BEFORE the caller's write
+ * runs: an attempt that reaches the seam has cost work whether or not the
+ * payload turns out to be valid, and a limit that only counted successes would
+ * let a valid token retry rejected writes forever.
  */
 export const writeThroughPatientLink = async <T>(
   request: PatientLinkWriteRequest<T>,
 ): Promise<Result<T>> => {
   const { text } = request;
-  if (tooLong(text?.bodies, PATIENT_LINK_BODY_MAX)) {
+  if (tooLong(text.bodies ?? [], PATIENT_LINK_BODY_MAX)) {
     return err(
       "invalid_input",
       `that text is too long — ${PATIENT_LINK_BODY_MAX} characters at most`,
     );
   }
-  if (tooLong(text?.shorts, PATIENT_LINK_SHORT_MAX)) {
+  if (tooLong(text.shorts ?? [], PATIENT_LINK_SHORT_MAX)) {
     return err(
       "invalid_input",
       `that value is too long — ${PATIENT_LINK_SHORT_MAX} characters at most`,
@@ -167,38 +207,46 @@ export const writeThroughPatientLink = async <T>(
   }
   const patient = resolved.data;
 
-  const now = Date.now();
-  const recent = await countRecentWrites(patient.id, now);
-  if (recent.inMinute >= PATIENT_LINK_WRITES_PER_MINUTE) {
-    return err("rate_limited", "too many changes at once — try again shortly");
+  const claim = await claimWriteSlot(patient.id);
+  if (!claim.granted) {
+    return err(
+      "rate_limited",
+      claim.window === "minute"
+        ? "too many changes at once — try again shortly"
+        : "too many changes today — try again tomorrow",
+    );
   }
-  if (recent.inDay >= PATIENT_LINK_WRITES_PER_DAY) {
-    return err("rate_limited", "too many changes today — try again tomorrow");
-  }
-  await ledger().insert({ patientId: patient.id });
 
   const result = await request.write(patient);
   if (!result.ok) {
     return result;
   }
 
-  // The write may have gone through a console service, which bumps the roster
-  // timestamp because an operator writing there IS working on the patient. A
-  // patient writing into their own link is not, so it goes back.
-  await restorePatientLastEdited(patient.id, patient.lastEditedAt);
-
-  // Both of these record the write rather than being part of it, so neither
-  // may fail it: the audit service swallows its own errors by design, and the
-  // stamp is one column on a row that has already been read.
-  await recordAuditEvent({
-    actor: { kind: "patient", id: patient.id, name: patient.pseudonym },
-    action: request.action,
-    targetType: request.target?.type,
-    targetId: request.target?.id,
-    targetLabel: request.target?.label ?? patient.pseudonym,
-    detail: request.target?.detail,
-  });
-  await recordPatientLinkWrote(patient.id);
+  // Everything below records the write rather than being part of it, so none of
+  // it may fail the write: the row is already committed, and a throw here would
+  // show the patient an error for a meal that saved — and have them enter it
+  // twice. The audit service already swallows its own failures; these two
+  // reach the database on their own account, so they are caught here.
+  try {
+    // The write may have gone through a console service, which bumps the roster
+    // timestamp because an operator writing there IS working on the patient. A
+    // patient writing into their own link is not, so it goes back.
+    await restorePatientLastEdited(patient.id, patient.lastEditedAt);
+    await recordAuditEvent({
+      actor: { kind: "patient", id: patient.id, name: patient.pseudonym },
+      action: request.action,
+      targetType: request.target?.type,
+      targetId: request.target?.id,
+      targetLabel: request.target?.label ?? patient.pseudonym,
+      detail: request.target?.detail,
+    });
+    await recordPatientLinkWrote(patient.id);
+  } catch (cause) {
+    console.error("[patient-link] a write was saved but not fully recorded", {
+      action: request.action,
+      cause,
+    });
+  }
 
   return ok(result.data);
 };

@@ -46,14 +46,18 @@ describe("writing through a patient link", () => {
     const result = await writeThroughPatientLink({
       token: patient.shareToken,
       action: "meal.logged",
+      text: { bodies: ["Spaghetti sauce tomate"] },
       write: (resolved) =>
-        addMealEntry(resolved.id, {
-          eatenOn: "2026-09-17",
-          description: "Spaghetti sauce tomate",
-        }),
+        addMealEntry(
+          resolved.id,
+          { eatenOn: "2026-09-17", description: "Spaghetti sauce tomate" },
+          "patient",
+        ),
     });
 
     expect(result.ok).toBe(true);
+    // The row itself says whose it is, not only the trail beside it.
+    expect(result.ok && result.data.writtenBy).toBe("patient");
 
     const after = await getPatient(patient.id);
     expect(after.ok).toBe(true);
@@ -79,6 +83,7 @@ describe("writing through a patient link", () => {
     await writeThroughPatientLink({
       token: patient.shareToken,
       action: "meal.logged",
+      text: {},
       write: async (resolved) => {
         seen = resolved.id;
         return ok("written");
@@ -97,6 +102,7 @@ describe("writing through a patient link", () => {
       const result = await writeThroughPatientLink({
         token,
         action: "meal.logged",
+        text: {},
         write: noop,
       });
       expect(result.ok).toBe(false);
@@ -164,6 +170,7 @@ describe("writing through a patient link", () => {
       const allowed = await writeThroughPatientLink({
         token: patient.shareToken,
         action: "meal.logged",
+        text: {},
         write: noop,
       });
       expect(allowed.ok).toBe(true);
@@ -172,6 +179,7 @@ describe("writing through a patient link", () => {
     const refused = await writeThroughPatientLink({
       token: patient.shareToken,
       action: "meal.logged",
+      text: {},
       write: noop,
     });
     expect(refused.ok).toBe(false);
@@ -190,6 +198,7 @@ describe("writing through a patient link", () => {
       const allowed = await writeThroughPatientLink({
         token: patient.shareToken,
         action: "meal.logged",
+        text: {},
         write: noop,
       });
       expect(allowed.ok).toBe(true);
@@ -199,6 +208,7 @@ describe("writing through a patient link", () => {
     const refused = await writeThroughPatientLink({
       token: patient.shareToken,
       action: "meal.logged",
+      text: {},
       write: noop,
     });
     expect(refused.ok).toBe(false);
@@ -212,9 +222,50 @@ describe("writing through a patient link", () => {
     const later = await writeThroughPatientLink({
       token: patient.shareToken,
       action: "meal.logged",
+      text: {},
       write: noop,
     });
     expect(later.ok).toBe(true);
+  });
+
+  it("holds the ceiling when the writes arrive at once, not one by one", async () => {
+    const patient = await newPatient("Farah");
+
+    // The seam has no interactive transaction, so a count-then-insert limit
+    // would let every one of these through: they all read the same zero.
+    const results = await Promise.all(
+      Array.from({ length: PATIENT_LINK_WRITES_PER_MINUTE + 5 }, () =>
+        writeThroughPatientLink({
+          token: patient.shareToken,
+          action: "meal.logged",
+          text: {},
+          write: noop,
+        }),
+      ),
+    );
+
+    // The invariant, and the only one worth asserting: never MORE than the
+    // ceiling. Fewer is allowed and expected — when every claim lands before
+    // any of them counts, they all see the same over-limit total and all stand
+    // down. That is the safe direction, and it is not a bug to be tidied away.
+    const allowed = results.filter((result) => result.ok).length;
+    expect(allowed).toBeLessThanOrEqual(PATIENT_LINK_WRITES_PER_MINUTE);
+    for (const refused of results.filter((result) => !result.ok)) {
+      expect(refused.ok).toBe(false);
+      if (!refused.ok) {
+        expect(refused.error).toBe("rate_limited");
+      }
+    }
+
+    // And the window is not left poisoned: a refusal hands its slot back, so
+    // the patient whose burst was refused can still write the next moment.
+    const afterwards = await writeThroughPatientLink({
+      token: patient.shareToken,
+      action: "meal.logged",
+      text: {},
+      write: noop,
+    });
+    expect(afterwards.ok).toBe(true);
   });
 
   it("counts an attempt whose write failed", async () => {
@@ -223,6 +274,7 @@ describe("writing through a patient link", () => {
       const attempt = await writeThroughPatientLink({
         token: patient.shareToken,
         action: "meal.logged",
+        text: {},
         write: rejected,
       });
       expect(attempt.ok).toBe(false);
@@ -231,6 +283,7 @@ describe("writing through a patient link", () => {
     const refused = await writeThroughPatientLink({
       token: patient.shareToken,
       action: "meal.logged",
+      text: {},
       write: noop,
     });
     expect(refused.ok).toBe(false);
@@ -245,6 +298,7 @@ describe("writing through a patient link", () => {
     const result = await writeThroughPatientLink({
       token: patient.shareToken,
       action: "meal.logged",
+      text: {},
       write: rejected,
     });
 
