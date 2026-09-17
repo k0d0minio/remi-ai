@@ -56,10 +56,49 @@ export const createMemoryDatabase = (): DatabaseClient => {
     };
   };
 
+  /**
+   * Snapshot every store, run `fn`, and restore on a throw — the in-memory
+   * stand-in for the WebSocket adapter's `BEGIN` / `ROLLBACK`. Without it a
+   * service that must write five rows or none could only be tested against a
+   * real database, which is the test nobody runs.
+   *
+   * Nesting reuses the outer snapshot rather than taking a second one, so the
+   * outermost transaction is the one that rolls back — the same shape the
+   * adapter has.
+   */
+  let inTransaction = false;
+  const transaction = async <T>(
+    fn: (tx: DatabaseClient) => Promise<T>,
+  ): Promise<T> => {
+    if (inTransaction) {
+      return fn(client);
+    }
+    const snapshot = new Map(
+      [...stores].map((entry) => [entry[0], new Map(entry[1])] as const),
+    );
+    inTransaction = true;
+    try {
+      return await fn(client);
+    } catch (cause) {
+      // Restored into the live maps rather than swapping them out: a caller
+      // holding a `Collection` handle from before the rollback keeps reading
+      // the store it was handed.
+      for (const entry of stores) {
+        entry[1].clear();
+        for (const row of snapshot.get(entry[0]) ?? []) {
+          entry[1].set(row[0], row[1]);
+        }
+      }
+      throw cause;
+    } finally {
+      inTransaction = false;
+    }
+  };
+
   const client: DatabaseClient = {
     driver: "memory",
     collection,
-    transaction: async (fn) => fn(client),
+    transaction,
     close: async () => {},
   };
   return client;

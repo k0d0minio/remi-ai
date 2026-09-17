@@ -1,5 +1,5 @@
 {
-  "id": "1120ae59-0cb7-438e-9f9f-2344411116cb",
+  "id": "492cbc77-bd82-4059-a22a-66b05e1921b9",
   "prevId": "6dfd2e95-9c12-420e-af4c-85c5eff2a461",
   "version": "7",
   "dialect": "postgresql",
@@ -14,6 +14,13 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
+        },
+        "actor_kind": {
+          "name": "actor_kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'operator'"
         },
         "actor_id": {
           "name": "actor_id",
@@ -87,271 +94,6 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.ciqual_imports": {
-      "name": "ciqual_imports",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "edition": {
-          "name": "edition",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "food_count": {
-          "name": "food_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "nutrient_count": {
-          "name": "nutrient_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "source_checksums": {
-          "name": "source_checksums",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.food_nutrients": {
-      "name": "food_nutrients",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "food_code": {
-          "name": "food_code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "component_code": {
-          "name": "component_code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "component_name_fr": {
-          "name": "component_name_fr",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "unit": {
-          "name": "unit",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "value": {
-          "name": "value",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "marker": {
-          "name": "marker",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'exact'"
-        },
-        "raw_value": {
-          "name": "raw_value",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "confidence": {
-          "name": "confidence",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "food_nutrients_component_code_index": {
-          "name": "food_nutrients_component_code_index",
-          "columns": [
-            {
-              "expression": "component_code",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "food_nutrients_food_code_component_code_unique": {
-          "name": "food_nutrients_food_code_component_code_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "food_code",
-            "component_code"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.foods": {
-      "name": "foods",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "code": {
-          "name": "code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name_fr": {
-          "name": "name_fr",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name_en": {
-          "name": "name_en",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "search_name": {
-          "name": "search_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "group_code": {
-          "name": "group_code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "group_name_fr": {
-          "name": "group_name_fr",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "sub_group_code": {
-          "name": "sub_group_code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "sub_group_name_fr": {
-          "name": "sub_group_name_fr",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "foods_code_unique": {
-          "name": "foods_code_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "code"
-          ]
-        }
-      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -629,6 +371,13 @@
           "notNull": true,
           "default": "''"
         },
+        "written_by": {
+          "name": "written_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'practitioner'"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -812,6 +561,60 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.patient_link_writes": {
+      "name": "patient_link_writes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "patient_id": {
+          "name": "patient_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "patient_link_writes_patient_id_patient_profiles_id_fk": {
+          "name": "patient_link_writes_patient_id_patient_profiles_id_fk",
+          "tableFrom": "patient_link_writes",
+          "tableTo": "patient_profiles",
+          "columnsFrom": [
+            "patient_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.patient_meal_entries": {
       "name": "patient_meal_entries",
       "schema": "",
@@ -879,6 +682,13 @@
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false
+        },
+        "written_by": {
+          "name": "written_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'practitioner'"
         },
         "created_at": {
           "name": "created_at",
@@ -1334,6 +1144,12 @@
         },
         "link_last_opened_at": {
           "name": "link_last_opened_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "link_last_wrote_at": {
+          "name": "link_last_wrote_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false

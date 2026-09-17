@@ -108,3 +108,30 @@ export type {
   StepStatus,
   TherapeuticFrame,
 } from "../db/models";
+
+/**
+ * The patient context block, from `../ai/context`.
+ *
+ * It lives under `ai/` because it is the block every prompt there opens with,
+ * and it is re-exported here because it is genuinely isomorphic: the function
+ * imports nothing, so the console can re-assemble the text in the browser as
+ * the operator edits the preamble and toggles blocks. Reaching it through
+ * `/ai` from a client component would instead pull the provider seam — and,
+ * once an adapter exists, a vendor — into the browser bundle.
+ */
+export {
+  DEFAULT_CONTEXT_PREAMBLE,
+  contextBlocks,
+  defaultContextBlocks,
+  patientContextText,
+} from "../ai/context";
+export type {
+  ContextBlock,
+  ContextEssential,
+  ContextGoal,
+  ContextProfile,
+  ContextRecommendationGroup,
+  ContextSupplement,
+  PatientContextInput,
+  PatientContextOptions,
+} from "../ai/context";

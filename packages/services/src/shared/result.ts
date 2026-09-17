@@ -14,6 +14,8 @@ export type ServiceErrorCode =
   | "not_permitted"
   | "invalid_input"
   | "conflict"
+  /** The caller is over a ceiling and should try later — never a permanent no. */
+  | "rate_limited"
   | "upstream_failed";
 
 export const ok = <T>(data: T): Result<T, never> => ({ ok: true, data });

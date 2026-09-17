@@ -1,12 +1,19 @@
 -- Written idempotently on purpose: `IF NOT EXISTS` rather than drizzle-kit's plain
--- CREATE. scripts/migrate.mjs explains why — drizzle decides what to apply by comparing
--- this migration's journal timestamp against the newest `created_at` already in
--- drizzle.__drizzle_migrations, never by hash. A migration whose timestamp lands behind
--- that high-water mark is recorded as applied and never runs, and drizzle never revisits
--- it. That happened to this one: generated at 12:05:30Z against a database whose mark was
--- already 12:07:51Z, so all three tables were reported applied and were absent. This
--- version is regenerated past the mark, and stays a no-op wherever the tables exist —
--- which is what makes it safe to re-apply if a preview deploy gets there first.
+-- CREATE. Two reasons, and the second is not hypothetical.
+--
+-- One: scripts/migrate.mjs explains that drizzle decides what to apply by comparing this
+-- migration's journal timestamp against the newest `created_at` already in
+-- drizzle.__drizzle_migrations, never by hash. A migration landing behind that mark is
+-- recorded as applied and never runs. That happened to this one's first attempt —
+-- generated at 12:05:30Z, while 0013_gray_charles_xavier merged to main and was applied at
+-- 12:07:51Z — so all three tables were reported applied and were absent.
+--
+-- Two: the repair attempt then DID create them, on this branch's admin preview, against the
+-- database production shares. So these tables already exist there, and a plain CREATE would
+-- now fail with "relation already exists" on the next build. This version no-ops instead.
+--
+-- Why a preview could write to that database at all is a defect in its own right:
+-- .icm/intake/triage/preview-deploys-migrate-production.md.
 
 CREATE TABLE IF NOT EXISTS "ciqual_imports" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,

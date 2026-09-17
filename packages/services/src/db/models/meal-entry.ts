@@ -1,7 +1,10 @@
 import type { Entity, Id } from "../../types";
-import type { mealSlots } from "../../shared/patient";
+import type { mealSlots, writtenByKinds } from "../../shared/patient";
 
 export type MealSlot = (typeof mealSlots)[number];
+
+/** Whose words a row holds — see `writtenByKinds`. */
+export type WrittenBy = (typeof writtenByKinds)[number];
 
 /**
  * One meal in a patient's journal, with Morgane's answer to it — the § 5 loop
@@ -34,4 +37,6 @@ export type MealEntry = Entity & {
   learning: string;
   /** Set when the entry leaves the journal without leaving the record. */
   archivedAt: Date | null;
+  /** Her transcription, or the patient's own entry through their link. */
+  writtenBy: WrittenBy;
 };
