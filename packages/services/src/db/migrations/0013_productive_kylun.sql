@@ -1,4 +1,14 @@
-CREATE TABLE "ciqual_imports" (
+-- Written idempotently on purpose: `IF NOT EXISTS` rather than drizzle-kit's plain
+-- CREATE. scripts/migrate.mjs explains why — drizzle decides what to apply by comparing
+-- this migration's journal timestamp against the newest `created_at` already in
+-- drizzle.__drizzle_migrations, never by hash. A migration whose timestamp lands behind
+-- that high-water mark is recorded as applied and never runs, and drizzle never revisits
+-- it. That happened to this one: generated at 12:05:30Z against a database whose mark was
+-- already 12:07:51Z, so all three tables were reported applied and were absent. This
+-- version is regenerated past the mark, and stays a no-op wherever the tables exist —
+-- which is what makes it safe to re-apply if a preview deploy gets there first.
+
+CREATE TABLE IF NOT EXISTS "ciqual_imports" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"edition" text NOT NULL,
 	"food_count" integer DEFAULT 0 NOT NULL,
@@ -8,7 +18,7 @@ CREATE TABLE "ciqual_imports" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "food_nutrients" (
+CREATE TABLE IF NOT EXISTS "food_nutrients" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"food_code" text NOT NULL,
 	"component_code" text NOT NULL,
@@ -23,7 +33,7 @@ CREATE TABLE "food_nutrients" (
 	CONSTRAINT "food_nutrients_food_code_component_code_unique" UNIQUE("food_code","component_code")
 );
 --> statement-breakpoint
-CREATE TABLE "foods" (
+CREATE TABLE IF NOT EXISTS "foods" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"code" text NOT NULL,
 	"name_fr" text NOT NULL,
@@ -38,4 +48,4 @@ CREATE TABLE "foods" (
 	CONSTRAINT "foods_code_unique" UNIQUE("code")
 );
 --> statement-breakpoint
-CREATE INDEX "food_nutrients_component_code_index" ON "food_nutrients" USING btree ("component_code");
+CREATE INDEX IF NOT EXISTS "food_nutrients_component_code_index" ON "food_nutrients" USING btree ("component_code");
