@@ -6,4 +6,4 @@ and one save.
 **Why it matters:** The patient loop for one real patient — this period's first objective — waits
 on a record she can keep current.
 
-Dig deeper: <merged-PR URL> · <changelog entry URL>
+Dig deeper: https://github.com/k0d0minio/remi-ai/pull/99 · https://remi-docs.jamienisbet.com/changelog/2026-09-17-consultation-update
