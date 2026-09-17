@@ -2,21 +2,16 @@
 
 import { Plus } from "lucide-react";
 import type { ReactNode } from "react";
-import { useActionState, useCallback, useEffect, useState } from "react";
+import { useCallback, useState, useTransition } from "react";
 import type { PantryEssential } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Field, Input, Textarea, Typography } from "@remi/ui/server";
-import {
-  savePantrySectionAction,
-  type SectionSaveState,
-} from "@/lib/patients/actions";
+import { savePantrySectionAction } from "@/lib/patients/actions";
 import { SectionEditFrame } from "@/components/patients/section-edit-frame";
 import { SectionRowControls } from "@/components/patients/section-row-controls";
 import { useSectionRows } from "@/components/patients/use-section-rows";
 
 type Row = { id: string; item: string; why: string };
-
-const initial: SectionSaveState = { error: null, saved: false };
 
 type Props = {
   patientId: string;
@@ -52,20 +47,25 @@ export const PantrySection = ({
 }: Props) => {
   const [editing, setEditing] = useState(false);
   const [pasted, setPasted] = useState("");
-  const [state, action, pending] = useActionState(
-    savePantrySectionAction,
-    initial,
-  );
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  /**
+   * The save closes the editor, and it does so here rather than in an effect
+   * watching the result: the page revalidates behind this, so what the read
+   * view shows on the way back is already the section she just wrote.
+   */
+  const save = (formData: FormData) => {
+    startTransition(async () => {
+      const result = await savePantrySectionAction(formData);
+      setError(result.error);
+      if (result.saved) {
+        setEditing(false);
+      }
+    });
+  };
   const { rows, addRow, addRows, removeRow, moveRow, setField, reset } =
     useSectionRows<Row>(essentials.map(toRow), blankRow);
-
-  // The save revalidates the page, so the read view behind this is already the
-  // list she just wrote — close the editor and let her see it.
-  useEffect(() => {
-    if (state.saved) {
-      setEditing(false);
-    }
-  }, [state]);
 
   const open = useCallback(() => {
     // Re-seed from the current props rather than from whatever the last
@@ -94,10 +94,10 @@ export const PantrySection = ({
       onEdit={open}
       onCancel={() => setEditing(false)}
       pending={pending}
-      error={state.error}
+      error={error}
       patientId={patientId}
       pseudonym={pseudonym}
-      action={action}
+      action={save}
       editLabel="Modifier la liste"
       readView={children}
       footer={

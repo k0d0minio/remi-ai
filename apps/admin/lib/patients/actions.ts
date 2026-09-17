@@ -1313,7 +1313,6 @@ const countsSummary = (counts: SectionSaveCounts) =>
     .join(", ") || "aucun changement";
 
 export const saveRecommendationSectionAction = async (
-  _previous: SectionSaveState,
   formData: FormData,
 ): Promise<SectionSaveState> => {
   const operator = await requireOperator();
@@ -1343,7 +1342,6 @@ export const saveRecommendationSectionAction = async (
 };
 
 export const saveSupplementSectionAction = async (
-  _previous: SectionSaveState,
   formData: FormData,
 ): Promise<SectionSaveState> => {
   const operator = await requireOperator();
@@ -1380,7 +1378,6 @@ export const saveSupplementSectionAction = async (
 };
 
 export const savePantrySectionAction = async (
-  _previous: SectionSaveState,
   formData: FormData,
 ): Promise<SectionSaveState> => {
   const operator = await requireOperator();

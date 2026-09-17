@@ -2,14 +2,11 @@
 
 import { Plus } from "lucide-react";
 import type { ReactNode } from "react";
-import { useActionState, useCallback, useEffect, useState } from "react";
+import { useCallback, useState, useTransition } from "react";
 import type { PatientSupplement } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Field, Input, Textarea, Typography } from "@remi/ui/server";
-import {
-  saveSupplementSectionAction,
-  type SectionSaveState,
-} from "@/lib/patients/actions";
+import { saveSupplementSectionAction } from "@/lib/patients/actions";
 import { SectionEditFrame } from "@/components/patients/section-edit-frame";
 import { SectionRowControls } from "@/components/patients/section-row-controls";
 import { useSectionRows } from "@/components/patients/use-section-rows";
@@ -21,8 +18,6 @@ type Row = {
   timing: string;
   reason: string;
 };
-
-const initial: SectionSaveState = { error: null, saved: false };
 
 type Props = {
   patientId: string;
@@ -64,18 +59,25 @@ export const SupplementSection = ({
   children,
 }: Props) => {
   const [editing, setEditing] = useState(false);
-  const [state, action, pending] = useActionState(
-    saveSupplementSectionAction,
-    initial,
-  );
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  /**
+   * The save closes the editor, and it does so here rather than in an effect
+   * watching the result: the page revalidates behind this, so what the read
+   * view shows on the way back is already the section she just wrote.
+   */
+  const save = (formData: FormData) => {
+    startTransition(async () => {
+      const result = await saveSupplementSectionAction(formData);
+      setError(result.error);
+      if (result.saved) {
+        setEditing(false);
+      }
+    });
+  };
   const { rows, addRow, removeRow, moveRow, setField, reset } =
     useSectionRows<Row>(supplements.map(toRow), blankRow);
-
-  useEffect(() => {
-    if (state.saved) {
-      setEditing(false);
-    }
-  }, [state]);
 
   const open = useCallback(() => {
     reset(supplements.map(toRow));
@@ -88,10 +90,10 @@ export const SupplementSection = ({
       onEdit={open}
       onCancel={() => setEditing(false)}
       pending={pending}
-      error={state.error}
+      error={error}
       patientId={patientId}
       pseudonym={pseudonym}
-      action={action}
+      action={save}
       editLabel="Modifier le protocole"
       readView={children}
     >

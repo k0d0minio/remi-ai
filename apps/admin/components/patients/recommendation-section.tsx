@@ -2,7 +2,7 @@
 
 import { Plus } from "lucide-react";
 import type { ReactNode } from "react";
-import { useActionState, useCallback, useEffect, useState } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { recommendationCategories } from "@remi/services/shared";
 import type {
   PatientRecommendation,
@@ -10,10 +10,7 @@ import type {
 } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Field, Input, Textarea, Typography } from "@remi/ui/server";
-import {
-  saveRecommendationSectionAction,
-  type SectionSaveState,
-} from "@/lib/patients/actions";
+import { saveRecommendationSectionAction } from "@/lib/patients/actions";
 import { SectionEditFrame } from "@/components/patients/section-edit-frame";
 import { SectionRowControls } from "@/components/patients/section-row-controls";
 import { useSectionRows } from "@/components/patients/use-section-rows";
@@ -28,8 +25,6 @@ type Row = {
   title: string;
   detail: string;
 };
-
-const initial: SectionSaveState = { error: null, saved: false };
 
 type Props = {
   patientId: string;
@@ -71,10 +66,23 @@ export const RecommendationSection = ({
   children,
 }: Props) => {
   const [editing, setEditing] = useState(false);
-  const [state, action, pending] = useActionState(
-    saveRecommendationSectionAction,
-    initial,
-  );
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  /**
+   * The save closes the editor, and it does so here rather than in an effect
+   * watching the result: the page revalidates behind this, so what the read
+   * view shows on the way back is already the section she just wrote.
+   */
+  const save = (formData: FormData) => {
+    startTransition(async () => {
+      const result = await saveRecommendationSectionAction(formData);
+      setError(result.error);
+      if (result.saved) {
+        setEditing(false);
+      }
+    });
+  };
   const { rows, addRows, removeRow, swapRows, setField, reset } =
     useSectionRows<Row>(recommendations.map(toRow), () => ({
       id: "",
@@ -82,12 +90,6 @@ export const RecommendationSection = ({
       title: "",
       detail: "",
     }));
-
-  useEffect(() => {
-    if (state.saved) {
-      setEditing(false);
-    }
-  }, [state]);
 
   const open = useCallback(() => {
     reset(recommendations.map(toRow));
@@ -107,10 +109,10 @@ export const RecommendationSection = ({
       onEdit={open}
       onCancel={() => setEditing(false)}
       pending={pending}
-      error={state.error}
+      error={error}
       patientId={patientId}
       pseudonym={pseudonym}
-      action={action}
+      action={save}
       editLabel="Modifier les recommandations"
       readView={children}
     >

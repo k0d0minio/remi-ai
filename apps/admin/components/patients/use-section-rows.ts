@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
 /**
  * The local row state behind a whole-section edit mode.
@@ -39,13 +39,14 @@ export const useSectionRows = <T>(
   initial: readonly T[],
   blank: () => T,
 ): SectionRows<T> => {
-  const nextKey = useRef(0);
-  const withKeys = useCallback((values: readonly T[]): Keyed<T>[] => {
-    return values.map((value) => {
-      nextKey.current += 1;
-      return { ...value, key: `row-${nextKey.current}` };
-    });
-  }, []);
+  // A fresh id per row rather than a counter in a ref: the initial state is
+  // built during render, and reading a ref there is exactly what React tells
+  // you not to do. Nothing renders the key, so it only has to be unique.
+  const withKeys = useCallback(
+    (values: readonly T[]): Keyed<T>[] =>
+      values.map((value) => ({ ...value, key: crypto.randomUUID() })),
+    [],
+  );
 
   const [rows, setRows] = useState<Keyed<T>[]>(() => withKeys(initial));
 
