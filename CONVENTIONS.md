@@ -195,8 +195,19 @@ preview, not to a session's context window:
 | --------------- | ------------------------------------------------------------- |
 | Format          | Husky pre-commit (lint-staged) + CI                           |
 | Lint, typecheck | CI — `.github/workflows/quality.yaml`, on **every** PR        |
+| Migration order | CI — `quality.yaml`, on every PR (see below)                  |
 | Build           | The Vercel preview deploy                                     |
 | Pipeline gates  | CI — `.github/workflows/gates.yaml` reads the PR's checkboxes |
+
+**Regenerate a migration, never renumber it.** Drizzle decides what to apply by comparing the
+journal's `when` against the newest already applied — never by hash — so a migration generated
+before something already on `main` is recorded as applied and never runs, and the branch ships
+code querying columns that do not exist. When two branches number their migration the same, the
+visible failure is a git conflict in `_journal.json`; the dangerous way out is renumbering the
+entry by hand and keeping its original `when`. So after bringing `main` into a migration-bearing
+branch: delete the branch's migration and its journal entry, then `pnpm db:generate` again. The
+`Migration order` step (`packages/services/scripts/check-migration-order.mjs`) is what fails a PR
+that did it the other way.
 
 `.claude/hooks/block-local-checks.sh` enforces this for agent sessions. Push, then read the result
 back from the PR's check runs. The one exception: if you already know an edit introduced a type
