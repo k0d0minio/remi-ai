@@ -1,6 +1,7 @@
 import { cache } from "react";
 import {
   getPatientByShareToken,
+  getPatientInstruction,
   getPatientSummary,
   listMealEntries,
   listPantryEssentials,
@@ -15,6 +16,9 @@ import type { PatientLinkSegment } from "./segments";
 
 /**
  * Everything the six segments render, read once per request.
+ *
+ * The standing instruction rides along for the home's « cette semaine » block:
+ * one more read on the same patient, under the same token check as the rest.
  *
  * Every page loads the whole record rather than just its own slice, because
  * the navigation has to know which segments are non-empty on every route —
@@ -33,6 +37,7 @@ export const loadPatientLink = cache(async (token: string) => {
 
   const [
     summary,
+    instruction,
     goals,
     recommendations,
     supplements,
@@ -41,6 +46,7 @@ export const loadPatientLink = cache(async (token: string) => {
     meals,
   ] = await Promise.all([
     getPatientSummary(patient.id),
+    getPatientInstruction(patient.id),
     listPatientGoals(patient.id),
     listPatientRecommendations(patient.id),
     listPatientSupplements(patient.id),
@@ -59,6 +65,10 @@ export const loadPatientLink = cache(async (token: string) => {
   return {
     patient,
     summary,
+    // Only `patientBody` is ever rendered — `body` is Morgane's line to REMI
+    // and the home never falls back to it. It travels no further than this
+    // module's callers, which read the one field.
+    instruction,
     goals,
     recommendations,
     supplements,

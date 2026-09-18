@@ -289,11 +289,33 @@ export type Content = {
       recettes: string;
       repas: string;
     };
-    /** Home: the living summary and the priority goals, in her order. */
-    summaryTitle: string;
+    /**
+     * Home, in her § 6 order: today and this week, the prioritised
+     * recommendations, the recipes, the essentials, the way in to a meal, and
+     * the living summary last.
+     */
+    todayTitle: string;
+    /** Heads the week's consigne, when she has written one to the patient. */
+    weekChallengeTitle: string;
+    /** Sits above the goals inside « Aujourd'hui ». */
     goalsTitle: string;
     /** Precedes a goal's starting point: "Point de départ : ...". */
     baselineLabel: string;
+    /** Follows each home section into its full segment. */
+    seeAllLabel: string;
+    /**
+     * The meal entry point. The slot and its wording ship here; `meal-entry`
+     * gives the two controls their behaviour.
+     */
+    mealEntry: {
+      title: string;
+      lead: string;
+      willEat: string;
+      haveEaten: string;
+      /** Says plainly that the buttons do not work yet. */
+      comingSoon: string;
+    };
+    summaryTitle: string;
     recommendationsTitle: string;
     categories: Record<RecommendationCategory, string>;
     /** Compléments: the validated protocol, never the profile free text. */
