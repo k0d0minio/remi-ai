@@ -28,6 +28,24 @@ export type { AuditActionName } from "./audit";
 export { appHref, appOrigin } from "./links";
 export { nutritionRuleKinds, nutritionRuleStatuses } from "./nutrition-rules";
 export type { NutritionRuleKind, NutritionRuleStatus } from "./nutrition-rules";
+export {
+  blankPersonalFields,
+  blankPersonalFieldsOf,
+  isPersonalField,
+  isProtocolCopyKind,
+  isProtocolTemplateKind,
+  protocolCopyKinds,
+  protocolKindFields,
+  protocolTemplateKinds,
+  readProtocolRow,
+  readProtocolRows,
+} from "./protocol-reuse";
+export type {
+  ProtocolCopyKindName,
+  ProtocolField,
+  ProtocolRow,
+  ProtocolTemplateKindName,
+} from "./protocol-reuse";
 export type { AppKey } from "./links";
 export { canManageOperators, isAtLeast, operatorRoles } from "./operator";
 export type { OperatorRoleName } from "./operator";
@@ -100,6 +118,9 @@ export type {
   PlanStatus,
   Practitioner,
   ProgressSignal,
+  ProtocolTemplate,
+  ProtocolTemplateKind,
+  ProtocolTemplateView,
   PsychologyProfile,
   Recipe,
   RecipeAssignment,

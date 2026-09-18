@@ -3,12 +3,14 @@
 import { Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { useCallback, useState, useTransition } from "react";
-import type { PantryEssential } from "@remi/services/shared";
+import type { PantryEssential, ProtocolRow } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Field, Input, Textarea, Typography } from "@remi/ui/server";
 import { savePantrySectionAction } from "@/lib/patients/actions";
+import { CopyFromPatient } from "@/components/patients/copy-from-patient";
 import { SectionEditFrame } from "@/components/patients/section-edit-frame";
 import { SectionRowControls } from "@/components/patients/section-row-controls";
+import { TemplateControls } from "@/components/patients/template-controls";
 import { useSectionRows } from "@/components/patients/use-section-rows";
 
 type Row = { id: string; item: string; why: string };
@@ -27,6 +29,17 @@ const toRow = (essential: PantryEssential): Row => ({
   id: essential.id,
   item: essential.item,
   why: essential.why,
+});
+
+/**
+ * A reused row arrives with no id — it is a new row on *this* list, not a
+ * pointer at the row it was copied from. A copy is a copy: changing the source
+ * later changes nothing here.
+ */
+const fromReused = (row: ProtocolRow): Row => ({
+  id: "",
+  item: row.item ?? "",
+  why: row.why ?? "",
 });
 
 /**
@@ -106,37 +119,52 @@ export const PantrySection = ({
       editLabel="Modifier la liste"
       readView={children}
       footer={
-        <details className="border-border rounded-md border p-3">
-          <summary className="text-muted-foreground hover:text-foreground cursor-pointer text-sm">
-            Coller une liste
-          </summary>
-          <div className="flex flex-col gap-3 pt-3">
-            <Field
-              id="pantry-paste"
-              label="Un aliment par ligne"
-              hint="Chaque ligne devient une ligne de la liste. Le pourquoi reste à compléter."
-            >
-              <Textarea
+        <div className="flex flex-col gap-3">
+          <CopyFromPatient
+            patientId={patientId}
+            kind="pantry"
+            emptyLabel="aucun essentiel en cours"
+            onTaken={(taken) => addRows(taken.rows.map(fromReused))}
+          />
+
+          <TemplateControls
+            kind="pantry"
+            currentRows={rows.map((row) => ({ item: row.item, why: row.why }))}
+            onInsert={(inserted) => addRows(inserted.map(fromReused))}
+          />
+
+          <details className="border-border rounded-md border p-3">
+            <summary className="text-muted-foreground hover:text-foreground cursor-pointer text-sm">
+              Coller une liste
+            </summary>
+            <div className="flex flex-col gap-3 pt-3">
+              <Field
                 id="pantry-paste"
-                rows={4}
-                value={pasted}
-                onChange={(event) => setPasted(event.target.value)}
-              />
-            </Field>
-            <div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={appendPasted}
-                disabled={pasted.trim().length === 0}
+                label="Un aliment par ligne"
+                hint="Chaque ligne devient une ligne de la liste. Le pourquoi reste à compléter."
               >
-                <Plus aria-hidden="true" />
-                Ajouter ces lignes
-              </Button>
+                <Textarea
+                  id="pantry-paste"
+                  rows={4}
+                  value={pasted}
+                  onChange={(event) => setPasted(event.target.value)}
+                />
+              </Field>
+              <div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={appendPasted}
+                  disabled={pasted.trim().length === 0}
+                >
+                  <Plus aria-hidden="true" />
+                  Ajouter ces lignes
+                </Button>
+              </div>
             </div>
-          </div>
-        </details>
+          </details>
+        </div>
       }
     >
       <div className="flex flex-col gap-3">

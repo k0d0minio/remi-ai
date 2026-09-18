@@ -86,6 +86,13 @@ export const actionLabels: Record<AuditActionName, string> = {
   "share_link.regenerated": "lien patient régénéré",
   "share_link.emailed": "lien patient envoyé",
   "context.exported": "contexte copié",
+  "protocol.copied_from_patient": "lignes reprises d'un autre patient",
+  "template.saved": "modèle enregistré",
+  "template.overwritten": "modèle remplacé",
+  "template.renamed": "modèle renommé",
+  "template.deleted": "modèle supprimé",
+  "template.shared": "modèle partagé",
+  "template.unshared": "partage du modèle retiré",
   "operator.invited": "invitation envoyée",
   "operator.invite_revoked": "invitation retirée",
   "operator.joined": "compte créé",
@@ -180,6 +187,17 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   // Health data left the console, pseudonymous but real — worth the eye, not an
   // alarm: it is the operator doing her job with the tool built for it.
   "context.exported": "warning",
+  // One patient's rows read into another patient's grid. The same reasoning as
+  // the export above: health data crossed records, which is worth the eye even
+  // though it is the operator working inside her own console.
+  "protocol.copied_from_patient": "warning",
+  "template.saved": "neutral",
+  "template.overwritten": "neutral",
+  "template.renamed": "neutral",
+  "template.deleted": "error",
+  // A set that was hers alone is now readable by every operator of the console.
+  "template.shared": "warning",
+  "template.unshared": "info",
   "operator.invited": "info",
   "operator.invite_revoked": "warning",
   "operator.joined": "info",

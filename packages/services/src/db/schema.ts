@@ -1,8 +1,10 @@
 import {
+  boolean,
   date,
   doublePrecision,
   index,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -601,6 +603,42 @@ export const operatorInvitations = pgTable("operator_invitations", {
   acceptedAt: timestamp("accepted_at", { withTimezone: true, mode: "date" }),
   /** Kept as text, not a foreign key — the trail survives the inviter leaving. */
   invitedByEmail: text("invited_by_email").notNull().default(""),
+  ...timestamps,
+});
+
+/**
+ * A named set of protocol rows an operator saves once and inserts into any
+ * patient — « Base anti-inflammatoire », « Compléments fatigue ».
+ *
+ * The one table `reuse-and-duplicate` adds, and deliberately the *only* one:
+ * brainstorm § 7 rules out an exhaustive practitioner base, so the rows are a
+ * JSON blob rather than a normalised catalogue nothing else points at. They are
+ * read back tolerantly (`shared/protocol-reuse.ts`) — a field a stored row does
+ * not carry comes back empty, exactly as the columns themselves default — so a
+ * change to a row shape needs neither a migration nor a version in the blob.
+ *
+ * `operator_id` is the key because a template is personal until she says
+ * otherwise: `shared` flips it to visible for every operator, and only the
+ * owner renames, overwrites, deletes or un-shares it. The cascade is right
+ * here in a way it is not for the audit trail — a departed operator's private
+ * sets are hers, and nothing else references them.
+ *
+ * Recipes are absent on purpose. A named set of library recipes is a patient
+ * group in disguise, and groups are parked in `beyond-december/patient-groups`.
+ */
+export const protocolTemplates = pgTable("protocol_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  operatorId: uuid("operator_id")
+    .notNull()
+    .references(() => operators.id, { onDelete: "cascade" }),
+  /** A key from `protocolTemplateKinds` — recommendation, supplement, pantry. */
+  kind: text("kind").notNull(),
+  /** How she named the set. Unique per operator per kind — a re-save overwrites. */
+  name: text("name").notNull(),
+  /** The rows as she adapted them, each a `ProtocolRow`. Read tolerantly. */
+  rows: jsonb("rows").notNull(),
+  /** Private until she shares it; shared sets are listed for every operator. */
+  shared: boolean("shared").notNull().default(false),
   ...timestamps,
 });
 

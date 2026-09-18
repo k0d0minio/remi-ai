@@ -118,6 +118,16 @@ export type {
 export type { SectionSaveCounts } from "../db/services/section-save";
 
 export {
+  deleteProtocolTemplate,
+  getProtocolTemplate,
+  listProtocolTemplates,
+  renameProtocolTemplate,
+  saveProtocolTemplate,
+  setProtocolTemplateShared,
+} from "../db/services/protocol-templates";
+export type { SavedProtocolTemplate } from "../db/services/protocol-templates";
+
+export {
   archiveRecipe,
   countRecipeAssignments,
   createRecipe,
