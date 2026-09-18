@@ -641,7 +641,12 @@ export const protocolTemplates = pgTable("protocol_templates", {
     .references(() => operators.id, { onDelete: "cascade" }),
   /** A key from `protocolTemplateKinds` — recommendation, supplement, pantry. */
   kind: text("kind").notNull(),
-  /** How she named the set. Unique per operator per kind — a re-save overwrites. */
+  /**
+   * How she named the set. Uniqueness per operator per kind is the service's
+   * rule, not a constraint here — `saveProtocolTemplate` looks the name up and
+   * overwrites. A database-level unique index would be the stronger answer and
+   * is parked as `triage/protocol-template-name-unique-index`.
+   */
   name: text("name").notNull(),
   /** The rows as she adapted them, each a `ProtocolRow`. Read tolerantly. */
   rows: jsonb("rows").notNull(),

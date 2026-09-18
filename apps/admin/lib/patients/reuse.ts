@@ -49,8 +49,15 @@ export type CopySource = {
 };
 
 export type CopyRow = {
-  /** The row's index in the source list — how the confirm names what she ticked. */
-  index: number;
+  /**
+   * The source row's own id — how the confirm names what she ticked.
+   *
+   * Deliberately not its position in the list: the picker's read and her
+   * confirm are two round trips, and a row archived from the source in between
+   * would shift every index after it, so a positional match would copy rows she
+   * never ticked. An id either still resolves or it does not.
+   */
+  id: string;
   /** What the picker shows: the factual fields, already joined for display. */
   label: string;
 };
@@ -143,36 +150,34 @@ export const readCopyRowsAction = async (
     return { error: "Ce patient n'existe plus.", rows: [] };
   }
 
-  const labels = await copyLabels(sourcePatientId, copyKind);
-  return {
-    error: null,
-    rows: labels.map((label, index) => ({ index, label })),
-  };
+  return { error: null, rows: await copyEntries(sourcePatientId, copyKind) };
 };
 
-const copyLabels = async (
+const copyEntries = async (
   patientId: string,
   kind: ProtocolCopyKindName,
-): Promise<readonly string[]> => {
-  if (kind === "recommendation") {
-    const rows = await listPatientRecommendations(patientId);
-    return rows.map((row) => row.title);
+): Promise<readonly CopyRow[]> => {
+  if (kind === "recipe") {
+    // A recipe's id is the library row's, not the assignment's: it is what the
+    // assign form ticks, and what the copy actually carries across.
+    return (await assignableRecipes(patientId)).map((entry) => ({
+      id: entry.recipe.id,
+      label: entry.recipe.title,
+    }));
   }
+  return (await sourceRows(patientId, kind)).map((entry) => ({
+    id: entry.id,
+    label: labelFor(kind, entry.row),
+  }));
+};
+
+const labelFor = (kind: ProtocolTemplateKindName, row: ProtocolRow): string => {
   if (kind === "supplement") {
-    const rows = await listPatientSupplements(patientId);
-    return rows.map((row) =>
-      [row.name, row.dose, row.timing]
-        .filter((part) => part.length > 0)
-        .join(" · "),
-    );
+    return [row.name, row.dose, row.timing]
+      .filter((part) => part !== undefined && part.length > 0)
+      .join(" · ");
   }
-  if (kind === "pantry") {
-    const rows = await listPantryEssentials(patientId);
-    return rows.map((row) => row.item);
-  }
-  return (await assignableRecipes(patientId)).map(
-    (entry) => entry.recipe.title,
-  );
+  return (kind === "recommendation" ? row.title : row.item) ?? "";
 };
 
 /**
@@ -195,8 +200,9 @@ const assignableRecipes = async (patientId: string) =>
  *
  * Re-read rather than trusting what the picker posted, so the audit event's
  * count is the number of rows that actually crossed and not a number the
- * browser asserted. The indexes are matched against the same ordered list the
- * picker was built from.
+ * browser asserted. The ticks are matched by the source row's own id, so a row
+ * archived between the picker's read and this confirm simply drops out instead
+ * of shifting a positional match onto its neighbour.
  */
 export const takeCopyRowsAction = async (
   formData: FormData,
@@ -211,9 +217,9 @@ export const takeCopyRowsAction = async (
   const sourcePatientId = String(formData.get("sourcePatientId") ?? "");
   const targetPatientId = String(formData.get("targetPatientId") ?? "");
   const chosen = formData
-    .getAll("rowIndex")
-    .map((value) => Number(value))
-    .filter((index) => Number.isInteger(index) && index >= 0);
+    .getAll("rowId")
+    .map((value) => String(value))
+    .filter((id) => id.length > 0);
 
   if (chosen.length === 0) {
     return { error: "Aucune ligne sélectionnée.", ...empty };
@@ -241,38 +247,44 @@ export const takeCopyRowsAction = async (
 const takeProtocolRows = async (
   sourcePatientId: string,
   kind: ProtocolTemplateKindName,
-  chosen: readonly number[],
+  chosen: readonly string[],
 ): Promise<{ rows: ProtocolRow[]; recipeIds: string[] }> => {
   const stored = await sourceRows(sourcePatientId, kind);
+  const byId = new Map(stored.map((entry) => [entry.id, entry.row]));
   const rows = chosen
-    .map((index) => stored[index])
+    .map((id) => byId.get(id))
     .filter((row) => row !== undefined)
     .map((row) => blankPersonalFields(kind, readProtocolRow(kind, row)));
   return { rows, recipeIds: [] };
 };
 
+/** A source row with the id the picker ticks it by. */
+type SourceRow = { id: string; row: ProtocolRow };
+
 const sourceRows = async (
   patientId: string,
   kind: ProtocolTemplateKindName,
-): Promise<readonly ProtocolRow[]> => {
+): Promise<readonly SourceRow[]> => {
   if (kind === "recommendation") {
     return (await listPatientRecommendations(patientId)).map((row) => ({
-      category: row.category,
-      title: row.title,
-      detail: row.detail,
+      id: row.id,
+      row: { category: row.category, title: row.title, detail: row.detail },
     }));
   }
   if (kind === "supplement") {
     return (await listPatientSupplements(patientId)).map((row) => ({
-      name: row.name,
-      dose: row.dose,
-      timing: row.timing,
-      reason: row.reason,
+      id: row.id,
+      row: {
+        name: row.name,
+        dose: row.dose,
+        timing: row.timing,
+        reason: row.reason,
+      },
     }));
   }
   return (await listPantryEssentials(patientId)).map((row) => ({
-    item: row.item,
-    why: row.why,
+    id: row.id,
+    row: { item: row.item, why: row.why },
   }));
 };
 
@@ -284,13 +296,12 @@ const sourceRows = async (
  */
 const takeRecipes = async (
   sourcePatientId: string,
-  chosen: readonly number[],
+  chosen: readonly string[],
 ): Promise<{ rows: ProtocolRow[]; recipeIds: string[] }> => {
   const given = await assignableRecipes(sourcePatientId);
-  const recipeIds = chosen
-    .map((index) => given[index])
-    .filter((entry) => entry !== undefined)
-    .map((entry) => entry.recipe.id);
+  const recipeIds = chosen.filter((id) =>
+    given.some((entry) => entry.recipe.id === id),
+  );
   return { rows: [], recipeIds };
 };
 

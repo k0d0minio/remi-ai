@@ -20,6 +20,18 @@ import {
   type TemplateSummary,
 } from "@/lib/patients/reuse";
 
+/**
+ * Enter in a text input implicitly submits the form it sits in, and every input
+ * below sits inside the section's own form. `type="button"` on the controls does
+ * not cover that path — only swallowing the key does. Without this, Enter while
+ * naming a template saves the whole section and discards the preview.
+ */
+const swallowEnter = (event: { key: string; preventDefault: () => void }) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+  }
+};
+
 /** The row fields, as the console names them. Written where they render. */
 const fieldLabels: Record<string, string> = {
   category: "Catégorie",
@@ -136,6 +148,7 @@ export const TemplateControls = ({ kind, currentRows, onInsert }: Props) => {
         ownNames={(templates ?? [])
           .filter((template) => template.owned)
           .map((template) => template.name)}
+        namesLoaded={templates !== null}
         onOpen={loadOnce}
         pending={pending}
         onSaved={() => {
@@ -218,6 +231,7 @@ const TemplateList = ({
                   value={newName}
                   maxLength={120}
                   onChange={(event) => setNewName(event.target.value)}
+                  onKeyDown={swallowEnter}
                 />
               </Field>
               <Button
@@ -353,6 +367,13 @@ type SaveProps = {
   currentRows: readonly ProtocolRow[];
   /** The names her own sets already use — what makes a save an overwrite. */
   ownNames: readonly string[];
+  /**
+   * Whether that list has actually arrived. An empty `ownNames` is ambiguous —
+   * she may have no templates, or the list may have failed to load — and
+   * treating the second case as the first would silently replace a set instead
+   * of asking. Until it has loaded, the save waits.
+   */
+  namesLoaded: boolean;
   /** Loads that list, for the case where she never opened the insert panel. */
   onOpen: () => void;
   pending: boolean;
@@ -373,6 +394,7 @@ const SaveAsTemplate = ({
   kind,
   currentRows,
   ownNames,
+  namesLoaded,
   onOpen,
   pending,
   onSaved,
@@ -381,6 +403,10 @@ const SaveAsTemplate = ({
   const [rows, setRows] = useState<ProtocolRow[] | null>(null);
   const [name, setName] = useState("");
   const [confirmed, setConfirmed] = useState(false);
+  // Its own flag rather than the parent's transition: two clicks before the
+  // first settles would insert the set twice, and the name's uniqueness is the
+  // service's rule, not a database constraint.
+  const [saving, setSaving] = useState(false);
   const fields = protocolKindFields(kind);
 
   /**
@@ -409,16 +435,21 @@ const SaveAsTemplate = ({
     );
   };
 
-  const save = () => {
-    const formData = new FormData();
-    formData.set("kind", kind);
-    formData.set("name", name);
-    for (const row of rows ?? []) {
-      for (const field of fields) {
-        formData.append(`row-${field}`, row[field] ?? "");
-      }
+  const save = async () => {
+    if (saving) {
+      return;
     }
-    void saveTemplateAction(formData).then((result) => {
+    setSaving(true);
+    try {
+      const formData = new FormData();
+      formData.set("kind", kind);
+      formData.set("name", name);
+      for (const row of rows ?? []) {
+        for (const field of fields) {
+          formData.append(`row-${field}`, row[field] ?? "");
+        }
+      }
+      const result = await saveTemplateAction(formData);
       onError(result.error);
       if (result.error === null) {
         setRows(null);
@@ -426,7 +457,11 @@ const SaveAsTemplate = ({
         setConfirmed(false);
         onSaved();
       }
-    });
+    } finally {
+      // Without this the form stays stuck at "Enregistrement…" on a throw, and
+      // the only way out discards the rows she just adapted.
+      setSaving(false);
+    }
   };
 
   if (rows === null) {
@@ -472,6 +507,7 @@ const SaveAsTemplate = ({
                 value={row[field] ?? ""}
                 maxLength={500}
                 onChange={(event) => setField(index, field, event.target.value)}
+                onKeyDown={swallowEnter}
               />
             </Field>
           ))}
@@ -488,6 +524,7 @@ const SaveAsTemplate = ({
             setName(event.target.value);
             setConfirmed(false);
           }}
+          onKeyDown={swallowEnter}
         />
       </Field>
 
@@ -508,12 +545,20 @@ const SaveAsTemplate = ({
           type="button"
           size="sm"
           disabled={
-            pending || name.trim().length === 0 || (replaces && !confirmed)
+            pending ||
+            saving ||
+            !namesLoaded ||
+            name.trim().length === 0 ||
+            (replaces && !confirmed)
           }
-          onClick={save}
+          onClick={() => void save()}
         >
           <Check aria-hidden="true" />
-          {replaces ? "Remplacer le modèle" : "Enregistrer le modèle"}
+          {saving
+            ? "Enregistrement…"
+            : replaces
+              ? "Remplacer le modèle"
+              : "Enregistrer le modèle"}
         </Button>
         <Button
           type="button"

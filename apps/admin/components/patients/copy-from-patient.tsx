@@ -54,7 +54,7 @@ export const CopyFromPatient = ({
   const [sources, setSources] = useState<readonly CopySource[] | null>(null);
   const [chosenSource, setChosenSource] = useState<CopySource | null>(null);
   const [rows, setRows] = useState<readonly CopyRow[]>([]);
-  const [ticked, setTicked] = useState<readonly number[]>([]);
+  const [ticked, setTicked] = useState<readonly string[]>([]);
   const [search, setSearch] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -87,11 +87,9 @@ export const CopyFromPatient = ({
     setError(null);
   };
 
-  const toggle = (index: number, checked: boolean) => {
+  const toggle = (id: string, checked: boolean) => {
     setTicked((current) =>
-      checked
-        ? [...current, index]
-        : current.filter((entry) => entry !== index),
+      checked ? [...current, id] : current.filter((entry) => entry !== id),
     );
   };
 
@@ -103,8 +101,8 @@ export const CopyFromPatient = ({
     formData.set("kind", kind);
     formData.set("sourcePatientId", chosenSource.id);
     formData.set("targetPatientId", patientId);
-    for (const index of ticked) {
-      formData.append("rowIndex", String(index));
+    for (const id of ticked) {
+      formData.append("rowId", id);
     }
 
     startTransition(async () => {
@@ -190,6 +188,15 @@ const SourceList = ({
       placeholder="Filtrer…"
       value={search}
       onChange={(event) => onSearch(event.target.value)}
+      // This renders inside the section's own form, and a lone text input is
+      // implicitly submitted by Enter — which would save the section (or, in
+      // the recipe form, assign whatever is ticked) from the middle of a pick.
+      // `type="button"` on the controls does not cover implicit submission.
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+        }
+      }}
     />
 
     {!loaded && pending ? (
@@ -200,7 +207,9 @@ const SourceList = ({
 
     {loaded && sources.length === 0 ? (
       <Typography size="sm" tone="muted">
-        Aucun autre patient.
+        {search.trim().length > 0
+          ? "Aucun patient ne correspond."
+          : "Aucun autre patient."}
       </Typography>
     ) : null}
 
@@ -228,10 +237,10 @@ const SourceList = ({
 type RowListProps = {
   source: CopySource;
   rows: readonly CopyRow[];
-  ticked: readonly number[];
+  ticked: readonly string[];
   emptyLabel: string;
   pending: boolean;
-  onToggle: (index: number, checked: boolean) => void;
+  onToggle: (id: string, checked: boolean) => void;
   onBack: () => void;
   onTake: () => void;
 };
@@ -274,14 +283,12 @@ const RowList = ({
       <div className="border-border max-h-64 overflow-y-auto rounded-lg border">
         {rows.map((row) => (
           <label
-            key={row.index}
+            key={row.id}
             className="hover:bg-muted/50 border-border flex cursor-pointer items-center gap-3 border-b p-3 last:border-b-0"
           >
             <Checkbox
-              checked={ticked.includes(row.index)}
-              onCheckedChange={(checked) =>
-                onToggle(row.index, checked === true)
-              }
+              checked={ticked.includes(row.id)}
+              onCheckedChange={(checked) => onToggle(row.id, checked === true)}
             />
             <Typography size="sm">{row.label}</Typography>
           </label>
