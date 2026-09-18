@@ -1,5 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { registerDatabase } from "../../client";
+import type { Id } from "../../../types";
+import {
+  registerDatabase,
+  type Collection,
+  type DatabaseClient,
+} from "../../client";
 import { createMemoryDatabase } from "../../test-helpers";
 import { createPatient } from "../patients";
 import { createRecipe, listRecipes } from "../recipes";
@@ -19,6 +24,40 @@ let otherPatientId: string;
 let sardines: string;
 let dahl: string;
 
+/**
+ * The collection whose next insert throws, or `null` for none.
+ *
+ * The gestures at the bottom of this file write `recipes` and
+ * `patient_recipe_assignments` as one unit, and the only way to observe that
+ * the unit holds is to fail it between the two writes. Validation refusals
+ * cannot: they land before anything is written, so they would pass just as
+ * well against the pass-through `transaction()` this adapter used to have.
+ */
+let failInsertInto: string | null = null;
+
+/**
+ * The memory client with that failure spliced in — including the client handed
+ * to a `transaction()` callback, because that is the one these gestures write
+ * through. The rollback itself is the harness's, untouched.
+ */
+const withInjectedFailure = (base: DatabaseClient): DatabaseClient => ({
+  driver: base.driver,
+  close: base.close,
+  transaction: (fn) => base.transaction(() => fn(withInjectedFailure(base))),
+  collection: <T extends { id: Id }>(name: string): Collection<T> => {
+    const inner = base.collection<T>(name);
+    return {
+      ...inner,
+      insert: async (doc) => {
+        if (failInsertInto === name) {
+          throw new Error("injected write failure");
+        }
+        return inner.insert(doc);
+      },
+    };
+  },
+});
+
 const recipeNamed = async (title: string) => {
   const result = await createRecipe({
     title,
@@ -31,7 +70,7 @@ const recipeNamed = async (title: string) => {
 };
 
 beforeAll(async () => {
-  registerDatabase(createMemoryDatabase());
+  registerDatabase(withInjectedFailure(createMemoryDatabase()));
   const claire = await createPatient({ pseudonym: "Claire" });
   const luc = await createPatient({ pseudonym: "Luc" });
   if (!claire.ok || !luc.ok) {
@@ -339,6 +378,29 @@ describe("writing a recipe and giving it in one save", () => {
     );
     expect(result.ok).toBe(false);
     // The order matters: the recipe must not land before the date is refused.
+    expect((await listRecipes()).length).toBe(before);
+    expect(await held(patient.data.id)).toEqual([]);
+  });
+
+  it("leaves no library row when the assignment fails after it", async () => {
+    const patient = await createPatient({ pseudonym: "Théo" });
+    if (!patient.ok) {
+      throw new Error("patient not created");
+    }
+    const before = (await listRecipes()).length;
+
+    // Not a refusal: the recipe row is written, and the write after it throws.
+    // Under the pass-through `transaction()` this seam used to have, that left
+    // an orphaned library row — and the library has no delete to take it back.
+    failInsertInto = "patient_recipe_assignments";
+    const save = createAndAssignRecipe(
+      patient.data.id,
+      { title: "Soupe de courge", body: "De la courge, du bouillon." },
+      { assignedOn: "2026-09-18" },
+    );
+    await expect(save).rejects.toThrow("injected write failure");
+    failInsertInto = null;
+
     expect((await listRecipes()).length).toBe(before);
     expect(await held(patient.data.id)).toEqual([]);
   });
