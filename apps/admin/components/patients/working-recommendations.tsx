@@ -1,5 +1,5 @@
 import { Typography } from "@remi/ui/server";
-import { recommendationCategories } from "@remi/services/shared";
+import { firstRecommendationPerCategory } from "@remi/services/shared";
 import type { PatientRecommendation } from "@remi/services/shared";
 import { categoryLabels } from "@/components/patients/vocabulary";
 
@@ -12,14 +12,13 @@ type Props = {
  * active recommendation of each category (§ 9 — not flagged, not a top-N). One
  * compact row per category; the full protocol, all categories and all entries,
  * stays in the secondary sections.
+ *
+ * The selection itself lives in `@remi/services/shared` because the patient
+ * link's home renders the same set: what "principale" means is one decision,
+ * so reordering here reorders what the patient sees.
  */
 export const WorkingRecommendations = ({ recommendations }: Props) => {
-  const rows = recommendationCategories.flatMap((category) => {
-    const first = recommendations.find(
-      (recommendation) => recommendation.category === category,
-    );
-    return first ? [{ category, first }] : [];
-  });
+  const rows = firstRecommendationPerCategory(recommendations);
 
   if (rows.length === 0) {
     return (
@@ -31,20 +30,20 @@ export const WorkingRecommendations = ({ recommendations }: Props) => {
 
   return (
     <ol className="flex flex-col gap-2">
-      {rows.map(({ category, first }) => (
+      {rows.map((recommendation) => (
         <li
-          key={category}
+          key={recommendation.id}
           className="border-border flex flex-col gap-0.5 border-b pb-2 last:border-b-0"
         >
           <Typography variant="eyebrow" tone="muted">
-            {categoryLabels[category]}
+            {categoryLabels[recommendation.category]}
           </Typography>
           <Typography size="sm" weight="medium">
-            {first.title}
+            {recommendation.title}
           </Typography>
-          {first.detail ? (
+          {recommendation.detail ? (
             <Typography size="sm" tone="muted" className="line-clamp-2">
-              {first.detail}
+              {recommendation.detail}
             </Typography>
           ) : null}
         </li>
