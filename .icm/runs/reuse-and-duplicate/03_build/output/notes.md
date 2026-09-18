@@ -10,7 +10,7 @@
   paths need it: the copy picker blanks on the **server**, so another patient's wording never
   reaches the browser at all, and « Enregistrer comme modèle » blanks in the **browser**, into the
   preview she adapts. Exported from `/shared`.
-- `packages/services/src/db/schema.ts` + `migrations/0017_*.sql`: one new table,
+- `packages/services/src/db/schema.ts` + `migrations/0018_rapid_lizard.sql`: one new table,
   `protocol_templates` (operator_id, kind, name, rows jsonb, shared, timestamps). The generated
   migration touches nothing else, which is criterion 9's second half.
 - `packages/services/src/db/models/protocol-template.ts` (new): `rows` is typed `unknown` on the
@@ -56,6 +56,29 @@ on save, and a stray submit would save the section mid-pick. Each write builds i
 - [x] The copy writes one audit event naming the source patient and the row count, at the copy
 - [x] Save, rename, overwrite, delete and share each write one audit event
 - [x] A patient's own page never offers that patient — `listCopySourcesAction` excludes the target
+
+## The admin preview failed once, and why it is worth reading
+
+The first full-gate run went red on `Vercel – admin`, at `applying migrations…`, before
+`next build` ran. Not a code failure, and not a flake:
+
+`ALLOW_NON_PRODUCTION_MIGRATIONS=true` is set preview-only on the admin project, so **every admin
+preview build migrates the shared production database**. This branch's first preview therefore
+applied its original `0017`, creating `protocol_templates` in the live database. `main` then landed
+its own `0017`, so this branch regenerated its migration as `0018` — correct, and what
+CONVENTIONS.md § "Regenerate a migration, never renumber it" requires. But `0018` carries the same
+`CREATE TABLE`, and it collided with the table its own **withdrawn** predecessor had already
+created.
+
+The owner dropped the orphaned table, which puts the database back in the state the journal
+describes; `0018` then applies as generated. Nothing in the diff changed as a result.
+
+Two things to carry forward. `.icm/docs/ENV.md` still calls that variable "unset everywhere", which
+is what made the trap invisible — parked as
+[`triage/env-preview-migrations-row-is-stale`](../../../../intake/triage/env-preview-migrations-row-is-stale.md).
+And the same thing will happen to any other in-flight branch that regenerates a migration after its
+preview has already applied the original — **PR #110 is in exactly that position**, still numbered
+`0017`.
 
 ## Notes for Release
 
