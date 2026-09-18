@@ -1,15 +1,22 @@
 # Stub: Patient home — today and this week, then the way in to the meal loop
 
 - feature-slug: patient-home-today
-- sequence: 2 of 6
+- scope: patient-loop
+- personas: patient
+- initiative: a patient experience validated on real terrain, in time for the December open day / objective: the patient loop working end to end for one real patient
 - depends-on: link-writes
+- sequence: 2 of 6
 - priority: P1
 - size: M
 - sources: feedback § 6 ("Accueil patient — éléments essentiels") · V2 explication (« Accueil » :
   dialogue à tout moment, recommandations page as the reference) · brainstorm § J ·
   `apps/web/app/[locale]/p/[token]/page.tsx` · `apps/web/lib/patient-link/segments.ts`
 
-## What this is
+## Problem
+
+The link's home shows the living summary and the goals; her § 6 wants it to be the patient's today — the current goal and this week's consigne, the prioritised recommendations, the current recipes and essentials, and the way in to the meal loop. A static rendering cannot say whether REMI helps between two consultations.
+
+## Proposed change
 
 The link's home today shows the living summary and the goals. Her § 6 wants the home to be the
 patient's **today**:
@@ -33,7 +40,20 @@ segment nav keeps the existing segments; "Accueil" is renamed to whatever she ca
 Phone-first, since that is where a patient opens a link from a message: one column, the meal
 control within thumb reach, targets ≥ 44 px.
 
-## Worth knowing
+## Acceptance criteria (rough)
+
+- [ ] The home opens on « Aujourd'hui / cette semaine »: the active goal(s) and this week's consigne, then the prioritised recommendations, the current recipes (favourites first once they exist), the essentials, and a prominent meal entry-point slot
+- [ ] The summary is demoted below or into its own segment; the existing segments stay
+- [ ] Phone-first: one column, the meal control within thumb reach, targets ≥ 44 px
+- [ ] `business/roles` says what the patient now sees, updated in the same PR
+
+## Out of scope (this feature)
+
+- The meal control's behaviour (`meal-entry` wires it); any model call; photos
+
+## Notes for Define
+
+- **Decisions that bind** ([`README.md § Decisions of record`](../README.md)): D-2 (the same token, read + write) · D-6 (the slot is built here, the model arrives in `ai-assist`).
 
 - The loader already fetches everything the home needs except the instruction; adding it is one
   more read on the same patient, guarded by the same visibility rules.
@@ -41,7 +61,7 @@ control within thumb reach, targets ≥ 44 px.
   keep it).
 - The docs' `business/roles` page says what the patient sees; update in the same PR.
 
-## Open questions — flag these on pickup
+**Open for Define** — settled with the operator before the spec is approved, never assumed:
 
 - "Challenge de la semaine": is it the practitioner instruction shown to the patient, or a
   separate patient-facing sentence she writes? The brainstorm's `PRACTITIONER_INSTRUCTION` was
@@ -51,9 +71,4 @@ control within thumb reach, targets ≥ 44 px.
 
 ## Prompt
 
-Run `/pipeline new .icm/intake/patient-loop/patient-home-today.md` in the remi-ai repo and follow
-the pipeline from there. Read the stub, its epic's `breakdown.md` and the `link-writes` run's
-notes first. Scope: the link's home becomes "today / this week" — active goals and this week's
-consigne, the prioritised recommendations, current recipes, essentials, and a prominent meal
-entry-point slot; summary demoted; phone-first. Reads only, no model call. Raise the stub's open
-questions rather than answering them.
+Run `/pipeline new patient-home-today` in the remi-ai repo. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.

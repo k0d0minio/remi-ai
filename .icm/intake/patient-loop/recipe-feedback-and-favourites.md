@@ -1,15 +1,22 @@
 # Stub: Recipe feedback and favourites — four buttons, and « Mes recettes préférées »
 
 - feature-slug: recipe-feedback-and-favourites
-- sequence: 4 of 6
+- scope: patient-loop
+- personas: patient, practitioner
+- initiative: a patient experience validated on real terrain, in time for the December open day / objective: the patient loop working end to end for one real patient
 - depends-on: link-writes
+- sequence: 4 of 6
 - priority: P1
 - size: S
 - sources: feedback § 7 ("Feedback patient : J'aime · Pas pour moi · Trop long · À refaire") · V2
   explication (« Enregistrer cette recette », onglet « Mes recettes préférées ») · brainstorm § 5
   step 4 · `patient_recipe_assignments` · `apps/web/app/[locale]/p/[token]/recettes/page.tsx`
 
-## What this is
+## Problem
+
+Her § 7 closes with the signal that makes the next recipes better — J'aime · Pas pour moi · Trop long · À refaire — and the patient has no way to give it. Without it, generation has no « ce qui a été essayé, apprécié, refusé » to read.
+
+## Proposed change
 
 Her § 7 closes with the signal that makes the next recipes better: the patient says **J'aime · Pas
 pour moi · Trop long · À refaire** on each recipe, and those answers "permettent d'améliorer les
@@ -26,7 +33,20 @@ version had:
   each. `ai-assist/recipe-generation` reads the answers as its "ce qui a été essayé, apprécié,
   refusé" input (brainstorm § I).
 
-## Worth knowing
+## Acceptance criteria (rough)
+
+- [ ] Each assigned recipe on the link carries the four answers, one tap, changeable; the answer is stored on the assignment row with patient attribution and a timestamp
+- [ ] « Mes recettes préférées » is the à-refaire view, first on the recipes segment; no second table
+- [ ] The console shows the patient's answer on the assignment row and a per-answer count under « À retenir »
+- [ ] An archived assignment keeps its answer
+
+## Out of scope (this feature)
+
+- Any model call; a « how long would be fine » follow-up unless Morgane wants one (open point)
+
+## Notes for Define
+
+- **Decisions that bind** ([`README.md § Decisions of record`](../README.md)): D-5 (the library stays; feedback is per assignment) · D-9 (in-page, no outbound channel).
 
 - One nullable enum column on `patient_recipe_assignments` (`patient_response`) plus a timestamp;
   migration generated, audited through `link-writes`.
@@ -34,17 +54,11 @@ version had:
   truth.
 - An archived assignment keeps its answer — that is exactly the history generation wants.
 
-## Open questions — flag these on pickup
+**Open for Define** — settled with the operator before the spec is approved, never assumed:
 
 - Her four labels, verbatim, in the patient's register — and whether « Trop long » should carry a
   "how long would be fine" follow-up (a second field) or stay one tap.
 
 ## Prompt
 
-Run `/pipeline new .icm/intake/patient-loop/recipe-feedback-and-favourites.md` in the remi-ai repo
-and follow the pipeline from there. Read the stub, its epic's `breakdown.md` and the `link-writes`
-run's notes first. Scope: a four-answer response per assigned recipe (J'aime / Pas pour moi /
-Trop long / À refaire) stored on the assignment with patient attribution, « Mes recettes
-préférées » as the à-refaire view on the recipes segment, the answer visible in the console's
-assignment row and learnings. No model call. Raise the stub's open question rather than answering
-it.
+Run `/pipeline new recipe-feedback-and-favourites` in the remi-ai repo. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.

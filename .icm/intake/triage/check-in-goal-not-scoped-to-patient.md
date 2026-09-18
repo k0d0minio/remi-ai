@@ -1,11 +1,8 @@
-# check-in-goal-not-scoped-to-patient
+# Stub: Check-in actions accept a goal that belongs to another patient
 
-- epic: triage
 - lane: bug
-- status: active
-- created: 2026-09-17
+- found-by: the `consultation-update` Release review (#99) · 2026-09-17
 - size: S
-- depends-on: none
 
 ## Problem
 
@@ -24,7 +21,11 @@ were left alone rather than widening that PR.
 integrity and a truthful audit trail, not an access-control hole. That is why it is a bug stub and
 not a security hold.
 
-## Acceptance
+## Proposed change
+
+Check the submitted goal id against the patient's own goals in the service — the same « no such goal for this patient » shape the composed write uses — so no caller can forget it.
+
+## Acceptance criteria (rough)
 
 - [ ] `addCheckInAction` and `updateCheckInAction` refuse a `goalId` that does not belong to the
       `patientId` on the form, with the same "no such goal for this patient" shape the composed
@@ -32,3 +33,7 @@ not a security hold.
 - [ ] A service test covers each, asserting nothing is written and no audit row is recorded.
 - [ ] The check lives where it cannot be forgotten by the next caller — preferably in the service,
       taking the patient id, rather than repeated in each action.
+
+## Prompt
+
+Run `/pipeline bug check-in-goal-not-scoped-to-patient` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

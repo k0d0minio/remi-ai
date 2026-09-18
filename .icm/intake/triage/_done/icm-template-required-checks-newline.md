@@ -1,3 +1,5 @@
+> Done: 2026-09-18 — the template's `ci-status.sh` splits `PIPELINE_REQUIRED_CHECKS` on newlines only (icm-board, estate decision D20), and this repo's copy is now byte-identical to it, synced by `icm-sync.sh`. The `Pipeline gates` noise rule is gone with it: the check is named `Pipeline gates (advisory)` and the template classes it by that suffix. `required_checks` in `.icm/project.json` is the checked-in home of the check name.
+
 # Stub: port the `PIPELINE_REQUIRED_CHECKS` newline-only parse upstream to the template
 
 - feature-slug: icm-template-required-checks-newline

@@ -1,17 +1,24 @@
 # Stub: Meal suggestions — « Je vais manger → Suggestions », instant, in her nutrition, to the patient
 
 - feature-slug: meal-suggestions
-- sequence: 2 of 5
+- scope: ai-assist
+- personas: patient, practitioner
+- initiative: a patient experience validated on real terrain, in time for the December open day / objective: the patient loop working end to end for one real patient
 - depends-on: mistral-adapter
+- sequence: 2 of 5
 - priority: P1
 - size: L
 - sources: feedback § 8 (the whole section: analysis inputs, the four-part answer, the
   pedagogical why, "le praticien ne doit pas devoir commenter chaque repas") · § 6 · § 9.5 ·
   braindump `roadmap/features.md` (« Améliore mon assiette », the V2's central feature) ·
-  decision #6 · cross-epic: `patient-loop/meal-entry` (the entry and the response slot),
+  decision D-6 · cross-epic: `patient-loop/meal-entry` (the entry and the response slot),
   `nutrition-knowledge/nutrition-rules` (soft)
 
-## What this is
+## Problem
+
+« Je vais manger » is the workflow the product bends toward (her § 8), and today the response slot `meal-entry` built only ever holds Morgane's own feedback, written after the fact. The patient gets no instant, pedagogical answer, and she has to comment every meal by hand.
+
+## Proposed change
 
 The patient writes « Spaghetti sauce tomate », taps « Suggestions », and within seconds reads:
 
@@ -25,7 +32,7 @@ The patient writes « Spaghetti sauce tomate », taps « Suggestions », and wit
 
 Short, concrete, applicable now, and pedagogical — the patient learns to improve their own meals.
 The same call, with intent `eaten`, gives the « J'ai mangé » feedback: what was good, one thing
-for next time, why. Decision #6: **straight to the patient**, no queue; Morgane sees every
+for next time, why. Decision D-6: **straight to the patient**, no queue; Morgane sees every
 exchange in the journal and can add or correct — her feedback sits beside REMI's, labelled.
 
 - **Context assembly** (tested against fixtures): profile (diet, allergies, intolerances, likes /
@@ -45,7 +52,22 @@ exchange in the journal and can add or correct — her feedback sits beside REMI
   timeout the entry is saved and the slot says the suggestion is coming — a retry on next open, not
   a queue.
 
-## Worth knowing
+## Acceptance criteria (rough)
+
+- [ ] On a planned or eaten meal entry, one structured `fast` call returns positive / improve / action / why within a hard timeout, and the entry renders it labelled « proposé par REMI »
+- [ ] The context block (profile, recommendations, goals, instruction, retrieved rules) is assembled by a function tested against fixtures
+- [ ] A suggestion whose action names an allergen, intolerance or excluded food is withheld by code and logged; the patient sees that REMI has no suggestion for this meal
+- [ ] The patient can tap « utile / pas utile » once per suggestion and the answer is stored
+- [ ] Generations are capped per patient per day and every one is logged; a timeout saves the entry and retries on the next open
+
+## Out of scope (this feature)
+
+- A queue or a manual gate before the patient sees it (D-6 says straight to the patient); a chat; memory beyond the context block
+- Photos (D-12); previous meals of the day beyond the last few entries — the « vision finale », a later round
+
+## Notes for Define
+
+- **Decisions that bind** ([`README.md § Decisions of record`](../README.md)): D-6 (straight to the patient, visible and correctable) · D-7 (her rules are what the prompt retrieves) · D-12 (text only).
 
 - One structured call per meal; no conversation, no memory beyond the context block. The old
   version's "dialogue à tout moment" is not this — a chat is a different product decision.
@@ -55,7 +77,7 @@ exchange in the journal and can add or correct — her feedback sits beside REMI
 - Rules retrieval is soft: with none validated yet the prompt says so and the output's `why` is
   the model's; the log records which rules were used so she can see the gap.
 
-## Open questions — flag these on pickup
+**Open for Define** — settled with the operator before the spec is approved, never assumed:
 
 - Her tone and length: the § 8 examples are the target — confirm the four labels and whether the
   "pourquoi" is a fourth block or folded into the action.
@@ -65,12 +87,4 @@ exchange in the journal and can add or correct — her feedback sits beside REMI
 
 ## Prompt
 
-Run `/pipeline new .icm/intake/ai-assist/meal-suggestions.md` in the remi-ai repo and follow the
-pipeline from there. Read the stub, its epic's `breakdown.md` (§ The shape, decision #6) and the
-`mistral-adapter` and `patient-loop/meal-entry` runs' notes first. Scope: on a patient's meal entry
-(planned or eaten), one structured `fast` call with a fixture-tested context block (profile,
-recommendations, goals, instruction, retrieved rules) returning positive / improve / action / why,
-post-checked in code against allergies, intolerances and diet, stored on the entry, rendered in
-the response slot labelled « proposé par REMI » with a useful / not-useful tap, logged with tokens
-and outcome, capped per patient per day, timeout-safe. No queue, no chat, no photos. Raise the
-stub's open questions rather than answering them.
+Run `/pipeline new meal-suggestions` in the remi-ai repo. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.

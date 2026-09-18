@@ -1,11 +1,8 @@
-# at-a-glance-prep-note-polish
+# Stub: Prep note — no stale-prop flicker after a save, one submission per click
 
-- epic: triage
 - lane: tweak
-- status: active
-- created: 2026-09-10
+- found-by: the `at-a-glance-page` Release review · 2026-09-10
 - size: S
-- depends-on: none
 
 ## Problem
 
@@ -20,9 +17,17 @@ found in Release review, neither merge-stopping (build notes / 03_build/output/n
    `requestSubmit()` can run twice on a fast click, writing an idempotent identical value plus a
    duplicate audit row.
 
-## Acceptance
+## Proposed change
+
+Mirror the action's returned `saved` state into the display instead of the server prop, and guard the blur-then-click path so a fast click submits once.
+
+## Acceptance criteria (rough)
 
 - [ ] After saving, the display never flashes the pre-edit text; the saved value shows from the
       moment the action settles (e.g. mirror the action's returned `saved` state into the display
       rather than the server prop).
 - [ ] A fast blur+click produces exactly one submission.
+
+## Prompt
+
+Run `/pipeline tweak at-a-glance-prep-note-polish` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

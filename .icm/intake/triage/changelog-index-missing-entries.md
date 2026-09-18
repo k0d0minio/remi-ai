@@ -1,12 +1,11 @@
 # Stub: the changelog index page has stopped listing new entries
 
-- feature-slug: changelog-index-missing-entries
 - lane: chore
-- priority: P3
 - found-by: the `ciqual-import` Release docs pass, 2026-09-17
+- priority: P3
 - sources: `apps/docs/app/changelog/page.mdx` § Entries · `apps/docs/app/changelog/_meta.ts`
 
-## What this is
+## Problem
 
 There are two lists of changelog entries and only one of them is being maintained. `_meta.ts` is
 Nextra's navigation and every run has updated it. The `## Entries` list on the index page is
@@ -30,3 +29,7 @@ index page makes about itself and currently does not keep.
 
 - [ ] There is one list of changelog entries, not two that can disagree
 - [ ] Every shipped entry is reachable from `/changelog`
+
+## Prompt
+
+Run `/pipeline chore changelog-index-missing-entries` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

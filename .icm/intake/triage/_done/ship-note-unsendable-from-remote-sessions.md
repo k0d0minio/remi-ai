@@ -1,3 +1,5 @@
+> Done: 2026-09-18 — with the pipeline template sync. The ship note is now the changelog page's one-liner, handed to the project-owned `.icm/scripts/notify.sh`, which sends it through Resend where `RESEND_API_KEY`, `SHIP_NOTE_RECIPIENTS` and `EMAIL_FROM` are set and otherwise prints it and reports `RESULT: SKIPPED` — « written, not sent » is a normal outcome, not a failed step; there is no `release.md` and no `sent:` line to correct afterwards. `.icm/docs/ENV.md` § Pipeline says where the variables live.
+
 # Stub: Release's ship note cannot be sent from a remote Claude Code session
 
 - feature-slug: ship-note-unsendable-from-remote-sessions

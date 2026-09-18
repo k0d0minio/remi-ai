@@ -1,13 +1,12 @@
 # Stub: `rankFoodsByComponent` always ranks descending, while the component map says some go down
 
-- feature-slug: rank-by-component-ignores-direction
 - lane: bug
-- priority: P2
 - found-by: the `ciqual-import` Release code review, 2026-09-17 — latent, no caller yet
+- priority: P2
 - sources: `packages/services/src/db/services/foods/index.ts` § `rankFoodsByComponent` ·
   `packages/services/src/shared/nutrition.ts` § `NutrientDirection`
 
-## What this is
+## Problem
 
 `nutrientComponents` publicly carries a `direction` per component, and one of the twelve is
 `reduce`: « sucres ». `rankFoodsByComponent` sorts descending, unconditionally, and `RankQuery` has
@@ -40,3 +39,7 @@ cannot silently disagree with the vocabulary.
 - [ ] Ranking on a `reduce` component cannot return the richest foods in it
 - [ ] The direction comes from the component vocabulary by default, not from each call site
 - [ ] A test covers « réduire les sucres » end to end, from the phrasing to the ranked result
+
+## Prompt
+
+Run `/pipeline bug rank-by-component-ignores-direction` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.
