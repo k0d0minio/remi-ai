@@ -103,7 +103,7 @@ const PatientLinkHome = async ({ params }: { params: Promise<Params> }) => {
         </SegmentPage>
       ) : null}
 
-      <MealEntryPoint content={content} />
+      <MealEntryPoint content={content} href={segment("repas")} />
 
       {principales.length > 0 ? (
         <HomeSection

@@ -1,0 +1,153 @@
+# Build notes: meal-entry
+
+- commits: see the branch — services (`intent` + the flip), web (the entry control, the always-on
+  segment), ui (`ChoiceChip`), admin (the marker + the four-part placeholder)
+- ci: pending — recorded below once `ci-status.sh` settles
+
+## What changed
+
+### `packages/services`
+
+- `shared/patient.ts` · `db/models/meal-entry.ts` · `db/schema.ts` — a new `intent` column
+  (`planned | eaten`), defaulting to `eaten`. The stub said `written_by` was new too; it is not —
+  `link-writes` (#98) already shipped it, so only `intent` is.
+- `db/migrations/0018_greedy_mentallo.sql` + its snapshot and journal entry. First written by hand, not
+  by `pnpm db:generate`: the session started with no `node_modules`. The snapshot is 0016's with
+  the chain ids advanced and the one column added, which `diff <(jq -S .)` proves. The `ALTER` is
+  `IF NOT EXISTS`, and the journal's `when` sits ahead of 0016's — drizzle never revisits a
+  timestamp it has passed, the failure mode `triage/parallel-migrations-journal-ordering.md`
+  already records.
+- `db/services/meal-entries/` — `intent` joins the validated input (a claimed intent forges
+  nothing, unlike a claimed `writtenBy`, so it does not need to be a code-path argument);
+  `updateMealEntry` **omits** it so the transition has exactly one writer; `markMealEntryEaten`
+  is that writer and only moves `planned → eaten`; `mealEntryOwner` answers the ownership
+  question `writeThroughPatientLink` needs before it lets a token touch a row by id.
+- `shared/format.ts` — `todayAtPractice()`. `toISOString().slice(0, 10)` reads UTC, so a meal
+  entered after midnight in Brussels would be dated the day before, on a journal whose date the
+  patient can see and has no field to correct.
+
+### `packages/ui`
+
+- `ChoiceChip` — the slot chip, lifted out of `apps/admin` rather than copied into `apps/web`
+  (CONVENTIONS § Keeping the codebase lean). Both apps consume it in this PR.
+
+### `apps/web`
+
+- `lib/patient-link/actions.ts` (new) — the link's first two write endpoints, both through
+  `writePatientLink`. The flip passes `ownerOf`, so a posted meal id that belongs to someone else
+  is refused as "no such patient link". Service error *codes* map to dictionary keys; no English
+  service message reaches a patient.
+- `lib/patient-link/load.ts` — `repas` joins `home` as always-visible. It had to: the segment 404s
+  when a patient has no meals, and it is now where the first one is written.
+- `components/patient-link/meal-entry-form.tsx` (new) — the two sentences as two submit buttons on
+  one form, so the intent is the press rather than a mode to set first.
+- `components/patient-link/meal-mark-eaten.tsx` (new) — the only interactive thing on the journal,
+  so `MealList` stays a server component.
+- `components/patient-link/meal-list.tsx` — the intent badge, and the response area now renders
+  whether or not it has been answered.
+- `app/[locale]/p/[token]/repas/page.tsx` — entry control first, history second.
+- `lib/content/{types,fr,en}.ts` — the copy, with `mealEntry.errors` keyed by `PatientWriteError`
+  so a new failure cannot ship unworded.
+
+### `apps/admin`
+
+- `meal-entry-item.tsx` — « écrit depuis le lien » on a patient-written entry (`written_by` has
+  been stored since #98 and rendered nowhere), and the four-part shape as the feedback
+  placeholder. The badge names the act rather than the person: `apps/admin/AGENTS.md` rules out
+  gendered French role nouns, so « écrit par la patiente » — the wording the `writtenBy` comment
+  in `shared/patient.ts` anticipated — would have been wrong for half the people it describes.
+- `meal-slot-field.tsx` — now composes `ChoiceChip`; the markup it used to own moved to the
+  design system unchanged.
+
+## Acceptance criteria status
+
+- [x] `intent` column (`planned | eaten`), not null, migration in the repo, existing rows `eaten` —
+      `0017_meal_entry_intent.sql`, `DEFAULT 'eaten'`
+- [x] Entry control on `repas`: the two sentences, a text field, an optional slot over the four
+      existing `mealSlots` keys, defaulting to none
+- [x] One row through the `link-writes` path, `written_by: patient`, `eaten_on` = today,
+      `intent` from the button — `logMealAction`
+- [x] Cap and ceilings from `link-writes`; a refusal reads in the patient's language —
+      `mealWriteErrors`, keyed by service error code
+- [x] The entry appears with its empty response slot straight after submitting — the action
+      revalidates the token subtree; the form resets only on success
+- [x] `planned` offers « je l'ai mangé »; the flip keeps description, slot and feedback, and is
+      offered once — `markMealEntryEaten`, one-way, proven by test
+- [x] Every entry renders a response slot: her feedback, else `mealAwaitingResponse`
+- [x] Newest first, planned and eaten told apart, no author shown to the patient — the ordering is
+      the service's, unchanged
+- [x] `repas` reachable and in the navigation for every patient, including one with no entries
+- [x] Patient-written entries marked in the console's journal card
+- [x] The four-part shape is the admin feedback textarea's placeholder
+
+## The merge with `main`
+
+`patient-home-today` (#106), and the two lane PRs #108 and #109, landed while this run was in
+Build. Merging them in cost four resolutions:
+
+- **Migration renumbered by regenerating, not by hand.** `main` shipped its own `0017`, so both
+  meta files conflicted. The hand-written `0017_meal_entry_intent` was deleted, `main`'s meta
+  taken whole, and `pnpm db:generate` run for real — `node_modules` exists now, which it did not
+  when this run started. The result is `0018_greedy_mentallo`. That is exactly the remedy #109's
+  new `check-migration-order.mjs` prescribes, and the check passes.
+- **The meal copy had two homes.** #106 shipped `mealEntry: { title, lead, willEat, haveEaten,
+  comingSoon }`; this run had added a flat `mealEntryTitle` … `mealWriteErrors`. « Je vais manger »
+  was in the dictionary twice. Everything now sits in `mealEntry`, with `actions` (the verbs that
+  write) and `states` (how a written meal reads back) kept apart.
+- **`MealEntryPoint` was a dead control.** #106 shipped it inert with « Bientôt disponible. » and
+  said in its own comment that `meal-entry` would wire it. Leaving it would ship two labels that
+  ignore a tap next to a working form one segment away, and CONVENTIONS § Superseding deletes the
+  superseded forbids it. The labels are now links to Repas — #106's own framing, "the way in to
+  the meal loop" — so the operator's placement decision stands and there is still one form.
+- **`visibleSegments`** auto-merged cleanly; `repas` stays unconditionally present.
+
+## Notes for Release
+
+- **Nine service tests ride along**, written from the criteria: the default intent, a planned
+  entry, an intent outside the vocabulary, the flip keeping everything else, the one-way rule, a
+  flip of a never-planned or unknown row, an ordinary edit failing to move the intent, and
+  `mealEntryOwner` both ways. The UI composition is exempt per CONVENTIONS § Testing.
+- **The migration was hand-written.** It is the one artefact in this diff a generator normally
+  produces; the snapshot diff against 0016 is the check worth repeating.
+- **`apps/admin`'s two `today` call sites still read UTC** — parked as
+  `triage/console-today-is-utc.md` rather than absorbed. Morgane can correct both fields; the
+  patient cannot, which is why only the patient side moved.
+- The home's meal card changed from inert labels to links, which is a **shipped** surface
+  changing under #106's feet. It is the smallest resolution that leaves no dead control; putting
+  the form itself on the home is a `revise`, not a Build decision.
+- `visibleSegments` changed behaviour for a **shipped** segment. A patient with no meals now sees
+  « Repas » in their navigation where they did not before. That was forced by the placement
+  settled at Define, and the spec says so.
+
+## Release
+
+- gate: Ready to merge ticked — merge authorised
+- ci: GREEN on the head pushed at step 7 (ci-status.sh, full gate, after the last push)
+- reviews: code medium — 6 findings, 2 fixed in-ticket, 4 parked · security run — no findings at
+  confidence >= 8 (tenant scoping, ownership-check ordering, attribution forging, error oracle and
+  the `visibleSegments` change all traced and clean) · readiness n/a — the repo ships no
+  `/production-readiness` skill (`_shared/project-rules.md` → Capability skills: none yet). Its
+  substance was checked by hand instead: no new env vars, so `.icm/docs/ENV.md` is unchanged and
+  correct; migration 0018 is additive with a default, which Postgres applies as metadata only, so
+  it needs no table rewrite; the snapshot is drizzle-generated, so no index/schema mismatch. No
+  deploy-breaking finding.
+- parked: console-shows-no-meal-intent · patient-link-forms-have-no-pending-state ·
+  meal-flip-reports-failure-when-it-succeeded · home-meal-labels-do-not-carry-intent ·
+  patient-home-today-release-incomplete (plus console-today-is-utc, parked during Build)
+- docs: no docs impact — `business/roles` already describes the link as read-and-write and names
+  "the way in to the meal loop"; `link-writes` and #106 wrote those sentences ahead of this run,
+  and nothing on the page became false. · announce: public
+
+### The two review findings fixed in-ticket
+
+- **The form reset was backwards.** React resets an *uncontrolled* form itself once a function
+  action returns, success or failure both, so a refused write wiped the meal the patient had just
+  typed — while telling them to check it. The `if (!result.error)` guard around
+  `formRef.current?.reset()` never ran at all. The description is controlled state now, cleared on
+  success only, which is what the comment beside it had been claiming.
+- **Tap targets.** The two submit buttons (36px) and « Je l'ai mangé » (32px) sat under the 44px
+  every other control on `/p/[token]` holds, including the `ChoiceChip` directly above them.
+
+The other four are triage stubs, named above. The one worth reading before the next patient-loop
+run is `home-meal-labels-do-not-carry-intent`: the merge with #106 left both home labels pointing
+at the same URL, so « J'ai mangé » lands on a form whose primary button writes `planned`.

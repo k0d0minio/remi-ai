@@ -85,11 +85,14 @@ export type PatientLinkData = NonNullable<
 /**
  * Which segments this patient's record has something to show for.
  *
- * Home always appears — it carries the greeting even when nothing else is
- * written. A segment whose read came back empty appears in no navigation and
- * 404s at its own URL: a nav entry leading to an empty page and a reachable
- * empty page are the same broken product, and Morgane fills patients at her
- * own pace.
+ * A segment whose read came back empty appears in no navigation and 404s at
+ * its own URL: a nav entry leading to an empty page and a reachable empty page
+ * are the same broken product, and Morgane fills patients at her own pace.
+ *
+ * Two segments are exempt, and for the same reason — they are not waiting on
+ * her. Home carries the greeting. Repas carries « Je vais manger » / « J'ai
+ * mangé », so it is where the patient's first entry is written: hiding it
+ * until an entry exists would make the first one impossible to make.
  */
 export const visibleSegments = (
   data: PatientLinkData,
@@ -107,9 +110,7 @@ export const visibleSegments = (
   if (data.recipes.length > 0) {
     present.push("recettes");
   }
-  if (data.meals.length > 0) {
-    present.push("repas");
-  }
+  present.push("repas");
   return present;
 };
 
