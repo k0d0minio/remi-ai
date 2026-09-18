@@ -19,6 +19,22 @@ type Props = {
 };
 
 /**
+ * § 8's four parts, as the answer's suggested shape rather than four fields.
+ *
+ * A placeholder because it is a prompt, not a schema: she overwrites it with
+ * whatever the meal needs, and a meal that needs two lines gets two. What it
+ * buys is that her answers and the ones `ai-assist` will write into the same
+ * column arrive in the same order, so a patient reading their journal in
+ * December cannot tell which of them came from where by its shape.
+ */
+const MEAL_FEEDBACK_SHAPE = [
+  "Ce qui est bien :",
+  "Ce qui manque :",
+  "Une amélioration :",
+  "Pourquoi c'est important pour vous :",
+].join("\n");
+
+/**
  * One exchange, read as an exchange: the meal, what the person said about it,
  * and her answer beneath — not two lists to reconcile by eye.
  *
@@ -123,6 +139,15 @@ export const MealEntryItem = ({ entry }: Props) => {
             {mealSlotLabels[entry.slot]}
           </Badge>
         ) : null}
+        {/* Named by the act, not the person: a role label has to read right
+            for everyone who will ever hold it (apps/admin/AGENTS.md). Only the
+            patient writes through the link, so this says the same thing
+            without guessing at anyone's gender. */}
+        {entry.writtenBy === "patient" ? (
+          <Badge variant="info" tone="subtle" size="sm">
+            écrit depuis le lien
+          </Badge>
+        ) : null}
         {archived ? (
           <Badge variant="neutral" tone="subtle" size="sm">
             archivé
@@ -169,9 +194,10 @@ export const MealEntryItem = ({ entry }: Props) => {
             <Textarea
               id={`meal-feedback-${entry.id}`}
               name="feedback"
-              rows={3}
+              rows={4}
               maxLength={2000}
               defaultValue={entry.feedback}
+              placeholder={MEAL_FEEDBACK_SHAPE}
             />
           </Field>
 

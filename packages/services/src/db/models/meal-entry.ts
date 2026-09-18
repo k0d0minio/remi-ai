@@ -1,7 +1,14 @@
 import type { Entity, Id } from "../../types";
-import type { mealSlots, writtenByKinds } from "../../shared/patient";
+import type {
+  mealIntents,
+  mealSlots,
+  writtenByKinds,
+} from "../../shared/patient";
 
 export type MealSlot = (typeof mealSlots)[number];
+
+/** Whether the meal is still ahead or already behind — see `mealIntents`. */
+export type MealIntent = (typeof mealIntents)[number];
 
 /** Whose words a row holds — see `writtenByKinds`. */
 export type WrittenBy = (typeof writtenByKinds)[number];
@@ -39,4 +46,10 @@ export type MealEntry = Entity & {
   archivedAt: Date | null;
   /** Her transcription, or the patient's own entry through their link. */
   writtenBy: WrittenBy;
+  /**
+   * Written before the meal or after it. A planned entry is flipped in place
+   * once it has been eaten, so this is the row's current state and not a
+   * record of how it started.
+   */
+  intent: MealIntent;
 };

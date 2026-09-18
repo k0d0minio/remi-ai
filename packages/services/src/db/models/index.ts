@@ -17,7 +17,7 @@ export type {
 } from "./food";
 export type { Operator, OperatorRole } from "./operator";
 export type { OperatorInvitation } from "./operator-invitation";
-export type { MealEntry, MealSlot } from "./meal-entry";
+export type { MealEntry, MealIntent, MealSlot } from "./meal-entry";
 export type { NutritionRule } from "./nutrition-rule";
 export type { PantryEssential } from "./pantry-essential";
 export type {

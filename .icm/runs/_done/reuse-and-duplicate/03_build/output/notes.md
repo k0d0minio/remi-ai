@@ -11,7 +11,7 @@
   paths need it: the copy picker blanks on the **server**, so another patient's wording never
   reaches the browser at all, and « Enregistrer comme modèle » blanks in the **browser**, into the
   preview she adapts. Exported from `/shared`.
-- `packages/services/src/db/schema.ts` + `migrations/0018_rapid_lizard.sql`: one new table,
+- `packages/services/src/db/schema.ts` + `migrations/0019_boring_ultimo.sql`: one new table,
   `protocol_templates` (operator_id, kind, name, rows jsonb, shared, timestamps). The generated
   migration touches nothing else, which is criterion 9's second half.
 - `packages/services/src/db/models/protocol-template.ts` (new): `rows` is typed `unknown` on the
@@ -104,13 +104,14 @@ to match the test shape.
 ## Release
 
 - gate: Ready to merge ticked — merge authorised
-- ci: GREEN on `8d2d4b0` (the last code-bearing head); re-settled with `ci-status.sh` after the
-  close-out push, which is the verdict that authorised the merge
+- ci: GREEN — settled with `ci-status.sh` on the close-out head `ada7579`, then re-settled after
+  `main` moved again mid-stage (PR #110) and the migration was regenerated as `0019`; the last of
+  those is the verdict that authorised the merge
 - reviews: code high (5 findings, all fixed on the branch) · security run — no findings at or above
   the confidence threshold · readiness run by hand — no `/production-readiness` skill exists in this
   session, so its three checks were done directly: no new env var in the diff (no `process.env`,
   `env()` or `requireEnv()` added, so no ENV.md / `turbo.json` / Vercel edit is owed), the migration
-  is additive and carries no `down` (up-only is the repo-wide convention, 0000–0018), and the
+  is additive and carries no `down` (up-only is the repo-wide convention, 0000–0019), and the
   migration agrees with `schema.ts` because drizzle generated it from it
 - parked: `env-preview-migrations-row-is-stale` · `protocol-template-name-unique-index`
 - docs: `business/roles` § Operator — the reuse paths, the factual/personal rule and the audit
@@ -127,6 +128,27 @@ section's form (`type="button"` does not cover implicit submission); the overwri
 derived from a template list that might not have loaded, so a failed load would replace a set
 silently; the template save bypassed its pending state and could insert twice; and the picker's
 empty state reported a filter that matched nothing as an empty roster.
+
+### It happened a second time, and that is what made the migration idempotent
+
+`main` moved again during Release — PR #110 merged and landed its own `0018`, so this branch's
+`0018` was regenerated as `0019`, the same procedure as before. What is different the second time
+is the state of the database: the withdrawn `0018` had **already created `protocol_templates` in
+the shared database** from a preview build, so a plain `CREATE TABLE` in `0019` would have failed
+here while succeeding on a fresh database.
+
+`0019` is therefore **hand-edited to be idempotent** — `CREATE TABLE IF NOT EXISTS` plus a
+`duplicate_object`-guarded `ADD CONSTRAINT`. That is the repair `scripts/migrate.mjs` names in its
+own error text for exactly this case: a new migration, past the high-water mark, that no-ops
+wherever the object already exists. It is correct on production (no-op), on a fresh database
+(creates), and on a Neon branch, which is why it was preferred over dropping the table by hand a
+second time — the drop only works until `main` moves again, and it moved three times during this
+run.
+
+The snapshot `0019` was generated against is untouched, so the next `db:generate` still diffs
+cleanly. One residue worth knowing: production's `__drizzle_migrations` still carries a row for the
+withdrawn `0018_rapid_lizard` tag. Drizzle compares `created_at`, never the tag or the hash, so it
+is inert — but it is why the `triage/env-preview-migrations-row-is-stale` stub matters.
 
 ### A correction to this file's own Notes for Release
 

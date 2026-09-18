@@ -1,0 +1,1 @@
+ALTER TABLE "patient_meal_entries" ADD COLUMN "intent" text DEFAULT 'eaten' NOT NULL;
