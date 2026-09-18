@@ -2,7 +2,7 @@
 
 - slug: nutrition-rules
 - apps: admin, packages
-- touches: packages/services/src/db/schema.ts, packages/services/src/db/migrations, packages/services/src/db/models/nutrition-rule.ts, packages/services/src/db/models/index.ts, packages/services/src/db/services/nutrition-rules, packages/services/src/db/adapters/neon.ts, packages/services/src/server/index.ts, packages/services/src/shared/index.ts, packages/services/src/shared/audit.ts, packages/services/src/shared/nutrition.ts, packages/ui/src/server/markdown.tsx, packages/ui/src/server.ts, packages/ui/package.json, pnpm-workspace.yaml, apps/admin/app/(admin)/knowledge, apps/admin/components/knowledge, apps/admin/components/shell/nav-sections.ts, apps/admin/components/audit/vocabulary.ts, apps/admin/lib/knowledge/actions.ts
+- touches: packages/services/src/db/schema.ts, packages/services/src/db/migrations, packages/services/src/db/models/nutrition-rule.ts, packages/services/src/db/models/index.ts, packages/services/src/db/services/nutrition-rules, packages/services/src/db/adapters/neon.ts, packages/services/src/server/index.ts, packages/services/src/shared/index.ts, packages/services/src/shared/audit.ts, packages/services/src/shared/nutrition-rules.ts, packages/ui/src/server/markdown.tsx, packages/ui/src/server.ts, packages/ui/package.json, pnpm-workspace.yaml, apps/admin/app/(admin)/knowledge, apps/admin/components/knowledge, apps/admin/components/shell/nav-sections.ts, apps/admin/components/audit/vocabulary.ts, apps/admin/lib/knowledge/actions.ts
 - complexity: complex
 - demo: none
 

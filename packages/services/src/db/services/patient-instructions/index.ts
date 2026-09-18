@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
-import { getDatabase } from "../../client";
+import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientInstruction } from "../../models/patient-instruction";
 import { touchPatient } from "../patients";
 
@@ -19,8 +19,9 @@ import { touchPatient } from "../patients";
  * generation prompt's practitioner line: a new reader, not a new table.
  */
 
-const instructions = () =>
-  getDatabase().collection<PatientInstruction>("patient_instructions");
+/** On the pooled client, or on a transaction when one is handed in. */
+const instructions = (db: DatabaseClient = getDatabase()) =>
+  db.collection<PatientInstruction>("patient_instructions");
 
 const uuidSchema = z.uuid();
 
@@ -28,19 +29,21 @@ const bodySchema = z.string().trim().max(2000);
 
 const allForPatient = async (
   patientId: Id,
+  db?: DatabaseClient,
 ): Promise<readonly PatientInstruction[]> => {
   if (!uuidSchema.safeParse(patientId).success) {
     return [];
   }
-  const page = await instructions().findMany({ patientId }, { limit: 200 });
+  const page = await instructions(db).findMany({ patientId }, { limit: 200 });
   return page.items;
 };
 
 /** The consigne in force, or `null` when she has not written one. */
 export const getPatientInstruction = async (
   patientId: Id,
+  db?: DatabaseClient,
 ): Promise<PatientInstruction | null> => {
-  const active = (await allForPatient(patientId)).filter(
+  const active = (await allForPatient(patientId, db)).filter(
     (instruction) => instruction.archivedAt === null,
   );
   if (active.length === 0) {
@@ -74,6 +77,7 @@ export const listArchivedPatientInstructions = async (
 export const setPatientInstruction = async (
   patientId: Id,
   body: string,
+  db?: DatabaseClient,
 ): Promise<Result<PatientInstruction | null>> => {
   if (!uuidSchema.safeParse(patientId).success) {
     return err("not_found", "no such patient");
@@ -83,7 +87,7 @@ export const setPatientInstruction = async (
     return err("invalid_input", parsed.error.issues[0].message);
   }
 
-  const current = await getPatientInstruction(patientId);
+  const current = await getPatientInstruction(patientId, db);
 
   // Saving the same words is not a replacement. Without this, re-saving an
   // untouched textarea would archive the row, insert an identical one, and
@@ -93,22 +97,22 @@ export const setPatientInstruction = async (
   }
 
   if (current) {
-    await instructions().update(current.id, { archivedAt: new Date() });
+    await instructions(db).update(current.id, { archivedAt: new Date() });
   }
 
   if (parsed.data === "") {
     if (current) {
-      await touchPatient(patientId);
+      await touchPatient(patientId, db);
     }
     return ok(null);
   }
 
-  const created = await instructions().insert({
+  const created = await instructions(db).insert({
     patientId,
     body: parsed.data,
     archivedAt: null,
   });
-  await touchPatient(patientId);
+  await touchPatient(patientId, db);
   return ok(created);
 };
 

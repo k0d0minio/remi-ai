@@ -3,7 +3,7 @@ import {
   nutritionRuleKinds,
   type NutritionRuleKind,
   type NutritionRuleStatus,
-} from "../../../shared/nutrition";
+} from "../../../shared/nutrition-rules";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase } from "../../client";

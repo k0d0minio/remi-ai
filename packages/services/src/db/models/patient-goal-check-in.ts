@@ -1,5 +1,6 @@
 import type { Entity, Id } from "../../types";
 import type { goalDirections } from "../../shared/patient";
+import type { WrittenBy } from "./meal-entry";
 
 /** How a goal moved since the last check-in — § D's mieux / stable / moins bien. */
 export type GoalDirection = (typeof goalDirections)[number];
@@ -23,4 +24,6 @@ export type PatientGoalCheckIn = Entity & {
   /** The simple measure on the day — "4/10". Free text, never a scale. */
   measure: string;
   note: string;
+  /** Her consultation check-in, or the patient's own answer through the link. */
+  writtenBy: WrittenBy;
 };

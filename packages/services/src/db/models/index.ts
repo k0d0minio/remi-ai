@@ -8,6 +8,13 @@
 
 export type { AuditAction, AuditEvent } from "./audit-event";
 export type { Consultation } from "./consultation";
+export type {
+  CiqualImport,
+  ConfidenceCode,
+  Food,
+  FoodNutrient,
+  NutrientMarker,
+} from "./food";
 export type { Operator, OperatorRole } from "./operator";
 export type { OperatorInvitation } from "./operator-invitation";
 export type { MealEntry, MealSlot } from "./meal-entry";

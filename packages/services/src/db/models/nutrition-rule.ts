@@ -1,7 +1,7 @@
 import type {
   NutritionRuleKind,
   NutritionRuleStatus,
-} from "../../shared/nutrition";
+} from "../../shared/nutrition-rules";
 import type { Entity, Id } from "../../types";
 
 /**
@@ -27,7 +27,7 @@ export type NutritionRule = Entity & {
   title: string;
   /** Markdown, stored raw — it is what a prompt will paste verbatim. */
   body: string;
-  /** Free text, normalised, no taxonomy. See `shared/nutrition.ts`. */
+  /** Free text, normalised, no taxonomy. See `shared/nutrition-rules.ts`. */
   tags: string[];
   kind: NutritionRuleKind;
   status: NutritionRuleStatus;

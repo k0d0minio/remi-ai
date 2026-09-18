@@ -13,6 +13,13 @@ type Props = {
   variant?: "primary" | "secondary" | "outline" | "ghost";
   size?: "sm" | "md" | "lg";
   className?: string;
+  /**
+   * Fired after the clipboard write succeeded, never when it was denied. It is
+   * the only way a caller can tell the two apart, since the failure is
+   * swallowed here on purpose — a caller that records or reports a copy must
+   * not record one that did not happen.
+   */
+  onCopied?: () => void;
 };
 
 /** How long the confirmation stays up before the button reads as itself again. */
@@ -38,6 +45,7 @@ export const CopyButton = ({
   variant = "outline",
   size = "sm",
   className,
+  onCopied,
 }: Props) => {
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -54,16 +62,21 @@ export const CopyButton = ({
   );
 
   const copy = async () => {
+    // Only the write is guarded. Everything after it runs on the success path,
+    // so a caller's `onCopied` throwing is not mistaken for a denied clipboard
+    // and swallowed — which would defeat the one thing that prop is for.
     try {
       await navigator.clipboard.writeText(value);
-      setCopied(true);
-      if (timer.current) {
-        clearTimeout(timer.current);
-      }
-      timer.current = setTimeout(() => setCopied(false), CONFIRMATION_MS);
     } catch {
       // Clipboard access denied — the value stays selectable beside the button.
+      return;
     }
+    setCopied(true);
+    if (timer.current) {
+      clearTimeout(timer.current);
+    }
+    timer.current = setTimeout(() => setCopied(false), CONFIRMATION_MS);
+    onCopied?.();
   };
 
   return (

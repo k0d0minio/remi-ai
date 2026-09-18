@@ -9,7 +9,7 @@ import {
 } from "../../../shared/patient";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
-import { getDatabase } from "../../client";
+import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientProfile } from "../../models/patient-profile";
 
 /**
@@ -19,8 +19,15 @@ import type { PatientProfile } from "../../models/patient-profile";
  * names the driver.
  */
 
-const patients = () =>
-  getDatabase().collection<PatientProfile>("patient_profiles");
+/**
+ * The collection, on the pooled client by default or on a transaction when one
+ * is handed in. Every write below takes that client as a trailing optional
+ * argument for the same reason: `recordConsultation` composes several of them
+ * into one unit, and a service that can only reach `getDatabase()` cannot be
+ * part of a transaction someone else opened.
+ */
+const patients = (db: DatabaseClient = getDatabase()) =>
+  db.collection<PatientProfile>("patient_profiles");
 
 /** 24 random bytes, base64url — an unguessable capability, not a session. */
 const newShareToken = () => randomBytes(24).toString("base64url");
@@ -168,11 +175,14 @@ export const listPatients = async (
     .sort(sorters[query.sort ?? "recent"]);
 };
 
-export const getPatient = async (id: Id): Promise<Result<PatientProfile>> => {
+export const getPatient = async (
+  id: Id,
+  db?: DatabaseClient,
+): Promise<Result<PatientProfile>> => {
   if (!isValidId(id)) {
     return err("not_found", "no such patient");
   }
-  const patient = await patients().findById(id);
+  const patient = await patients(db).findById(id);
   return patient ? ok(patient) : err("not_found", "no such patient");
 };
 
@@ -227,6 +237,7 @@ export const createPatient = async (
     lastEditedAt: new Date(),
     shareToken: newShareToken(),
     linkLastOpenedAt: null,
+    linkLastWroteAt: null,
   });
   return ok(patient);
 };
@@ -273,11 +284,14 @@ export const updatePatient = async (
  * IS working on that patient — and the roster's ordering is only useful if it
  * says so.
  */
-export const touchPatient = async (id: Id): Promise<void> => {
+export const touchPatient = async (
+  id: Id,
+  db?: DatabaseClient,
+): Promise<void> => {
   if (!isValidId(id)) {
     return;
   }
-  await patients().update(id, { lastEditedAt: new Date() });
+  await patients(db).update(id, { lastEditedAt: new Date() });
 };
 
 /** How stale the recorded value has to be before opening the link rewrites it. */
@@ -306,6 +320,50 @@ export const recordPatientLinkOpened = async (id: Id): Promise<void> => {
   await patients().update(id, { linkLastOpenedAt: new Date() });
 };
 
+/**
+ * Puts back the roster timestamp a patient's write moved.
+ *
+ * The console services bump `lastEditedAt` on every write, correctly: encoding
+ * a protocol entry IS working on that patient. A patient writing through their
+ * own link is not, and the later stubs of `patient-loop` reach those same
+ * services — so the rule is enforced once, where every patient write passes,
+ * rather than five times in five callers that each have to remember it.
+ *
+ * It compares before it writes, so a write that never touched the column costs
+ * nothing. An operator edit landing inside the same few milliseconds would be
+ * put back a second early; with one practitioner and a roster of fifteen that
+ * is a stale sort order nobody sees, and the alternative — a patient's meal
+ * jumping their record above the one she spent the morning on — is the failure
+ * that would actually be noticed.
+ */
+export const restorePatientLastEdited = async (
+  id: Id,
+  previous: Date,
+): Promise<void> => {
+  const patient = await patients().findById(id);
+  if (!patient || patient.lastEditedAt.getTime() === previous.getTime()) {
+    return;
+  }
+  await patients().update(id, { lastEditedAt: previous });
+};
+
+/**
+ * Records that the patient wrote through their link. Unlike the open above it
+ * is not rate-limited and never skipped: a write is already ceilinged by
+ * `writeThroughPatientLink`, and this is the timestamp Morgane reads to know
+ * something is waiting for her — a stale one would be worse than none.
+ *
+ * It never touches `lastEditedAt` either. The roster sorts on that, and it
+ * means she worked on this patient; a patient logging a meal must not push
+ * their own record above the one she spent the morning encoding.
+ */
+export const recordPatientLinkWrote = async (id: Id): Promise<void> => {
+  if (!isValidId(id)) {
+    return;
+  }
+  await patients().update(id, { linkLastWroteAt: new Date() });
+};
+
 /** Cuts off the old link — the recovery move when a share URL leaks. */
 export const regenerateShareToken = async (
   id: Id,
@@ -316,6 +374,7 @@ export const regenerateShareToken = async (
   const patient = await patients().update(id, {
     shareToken: newShareToken(),
     linkLastOpenedAt: null,
+    linkLastWroteAt: null,
     lastEditedAt: new Date(),
   });
   return patient ? ok(patient) : err("not_found", "no such patient");
@@ -330,6 +389,7 @@ export const regenerateShareToken = async (
 export const setPatientNextConsultationPrep = async (
   id: Id,
   value: string,
+  db?: DatabaseClient,
 ): Promise<Result<PatientProfile>> => {
   if (!isValidId(id)) {
     return err("not_found", "no such patient");
@@ -339,7 +399,7 @@ export const setPatientNextConsultationPrep = async (
     return err("invalid_input", "that note is too long");
   }
   const prep = parsed.data === "" ? null : parsed.data;
-  const patient = await patients().update(id, {
+  const patient = await patients(db).update(id, {
     nextConsultationPrep: prep,
     lastEditedAt: new Date(),
   });

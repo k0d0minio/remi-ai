@@ -1,5 +1,6 @@
 import {
   BookOpen,
+  Carrot,
   ChefHat,
   Home,
   ScrollText,
@@ -22,7 +23,7 @@ export type NavSection = {
 };
 
 /**
- * The console's whole surface. It is deliberately five rows: this console is
+ * The console's whole surface. It is deliberately six rows: this console is
  * Morgane's patient tool and the accounts that reach it, and nothing else. The
  * practitioner, pilot, support and flag screens that used to live here were
  * fixtures with no data behind them — they were deleted rather than hidden.
@@ -43,8 +44,11 @@ export const navSections: readonly NavSection[] = [
       // Beside Patients rather than under one: the library belongs to no
       // patient, which is the whole reason it is a library.
       { href: "/recipes", label: "Recettes", icon: ChefHat },
-      // Beside the library for the same reason: the nutrition corpus belongs to
-      // no patient either. It is what REMI knows, not what anyone was told.
+      // Reference data rather than a patient's: the CIQUAL table, read-only,
+      // so a number the recipe step will use can be checked by hand.
+      { href: "/aliments", label: "Aliments", icon: Carrot },
+      // Beside them for the same reason: the nutrition corpus belongs to no
+      // patient either. It is what REMI knows, not what anyone was told.
       { href: "/knowledge", label: "Connaissances", icon: BookOpen },
     ],
   },

@@ -21,6 +21,42 @@ export type { Collection, DatabaseClient } from "./client";
  */
 export { createNeonDatabase } from "./adapters/neon";
 
+/**
+ * The CIQUAL surface. The query half is re-exported through `/server` for the
+ * console; the parsing half is not — its only consumers are the maintenance
+ * scripts under `scripts/`, which import this entry from `dist/`.
+ */
+export {
+  getCiqualImport,
+  getFood,
+  getFoodNutrients,
+  listFoodGroups,
+  rankFoodsByComponent,
+  refreshFoodCatalogue,
+  searchFoods,
+} from "./services/foods";
+export type { FoodSearch, RankQuery, RankedFood } from "./services/foods";
+
+export {
+  checkComponents,
+  parseCiqualExport,
+  parseComponents,
+  parseFoods,
+  parseNutrients,
+  parseTeneur,
+  readField,
+  readRecords,
+  splitComponentName,
+} from "./services/foods/ciqual";
+export type {
+  CiqualComponent,
+  CiqualExport,
+  CiqualSourceText,
+  ParsedFood,
+  ParsedNutrient,
+  ParsedValue,
+} from "./services/foods/ciqual";
+
 export {
   createPatient,
   deletePatient,
@@ -33,10 +69,22 @@ export {
 } from "./services/patients";
 export type { PatientInput } from "./services/patients";
 
+export { writeThroughPatientLink } from "./services/patient-link-writes";
+export type { PatientLinkWriteRequest } from "./services/patient-link-writes";
+
 export {
   listPatientAnamnesis,
   setPatientAnamnesis,
 } from "./services/patient-anamnesis";
+
+export {
+  describeConsultation,
+  recordConsultation,
+} from "./services/consultations";
+export type {
+  ConsultationInput,
+  ConsultationRecord,
+} from "./services/consultations";
 
 export {
   addGoalCheckIn,

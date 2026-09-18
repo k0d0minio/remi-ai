@@ -1,4 +1,4 @@
-CREATE TABLE "nutrition_rules" (
+CREATE TABLE IF NOT EXISTS "nutrition_rules" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" text NOT NULL,
 	"body" text DEFAULT '' NOT NULL,
@@ -29,7 +29,12 @@ CREATE TABLE "nutrition_rules" (
 -- `.icm/docs/braindump/` holds no nutrition content at all; the sources below
 -- are the whole of what there was to seed.
 --
--- Guarded on an empty table so a manual re-apply cannot duplicate the corpus.
+-- This migration is idempotent on both statements — CREATE TABLE IF NOT EXISTS
+-- above, and the guard below. It replaces an earlier attempt numbered 0013,
+-- which collided with `0013_gray_charles_xavier` on main and carried a `when`
+-- 42 seconds older than it; drizzle compares that timestamp against the newest
+-- applied migration and never revisits what it has passed, so the older one was
+-- skipped while reporting success. See `.icm/intake/triage/parallel-migrations-journal-ordering.md`.
 INSERT INTO "nutrition_rules" ("title", "body", "tags", "kind", "status")
 SELECT * FROM (VALUES
   (

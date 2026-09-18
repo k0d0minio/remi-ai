@@ -12,6 +12,7 @@ export {
   formatCurrency,
   formatDate,
   formatDateTime,
+  formatNumber,
   initials,
 } from "./format";
 export {
@@ -25,8 +26,8 @@ export type { Locale } from "./i18n";
 export { auditActions } from "./audit";
 export type { AuditActionName } from "./audit";
 export { appHref, appOrigin } from "./links";
-export { nutritionRuleKinds, nutritionRuleStatuses } from "./nutrition";
-export type { NutritionRuleKind, NutritionRuleStatus } from "./nutrition";
+export { nutritionRuleKinds, nutritionRuleStatuses } from "./nutrition-rules";
+export type { NutritionRuleKind, NutritionRuleStatus } from "./nutrition-rules";
 export type { AppKey } from "./links";
 export { canManageOperators, isAtLeast, operatorRoles } from "./operator";
 export type { OperatorRoleName } from "./operator";
@@ -40,6 +41,14 @@ export {
   patientStatuses,
   recommendationCategories,
 } from "./patient";
+export {
+  componentsForRecommendation,
+  normaliseNutritionText,
+  nutrientComponentByKey,
+  nutrientComponents,
+} from "./nutrition";
+export type { NutrientComponent, NutrientDirection } from "./nutrition";
+export { variantTitle, VARIANT_SUFFIX } from "./recipe";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
 export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";
@@ -53,15 +62,20 @@ export type {
   AssignedRecipe,
   AuditAction,
   AuditEvent,
+  CiqualImport,
+  ConfidenceCode,
   ConsentChannel,
   Consultation,
   CookingAffinity,
+  Food,
+  FoodNutrient,
   FramePrinciple,
   GenotypeMarker,
   GoalDirection,
   HabitsProfile,
   MealEntry,
   MealSlot,
+  NutrientMarker,
   NutritionRule,
   OperatorRole,
   PantryEssential,
@@ -98,3 +112,30 @@ export type {
   StepStatus,
   TherapeuticFrame,
 } from "../db/models";
+
+/**
+ * The patient context block, from `../ai/context`.
+ *
+ * It lives under `ai/` because it is the block every prompt there opens with,
+ * and it is re-exported here because it is genuinely isomorphic: the function
+ * imports nothing, so the console can re-assemble the text in the browser as
+ * the operator edits the preamble and toggles blocks. Reaching it through
+ * `/ai` from a client component would instead pull the provider seam — and,
+ * once an adapter exists, a vendor — into the browser bundle.
+ */
+export {
+  DEFAULT_CONTEXT_PREAMBLE,
+  contextBlocks,
+  defaultContextBlocks,
+  patientContextText,
+} from "../ai/context";
+export type {
+  ContextBlock,
+  ContextEssential,
+  ContextGoal,
+  ContextProfile,
+  ContextRecommendationGroup,
+  ContextSupplement,
+  PatientContextInput,
+  PatientContextOptions,
+} from "../ai/context";

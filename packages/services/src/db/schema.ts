@@ -1,12 +1,14 @@
 import {
   date,
   doublePrecision,
+  index,
   integer,
   pgTable,
   text,
   timestamp,
   unique,
   uuid,
+  type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -126,6 +128,19 @@ export const patientProfiles = pgTable("patient_profiles", {
    * actually asks of it — did they look — without a page-view table behind it.
    */
   linkLastOpenedAt: timestamp("link_last_opened_at", {
+    withTimezone: true,
+    mode: "date",
+  }),
+  /**
+   * When the patient last WROTE through the link, which is a different fact
+   * from having opened it and one Morgane acts on differently: a page that was
+   * read tells her nothing happened yet, a page that was written into is a
+   * meal or a check-in waiting for her. Deliberately not `last_edited_at` —
+   * that column means she worked on this patient and sorts her roster, and a
+   * patient logging a meal must not push their own record above the one she
+   * spent the morning encoding.
+   */
+  linkLastWroteAt: timestamp("link_last_wrote_at", {
     withTimezone: true,
     mode: "date",
   }),
@@ -295,6 +310,13 @@ export const patientGoalCheckIns = pgTable("patient_goal_check_ins", {
   /** The simple measure on the day — "4/10", "presque plus de réveils". */
   measure: text("measure").notNull().default(""),
   note: text("note").notNull().default(""),
+  /**
+   * A key from `writtenByKinds`. Morgane's consultation check-in and the
+   * patient's own in-page answer share this table, and the console needs to
+   * tell them apart; the default is what every row predating the link's write
+   * path was.
+   */
+  writtenBy: text("written_by").notNull().default("practitioner"),
   ...timestamps,
 });
 
@@ -411,6 +433,19 @@ export const recipes = pgTable("recipes", {
    * archives and never deletes — the restrict below is what enforces it.
    */
   archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  /**
+   * Where a variant came from. Null for a recipe written from scratch, and for
+   * every row that predates the column — provenance is not reconstructible, so
+   * a blank here means "unknown", never "original".
+   *
+   * `restrict` for the same reason the assignment's recipe FK is: the library
+   * never deletes, and a row that other rows point back to is exactly the kind
+   * the rule exists for. The self-reference needs the `AnyPgColumn` annotation
+   * because the table is still being defined at this point.
+   */
+  variantOfId: uuid("variant_of_id").references((): AnyPgColumn => recipes.id, {
+    onDelete: "restrict",
+  }),
   ...timestamps,
 });
 
@@ -501,6 +536,13 @@ export const patientMealEntries = pgTable("patient_meal_entries", {
   learning: text("learning").notNull().default(""),
   /** Archive, never delete: a meal she answered stays in the record. */
   archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  /**
+   * A key from `writtenByKinds` — her transcription, or the patient's own
+   * entry through the link. `description` is prose either way, so without this
+   * column nothing downstream can tell whose words they are, and the AI round
+   * has to.
+   */
+  writtenBy: text("written_by").notNull().default("practitioner"),
   ...timestamps,
 });
 
@@ -574,6 +616,13 @@ export const operatorInvitations = pgTable("operator_invitations", {
  */
 export const auditEvents = pgTable("audit_events", {
   id: uuid("id").primaryKey().defaultRandom(),
+  /**
+   * A key from `auditActorKinds`. Explicit rather than inferred: a patient
+   * writing through their link has no account and so no email, and an empty
+   * email is exactly what a system write leaves too. The default is what every
+   * row written before the link accepted writes was.
+   */
+  actorKind: text("actor_kind").notNull().default("operator"),
   actorId: uuid("actor_id"),
   actorEmail: text("actor_email").notNull().default(""),
   actorName: text("actor_name").notNull().default(""),
@@ -583,6 +632,114 @@ export const auditEvents = pgTable("audit_events", {
   /** How the target read at the time — a pseudonym, an email, a title. */
   targetLabel: text("target_label").notNull().default(""),
   detail: text("detail").notNull().default(""),
+  ...timestamps,
+});
+
+/**
+ * CIQUAL — ANSES's food-composition table, imported as reference data.
+ *
+ * Not patient data: no care-relationship scoping, no audit trail, no cascade.
+ * It is a public dataset (Etalab 2.0) that the recipe step queries, and the
+ * three tables below are shaped by the one constraint the storage seam imposes:
+ * `Collection.findMany` takes an exact-match filter and nothing else, so there
+ * is no join to lean on. Group and component names are therefore denormalised
+ * onto the rows that display them. That is the seam's shape, not a shortcut.
+ */
+export const foods = pgTable("foods", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  /** CIQUAL's own `alim_code` — the natural key the import upserts on. */
+  code: text("code").notNull().unique(),
+  nameFr: text("name_fr").notNull(),
+  nameEn: text("name_en").notNull().default(""),
+  /**
+   * `name_fr` lowercased with its accents stripped. Search matches on this
+   * rather than on a Postgres collation or the `unaccent` extension, so the
+   * in-memory client the service tests run against behaves identically to Neon
+   * — the seam is only honest if both sides answer the same question.
+   */
+  searchName: text("search_name").notNull(),
+  groupCode: text("group_code").notNull(),
+  groupNameFr: text("group_name_fr").notNull(),
+  subGroupCode: text("sub_group_code").notNull().default(""),
+  subGroupNameFr: text("sub_group_name_fr").notNull().default(""),
+  ...timestamps,
+});
+
+/**
+ * One food's value for one component, per 100 g.
+ *
+ * CIQUAL's `teneur` is not always a number: 83 246 cells read `-` (not
+ * determined), 2 514 read `traces`, and some seventeen thousand read `< x`
+ * (below the limit of quantification). Coercing those to 0 would silently rank
+ * an unmeasured food alongside a measured one, so the marker is stored beside
+ * the value and `raw_value` keeps the publisher's own string.
+ */
+export const foodNutrients = pgTable(
+  "food_nutrients",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** CIQUAL's `alim_code`, not our uuid — the importer works in CIQUAL's keys. */
+    foodCode: text("food_code").notNull(),
+    componentCode: text("component_code").notNull(),
+    componentNameFr: text("component_name_fr").notNull(),
+    unit: text("unit").notNull().default(""),
+    /** Null when the marker is `not_determined` — absent, not zero. */
+    value: doublePrecision("value"),
+    /** `exact` | `traces` | `less_than` | `not_determined`. */
+    marker: text("marker").notNull().default("exact"),
+    rawValue: text("raw_value").notNull().default(""),
+    /** CIQUAL's confidence code: A, B, C or D. */
+    confidence: text("confidence").notNull().default(""),
+    ...timestamps,
+  },
+  (table) => [
+    unique().on(table.foodCode, table.componentCode),
+    // A rank reads one component's column across every food — 3 484 rows out
+    // of 257 816. Without this it is a sequential scan per ranked component.
+    index().on(table.componentCode),
+  ],
+);
+
+/**
+ * One row per run of the import script: which edition landed, how much of it,
+ * and the checksums of the files it came from.
+ *
+ * The console reads the newest row to say « N aliments importés », and the
+ * checksums are what tells a later operator whether the database holds the
+ * export they have in their hands.
+ */
+export const ciqualImports = pgTable("ciqual_imports", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  /** The publisher's edition label, e.g. "Ciqual 2025". */
+  edition: text("edition").notNull(),
+  foodCount: integer("food_count").notNull().default(0),
+  nutrientCount: integer("nutrient_count").notNull().default(0),
+  /** `<file>:<sha256>` per source file, newline-separated. */
+  sourceChecksums: text("source_checksums").notNull().default(""),
+  ...timestamps,
+});
+
+/**
+ * One row per write accepted through a patient link — the ledger the per-token
+ * rate limit counts.
+ *
+ * A ledger rather than a counter column because the limit is a ROLLING window:
+ * a counter with a window start resets at a boundary, so ten writes at 10:59
+ * and ten more at 11:00 pass a "ten per hour" rule that means nothing. Counting
+ * rows inside the window has no such edge, and the table stays small because
+ * every accepted write prunes what has fallen out of the longest window — the
+ * day ceiling is also the row ceiling, about a hundred per patient.
+ *
+ * It holds when, and nothing else: no body, no action, no address. What was
+ * written is the row the write created, and who did it is the audit trail —
+ * duplicating either here would be a second copy of health data whose only job
+ * is arithmetic.
+ */
+export const patientLinkWrites = pgTable("patient_link_writes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
   ...timestamps,
 });
 
