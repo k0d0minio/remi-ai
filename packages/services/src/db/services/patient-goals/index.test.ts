@@ -171,6 +171,11 @@ describe("goal check-ins", () => {
       "2026-09-01",
       "2026-08-01",
     ]);
+    // Her consultation check-in. The patient's own in-page answer shares this
+    // table and is told apart by this column.
+    expect(trail.every((entry) => entry.writtenBy === "practitioner")).toBe(
+      true,
+    );
     expect(trail[0].measure).toBe("6/10");
     expect(trail[2].direction).toBeNull();
   });

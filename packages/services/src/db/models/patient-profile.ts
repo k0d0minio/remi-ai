@@ -70,4 +70,10 @@ export type PatientProfile = Entity & {
   /** The unguessable capability in the shareable patient link. */
   shareToken: string;
   linkLastOpenedAt: Date | null;
+  /**
+   * When the patient last wrote through the link. Null means they have read it
+   * or never opened it — "they looked" and "they answered" are different facts,
+   * and only the second one is waiting for Morgane.
+   */
+  linkLastWroteAt: Date | null;
 };

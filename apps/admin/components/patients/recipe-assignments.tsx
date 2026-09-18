@@ -4,6 +4,8 @@ import { RecipeAssignmentItem } from "@/components/patients/recipe-assignment-it
 type Props = {
   /** Already ordered by the service — newest giving first. */
   entries: readonly AssignedRecipe[];
+  /** Today, for the date a variant is given on. Resolved on the server. */
+  today: string;
 };
 
 /**
@@ -11,10 +13,14 @@ type Props = {
  * recorded as the dates on these rows, so no week grouping is derived here and
  * none is stored.
  */
-export const RecipeAssignments = ({ entries }: Props) => (
+export const RecipeAssignments = ({ entries, today }: Props) => (
   <ul className="flex flex-col gap-3">
     {entries.map((entry) => (
-      <RecipeAssignmentItem key={entry.assignment.id} entry={entry} />
+      <RecipeAssignmentItem
+        key={entry.assignment.id}
+        entry={entry}
+        today={today}
+      />
     ))}
   </ul>
 );

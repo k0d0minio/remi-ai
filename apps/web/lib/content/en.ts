@@ -313,7 +313,7 @@ export const en: Content = {
     },
     privacy: {
       title: "Your data and this link",
-      body: "This page shows only what your practitioner recorded for you. It does not appear in search engines, but it opens without a password — anyone holding the link can read it, so pass it on only to people you choose. To see, correct or have your data deleted, write to your practitioner: nobody else has access.",
+      body: "This page shows what your practitioner recorded for you, and what you write here yourself. What you write is kept, attached to your link and read by your practitioner — that is what lets them follow you between consultations. The page does not appear in search engines, but it opens without a password: anyone holding the link can read it and write here as you, so pass it on only to people you choose. To see, correct or have your data deleted, or to get a new link, write to your practitioner: nobody else has access.",
     },
     betaNote:
       "REMI is in beta — feedback is welcome, tell us what is missing or in the way.",

@@ -36,6 +36,9 @@ export type {
   PatientSort,
 } from "../db/services/patients";
 
+export { writeThroughPatientLink } from "../db/services/patient-link-writes";
+export type { PatientLinkWriteRequest } from "../db/services/patient-link-writes";
+
 export {
   addGoalCheckIn,
   addPatientGoal,
@@ -74,9 +77,13 @@ export {
   listArchivedPatientRecommendations,
   listPatientRecommendations,
   movePatientRecommendation,
+  savePatientRecommendations,
   updatePatientRecommendation,
 } from "../db/services/patient-recommendations";
-export type { RecommendationInput } from "../db/services/patient-recommendations";
+export type {
+  RecommendationInput,
+  RecommendationRow,
+} from "../db/services/patient-recommendations";
 
 export {
   addPatientSupplement,
@@ -85,9 +92,13 @@ export {
   listArchivedPatientSupplements,
   listPatientSupplements,
   movePatientSupplement,
+  savePatientSupplements,
   updatePatientSupplement,
 } from "../db/services/patient-supplements";
-export type { SupplementInput } from "../db/services/patient-supplements";
+export type {
+  SupplementInput,
+  SupplementRow,
+} from "../db/services/patient-supplements";
 
 export {
   addPantryEssential,
@@ -96,14 +107,21 @@ export {
   listArchivedPantryEssentials,
   listPantryEssentials,
   movePantryEssential,
+  savePantryEssentials,
   updatePantryEssential,
 } from "../db/services/pantry-essentials";
-export type { PantryEssentialInput } from "../db/services/pantry-essentials";
+export type {
+  PantryEssentialInput,
+  PantryEssentialRow,
+} from "../db/services/pantry-essentials";
+
+export type { SectionSaveCounts } from "../db/services/section-save";
 
 export {
   archiveRecipe,
   countRecipeAssignments,
   createRecipe,
+  duplicateRecipe,
   getRecipe,
   listArchivedRecipes,
   listRecipeTags,
@@ -114,18 +132,41 @@ export type { RecipeInput } from "../db/services/recipes";
 
 export {
   archiveRecipeAssignment,
-  assignRecipe,
+  assignRecipes,
+  createAndAssignRecipe,
+  duplicateAndAssignRecipe,
   listArchivedPatientRecipes,
   listPatientRecipes,
   removeRecipeAssignment,
   updateRecipeAssignment,
 } from "../db/services/recipe-assignments";
-export type { AssignmentInput } from "../db/services/recipe-assignments";
+export type {
+  AssignmentInput,
+  GivenRecipe,
+} from "../db/services/recipe-assignments";
 export type {
   AssignedRecipe,
   RecipeAssignment,
 } from "../db/models/recipe-assignment";
 export type { Recipe } from "../db/models/recipe";
+
+export {
+  getCiqualImport,
+  getFood,
+  getFoodNutrients,
+  listFoodGroups,
+  rankFoodsByComponent,
+  refreshFoodCatalogue,
+  searchFoods,
+} from "../db/services/foods";
+export type { FoodSearch, RankQuery, RankedFood } from "../db/services/foods";
+export type {
+  CiqualImport,
+  ConfidenceCode,
+  Food,
+  FoodNutrient,
+  NutrientMarker,
+} from "../db/models/food";
 
 export {
   addMealEntry,
@@ -167,6 +208,16 @@ export {
   listPatientAnamnesis,
   setPatientAnamnesis,
 } from "../db/services/patient-anamnesis";
+
+export {
+  describeConsultation,
+  recordConsultation,
+} from "../db/services/consultations";
+export type {
+  ConsultationCheckInInput,
+  ConsultationInput,
+  ConsultationRecord,
+} from "../db/services/consultations";
 
 export {
   changeOperatorPassword,

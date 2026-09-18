@@ -10,6 +10,7 @@ import {
   listArchivedPantryEssentials,
   listPantryEssentials,
   movePantryEssential,
+  savePantryEssentials,
   updatePantryEssential,
 } from "./index";
 
@@ -175,5 +176,85 @@ describe("pantry essentials", () => {
     if (!result.ok) {
       expect(result.error).toBe("not_found");
     }
+  });
+});
+
+describe("saving the whole list at once", () => {
+  // Its own patient: this suite asserts on the entire section, so it cannot
+  // share the rows the single-row tests above leave behind.
+  let sectionPatientId: string;
+
+  beforeAll(async () => {
+    const created = await createPatient({ pseudonym: "Margaux" });
+    if (!created.ok) {
+      throw new Error("test patient not created");
+    }
+    sectionPatientId = created.data.id;
+  });
+
+  it("writes a pasted list of items in one call, in the order given", async () => {
+    const saved = await savePantryEssentials(sectionPatientId, [
+      { item: "Sardines", why: "oméga-3" },
+      { item: "Œufs", why: "" },
+      { item: "Épinards", why: "" },
+    ]);
+
+    expect(saved.ok && saved.data.added).toBe(3);
+    expect(
+      (await listPantryEssentials(sectionPatientId)).map((row) => row.item),
+    ).toEqual(["Sardines", "Œufs", "Épinards"]);
+  });
+
+  it("applies an edit, an addition, a removal and a reorder in one save", async () => {
+    const before = await listPantryEssentials(sectionPatientId);
+
+    const saved = await savePantryEssentials(sectionPatientId, [
+      { id: before[2].id, item: before[2].item, why: "fer" },
+      { id: before[0].id, item: before[0].item, why: before[0].why },
+      { item: "Lentilles", why: "" },
+    ]);
+
+    expect(saved.ok && saved.data).toEqual({
+      added: 1,
+      updated: 1,
+      archived: 1,
+      reordered: 2,
+    });
+    expect(
+      (await listPantryEssentials(sectionPatientId)).map((row) => row.item),
+    ).toEqual(["Épinards", "Sardines", "Lentilles"]);
+    expect(
+      (await listArchivedPantryEssentials(sectionPatientId)).map(
+        (row) => row.item,
+      ),
+    ).toContain("Œufs");
+  });
+
+  it("refuses the whole save on a bad row, naming which one", async () => {
+    const before = await listPantryEssentials(sectionPatientId);
+
+    const saved = await savePantryEssentials(sectionPatientId, [
+      { item: "Amandes", why: "" },
+      { item: "  ", why: "" },
+    ]);
+
+    expect(!saved.ok && saved.message).toContain("row 2");
+    expect(await listPantryEssentials(sectionPatientId)).toEqual(before);
+  });
+
+  it("does nothing when the section comes back unchanged", async () => {
+    const before = await listPantryEssentials(sectionPatientId);
+
+    const saved = await savePantryEssentials(
+      sectionPatientId,
+      before.map((row) => ({ id: row.id, item: row.item, why: row.why })),
+    );
+
+    expect(saved.ok && saved.data.added).toBe(0);
+    expect(await listPantryEssentials(sectionPatientId)).toEqual(before);
+  });
+
+  it("treats a malformed patient id as not found", async () => {
+    expect((await savePantryEssentials("not-a-uuid", [])).ok).toBe(false);
   });
 });

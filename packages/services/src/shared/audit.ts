@@ -7,6 +7,18 @@
  * first, which is the point.
  */
 
+/**
+ * Who took the action. `operator` is Morgane or a founder in the console, and
+ * was the only possibility until the patient link began accepting writes
+ * (`link-writes`): a patient holding their token is an actor with no account,
+ * so the trail records the kind explicitly rather than leaving it inferred
+ * from an empty email — an empty email is also what a system write would
+ * leave, and "nobody" and "the patient" are not the same answer.
+ */
+export const auditActorKinds = ["operator", "patient"] as const;
+
+export type AuditActorKindName = (typeof auditActorKinds)[number];
+
 export const auditActions = [
   "patient.created",
   "patient.updated",
@@ -17,23 +29,29 @@ export const auditActions = [
   "recommendation.restored",
   "recommendation.deleted",
   "recommendation.reordered",
+  "recommendation.batch_saved",
   "supplement.added",
   "supplement.updated",
   "supplement.archived",
   "supplement.restored",
   "supplement.deleted",
   "supplement.reordered",
+  "supplement.batch_saved",
   "pantry.added",
   "pantry.updated",
   "pantry.archived",
   "pantry.restored",
   "pantry.deleted",
   "pantry.reordered",
+  "pantry.batch_saved",
   "recipe.created",
   "recipe.updated",
   "recipe.archived",
   "recipe.restored",
   "recipe.assigned",
+  "recipe.created_and_assigned",
+  "recipe.duplicated_as_variant",
+  "recipe.assigned_bulk",
   "recipe.assignment_updated",
   "recipe.assignment_archived",
   "recipe.assignment_restored",
@@ -50,6 +68,7 @@ export const auditActions = [
   "observation.archived",
   "observation.restored",
   "observation.deleted",
+  "consultation.recorded",
   "note.added",
   "note.updated",
   "note.deleted",

@@ -1,7 +1,11 @@
 import { auditActions } from "../../../shared/audit";
 import type { Id } from "../../../types";
 import { getDatabase } from "../../client";
-import type { AuditAction, AuditEvent } from "../../models/audit-event";
+import type {
+  AuditAction,
+  AuditActorKind,
+  AuditEvent,
+} from "../../models/audit-event";
 
 /**
  * The audit trail — `apps/admin/AGENTS.md`'s "an admin action with no trace is
@@ -16,11 +20,33 @@ import type { AuditAction, AuditEvent } from "../../models/audit-event";
 
 const events = () => getDatabase().collection<AuditEvent>("audit_events");
 
-export type AuditActor = {
+/** An operator in the console — the only actor the trail had until `link-writes`. */
+export type OperatorActor = {
   id: Id;
   email: string;
   name: string;
 };
+
+/**
+ * A patient writing through their own link. No email, because there is no
+ * account to have one: inventing an address to fill the column would be a lie
+ * the trail could never correct. The name is the pseudonym as it read at the
+ * time, denormalised like every other actor here so the row survives the
+ * profile's deletion.
+ */
+export type PatientActor = {
+  kind: "patient";
+  id: Id;
+  name: string;
+};
+
+export type AuditActor = OperatorActor | PatientActor;
+
+const kindOf = (actor: AuditActor | null): AuditActorKind =>
+  actor && "kind" in actor ? actor.kind : "operator";
+
+const emailOf = (actor: AuditActor | null): string =>
+  actor && "kind" in actor ? "" : (actor?.email ?? "");
 
 export type AuditRecord = {
   actor: AuditActor | null;
@@ -38,8 +64,9 @@ export const recordAuditEvent = async (record: AuditRecord): Promise<void> => {
   }
   try {
     await events().insert({
+      actorKind: kindOf(record.actor),
       actorId: record.actor?.id ?? null,
-      actorEmail: record.actor?.email ?? "",
+      actorEmail: emailOf(record.actor),
       actorName: record.actor?.name ?? "",
       action: record.action,
       targetType: record.targetType ?? "",
@@ -48,7 +75,7 @@ export const recordAuditEvent = async (record: AuditRecord): Promise<void> => {
       detail: record.detail ?? "",
     });
   } catch (cause) {
-    console.error("[audit] failed to record an operator action", {
+    console.error("[audit] failed to record an action", {
       action: record.action,
       cause,
     });
@@ -57,8 +84,10 @@ export const recordAuditEvent = async (record: AuditRecord): Promise<void> => {
 
 export type AuditQuery = {
   action?: AuditAction | "all";
-  /** Everything an operator did, by their account id. */
+  /** Everything one actor did, by their account or patient id. */
   actorId?: Id;
+  /** Everything one kind of actor did — every patient write, say. */
+  actorKind?: AuditActorKind;
   targetId?: string;
   limit?: number;
 };
@@ -78,6 +107,9 @@ export const listAuditEvents = async (
         : true,
     )
     .filter((event) => (query.actorId ? event.actorId === query.actorId : true))
+    .filter((event) =>
+      query.actorKind ? event.actorKind === query.actorKind : true,
+    )
     .filter((event) =>
       query.targetId ? event.targetId === query.targetId : true,
     )

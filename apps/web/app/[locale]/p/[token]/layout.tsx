@@ -29,7 +29,10 @@ type Params = { locale: string; token: string };
  * patient's name never reaches the page.
  *
  * Nothing here links onward into the signed-in app, and no session is created
- * or read.
+ * or read — not even now that the token accepts writes (decision #2). A write
+ * arrives through `lib/patient-link/write.ts`, which takes the token from the
+ * URL and nothing else; putting it in a cookie is exactly what patient
+ * accounts postpone.
  */
 const PatientLinkLayout = async ({
   children,

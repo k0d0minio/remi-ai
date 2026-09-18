@@ -59,6 +59,32 @@ page until Morgane and Arnaud answer them.
 - **Bilingual v1.** The product ships French and English, matching the marketing site. `apps/web`
   already routes through `[locale]`; the work is finishing dictionaries, not building a system.
 
+## Nutrition knowledge — 2026-09-17
+
+- **The food-composition source is CIQUAL, and the edition is pinned.** ANSES's
+  *Table de composition nutritionnelle des aliments Ciqual 2025* — 3 484 foods, 74 constituents,
+  257 816 composition values — imported into `foods` / `food_nutrients` behind the storage seam.
+  Published 19 November 2025 (data files dated 3 November 2025); DOI
+  [10.57745/RDMHWY](https://doi.org/10.57745/RDMHWY) on Recherche Data Gouv. It is the newest
+  edition: there is no 2026 table. The importer refuses an export whose component vocabulary does
+  not match the one the recommendation map was written against, so moving to a later edition is a
+  deliberate act rather than a silent one.
+- **Licence: Licence Ouverte 2.0 (Etalab)**, SPDX `etalab-2.0`. It grants reuse, adaptation and
+  redistribution — including commercially — on one condition: the source is named. So it is named
+  on every surface that shows one of its numbers, and the committed test subset carries its own
+  `LICENCE.md` with the citation of record. The full 75 MB export is not committed; the importer
+  takes it from wherever it was downloaded.
+- **The publisher's uncertainty is stored, not flattened.** CIQUAL writes `-` for a constituent it
+  never determined (83 246 cells), `traces` (2 514), and `< x` for a value below the limit of
+  quantification (20 075). Each value carries a marker beside it and the publisher's own string,
+  and ranking reads measured values only unless a caller opts in — `< 20 µg` is an upper bound, and
+  ranking it as 20 would put an unmeasured food above one measured at 5.
+- **The recommendation-to-component map is hand-written and stays that way.**
+  `packages/services/src/shared/nutrition.ts` maps French phrasing to CIQUAL component codes; no
+  model call is involved in deciding that « augmenter les protéines » means component 25000. Which
+  components Morgane's practice needs beyond the twelve it ships with is open, and the answer lands
+  in that file.
+
 ## Access control — 2026-08-13
 
 - **Operator access is a role, not a URL.** An `operator` role lands in the database and the backend
@@ -75,3 +101,24 @@ page until Morgane and Arnaud answer them.
   the root layout sends `noindex`, so it stays out of search results. That is a publishing choice,
   not an access control, and this site's content is written on that basis — figures live in the
   console and this site carries the shape of a decision rather than its numbers.
+
+## Storage driver — 2026-09-17
+
+- **Neon over the WebSocket driver, not the HTTP one.** The adapter
+  (`packages/services/src/db/adapters/neon.ts`) uses `@neondatabase/serverless`'s `Pool` with
+  `drizzle-orm/neon-serverless`, so the storage seam's `transaction()` issues a real
+  `BEGIN` / `COMMIT` / `ROLLBACK`. The HTTP driver has no interactive transactions: its
+  `transaction()` could only run the callback on the same client, which is a promise the seam's
+  own type makes and could not keep. The first service to write across tables in one unit —
+  recording a consultation, which writes a note, its check-ins, the instruction, the summary and
+  the preparation note or none of them — is what made that gap real rather than theoretical.
+- **A service takes the transaction's client as an argument.** `transaction(fn)` hands `fn` a
+  `DatabaseClient` bound to the open transaction; a service reaching `getDatabase()` instead would
+  silently write outside it. The five writes a consultation composes take that client as a trailing
+  optional argument, defaulting to the pooled one, so every other call site is unchanged. Adding a
+  service to a transaction means giving it that argument, not copying its logic into the caller.
+- **The pool is per module graph, and bounded for it.** Next.js gives every route bundle its own
+  copy of this package, so `registerDatabase()` runs once per graph and each one builds its own
+  pool. They are sized on that basis — small, with an idle timeout, and with an `error` listener,
+  because an idle connection dropped by Neon emits on the pool and an unhandled `error` event ends
+  the process.

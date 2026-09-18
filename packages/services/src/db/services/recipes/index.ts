@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { variantTitle } from "../../../shared/recipe";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
-import { getDatabase } from "../../client";
+import { getDatabase, type DatabaseClient } from "../../client";
 import type { Recipe } from "../../models/recipe";
 import type { RecipeAssignment } from "../../models/recipe-assignment";
 
@@ -20,10 +21,17 @@ import type { RecipeAssignment } from "../../models/recipe-assignment";
  * reports what she actually used.
  */
 
-const library = () => getDatabase().collection<Recipe>("recipes");
+/**
+ * The client is a parameter so a gesture spanning both tables can pass the one
+ * `transaction()` handed it, instead of each write reaching for the global and
+ * landing outside the unit. Every single-table function below keeps the
+ * default and reads exactly as it did.
+ */
+const library = (db: DatabaseClient = getDatabase()) =>
+  db.collection<Recipe>("recipes");
 
-const assignments = () =>
-  getDatabase().collection<RecipeAssignment>("patient_recipe_assignments");
+const assignments = (db: DatabaseClient = getDatabase()) =>
+  db.collection<RecipeAssignment>("patient_recipe_assignments");
 
 const uuidSchema = z.uuid();
 
@@ -46,7 +54,7 @@ const tagsSchema = z
     "a tag is at most 32 characters",
   );
 
-const recipeFields = z.object({
+export const recipeFields = z.object({
   title: z.string().trim().min(1, "a title is required").max(140),
   body: z
     .string()
@@ -121,17 +129,66 @@ export const getRecipe = async (id: Id): Promise<Result<Recipe>> => {
 
 export const createRecipe = async (
   input: RecipeInput,
+  db?: DatabaseClient,
 ): Promise<Result<Recipe>> => {
   const parsed = recipeFields.partial({ tags: true }).safeParse(input);
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
   }
   return ok(
-    await library().insert({
+    await library(db).insert({
       title: parsed.data.title,
       body: parsed.data.body,
       tags: parsed.data.tags ?? [],
       archivedAt: null,
+      variantOfId: null,
+    }),
+  );
+};
+
+/**
+ * A variant — the answer to "adapt this for one person" that `updateRecipe`
+ * cannot give, because an edit there reaches everyone holding the recipe.
+ *
+ * It is a full library row, not a fork of an assignment, so the origin's
+ * holder count is unchanged by it and every other holder keeps the recipe they
+ * were given. The link back is `variantOfId`, set here and never again.
+ */
+export const duplicateRecipe = async (
+  id: Id,
+  /**
+   * What she changed before saving. The copy is opened for editing, so the
+   * adapted title and body are written by the insert itself rather than by an
+   * update chasing it — one row, one write, nothing half-adapted in between.
+   */
+  overrides?: RecipeInput,
+  db?: DatabaseClient,
+): Promise<Result<Recipe>> => {
+  if (!uuidSchema.safeParse(id).success) {
+    return err("not_found", "no such recipe");
+  }
+  const origin = await library(db).findById(id);
+  if (!origin) {
+    return err("not_found", "no such recipe");
+  }
+  const parsed = recipeFields.partial().safeParse({
+    title: overrides?.title ?? variantTitle(origin.title),
+    body: overrides?.body ?? origin.body,
+  });
+  if (!parsed.success) {
+    return err("invalid_input", parsed.error.issues[0].message);
+  }
+  return ok(
+    await library(db).insert({
+      title: parsed.data.title ?? variantTitle(origin.title),
+      body: parsed.data.body ?? origin.body,
+      // Tags come from the origin and are not editable in the gesture: a
+      // variant of a winter recipe is still a winter recipe.
+      tags: [...origin.tags],
+      // A variant of an archived recipe is itself active: she is adapting it
+      // now, whatever the state of what she adapted.
+      archivedAt: null,
+      variantOfId: origin.id,
     }),
   );
 };
