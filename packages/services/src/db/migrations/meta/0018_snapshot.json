@@ -1,6 +1,6 @@
 {
-  "id": "ea4640cb-14a3-4859-afb8-9e030faaed79",
-  "prevId": "2acce5a3-a829-41de-8698-2dcd81287443",
+  "id": "400b33e8-5327-41d8-ba71-b2b4d85fdd0d",
+  "prevId": "ea4640cb-14a3-4859-afb8-9e030faaed79",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1881,6 +1881,85 @@
           "tableTo": "patient_profiles",
           "columnsFrom": [
             "patient_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.protocol_templates": {
+      "name": "protocol_templates",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "operator_id": {
+          "name": "operator_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rows": {
+          "name": "rows",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "shared": {
+          "name": "shared",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "protocol_templates_operator_id_operators_id_fk": {
+          "name": "protocol_templates_operator_id_operators_id_fk",
+          "tableFrom": "protocol_templates",
+          "tableTo": "operators",
+          "columnsFrom": [
+            "operator_id"
           ],
           "columnsTo": [
             "id"

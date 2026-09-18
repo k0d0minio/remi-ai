@@ -29,16 +29,16 @@ describe("the standing instruction", () => {
   });
 
   it("archives the current one when a replacement lands", async () => {
-    const first = await setPatientInstruction(
-      patientId,
-      "Priorité énergie, peu de changements la première semaine",
-    );
+    const first = await setPatientInstruction(patientId, {
+      body: "Priorité énergie, peu de changements la première semaine",
+      patientBody: "",
+    });
     expect(first.ok).toBe(true);
 
-    const second = await setPatientInstruction(
-      patientId,
-      "Priorité digestion, on relâche sur les féculents",
-    );
+    const second = await setPatientInstruction(patientId, {
+      body: "Priorité digestion, on relâche sur les féculents",
+      patientBody: "",
+    });
     expect(second.ok).toBe(true);
 
     const active = await getPatientInstruction(patientId);
@@ -55,7 +55,10 @@ describe("the standing instruction", () => {
   });
 
   it("never leaves two in force — every write but the last is archived", async () => {
-    await setPatientInstruction(patientId, "Troisième consigne");
+    await setPatientInstruction(patientId, {
+      body: "Troisième consigne",
+      patientBody: "",
+    });
     expect((await getPatientInstruction(patientId))?.body).toBe(
       "Troisième consigne",
     );
@@ -69,7 +72,10 @@ describe("the standing instruction", () => {
       throw new Error("expected a standing instruction");
     }
 
-    const again = await setPatientInstruction(patientId, before.body);
+    const again = await setPatientInstruction(patientId, {
+      body: before.body,
+      patientBody: before.patientBody ?? "",
+    });
     expect(again.ok).toBe(true);
     if (again.ok) {
       expect(again.data?.id).toBe(before.id);
@@ -80,7 +86,10 @@ describe("the standing instruction", () => {
   });
 
   it("clears to none, keeping the trail", async () => {
-    const cleared = await setPatientInstruction(patientId, "   ");
+    const cleared = await setPatientInstruction(patientId, {
+      body: "   ",
+      patientBody: "   ",
+    });
     expect(cleared.ok).toBe(true);
     if (cleared.ok) {
       expect(cleared.data).toBeNull();
@@ -90,10 +99,10 @@ describe("the standing instruction", () => {
   });
 
   it("deletes a row that should never have been written", async () => {
-    const written = await setPatientInstruction(
-      patientId,
-      "Une faute de frappe",
-    );
+    const written = await setPatientInstruction(patientId, {
+      body: "Une faute de frappe",
+      patientBody: "",
+    });
     if (!written.ok || !written.data) {
       throw new Error("instruction not written");
     }
@@ -103,12 +112,22 @@ describe("the standing instruction", () => {
 
   it("treats malformed ids as empty or not found", async () => {
     expect(await getPatientInstruction("not-a-uuid")).toBeNull();
-    expect((await setPatientInstruction("not-a-uuid", "x")).ok).toBe(false);
+    expect(
+      (
+        await setPatientInstruction("not-a-uuid", {
+          body: "x",
+          patientBody: "",
+        })
+      ).ok,
+    ).toBe(false);
     expect((await deletePatientInstruction("not-a-uuid")).ok).toBe(false);
   });
 
   it("never reaches the patient link", async () => {
-    await setPatientInstruction(patientId, "Priorité énergie");
+    await setPatientInstruction(patientId, {
+      body: "Priorité énergie",
+      patientBody: "",
+    });
     const patient = await getPatientByShareToken(shareToken);
     if (!patient.ok) {
       throw new Error("patient not found by share token");
@@ -118,5 +137,105 @@ describe("the standing instruction", () => {
     expect(Object.keys(patient.data)).not.toContain("instruction");
     expect(Object.keys(patient.data)).not.toContain("goals");
     expect(await getPatientInstruction(patientId)).not.toBeNull();
+  });
+});
+
+describe("the patient-facing half of the consigne", () => {
+  let ownId: string;
+
+  beforeAll(async () => {
+    const created = await createPatient({ pseudonym: "Inès" });
+    if (!created.ok) {
+      throw new Error("test patient not created");
+    }
+    ownId = created.data.id;
+  });
+
+  it("is absent until she writes one, and never falls back to the REMI line", async () => {
+    await setPatientInstruction(ownId, {
+      body: "Priorité énergie, peu de changements",
+      patientBody: "",
+    });
+
+    const active = await getPatientInstruction(ownId);
+    expect(active?.body).toBe("Priorité énergie, peu de changements");
+    // The home renders nothing rather than showing the line above, which is
+    // addressed to REMI.
+    expect(active?.patientBody).toBeNull();
+  });
+
+  it("holds both halves on the one row, each with its own words", async () => {
+    await setPatientInstruction(ownId, {
+      body: "Priorité digestion, on relâche sur les féculents",
+      patientBody: "Cette semaine : un légume cuit à chaque repas.",
+    });
+
+    const active = await getPatientInstruction(ownId);
+    expect(active?.body).toBe(
+      "Priorité digestion, on relâche sur les féculents",
+    );
+    expect(active?.patientBody).toBe(
+      "Cette semaine : un légume cuit à chaque repas.",
+    );
+  });
+
+  it("counts a change to either half as a replacement", async () => {
+    const before = await getPatientInstruction(ownId);
+    if (!before) {
+      throw new Error("expected a standing instruction");
+    }
+    const archivedBefore = await listArchivedPatientInstructions(ownId);
+
+    await setPatientInstruction(ownId, {
+      body: before.body,
+      patientBody: "Cette semaine : deux légumes cuits par jour.",
+    });
+
+    const after = await getPatientInstruction(ownId);
+    expect(after?.id).not.toBe(before.id);
+    expect(await listArchivedPatientInstructions(ownId)).toHaveLength(
+      archivedBefore.length + 1,
+    );
+  });
+
+  it("takes a patient-facing consigne with no REMI line at all", async () => {
+    await setPatientInstruction(ownId, {
+      body: "",
+      patientBody: "Cette semaine : on boit un verre d'eau au réveil.",
+    });
+
+    const active = await getPatientInstruction(ownId);
+    expect(active?.body).toBe("");
+    expect(active?.patientBody).toBe(
+      "Cette semaine : on boit un verre d'eau au réveil.",
+    );
+  });
+
+  it("clears only when both halves are empty", async () => {
+    await setPatientInstruction(ownId, { body: "", patientBody: "   " });
+    expect(await getPatientInstruction(ownId)).toBeNull();
+  });
+
+  it("treats re-saving both halves unchanged as a no-op", async () => {
+    const written = await setPatientInstruction(ownId, {
+      body: "Priorité sommeil",
+      patientBody: "Cette semaine : au lit avant 23h.",
+    });
+    if (!written.ok || !written.data) {
+      throw new Error("instruction not written");
+    }
+    const archivedBefore = await listArchivedPatientInstructions(ownId);
+
+    const again = await setPatientInstruction(ownId, {
+      body: "Priorité sommeil",
+      patientBody: "Cette semaine : au lit avant 23h.",
+    });
+    expect(again.ok).toBe(true);
+    if (again.ok) {
+      expect(again.data?.id).toBe(written.data.id);
+    }
+    expect(await listArchivedPatientInstructions(ownId)).toHaveLength(
+      archivedBefore.length,
+    );
   });
 });

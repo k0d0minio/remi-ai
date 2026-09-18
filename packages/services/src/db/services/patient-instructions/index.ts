@@ -15,8 +15,10 @@ import { touchPatient } from "../patients";
  * whether she wants several concurrent consignes is § E's open question, and
  * this table already holds them if the answer changes.
  *
- * Today nothing reads it but the console. In the AI round it becomes the
+ * Today nothing reads `body` but the console. In the AI round it becomes the
  * generation prompt's practitioner line: a new reader, not a new table.
+ * `patientBody` is the half written to the patient, and the link's home is its
+ * only reader.
  */
 
 /** On the pooled client, or on a transaction when one is handed in. */
@@ -26,6 +28,21 @@ const instructions = (db: DatabaseClient = getDatabase()) =>
 const uuidSchema = z.uuid();
 
 const bodySchema = z.string().trim().max(2000);
+
+/**
+ * What she wrote this time, for each of the row's two audiences. An object
+ * rather than two positional strings: the halves are easy to swap by accident,
+ * and swapping them puts a line addressed to REMI in front of the patient.
+ */
+export type InstructionBodies = {
+  /** § E's line, written to REMI. The patient never sees it. */
+  body: string;
+  /** The same consigne written to the patient. The link's home renders it. */
+  patientBody: string;
+};
+
+/** Empty and whitespace-only mean the same thing: she has not written one. */
+const orNull = (value: string): string | null => (value === "" ? null : value);
 
 const allForPatient = async (
   patientId: Id,
@@ -70,29 +87,39 @@ export const listArchivedPatientInstructions = async (
  * Replace-and-archive, in that order: the current row is archived before the
  * new one is inserted, so a patient is never left with two in force.
  *
- * An empty body archives what is there and inserts nothing — "no standing
- * instruction" is a real state, and clearing the field is how she says so.
- * The result is the new instruction, or `null` when she cleared it.
+ * Both halves clearing archives what is there and inserts nothing — "no
+ * standing instruction" is a real state, and emptying the fields is how she
+ * says so. Either half alone is a real state too: a week she steers by without
+ * telling the patient anything, or a consigne to the patient she needs no note
+ * to herself about. The result is the new instruction, or `null` when she
+ * cleared both.
  */
 export const setPatientInstruction = async (
   patientId: Id,
-  body: string,
+  bodies: InstructionBodies,
   db?: DatabaseClient,
 ): Promise<Result<PatientInstruction | null>> => {
   if (!uuidSchema.safeParse(patientId).success) {
     return err("not_found", "no such patient");
   }
-  const parsed = bodySchema.safeParse(body);
+  const parsed = bodySchema.safeParse(bodies.body);
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
   }
+  const parsedPatient = bodySchema.safeParse(bodies.patientBody);
+  if (!parsedPatient.success) {
+    return err("invalid_input", parsedPatient.error.issues[0].message);
+  }
 
+  const body = parsed.data;
+  const patientBody = orNull(parsedPatient.data);
   const current = await getPatientInstruction(patientId, db);
 
   // Saving the same words is not a replacement. Without this, re-saving an
-  // untouched textarea would archive the row, insert an identical one, and
-  // reset "en vigueur depuis" to today — turning a no-op into history.
-  if (current?.body === parsed.data) {
+  // untouched form would archive the row, insert an identical one, and reset
+  // "en vigueur depuis" to today — turning a no-op into history. Both halves
+  // have to match: editing one of them is a replacement.
+  if (current?.body === body && current?.patientBody === patientBody) {
     return ok(current);
   }
 
@@ -100,7 +127,7 @@ export const setPatientInstruction = async (
     await instructions(db).update(current.id, { archivedAt: new Date() });
   }
 
-  if (parsed.data === "") {
+  if (body === "" && patientBody === null) {
     if (current) {
       await touchPatient(patientId, db);
     }
@@ -109,7 +136,8 @@ export const setPatientInstruction = async (
 
   const created = await instructions(db).insert({
     patientId,
-    body: parsed.data,
+    body,
+    patientBody,
     archivedAt: null,
   });
   await touchPatient(patientId, db);
