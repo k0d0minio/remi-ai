@@ -1,7 +1,7 @@
 # Build notes: nutrition-rules
 
 - commits: see the branch — services (table, service, tests), `@remi/ui` (the Markdown primitive), admin (« Connaissances »)
-- ci: pending — filled in after the last push
+- ci: GREEN on 29da351 (ci-status.sh) — the head carrying every code change of this run
 
 ## What changed
 
