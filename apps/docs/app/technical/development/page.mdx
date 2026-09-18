@@ -30,5 +30,8 @@ package builds CI needs for `typecheck` are usually restored rather than recompi
 
 ## Delivery
 
-Work reaches `main` through the pipeline: `/pipeline scope` → `design` → `new` → `build` →
-`verify` → `ship`, or a `bug` / `tweak` / `chore` fast lane. See `.icm/CONTEXT.md`.
+Work reaches `main` through the pipeline. `/pipeline scope` settles a request with the operator into
+`scope.md` and cuts the intake batch; then, per stub, `new` → `build` → `release` — one feature PR,
+two human gates (Spec approved, Ready to merge), and a squash-merge that carries the run's record and
+its archive. A `bug` / `tweak` / `chore` fast lane skips the front and ends in a PR the operator
+merges; `knowledge` changes one of these pages outside a Release. See `.icm/CONTEXT.md`.

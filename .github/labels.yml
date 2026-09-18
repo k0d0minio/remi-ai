@@ -1,8 +1,10 @@
 # Label vocabulary for the delivery pipeline.
 #
-# Labels attach to the feature PR, projected ONE WAY from the run's spec.md (see
-# .icm/_shared/github.md). This file is documentation plus one-time repo setup: create any
-# missing label once, via `gh label create` or the GitHub UI.
+# Labels attach to the run's PR, projected ONE WAY from the run's spec.md by
+# .icm/scripts/project-labels.sh (see .icm/_shared/github.md → Labels): the labels job in
+# .github/workflows/pipeline.yaml re-projects the full set on every push touching .icm/runs/**.
+# This file is documentation plus one-time repo setup: create any missing label once, via
+# `gh label create` or the GitHub UI (the API also creates a label it is asked to apply).
 #
 # Keep this list small and fixed — it powers at-a-glance observability, not free-form tagging.
 # Gates are NOT labels: they are checkboxes in the PR body.
@@ -19,7 +21,7 @@
   description: "Build — implementation in progress on the run's branch; CI green before hand-off"
 - name: "stage:release"
   color: "5319e7"
-  description: "Release — review passes + docs + changelog → gated squash-merge → ship note"
+  description: "Release — review passes + docs + changelog + close-out → gated squash-merge"
 
 # --- Type — spine features and the fast lanes ----------------------------------------------------
 - name: "type:feature"
@@ -27,33 +29,13 @@
   description: "A spec'd feature run through the pipeline spine"
 - name: "type:bug"
   color: "d73a4a"
-  description: "Fast lane — reproduce → fix → verify; merge gate only"
+  description: "Fast lane — reproduce → fix → verify; the merge button is the gate"
 - name: "type:tweak"
   color: "bfd4f2"
-  description: "Fast lane — tiny, fully-specified adjustment; merge gate only"
+  description: "Fast lane — tiny, fully-specified adjustment; the merge button is the gate"
 - name: "type:chore"
   color: "cfd3d7"
   description: "Fast lane — refactor / dep bump / migration, no user-facing behaviour change"
-
-# --- Retired — HISTORICAL ONLY, never projected again ---------------------------------------------
-#
-# The six-stage pipeline (Scope → Design → Define → Build → Verify → Ship) was collapsed to four:
-# Release absorbed Verify and Ship, and Design was retired outright — prototyping in apps/demo
-# is Build's, and the app keeps its own rules in apps/demo/AGENTS.md.
-#
-# These three labels stay in this file, and on the repo, so the merged PRs of the runs archived
-# under .icm/runs/ keep valid labels and their history stays readable. NOTHING projects them:
-# project-labels.sh maps the legacy 05_verify/ and 06_ship/ layouts onto `stage:release`, and no
-# stage writes `type:design` at all. Do not delete them, and do not reuse them for new work.
-- name: "stage:verify"
-  color: "0e8a16"
-  description: "HISTORICAL — the retired Verify stage; absorbed into stage:release"
-- name: "stage:ship"
-  color: "5319e7"
-  description: "HISTORICAL — the retired Ship stage; absorbed into stage:release"
-- name: "type:design"
-  color: "f9d0c4"
-  description: "HISTORICAL — the retired Design front's demo PRs (apps/demo only)"
 
 # --- Complexity — mirrors the spec header, and sets Release's code-review effort ------------------
 - name: "complexity:trivial"
@@ -66,33 +48,20 @@
   color: "d93f0b"
   description: "Complex — large or high-risk change (code review at high effort)"
 
-# --- App — which workspace the change lands in (zero or more) -------------------------------------
+# --- Persona — who the change is for (one or more, from the spec's `personas:` line) ---------------
 #
-# This is the axis a persona vocabulary would occupy. Remi AI's roles are documented
-# (apps/docs/app/business/roles — person, practitioner, operator), but `app:` is used because it is
-# verifiable from the diff itself. Add a `persona:` axis alongside it when a run needs one —
-# project-labels.sh takes the new vocabulary in one place.
-- name: "app:web"
+# The vocabulary is the `personas` array in .icm/project.json, which is the three roles of
+# apps/docs/app/business/roles: the person REMI accompanies, the practitioner who follows them,
+# and the operator who runs the console. project-labels.sh projects one label per persona named.
+- name: "persona:patient"
   color: "ededed"
-  description: "apps/web — the product"
-- name: "app:admin"
+  description: "The patient — the person applying their recommendations day to day"
+- name: "persona:practitioner"
   color: "ededed"
-  description: "apps/admin — internal operations"
-- name: "app:marketing"
+  description: "The practitioner — encodes the record, follows the patient"
+- name: "persona:operator"
   color: "ededed"
-  description: "apps/marketing — the public site"
-- name: "app:docs"
-  color: "ededed"
-  description: "apps/docs — the reference site"
-- name: "app:support"
-  color: "ededed"
-  description: "apps/support — the public help centre"
-- name: "app:demo"
-  color: "ededed"
-  description: "apps/demo — the mock-data prototype sandbox"
-- name: "app:packages"
-  color: "ededed"
-  description: "packages/ui or packages/services — the shared layer"
+  description: "The operator — runs the console and the estate"
 
 # --- Intake — the issue front door, not a pipeline label ------------------------------------------
 - name: "feedback"

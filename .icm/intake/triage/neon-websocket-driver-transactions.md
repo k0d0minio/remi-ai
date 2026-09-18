@@ -1,11 +1,8 @@
-# neon-websocket-driver-transactions
+# Stub: `transaction()` is a pass-through in both storage adapters
 
-- epic: triage
 - lane: chore
-- status: active
-- created: 2026-09-17
+- found-by: the `recipe-in-place` run (#95); parked by the owner · 2026-09-17
 - size: M
-- depends-on: none
 
 ## Problem
 
@@ -31,7 +28,24 @@ landed anywhere. This stub is its home.
 The owner chose to park it rather than ride it on a feature PR (2026-09-17): the driver sits under
 every query in `admin` and `web`, and it deserves its own PR, preview and review.
 
-## Worth knowing
+## Proposed change
+
+Move the Neon adapter to the WebSocket driver so `transaction(fn)` is a real Postgres transaction, give the in-memory client snapshot-and-restore, and settle the pool lifecycle for Vercel.
+
+## Acceptance criteria (rough)
+
+- [ ] `createNeonDatabase()` runs `transaction(fn)` inside a real Postgres transaction; a throw
+      inside `fn` rolls back every write made through the `tx` client it was given.
+- [ ] `createMemoryDatabase()` does the same in memory, so the service tests can assert rollback.
+- [ ] A service test proves it: a gesture that fails after its first insert leaves neither row
+      behind. `recipe-in-place`'s `createAndAssignRecipe` is the natural subject.
+- [ ] Connection lifecycle is settled for Vercel's runtime and written down — pool size, whether a
+      pool is per-request or per-process, and what `close()` now does.
+- [ ] The comment in `neon.ts` naming REMI-013 is gone, replaced by what was actually decided.
+- [ ] `.icm/docs/ENV.md` gains any variable the pooled driver needs, or states plainly that it
+      needs none.
+
+## Notes
 
 - **No new dependency.** `@neondatabase/serverless` (^1.1.0) already ships `Pool`, and
   `drizzle-orm` (^0.45.2) already ships `drizzle-orm/neon-serverless`. The change is an import and
@@ -46,15 +60,6 @@ every query in `admin` and `web`, and it deserves its own PR, preview and review
 - Services already thread the client correctly: `recipes/` and `recipe-assignments/` take
   `db?: DatabaseClient` on every function a gesture calls. Nothing above the seam changes.
 
-## Acceptance
+## Prompt
 
-- [ ] `createNeonDatabase()` runs `transaction(fn)` inside a real Postgres transaction; a throw
-      inside `fn` rolls back every write made through the `tx` client it was given.
-- [ ] `createMemoryDatabase()` does the same in memory, so the service tests can assert rollback.
-- [ ] A service test proves it: a gesture that fails after its first insert leaves neither row
-      behind. `recipe-in-place`'s `createAndAssignRecipe` is the natural subject.
-- [ ] Connection lifecycle is settled for Vercel's runtime and written down — pool size, whether a
-      pool is per-request or per-process, and what `close()` now does.
-- [ ] The comment in `neon.ts` naming REMI-013 is gone, replaced by what was actually decided.
-- [ ] `.icm/docs/ENV.md` gains any variable the pooled driver needs, or states plainly that it
-      needs none.
+Run `/pipeline chore neon-websocket-driver-transactions` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

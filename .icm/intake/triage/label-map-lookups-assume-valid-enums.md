@@ -1,12 +1,13 @@
 # Stub: label-map lookups assume the database row is in-union
 
-- feature-slug: label-map-lookups-assume-valid-enums
+- lane: chore
+- found-by: `/code-review` on `secondary-sections` (#100) · 2026-09-18
 - priority: P3
 - size: S
 - sources: `/code-review` on `secondary-sections` (#100) ·
   `apps/admin/components/patients/vocabulary.ts` and every consumer of it
 
-## What this is
+## Problem
 
 The console reads enum-ish columns — `locale`, `status`, `sex`, `likes_cooking`,
 `consent_channel`, `category` — and indexes a `Record<…, string>` in `vocabulary.ts` to render
@@ -18,7 +19,11 @@ This is **not** specific to the profile read summary — the roster, the status 
 recommendation forms and the profile form all index the same maps the same way, and have since
 they were written. `secondary-sections` added one more consumer, which is how it surfaced.
 
-## Worth knowing
+## Proposed change
+
+Pick one of the two fixes — validate at the read boundary in the services package (the honest fix) or make the lookups total in `vocabulary.ts` — and apply it once, across every consumer; never per component.
+
+## Notes
 
 - The values only go out of union through a hand-written SQL update, a migration that widens a
   column without widening the constant, or a restore from an older schema. All three are real but
@@ -30,14 +35,11 @@ they were written. `secondary-sections` added one more consumer, which is how it
 - Whichever is chosen, it is one change across all consumers — not per-component patches, which is
   exactly the drift `CONVENTIONS.md` § leanness warns about.
 
-## Open questions — flag these on pickup
+**Open — raise on pickup, do not answer in code:**
 
 - Is a row out of union worth a runtime guard at all, or is the schema constraint plus review the
   intended defence? If the latter, this stub closes as a decision rather than a fix.
 
 ## Prompt
 
-Run `/pipeline chore "label-map lookups assume the database row is in-union"` in the remi-ai repo.
-Read this stub and `apps/admin/components/patients/vocabulary.ts` first. Scope: pick one of the two
-fixes named in the stub and apply it once, across every consumer — never per-component. No
-behaviour change for in-union values. Raise the open question rather than answering it.
+Run `/pipeline chore label-map-lookups-assume-valid-enums` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

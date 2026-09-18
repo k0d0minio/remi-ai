@@ -1,11 +1,8 @@
-# parallel-migrations-journal-ordering
+# Stub: Two open PRs generated the same migration number
 
-- epic: triage
 - lane: chore
-- status: active
-- created: 2026-09-17
+- found-by: the `link-writes` Release production-readiness pass · 2026-09-17
 - size: M
-- depends-on: none
 
 ## Problem
 
@@ -30,7 +27,11 @@ Two entries at `idx: 13` normally collide in `_journal.json` and git raises a co
 the visible path. The dangerous path is resolving that conflict by renumbering the entry while
 keeping its original `when`.
 
-## Acceptance
+## Proposed change
+
+Regenerate, never renumber, a migration after rebasing; add a check that fails a PR whose newest journal `when` is older than main's.
+
+## Acceptance criteria (rough)
 
 - [ ] Every migration-bearing PR still open after the first one merges is rebased on `main` and its
       migration **regenerated** (`pnpm db:generate`) rather than renumbered by hand, so `when` is
@@ -38,3 +39,7 @@ keeping its original `when`.
 - [ ] A check — CI job or a line in `CONVENTIONS.md` § the factory — that fails a PR whose newest
       journal `when` is older than `main`'s newest, so this cannot be resolved wrongly by hand
       again.
+
+## Prompt
+
+Run `/pipeline chore parallel-migrations-journal-ordering` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

@@ -1,11 +1,17 @@
-# Epic: beyond-december — the old version's flows that are right, and not for now
+# Breakdown: beyond-december — the old version's flows that are right, and not for now
+
+- scope-slug: beyond-december · story: none — cut 2026-09-10 from the old version's product logic (`remi-v2-explication-systeme.docx`, precedence row 5) and the « vision finale » paragraphs of the feedback § 7 and § 8
+- initiative: a patient experience validated on real terrain, in time for the December open day / objective: the database and accounts under it
+- personas: patient, practitioner, operator
+
+## What I understood
 
 Cut 2026-09-10 from the old version's product logic
 ([`remi-v2-explication-systeme.docx`](../../docs/collaboration/remi-v2-explication-systeme.docx),
 precedence row 5) and the "vision finale" paragraphs of Morgane's feedback § 7 and § 8. She asked
 that the old version not be reproduced as is, but that its thought-through journeys not be thrown
 away either: "conserver les apprentissages et les bonnes idées de ce qui existe déjà". Decision
-#10 (2026-09-10, [`practitioner-workflow/breakdown.md § Decisions`](../practitioner-workflow/breakdown.md))
+D-10 (2026-09-10, [`README.md § Decisions of record`](../README.md))
 settles that FunMedDev's team tests on 1 December as patients Morgane creates, so none of the
 flows below is needed for the open day. They are parked **as stubs, not as a wish list**, so the
 board shows them and a pickup starts from a written scope — every one is P2, and two are blocked
@@ -13,6 +19,10 @@ on decisions only the owner can make.
 
 The sequence below is an order of _likely need_, not a dependency chain, and no stub here is
 "next" until the owner moves it or lifts its P2.
+
+## Where it sits
+
+Accounts and sessions on the product app; the practitioner request flow and billing; the files seam; groups on the console; the generation context slot.
 
 ## Build order
 

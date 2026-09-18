@@ -1,4 +1,10 @@
-# Epic: ai-assist — the model arrives, into slots the manual product already has
+# Breakdown: ai-assist — the model arrives, into slots the manual product already has
+
+- scope-slug: ai-assist · story: none — cut 2026-09-10 from Morgane's feedback § 5, § 7, § 8 and her covering message (`correspondence/03`)
+- initiative: a patient experience validated on real terrain, in time for the December open day / objective: a usable patient version for the partner clinic to test on 1 December
+- personas: patient, practitioner, operator
+
+## What I understood
 
 Cut 2026-09-10 from Morgane's feedback § 5 (the "ensuite, l'IA" paragraph), § 7 (recipe
 generation), § 8 (meal suggestions) and her covering message: "pour certaines fonctions comme les
@@ -9,14 +15,14 @@ into workflows that exist. Every stub here writes into a table and a screen that
 `practitioner-workflow`, `patient-loop` or `nutrition-knowledge` built first.
 
 Decisions of record (2026-09-10,
-[`practitioner-workflow/breakdown.md § Decisions`](../practitioner-workflow/breakdown.md)) that
-bind this epic: **#3** — Mistral, EU-hosted, behind the `TextProvider` seam; **#6** — meal
+[`README.md § Decisions of record`](../README.md)) that
+bind this epic: **D-3** — Mistral, EU-hosted, behind the `TextProvider` seam; **D-6** — meal
 suggestions straight to the patient, generated recipes gated by an automated check, not a manual
-one; **#7** — CIQUAL and her rules are the knowledge the prompts retrieve; **#8** — the first round
+one; **D-7** — CIQUAL and her rules are the knowledge the prompts retrieve; **D-8** — the first round
 is meal suggestions, recipe generation and consultation notes → summary draft; free text →
 structured rows is excluded from the first round and sits last, P2. Brainstorm § 7's "no
 automation without human validation at the start" is honoured where a human reads the output
-before it acts (summary draft, recipe check) and consciously set aside for meal suggestions by #6
+before it acts (summary draft, recipe check) and consciously set aside for meal suggestions by D-6
 — they are advice to a patient, visible to Morgane, correctable, and the thing she wants to test.
 
 ## The shape every stub shares
@@ -40,10 +46,14 @@ before it acts (summary draft, recipe check) and consciously set aside for meal 
 
 ## When it starts
 
-Mid-October (decision #14, 2026-09-11): after `patient-loop/link-writes` and `meal-entry`, so the
+Mid-October (decision D-14, 2026-09-11): after `patient-loop/link-writes` and `meal-entry`, so the
 first call has a slot to land in. The context block every prompt opens with is built earlier by
 `practitioner-workflow/copy-context` and reused here unchanged. Milestones in
-[`../README.md § Milestones`](../README.md): suggestions by 31 October, generation by 15 November.
+[`README.md § Milestones`](../README.md): suggestions by 31 October, generation by 15 November.
+
+## Where it sits
+
+The patient loop (meal entry → suggestion) and the recipe library (generation → assignment) on the patient link; the consultation screen in the console; the AI seam in the services package and its generation log.
 
 ## Build order
 
@@ -59,7 +69,7 @@ first call has a slot to land in. The context block every prompt opens with is b
 4. `summary-draft` — consultation notes → a proposed living-summary revision and anamnesis
    fields, for Morgane to edit — depends-on: mistral-adapter (cross-epic:
    `practitioner-workflow/consultation-update`)
-5. `free-text-to-rows` — P2, excluded from the first round by decision #8 — depends-on:
+5. `free-text-to-rows` — P2, excluded from the first round by decision D-8 — depends-on:
    mistral-adapter (cross-epic: `practitioner-workflow/bulk-entry`)
 
 ## Parallelizable
@@ -72,7 +82,7 @@ P2, not just for 1.
 
 - Photo recognition, multiple variants, "tient compte des repas précédents de la journée" — her
   § 8 "vision finale"; a second round once the first is measured.
-- Autonomy beyond what #6 grants: nothing here archives, changes or sends a protocol on its own.
+- Autonomy beyond what D-6 grants: nothing here archives, changes or sends a protocol on its own.
 - Embeddings, agents, tool use — a single structured call per capability is the whole design
   until the log says otherwise.
 - Any vendor other than the adapter's; a second adapter is a new stub with an owner decision.
