@@ -4,6 +4,7 @@ import type {
   ConsentChannel,
   CookingAffinity,
   GoalDirection,
+  Locale,
   MealSlot,
   PatientSex,
   PatientStatus,
@@ -60,6 +61,16 @@ export const segmentLabels: Record<PatientSegment, string> = {
   journal: "Journal",
   dossier: "Dossier",
   profil: "Profil",
+};
+
+/**
+ * The two locales a patient record can carry, as Morgane reads them. Named here
+ * rather than beside one form because the profile summary and the profile form
+ * both render it, and a language must read identically in each.
+ */
+export const localeLabels: Record<Locale, string> = {
+  fr: "français",
+  en: "anglais",
 };
 
 /** How the consent was given — read on the profile and in the select. */
