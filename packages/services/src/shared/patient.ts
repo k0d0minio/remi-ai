@@ -22,6 +22,19 @@ export const patientSexes = ["female", "male", "other", "unspecified"] as const;
  */
 export const consentChannels = ["consultation", "whatsapp", "email"] as const;
 
+/**
+ * Who put a row there, on the tables the console and the patient link both
+ * write — the meal journal and the goal check-ins today, and whatever
+ * `patient-loop` adds next.
+ *
+ * `practitioner` is the default because it is what every row predating the
+ * patient link's write path actually was: Morgane transcribing from WhatsApp.
+ * The distinction is not decoration — the console shows « écrit par la
+ * patiente » from it, and the later AI round has to tell a patient's own words
+ * from her transcription of them.
+ */
+export const writtenByKinds = ["practitioner", "patient"] as const;
+
 export const recommendationCategories = [
   "nutrition",
   "habit",

@@ -51,3 +51,13 @@ Pick the entrypoint that matches where the code runs:
 The root `@remi/services` barrel is types-only and apps are lint-blocked from importing it, so the
 choice is always explicit at the call site. What each entrypoint carries, and why a seam's registry
 belongs to the entrypoint you reached it through, are in `packages/services/AGENTS.md`.
+
+`patientContextText()` is the one export that sits on two of them. It assembles a patient's
+pseudonymous context — profile, goals, the current instruction, active recommendations, supplements
+and essentials — into the plain French text an AI prompt opens with, and it is a pure function: no
+I/O, no clock, no provider. It lives under `src/ai/` because that is what it is for, and it is
+re-exported from `/shared` as well as `/ai` and `/server` because it is genuinely isomorphic — the
+console re-assembles the text in the browser as the operator edits it, and reaching it through
+`/ai` from a client component would pull the provider seam into that bundle. Its input type has no
+field for a real name, an email or a share token, so pseudonymity is a property of the signature
+rather than of the caller's memory.

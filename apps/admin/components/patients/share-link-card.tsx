@@ -20,6 +20,11 @@ type Props = {
   /** Null until the patient has an address on file — the email button needs one. */
   email: string | null;
   lastOpenedAt: Date | null;
+  /**
+   * Separate from `lastOpenedAt` because they are separate questions: one says
+   * they looked, the other says something is waiting for you.
+   */
+  lastWroteAt: Date | null;
 };
 
 /**
@@ -33,6 +38,7 @@ export const ShareLinkCard = ({
   url,
   email,
   lastOpenedAt,
+  lastWroteAt,
 }: Props) => {
   const [confirming, setConfirming] = useState(false);
   const [state, sendEmail, sending] = useActionState(
@@ -125,6 +131,12 @@ export const ShareLinkCard = ({
           : "Le lien n'a pas encore été ouvert."}
       </Typography>
 
+      <Typography size="xs" tone="muted">
+        {lastWroteAt
+          ? `Dernière écriture le ${formatDateTime(lastWroteAt)}.`
+          : "Rien n'a encore été écrit depuis le lien."}
+      </Typography>
+
       {confirming ? (
         <Typography size="xs" tone="muted">
           Régénérer tue le lien actuel : toute personne qui le détient perd
@@ -132,8 +144,9 @@ export const ShareLinkCard = ({
         </Typography>
       ) : (
         <Typography size="xs" tone="muted">
-          Toute personne détenant ce lien voit le profil et les recommandations.
-          Ne le transmettez que par un canal privé.
+          Toute personne détenant ce lien voit le profil et les recommandations,
+          et peut écrire à la place de la personne suivie. Ne le transmettez que
+          par un canal privé.
         </Typography>
       )}
     </div>

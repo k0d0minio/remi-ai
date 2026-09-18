@@ -40,6 +40,7 @@ import {
 } from "@remi/ui/server";
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
+import { CopyContextCard } from "@/components/patients/copy-context-card";
 import { DeletePatient } from "@/components/patients/delete-patient";
 import { GoalAddForm } from "@/components/patients/goal-add-form";
 import { GoalList } from "@/components/patients/goal-list";
@@ -58,18 +59,21 @@ import {
 } from "@/components/patients/patient-navigation";
 import { PantryAddForm } from "@/components/patients/pantry-add-form";
 import { PantryList } from "@/components/patients/pantry-list";
+import { PantrySection } from "@/components/patients/pantry-section";
 import { ProfileSummary } from "@/components/patients/profile-summary";
 import { PrepNote } from "@/components/patients/prep-note";
 import { QuickActions } from "@/components/patients/quick-actions";
 import { RecipeAssignments } from "@/components/patients/recipe-assignments";
 import { RecommendationAddForm } from "@/components/patients/recommendation-add-form";
 import { RecommendationGroups } from "@/components/patients/recommendation-groups";
+import { RecommendationSection } from "@/components/patients/recommendation-section";
 import { SectionFold } from "@/components/patients/section-fold";
 import { ShareLinkCard } from "@/components/patients/share-link-card";
 import { SummaryBlock } from "@/components/patients/summary-block";
 import { SummaryHead } from "@/components/patients/summary-head";
 import { SupplementAddForm } from "@/components/patients/supplement-add-form";
 import { SupplementProtocol } from "@/components/patients/supplement-protocol";
+import { SupplementSection } from "@/components/patients/supplement-section";
 import { WorkingGoals } from "@/components/patients/working-goals";
 import { WorkingMeals } from "@/components/patients/working-meals";
 import { WorkingRecommendations } from "@/components/patients/working-recommendations";
@@ -80,6 +84,7 @@ import {
   patientStatusLabels,
   type PatientSegment,
 } from "@/components/patients/vocabulary";
+import { patientContextInput } from "@/lib/patients/context";
 import { ensureDatabase } from "@/lib/database";
 
 /** Reads the database on every hit — never prerendered. */
@@ -89,7 +94,7 @@ type Params = { id: string };
 
 type PageProps = {
   params: Promise<Params>;
-  searchParams: Promise<{ segment?: string | string[] }>;
+  searchParams: Promise<{ segment?: string | string[]; from?: string }>;
 };
 
 const isPatientSegment = (value: string): value is PatientSegment =>
@@ -109,7 +114,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   // The page's own graph, not the layout's — the two render in parallel.
   ensureDatabase();
   const { id } = await params;
-  const segmentParam = (await searchParams).segment;
+  const query = await searchParams;
+  const segmentParam = query.segment;
+  // Set by the consultation screen's protocol links: leaving the write-up to
+  // add a recommendation is a round trip, so the way back is on the page she
+  // lands on rather than in her browser history.
+  const fromConsultation = query.from === "consultation";
   const segmentValue = Array.isArray(segmentParam)
     ? segmentParam[0]
     : segmentParam;
@@ -265,11 +275,15 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
         {/* Status banner — above every section, stays put on desktop. */}
         <div className="bg-background flex flex-col gap-2 lg:sticky lg:top-14 lg:z-20">
           <NextLink
-            href="/patients"
+            href={
+              fromConsultation
+                ? `/patients/${patient.id}/consultation`
+                : "/patients"
+            }
             className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/40 inline-flex w-fit items-center gap-1.5 rounded-sm text-sm transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
           >
             <ArrowLeft aria-hidden="true" className="size-4" />
-            Patients
+            {fromConsultation ? "Retour à la consultation" : "Patients"}
           </NextLink>
           <div className="flex flex-wrap items-center gap-3">
             <Typography as="h1" size="2xl" weight="semibold">
@@ -421,7 +435,35 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
             </CardContent>
           </Card>
 
-          <QuickActions />
+          <Card id="copy-context" className="scroll-mt-32">
+            <CardHeader>
+              <CardTitle>Copier le contexte</CardTitle>
+              <CardDescription>
+                Le contexte de la personne en texte clair, à coller dans le
+                modèle de votre choix. Pseudonyme uniquement, aucun appel au
+                modèle depuis REMI.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CopyContextCard
+                patientId={patient.id}
+                context={patientContextInput({
+                  patient,
+                  goals,
+                  instruction,
+                  recommendations,
+                  supplements,
+                  essentials,
+                  summary,
+                })}
+              />
+            </CardContent>
+          </Card>
+
+          {/* It reads the segment from the URL, same as the navigation. */}
+          <Suspense fallback={null}>
+            <QuickActions patientId={patient.id} />
+          </Suspense>
         </section>
 
         {/* Secondary sections — each registered once above, body untouched. */}
@@ -445,6 +487,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 url={shareUrl}
                 email={patient.email}
                 lastOpenedAt={patient.linkLastOpenedAt}
+                lastWroteAt={patient.linkLastWroteAt}
               />
             </CardContent>
           </Card>
@@ -541,15 +584,20 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
-              {recommendations.length === 0 ? (
-                <Typography size="sm" tone="muted">
-                  Rien d&apos;encodé pour le moment.
-                </Typography>
-              ) : (
-                <RecommendationGroups recommendations={recommendations} />
-              )}
-
-              <RecommendationAddForm patientId={patient.id} />
+              <RecommendationSection
+                patientId={patient.id}
+                pseudonym={patient.pseudonym}
+                recommendations={recommendations}
+              >
+                {recommendations.length === 0 ? (
+                  <Typography size="sm" tone="muted">
+                    Rien d&apos;encodé pour le moment.
+                  </Typography>
+                ) : (
+                  <RecommendationGroups recommendations={recommendations} />
+                )}
+                <RecommendationAddForm patientId={patient.id} />
+              </RecommendationSection>
 
               {archived.length > 0 ? (
                 <SectionFold
@@ -575,15 +623,20 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
-              {supplements.length === 0 ? (
-                <Typography size="sm" tone="muted">
-                  Aucun complément prescrit pour le moment.
-                </Typography>
-              ) : (
-                <SupplementProtocol supplements={supplements} />
-              )}
-
-              <SupplementAddForm patientId={patient.id} />
+              <SupplementSection
+                patientId={patient.id}
+                pseudonym={patient.pseudonym}
+                supplements={supplements}
+              >
+                {supplements.length === 0 ? (
+                  <Typography size="sm" tone="muted">
+                    Aucun complément prescrit pour le moment.
+                  </Typography>
+                ) : (
+                  <SupplementProtocol supplements={supplements} />
+                )}
+                <SupplementAddForm patientId={patient.id} />
+              </SupplementSection>
 
               {archivedSupplements.length > 0 ? (
                 <SectionFold
@@ -608,15 +661,20 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
-              {essentials.length === 0 ? (
-                <Typography size="sm" tone="muted">
-                  Aucun essentiel pour le moment.
-                </Typography>
-              ) : (
-                <PantryList essentials={essentials} />
-              )}
-
-              <PantryAddForm patientId={patient.id} />
+              <PantrySection
+                patientId={patient.id}
+                pseudonym={patient.pseudonym}
+                essentials={essentials}
+              >
+                {essentials.length === 0 ? (
+                  <Typography size="sm" tone="muted">
+                    Aucun essentiel pour le moment.
+                  </Typography>
+                ) : (
+                  <PantryList essentials={essentials} />
+                )}
+                <PantryAddForm patientId={patient.id} />
+              </PantrySection>
 
               {archivedEssentials.length > 0 ? (
                 <SectionFold
@@ -637,8 +695,9 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               <CardTitle>Recettes</CardTitle>
               <CardDescription>
                 Les recettes que cette personne a en ce moment, avec le mot qui
-                va avec chacune. Elles s&apos;écrivent une fois dans « Recettes
-                » et s&apos;attribuent ici.
+                va avec chacune. Attribuez-en plusieurs d&apos;un coup,
+                écrivez-en une ici, ou adaptez-en une en variante — la
+                bibliothèque « Recettes » garde tout.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
@@ -647,7 +706,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                   Aucune recette attribuée pour le moment.
                 </Typography>
               ) : (
-                <RecipeAssignments entries={assignedRecipes} />
+                <RecipeAssignments entries={assignedRecipes} today={today} />
               )}
 
               <AssignRecipeForm
@@ -662,7 +721,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                   label="Recettes précédentes"
                   count={pastRecipes.length}
                 >
-                  <RecipeAssignments entries={pastRecipes} />
+                  <RecipeAssignments entries={pastRecipes} today={today} />
                 </SectionFold>
               ) : null}
             </CardContent>

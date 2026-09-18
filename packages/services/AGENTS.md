@@ -35,17 +35,27 @@ it is one POST to one endpoint, so it uses `fetch` and the package stays at a si
 
 ## Entrypoints — pick the one that matches where the code runs
 
-| Import                  | Contains                                                          | Runs on          |
-| ----------------------- | ----------------------------------------------------------------- | ---------------- |
-| `@remi/services/shared` | types, domain vocabulary, formatters, `Result`, locales, app URLs | browser + server |
-| `@remi/services/server` | storage, email, AI, env — the whole Node surface                  | server only      |
-| `@remi/services/db`     | the storage seam alone                                            | server only      |
-| `@remi/services/ai`     | model roles + the provider seam                                   | server only      |
-| `@remi/services/email`  | the mailer seam                                                   | server only      |
-| `@remi/services`        | types only — apps are lint-blocked from it                        | —                |
+| Import                  | Contains                                                                                | Runs on          |
+| ----------------------- | --------------------------------------------------------------------------------------- | ---------------- |
+| `@remi/services/shared` | types, domain vocabulary, formatters, `Result`, locales, app URLs, the AI context block | browser + server |
+| `@remi/services/server` | storage, email, AI, env — the whole Node surface                                        | server only      |
+| `@remi/services/db`     | the storage seam alone                                                                  | server only      |
+| `@remi/services/ai`     | model roles, the provider seam, the context block                                       | server only      |
+| `@remi/services/email`  | the mailer seam                                                                         | server only      |
+| `@remi/services`        | types only — apps are lint-blocked from it                                              | —                |
 
 Adding an entrypoint means editing **two** places that must agree: `exports` in `package.json` and
 `entry` in `tsup.config.ts`.
+
+**One export sits on both `/shared` and `/ai`, and only one ever should.**
+`ai/context.ts` — `patientContextText()`, the pseudonymous French block every prompt opens with —
+imports nothing, touches no I/O and reads no clock, so it is genuinely isomorphic even though it
+belongs conceptually under `ai/`. The console assembles that text **in the browser** as the
+operator edits the preamble and toggles blocks, and reaching it through `/ai` from a client
+component would inline the provider seam — and, once an adapter exists, a vendor SDK — into that
+bundle. So `shared/index.ts` re-exports it from `../ai/context` directly, never from `../ai`.
+Anything under `ai/` that touches the seam stays off `/shared`, and the test of whether a new
+export may join it is the same one: does it import anything at all?
 
 **A seam's registry belongs to the entrypoint you reached it through.** tsup bundles each entry
 independently, so `@remi/services/email` and `@remi/services/server` carry their own copy of the
@@ -91,7 +101,7 @@ src/
   auth/        password hashing + session tokens — vendor-free, `node:crypto` only
   db/          client.ts (the seam) · schema.ts (Drizzle) · adapters/ · models/ · services/ · migrations/
   email/       the mailer seam + templates
-  ai/          model roles + the provider seam
+  ai/          model roles · the provider seam · context.ts (the prompt's context block)
 ```
 
 `db/models/` files are **types only**. That is what lets `shared/` re-export the domain vocabulary

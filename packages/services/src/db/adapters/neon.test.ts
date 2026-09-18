@@ -39,6 +39,11 @@ describe("neon adapter", () => {
   it("serves every table the schema declares", () => {
     const db = createNeonDatabase();
     expect(schemaTableNames).toContain("patient_supplements");
+    // The CIQUAL tables for the same reason: the foods service asks the seam
+    // for these three names, and the in-memory client would invent any of them.
+    expect(schemaTableNames).toEqual(
+      expect.arrayContaining(["foods", "food_nutrients", "ciqual_imports"]),
+    );
     for (const name of schemaTableNames) {
       expect(db.collection(name)).toBeDefined();
     }
