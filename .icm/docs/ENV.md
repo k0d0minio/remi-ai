@@ -179,24 +179,23 @@ unless a second analytics vendor arrives with a reader to go with it.
 
 ## Pipeline & CI (GitHub Actions)
 
-| Variable                   | Purpose                                                                                                                                                                     | Where set | Public? |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
-| `GITHUB_TOKEN`             | Injected automatically by Actions — do **not** add it                                                                                                                       | Actions   | no      |
-| `GH_TOKEN`                 | Local alternative for the pipeline scripts (`resolve-run.sh`, `new-run.sh`, `project-labels.sh`)                                                                            | local     | no      |
-| `GITHUB_REPO`              | Optional `owner/repo` override for the pipeline scripts. Default: `k0d0minio/remi-ai`                                                                                       | local     | no      |
-| `GITHUB_API_URL`           | API base for the same scripts — Actions injects it; set it locally only for an override. Default: `https://api.github.com`                                                  | both      | no      |
-| `TURBO_TOKEN`              | Turborepo remote cache token — shares the cache between CI and Vercel                                                                                                       | Actions   | no      |
-| `TURBO_TEAM`               | Turborepo team slug (a repo **variable**, not a secret)                                                                                                                     | Actions   | no      |
-| `SHIP_NOTE_FROM`           | From-address for the Ship stage's note (`send-ship-note.sh`)                                                                                                                | local     | no      |
-| `SHIP_NOTE_RECIPIENTS`     | Where the ship note goes — normally one channel inbox address                                                                                                               | local     | no      |
-| `PIPELINE_REQUIRED_CHECKS` | Check-run names `ci-status.sh` must see completed before GREEN — **newline-separated**. Set in-repo by `.claude/settings.json` → `env`; export it by hand for a plain shell | repo      | no      |
+| Variable                   | Purpose                                                                                                                                                               | Where set | Public? |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
+| `GITHUB_TOKEN`             | Injected automatically by Actions — do **not** add it                                                                                                                 | Actions   | no      |
+| `GH_TOKEN`                 | Local alternative for the pipeline scripts — every GitHub call goes through `.icm/scripts/lib/gh.sh`, which takes either token, else a logged-in `gh`                 | local     | no      |
+| `GITHUB_REPO`              | Optional `owner/repo` override for the pipeline scripts. Default: derived from `origin`                                                                               | local     | no      |
+| `GITHUB_API_URL`           | API base for the same scripts — Actions injects it; set it locally only for an override. Default: `https://api.github.com`                                            | both      | no      |
+| `TURBO_TOKEN`              | Turborepo remote cache token — shares the cache between CI and Vercel                                                                                                 | Actions   | no      |
+| `TURBO_TEAM`               | Turborepo team slug (a repo **variable**, not a secret)                                                                                                               | Actions   | no      |
+| `SHIP_NOTE_FROM`           | From-address for the post-merge note (`.icm/scripts/notify.sh`); falls back to `EMAIL_FROM`                                                                           | local     | no      |
+| `SHIP_NOTE_RECIPIENTS`     | Where the post-merge note goes — normally one channel inbox address. Unset in a remote session: the note is printed, not sent (`RESULT: SKIPPED`)                     | local     | no      |
+| `PIPELINE_REQUIRED_CHECKS` | Optional **newline-separated** override of `required_checks` in `.icm/project.json` — the checked-in home of the check names `ci-status.sh` waits for. Normally unset | local     | no      |
 
-`PIPELINE_REQUIRED_CHECKS` is the one row here with a checked-in home: it names check runs, not a
-secret, so `.claude/settings.json` → `env` carries it and every agent session in this repo has it
-without anyone setting anything up. Its value today is this repo's one blocking Actions check,
-`Format, lint, typecheck` — **one name per line, never comma-separated**, because that name
-contains commas. `Pipeline gates` is deliberately absent; the reasoning is in
-[`.icm/_shared/ci.md`](../_shared/ci.md).
+The required check names have a checked-in home — `required_checks` in `.icm/project.json` — which
+today holds this repo's one blocking Actions check, `Format, lint, typecheck`, **one name per array
+element** (the name contains commas, so no comma-separated form can carry it). `PIPELINE_REQUIRED_CHECKS`
+only overrides it, one name per line. `Pipeline gates (advisory)` is deliberately not required: it
+projects the PR body's checkboxes, not the factory (`.icm/_shared/project-rules.md` → The factory).
 
 ## Not wired yet
 
@@ -204,5 +203,5 @@ Nothing reads these today. Document the real value here the moment each is integ
 
 - **Error tracking** — `SENTRY_DSN` (+ `NEXT_PUBLIC_SENTRY_DSN`). Until it exists, a production
   exception is invisible. This is the top unstarted ops item.
-- **Payments** — the Verify stage's smoke checklist has a payments line that stays "not touched"
-  until this exists.
+- **Payments** — nothing reads a Stripe key yet; billing arrives with the parked
+  `beyond-december/practitioner-space` stub, and its variables land here then.

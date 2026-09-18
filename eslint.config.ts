@@ -187,7 +187,7 @@ export default defineConfig(
     },
   },
   {
-    // apps/demo is the Design stage's sandbox: mock data only, no services, no auth.
+    // apps/demo is the prototype sandbox: mock data only, no services, no auth.
     // The lint rule is what keeps it a sandbox instead of a second product.
     files: ["apps/demo/**/*.{ts,tsx}"],
     rules: {

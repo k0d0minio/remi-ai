@@ -12,7 +12,7 @@ apps/
   admin/        internal operations — operator-only, separate deployment (:3002)
   docs/         the reference site — Nextra (:3003)
   support/      the public help centre — unauthenticated, indexable (:3004)
-  demo/         the Design stage's prototype sandbox — mock data only (:3005)
+  demo/         the prototype sandbox — mock data only, no backend (:3005)
 packages/
   ui/           @remi/ui — the design system; the only home for primitives
   services/     @remi/services — storage, email, AI, env; seams, not integrations

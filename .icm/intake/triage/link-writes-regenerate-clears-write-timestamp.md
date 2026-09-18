@@ -1,11 +1,8 @@
-# link-writes-regenerate-clears-write-timestamp
+# Stub: Rotating the share link says the patient has written nothing
 
-- epic: triage
 - lane: tweak
-- status: active
-- created: 2026-09-17
+- found-by: the `link-writes` Release code review · 2026-09-17
 - size: S
-- depends-on: none
 
 ## Problem
 
@@ -21,8 +18,16 @@ history. The question is whether that is the fact Morgane wants, or whether she 
 le nouveau lien, N entrées avant ». It is a product question, not a defect, and it only matters
 once patients are actually writing — `patient-loop/meal-entry` is when it becomes visible.
 
-## Acceptance
+## Proposed change
+
+Ask Morgane which reading she wants after a rotation and make the card say that; never imply an empty journal.
+
+## Acceptance criteria (rough)
 
 - [ ] Ask Morgane which reading she wants after a rotation, and make the card say that.
 - [ ] Whatever is chosen, the card never implies a patient has written nothing when their entries
       are in the journal.
+
+## Prompt
+
+Run `/pipeline tweak link-writes-regenerate-clears-write-timestamp` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

@@ -2,31 +2,33 @@
 # validate-spec.sh — Define's structural self-check on a run's spec.md.
 #
 # Define calls this before opening (or revising) the draft PR, instead of eyeballing the structure
-# conversationally. It checks only the DETERMINISTIC, non-AI properties: header fields, required
-# sections, acceptance criteria written as checkboxes. Whether an open question actually *blocks* a
-# criterion is a judgement the agent still owns — open questions are surfaced as an advisory line,
-# never a failure. No network. Pure awk/grep.
+# conversationally. It checks only the DETERMINISTIC, non-AI properties of the spec — header fields,
+# required sections, acceptance criteria written as checkboxes. Whether an open question actually
+# *blocks* a criterion is a judgement the agent still owns; this script surfaces open questions as an
+# advisory line, it does not fail on them. Requires no network. awk/grep, plus jq to read the
+# repo's persona vocabulary from .icm/project.json.
 #
-# It runs at Define time, before the gate. The pipeline.yaml CI job also runs it on later pushes,
-# but only as an advisory job-summary note — it never red-blocks the PR.
+# This is a Define-time call, not a CI check (see issue #548, open question 1) — it runs in the
+# Define stage before the gate, never as a GitHub Action.
 #
 # Usage:
-#   .icm/scripts/validate-spec.sh <slug>             # resolves .icm/runs/<slug>/02_define/output/spec.md
-#   .icm/scripts/validate-spec.sh <path-to-spec.md>  # or validate a file directly
+#   .icm/scripts/validate-spec.sh <slug>            # resolves .icm/runs/<slug>/02_define/output/spec.md
+#   .icm/scripts/validate-spec.sh <path-to-spec.md> # or validate a spec file directly
 #
 # Verdict (stdout, last line):
-#   RESULT: OK        exit 0  — structure is sound; ready for the human to review.
-#   RESULT: INVALID   exit 2  — structural problems (listed on stderr) — fix and re-run.
+#   RESULT: OK        exit 0  — structure is sound; the spec is ready for the human to review.
+#   RESULT: INVALID   exit 2  — one or more structural problems (listed on stderr) — fix and re-run.
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 die() { echo "error: $*" >&2; exit 1; }
 
-# The app vocabulary — must stay in step with .github/labels.yml and project-labels.sh.
-APPS=(web admin marketing docs support demo packages)
+command -v jq >/dev/null || die "jq not found — needed to read the persona vocabulary from .icm/project.json"
+# shellcheck source=lib/project.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib/project.sh"
 
-# --- args → spec path -------------------------------------------------------------------------
+# --- args → spec path ------------------------------------------------------------------------------
 
 arg=""
 while [ $# -gt 0 ]; do
@@ -41,22 +43,20 @@ if [ -f "$arg" ]; then
   spec="$arg"
 else
   spec="$repo_root/.icm/runs/$arg/02_define/output/spec.md"
-  # Legacy six-stage layout — the archived runs keep their spec at 03_define/.
-  [ -f "$spec" ] || spec="$repo_root/.icm/runs/$arg/03_define/output/spec.md"
 fi
-[ -f "$spec" ] || die "no spec at $spec (write spec.md first, or pass an explicit path)"
+[ -f "$spec" ] || die "no spec found at .icm/runs/$arg/02_define/output/spec.md (write spec.md first, or pass an explicit path)"
 
-# --- checks -----------------------------------------------------------------------------------
+# --- checks ----------------------------------------------------------------------------------------
 
 problems=()
 add() { problems+=("$1"); }
 
-# 1. Header fields present — these are the projection inputs for the labels and the PR body.
-for field in slug apps touches complexity; do
+# 1. Header fields present (the projection inputs for labels + the PR body).
+for field in slug personas touches complexity; do
   grep -Eq "^- ${field}:[[:space:]]*[^[:space:]]" "$spec" || add "missing or empty header field: '- ${field}:'"
 done
 
-# complexity must be one of the fixed vocabulary — the label depends on it.
+# complexity must be one of the fixed vocabulary (labels depend on it).
 complexity="$(grep -m1 '^- complexity:' "$spec" | sed -E 's/^- complexity:[[:space:]]*//; s/[[:space:]]*$//' | tr '[:upper:]' '[:lower:]' || true)"
 case "$complexity" in
   trivial|standard|complex) : ;;
@@ -64,15 +64,19 @@ case "$complexity" in
   *) add "complexity must be trivial|standard|complex, found: '$complexity'" ;;
 esac
 
-# apps must name at least one workspace app. project-labels.sh hard-fails without one, and by then
-# the PR is already open — catch it here, before any side effect.
-apps_raw="$(grep -m1 '^- apps:' "$spec" | sed -E 's/^- apps:[[:space:]]*//; s/[[:space:]]*$//' || true)"
-if [ -n "$apps_raw" ]; then
-  app_hit=0
-  for vocab in "${APPS[@]}"; do
-    printf '%s' "$apps_raw" | grep -iqwE "$vocab" && app_hit=1
+# personas must name at least one word of the repo's own persona vocabulary — the `personas`
+# array in .icm/project.json (lib/project.sh), the same list project-labels.sh projects from.
+# project-labels.sh hard-fails without a match, and by then the PR is already open; catch it
+# here, before any side effect. A repo that declares no vocabulary projects no persona labels
+# and is not wrong, so the check is skipped for it.
+personas_raw="$(grep -m1 '^- personas:' "$spec" | sed -E 's/^- personas:[[:space:]]*//; s/[[:space:]]*$//' || true)"
+persona_vocab="$(project_list '.personas')"
+if [ -n "$personas_raw" ] && [ -n "$persona_vocab" ]; then
+  persona_hit=0
+  for vocab in $persona_vocab; do
+    printf '%s' "$personas_raw" | grep -iqwE "$vocab" && persona_hit=1
   done
-  [ "$app_hit" -eq 1 ] || add "apps must name at least one of: ${APPS[*]} — found: '$apps_raw'"
+  [ "$persona_hit" -eq 1 ] || add "personas must name at least one of the repo's vocabulary (personas in .icm/project.json): $(printf '%s' "$persona_vocab" | paste -sd', ' -) — found: '$personas_raw'"
 fi
 
 # 2. Required sections present.
@@ -80,7 +84,8 @@ for section in "Problem" "Proposed change" "Acceptance criteria" "Out of scope" 
   grep -Eq "^##[[:space:]]+${section}[[:space:]]*$" "$spec" || add "missing required section: '## ${section}'"
 done
 
-# 3. Acceptance criteria are checkboxes — at least one, and every bullet in the section is one.
+# 3. Acceptance criteria are checkboxes — at least one, and every bullet in the section is a checkbox.
+#    awk extracts the body of the '## Acceptance criteria' section (up to the next '## ' heading).
 ac_section="$(awk '
   /^##[[:space:]]+Acceptance criteria[[:space:]]*$/ { grab=1; next }
   grab && /^##[[:space:]]/ { grab=0 }
@@ -95,9 +100,9 @@ if grep -Eq "^##[[:space:]]+Acceptance criteria[[:space:]]*$" "$spec"; then
   [ "$ac_plain_bullets" -eq 0 ] || add "## Acceptance criteria has $ac_plain_bullets non-checkbox bullet(s) — every criterion must be a '- [ ]' checkbox"
 fi
 
-# --- advisory (never a failure): open questions ------------------------------------------------
-# The template says Open questions must be "none" or non-blocking notes. Whether an entry blocks a
-# criterion is the agent's call — we only flag that entries exist, so it gets a second look.
+# --- advisory (not a failure): open questions ------------------------------------------------------
+# The spec template says Open questions must be "none" or only non-blocking notes. Whether an entry
+# blocks a criterion is the agent's call — we only flag that entries exist so it gets a second look.
 oq_section="$(awk '
   /^##[[:space:]]+Open questions[[:space:]]*$/ { grab=1; next }
   grab && /^##[[:space:]]/ { grab=0 }
@@ -105,10 +110,10 @@ oq_section="$(awk '
 ' "$spec")"
 oq_entries="$(printf '%s\n' "$oq_section" | grep -E '^[[:space:]]*-[[:space:]]' | grep -Eiv '^[[:space:]]*-[[:space:]]+none[[:space:].]*$' || true)"
 
-# --- verdict ----------------------------------------------------------------------------------
+# --- verdict ---------------------------------------------------------------------------------------
 
 if [ -n "$oq_entries" ]; then
-  echo "advisory: ## Open questions has entries — confirm none of them block an acceptance criterion. Move anything you won't do this run to ## Out of scope." >&2
+  echo "advisory: ## Open questions has entries — confirm none of them block an acceptance criterion (Define gate). Move anything you won't do this run to ## Out of scope." >&2
 fi
 
 if [ "${#problems[@]}" -eq 0 ]; then

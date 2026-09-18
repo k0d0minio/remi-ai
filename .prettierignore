@@ -7,3 +7,17 @@ pnpm-lock.yaml
 
 # Canonical assets seeded from icm-board — kept byte-identical to the template
 .claude/
+
+# Immutable records — pipeline run artifacts are written once and kept verbatim; reformatting
+# them rewrites history for no benefit.
+.icm/runs/
+
+# Template-owned pipeline files — byte-identical with the estate template in icm-board
+# (`_system/template/icm-pipeline/MANIFEST`, estate decision D20) and synced from it by
+# `icm-sync.sh`. A formatter pass here would put them out of step with every other repo and read
+# as drift; they are edited in the template, never in place. `.claude/` above covers the router.
+.icm/stages/
+.icm/lanes/
+.icm/_shared/
+.icm/intake/CONTEXT.md
+.github/pull_request_template.md

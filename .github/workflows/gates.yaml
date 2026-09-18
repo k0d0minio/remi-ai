@@ -1,9 +1,13 @@
 name: Gates
 
 # The pipeline's two human gates are checkboxes in the PR body (`.icm/_shared/github.md` →
-# "Gates"). This job is the machinery that makes them binding: a gate that is present and unticked
-# is a red check, so branch protection can hold the merge until a human ticks it. Nothing here
-# ticks a box — it only reads.
+# Gates). This job reads them and is red while a gate that is present in the body is unticked —
+# a visible signal on the PR, so nobody has to open the body to see where a run stands. It is
+# ADVISORY to the factory's verdict, and says so in its name: `ci-status.sh` classes a check run
+# whose name ends "(advisory)" as reported-never-blocking, which is right — the stage contracts
+# read the checkbox itself out of the body, never a projection of it, and `main`'s ruleset does
+# not require this check. A lane PR carries no anchors and reads green. Nothing here ticks a box —
+# it only reads.
 #
 # `edited` is the trigger that matters: ticking a checkbox changes the body and nothing else.
 #
@@ -23,7 +27,7 @@ permissions: {}
 jobs:
   gates:
     runs-on: ubuntu-latest
-    name: Pipeline gates
+    name: Pipeline gates (advisory)
     timeout-minutes: 5
     steps:
       - name: Read the gate checkboxes in the PR body

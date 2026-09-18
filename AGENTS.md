@@ -92,40 +92,43 @@ Nothing below is restated here. Each rule lives once, and loads on demand.
 ## How work gets done here
 
 Through the pipeline, not ad hoc. The spine is **four stages — Scope → Define → Build → Release**,
-the estate's standard set (`_system/template/icm-pipeline/` in icm-board):
+the estate's standard set: the contracts are synced from `_system/template/icm-pipeline/` in
+icm-board and carry no repo identity; what is true of this repo is in
+[`.icm/_shared/project-rules.md`](.icm/_shared/project-rules.md) and [`.icm/project.json`](.icm/project.json).
 
-| Stage       | What it owns                                                                   |
-| ----------- | ------------------------------------------------------------------------------ |
-| **Scope**   | interrogate the business logic → `scope.md` → cut the intake batch. No PR.     |
-| **Define**  | one stub → an approvable `spec.md`; opens the run's **one** feature PR (draft) |
-| **Build**   | implement the spec on the branch, prove CI green, flip the PR draft → open     |
-| **Release** | review passes · docs + changelog in-PR → gated squash-merge → ship note        |
+| Stage       | What it owns                                                                                                            |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **Scope**   | record the source, settle it with the operator in session → `scope.md` (`D-n` decisions) → cut the intake batch. No PR. |
+| **Define**  | one stub → an approvable `spec.md`; opens the run's **one** feature PR (draft)                                          |
+| **Build**   | implement the spec on the branch, prove CI green, flip the PR draft → open                                              |
+| **Release** | review passes · docs + changelog + close-out in-PR → gated squash-merge → `notify.sh`                                   |
 
-`/pipeline scope "<topic>"` for a new capability; `/pipeline bug | tweak | chore "<request>"` for the
-fast lanes; `/pipeline status` to see where everything stands. Every stage has a human gate at its
-boundary and the agent never crosses one on its own.
+`/pipeline scope <input>` for anything new; `/pipeline new` for the next stub; `/pipeline bug | tweak |
+chore "<request>"` (or `<stub-name>` from `.icm/intake/triage/`) for the fast lanes; `/pipeline
+knowledge add|edit|remove "<what>"` to change a docs page outside a Release. The bare forms route the
+same without the slash. Every stage has a human gate at its boundary and the agent never crosses one
+on its own.
 
-**Two binding gates, both PR checkboxes, both the owner's to tick.** **Spec approved** before Build;
-**Ready to merge** before the squash-merge. Ticking the second one **attests your own manual and
-signed-in testing of the change** — that is why Release has no quality gate of its own and never
+**Two binding gates, both PR checkboxes, both the operator's to tick.** **Spec approved** before
+Build; **Ready to merge** before the squash-merge. Ticking the second one **attests your own manual
+and signed-in testing of the change** — that is why Release has no quality gate of its own and never
 asks you to re-test. Once it is ticked, only three things may still stop the merge: a blocking CI
 failure, a security-critical finding introduced by the diff, or a deploy-breaking config finding.
-Everything else is parked as a stub in `.icm/intake/triage/` and the merge proceeds.
+Everything else is parked as a stub in `.icm/intake/triage/` and the merge proceeds. Lane PRs carry
+no checkboxes: the merge button is the gate.
 
-**`apps/demo` is not a pipeline stage.** The six-stage pipeline had a **Design** stage that made a
-prototype in `apps/demo` mandatory between Scope and Define. In twelve runs it was never once used,
-so it was **dropped** rather than folded into Scope or kept as a lane (Jamie's call, 2026-09-08).
-Prototyping is Build's when a change wants one; `apps/demo` survives as an ordinary app with its own
-[`AGENTS.md`](apps/demo/AGENTS.md) and its own guards, reachable by any lane or run that needs it.
-`stage:verify`, `stage:ship` and `type:design` remain in [`.github/labels.yml`](.github/labels.yml)
-as **historical only**, so the archived runs' merged PRs keep valid labels.
+`apps/demo` is an ordinary app with its own [`AGENTS.md`](apps/demo/AGENTS.md) and its own guards —
+mock data only. Prototyping is Build's when a change wants one.
 
 **CI is the source of truth.** Never run local checks; push and read the verdict back through
 `.icm/scripts/ci-status.sh` — one blocking call per push ([`.icm/_shared/ci.md`](.icm/_shared/ci.md)).
-And **no PR in this repository is subscribed to**: a single push produces a dozen-plus deploy and
-job events, none of them a verdict ([`.icm/_shared/github.md`](.icm/_shared/github.md) § PR events).
+Two changed-files-only feedback scripts, `.icm/scripts/format.sh` and `.icm/scripts/lint.sh`, exist
+for the gap before a push; neither is the verdict. And **no PR in this repository is subscribed
+to**: a single push produces a dozen-plus deploy and job events, none of them a verdict
+([`.icm/_shared/github.md`](.icm/_shared/github.md) § PR events).
 
-The ordered backlog lives in [`.icm/intake/`](.icm/intake/README.md) (estate ticket standard,
-formerly `ISSUES/`): one markdown ticket per unit of work, each with a pasteable agent prompt.
-**The PR that implements a ticket is the PR that retires it** — the move into `_done/` rides along
-with the work, never a follow-up sweep. The mechanics are in that README.
+The ordered backlog lives in [`.icm/intake/`](.icm/intake/README.md) (the estate ticket standard:
+epics of sequenced stubs, a triage lane for one-off findings, and the decisions of record and the
+milestones in its README). **The PR that implements a stub is the PR that retires it** —
+`new-run.sh --stub` moves it into `_done/` when the run opens, and `close-out.sh` archives the epic
+when its last run merges; never a follow-up sweep.

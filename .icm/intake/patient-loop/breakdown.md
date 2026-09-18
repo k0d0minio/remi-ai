@@ -1,4 +1,8 @@
-# Epic: patient-loop — the link the patient writes into
+# Breakdown: patient-loop — the link the patient writes into
+
+- scope-slug: patient-loop · story: none — cut 2026-09-10 from Morgane's feedback § 6 and § 8 (precedence row 1), with the old version's patient flows (row 5) as flows to learn from
+- initiative: a patient experience validated on real terrain, in time for the December open day / objective: the patient loop working end to end for one real patient
+- personas: patient, practitioner
 
 Cut 2026-09-10 from Morgane's feedback § 6 and § 8
 ([`remi-v2-feedback-on-first-version.docx`](../../docs/collaboration/remi-v2-feedback-on-first-version.docx),
@@ -11,8 +15,8 @@ consultations?** A static rendering of the protocol cannot answer that; a page t
 into can.
 
 Today `/p/[token]` is six read-only segments (home, recommandations, compléments, placard-frigo,
-recettes, repas) and the token is the whole credential. Decision #2 of 2026-09-10
-([`practitioner-workflow/breakdown.md § Decisions`](../practitioner-workflow/breakdown.md)) makes
+recettes, repas) and the token is the whole credential. Decision D-2 of 2026-09-10
+([`README.md § Decisions of record`](../README.md)) makes
 the same link **read + write**: patient accounts wait (`beyond-december`), so the token stays the
 credential and everything a patient writes is attributed to the token's patient.
 
@@ -26,25 +30,29 @@ fills it instantly later. Her § 6's list is the scope, verbatim:
 - Mes essentiels : aliments à avoir à la maison.
 - Interaction repas : « Je vais manger » et « J'ai mangé ».
 
-Plus, from the old version and decision #9: quick feedback on recipes with favourites, an in-page
+Plus, from the old version and decision D-9: quick feedback on recipes with favourites, an in-page
 check-in, and a simple progression view.
 
 ## What I understood
 
-Same brief and same decisions as `practitioner-workflow`. The ones this epic leans on: #2 (token
-read + write), #6 (suggestions straight to the patient — the slot is built here, the model arrives
-in `ai-assist`), #9 (check-ins in-page, no outbound channel), #12 (text-only meals).
+Same brief and same decisions as `practitioner-workflow`. The ones this epic leans on: D-2 (token
+read + write), D-6 (suggestions straight to the patient — the slot is built here, the model arrives
+in `ai-assist`), D-9 (check-ins in-page, no outbound channel), D-12 (text-only meals).
 
 ## Feedback § / V2 flow → stub
 
 | Source                                                                               | Stub                             |
 | ------------------------------------------------------------------------------------ | -------------------------------- |
-| decision #2 · RETENTION                                                              | `link-writes`                    |
+| decision D-2 · RETENTION                                                             | `link-writes`                    |
 | § 6 "Aujourd'hui / cette semaine", recommandations, essentiels                       | `patient-home-today`             |
 | § 6 « Je vais manger » / « J'ai mangé » · § 8                                        | `meal-entry`                     |
 | § 7 patient feedback (J'aime / Pas pour moi / Trop long / À refaire) · V2 favourites | `recipe-feedback-and-favourites` |
 | V2 patient onboarding (profile the patient completes) · § 7 profile inputs           | `patient-profile-edit`           |
-| V2 "feedback régulier" + "Ma progression" · decision #9                              | `check-in-and-progression`       |
+| V2 "feedback régulier" + "Ma progression" · decision D-9                             | `check-in-and-progression`       |
+
+## Where it sits
+
+The patient link (`/p/[token]`) — home, meals, recipes, profile, progression — and the console's journal, assignment rows and at-a-glance goals slot.
 
 ## Build order
 
@@ -70,7 +78,7 @@ both read the journal but neither changes its shape.
 
 ## Out of scope (whole epic)
 
-- Any model call (`ai-assist`); photos (decision #12); accounts, email nudges, push
-  (`beyond-december`, decision #9).
+- Any model call (`ai-assist`); photos (decision D-12); accounts, email nudges, push
+  (`beyond-december`, decision D-9).
 - Anything in `apps/admin` beyond what a write here needs to show up there (the journal already
   renders entries; a "patient-written" marker is in scope, a redesign is not).

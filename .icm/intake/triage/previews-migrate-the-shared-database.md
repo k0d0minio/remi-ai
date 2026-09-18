@@ -1,11 +1,8 @@
-# previews-migrate-the-shared-database
+# Stub: Preview deploys migrate the shared database
 
-- epic: triage
 - lane: chore
-- status: active
-- created: 2026-09-17
+- found-by: PR #95's preview deploys, confirmed again by `ciqual-import` (#102) · 2026-09-17
 - size: M
-- depends-on: none
 
 ## Problem
 
@@ -58,7 +55,22 @@ The immediate fix was to hand-guard that migration (`ADD COLUMN IF NOT EXISTS` p
 `duplicate_object` catch), which is the repair `migrate.mjs` itself prescribes. That unblocks one
 PR. It does not stop the next branch doing the same thing.
 
-## Worth knowing
+## Proposed change
+
+Settle whether previews migrate at all and against what: a Neon branch per preview, or the opt-out off on every project and the trade-off written where a tester reads it; make the guard fail closed.
+
+## Acceptance criteria (rough)
+
+- [ ] It is settled and written down whether previews migrate at all, and against what database.
+- [ ] If previews keep migrating: each gets its own Neon branch, so no preview can write into the
+      database another deploy reads.
+- [ ] If they do not: `ALLOW_NON_PRODUCTION_MIGRATIONS` is off on every project, and the tradeoff —
+      a preview serving against `main`'s schema, so a branch's new columns are absent until merge —
+      is stated where someone testing a preview will read it.
+- [ ] `.icm/docs/ENV.md` records the setting per project and the reason.
+- [ ] `migrate.mjs`'s header stops describing a guard that is not in force.
+
+## Notes
 
 - The failure mode is asymmetric and nasty: the preview that pollutes the database **passes**, and
   the cost lands on a later build, often on a different branch, as an error that names a column
@@ -73,13 +85,6 @@ PR. It does not stop the next branch doing the same thing.
   match it, and `.icm/docs/ENV.md` should say which projects carry it and why. Right now the code
   says one thing and the deployment says another, which is worse than either.
 
-## Acceptance
+## Prompt
 
-- [ ] It is settled and written down whether previews migrate at all, and against what database.
-- [ ] If previews keep migrating: each gets its own Neon branch, so no preview can write into the
-      database another deploy reads.
-- [ ] If they do not: `ALLOW_NON_PRODUCTION_MIGRATIONS` is off on every project, and the tradeoff —
-      a preview serving against `main`'s schema, so a branch's new columns are absent until merge —
-      is stated where someone testing a preview will read it.
-- [ ] `.icm/docs/ENV.md` records the setting per project and the reason.
-- [ ] `migrate.mjs`'s header stops describing a guard that is not in force.
+Run `/pipeline chore previews-migrate-the-shared-database` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

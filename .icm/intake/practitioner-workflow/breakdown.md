@@ -1,4 +1,8 @@
-# Epic: practitioner-workflow — the console follows the consultation, not the schema
+# Breakdown: practitioner-workflow — the console follows the consultation, not the schema
+
+- scope-slug: practitioner-workflow · story: none — cut 2026-09-10 from Morgane's feedback on the first version (precedence row 1, covering message in `correspondence/03`)
+- initiative: a patient experience validated on real terrain, in time for the December open day / objective: a usable patient version for the partner clinic to test on 1 December
+- personas: practitioner, operator
 
 Cut 2026-09-10 from Morgane's feedback on the first version
 ([`.icm/docs/collaboration/remi-v2-feedback-on-first-version.docx`](../../docs/collaboration/remi-v2-feedback-on-first-version.docx),
@@ -36,62 +40,9 @@ with nothing changed in what it does — was dropped whole in favour of this one
 (R1–R30, primary sources on record-page layout, progressive disclosure, phone ergonomics) still
 applies and is cited by slug below rather than repeated.
 
-## Decisions of record (Jamie, 2026-09-10)
+## Decisions of record
 
-These bind all five epics cut that day (`practitioner-workflow`, `patient-loop`,
-`nutrition-knowledge`, `ai-assist`, `beyond-december`). Where one supersedes a decision of
-2026-09-01 ([`patient-record/breakdown.md § Decisions`](../_done/patient-record/breakdown.md)) it
-says so; the rest of that list still stands, as does the brainstorm's § 7 what-not-to-build.
-
-1. **The practitioner space is the admin console, reorganised.** No second signed-in surface before
-   the open day. Morgane stays an operator. Her § 3's A/B split ("console admin" vs "espace
-   praticien") is _console pages vs the patient page_ inside `apps/admin`, not two apps.
-2. **The patient link becomes read + write on the same token.** Supersedes 2026-09-01 #1 (view-only,
-   WhatsApp carries the loop). The token in the URL is still the whole credential; patient accounts
-   are parked in `beyond-december`.
-3. **AI vendor: Mistral, EU-hosted, behind the existing `TextProvider` seam.** Supersedes "AI
-   deliberately unchosen". One adapter file; nothing above the seam names it.
-4. **Order: `practitioner-workflow` → `patient-loop` → `ai-assist`.** `nutrition-knowledge` runs
-   alongside the first two and is a dependency of recipe generation. Her § 9 order.
-5. **Recipes: the library stays.** Generation writes into it and assigns in the same step; a recipe
-   can be created from the patient page and assigned at creation; duplicate-as-variant exists.
-   Extends 2026-09-01 #5 rather than replacing it. Patient groups are parked.
-6. **Meal suggestions go straight to the patient** — no practitioner gate. Every exchange is visible
-   in the journal in admin and Morgane can correct after the fact. Generated recipes pass an
-   _automated_ check (allergies, intolerances, diet, active recommendations, time and difficulty)
-   and reach the patient without a manual gate; she can archive any of them.
-7. **Knowledge layer now: CIQUAL + Morgane's own nutrition rules as text.** Genotype (Fagron / Dr
-   Mouton) parked until the rights question is answered.
-8. **First AI round: meal suggestions, recipe generation, consultation notes → summary draft.**
-   "Free text → structured rows" is _explicitly excluded_ from the first round; it sits P2 at the
-   end of `ai-assist` so it is not lost.
-9. **Check-ins are in-page, with no outbound channel**; a simple progression view on both sides.
-10. **FunMedDev's team tests on 1 December as patients Morgane creates.** Practitioner sign-up,
-    admin approval, Stripe, the 3-months-free rule, patient accounts and PDF import are all parked
-    in `beyond-december`.
-11. **Her feedback ranks 1** in [`.icm/docs/README.md § Precedence`](../../docs/README.md).
-12. **The meal journal stays text-only** (2026-09-01 #6 stands); photos are parked pending a blob
-    vendor — an owner decision, never made in passing.
-
-## Decisions of record (Jamie, 2026-09-11 — before the call with Morgane and Arnaud)
-
-The twelve above were taken the day the feedback arrived and had not left the repository; the
-call of 11 September is where Morgane and Arnaud confirm or overturn them. Three more, from the
-preparation of that call:
-
-13. **A bridge for "tester dès maintenant" that calls no model: `copy-context`.** Her § 9.4 aside
-    — she already generates with ChatGPT from a hand-typed profile — becomes one button that
-    exports the patient's pseudonymous context as a prompt. Its assembler is the context block
-    every `ai-assist` prompt opens with, built first and reused, so the bridge is not throwaway.
-    Sequence 2 of this epic; the rest renumbered.
-14. **The AI order stands, with its reason written down.** Grids and slots first so the model has
-    somewhere to fill; `free-text-to-rows` stays P2 for that reason and is re-examined at the
-    31 October milestone, not before. Mistral starts mid-October, once `patient-loop/link-writes`
-    and `meal-entry` exist for suggestions to land in. Not "AI later" — "AI into slots that exist".
-15. **The backlog carries dates.** Five milestones to 1 December are in
-    [`.icm/intake/README.md § Milestones`](../README.md); a stub's epic tells the milestone it
-    serves. One person runs the agents, in parallel where the epics allow it and serially where
-    they do not; the dates assume yesterday's pace, one stub a day.
+The fifteen decisions that bind all five epics cut in September 2026 — D-1 … D-12 (2026-09-10) and D-13 … D-15 (2026-09-11) — live in [`README.md § Decisions of record`](../README.md), where they outlast this epic's archival.
 
 ## Feedback § → stub
 
@@ -104,6 +55,10 @@ preparation of that call:
 | § 5 "duplication / réutilisation"                           | `reuse-and-duplicate` | copy a protocol block from another patient or a personal template  |
 | § 4 quick actions · § 9.2 · product rule "quelques minutes" | `consultation-update` | one post-consultation screen, one save                             |
 | § 4 last paragraph · § 2 row 1                              | `secondary-sections`  | anamnesis, profile, consent, admin data out of the working view    |
+
+## Where it sits
+
+The console's patient page — the working view, the protocol grids, the recipe forms, the consultation screen — and the services functions behind them.
 
 ## Build order
 
@@ -134,5 +89,5 @@ which has shipped.
 - Anything the patient sees (`patient-loop`), anything AI (`ai-assist`).
 - A practitioner app, practitioner accounts, sign-up, billing (`beyond-december`).
 - The roster (`/patients`) beyond a link into the new first screen.
-- "Free text → structured rows" — decisions #8 and #14. `copy-context` is not it: the text goes
+- "Free text → structured rows" — decisions D-8 and D-14. `copy-context` is not it: the text goes
   out to a model of her choosing and nothing comes back into a field.

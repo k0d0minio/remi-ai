@@ -1,18 +1,25 @@
 # Stub: Recipe generation — several recipes from profile + recommendations, checked before display
 
 - feature-slug: recipe-generation
-- sequence: 3 of 5
+- scope: ai-assist
+- personas: practitioner, patient
+- initiative: a patient experience validated on real terrain, in time for the December open day / objective: a usable patient version for the partner clinic to test on 1 December
 - depends-on: mistral-adapter
+- sequence: 3 of 5
 - priority: P1
 - size: L
 - sources: feedback § 7 (the whole section: inputs, food selection, generation "tel un chef",
   control before display, patient feedback, "Pour la V2", "Vision finale") · § 9.4 · brainstorm
-  § I · decisions #5, #6, #7 · cross-epic: `practitioner-workflow/recipe-in-place` (the library-and-assignment write path),
+  § I · decisions D-5, D-6, D-7 · cross-epic: `practitioner-workflow/recipe-in-place` (the library-and-assignment write path),
   `patient-loop/patient-profile-edit` (time available, budget, likes cooking),
   `patient-loop/recipe-feedback-and-favourites` (the feedback signal),
   `nutrition-knowledge/ciqual-import` and `nutrition-rules`
 
-## What this is
+## Problem
+
+Her § 7 « Pour la V2 »: profile plus recommendations should give several adapted recipes, checked before display, without her creating and assigning each one by hand. Today every recipe in the library is typed; `recipe-in-place` built the write path, nothing fills it.
+
+## Proposed change
 
 Her § 7 "Pour la V2": **profil patient + recommandations praticien → REMI génère automatiquement
 plusieurs recettes adaptées**; the practitioner does not create and assign each one by hand. Her
@@ -34,7 +41,7 @@ four steps become four pieces of code around one model call:
    logged, never shown. A second, cheap model pass "does this recipe respect these
    recommendations?" is optional and Define decides whether it earns its cost.
 
-**Where it lands** (decision #5 + #6): each surviving recipe is written to the library through
+**Where it lands** (decision D-5 + D-6): each surviving recipe is written to the library through
 `recipe-in-place`'s path and assigned to the patient in the same transaction, marked as generated
 (prompt version, generation id); it reaches the patient's « Mes recettes » **without a manual
 gate**. Morgane sees them on the patient page labelled « proposé par REMI », can edit (as a
@@ -46,7 +53,22 @@ answers close the loop for the next batch.
 (count, optional instruction); the patient gets nothing to trigger in this round — cadence is
 Morgane's until the log says patients want a button.
 
-## Worth knowing
+## Acceptance criteria (rough)
+
+- [ ] From « Proposer une recette », a « Générer » action (count, optional instruction) makes one structured `balanced` call and returns N recipes against a schema (title, servings, time, difficulty, ingredients, steps, why-for-you, tags)
+- [ ] Candidate foods come from CIQUAL, filtered against the profile and ranked by the recommendations' components; with the dataset absent the step is skipped and logged
+- [ ] Every recipe is checked in code (allergens, intolerances, diet, time) and a failing one is dropped and logged, never shown
+- [ ] Survivors are written to the library and assigned to the patient in one transaction, marked as generated, and reach « Mes recettes » without a manual gate; Morgane can edit as a variant, archive, or regenerate with an instruction
+- [ ] Every generation and every drop is in `ai_generations`
+
+## Out of scope (this feature)
+
+- A patient-side trigger; a weekly cadence or cron; the old version's 7 × 4 weekly plan
+- Genotype inputs — the context block keeps an empty « nutrients to favour » slot for `genotype-layer`
+
+## Notes for Define
+
+- **Decisions that bind** ([`README.md § Decisions of record`](../README.md)): D-5 (the library stays; generation writes into it and assigns) · D-6 (an automated check, no manual gate) · D-7 (CIQUAL and her rules).
 
 - The recipe body is single-field prose today; this stub (or `recipe-in-place`, whichever ships
   first — flag, do not do both) splits it into ingredients + steps + meta, with the prose kept as
@@ -58,24 +80,14 @@ Morgane's until the log says patients want a button.
 - Every generation writes `ai_generations`; dropped recipes are logged with the reason — that is
   the safety record.
 
-## Open questions — flag these on pickup
+**Open for Define** — settled with the operator before the spec is approved, never assumed:
 
 - N per generation (3? 5?) and the servings default — hers.
 - The ingredients / steps split: does she want quantities, or is "tel un chef" prose enough for
   the patient? It changes the schema and the check's precision.
 - Should a generated recipe ever be visible to the patient before she has _seen_ it (not gated,
-  but noticed)? Decision #6 says yes; confirm with her on the first real batch.
+  but noticed)? Decision D-6 says yes; confirm with her on the first real batch.
 
 ## Prompt
 
-Run `/pipeline new .icm/intake/ai-assist/recipe-generation.md` in the remi-ai repo and follow the
-pipeline from there. Read the stub, its epic's `breakdown.md` (§ The shape, decisions #5–#7) and
-the `mistral-adapter`, `practitioner-workflow/recipe-in-place`, `nutrition-knowledge/*` and
-`patient-loop/patient-profile-edit` runs' notes first. Scope: from the console's « Proposer une
-recette », a « Générer » action that assembles a fixture-tested context (profile, recommendations,
-goals, instruction, recipe answers, recent meals, CIQUAL-ranked candidate foods, retrieved rules),
-makes one structured `balanced` call for N recipes, post-checks each in code (allergens,
-intolerances, diet, time), writes survivors to the library and assigns them in one transaction
-marked as generated, renders them labelled « proposé par REMI » on both sides, supports a
-contextual instruction and regenerate, logs every generation and every drop. No manual gate, no
-weekly cron, no patient trigger. Raise the stub's open questions rather than answering them.
+Run `/pipeline new recipe-generation` in the remi-ai repo. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.

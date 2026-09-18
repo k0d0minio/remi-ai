@@ -98,7 +98,7 @@ answer for what it did.
 | `marketing` (:3001) | The public site, signed out, in English or French                    | The same site, plus the practitioner page            | The same as anyone                                     |
 | `support` (:3004)   | The help centre, anonymously — it never knows who is asking          | The same                                             | The same                                               |
 | `docs` (:3003)      | Not a product surface — this site is reference material for the team | The same                                             | The same                                               |
-| `demo` (:3005)      | Not a product surface — the Design stage's sandbox, mock data only   | The same                                             | The same                                               |
+| `demo` (:3005)      | Not a product surface — the prototype sandbox, mock data only   | The same                                             | The same                                               |
 
 Two of those cells matter more than they look. `web` is the only app where the role changes what is
 rendered, and `admin` is the only app no role but the operator can reach at all — that boundary is
@@ -110,5 +110,6 @@ Decision rights are the most common silent assumption in a scope. Written here o
 document does not have to re-derive them, and a spec that gives a patient something only a
 practitioner may change contradicts a page rather than an opinion.
 
-The pipeline's label vocabulary can now grow the `persona:` axis it deferred while this page was a
-stub — `patient`, `practitioner`, `operator`, the same three names used above.
+The pipeline's label vocabulary carries the `persona:` axis this page defines — `patient`,
+`practitioner`, `operator`, the same three names used above — as the `personas` list in
+`.icm/project.json`.

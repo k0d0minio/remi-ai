@@ -1,11 +1,8 @@
-# db-migrate-connection-retry
+# Stub: One dropped Neon connection fails the whole admin deploy
 
-- epic: triage
 - lane: chore
-- status: active
-- created: 2026-09-17
+- found-by: PR #95's failed preview deploy · 2026-09-17
 - size: S
-- depends-on: none
 
 ## Problem
 
@@ -30,7 +27,22 @@ The cost is disproportionate: a red required check on a PR whose code is fine, a
 round-trip to work out that the failure was never about the diff. It will recur, because nothing
 about it was specific to this PR.
 
-## Worth knowing
+## Proposed change
+
+Retry connection-level failures of the migrate step and its verification query with a short backoff; never retry a migration that genuinely failed to apply.
+
+## Acceptance criteria (rough)
+
+- [ ] A connection-level failure of `drizzle-kit migrate` is retried (a small number of attempts,
+      with backoff) instead of failing the build on the first drop.
+- [ ] The verification query in `scripts/migrate.mjs` is guarded the same way.
+- [ ] A non-connection failure — a migration that genuinely fails to apply — still fails the build
+      on the first attempt, loudly, and is never retried into an out-of-order apply.
+- [ ] The retry says what it is doing in the build log, so a slow deploy is explainable.
+- [ ] The `turbo.json` / Vercel environment-variable mismatch above is either fixed or recorded in
+      `.icm/docs/ENV.md` as deliberate.
+
+## Notes
 
 - Two separate connections are made, and **both** are unguarded: `drizzle-kit migrate` (websocket
   driver, via `drizzle.config.ts`) and then the verification query in `scripts/migrate.mjs`, which
@@ -49,13 +61,6 @@ about it was specific to this PR.
   that hides a real missing variable later. Either add them or confirm in `.icm/docs/ENV.md` that
   they are deliberately unused.
 
-## Acceptance
+## Prompt
 
-- [ ] A connection-level failure of `drizzle-kit migrate` is retried (a small number of attempts,
-      with backoff) instead of failing the build on the first drop.
-- [ ] The verification query in `scripts/migrate.mjs` is guarded the same way.
-- [ ] A non-connection failure — a migration that genuinely fails to apply — still fails the build
-      on the first attempt, loudly, and is never retried into an out-of-order apply.
-- [ ] The retry says what it is doing in the build log, so a slow deploy is explainable.
-- [ ] The `turbo.json` / Vercel environment-variable mismatch above is either fixed or recorded in
-      `.icm/docs/ENV.md` as deliberate.
+Run `/pipeline chore db-migrate-connection-retry` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.
