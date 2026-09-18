@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { mealIntents, mealSlots } from "@remi/services/shared";
 import { ChoiceChip, Field, Textarea, Typography } from "@remi/ui/server";
 import { Button } from "@remi/ui";
@@ -26,19 +26,21 @@ type Props = {
  * entry with no moment is a real entry, not a form left half-finished.
  */
 export const MealEntryForm = ({ token, locale, content }: Props) => {
-  const formRef = useRef<HTMLFormElement>(null);
+  // Controlled, and that is the whole reason: React resets an *uncontrolled*
+  // form itself once a function action returns, success or not, so a refused
+  // write would wipe the meal the patient just typed while telling them to
+  // check it. Holding the text in state means the reset has nothing to clear
+  // and this component decides when it goes — which is on success only.
+  const [description, setDescription] = useState("");
   const [state, setState] = useState<WriteState>({ error: null });
 
   return (
     <form
-      ref={formRef}
       action={async (formData: FormData) => {
         const result = await logMealAction({ error: null }, formData);
         setState(result);
         if (!result.error) {
-          // Cleared only on success: a refused write keeps what was typed, so
-          // nobody has to write their dinner out twice.
-          formRef.current?.reset();
+          setDescription("");
         }
       }}
       className="flex flex-col gap-4"
@@ -58,6 +60,8 @@ export const MealEntryForm = ({ token, locale, content }: Props) => {
           rows={2}
           maxLength={2000}
           placeholder={content.mealEntry.placeholder}
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
         />
       </Field>
 
@@ -93,6 +97,7 @@ export const MealEntryForm = ({ token, locale, content }: Props) => {
             name="intent"
             value={intent}
             variant={intent === "planned" ? "primary" : "outline"}
+            className="min-h-11"
           >
             {content.mealEntry.actions[intent]}
           </Button>

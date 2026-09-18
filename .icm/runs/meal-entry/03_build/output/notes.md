@@ -11,7 +11,7 @@
 - `shared/patient.ts` · `db/models/meal-entry.ts` · `db/schema.ts` — a new `intent` column
   (`planned | eaten`), defaulting to `eaten`. The stub said `written_by` was new too; it is not —
   `link-writes` (#98) already shipped it, so only `intent` is.
-- `db/migrations/0017_meal_entry_intent.sql` + its snapshot and journal entry. Written by hand, not
+- `db/migrations/0018_greedy_mentallo.sql` + its snapshot and journal entry. First written by hand, not
   by `pnpm db:generate`: the session started with no `node_modules`. The snapshot is 0016's with
   the chain ids advanced and the one column added, which `diff <(jq -S .)` proves. The `ALTER` is
   `IF NOT EXISTS`, and the journal's `when` sits ahead of 0016's — drizzle never revisits a
@@ -46,7 +46,7 @@
 - `components/patient-link/meal-list.tsx` — the intent badge, and the response area now renders
   whether or not it has been answered.
 - `app/[locale]/p/[token]/repas/page.tsx` — entry control first, history second.
-- `lib/content/{types,fr,en}.ts` — the copy, with `mealWriteErrors` keyed by `PatientWriteError`
+- `lib/content/{types,fr,en}.ts` — the copy, with `mealEntry.errors` keyed by `PatientWriteError`
   so a new failure cannot ship unworded.
 
 ### `apps/admin`
@@ -118,3 +118,36 @@ Build. Merging them in cost four resolutions:
 - `visibleSegments` changed behaviour for a **shipped** segment. A patient with no meals now sees
   « Repas » in their navigation where they did not before. That was forced by the placement
   settled at Define, and the spec says so.
+
+## Release
+
+- gate: Ready to merge ticked — merge authorised
+- ci: GREEN on the head pushed at step 7 (ci-status.sh, full gate, after the last push)
+- reviews: code medium — 6 findings, 2 fixed in-ticket, 4 parked · security run — no findings at
+  confidence >= 8 (tenant scoping, ownership-check ordering, attribution forging, error oracle and
+  the `visibleSegments` change all traced and clean) · readiness n/a — the repo ships no
+  `/production-readiness` skill (`_shared/project-rules.md` → Capability skills: none yet). Its
+  substance was checked by hand instead: no new env vars, so `.icm/docs/ENV.md` is unchanged and
+  correct; migration 0018 is additive with a default, which Postgres applies as metadata only, so
+  it needs no table rewrite; the snapshot is drizzle-generated, so no index/schema mismatch. No
+  deploy-breaking finding.
+- parked: console-shows-no-meal-intent · patient-link-forms-have-no-pending-state ·
+  meal-flip-reports-failure-when-it-succeeded · home-meal-labels-do-not-carry-intent ·
+  patient-home-today-release-incomplete (plus console-today-is-utc, parked during Build)
+- docs: no docs impact — `business/roles` already describes the link as read-and-write and names
+  "the way in to the meal loop"; `link-writes` and #106 wrote those sentences ahead of this run,
+  and nothing on the page became false. · announce: public
+
+### The two review findings fixed in-ticket
+
+- **The form reset was backwards.** React resets an *uncontrolled* form itself once a function
+  action returns, success or failure both, so a refused write wiped the meal the patient had just
+  typed — while telling them to check it. The `if (!result.error)` guard around
+  `formRef.current?.reset()` never ran at all. The description is controlled state now, cleared on
+  success only, which is what the comment beside it had been claiming.
+- **Tap targets.** The two submit buttons (36px) and « Je l'ai mangé » (32px) sat under the 44px
+  every other control on `/p/[token]` holds, including the `ChoiceChip` directly above them.
+
+The other four are triage stubs, named above. The one worth reading before the next patient-loop
+run is `home-meal-labels-do-not-carry-intent`: the merge with #106 left both home labels pointing
+at the same URL, so « J'ai mangé » lands on a form whose primary button writes `planned`.

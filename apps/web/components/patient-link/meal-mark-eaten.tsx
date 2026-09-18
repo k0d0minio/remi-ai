@@ -37,7 +37,7 @@ export const MealMarkEaten = ({ mealId, token, locale, content }: Props) => {
       <input type="hidden" name="id" value={mealId} />
       <input type="hidden" name="token" value={token} />
       <input type="hidden" name="locale" value={locale} />
-      <Button type="submit" size="sm" variant="outline">
+      <Button type="submit" size="sm" variant="outline" className="min-h-11">
         {content.mealEntry.markEaten}
       </Button>
       {state.error ? (
