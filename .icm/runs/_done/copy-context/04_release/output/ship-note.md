@@ -6,4 +6,4 @@
 
 Every export is audited.
 
-Dig deeper: <merged-PR URL> · <changelog entry URL>
+Dig deeper: https://github.com/k0d0minio/remi-ai/pull/96 · https://github.com/k0d0minio/remi-ai/blob/main/apps/docs/app/changelog/2026-09-17-copy-context/page.mdx
