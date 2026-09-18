@@ -17,8 +17,9 @@
   navigation
 - release notes: both
 - sent: see below
-- closed out: RESULT: CLOSED — run archived; `practitioner-workflow` epic archived (this was its
-  last unshipped stub)
+- closed out: RESULT: CLOSED — run archived. The `practitioner-workflow` epic stays open:
+  `reuse-and-duplicate` is still to spin out, and it waits on `bulk-entry` and `recipe-in-place`,
+  both of which landed on `main` overnight — so it is unblocked and is the epic's next stub.
 
 ## The base merge
 
