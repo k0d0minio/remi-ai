@@ -3,12 +3,11 @@
 import { Pencil, X } from "lucide-react";
 import { useState } from "react";
 import type { PatientProfile } from "@remi/services/shared";
-import { ageInYears, formatDate } from "@remi/services/shared";
+import { ageInYears } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Badge, Separator, Typography } from "@remi/ui/server";
 import { PatientForm } from "@/components/patients/patient-form";
 import {
-  consentChannelLabels,
   cookingAffinityLabels,
   localeLabels,
   patientSexLabels,
@@ -17,8 +16,15 @@ import {
 
 type Props = {
   patient: PatientProfile;
-  /** Formatted on the server — an `Intl` call on a `Date` drifts by timezone. */
+  /**
+   * Both dates arrive formatted. `Intl` resolves against the runtime's
+   * timezone, so formatting here would render one day in Brussels and another
+   * in the browser of anyone east or west of it — and disagree with the server
+   * markup on hydration. The server is the one clock.
+   */
   lastEditedAt: string;
+  /** « Recueilli le … · WhatsApp », or `null` when it is not recorded. */
+  consent: string | null;
 };
 
 /** One line of the read summary. `null` reads as an em dash. */
@@ -38,7 +44,7 @@ type Row = {
  * The form is not closed for her on save: it owns its own « Enregistré. » and
  * saying so where she is looking is worth more than collapsing under her.
  */
-export const ProfileSummary = ({ patient, lastEditedAt }: Props) => {
+export const ProfileSummary = ({ patient, lastEditedAt, consent }: Props) => {
   const [editing, setEditing] = useState(false);
 
   if (editing) {
@@ -61,13 +67,6 @@ export const ProfileSummary = ({ patient, lastEditedAt }: Props) => {
   }
 
   const age = ageInYears(patient.birthDate);
-
-  // Both halves or neither: a date with no channel says nothing about what the
-  // patient actually agreed through, so it still reads as not recorded.
-  const consent =
-    patient.consentDate && patient.consentChannel
-      ? { date: patient.consentDate, channel: patient.consentChannel }
-      : null;
 
   const identity: Row[] = [
     { label: "Pseudonyme", value: patient.pseudonym },
@@ -139,7 +138,7 @@ export const ProfileSummary = ({ patient, lastEditedAt }: Props) => {
         <div className="flex flex-wrap gap-2">
           {consent ? (
             <Badge variant="success" tone="subtle" size="sm">
-              {`Recueilli le ${formatDate(consent.date)} · ${consentChannelLabels[consent.channel]}`}
+              {consent}
             </Badge>
           ) : (
             <Badge variant="warning" tone="subtle" size="sm">

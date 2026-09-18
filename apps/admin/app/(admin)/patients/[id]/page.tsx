@@ -78,6 +78,7 @@ import { WorkingGoals } from "@/components/patients/working-goals";
 import { WorkingMeals } from "@/components/patients/working-meals";
 import { WorkingRecommendations } from "@/components/patients/working-recommendations";
 import {
+  consentChannelLabels,
   patientSegments,
   patientSexLabels,
   patientStatusIntents,
@@ -190,6 +191,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   const checkIns = Object.fromEntries(
     trails.map((trail) => [trail.id, trail.entries]),
   );
+  // Both halves or neither: a date with no channel says nothing about what the
+  // patient actually agreed through, so it still reads as not recorded.
+  const consent =
+    patient.consentDate && patient.consentChannel
+      ? `Recueilli le ${formatDate(patient.consentDate)} · ${consentChannelLabels[patient.consentChannel]}`
+      : null;
   const shareUrl = appHref("web", `/p/${patient.shareToken}`, patient.locale);
   const age = ageInYears(patient.birthDate);
 
@@ -605,7 +612,13 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                   label="Recommandations archivées"
                   count={archived.length}
                 >
-                  <RecommendationGroups recommendations={archived} />
+                  <div className="flex flex-col gap-3">
+                    <Typography size="sm" tone="muted">
+                      Ce qui a été suivi puis arrêté. Invisible sur le lien
+                      patient, gardé pour la suite du dossier.
+                    </Typography>
+                    <RecommendationGroups recommendations={archived} />
+                  </div>
                 </SectionFold>
               ) : null}
             </CardContent>
@@ -856,6 +869,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               <ProfileSummary
                 patient={patient}
                 lastEditedAt={formatDate(patient.lastEditedAt)}
+                consent={consent}
               />
 
               <SectionFold id="danger-zone" label="Zone sensible" tone="error">

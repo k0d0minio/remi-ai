@@ -154,7 +154,11 @@ const AnamnesisCategoryRow = ({
             <input type="hidden" name="patientId" value={patientId} />
             <input type="hidden" name="category" value={category} />
 
+            {/* Focus follows the click: « Compléter » opens this row further
+                up the list than the button she tapped, and on a phone that
+                otherwise reads as the button vanishing. */}
             <Textarea
+              autoFocus
               name="body"
               rows={4}
               defaultValue={body}
