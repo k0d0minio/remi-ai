@@ -1,8 +1,11 @@
 "use client";
 
-import { Pencil } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import { useState } from "react";
-import type { PatientAnamnesis } from "@remi/services/shared";
+import type {
+  AnamnesisCategory,
+  PatientAnamnesis,
+} from "@remi/services/shared";
 import { anamnesisCategories } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Textarea, Typography } from "@remi/ui/server";
@@ -15,37 +18,87 @@ type Props = {
 };
 
 /**
- * § B's twelve areas, always all twelve, always in her order — an area she has
- * never touched reads as a heading with nothing under it, which is the whole
- * point: what the record does not yet say is as legible as what it does.
+ * § B's twelve areas, filled ones first.
+ *
+ * The block used to list all twelve always, so a record with two areas covered
+ * read as ten empty headings — the shape of the schema rather than the shape of
+ * what she knows. Now what she has written is the section, and what she has not
+ * is one short row of invitations under it: still legibly absent, no longer the
+ * bulk of the page.
  *
  * One category edits at a time, so a save mid-consultation writes only the area
  * she just asked about. Nothing here reaches the patient link.
  */
 export const AnamnesisBlock = ({ patientId, entries }: Props) => {
-  const [editing, setEditing] = useState<string | null>(null);
+  const [editing, setEditing] = useState<AnamnesisCategory | null>(null);
   const bodies = new Map(entries.map((entry) => [entry.category, entry.body]));
+  const isFilled = (category: AnamnesisCategory) =>
+    (bodies.get(category) ?? "").trim() !== "";
+
+  const filled = anamnesisCategories.filter(isFilled);
+  const empty = anamnesisCategories.filter((category) => !isFilled(category));
+
+  // An empty area being completed joins the list above rather than opening a
+  // textarea inside a row of buttons — it is about to belong there anyway.
+  const completing = editing !== null && !isFilled(editing) ? editing : null;
+  const toComplete = empty.filter((category) => category !== completing);
+
+  const rowFor = (category: AnamnesisCategory) => (
+    <AnamnesisCategoryRow
+      key={category}
+      patientId={patientId}
+      category={category}
+      body={bodies.get(category) ?? ""}
+      editing={editing === category}
+      onEdit={() => setEditing(category)}
+      onDone={() => setEditing(null)}
+    />
+  );
 
   return (
-    <dl className="flex flex-col gap-5">
-      {anamnesisCategories.map((category) => (
-        <AnamnesisCategoryRow
-          key={category}
-          patientId={patientId}
-          category={category}
-          body={bodies.get(category) ?? ""}
-          editing={editing === category}
-          onEdit={() => setEditing(category)}
-          onDone={() => setEditing(null)}
-        />
-      ))}
-    </dl>
+    <div className="flex flex-col gap-5">
+      <Typography size="sm" tone="muted">
+        {filled.length === anamnesisCategories.length
+          ? `Les ${anamnesisCategories.length} domaines sont renseignés.`
+          : `${filled.length} des ${anamnesisCategories.length} domaines renseignés.`}
+      </Typography>
+
+      {filled.length > 0 || completing !== null ? (
+        <dl className="flex flex-col gap-5">
+          {filled.map(rowFor)}
+          {completing !== null ? rowFor(completing) : null}
+        </dl>
+      ) : null}
+
+      {toComplete.length > 0 ? (
+        <div className="border-border flex flex-col gap-2 border-t pt-4">
+          <Typography as="h4" size="sm" weight="medium" tone="muted">
+            À compléter
+          </Typography>
+          <div className="flex flex-wrap gap-2">
+            {toComplete.map((category) => (
+              <Button
+                key={category}
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => setEditing(category)}
+                aria-label={`Compléter « ${anamnesisCategoryLabels[category]} »`}
+              >
+                <Plus aria-hidden="true" />
+                {anamnesisCategoryLabels[category]}
+              </Button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 };
 
 type RowProps = {
   patientId: string;
-  category: (typeof anamnesisCategories)[number];
+  category: AnamnesisCategory;
   body: string;
   editing: boolean;
   onEdit: () => void;
@@ -78,7 +131,7 @@ const AnamnesisCategoryRow = ({
             aria-label={`Modifier « ${label} »`}
           >
             <Pencil aria-hidden="true" />
-            {body ? "Modifier" : "Compléter"}
+            Modifier
           </Button>
         )}
       </dt>
@@ -101,7 +154,11 @@ const AnamnesisCategoryRow = ({
             <input type="hidden" name="patientId" value={patientId} />
             <input type="hidden" name="category" value={category} />
 
+            {/* Focus follows the click: « Compléter » opens this row further
+                up the list than the button she tapped, and on a phone that
+                otherwise reads as the button vanishing. */}
             <Textarea
+              autoFocus
               name="body"
               rows={4}
               defaultValue={body}
