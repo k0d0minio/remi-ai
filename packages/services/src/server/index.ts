@@ -131,6 +131,28 @@ export {
 export type { RecipeInput } from "../db/services/recipes";
 
 export {
+  NUTRITION_RULE_RETRIEVAL_LIMIT,
+  archiveNutritionRule,
+  createNutritionRule,
+  getNutritionRule,
+  getNutritionRuleLineage,
+  listNutritionRuleTags,
+  listNutritionRules,
+  retrieveNutritionRules,
+  updateNutritionRule,
+  validateNutritionRule,
+} from "../db/services/nutrition-rules";
+export type {
+  NutritionRuleEdit,
+  NutritionRuleInput,
+  NutritionRuleLineage,
+  NutritionRuleQuery,
+  NutritionRuleRetrieval,
+  NutritionRuleShelf,
+} from "../db/services/nutrition-rules";
+export type { NutritionRule } from "../db/models/nutrition-rule";
+
+export {
   archiveRecipeAssignment,
   assignRecipes,
   createAndAssignRecipe,

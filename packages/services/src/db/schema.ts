@@ -742,3 +742,53 @@ export const patientLinkWrites = pgTable("patient_link_writes", {
     .references(() => patientProfiles.id, { onDelete: "cascade" }),
   ...timestamps,
 });
+
+/**
+ * Morgane's own nutrition knowledge, as text — decision #7's second half, and
+ * the answer to the last line of her covering message: « remplir la base de
+ * donnée de REMI avec les informations importantes et que l'IA puisse aller
+ * les rechercher facilement ».
+ *
+ * Like `recipes`, this table belongs to no patient. Unlike `recipes`, it also
+ * belongs to no practitioner: there is no `practitioner_id` column, because
+ * whether the corpus is house-wide or per-practitioner is Morgane's question
+ * to answer and a nullable column added later answers it without a reshape.
+ *
+ * `status` is the load-bearing column. Retrieval reads `validated` rows only —
+ * brainstorm § 6's « puis de les valider avant intégration » made structural,
+ * so a rule that nobody has agreed to cannot reach a prompt by accident.
+ */
+export const nutritionRules = pgTable("nutrition_rules", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  /** Markdown, stored raw: it is what a prompt will paste verbatim. */
+  body: text("body").notNull().default(""),
+  /**
+   * Free text and deliberately no taxonomy, exactly as `recipes.tags` is. The
+   * recommendation categories are five words about a protocol; the words a
+   * nutrition rule is found by are hers, and the console's filter lists
+   * whatever the corpus actually carries.
+   */
+  tags: text("tags").array().notNull().default([]),
+  /** `principle` | `food-list` | `seasonality` | `safety` | `house-rule`. */
+  kind: text("kind").notNull().default("principle"),
+  /** `draft` | `validated`. Never defaults to validated — that is the point. */
+  status: text("status").notNull().default("draft"),
+  version: integer("version").notNull().default(1),
+  /**
+   * Who agreed to this wording, denormalised to nothing: a plain id with no
+   * foreign key, for the same reason `audit_events.actor_id` has none — the
+   * record of who validated must survive the account being removed.
+   */
+  validatedBy: uuid("validated_by"),
+  validatedAt: timestamp("validated_at", { withTimezone: true, mode: "date" }),
+  /**
+   * The revision that replaced this row. A same-table pointer rather than a
+   * foreign key because nothing here is ever deleted — there is no hard delete
+   * in the service or on the page — so it cannot dangle.
+   */
+  supersededBy: uuid("superseded_by"),
+  /** Withdrawn with no replacement. The counterpart to the library's archive. */
+  archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
