@@ -5,6 +5,8 @@ import type { Content } from "@/lib/content/types";
 type Props = {
   recipes: readonly AssignedRecipe[];
   content: Content["patientLink"];
+  /** Titles only, for the home's preview — the segment carries the rest. */
+  compact?: boolean;
 };
 
 /**
@@ -15,8 +17,12 @@ type Props = {
  * into ingredients and steps — she writes it the way she writes it, and
  * inventing structure would be putting words in her mouth. The library's tags
  * are her filing vocabulary in the console and do not render here.
+ *
+ * `compact` is the same list with the bodies withheld: on the home a recipe is
+ * a title to recognise and tap, and four recipes' worth of method would bury
+ * everything under it.
  */
-export const RecipeList = ({ recipes, content }: Props) => (
+export const RecipeList = ({ recipes, content, compact }: Props) => (
   <ul className="flex flex-col gap-3">
     {recipes.map(({ assignment, recipe }) => (
       <li key={assignment.id}>
@@ -25,12 +31,12 @@ export const RecipeList = ({ recipes, content }: Props) => (
             <Typography as="h3" size="sm" weight="medium">
               {recipe.title}
             </Typography>
-            {recipe.body.trim() !== "" ? (
+            {!compact && recipe.body.trim() !== "" ? (
               <Typography size="sm" className="whitespace-pre-line">
                 {recipe.body}
               </Typography>
             ) : null}
-            {assignment.note.trim() !== "" ? (
+            {!compact && assignment.note.trim() !== "" ? (
               <Typography
                 size="sm"
                 tone="muted"

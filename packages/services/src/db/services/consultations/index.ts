@@ -54,7 +54,10 @@ export type ConsultationCheckInInput = {
 export type ConsultationInput = {
   note: ConsultationNoteInput;
   checkIns?: readonly ConsultationCheckInInput[];
+  /** § E's line, written to REMI. */
   instruction?: string;
+  /** The same week's consigne written to the patient, shown on their link. */
+  patientInstruction?: string;
   summary?: string;
   nextConsultationPrep?: string;
 };
@@ -137,10 +140,24 @@ export const recordConsultation = async (
         }
 
         let instructionChanged = false;
-        if (input.instruction !== undefined) {
+        if (
+          input.instruction !== undefined ||
+          input.patientInstruction !== undefined
+        ) {
           const before = await getPatientInstruction(patientId, tx);
+          // A field absent from the form keeps what is on the row: the two
+          // halves live on one row, so writing only the half she edited would
+          // otherwise clear the other.
           const after = orRollback(
-            await setPatientInstruction(patientId, input.instruction, tx),
+            await setPatientInstruction(
+              patientId,
+              {
+                body: input.instruction ?? before?.body ?? "",
+                patientBody:
+                  input.patientInstruction ?? before?.patientBody ?? "",
+              },
+              tx,
+            ),
           );
           instructionChanged = (after?.id ?? null) !== (before?.id ?? null);
         }
