@@ -1,4 +1,5 @@
 import {
+  BookOpen,
   Carrot,
   ChefHat,
   Home,
@@ -46,6 +47,9 @@ export const navSections: readonly NavSection[] = [
       // Reference data rather than a patient's: the CIQUAL table, read-only,
       // so a number the recipe step will use can be checked by hand.
       { href: "/aliments", label: "Aliments", icon: Carrot },
+      // Beside them for the same reason: the nutrition corpus belongs to no
+      // patient either. It is what REMI knows, not what anyone was told.
+      { href: "/knowledge", label: "Connaissances", icon: BookOpen },
     ],
   },
   {
