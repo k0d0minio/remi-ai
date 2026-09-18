@@ -1,0 +1,10 @@
+{
+  "name": "remi-ai",
+  "profile": "pipeline",
+  "docs_path": "apps/docs/app",
+  "required_env": [],
+  "required_checks": ["Format, lint, typecheck"],
+  "personas": ["patient", "practitioner", "operator"],
+  "runs_archive": ".icm/runs/_done",
+  "intake_archive": ".icm/intake/_done"
+}

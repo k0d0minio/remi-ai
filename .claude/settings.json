@@ -1,8 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "env": {
-    "PIPELINE_REQUIRED_CHECKS": "Format, lint, typecheck"
-  },
   "permissions": {
     "allow": [
       "Bash(pnpm install:*)",
@@ -36,8 +33,20 @@
       "Bash(gh run view:*)",
       "Bash(gh run list:*)",
       "Bash(.icm/scripts/resolve-run.sh:*)",
-      "Bash(.icm/scripts/validate-spec.sh:*)",
+      "Bash(.icm/scripts/new-run.sh:*)",
+      "Bash(.icm/scripts/project-body.sh:*)",
       "Bash(.icm/scripts/project-labels.sh:*)",
+      "Bash(.icm/scripts/validate-spec.sh:*)",
+      "Bash(.icm/scripts/validate-intake.sh:*)",
+      "Bash(.icm/scripts/validate-decisions.sh:*)",
+      "Bash(.icm/scripts/validate-knowledge-map.sh:*)",
+      "Bash(.icm/scripts/triage-report.sh:*)",
+      "Bash(.icm/scripts/ci-status.sh:*)",
+      "Bash(.icm/scripts/close-out.sh:*)",
+      "Bash(.icm/scripts/env-check.sh:*)",
+      "Bash(.icm/scripts/format.sh:*)",
+      "Bash(.icm/scripts/lint.sh:*)",
+      "Bash(.icm/scripts/notify.sh:*)",
       "Bash(rg:*)",
       "Bash(grep:*)",
       "Bash(ls:*)",
