@@ -16,8 +16,15 @@
   `.icm/docs/RETENTION.md` (what a `context.exported` row is)
 - business docs: no business docs impact — `business/roles` still describes the operator's rights
   correctly, and this adds no role, no permission and nothing a patient sees.
-- release notes: both
-- sent: ship note sent 2026-09-17
+- release notes: both. The changelog link in the ship note points at the published source on
+  `main` rather than the live docs origin: that origin comes from `NEXT_PUBLIC_DOCS_URL` (set in
+  Vercel, not in the repo) and the Vercel API returned 403 for this team from this session, so a
+  guessed origin was not put into an outbound email.
+- sent: **not sent** — the ship note is written and its links are filled and verified, but
+  none of `RESEND_API_KEY`, `SHIP_NOTE_RECIPIENTS`, `SHIP_NOTE_FROM` or `EMAIL_FROM` is set in
+  the environment the pipeline runs in, so `send-ship-note.sh --send` cannot send it. Parked as
+  `.icm/intake/triage/ship-note-unsendable-from-remote-sessions.md`; the note is ready to send
+  by hand or by a later run with the variables present.
 - closed out: RESULT: CLOSED — run archived to `.icm/runs/_done/copy-context/`;
   `practitioner-workflow` has 5 stubs left, so the epic is not finished by this run
 
