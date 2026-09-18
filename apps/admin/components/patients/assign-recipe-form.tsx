@@ -10,6 +10,7 @@ import {
   createAndAssignRecipeAction,
   type AssignmentFormState,
 } from "@/lib/patients/actions";
+import { CopyFromPatient } from "@/components/patients/copy-from-patient";
 
 const initial: AssignmentFormState = { error: null };
 
@@ -90,6 +91,23 @@ const AssignExistingForm = ({ patientId, recipes, today }: Props) => {
     );
   };
 
+  /**
+   * Reusing another patient's set ticks the same recipes here, unsaved: this
+   * selection *is* this section's grid, so « Reprendre de … » lands in it
+   * exactly as a copied row lands in a protocol grid. The note stays blank and
+   * the date stays today — the giving is what is personal, and it is written
+   * for this patient or not at all.
+   */
+  const reuse = (recipeIds: readonly string[]) => {
+    const known = recipeIds.filter((id) =>
+      recipes.some((recipe) => recipe.id === id),
+    );
+    setChosen((current) => [
+      ...current,
+      ...known.filter((id) => !current.includes(id)),
+    ]);
+  };
+
   const titles = recipes
     .filter((recipe) => chosen.includes(recipe.id))
     .map((recipe) => recipe.title)
@@ -116,6 +134,13 @@ const AssignExistingForm = ({ patientId, recipes, today }: Props) => {
     >
       <input type="hidden" name="patientId" value={patientId} />
       <input type="hidden" name="titles" value={titles} />
+
+      <CopyFromPatient
+        patientId={patientId}
+        kind="recipe"
+        emptyLabel="aucune recette en cours"
+        onTaken={(taken) => reuse(taken.recipeIds)}
+      />
 
       <fieldset className="flex flex-col gap-2">
         <Typography as="legend" size="sm" weight="medium" className="mb-2">

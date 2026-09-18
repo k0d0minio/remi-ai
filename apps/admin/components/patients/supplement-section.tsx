@@ -3,12 +3,14 @@
 import { Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { useCallback, useState, useTransition } from "react";
-import type { PatientSupplement } from "@remi/services/shared";
+import type { PatientSupplement, ProtocolRow } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Field, Input, Textarea, Typography } from "@remi/ui/server";
 import { saveSupplementSectionAction } from "@/lib/patients/actions";
+import { CopyFromPatient } from "@/components/patients/copy-from-patient";
 import { SectionEditFrame } from "@/components/patients/section-edit-frame";
 import { SectionRowControls } from "@/components/patients/section-row-controls";
+import { TemplateControls } from "@/components/patients/template-controls";
 import { useSectionRows } from "@/components/patients/use-section-rows";
 
 type Row = {
@@ -41,6 +43,20 @@ const toRow = (supplement: PatientSupplement): Row => ({
   dose: supplement.dose,
   timing: supplement.timing,
   reason: supplement.reason,
+});
+
+/**
+ * A reused row arrives with no id — a new row on *this* protocol, not a pointer
+ * at the one it came from. Dose and moment travel because they are facts about
+ * the supplement; the raison does not, because § G's justification was written
+ * for one person.
+ */
+const fromReused = (row: ProtocolRow): Row => ({
+  id: "",
+  name: row.name ?? "",
+  dose: row.dose ?? "",
+  timing: row.timing ?? "",
+  reason: row.reason ?? "",
 });
 
 /**
@@ -79,7 +95,7 @@ export const SupplementSection = ({
       }
     });
   };
-  const { rows, addRow, removeRow, moveRow, setField, reset } =
+  const { rows, addRow, addRows, removeRow, moveRow, setField, reset } =
     useSectionRows<Row>(supplements.map(toRow), blankRow);
 
   const open = useCallback(() => {
@@ -101,6 +117,27 @@ export const SupplementSection = ({
       action={save}
       editLabel="Modifier le protocole"
       readView={children}
+      footer={
+        <div className="flex flex-col gap-3">
+          <CopyFromPatient
+            patientId={patientId}
+            kind="supplement"
+            emptyLabel="aucun complément en cours"
+            onTaken={(taken) => addRows(taken.rows.map(fromReused))}
+          />
+
+          <TemplateControls
+            kind="supplement"
+            currentRows={rows.map((row) => ({
+              name: row.name,
+              dose: row.dose,
+              timing: row.timing,
+              reason: row.reason,
+            }))}
+            onInsert={(inserted) => addRows(inserted.map(fromReused))}
+          />
+        </div>
+      }
     >
       <div className="flex flex-col gap-3">
         {seeded.map((id) => (

@@ -101,6 +101,26 @@ export const auditActions = [
    * worth a line in the trail even when what leaves carries no real identity.
    */
   "context.exported",
+  /**
+   * Rows read out of one patient's record and into another's open grid
+   * (`reuse-and-duplicate`). Recorded at the moment of the copy rather than at
+   * the section's save: the copy is when the data crossed records, and she may
+   * then abandon the grid without saving — which would otherwise leave health
+   * data having moved between two patients with no trace at all. The source
+   * patient is named on the event.
+   */
+  "protocol.copied_from_patient",
+  /**
+   * Her own named sets. A template holds no patient's data by the time it is
+   * stored — the personal fields are blanked into the preview before she names
+   * it — so inserting one records nothing; only the writes below do.
+   */
+  "template.saved",
+  "template.overwritten",
+  "template.renamed",
+  "template.deleted",
+  "template.shared",
+  "template.unshared",
   "operator.invited",
   "operator.invite_revoked",
   "operator.joined",
