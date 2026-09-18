@@ -51,6 +51,20 @@ jobs:
           node-version: 22
           cache: "pnpm"
 
+      # Before the install, because it needs neither: plain node and git, and it is the
+      # cheapest thing on the branch to fail. Drizzle applies migrations by comparing the
+      # journal's `when` against the newest already applied — never by hash — so one
+      # generated before something already on main is recorded as applied and never run.
+      # Two PRs cut from the same main both numbered theirs 0013 once. The base ref is
+      # fetched shallowly because actions/checkout leaves it out at fetch-depth 1.
+      - name: Migration order
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch --no-tags --depth=1 origin "$BASE_REF"
+          node packages/services/scripts/check-migration-order.mjs --base FETCH_HEAD
+        env:
+          BASE_REF: ${{ github.base_ref }}
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
