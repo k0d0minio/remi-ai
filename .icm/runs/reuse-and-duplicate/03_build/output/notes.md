@@ -1,7 +1,8 @@
 # Build notes: reuse-and-duplicate
 
 - commits: see the branch — one per layer (table · shared rule · service · actions · surfaces)
-- ci: pending the push; read back with `ci-status.sh reuse-and-duplicate`
+- ci: GREEN on the full gate — settled on `f0d13b6`, after the orphaned-table repair below
+- preview: https://admin-git-claude-funny-pascal-toua7k-remi21.vercel.app
 
 ## What changed
 
