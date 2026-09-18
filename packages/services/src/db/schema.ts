@@ -551,6 +551,13 @@ export const patientMealEntries = pgTable("patient_meal_entries", {
    * has to.
    */
   writtenBy: text("written_by").notNull().default("practitioner"),
+  /**
+   * A key from `mealIntents` — « Je vais manger » or « J'ai mangé » (§ 8).
+   * Defaults to `eaten` because that is what every row written before the
+   * patient could enter one actually was: a meal Morgane transcribed after
+   * the fact. A planned row is updated in place when the meal happens.
+   */
+  intent: text("intent").notNull().default("eaten"),
   ...timestamps,
 });
 

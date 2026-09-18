@@ -39,6 +39,32 @@ export const formatNumber = (
         },
   ).format(value);
 
+/**
+ * The practice's clock. Every patient in the pilot is one of Morgane's, and she
+ * practises in Belgium — so "today" is Belgian, not the server's.
+ */
+export const PRACTICE_TIME_ZONE = "Europe/Brussels";
+
+/**
+ * Today as `YYYY-MM-DD`, in the practice's timezone.
+ *
+ * `toISOString().slice(0, 10)` is the obvious version and it is wrong here: it
+ * reads UTC, which is behind Brussels, so a meal entered after midnight local
+ * time would be dated the day before — and the patient sees that date on their
+ * own journal, with no field to correct it.
+ */
+export const todayAtPractice = (at: Date = new Date()) => {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: PRACTICE_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(at);
+  const part = (type: "year" | "month" | "day") =>
+    parts.find((candidate) => candidate.type === type)?.value ?? "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+};
+
 export const formatDate = (value: Date | string, locale = DEFAULT_LOCALE) =>
   new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
     typeof value === "string" ? new Date(value) : value,

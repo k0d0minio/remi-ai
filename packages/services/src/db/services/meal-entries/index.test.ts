@@ -11,6 +11,8 @@ import {
   getMealEntry,
   listArchivedMealEntries,
   listMealEntries,
+  markMealEntryEaten,
+  mealEntryOwner,
   updateMealEntry,
 } from "./index";
 
@@ -236,5 +238,107 @@ describe("meal entries", () => {
     expect(
       (await updateMealEntry(entry.id, { learning: "x".repeat(501) })).ok,
     ).toBe(false);
+  });
+  it("treats an entry with no stated intent as one already eaten", async () => {
+    const entry = await log({
+      eatenOn: "2026-09-01",
+      description: "Un plat",
+    });
+
+    expect(entry.intent).toBe("eaten");
+  });
+
+  it("records a meal the patient has not eaten yet", async () => {
+    const entry = await log({
+      eatenOn: "2026-09-01",
+      description: "Spaghetti sauce tomate",
+      intent: "planned",
+    });
+
+    expect(entry.intent).toBe("planned");
+  });
+
+  it("refuses an intent outside the vocabulary", async () => {
+    const result = await addMealEntry(patientId, {
+      eatenOn: "2026-09-01",
+      description: "Un plat",
+      // Cast because the point of the test is the runtime guard, not the type.
+      intent: "maybe" as never,
+    });
+
+    expect(result.ok).toBe(false);
+  });
+
+  it("turns a planned meal into an eaten one without touching the rest", async () => {
+    const planned = await log({
+      eatenOn: "2026-09-01",
+      slot: "dejeuner",
+      description: "Spaghetti sauce tomate",
+      feedback: "Ajoutez des légumes",
+      intent: "planned",
+    });
+
+    const flipped = await markMealEntryEaten(planned.id);
+
+    expect(flipped.ok).toBe(true);
+    if (flipped.ok) {
+      expect(flipped.data.intent).toBe("eaten");
+      expect(flipped.data.description).toBe("Spaghetti sauce tomate");
+      expect(flipped.data.slot).toBe("dejeuner");
+      expect(flipped.data.feedback).toBe("Ajoutez des légumes");
+      expect(flipped.data.feedbackWrittenAt).toEqual(planned.feedbackWrittenAt);
+    }
+  });
+
+  it("only moves an intent one way — a meal eaten twice is refused", async () => {
+    const planned = await log({
+      eatenOn: "2026-09-01",
+      description: "Spaghetti sauce tomate",
+      intent: "planned",
+    });
+    expect((await markMealEntryEaten(planned.id)).ok).toBe(true);
+
+    expect((await markMealEntryEaten(planned.id)).ok).toBe(false);
+  });
+
+  it("refuses to flip an entry that was never planned, or that does not exist", async () => {
+    const eaten = await log({
+      eatenOn: "2026-09-01",
+      description: "Un plat",
+    });
+
+    expect((await markMealEntryEaten(eaten.id)).ok).toBe(false);
+    expect((await markMealEntryEaten("not-a-uuid")).ok).toBe(false);
+  });
+
+  it("does not let an ordinary edit move the intent", async () => {
+    const planned = await log({
+      eatenOn: "2026-09-01",
+      description: "Spaghetti sauce tomate",
+      intent: "planned",
+    });
+
+    // No cast: `intent` is a legitimate `MealEntryInput` key — the point is
+    // that this path strips it rather than refusing it.
+    const updated = await updateMealEntry(planned.id, {
+      description: "Spaghetti bolognaise",
+      intent: "eaten",
+    });
+
+    expect(updated.ok).toBe(true);
+    if (updated.ok) {
+      expect(updated.data.description).toBe("Spaghetti bolognaise");
+      expect(updated.data.intent).toBe("planned");
+    }
+  });
+
+  it("names the patient an entry belongs to, and nobody for one that does not exist", async () => {
+    const entry = await log({
+      eatenOn: "2026-09-01",
+      description: "Un plat",
+    });
+
+    expect(await mealEntryOwner(entry.id)).toBe(patientId);
+    expect(await mealEntryOwner("not-a-uuid")).toBeNull();
   });
 });

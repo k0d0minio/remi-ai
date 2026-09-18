@@ -286,9 +286,30 @@ export const en: Content = {
     mealEntry: {
       title: "A meal?",
       lead: "Tell REMI, before or after — your practitioner will see it.",
-      willEat: "I am about to eat",
-      haveEaten: "I have eaten",
-      comingSoon: "Coming soon.",
+      formTitle: "Say what you are eating",
+      formLead:
+        "Before or after, whichever suits you. Your practitioner sees it and answers you here.",
+      descriptionLabel: "Your meal",
+      placeholder: "Spaghetti with tomato sauce",
+      slotLabel: "When",
+      slotNone: "None",
+      actions: {
+        planned: "I am about to eat",
+        eaten: "I have eaten",
+      },
+      states: {
+        planned: "Planned",
+        eaten: "Eaten",
+      },
+      markEaten: "I have eaten this",
+      awaitingResponse: "Your practitioner will answer you here.",
+      empty: "Nothing noted yet. Write your first meal above.",
+      errors: {
+        invalid_input: "That meal could not be saved — check the text.",
+        rate_limited: "That is a lot at once — try again in a moment.",
+        not_found: "That meal is no longer there. Reload the page.",
+        unknown: "That did not work. Try again in a moment.",
+      },
     },
     summaryTitle: "Where you are",
     recommendationsTitle: "Your recommendations",

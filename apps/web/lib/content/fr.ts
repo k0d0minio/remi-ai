@@ -286,9 +286,33 @@ export const fr: Content = {
     mealEntry: {
       title: "Un repas ?",
       lead: "Dites-le à REMI, avant ou après — votre praticienne le verra.",
-      willEat: "Je vais manger",
-      haveEaten: "J'ai mangé",
-      comingSoon: "Bientôt disponible.",
+      formTitle: "Dites ce que vous mangez",
+      formLead:
+        "Avant ou après, comme cela vous arrange. Votre praticienne le voit et vous répond ici.",
+      descriptionLabel: "Votre repas",
+      placeholder: "Spaghetti sauce tomate",
+      slotLabel: "Moment",
+      slotNone: "Aucun",
+      actions: {
+        planned: "Je vais manger",
+        eaten: "J'ai mangé",
+      },
+      states: {
+        planned: "Prévu",
+        eaten: "Mangé",
+      },
+      markEaten: "Je l'ai mangé",
+      awaitingResponse: "Votre praticienne vous répondra ici.",
+      empty:
+        "Vous n'avez encore rien noté. Écrivez votre premier repas ci-dessus.",
+      errors: {
+        invalid_input:
+          "Ce repas n'a pas pu être enregistré : vérifiez le texte.",
+        rate_limited:
+          "Vous avez écrit beaucoup de choses d'un coup — réessayez dans un instant.",
+        not_found: "Ce repas n'existe plus. Rechargez la page.",
+        unknown: "Cela n'a pas fonctionné. Réessayez dans un instant.",
+      },
     },
     summaryTitle: "Où vous en êtes",
     recommendationsTitle: "Vos recommandations",
