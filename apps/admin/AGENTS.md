@@ -92,5 +92,11 @@ the two never drift — but it is allowed to be plainer.
 **Phone-usable is a requirement, not a nicety.** Morgane works from consultations. The patient page
 opens on a working view — status, goals, instruction, summary head, last meals, main
 recommendations, a preparation note, and quick actions. Every other section is behind navigation: a
-section index on desktop, a segmented control on phone (Suivi · Journal · Dossier · Profil). Bodies
-of secondary sections are untouched.
+section index on desktop, a segmented control on phone (Suivi · Journal · Dossier · Profil).
+
+The secondary sections read the way she works, not the way the schema stores things. The anamnesis
+lists what she has written first and offers the rest as « Compléter »; the profile is a read summary
+with the form one click behind « Modifier ». **What is no longer live is a closed fold with its
+count at the foot of its own section** — archived rows, and the delete flow at the end of the
+profile. That is the only pattern for it: no standalone « archivées » card, no red card, so the
+section list is the same for every patient.

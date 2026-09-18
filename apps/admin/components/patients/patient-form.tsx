@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import type { Locale, PatientProfile } from "@remi/services/shared";
+import type { PatientProfile } from "@remi/services/shared";
 import {
   consentChannels,
   cookingAffinities,
@@ -34,16 +34,12 @@ import {
   consentChannelLabels,
   cookingAffinityLabels,
   dietaryRegimeSuggestions,
+  localeLabels,
   patientSexLabels,
   patientStatusLabels,
 } from "@/components/patients/vocabulary";
 
 const initial: PatientFormState = { error: null, saved: false };
-
-const localeLabels: Record<Locale, string> = {
-  fr: "français",
-  en: "anglais",
-};
 
 type Props = {
   /** Present when editing; absent on `/patients/new`. */
