@@ -13,6 +13,7 @@
  */
 
 import type {
+  MealIntent,
   MealSlot,
   PersonalisationDimension,
   RecommendationCategory,
@@ -20,6 +21,7 @@ import type {
   StepStatus,
 } from "@remi/services/shared";
 import type { Theme } from "@remi/ui/server";
+import type { PatientWriteError } from "@/lib/patient-link/actions";
 
 export type NavItem = {
   /** Path without the locale prefix — the shell adds it. */
@@ -316,6 +318,30 @@ export type Content = {
     mealSlots: Record<MealSlot, string>;
     mealCommentLabel: string;
     mealFeedbackLabel: string;
+    /**
+     * Repas, the writing half: § 8's two sentences, the field they carry, and
+     * the answer that has not arrived yet.
+     *
+     * `mealIntentActions` are the two buttons that write an entry;
+     * `mealIntentLabels` are how an entry already written reads back. They are
+     * separate because the verb and the state are different words in both
+     * languages — « Je vais manger » writes a meal that reads « Prévu ».
+     */
+    mealEntryTitle: string;
+    mealEntryLead: string;
+    mealEntryDescriptionLabel: string;
+    mealEntryPlaceholder: string;
+    mealEntrySlotLabel: string;
+    mealEntrySlotNone: string;
+    mealIntentActions: Record<MealIntent, string>;
+    mealIntentLabels: Record<MealIntent, string>;
+    mealMarkEaten: string;
+    /** Stands in for the answer until Morgane — or, later, REMI — writes one. */
+    mealAwaitingResponse: string;
+    /** The journal before the patient has written anything into it. */
+    mealsEmpty: string;
+    /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
+    mealWriteErrors: Record<PatientWriteError, string>;
     empty: string;
     disclaimer: PlaceholderContent;
     /**

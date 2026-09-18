@@ -306,6 +306,30 @@ export const en: Content = {
     },
     mealCommentLabel: "What you said",
     mealFeedbackLabel: "Your practitioner's note",
+    mealEntryTitle: "Say what you are eating",
+    mealEntryLead:
+      "Before or after, whichever suits you. Your practitioner sees it and answers you here.",
+    mealEntryDescriptionLabel: "Your meal",
+    mealEntryPlaceholder: "Spaghetti with tomato sauce",
+    mealEntrySlotLabel: "When",
+    mealEntrySlotNone: "None",
+    mealIntentActions: {
+      planned: "I am going to eat",
+      eaten: "I have eaten",
+    },
+    mealIntentLabels: {
+      planned: "Planned",
+      eaten: "Eaten",
+    },
+    mealMarkEaten: "I have eaten this",
+    mealAwaitingResponse: "Your practitioner will answer you here.",
+    mealsEmpty: "Nothing noted yet. Write your first meal above.",
+    mealWriteErrors: {
+      invalid_input: "That meal could not be saved — check the text.",
+      rate_limited: "That is a lot at once — try again in a moment.",
+      not_found: "That meal is no longer there. Reload the page.",
+      unknown: "That did not work. Try again in a moment.",
+    },
     empty: "This will appear here once your practitioner has encoded it.",
     disclaimer: {
       title: "Your practitioner stays the reference",

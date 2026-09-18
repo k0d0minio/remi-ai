@@ -306,6 +306,32 @@ export const fr: Content = {
     },
     mealCommentLabel: "Ce que vous avez dit",
     mealFeedbackLabel: "Le mot de votre praticienne",
+    mealEntryTitle: "Dites ce que vous mangez",
+    mealEntryLead:
+      "Avant ou après, comme cela vous arrange. Votre praticienne le voit et vous répond ici.",
+    mealEntryDescriptionLabel: "Votre repas",
+    mealEntryPlaceholder: "Spaghetti sauce tomate",
+    mealEntrySlotLabel: "Moment",
+    mealEntrySlotNone: "Aucun",
+    mealIntentActions: {
+      planned: "Je vais manger",
+      eaten: "J'ai mangé",
+    },
+    mealIntentLabels: {
+      planned: "Prévu",
+      eaten: "Mangé",
+    },
+    mealMarkEaten: "Je l'ai mangé",
+    mealAwaitingResponse: "Votre praticienne vous répondra ici.",
+    mealsEmpty:
+      "Vous n'avez encore rien noté. Écrivez votre premier repas ci-dessus.",
+    mealWriteErrors: {
+      invalid_input: "Ce repas n'a pas pu être enregistré : vérifiez le texte.",
+      rate_limited:
+        "Vous avez écrit beaucoup de choses d'un coup — réessayez dans un instant.",
+      not_found: "Ce repas n'existe plus. Rechargez la page.",
+      unknown: "Cela n'a pas fonctionné. Réessayez dans un instant.",
+    },
     empty: "Cela apparaîtra ici une fois que votre praticienne l'aura encodé.",
     disclaimer: {
       title: "Votre praticienne reste la référence",
