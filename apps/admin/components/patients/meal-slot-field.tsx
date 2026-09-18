@@ -1,5 +1,5 @@
 import { mealSlots, type MealSlot } from "@remi/services/shared";
-import { Typography } from "@remi/ui/server";
+import { ChoiceChip, Typography } from "@remi/ui/server";
 import { mealSlotLabels } from "@/components/patients/vocabulary";
 
 type Props = {
@@ -24,46 +24,21 @@ export const MealSlotField = ({ name, selected }: Props) => (
       </Typography>
     </legend>
     <div className="flex flex-wrap gap-2">
-      <SlotChip
+      <ChoiceChip
         name={name}
         value=""
         label="Aucun"
-        checked={selected === null}
+        defaultChecked={selected === null}
       />
       {mealSlots.map((slot) => (
-        <SlotChip
+        <ChoiceChip
           key={slot}
           name={name}
           value={slot}
           label={mealSlotLabels[slot]}
-          checked={selected === slot}
+          defaultChecked={selected === slot}
         />
       ))}
     </div>
   </fieldset>
-);
-
-const SlotChip = ({
-  name,
-  value,
-  label,
-  checked,
-}: {
-  name: string;
-  value: string;
-  label: string;
-  checked: boolean;
-}) => (
-  <label className="cursor-pointer">
-    <input
-      type="radio"
-      name={name}
-      value={value}
-      defaultChecked={checked}
-      className="peer sr-only"
-    />
-    <span className="border-border bg-card text-muted-foreground peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-foreground peer-focus-visible:ring-ring/40 inline-flex min-h-11 items-center rounded-full border px-4 text-sm transition-colors duration-[--duration-fast] peer-focus-visible:outline-none peer-focus-visible:ring-[3px]">
-      {label}
-    </span>
-  </label>
 );

@@ -36,6 +36,7 @@ export {
   CardTitle,
   cardVariants,
 } from "./server/card";
+export { ChoiceChip } from "./server/choice-chip";
 export { Container } from "./server/container";
 export { Field } from "./server/field";
 export { IconTile } from "./server/icon-tile";
