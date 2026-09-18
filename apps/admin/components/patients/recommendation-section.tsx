@@ -6,13 +6,16 @@ import { useCallback, useState, useTransition } from "react";
 import { recommendationCategories } from "@remi/services/shared";
 import type {
   PatientRecommendation,
+  ProtocolRow,
   RecommendationCategory,
 } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Field, Input, Textarea, Typography } from "@remi/ui/server";
 import { saveRecommendationSectionAction } from "@/lib/patients/actions";
+import { CopyFromPatient } from "@/components/patients/copy-from-patient";
 import { SectionEditFrame } from "@/components/patients/section-edit-frame";
 import { SectionRowControls } from "@/components/patients/section-row-controls";
+import { TemplateControls } from "@/components/patients/template-controls";
 import { useSectionRows } from "@/components/patients/use-section-rows";
 import {
   addableRecommendationCategories,
@@ -40,6 +43,24 @@ const toRow = (recommendation: PatientRecommendation): Row => ({
   title: recommendation.title,
   detail: recommendation.detail,
 });
+
+/**
+ * A reused row arrives with no id — a new row in *this* protocol, not a pointer
+ * at the one it came from. The category travels with the title because it is
+ * what decides which block the row lands in; an unrecognised one falls back to
+ * nutrition rather than creating a block nothing else knows about.
+ */
+const fromReused = (row: ProtocolRow): Row => ({
+  id: "",
+  category: asCategory(row.category ?? ""),
+  title: row.title ?? "",
+  detail: row.detail ?? "",
+});
+
+const asCategory = (value: string): RecommendationCategory =>
+  (recommendationCategories as readonly string[]).includes(value)
+    ? (value as RecommendationCategory)
+    : "nutrition";
 
 // `some` rather than `includes`: the addable list is narrowed to the four
 // categories it offers, so `includes` refuses the wider argument this is asked
@@ -123,6 +144,26 @@ export const RecommendationSection = ({
       action={save}
       editLabel="Modifier les recommandations"
       readView={children}
+      footer={
+        <div className="flex flex-col gap-3">
+          <CopyFromPatient
+            patientId={patientId}
+            kind="recommendation"
+            emptyLabel="aucune recommandation en cours"
+            onTaken={(taken) => addRows(taken.rows.map(fromReused))}
+          />
+
+          <TemplateControls
+            kind="recommendation"
+            currentRows={rows.map((row) => ({
+              category: row.category,
+              title: row.title,
+              detail: row.detail,
+            }))}
+            onInsert={(inserted) => addRows(inserted.map(fromReused))}
+          />
+        </div>
+      }
     >
       <div className="flex flex-col gap-6">
         {seeded.map((id) => (
