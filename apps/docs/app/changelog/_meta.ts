@@ -3,6 +3,8 @@
 // a new entry goes at the top of this object, which is what puts newest first.
 export default {
   index: "Overview",
+  "2026-09-18-reuse-and-duplicate":
+    "The same protocol, without typing it a tenth time",
   "2026-09-18-secondary-sections": "The rest of the record, made readable",
   "2026-09-17-bulk-entry": "A whole protocol in one save, not thirty",
   "2026-09-17-ciqual-import": "What is actually in a food",

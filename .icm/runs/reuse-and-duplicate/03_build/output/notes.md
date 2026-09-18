@@ -100,3 +100,40 @@ preview has already applied the original — **PR #110 is in exactly that positi
 Context budget: beyond the Inputs table — the four row-kind services and their components, which
 `touches:` named and the diff edits; plus `db/test-helpers.ts` and one existing service test, read
 to match the test shape.
+
+## Release
+
+- gate: Ready to merge ticked — merge authorised
+- ci: GREEN on `8d2d4b0` (the last code-bearing head); re-settled with `ci-status.sh` after the
+  close-out push, which is the verdict that authorised the merge
+- reviews: code high (5 findings, all fixed on the branch) · security run — no findings at or above
+  the confidence threshold · readiness run by hand — no `/production-readiness` skill exists in this
+  session, so its three checks were done directly: no new env var in the diff (no `process.env`,
+  `env()` or `requireEnv()` added, so no ENV.md / `turbo.json` / Vercel edit is owed), the migration
+  is additive and carries no `down` (up-only is the repo-wide convention, 0000–0018), and the
+  migration agrees with `schema.ts` because drizzle generated it from it
+- parked: `env-preview-migrations-row-is-stale` · `protocol-template-name-unique-index`
+- docs: `business/roles` § Operator — the reuse paths, the factual/personal rule and the audit
+  event · announce: public (`changelog/2026-09-18-reuse-and-duplicate`)
+
+### What the code review changed, and why it was fixed here rather than parked
+
+Five findings, all in this ticket's own code and all small, so all five were fixed on the branch
+rather than parked. The one worth a second look: the copy matched her ticks by **position** in the
+source list, so a row archived between the picker's read and her confirm would shift the match onto
+its neighbour and copy rows she never selected. It now matches the source row's own id, which
+either resolves or drops out. The other four: Enter in a reuse input implicitly submitted the
+section's form (`type="button"` does not cover implicit submission); the overwrite confirmation
+derived from a template list that might not have loaded, so a failed load would replace a set
+silently; the template save bypassed its pending state and could insert twice; and the picker's
+empty state reported a filter that matched nothing as an empty roster.
+
+### A correction to this file's own Notes for Release
+
+The note above saying `business/initiatives` still reads "the practitioner space is parked" is
+**stale** — the page was already corrected before this run, and now opens its second consequence
+with "The practitioner space is the admin console, reorganised". Nothing was owed there, and
+nothing was changed.
+
+Context budget: within the Inputs table, plus `apps/docs/app/changelog/` (an existing entry, the
+`_meta.ts` and the index) to match the announcement's shape.
