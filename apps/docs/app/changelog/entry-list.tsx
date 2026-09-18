@@ -42,9 +42,11 @@ export const EntryList = async () => {
     route: CHANGELOG_ROUTE,
   });
 
+  // `type: "doc"` is every page in the folder; the test is there so a separator
+  // or an external link added to `_meta.ts` one day is navigation, not an entry.
   const entries = directories
-    .filter((entry) => entry.route !== CHANGELOG_ROUTE)
-    .sort((a, b) => b.name.localeCompare(a.name));
+    .filter((entry) => entry.type === "doc" && entry.route !== CHANGELOG_ROUTE)
+    .sort((a, b) => (a.name < b.name ? 1 : -1));
 
   return (
     <List>
