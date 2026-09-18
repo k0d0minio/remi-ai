@@ -51,6 +51,7 @@ type Props = {
   today: string;
   goals: readonly ConsultationGoal[];
   instruction: string;
+  patientInstruction: string;
   summary: string;
   nextConsultationPrep: string;
   /** Where the three "Agir" links go — built server-side from the section ids. */
@@ -68,6 +69,7 @@ type Draft = {
   body: string;
   checkIns: Record<string, CheckInDraft>;
   instruction: string;
+  patientInstruction: string;
   summary: string;
   nextConsultationPrep: string;
 };
@@ -150,6 +152,7 @@ export const ConsultationForm = ({
   today,
   goals,
   instruction,
+  patientInstruction,
   summary,
   nextConsultationPrep,
   protocolLinks,
@@ -168,6 +171,7 @@ export const ConsultationForm = ({
       goals.map((entry) => [entry.goal.id, emptyCheckIn]),
     ),
     instruction,
+    patientInstruction,
     summary,
     nextConsultationPrep,
   };
@@ -422,7 +426,7 @@ export const ConsultationForm = ({
         <CardHeader>
           <CardTitle>La consigne et le résumé</CardTitle>
           <CardDescription>
-            Les deux textes sont préremplis avec ce qui est en vigueur. Une
+            Les trois textes sont préremplis avec ce qui est en vigueur. Une
             consigne modifiée remplace la précédente, qui reste consultable.
           </CardDescription>
         </CardHeader>
@@ -431,7 +435,7 @@ export const ConsultationForm = ({
             id="consultation-instruction"
             label="Consigne du moment"
             optional
-            hint="Vider le champ retire la consigne en cours."
+            hint="Pour vous, pas pour la personne suivie. Vider le champ retire la consigne en cours."
           >
             <Textarea
               id="consultation-instruction"
@@ -440,6 +444,23 @@ export const ConsultationForm = ({
               maxLength={2000}
               value={draft.instruction}
               onChange={(event) => update({ instruction: event.target.value })}
+            />
+          </Field>
+          <Field
+            id="consultation-patient-instruction"
+            label="Challenge de la semaine"
+            optional
+            hint="Pour la personne suivie — elle le lit en haut de son lien. Vider le champ le retire."
+          >
+            <Textarea
+              id="consultation-patient-instruction"
+              name="patientInstruction"
+              rows={3}
+              maxLength={2000}
+              value={draft.patientInstruction}
+              onChange={(event) =>
+                update({ patientInstruction: event.target.value })
+              }
             />
           </Field>
           <Field id="consultation-summary" label="Résumé vivant" optional>

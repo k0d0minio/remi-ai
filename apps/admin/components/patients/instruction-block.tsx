@@ -22,12 +22,19 @@ type Props = {
 };
 
 /**
- * § E's standing consigne — the line Morgane steers this accompaniment by.
+ * § E's standing consigne — the line Morgane steers this accompaniment by, and
+ * beneath it the same week's consigne written to the patient.
  *
- * Today it is a reminder to herself and nothing reads it but this page; the
- * description says so rather than implying a capability that does not exist
- * yet. Saving replaces: the service archives what was there, so the previous
- * wording stays readable with the date it stopped applying.
+ * Two fields because they have two readers and two registers: the first is a
+ * note to herself (and, in the AI round, the prompt's practitioner line) and
+ * the patient never sees it; the second is the « challenge de la semaine » her
+ * § 6 puts at the top of the link's home. Either may stand alone — a week she
+ * steers by silently, or a consigne to the patient she needs no note about.
+ * Both post together because they share one row.
+ *
+ * Saving replaces: the service archives what was there, so the previous
+ * wording stays readable with the date it stopped applying — and the pair that
+ * was in force is archived together.
  */
 export const InstructionBlock = ({
   patientId,
@@ -59,6 +66,21 @@ export const InstructionBlock = ({
             rows={3}
             maxLength={2000}
             defaultValue={instruction?.body ?? ""}
+          />
+        </Field>
+
+        <Field
+          id="instruction-patient-body"
+          label="Challenge de la semaine"
+          optional
+          hint="Pour la personne suivie — elle le lit en haut de son lien. Laissé vide, rien ne s'affiche."
+        >
+          <Textarea
+            id="instruction-patient-body"
+            name="patientBody"
+            rows={3}
+            maxLength={2000}
+            defaultValue={instruction?.patientBody ?? ""}
           />
         </Field>
 

@@ -102,3 +102,26 @@ export const mealSlots = [
  * direction *or* a simple measure, and one of the two is enough.
  */
 export const goalDirections = ["better", "stable", "worse"] as const;
+
+/**
+ * The "principales" rule: the first active recommendation of each category, in
+ * the category order above.
+ *
+ * It lives here rather than in either app because the console's at-a-glance
+ * and the patient link's home are one decision — what "prioritised" means is
+ * Morgane's, and two copies of the rule are two things to disagree. Callers
+ * pass the active list already ordered by category then position, which is
+ * what `listPatientRecommendations` returns; this picks the head of each run
+ * and never re-sorts, so reordering in the console reorders both surfaces.
+ */
+export const firstRecommendationPerCategory = <
+  T extends { category: (typeof recommendationCategories)[number] },
+>(
+  recommendations: readonly T[],
+): readonly T[] =>
+  recommendationCategories.flatMap((category) => {
+    const first = recommendations.find(
+      (recommendation) => recommendation.category === category,
+    );
+    return first ? [first] : [];
+  });

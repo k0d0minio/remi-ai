@@ -988,8 +988,11 @@ export const deleteCheckInAction = async (formData: FormData) => {
 
 /**
  * Replacing the consigne archives the one it replaces — that is the service's
- * doing, not a second call from here. An empty body is how Morgane says there
- * is no standing instruction, so it is a save, not a validation error.
+ * doing, not a second call from here. Empty fields are how Morgane says there
+ * is no standing instruction, so that is a save, not a validation error.
+ *
+ * Both halves post together because they live on one row: sending only the one
+ * she edited would clear the other.
  */
 export const setInstructionAction = async (
   _previous: InstructionFormState,
@@ -998,11 +1001,12 @@ export const setInstructionAction = async (
   const operator = await requireOperator();
   const patientId = field(formData, "patientId");
   const body = field(formData, "body");
+  const patientBody = field(formData, "patientBody");
   // Read before the write so the trail can tell a clearing from a save on a
   // patient who never had a consigne — the second changes nothing, and an
   // audit row for a non-event is worse than none.
   const before = await getPatientInstruction(patientId);
-  const result = await setPatientInstruction(patientId, body);
+  const result = await setPatientInstruction(patientId, { body, patientBody });
   if (!result.ok) {
     return { error: result.message, saved: false };
   }
@@ -1325,6 +1329,7 @@ export const recordConsultationAction = async (
     // A field the form did not send is a field this save must not touch, which
     // `""` would not say — that is how the consigne and the résumé are cleared.
     instruction: optionalField(formData, "instruction"),
+    patientInstruction: optionalField(formData, "patientInstruction"),
     summary: optionalField(formData, "summary"),
     nextConsultationPrep: optionalField(formData, "nextConsultationPrep"),
   });
