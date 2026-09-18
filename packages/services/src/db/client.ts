@@ -26,6 +26,13 @@ export type DatabaseClient = {
   collection: <T extends { id: Id }>(name: string) => Collection<T>;
   /** Run `fn` inside a transaction where the driver supports one. */
   transaction: <T>(fn: (tx: DatabaseClient) => Promise<T>) => Promise<T>;
+  /**
+   * Release whatever the adapter holds open. **Not a per-request call:** on
+   * Vercel one function instance serves many requests and the connection pool
+   * is meant to outlive them, so closing after a request would pay the
+   * connection cost every time. It exists for a script or a test that must not
+   * leave the process alive — nothing in the apps calls it.
+   */
   close: () => Promise<void>;
 };
 
