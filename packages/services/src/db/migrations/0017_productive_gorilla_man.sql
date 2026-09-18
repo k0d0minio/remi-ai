@@ -1,0 +1,1 @@
+ALTER TABLE "patient_instructions" ADD COLUMN "patient_body" text;

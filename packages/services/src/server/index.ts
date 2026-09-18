@@ -63,6 +63,7 @@ export {
   getPatientInstruction,
   listArchivedPatientInstructions,
   setPatientInstruction,
+  type InstructionBodies,
 } from "../db/services/patient-instructions";
 
 export {
