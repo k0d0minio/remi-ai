@@ -89,10 +89,18 @@ domain in it is a separate decision — REMI-037 (`remi.be` DNS) and decision D-
 
 **Neon Postgres**, by owner decision on 27 August 2026 — it supersedes the repo's earlier
 Supabase leaning (REMI-007/013 ticket texts predate it). The adapter is
-`packages/services/src/db/adapters/neon.ts`, Drizzle over the serverless HTTP driver; checked-in
-migrations live in `packages/services/src/db/migrations/` and are applied by
+`packages/services/src/db/adapters/neon.ts`, Drizzle over the serverless **WebSocket** driver
+(`@neondatabase/serverless`'s `Pool` with `drizzle-orm/neon-serverless`), so the storage seam's
+`transaction()` is a real `BEGIN` / `COMMIT` / `ROLLBACK`; checked-in migrations live in
+`packages/services/src/db/migrations/` and are applied by
 `pnpm --filter @remi/services db:migrate`, which runs at the front of the **admin** app's build so
 a deploy migrates before it serves.
+
+**The pooled driver needs no variable of its own.** Pool size and idle timeout are constants in
+the adapter, sized for one pool per Next.js route bundle rather than one per process. The socket
+needs no wiring either: `@neondatabase/serverless` v1 pulls in no `ws` package and uses the
+`WebSocket` Node 22 provides, so there is no `neonConfig` to set and nothing to carry per
+environment. `DATABASE_URL` remains the whole of the storage configuration.
 
 | Variable                          | Purpose                                                                      | Where set | Public? |
 | --------------------------------- | ---------------------------------------------------------------------------- | --------- | ------- |
