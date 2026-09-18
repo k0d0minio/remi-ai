@@ -86,8 +86,12 @@ Text only (D-12). No model call (D-6 fixes the slot; `ai-assist/meal-suggestions
 - Photos or any upload (D-12); the journal stays text-only.
 - The patient editing or deleting an entry after submitting, and flipping `eaten` back to `planned`.
   Correcting a meal is Morgane's, in the console, as it is today.
-- The entry control on the patient home. `patient-home-today` owns the home and places it there when
-  it runs; this run puts it where the history already lives.
+- The entry *form* on the patient home. `patient-home-today` (#106) merged while this run was in
+  Build and shipped `MealEntryPoint` there — the two labels in their final place, inert, with a
+  line saying they do not work yet. This run makes them a way in rather than a second form: they
+  link to Repas, where the writing happens and the history it joins already lives. Two forms for
+  one act would be two places to keep in step. Moving the form itself onto the home is still a
+  `revise` away.
 - Any change to how `feedback` is authored or stored beyond the placeholder — one column, two
   writers, and `ai-assist` decides its own shape.
 - Anything else in `apps/admin`: the marker and the placeholder only, no journal redesign.

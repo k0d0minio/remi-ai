@@ -100,6 +100,7 @@ const NewConsultation = async ({ params }: PageProps) => {
         today={today}
         goals={withLastCheckIn}
         instruction={instruction?.body ?? ""}
+        patientInstruction={instruction?.patientBody ?? ""}
         summary={summary?.body ?? ""}
         nextConsultationPrep={patient.nextConsultationPrep ?? ""}
         protocolLinks={protocolLinks(patient.id)}

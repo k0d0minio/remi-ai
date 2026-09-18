@@ -340,6 +340,14 @@ export const patientInstructions = pgTable("patient_instructions", {
     .notNull()
     .references(() => patientProfiles.id, { onDelete: "cascade" }),
   body: text("body").notNull(),
+  /**
+   * The same week's consigne written TO the patient, rendered on the link's
+   * home. Null when she has written only the REMI-facing line above: the two
+   * are independent, and the home shows nothing rather than falling back to
+   * `body`, which is addressed to REMI and would read as a note about the
+   * patient rather than to them.
+   */
+  patientBody: text("patient_body"),
   /** Set when a replacement supersedes it. Null on the one in force. */
   archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
   ...timestamps,

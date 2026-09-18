@@ -80,6 +80,27 @@
 - [x] Patient-written entries marked in the console's journal card
 - [x] The four-part shape is the admin feedback textarea's placeholder
 
+## The merge with `main`
+
+`patient-home-today` (#106), and the two lane PRs #108 and #109, landed while this run was in
+Build. Merging them in cost four resolutions:
+
+- **Migration renumbered by regenerating, not by hand.** `main` shipped its own `0017`, so both
+  meta files conflicted. The hand-written `0017_meal_entry_intent` was deleted, `main`'s meta
+  taken whole, and `pnpm db:generate` run for real — `node_modules` exists now, which it did not
+  when this run started. The result is `0018_greedy_mentallo`. That is exactly the remedy #109's
+  new `check-migration-order.mjs` prescribes, and the check passes.
+- **The meal copy had two homes.** #106 shipped `mealEntry: { title, lead, willEat, haveEaten,
+  comingSoon }`; this run had added a flat `mealEntryTitle` … `mealWriteErrors`. « Je vais manger »
+  was in the dictionary twice. Everything now sits in `mealEntry`, with `actions` (the verbs that
+  write) and `states` (how a written meal reads back) kept apart.
+- **`MealEntryPoint` was a dead control.** #106 shipped it inert with « Bientôt disponible. » and
+  said in its own comment that `meal-entry` would wire it. Leaving it would ship two labels that
+  ignore a tap next to a working form one segment away, and CONVENTIONS § Superseding deletes the
+  superseded forbids it. The labels are now links to Repas — #106's own framing, "the way in to
+  the meal loop" — so the operator's placement decision stands and there is still one form.
+- **`visibleSegments`** auto-merged cleanly; `repas` stays unconditionally present.
+
 ## Notes for Release
 
 - **Nine service tests ride along**, written from the criteria: the default intent, a planned
@@ -91,6 +112,9 @@
 - **`apps/admin`'s two `today` call sites still read UTC** — parked as
   `triage/console-today-is-utc.md` rather than absorbed. Morgane can correct both fields; the
   patient cannot, which is why only the patient side moved.
+- The home's meal card changed from inert labels to links, which is a **shipped** surface
+  changing under #106's feet. It is the smallest resolution that leaves no dead control; putting
+  the form itself on the home is a `revise`, not a Build decision.
 - `visibleSegments` changed behaviour for a **shipped** segment. A patient with no meals now sees
   « Repas » in their navigation where they did not before. That was forced by the placement
   settled at Define, and the spec says so.

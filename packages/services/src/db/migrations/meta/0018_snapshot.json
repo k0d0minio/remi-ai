@@ -1,6 +1,6 @@
 {
-  "id": "ea4640cb-14a3-4859-afb8-9e030faaed79",
-  "prevId": "2acce5a3-a829-41de-8698-2dcd81287443",
+  "id": "440aba1d-3cbd-4e42-b293-3159d6d7481b",
+  "prevId": "ea4640cb-14a3-4859-afb8-9e030faaed79",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1059,6 +1059,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'practitioner'"
+        },
+        "intent": {
+          "name": "intent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'eaten'"
         },
         "created_at": {
           "name": "created_at",

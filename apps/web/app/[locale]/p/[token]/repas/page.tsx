@@ -38,10 +38,10 @@ const Segment = async ({ params }: { params: Promise<Params> }) => {
 
   return (
     <div className="flex flex-col gap-8">
-      <SegmentPage title={content.mealEntryTitle}>
+      <SegmentPage title={content.mealEntry.formTitle}>
         <div className="flex flex-col gap-4">
           <Typography size="sm" tone="muted">
-            {content.mealEntryLead}
+            {content.mealEntry.formLead}
           </Typography>
           <Card>
             <CardContent>
@@ -61,7 +61,7 @@ const Segment = async ({ params }: { params: Promise<Params> }) => {
           />
         ) : (
           <Typography size="sm" tone="muted">
-            {content.mealsEmpty}
+            {content.mealEntry.empty}
           </Typography>
         )}
       </SegmentPage>

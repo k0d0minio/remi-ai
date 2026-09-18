@@ -48,8 +48,8 @@ export const MealEntryForm = ({ token, locale, content }: Props) => {
 
       <Field
         id="meal-entry-description"
-        label={content.mealEntryDescriptionLabel}
-        error={state.error ? content.mealWriteErrors[state.error] : undefined}
+        label={content.mealEntry.descriptionLabel}
+        error={state.error ? content.mealEntry.errors[state.error] : undefined}
       >
         <Textarea
           id="meal-entry-description"
@@ -57,21 +57,21 @@ export const MealEntryForm = ({ token, locale, content }: Props) => {
           required
           rows={2}
           maxLength={2000}
-          placeholder={content.mealEntryPlaceholder}
+          placeholder={content.mealEntry.placeholder}
         />
       </Field>
 
       <fieldset className="flex flex-col gap-2">
         <legend className="mb-1">
           <Typography as="span" size="sm" weight="medium">
-            {content.mealEntrySlotLabel}
+            {content.mealEntry.slotLabel}
           </Typography>
         </legend>
         <div className="flex flex-wrap gap-2">
           <ChoiceChip
             name="slot"
             value=""
-            label={content.mealEntrySlotNone}
+            label={content.mealEntry.slotNone}
             defaultChecked
           />
           {mealSlots.map((slot) => (
@@ -94,7 +94,7 @@ export const MealEntryForm = ({ token, locale, content }: Props) => {
             value={intent}
             variant={intent === "planned" ? "primary" : "outline"}
           >
-            {content.mealIntentActions[intent]}
+            {content.mealEntry.actions[intent]}
           </Button>
         ))}
       </div>

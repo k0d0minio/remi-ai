@@ -38,11 +38,11 @@ export const MealMarkEaten = ({ mealId, token, locale, content }: Props) => {
       <input type="hidden" name="token" value={token} />
       <input type="hidden" name="locale" value={locale} />
       <Button type="submit" size="sm" variant="outline">
-        {content.mealMarkEaten}
+        {content.mealEntry.markEaten}
       </Button>
       {state.error ? (
         <Typography size="sm" className="text-error-text" role="alert">
-          {content.mealWriteErrors[state.error]}
+          {content.mealEntry.errors[state.error]}
         </Typography>
       ) : null}
     </form>

@@ -44,7 +44,7 @@ export const MealList = ({ meals, locale, token, content }: Props) => (
                 tone="subtle"
                 size="sm"
               >
-                {content.mealIntentLabels[meal.intent]}
+                {content.mealEntry.states[meal.intent]}
               </Badge>
               <Typography size="xs" tone="muted">
                 {[
@@ -82,7 +82,7 @@ export const MealList = ({ meals, locale, token, content }: Props) => (
                 </Typography>
               ) : (
                 <Typography size="sm" tone="muted">
-                  {content.mealAwaitingResponse}
+                  {content.mealEntry.awaitingResponse}
                 </Typography>
               )}
             </div>

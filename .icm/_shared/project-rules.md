@@ -70,10 +70,11 @@ identity. Everything specific to Remi AI lives in the project-owned files the sy
   when used as an override, is newline-separated). The workflow is `Quality`
   (`.github/workflows/quality.yaml`); the **check run** is named after its one job. It runs on
   every PR and on `main`, with no path filter and **no tiering**: a draft head and a ready head
-  run the same whole job — a format check over `**/*.{ts,tsx,md}`, lint with a zero-warning
-  ceiling, the type check, and the `@remi/services` vitest suite — so here the "cheap tier" and
-  the "full gate" the contracts distinguish are one and the same verdict, and `ci-status.sh`
-  names the tier by the PR's draft state alone. The full sweep is blocked in-session by
+  run the same whole job — the migration-order check (`Migration order`, pull requests only:
+  `CONVENTIONS.md` § the factory), a format check over `**/*.{ts,tsx,md}`, lint with a
+  zero-warning ceiling, the type check, and the `@remi/services` vitest suite — so here the
+  "cheap tier" and the "full gate" the contracts distinguish are one and the same verdict, and
+  `ci-status.sh` names the tier by the PR's draft state alone. The full sweep is blocked in-session by
   `.claude/hooks/block-local-checks.sh`; Husky (`lint-staged`) formats staged `.ts/.tsx/.md` on
   commit wherever `node_modules` is installed.
 - **The other check runs on a PR:**

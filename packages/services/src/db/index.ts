@@ -110,6 +110,7 @@ export {
   getPatientInstruction,
   listArchivedPatientInstructions,
   setPatientInstruction,
+  type InstructionBodies,
 } from "./services/patient-instructions";
 
 export {

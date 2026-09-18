@@ -291,11 +291,52 @@ export type Content = {
       recettes: string;
       repas: string;
     };
-    /** Home: the living summary and the priority goals, in her order. */
-    summaryTitle: string;
+    /**
+     * Home, in her § 6 order: today and this week, the prioritised
+     * recommendations, the recipes, the essentials, the way in to a meal, and
+     * the living summary last.
+     */
+    todayTitle: string;
+    /** Heads the week's consigne, when she has written one to the patient. */
+    weekChallengeTitle: string;
+    /** Sits above the goals inside « Aujourd'hui ». */
     goalsTitle: string;
     /** Precedes a goal's starting point: "Point de départ : ...". */
     baselineLabel: string;
+    /** Follows each home section into its full segment. */
+    seeAllLabel: string;
+    /**
+     * Everything the meal loop says, in one block — the home's invitation and
+     * the form on Repas both, because « Je vais manger » is one string however
+     * many places it appears.
+     *
+     * `actions` are the two buttons that write an entry; `states` are how one
+     * already written reads back. They are separate because the verb and the
+     * state are different words in both languages — « Je vais manger » writes
+     * a meal that reads « Prévu ».
+     */
+    mealEntry: {
+      /** The home's invitation card, which links through to Repas. */
+      title: string;
+      lead: string;
+      /** The form on Repas, where the writing actually happens. */
+      formTitle: string;
+      formLead: string;
+      descriptionLabel: string;
+      placeholder: string;
+      slotLabel: string;
+      slotNone: string;
+      actions: Record<MealIntent, string>;
+      states: Record<MealIntent, string>;
+      markEaten: string;
+      /** Stands in for the answer until Morgane — or, later, REMI — writes one. */
+      awaitingResponse: string;
+      /** The journal before the patient has written anything into it. */
+      empty: string;
+      /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
+      errors: Record<PatientWriteError, string>;
+    };
+    summaryTitle: string;
     recommendationsTitle: string;
     categories: Record<RecommendationCategory, string>;
     /** Compléments: the validated protocol, never the profile free text. */
@@ -318,30 +359,6 @@ export type Content = {
     mealSlots: Record<MealSlot, string>;
     mealCommentLabel: string;
     mealFeedbackLabel: string;
-    /**
-     * Repas, the writing half: § 8's two sentences, the field they carry, and
-     * the answer that has not arrived yet.
-     *
-     * `mealIntentActions` are the two buttons that write an entry;
-     * `mealIntentLabels` are how an entry already written reads back. They are
-     * separate because the verb and the state are different words in both
-     * languages — « Je vais manger » writes a meal that reads « Prévu ».
-     */
-    mealEntryTitle: string;
-    mealEntryLead: string;
-    mealEntryDescriptionLabel: string;
-    mealEntryPlaceholder: string;
-    mealEntrySlotLabel: string;
-    mealEntrySlotNone: string;
-    mealIntentActions: Record<MealIntent, string>;
-    mealIntentLabels: Record<MealIntent, string>;
-    mealMarkEaten: string;
-    /** Stands in for the answer until Morgane — or, later, REMI — writes one. */
-    mealAwaitingResponse: string;
-    /** The journal before the patient has written anything into it. */
-    mealsEmpty: string;
-    /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
-    mealWriteErrors: Record<PatientWriteError, string>;
     empty: string;
     disclaimer: PlaceholderContent;
     /**

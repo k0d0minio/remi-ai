@@ -36,6 +36,7 @@ export {
   anamnesisCategories,
   consentChannels,
   cookingAffinities,
+  firstRecommendationPerCategory,
   goalDirections,
   mealIntents,
   mealSlots,
