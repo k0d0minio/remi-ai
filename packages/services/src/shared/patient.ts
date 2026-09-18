@@ -94,6 +94,18 @@ export const mealSlots = [
 ] as const;
 
 /**
+ * Why a meal was written down: « Je vais manger » before it, « J'ai mangé »
+ * after (§ 8).
+ *
+ * `eaten` is the default because it is what every row predating the patient's
+ * own entry control was: Morgane transcribing a meal that had already
+ * happened. A planned entry becomes an eaten one on the same row — one meal is
+ * one record — so the pair is a state the row moves through, never two rows to
+ * reconcile, and it moves one way only.
+ */
+export const mealIntents = ["planned", "eaten"] as const;
+
+/**
  * § D's check-in vocabulary — how a goal moved since the last one.
  *
  * English keys because they are what `patient_goal_check_ins` stores; the

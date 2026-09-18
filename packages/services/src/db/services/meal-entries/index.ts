@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { err, ok, type Result } from "../../../shared/result";
-import { mealSlots } from "../../../shared/patient";
+import { mealIntents, mealSlots } from "../../../shared/patient";
 import type { Id } from "../../../types";
 import { getDatabase } from "../../client";
 import type { MealEntry, WrittenBy } from "../../models/meal-entry";
@@ -38,6 +38,12 @@ const isoDate = z
 
 const entryFields = z.object({
   eatenOn: isoDate,
+  /**
+   * Which of § 8's two sentences this is. Validated like any other posted
+   * value rather than set by the code path the way `writtenBy` is: claiming an
+   * intent forges nothing, where claiming an authorship would.
+   */
+  intent: z.enum(mealIntents),
   /** `null` clears the slot; omitting the key leaves it as it was. */
   slot: z.enum(mealSlots).nullable(),
   description: z
@@ -149,6 +155,7 @@ export const addMealEntry = async (
   const parsed = entryFields
     .partial({
       slot: true,
+      intent: true,
       patientComment: true,
       feedback: true,
       learning: true,
@@ -172,6 +179,7 @@ export const addMealEntry = async (
     description: parsed.data.description,
     patientComment: parsed.data.patientComment ?? "",
     learning: parsed.data.learning ?? "",
+    intent: parsed.data.intent ?? "eaten",
     feedback,
     feedbackWrittenAt: feedback === "" ? null : new Date(),
     archivedAt: null,
@@ -188,7 +196,10 @@ export const updateMealEntry = async (
   if (!uuidSchema.safeParse(id).success) {
     return err("not_found", "no such meal entry");
   }
-  const parsed = entryFields.partial().safeParse(input);
+  // `intent` is omitted rather than ignored: the transition is one-way and
+  // belongs to `markMealEntryEaten` alone, so there is no second path that
+  // could quietly move a meal back to planned.
+  const parsed = entryFields.omit({ intent: true }).partial().safeParse(input);
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
   }
@@ -207,6 +218,49 @@ export const updateMealEntry = async (
   }
   await touchPatient(existing.patientId);
   return ok(updated);
+};
+
+/**
+ * « Je vais manger » becomes « J'ai mangé », on the row that already exists.
+ *
+ * One meal is one record: the patient wrote the plan, and the outcome is the
+ * same meal further along rather than a second entry to reconcile against the
+ * first. So nothing else moves — the description, the slot and any answer
+ * already written against the plan are all still about this meal.
+ *
+ * It only ever goes one way. A meal that has happened cannot un-happen, and a
+ * second press on a stale page is the ordinary case rather than an attack, so
+ * it reads as "no such planned meal" instead of silently rewriting a row.
+ */
+export const markMealEntryEaten = async (
+  id: Id,
+): Promise<Result<MealEntry>> => {
+  if (!uuidSchema.safeParse(id).success) {
+    return err("not_found", "no such meal entry");
+  }
+  const existing = await entries().findById(id);
+  if (!existing || existing.intent !== "planned") {
+    return err("not_found", "no such planned meal");
+  }
+  const updated = await entries().update(id, { intent: "eaten" });
+  if (!updated) {
+    return err("not_found", "no such meal entry");
+  }
+  await touchPatient(existing.patientId);
+  return ok(updated);
+};
+
+/**
+ * Whose entry is this? The ownership answer `writeThroughPatientLink` needs
+ * before it lets a token touch a row it named by id.
+ *
+ * It lives here because the question is the journal's to answer, and a caller
+ * that had to assemble it from `getMealEntry` could assemble it differently —
+ * which is one patient reading another's record away from being wrong.
+ */
+export const mealEntryOwner = async (id: Id): Promise<Id | null> => {
+  const entry = await getMealEntry(id);
+  return entry.ok ? entry.data.patientId : null;
 };
 
 export const archiveMealEntry = async (

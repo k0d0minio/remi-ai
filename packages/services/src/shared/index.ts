@@ -14,6 +14,7 @@ export {
   formatDateTime,
   formatNumber,
   initials,
+  todayAtPractice,
 } from "./format";
 export {
   defaultLocale,
@@ -36,6 +37,7 @@ export {
   consentChannels,
   cookingAffinities,
   goalDirections,
+  mealIntents,
   mealSlots,
   patientSexes,
   patientStatuses,
@@ -74,6 +76,7 @@ export type {
   GoalDirection,
   HabitsProfile,
   MealEntry,
+  MealIntent,
   MealSlot,
   NutrientMarker,
   NutritionRule,

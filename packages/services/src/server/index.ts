@@ -198,10 +198,12 @@ export {
   getMealEntry,
   listArchivedMealEntries,
   listMealEntries,
+  markMealEntryEaten,
+  mealEntryOwner,
   updateMealEntry,
 } from "../db/services/meal-entries";
 export type { MealEntryInput } from "../db/services/meal-entries";
-export type { MealEntry, MealSlot } from "../db/models/meal-entry";
+export type { MealEntry, MealIntent, MealSlot } from "../db/models/meal-entry";
 
 export {
   addPatientObservation,
