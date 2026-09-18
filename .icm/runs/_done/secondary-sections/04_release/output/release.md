@@ -16,7 +16,12 @@
 - business docs: `apps/docs/app/business/roles` — the Operator bullet says what is behind the
   navigation
 - release notes: both
-- sent: see below
+- sent: **no** — `RESEND_API_KEY`, `SHIP_NOTE_RECIPIENTS`, `SHIP_NOTE_FROM` and `EMAIL_FROM` are
+  all unset in a remote Claude Code session, so `send-ship-note.sh --send` cannot run. This is the
+  systemic gap parked as `.icm/intake/triage/ship-note-unsendable-from-remote-sessions.md`, found
+  by `ciqual-import` and `copy-context` the day before. Checked **before** the merge rather than
+  asserted from the template afterwards: the note is written and archived, and stays unsent until
+  someone runs the script where those variables exist.
 - closed out: RESULT: CLOSED — run archived. The `practitioner-workflow` epic stays open:
   `reuse-and-duplicate` is still to spin out, and it waits on `bulk-entry` and `recipe-in-place`,
   both of which landed on `main` overnight — so it is unblocked and is the epic's next stub.
