@@ -1,7 +1,11 @@
 # Build notes: recipe-feedback-and-favourites
 
-- commits: `e879c82` feat — four answers on a recipe, and the shelf they fill
-- ci: pending the push
+- commits: `e879c82` feat — four answers on a recipe, and the shelf they fill · `1f6c75f` build
+  notes · `e57cd5d` fix — a fresh recipe per answer test · `cfd6bcb` the ready flip's push
+- ci: GREEN on `cfd6bcb` — the full gate (ready). One red round on `1f6c75f`, mine: four of the
+  new services tests shared two fixture recipes, and a second *active* giving of the same recipe
+  to the same patient is a `conflict` by design, so only the test that ran first got an
+  assignment. Fixed in `e57cd5d` by giving each test its own dish.
 
 ## What changed
 
@@ -68,3 +72,11 @@
 - `patient-link-writes` counts this as one write against the per-token ceilings, which is what the
   ceiling comment already anticipated ("some recipe feedback").
 - The « Trop long » follow-up field stays out of scope, per the spec.
+- **No preview on the ready head.** The flip's empty commit changed no files, so Vercel's Ignored
+  Build Step skipped all six projects and the bot blanked its preview URLs. The previews for this
+  code are the branch aliases, built from `e57cd5d` (identical code):
+  <https://app-git-claude-recipe-feedback-favourites-pipelin-51dffd-remi21.vercel.app> (the patient
+  link) and <https://admin-git-claude-recipe-feedback-favourites-pipel-e82520-remi21.vercel.app>
+  (the console). Both answer 200. Parked as
+  `.icm/intake/triage/ready-flip-empty-commit-skips-previews.md`, since the step that causes it is
+  template-owned.
