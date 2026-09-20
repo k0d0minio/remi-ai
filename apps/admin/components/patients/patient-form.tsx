@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import type { PatientProfile } from "@remi/services/shared";
 import {
   consentChannels,
@@ -44,6 +44,12 @@ const initial: PatientFormState = { error: null, saved: false };
 type Props = {
   /** Present when editing; absent on `/patients/new`. */
   patient?: PatientProfile;
+  /**
+   * Called once a save has succeeded. The profile page collapses the form back
+   * to its read summary with it; `/patients/new` redirects instead and passes
+   * none.
+   */
+  onSaved?: () => void;
 };
 
 /**
@@ -55,8 +61,18 @@ type Props = {
  * They are the ones a protocol is actually written against, and separating
  * them is what lets Morgane scan for a medication without reading a paragraph.
  */
-export const PatientForm = ({ patient }: Props) => {
+export const PatientForm = ({ patient, onSaved }: Props) => {
   const [state, action, pending] = useActionState(savePatientAction, initial);
+
+  // A caller that swapped this form in has no other way to learn the save
+  // landed. `saved` only ever goes false → true within one mount — the state
+  // resets with the component, and a failed save leaves it false — so the
+  // notification is once per successful save, not once per render.
+  useEffect(() => {
+    if (state.saved) {
+      onSaved?.();
+    }
+  }, [state.saved, onSaved]);
 
   // Both halves or neither: a date with no channel says nothing about what the
   // patient actually agreed through, so it still reads as not recorded.
