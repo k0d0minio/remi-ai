@@ -52,6 +52,7 @@ export { canManageOperators, isAtLeast, operatorRoles } from "./operator";
 export type { OperatorRoleName } from "./operator";
 export {
   anamnesisCategories,
+  awaitsCheckInOn,
   checkInCategories,
   consentChannels,
   cookingAffinities,
@@ -60,11 +61,12 @@ export {
   isCheckInCategory,
   mealIntents,
   mealSlots,
+  orderCheckInRotation,
   patientSexes,
   patientStatuses,
   recommendationCategories,
 } from "./patient";
-export type { CheckInCategory } from "./patient";
+export type { CheckInCategory, CheckInSubject } from "./patient";
 export {
   componentsForRecommendation,
   normaliseNutritionText,

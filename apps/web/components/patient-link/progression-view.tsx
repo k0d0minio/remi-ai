@@ -41,8 +41,12 @@ export const ProgressionView = ({ data, locale, content }: Props) => {
     id: trail.goal.id,
     title: trail.goal.title,
     marks: marksFrom(
-      trail.checkIns.filter((entry) => entry.checkedOn >= since),
-      (entry) => entry.writtenBy === "patient",
+      trail.checkIns
+        .filter((entry) => entry.checkedOn >= since)
+        .map((entry) => ({
+          ...entry,
+          fromPatient: entry.writtenBy === "patient",
+        })),
     ),
   }));
 
@@ -59,8 +63,10 @@ export const ProgressionView = ({ data, locale, content }: Props) => {
       id: trail.recommendation.id,
       title: trail.recommendation.title,
       marks: marksFrom(
-        trail.checkIns.filter((entry) => entry.checkedOn >= since),
-        () => true,
+        trail.checkIns
+          .filter((entry) => entry.checkedOn >= since)
+          // Only the patient ever writes one of these.
+          .map((entry) => ({ ...entry, fromPatient: true })),
       ),
     }));
 
@@ -174,12 +180,11 @@ type AnsweredRow = {
   checkedOn: string;
   direction: CheckInMark["direction"] | null;
   note: string;
+  /** Set by the caller: a goal trail carries both authors, a recommendation one. */
+  fromPatient: boolean;
 };
 
-const marksFrom = (
-  entries: readonly AnsweredRow[],
-  fromPatient: (entry: AnsweredRow) => boolean,
-): readonly CheckInMark[] =>
+const marksFrom = (entries: readonly AnsweredRow[]): readonly CheckInMark[] =>
   [...entries].reverse().flatMap((entry) =>
     entry.direction === null
       ? []
@@ -189,7 +194,7 @@ const marksFrom = (
             checkedOn: entry.checkedOn,
             direction: entry.direction,
             note: entry.note,
-            fromPatient: fromPatient(entry),
+            fromPatient: entry.fromPatient,
           },
         ],
   );
