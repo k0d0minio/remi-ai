@@ -13,6 +13,7 @@ export const actionLabels: Record<AuditActionName, string> = {
   "patient.created": "profil créé",
   "patient.updated": "profil modifié",
   "patient.deleted": "profil supprimé",
+  "profile.preferences_updated": "profil modifié par la patiente",
   "recommendation.added": "recommandation ajoutée",
   "recommendation.updated": "recommandation modifiée",
   "recommendation.archived": "recommandation archivée",
@@ -110,6 +111,10 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "patient.created": "neutral",
   "patient.updated": "neutral",
   "patient.deleted": "error",
+  // Not coloured, for the reason above: it is an ordinary write, and the thing
+  // worth noticing about it — that the patient made it, not Morgane — is
+  // already in the label and in the row's actor.
+  "profile.preferences_updated": "neutral",
   "recommendation.added": "neutral",
   "recommendation.updated": "neutral",
   "recommendation.archived": "neutral",
