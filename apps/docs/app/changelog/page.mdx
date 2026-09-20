@@ -1,29 +1,14 @@
+import { EntryList } from "./entry-list";
+
 # Changelog
 
 What shipped, in the user's voice. One page per shipped feature, added by the pipeline's Release stage
 (or a bug or tweak lane, when the change is user-visible) in the same PR as the change itself — committing the entry **is** the publish, so the changelog can
 never be more than one merge out of date.
 
-Entries live at `changelog/<YYYY-MM-DD>-<slug>/`, newest first.
+Entries live at `changelog/<YYYY-MM-DD>-<slug>/`, newest first. The list below is read from that
+folder rather than written beside it, so an entry appears here as soon as its page exists.
 
 ## Entries
 
-- [The profile closes when you save it](/changelog/2026-09-18-profile-close-on-save) —
-  18 September 2026. « Fermer » no longer sits above the profile form, ready to drop everything
-  you typed; saving is what takes you back to the summary.
-- [The same protocol, without typing it a tenth time](/changelog/2026-09-18-reuse-and-duplicate) —
-  18 September 2026. Fill a patient's list from another patient's, or from a named model you keep;
-  the facts come across, the sentences you wrote for someone else do not.
-- [Your patients write their own meals now](/changelog/2026-09-18-meal-entry) —
-  18 September 2026. « Je vais manger » and « J'ai mangé » on the patient link, each meal carrying
-  the place your answer goes.
-- [What is actually in a food](/changelog/2026-09-17-ciqual-import) —
-  17 September 2026. The ANSES food-composition table, searchable in the console and queryable by
-  nutrient.
-- [Two or three goals, and the instruction that stands](/changelog/2026-09-03-goals-and-instruction)
-  — 3 September 2026. A patient's priority goals, dated check-ins against each, and the standing
-  instruction, on their page.
-- [The meal journal, out of the chat thread](/changelog/2026-09-03-meal-journal) —
-  3 September 2026. Meals, replies and what a week taught you, on the patient's page.
-- [One REMI, wherever you land](/changelog/2026-08-03-brand-foundation) — 3 August 2026. One
-  wordmark, one icon and one description of the product, across every app.
+<EntryList />

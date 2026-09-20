@@ -140,10 +140,9 @@ identity. Everything specific to Remi AI lives in the project-owned files the sy
   date), one page per shipped feature, in the user's voice: sentence case, what changed for the
   person reading, no internal terms, no slugs, no file paths. The H1 is the outcome in one line —
   that line is the summary `notify.sh` sends — followed by an italic date line and the body.
-  Register the entry at the **top** of `apps/docs/app/changelog/_meta.ts` (newest first) and in
-  the `## Entries` list of `apps/docs/app/changelog/page.mdx` (the open stub
-  `intake/triage/changelog-index-missing-entries.md` is about making that one list). No skill
-  owns the shape; this section does. Audience: a user-visible change gets a page and the note
+  Register the entry at the **top** of `apps/docs/app/changelog/_meta.ts` (newest first) — and
+  nowhere else: the `## Entries` list on `apps/docs/app/changelog/page.mdx` derives itself from
+  the folder, so a page that exists is already listed. No skill owns the shape; this section does. Audience: a user-visible change gets a page and the note
   (`announce: public`); an internal change — infra, security, performance — gets no page and the
   note alone, framed as reliability or trust (`announce: internal`); nothing worth saying is
   `announce: none`. Bug and tweak lanes write a page when the change is user-visible; chore never
