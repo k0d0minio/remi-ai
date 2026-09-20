@@ -4,14 +4,18 @@ import {
   addMealEntry,
   markMealEntryEaten,
   mealEntryOwner,
+  recipeAssignmentOwner,
+  respondToRecipeAssignment,
 } from "@remi/services/server";
 import {
   isLocale,
   mealIntents,
   mealSlots,
+  recipeResponses,
   todayAtPractice,
   type MealIntent,
   type MealSlot,
+  type RecipeResponse,
   type ServiceErrorCode,
 } from "@remi/services/shared";
 import { writePatientLink } from "@/lib/patient-link/write";
@@ -154,6 +158,50 @@ export const markMealEatenAction = async (
     // check a patient posting someone else's id would write into their record.
     target: { type: "meal_entry", id, ownerOf: mealEntryOwner },
     write: async () => markMealEntryEaten(id),
+  });
+
+  return result.ok ? written : { error: asPatientError(result.error) };
+};
+
+/**
+ * `""` is the tap that takes an answer back — the selected button pressed
+ * again, which is how a phone undoes a mis-tap and how a favourite leaves the
+ * shelf. Anything else outside the four is a post the page cannot produce.
+ */
+const asResponse = (value: string): RecipeResponse | null | undefined => {
+  if (value === "") {
+    return null;
+  }
+  return (recipeResponses as readonly string[]).includes(value)
+    ? (value as RecipeResponse)
+    : undefined;
+};
+
+/** § 7's four buttons — one answer on one giving, written as the patient. */
+export const respondToRecipeAction = async (
+  _previous: WriteState,
+  formData: FormData,
+): Promise<WriteState> => {
+  const token = field(formData, "token");
+  const locale = field(formData, "locale");
+  const id = field(formData, "id");
+  const posted = field(formData, "response");
+  const response = asResponse(posted);
+
+  if (!isLocale(locale) || response === undefined) {
+    return refused;
+  }
+
+  const result = await writePatientLink(locale, token, {
+    // Clearing is its own act in the trail: « elle a retiré son avis » is a
+    // fact about the week, and folding it into the write would lose it.
+    action:
+      response === null ? "recipe.response_cleared" : "recipe.response_written",
+    text: { shorts: [posted] },
+    // An assignment id is a plain uuid that travels, so the giving has to say
+    // whose it is before the token may answer on it.
+    target: { type: "recipe_assignment", id, ownerOf: recipeAssignmentOwner },
+    write: async () => respondToRecipeAssignment(id, response),
   });
 
   return result.ok ? written : { error: asPatientError(result.error) };

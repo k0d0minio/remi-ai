@@ -56,6 +56,13 @@ export const auditActions = [
   "recipe.assignment_archived",
   "recipe.assignment_restored",
   "recipe.assignment_removed",
+  /**
+   * The patient's own § 7 answer on a giving, and taking it back. Named as a
+   * pair like `meal.feedback_*` next door, because "they cleared it" is a fact
+   * the trail loses if both arrive as one action.
+   */
+  "recipe.response_written",
+  "recipe.response_cleared",
   "nutrition_rule.created",
   "nutrition_rule.updated",
   "nutrition_rule.revised",

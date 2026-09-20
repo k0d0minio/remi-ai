@@ -69,7 +69,13 @@ export {
   nutrientComponents,
 } from "./nutrition";
 export type { NutrientComponent, NutrientDirection } from "./nutrition";
-export { variantTitle, VARIANT_SUFFIX } from "./recipe";
+export {
+  FAVOURITE_RESPONSE,
+  recipeResponses,
+  variantTitle,
+  VARIANT_SUFFIX,
+} from "./recipe";
+export type { RecipeResponse } from "./recipe";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
 export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";

@@ -491,6 +491,25 @@ export const patientRecipeAssignments = pgTable("patient_recipe_assignments", {
   assignedOn: date("assigned_on", { mode: "string" }).notNull(),
   /** Set when the recipe rotates out, which is the refresh, not a deletion. */
   archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+  /**
+   * A key from `recipeResponses` in `shared/recipe.ts`, or nothing — § 7's
+   * « J'aime · Pas pour moi · Trop long · À refaire », as the patient gave it.
+   *
+   * It sits on the giving rather than on the library row because the answer is
+   * about this person's week with this dish: the same recipe is « à refaire »
+   * for one patient and « pas pour moi » for another. Nullable and null by
+   * default, because "not answered" is the ordinary state of a recipe given
+   * yesterday, and an archived row keeps whatever it held.
+   */
+  patientResponse: text("patient_response"),
+  /** When they answered — set and cleared with `patient_response`. */
+  respondedAt: timestamp("responded_at", { withTimezone: true, mode: "date" }),
+  /**
+   * A key from `writtenByKinds`. She writes the giving; the patient writes the
+   * answer on the same row, so the trail needs to say which surface touched it
+   * last. The default is what every row predating the answer was.
+   */
+  writtenBy: text("written_by").notNull().default("practitioner"),
   ...timestamps,
 });
 

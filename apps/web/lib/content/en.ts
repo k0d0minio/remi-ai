@@ -328,6 +328,25 @@ export const en: Content = {
     whyLabel: "Why this one",
     recipesTitle: "Your recipes",
     recipeNoteLabel: "Why this one for you",
+    recipeFeedback: {
+      legend: "What you thought of this recipe",
+      answers: {
+        liked: "Liked it",
+        not_for_me: "Not for me",
+        too_long: "Too long",
+        would_repeat: "Would make again",
+      },
+      favouritesTitle: "My favourite recipes",
+      favouritesLead:
+        "The recipes you marked “Would make again”. They stay here, even once your practitioner suggests others.",
+      archivedLabel: "no longer suggested",
+      errors: {
+        invalid_input: "That answer could not be saved.",
+        rate_limited: "You have written a lot at once — try again in a moment.",
+        not_found: "This recipe is no longer yours. Reload the page.",
+        unknown: "That did not work. Try again in a moment.",
+      },
+    },
     mealsTitle: "Your meals",
     mealSlots: {
       petit_dejeuner: "Breakfast",

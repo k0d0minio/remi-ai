@@ -16,6 +16,7 @@ import type {
   MealIntent,
   MealSlot,
   PersonalisationDimension,
+  RecipeResponse,
   RecommendationCategory,
   SignalKind,
   StepStatus,
@@ -354,6 +355,20 @@ export type Content = {
     /** Recettes: her per-patient « pourquoi pour toi » note. */
     recipesTitle: string;
     recipeNoteLabel: string;
+    /** § 7's four answers, and the shelf « À refaire » fills. */
+    recipeFeedback: {
+      /** Names the group of four for a screen reader, above the buttons. */
+      legend: string;
+      /** Morgane's own four words — the keys are what the row stores. */
+      answers: Record<RecipeResponse, string>;
+      /** « Mes recettes préférées », and the line under it. */
+      favouritesTitle: string;
+      favouritesLead: string;
+      /** On a favourite whose giving has rotated out of the active list. */
+      archivedLabel: string;
+      /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
+      errors: Record<PatientWriteError, string>;
+    };
     /** Repas: the journal, with her feedback beneath an entry when written. */
     mealsTitle: string;
     mealSlots: Record<MealSlot, string>;

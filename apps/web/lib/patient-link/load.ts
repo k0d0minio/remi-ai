@@ -6,6 +6,7 @@ import {
   listMealEntries,
   listPantryEssentials,
   listPatientGoals,
+  listPatientRecipeFavourites,
   listPatientRecipes,
   listPatientRecommendations,
   listPatientSupplements,
@@ -43,6 +44,7 @@ export const loadPatientLink = cache(async (token: string) => {
     supplements,
     essentials,
     recipes,
+    favourites,
     meals,
   ] = await Promise.all([
     getPatientSummary(patient.id),
@@ -52,6 +54,7 @@ export const loadPatientLink = cache(async (token: string) => {
     listPatientSupplements(patient.id),
     listPantryEssentials(patient.id),
     listPatientRecipes(patient.id),
+    listPatientRecipeFavourites(patient.id),
     listMealEntries(patient.id),
   ]);
 
@@ -74,6 +77,13 @@ export const loadPatientLink = cache(async (token: string) => {
     supplements,
     essentials,
     recipes,
+    /**
+     * « Mes recettes préférées » — the « à refaire » answers, archived ones
+     * included, so the shelf survives the weekly rotation. A separate read
+     * rather than a filter over `recipes`, because `recipes` is the active
+     * set by definition and the shelf is deliberately not.
+     */
+    favourites,
     meals,
   };
 });
@@ -107,7 +117,10 @@ export const visibleSegments = (
   if (data.essentials.length > 0) {
     present.push("placard-frigo");
   }
-  if (data.recipes.length > 0) {
+  // The shelf can outlive the givings that filled it: a patient whose recipes
+  // have all rotated out still has « Mes recettes préférées » to cook from, and
+  // hiding the segment would be the one place archiving acts as a delete.
+  if (data.recipes.length > 0 || data.favourites.length > 0) {
     present.push("recettes");
   }
   present.push("repas");

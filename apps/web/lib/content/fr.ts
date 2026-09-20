@@ -331,6 +331,28 @@ export const fr: Content = {
     whyLabel: "Pourquoi pour toi",
     recipesTitle: "Vos recettes",
     recipeNoteLabel: "Pourquoi pour toi",
+    recipeFeedback: {
+      legend: "Votre avis sur cette recette",
+      // Her § 7 words, verbatim and à la première personne — c'est la
+      // patiente qui parle sur le bouton, même si la page la vouvoie.
+      answers: {
+        liked: "J'aime",
+        not_for_me: "Pas pour moi",
+        too_long: "Trop long",
+        would_repeat: "À refaire",
+      },
+      favouritesTitle: "Mes recettes préférées",
+      favouritesLead:
+        "Les recettes que vous avez marquées « À refaire ». Elles restent ici, même quand votre praticienne en propose d'autres.",
+      archivedLabel: "plus proposée",
+      errors: {
+        invalid_input: "Cet avis n'a pas pu être enregistré.",
+        rate_limited:
+          "Vous avez écrit beaucoup de choses d'un coup — réessayez dans un instant.",
+        not_found: "Cette recette n'est plus la vôtre. Rechargez la page.",
+        unknown: "Cela n'a pas fonctionné. Réessayez dans un instant.",
+      },
+    },
     mealsTitle: "Vos repas",
     mealSlots: {
       petit_dejeuner: "Petit-déjeuner",

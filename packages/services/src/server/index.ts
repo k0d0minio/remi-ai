@@ -169,8 +169,11 @@ export {
   createAndAssignRecipe,
   duplicateAndAssignRecipe,
   listArchivedPatientRecipes,
+  listPatientRecipeFavourites,
   listPatientRecipes,
+  recipeAssignmentOwner,
   removeRecipeAssignment,
+  respondToRecipeAssignment,
   updateRecipeAssignment,
 } from "../db/services/recipe-assignments";
 export type {

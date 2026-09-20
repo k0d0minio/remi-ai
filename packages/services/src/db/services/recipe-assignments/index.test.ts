@@ -7,15 +7,18 @@ import {
 } from "../../client";
 import { createMemoryDatabase } from "../../test-helpers";
 import { createPatient } from "../patients";
-import { createRecipe, listRecipes } from "../recipes";
+import { createRecipe, getRecipe, listRecipes } from "../recipes";
 import {
   archiveRecipeAssignment,
   assignRecipes,
   createAndAssignRecipe,
   duplicateAndAssignRecipe,
   listArchivedPatientRecipes,
+  listPatientRecipeFavourites,
   listPatientRecipes,
+  recipeAssignmentOwner,
   removeRecipeAssignment,
+  respondToRecipeAssignment,
   updateRecipeAssignment,
 } from "./index";
 
@@ -516,5 +519,184 @@ describe("adapting a recipe for one person", () => {
         )
       ).ok,
     ).toBe(false);
+  });
+});
+
+/**
+ * § 7's four answers, written from the acceptance criteria rather than from
+ * the implementation: what a patient can say about a recipe, what the row
+ * keeps of it, and what « Mes recettes préférées » reads back.
+ *
+ * Its own patients and its own recipes, because every assertion here is about
+ * one person's answers and the file's shared pair accumulates givings.
+ */
+describe("the patient's answer on a recipe", () => {
+  let annie: string;
+  let bruno: string;
+  let soupe: string;
+  let gratin: string;
+
+  beforeAll(async () => {
+    const one = await createPatient({ pseudonym: "Annie" });
+    const two = await createPatient({ pseudonym: "Bruno" });
+    if (!one.ok || !two.ok) {
+      throw new Error("test patients not created");
+    }
+    annie = one.data.id;
+    bruno = two.data.id;
+    soupe = await recipeNamed("Soupe de potiron");
+    gratin = await recipeNamed("Gratin de courgettes");
+  });
+
+  const give = async (patient: string, recipe: string, on: string) => {
+    const given = await assignRecipes(patient, [recipe], { assignedOn: on });
+    if (!given.ok) {
+      throw new Error("assignment not created");
+    }
+    return given.data[0];
+  };
+
+  it("starts a giving with no answer on it", async () => {
+    const assignment = await give(annie, soupe, "2026-09-01");
+    expect(assignment.patientResponse).toBeNull();
+    expect(assignment.respondedAt).toBeNull();
+    expect(assignment.writtenBy).toBe("practitioner");
+  });
+
+  it("records the answer on the giving, stamped as the patient's", async () => {
+    const assignment = await give(bruno, soupe, "2026-09-02");
+    const answered = await respondToRecipeAssignment(assignment.id, "liked");
+    expect(answered.ok).toBe(true);
+    if (answered.ok) {
+      expect(answered.data.patientResponse).toBe("liked");
+      expect(answered.data.respondedAt).not.toBeNull();
+      expect(answered.data.writtenBy).toBe("patient");
+    }
+  });
+
+  it("leaves another patient's giving of the same recipe alone", async () => {
+    const shared = await getRecipe(gratin);
+    if (!shared.ok) {
+      throw new Error("shared recipe not found");
+    }
+    const before = shared.data;
+    const hers = await give(annie, gratin, "2026-09-03");
+    const his = await give(bruno, gratin, "2026-09-03");
+    await respondToRecipeAssignment(hers.id, "not_for_me");
+
+    const untouched = (await listPatientRecipes(bruno)).find(
+      (entry) => entry.assignment.id === his.id,
+    );
+    expect(untouched?.assignment.patientResponse).toBeNull();
+    // And the dish itself is the library's, untouched by either answer.
+    const after = await getRecipe(gratin);
+    expect(after.ok).toBe(true);
+    if (after.ok) {
+      expect(after.data.updatedAt).toEqual(before.updatedAt);
+    }
+  });
+
+  it("switches between the four on one tap, and clears on the same one", async () => {
+    const assignment = await give(annie, soupe, "2026-09-04");
+
+    const first = await respondToRecipeAssignment(assignment.id, "too_long");
+    expect(first.ok && first.data.patientResponse).toBe("too_long");
+
+    const switched = await respondToRecipeAssignment(
+      assignment.id,
+      "would_repeat",
+    );
+    expect(switched.ok && switched.data.patientResponse).toBe("would_repeat");
+
+    const cleared = await respondToRecipeAssignment(assignment.id, null);
+    expect(cleared.ok).toBe(true);
+    if (cleared.ok) {
+      expect(cleared.data.patientResponse).toBeNull();
+      expect(cleared.data.respondedAt).toBeNull();
+      // Clearing is the patient writing too — the trail keeps saying so.
+      expect(cleared.data.writtenBy).toBe("patient");
+    }
+  });
+
+  it("refuses an answer that is not one of the four", async () => {
+    const assignment = await give(bruno, soupe, "2026-09-05");
+    const result = await respondToRecipeAssignment(
+      assignment.id,
+      "delicious" as never,
+    );
+    expect(result.ok).toBe(false);
+  });
+
+  it("refuses an answer on a giving that does not exist", async () => {
+    expect((await respondToRecipeAssignment("not-a-uuid", "liked")).ok).toBe(
+      false,
+    );
+    expect(
+      (
+        await respondToRecipeAssignment(
+          "6d3a1c1e-0000-4000-8000-000000000000",
+          "liked",
+        )
+      ).ok,
+    ).toBe(false);
+  });
+
+  it("names the owner of a giving, and nobody for one that is not there", async () => {
+    const assignment = await give(annie, gratin, "2026-09-06");
+    expect(await recipeAssignmentOwner(assignment.id)).toBe(annie);
+    expect(await recipeAssignmentOwner("not-a-uuid")).toBeNull();
+    expect(
+      await recipeAssignmentOwner("6d3a1c1e-0000-4000-8000-000000000000"),
+    ).toBeNull();
+  });
+
+  it("keeps the answer when the giving is archived", async () => {
+    const assignment = await give(bruno, gratin, "2026-09-07");
+    await respondToRecipeAssignment(assignment.id, "would_repeat");
+    const archived = await archiveRecipeAssignment(assignment.id, true);
+    expect(archived.ok && archived.data.patientResponse).toBe("would_repeat");
+
+    const kept = (await listArchivedPatientRecipes(bruno)).find(
+      (entry) => entry.assignment.id === assignment.id,
+    );
+    expect(kept?.assignment.patientResponse).toBe("would_repeat");
+  });
+
+  it("shelves every « à refaire », the archived ones included, newest answer first", async () => {
+    const one = await createPatient({ pseudonym: "Chloé" });
+    if (!one.ok) {
+      throw new Error("test patient not created");
+    }
+    const chloe = one.data.id;
+    const tarte = await recipeNamed("Tarte aux poireaux");
+    const riz = await recipeNamed("Riz aux herbes");
+    const pain = await recipeNamed("Pain complet");
+
+    const first = await give(chloe, tarte, "2026-09-01");
+    const second = await give(chloe, riz, "2026-09-02");
+    const rejected = await give(chloe, pain, "2026-09-03");
+
+    await respondToRecipeAssignment(first.id, "would_repeat");
+    await respondToRecipeAssignment(second.id, "would_repeat");
+    await respondToRecipeAssignment(rejected.id, "not_for_me");
+    // The rotation that must not empty the shelf.
+    await archiveRecipeAssignment(first.id, true);
+
+    const shelf = await listPatientRecipeFavourites(chloe);
+    expect(shelf.map((entry) => entry.recipe.title)).toEqual([
+      "Riz aux herbes",
+      "Tarte aux poireaux",
+    ]);
+    // And the active list is what it always was — the archived one is gone
+    // from it, the rejected one is still in it.
+    expect(
+      (await listPatientRecipes(chloe)).map((e) => e.recipe.title),
+    ).toEqual(["Pain complet", "Riz aux herbes"]);
+
+    const unshelved = await respondToRecipeAssignment(second.id, null);
+    expect(unshelved.ok).toBe(true);
+    expect(
+      (await listPatientRecipeFavourites(chloe)).map((e) => e.recipe.title),
+    ).toEqual(["Tarte aux poireaux"]);
   });
 });

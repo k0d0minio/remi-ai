@@ -64,6 +64,7 @@ import { ProfileSummary } from "@/components/patients/profile-summary";
 import { PrepNote } from "@/components/patients/prep-note";
 import { QuickActions } from "@/components/patients/quick-actions";
 import { RecipeAssignments } from "@/components/patients/recipe-assignments";
+import { RecipeResponseSummary } from "@/components/patients/recipe-response-summary";
 import { RecommendationAddForm } from "@/components/patients/recommendation-add-form";
 import { RecommendationGroups } from "@/components/patients/recommendation-groups";
 import { RecommendationSection } from "@/components/patients/recommendation-section";
@@ -793,6 +794,11 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
+              <RecipeResponseSummary
+                assigned={assignedRecipes}
+                archived={pastRecipes}
+              />
+
               {learnings.length === 0 ? (
                 <Typography size="sm" tone="muted">
                   Rien à retenir pour le moment.

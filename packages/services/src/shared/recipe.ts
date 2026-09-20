@@ -25,3 +25,31 @@ export const variantTitle = (title: string) => {
     : title;
   return `${base.slice(0, MAX_TITLE - VARIANT_SUFFIX.length)}${VARIANT_SUFFIX}`;
 };
+
+/**
+ * § 7's four answers, as the patient gives them: « J'aime », « Pas pour moi »,
+ * « Trop long », « À refaire ».
+ *
+ * A closed set, because the point of the answer is that the next propositions
+ * can read it — « ce qui a été essayé, apprécié, refusé » is a query, not
+ * prose. The keys are stable ASCII because they are what the assignment row
+ * stores; Morgane's French lives in the console's `vocabulary.ts` and the
+ * patient's in each locale dictionary, so rewording either is an edit there
+ * and never a migration.
+ *
+ * `would_repeat` is « À refaire », and it doubles as the favourite: the shelf
+ * the old version called « Mes recettes préférées » is this answer, read back.
+ * A second flag would let a recipe be a favourite and not worth repeating,
+ * which is a distinction nobody asked for and two things to keep in step.
+ */
+export const recipeResponses = [
+  "liked",
+  "not_for_me",
+  "too_long",
+  "would_repeat",
+] as const;
+
+export type RecipeResponse = (typeof recipeResponses)[number];
+
+/** The answer that is also the favourite — named, so no call site spells it. */
+export const FAVOURITE_RESPONSE: RecipeResponse = "would_repeat";

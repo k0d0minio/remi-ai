@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  FAVOURITE_RESPONSE,
+  recipeResponses,
+  type RecipeResponse,
+} from "../../../shared/recipe";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
@@ -41,6 +46,19 @@ const library = (db: DatabaseClient = getDatabase()) =>
   db.collection<Recipe>("recipes");
 
 const uuidSchema = z.uuid();
+
+/**
+ * How a giving starts: no answer, and hers.
+ *
+ * Spelled once rather than at each of the three insert sites — a giving that
+ * forgot one of the three columns would be a row the patient could never
+ * answer, and the compiler cannot tell three literals apart.
+ */
+const unanswered = {
+  patientResponse: null,
+  respondedAt: null,
+  writtenBy: "practitioner",
+} as const;
 
 /** Same shape as the consultation date next door: a day, not an instant. */
 const isoDate = z
@@ -140,6 +158,91 @@ export const listArchivedPatientRecipes = async (
   );
 
 /**
+ * « Mes recettes préférées » — every « à refaire », the archived ones included,
+ * newest answer first.
+ *
+ * Archived rows belong on this list and that is the whole point of it: the
+ * shelf the old version gave the patient (« Enregistrer cette recette ») was
+ * theirs to keep, so a weekly rotation must not empty it. The active list next
+ * door is unchanged — a favourite that rotated out shows here and only here.
+ *
+ * Ordered by when they answered rather than by when she gave it: this list is
+ * the patient's own, and the thing they just marked is the thing they are
+ * looking for. Two answers can share a millisecond — a double tap, a test —
+ * so the giving order breaks the tie, for the same reason `byGiving` has one:
+ * a list that settles differently between two runs is a list that reorders
+ * itself under the patient's thumb.
+ */
+export const listPatientRecipeFavourites = async (
+  patientId: Id,
+): Promise<readonly AssignedRecipe[]> =>
+  withRecipes(
+    [...(await forPatient(patientId))]
+      .filter((assignment) => assignment.patientResponse === FAVOURITE_RESPONSE)
+      .sort(
+        (a, b) =>
+          (b.respondedAt?.getTime() ?? 0) - (a.respondedAt?.getTime() ?? 0) ||
+          byGiving(a, b),
+      ),
+  );
+
+/**
+ * Whose giving is this? The ownership answer `writeThroughPatientLink` needs
+ * before it lets a token answer a row it named by id.
+ *
+ * The same shape as `mealEntryOwner` next door, and for the same reason: an
+ * assignment id is a plain uuid that travels, and this service answers "does
+ * this row exist", never "is it yours".
+ */
+export const recipeAssignmentOwner = async (id: Id): Promise<Id | null> => {
+  if (!uuidSchema.safeParse(id).success) {
+    return null;
+  }
+  const assignment = await assignments().findById(id);
+  return assignment?.patientId ?? null;
+};
+
+/**
+ * § 7's answer, written by the patient: one of the four, or `null` to take it
+ * back.
+ *
+ * Clearing is an answer rather than an absence of one — tapping the selected
+ * button again is how a phone undoes a mis-tap, and how a favourite leaves the
+ * shelf — so it comes through the same call and leaves the same trail. Either
+ * way the row is stamped `patient`: they wrote it last, and a clear is still
+ * them writing.
+ *
+ * It does not touch the roster timestamp. That column means Morgane worked on
+ * this patient, and a patient answering their own recipe is not that
+ * (`patient-link-writes` restores it for any write that bumps it anyway).
+ *
+ * An archived giving is not refused here. The link offers the buttons on the
+ * active list only, so this is not a path the product opens; refusing it would
+ * put a sentence in both dictionaries that nothing can reach, and the row is
+ * the patient's own either way.
+ */
+export const respondToRecipeAssignment = async (
+  id: Id,
+  response: RecipeResponse | null,
+): Promise<Result<RecipeAssignment>> => {
+  if (!uuidSchema.safeParse(id).success) {
+    return err("not_found", "no such assignment");
+  }
+  if (response !== null && !recipeResponses.includes(response)) {
+    return err("invalid_input", "that is not one of the four answers");
+  }
+  const updated = await assignments().update(id, {
+    patientResponse: response,
+    respondedAt: response === null ? null : new Date(),
+    writtenBy: "patient",
+  });
+  if (!updated) {
+    return err("not_found", "no such assignment");
+  }
+  return ok(updated);
+};
+
+/**
  * Give several recipes at once — one note, one date, one submit.
  *
  * The bulk shape is the only one, because a week's inspirations are given
@@ -209,6 +312,7 @@ export const assignRecipes = async (
           note: parsed.data.note ?? "",
           assignedOn: parsed.data.assignedOn,
           archivedAt: null,
+          ...unanswered,
         }),
       );
     }
@@ -265,6 +369,7 @@ export const createAndAssignRecipe = async (
       note: parsed.data.note ?? "",
       assignedOn: parsed.data.assignedOn,
       archivedAt: null,
+      ...unanswered,
     });
     return ok({ recipe: created.data, assignment });
   });
@@ -326,6 +431,7 @@ export const duplicateAndAssignRecipe = async (
       note: parsed.data.note ?? "",
       assignedOn: parsed.data.assignedOn,
       archivedAt: null,
+      ...unanswered,
     });
     if (superseded) {
       await assignments(tx).update(superseded.id, { archivedAt: new Date() });

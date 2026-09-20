@@ -11,6 +11,10 @@ import {
 import { Button } from "@remi/ui";
 import { Badge, Field, Input, Textarea, Typography } from "@remi/ui/server";
 import {
+  recipeResponseIntents,
+  recipeResponseLabels,
+} from "@/components/patients/vocabulary";
+import {
   archiveRecipeAssignmentAction,
   duplicateAndAssignRecipeAction,
   removeRecipeAssignmentAction,
@@ -239,6 +243,24 @@ export const RecipeAssignmentItem = ({ entry, today }: Props) => {
         {archived ? (
           <Badge variant="neutral" tone="subtle" size="sm">
             archivée
+          </Badge>
+        ) : null}
+        {/*
+          The patient's own answer, read-only on purpose: it is their sentence
+          about their week, and a console that could edit it would make the
+          trail say something they never said. Clearing it is theirs too — on
+          their link, where they gave it.
+        */}
+        {assignment.patientResponse ? (
+          <Badge
+            variant={recipeResponseIntents[assignment.patientResponse]}
+            tone="subtle"
+            size="sm"
+          >
+            {recipeResponseLabels[assignment.patientResponse]}
+            {assignment.respondedAt
+              ? ` · ${formatDate(assignment.respondedAt)}`
+              : null}
           </Badge>
         ) : null}
       </div>

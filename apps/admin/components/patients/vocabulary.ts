@@ -8,6 +8,7 @@ import type {
   MealSlot,
   PatientSex,
   PatientStatus,
+  RecipeResponse,
   RecommendationCategory,
 } from "@remi/services/shared";
 import type { Intent } from "@remi/ui/server";
@@ -165,6 +166,32 @@ export const goalDirectionLabels: Record<GoalDirection, string> = {
   better: "mieux",
   stable: "stable",
   worse: "moins bien",
+};
+
+/**
+ * § 7's four answers as they read in the console — the patient's own words,
+ * turned from the first person into the third so a row says what happened
+ * rather than speaking as them. The keys are what the assignment row stores,
+ * so rewording one is an edit here alone.
+ */
+export const recipeResponseLabels: Record<RecipeResponse, string> = {
+  liked: "aimée",
+  not_for_me: "pas pour cette personne",
+  too_long: "trop longue",
+  would_repeat: "à refaire",
+};
+
+/**
+ * What the four answers are worth at a glance. « À refaire » is the one that
+ * says keep doing this; « pas pour moi » is the one that says stop. « Trop
+ * long » is neither — it is a constraint to work around, not a verdict on the
+ * dish — and « j'aime » is good news without being an instruction.
+ */
+export const recipeResponseIntents: Record<RecipeResponse, Intent> = {
+  liked: "success",
+  not_for_me: "warning",
+  too_long: "neutral",
+  would_repeat: "success",
 };
 
 /**
