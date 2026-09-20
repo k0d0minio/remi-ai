@@ -9,6 +9,8 @@ import { Badge, Separator, Typography } from "@remi/ui/server";
 import { PatientForm } from "@/components/patients/patient-form";
 import {
   cookingAffinityLabels,
+  cookingTimeLabels,
+  foodBudgetLabels,
   localeLabels,
   patientSexLabels,
   patientStatusLabels,
@@ -23,6 +25,12 @@ type Props = {
    * markup on hydration. The server is the one clock.
    */
   lastEditedAt: string;
+  /**
+   * « Profil modifié par la patiente le … », or `null` while only Morgane has
+   * ever written the food fields. Formatted on the server for the same reason
+   * as the two dates above.
+   */
+  preferencesUpdatedByPatient: string | null;
   /** « Recueilli le … · WhatsApp », or `null` when it is not recorded. */
   consent: string | null;
 };
@@ -44,7 +52,12 @@ type Row = {
  * The form is not closed for her on save: it owns its own « Enregistré. » and
  * saying so where she is looking is worth more than collapsing under her.
  */
-export const ProfileSummary = ({ patient, lastEditedAt, consent }: Props) => {
+export const ProfileSummary = ({
+  patient,
+  lastEditedAt,
+  preferencesUpdatedByPatient,
+  consent,
+}: Props) => {
   const [editing, setEditing] = useState(false);
 
   if (editing) {
@@ -97,13 +110,27 @@ export const ProfileSummary = ({ patient, lastEditedAt, consent }: Props) => {
     { label: "Régime alimentaire", value: patient.dietaryRegime },
     { label: "Allergies", value: patient.allergies },
     { label: "Intolérances", value: patient.intolerances },
-    { label: "Budget alimentaire", value: patient.foodBudget },
+    { label: "Goûts et aversions", value: patient.preferences },
     {
       label: "Aime cuisiner",
       value:
         patient.likesCooking === null
           ? null
           : cookingAffinityLabels[patient.likesCooking],
+    },
+    {
+      label: "Temps disponible",
+      value:
+        patient.cookingTime === null
+          ? null
+          : cookingTimeLabels[patient.cookingTime],
+    },
+    {
+      label: "Budget alimentaire",
+      value:
+        patient.foodBudget === null
+          ? null
+          : foodBudgetLabels[patient.foodBudget],
     },
   ];
 
@@ -128,7 +155,20 @@ export const ProfileSummary = ({ patient, lastEditedAt, consent }: Props) => {
       <Separator tone="subtle" />
       <SummaryGroup title="Mesures" rows={measures} />
       <Separator tone="subtle" />
-      <SummaryGroup title="Alimentation" rows={food} />
+      <div className="flex flex-col gap-2">
+        <SummaryGroup title="Alimentation" rows={food} />
+        {/*
+          Sits under the group rather than on each row: these seven fields are
+          the ones the patient owns on her link, and one line says the same
+          thing seven markers would. Absent entirely until she has written —
+          « pas encore » is not a fact worth a line.
+        */}
+        {preferencesUpdatedByPatient ? (
+          <Typography size="xs" tone="muted">
+            {`Profil modifié par la patiente le ${preferencesUpdatedByPatient}`}
+          </Typography>
+        ) : null}
+      </div>
       <Separator tone="subtle" />
 
       <div className="flex flex-col gap-2">

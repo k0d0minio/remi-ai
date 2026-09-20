@@ -23,6 +23,15 @@ export const auditActions = [
   "patient.created",
   "patient.updated",
   "patient.deleted",
+  /**
+   * The patient editing the seven fields § A marks patient-supplied, through
+   * their own link. Distinct from `patient.updated`, which is Morgane in the
+   * console: the same columns move, but "she corrected it" and "the patient
+   * corrected it" are the two answers this trail exists to tell apart — and
+   * one of those columns is allergies, which a recipe filter reads as a
+   * mandatory exclusion.
+   */
+  "profile.preferences_updated",
   "recommendation.added",
   "recommendation.updated",
   "recommendation.archived",

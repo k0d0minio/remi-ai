@@ -18,6 +18,7 @@ One row in `patient_profiles`, plus what hangs off it:
 | Pseudonym, real name, email, language, status                | `patient_profiles`        | the real name; the rest, no                        |
 | Birth date, sex, height, weight                              | `patient_profiles`        | age, height and weight — the birth date itself, no |
 | Objective, constraints, preferences, medication, supplements | `patient_profiles`        | yes                                                |
+| Regime, allergies, intolerances, likes-cooking, time, budget | `patient_profiles`        | yes — and the patient writes these themselves      |
 | Referral, anamnesis                                          | `patient_profiles`        | no — practitioner's working record                 |
 | Consent date and channel                                     | `patient_profiles`        | no                                                 |
 | The share token, when the link was last opened, last written | `patient_profiles`        | the token is the link                              |
@@ -38,6 +39,15 @@ Since `link-writes`, the same token that shows the page also accepts writes — 
 10 September 2026, with patient accounts parked until after December. Three things follow, and all
 three are what the code does:
 
+- **Seven fields of the profile are the patient's own.** Dietary regime, allergies,
+  intolerances, likes and dislikes, whether they enjoy cooking, how much time they have to cook
+  and their budget are editable from « Mon profil » on the link, allergies included — they can add
+  one and remove one. Everything else on the profile is read-only there (real name, age, height,
+  weight, medication, supplements) or does not reach the link at all (birth date, referral,
+  anamnesis, consent), exactly as the table above says. A patient's write to these seven is
+  stamped on the profile as `preferences_updated_by_patient_at`, which is what the console shows
+  Morgane as « Profil modifié par la patiente le … »; it is one date for the set, and which field
+  moved is the audit trail's answer, not this column's.
 - **Every row a patient creates is marked as theirs.** The tables the console and the link both
   write — the meal journal and the goal check-ins — carry a `written_by` column that reads
   `practitioner` or `patient`. Rows that predate the write path read `practitioner`, which is what

@@ -81,7 +81,19 @@ export const patientProfiles = pgTable("patient_profiles", {
    * consent channel: not asked yet is a different answer from "no".
    */
   likesCooking: text("likes_cooking"),
-  foodBudget: text("food_budget").notNull().default(""),
+  /**
+   * How much time there is to cook — her § 7's "temps disponible", as the old
+   * version's three bands rather than a number of minutes (brainstorm § 7
+   * rules out an exact preparation time). Nullable for the same reason as the
+   * two fields around it: not asked yet is not "no time".
+   */
+  cookingTime: text("cooking_time"),
+  /**
+   * Closed to three levels when the patient became the one answering it. It
+   * was free text while only Morgane wrote it; a prompt cannot filter on
+   * "serré, courses au marché", and nullable now carries what `""` used to.
+   */
+  foodBudget: text("food_budget"),
   /**
    * Kept out of `constraints` on purpose — an interaction has to be legible at
    * a glance, not recovered from a paragraph of prose.
@@ -99,6 +111,19 @@ export const patientProfiles = pgTable("patient_profiles", {
    * state, and the empty string is never used.
    */
   nextConsultationPrep: text("next_consultation_prep"),
+  /**
+   * When the patient last wrote to the seven fields they own. Separate from
+   * `link_last_wrote_at`, which moves on every write through the link: this
+   * one answers "has she touched her own profile, and when", which is the
+   * question the console's profile summary renders.
+   */
+  preferencesUpdatedByPatientAt: timestamp(
+    "preferences_updated_by_patient_at",
+    {
+      withTimezone: true,
+      mode: "date",
+    },
+  ),
   /**
    * When an operator last worked on this patient — a different fact from
    * `updated_at`, which the seam bumps on any row write including a patient

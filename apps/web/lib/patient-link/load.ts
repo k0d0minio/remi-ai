@@ -89,10 +89,13 @@ export type PatientLinkData = NonNullable<
  * its own URL: a nav entry leading to an empty page and a reachable empty page
  * are the same broken product, and Morgane fills patients at her own pace.
  *
- * Two segments are exempt, and for the same reason — they are not waiting on
+ * Three segments are exempt, and for the same reason — they are not waiting on
  * her. Home carries the greeting. Repas carries « Je vais manger » / « J'ai
  * mangé », so it is where the patient's first entry is written: hiding it
- * until an entry exists would make the first one impossible to make.
+ * until an entry exists would make the first one impossible to make. Profil is
+ * the same argument again and a little sharper: it is the one page whose whole
+ * job is to be filled in, and a profile is emptiest exactly when the patient
+ * most needs to reach it.
  */
 export const visibleSegments = (
   data: PatientLinkData,
@@ -111,6 +114,7 @@ export const visibleSegments = (
     present.push("recettes");
   }
   present.push("repas");
+  present.push("profil");
   return present;
 };
 

@@ -5,6 +5,8 @@ import type { PatientProfile } from "@remi/services/shared";
 import {
   consentChannels,
   cookingAffinities,
+  cookingTimes,
+  foodBudgets,
   formatDate,
   locales,
   patientSexes,
@@ -33,7 +35,9 @@ import {
 import {
   consentChannelLabels,
   cookingAffinityLabels,
+  cookingTimeLabels,
   dietaryRegimeSuggestions,
+  foodBudgetLabels,
   localeLabels,
   patientSexLabels,
   patientStatusLabels,
@@ -448,16 +452,46 @@ export const PatientForm = ({ patient }: Props) => {
           </Field>
 
           <Field
+            id="cookingTime"
+            label="Temps disponible"
+            optional
+            hint="Le temps qu'elle a pour cuisiner, en général — pas au repas près."
+          >
+            <Select
+              name="cookingTime"
+              defaultValue={patient?.cookingTime ?? ""}
+            >
+              <SelectTrigger id="cookingTime">
+                <SelectValue placeholder="Non renseigné" />
+              </SelectTrigger>
+              <SelectContent>
+                {cookingTimes.map((time) => (
+                  <SelectItem key={time} value={time}>
+                    {cookingTimeLabels[time]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          <Field
             id="foodBudget"
             label="Budget alimentaire"
             optional
-            hint="Ce qui garde les suggestions réalistes. Texte libre."
+            hint="Ce qui garde les suggestions réalistes."
           >
-            <Input
-              id="foodBudget"
-              name="foodBudget"
-              defaultValue={patient?.foodBudget ?? ""}
-            />
+            <Select name="foodBudget" defaultValue={patient?.foodBudget ?? ""}>
+              <SelectTrigger id="foodBudget">
+                <SelectValue placeholder="Non renseigné" />
+              </SelectTrigger>
+              <SelectContent>
+                {foodBudgets.map((budget) => (
+                  <SelectItem key={budget} value={budget}>
+                    {foodBudgetLabels[budget]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Field>
         </div>
 

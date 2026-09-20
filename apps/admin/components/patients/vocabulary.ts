@@ -3,6 +3,8 @@ import type {
   AnamnesisCategory,
   ConsentChannel,
   CookingAffinity,
+  CookingTime,
+  FoodBudget,
   GoalDirection,
   Locale,
   MealSlot,
@@ -104,6 +106,31 @@ export const cookingAffinityLabels: Record<CookingAffinity, string> = {
   yes: "oui",
   somewhat: "un peu",
   no: "non",
+};
+
+/**
+ * How much time there is to cook, and what a suggestion may cost.
+ *
+ * Both are the patient's own fields now — they edit them from the link — so
+ * these are the words Morgane reads back rather than the words either of them
+ * is offered. The patient's surface keeps its own wording in
+ * `apps/web/lib/content/`, which is also where the English half lives; this
+ * console is French-only, the same split `mealSlotLabels` already sits in.
+ *
+ * Her confirmation is what fixed the three time levels on the old version's
+ * bands. Because the column stores the stable keys, changing a word is an edit
+ * here and never a migration.
+ */
+export const cookingTimeLabels: Record<CookingTime, string> = {
+  low: "pressé(e)",
+  medium: "normal",
+  high: "tranquille",
+};
+
+export const foodBudgetLabels: Record<FoodBudget, string> = {
+  economical: "économique",
+  standard: "standard",
+  comfort: "confort",
 };
 
 /**

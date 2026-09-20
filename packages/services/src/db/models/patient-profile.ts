@@ -3,6 +3,8 @@ import type { Locale } from "../../shared/i18n";
 import type {
   consentChannels,
   cookingAffinities,
+  cookingTimes,
+  foodBudgets,
   patientSexes,
   patientStatuses,
 } from "../../shared/patient";
@@ -11,6 +13,8 @@ export type PatientStatus = (typeof patientStatuses)[number];
 export type PatientSex = (typeof patientSexes)[number];
 export type ConsentChannel = (typeof consentChannels)[number];
 export type CookingAffinity = (typeof cookingAffinities)[number];
+export type CookingTime = (typeof cookingTimes)[number];
+export type FoodBudget = (typeof foodBudgets)[number];
 
 /**
  * The profile Morgane creates and maintains for each of her patients — the
@@ -45,7 +49,10 @@ export type PatientProfile = Entity & {
   preferences: string;
   /** `null` until Morgane has asked — not the same answer as `"no"`. */
   likesCooking: CookingAffinity | null;
-  foodBudget: string;
+  /** How much time there is to cook. `null` until asked. */
+  cookingTime: CookingTime | null;
+  /** `null` until asked — and for every row the free-text migration blanked. */
+  foodBudget: FoodBudget | null;
   medications: string;
   supplements: string;
   referral: string;
@@ -57,6 +64,17 @@ export type PatientProfile = Entity & {
   nextConsultationPrep: string | null;
   /** When an operator last worked on the profile. Not `updatedAt`. */
   lastEditedAt: Date;
+  /**
+   * When the patient last changed the seven fields they own — regime,
+   * allergies, intolerances, preferences, likes-cooking, cooking time and
+   * budget. `null` while only Morgane has ever written them.
+   *
+   * One timestamp for the whole set rather than one per field: the console
+   * shows a single « Profil modifié par la patiente le … » line, and which
+   * field moved is a question the audit trail already answers. Seven columns
+   * to render one line would be seven columns to keep in step.
+   */
+  preferencesUpdatedByPatientAt: Date | null;
   /**
    * When and how the patient agreed to REMI holding their record and to the
    * share link existing. Recorded fact, never a gate: both are null until

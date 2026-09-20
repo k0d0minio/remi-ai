@@ -29,9 +29,11 @@ export {
   regenerateShareToken,
   setPatientNextConsultationPrep,
   updatePatient,
+  updatePatientPreferences,
 } from "../db/services/patients";
 export type {
   PatientInput,
+  PatientPreferencesInput,
   PatientQuery,
   PatientSort,
 } from "../db/services/patients";

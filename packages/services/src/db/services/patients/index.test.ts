@@ -11,6 +11,7 @@ import {
   regenerateShareToken,
   setPatientNextConsultationPrep,
   updatePatient,
+  updatePatientPreferences,
 } from "./index";
 
 beforeAll(() => {
@@ -269,7 +270,8 @@ describe("the food profile", () => {
         intolerances: "lactose",
         constraints: "hypothyroïdie",
         likesCooking: "somewhat",
-        foodBudget: "serré, courses au marché",
+        cookingTime: "low",
+        foodBudget: "economical",
       }),
     );
     expect(created.dietaryRegime).toBe("végétarien, sans gluten");
@@ -278,7 +280,8 @@ describe("the food profile", () => {
     expect(created.intolerances).toBe("lactose");
     expect(created.constraints).toBe("hypothyroïdie");
     expect(created.likesCooking).toBe("somewhat");
-    expect(created.foodBudget).toBe("serré, courses au marché");
+    expect(created.cookingTime).toBe("low");
+    expect(created.foodBudget).toBe("economical");
   });
 
   it("leaves them empty, and the affinity not recorded, when nothing is given", async () => {
@@ -286,9 +289,11 @@ describe("the food profile", () => {
     expect(created.dietaryRegime).toBe("");
     expect(created.allergies).toBe("");
     expect(created.intolerances).toBe("");
-    expect(created.foodBudget).toBe("");
-    // Not asked yet is a different answer from "no".
+    // Not asked yet is a different answer from "no" — and, since the free-text
+    // budget became a closed set, from "économique" too.
     expect(created.likesCooking).toBeNull();
+    expect(created.cookingTime).toBeNull();
+    expect(created.foodBudget).toBeNull();
   });
 
   it("takes each value of the affinity, and refuses one outside the set", async () => {
@@ -497,5 +502,123 @@ describe("the next-consultation prep note", () => {
     if (!result.ok) {
       expect(result.error).toBe("not_found");
     }
+  });
+});
+
+/**
+ * Written from the spec's acceptance criteria rather than from the
+ * implementation: the two new vocabularies are closed sets, the patient owns
+ * exactly seven fields and may both add and remove an allergy, and a patient's
+ * write is a different fact from Morgane's.
+ */
+describe("the fields the patient owns", () => {
+  it("takes each level of the time band and the budget, and refuses one outside them", async () => {
+    for (const time of ["low", "medium", "high"] as const) {
+      const created = unwrapOk(
+        await createPatient({ pseudonym: "Time", cookingTime: time }),
+      );
+      expect(created.cookingTime).toBe(time);
+    }
+    for (const budget of ["economical", "standard", "comfort"] as const) {
+      const created = unwrapOk(
+        await createPatient({ pseudonym: "Budget", foodBudget: budget }),
+      );
+      expect(created.foodBudget).toBe(budget);
+    }
+    // The old free-text value is exactly what must no longer validate.
+    expect(
+      (
+        await createPatient({
+          pseudonym: "Prose",
+          foodBudget: "serré, courses au marché" as never,
+        })
+      ).ok,
+    ).toBe(false);
+    expect(
+      (await createPatient({ pseudonym: "Bad", cookingTime: "30min" as never }))
+        .ok,
+    ).toBe(false);
+  });
+
+  it("writes the seven fields and stamps when the patient did it", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "Owner" }));
+    expect(created.preferencesUpdatedByPatientAt).toBeNull();
+
+    const written = unwrapOk(
+      await updatePatientPreferences(created.id, {
+        dietaryRegime: "sans gluten",
+        allergies: "arachides",
+        intolerances: "lactose",
+        preferences: "déteste le fenouil",
+        likesCooking: "somewhat",
+        cookingTime: "low",
+        foodBudget: "economical",
+      }),
+    );
+    expect(written.dietaryRegime).toBe("sans gluten");
+    expect(written.allergies).toBe("arachides");
+    expect(written.intolerances).toBe("lactose");
+    expect(written.preferences).toBe("déteste le fenouil");
+    expect(written.likesCooking).toBe("somewhat");
+    expect(written.cookingTime).toBe("low");
+    expect(written.foodBudget).toBe("economical");
+    expect(written.preferencesUpdatedByPatientAt).not.toBeNull();
+  });
+
+  it("lets the patient remove an allergy, not only add one", async () => {
+    const created = unwrapOk(
+      await createPatient({ pseudonym: "Allergic", allergies: "arachides" }),
+    );
+    const added = unwrapOk(
+      await updatePatientPreferences(created.id, {
+        allergies: "arachides, fruits à coque",
+      }),
+    );
+    expect(added.allergies).toBe("arachides, fruits à coque");
+
+    const removed = unwrapOk(
+      await updatePatientPreferences(created.id, { allergies: "" }),
+    );
+    expect(removed.allergies).toBe("");
+  });
+
+  it("leaves the practitioner's own record untouched", async () => {
+    const created = unwrapOk(
+      await createPatient({
+        pseudonym: "Guarded",
+        medications: "lévothyroxine",
+        anamnesis: "antécédents familiaux",
+        referral: "Dr Lambert",
+      }),
+    );
+    // The shape cannot carry these, so a posted one is dropped before it
+    // reaches the column rather than being refused at runtime.
+    const written = unwrapOk(
+      await updatePatientPreferences(created.id, {
+        allergies: "arachides",
+        medications: "",
+        anamnesis: "",
+        referral: "",
+        pseudonym: "Renamed",
+      } as never),
+    );
+    expect(written.allergies).toBe("arachides");
+    expect(written.medications).toBe("lévothyroxine");
+    expect(written.anamnesis).toBe("antécédents familiaux");
+    expect(written.referral).toBe("Dr Lambert");
+    expect(written.pseudonym).toBe("Guarded");
+  });
+
+  it("does not reorder Morgane's roster — that is her own working list", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "Quiet" }));
+    await tick();
+    const written = unwrapOk(
+      await updatePatientPreferences(created.id, { cookingTime: "high" }),
+    );
+    expect(written.lastEditedAt.getTime()).toBe(created.lastEditedAt.getTime());
+  });
+
+  it("is 'no such patient' for an id that is not one", async () => {
+    expect((await updatePatientPreferences("nonsense", {})).ok).toBe(false);
   });
 });

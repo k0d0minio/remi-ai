@@ -13,6 +13,9 @@
  */
 
 import type {
+  CookingAffinity,
+  CookingTime,
+  FoodBudget,
   MealIntent,
   MealSlot,
   PersonalisationDimension,
@@ -290,6 +293,7 @@ export type Content = {
       "placard-frigo": string;
       recettes: string;
       repas: string;
+      profil: string;
     };
     /**
      * Home, in her § 6 order: today and this week, the prioritised
@@ -360,6 +364,54 @@ export type Content = {
     mealCommentLabel: string;
     mealFeedbackLabel: string;
     empty: string;
+    /**
+     * « Mon profil » — the seven fields § A marks patient-supplied, and the
+     * practitioner's own record shown beside them without an input.
+     *
+     * The two label maps are keyed by the closed sets so a level cannot be
+     * added to the vocabulary without both locales naming it. They are the
+     * link's own wording; the console keeps its French in
+     * `apps/admin/components/patients/vocabulary.ts`, the same split
+     * `mealSlots` already lives with — two surfaces, one for a francophone
+     * patient and one for Morgane, neither importing the other's dictionary.
+     */
+    profile: {
+      title: string;
+      lead: string;
+      regimeLabel: string;
+      regimePlaceholder: string;
+      allergiesLabel: string;
+      /** Says plainly that removing one is allowed, and what it changes. */
+      allergiesHint: string;
+      allergiesPlaceholder: string;
+      intolerancesLabel: string;
+      intolerancesPlaceholder: string;
+      preferencesLabel: string;
+      preferencesPlaceholder: string;
+      likesCookingLabel: string;
+      likesCooking: Record<CookingAffinity, string>;
+      cookingTimeLabel: string;
+      cookingTimeHint: string;
+      cookingTimes: Record<CookingTime, string>;
+      budgetLabel: string;
+      budgets: Record<FoodBudget, string>;
+      /** The « non renseigné » option — a real answer, not an empty form. */
+      notRecorded: string;
+      save: string;
+      saved: string;
+      errors: Record<PatientWriteError, string>;
+      /** The practitioner's record, read-only beside the fields above. */
+      recordTitle: string;
+      recordLead: string;
+      nameLabel: string;
+      ageLabel: string;
+      ageUnit: string;
+      heightLabel: string;
+      weightLabel: string;
+      medicationsLabel: string;
+      supplementsLabel: string;
+      recordEmpty: string;
+    };
     disclaimer: PlaceholderContent;
     /**
      * What this page is, who can open it, and who to ask about the data.

@@ -869,6 +869,11 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               <ProfileSummary
                 patient={patient}
                 lastEditedAt={formatDate(patient.lastEditedAt)}
+                preferencesUpdatedByPatient={
+                  patient.preferencesUpdatedByPatientAt === null
+                    ? null
+                    : formatDate(patient.preferencesUpdatedByPatientAt)
+                }
                 consent={consent}
               />
 

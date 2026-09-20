@@ -4,6 +4,8 @@ import { locales } from "../../../shared/i18n";
 import {
   consentChannels,
   cookingAffinities,
+  cookingTimes,
+  foodBudgets,
   patientSexes,
   patientStatuses,
 } from "../../../shared/patient";
@@ -94,7 +96,10 @@ const patientFields = z.object({
   preferences: text,
   /** `""` clears it; the enum is what a later recipe filter can branch on. */
   likesCooking: z.union([z.literal(""), z.enum(cookingAffinities)]),
-  foodBudget: text,
+  /** Three bands, never a number of minutes — brainstorm § 7. */
+  cookingTime: z.union([z.literal(""), z.enum(cookingTimes)]),
+  /** Closed since the patient owns it; `""` clears, as everywhere here. */
+  foodBudget: z.union([z.literal(""), z.enum(foodBudgets)]),
   medications: text,
   supplements: text,
   referral: text,
@@ -226,12 +231,14 @@ export const createPatient = async (
     constraints: data.constraints ?? "",
     preferences: data.preferences ?? "",
     likesCooking: data.likesCooking ? data.likesCooking : null,
-    foodBudget: data.foodBudget ?? "",
+    cookingTime: data.cookingTime ? data.cookingTime : null,
+    foodBudget: data.foodBudget ? data.foodBudget : null,
     medications: data.medications ?? "",
     supplements: data.supplements ?? "",
     referral: data.referral ?? "",
     anamnesis: data.anamnesis ?? "",
     nextConsultationPrep: null,
+    preferencesUpdatedByPatientAt: null,
     consentDate: data.consentDate ? data.consentDate : null,
     consentChannel: data.consentChannel ? data.consentChannel : null,
     lastEditedAt: new Date(),
@@ -262,6 +269,8 @@ export const updatePatient = async (
     consentDate,
     consentChannel,
     likesCooking,
+    cookingTime,
+    foodBudget,
     ...rest
   } = parsed.data;
   const patch: Partial<PatientProfile> = { ...rest, lastEditedAt: new Date() };
@@ -273,6 +282,75 @@ export const updatePatient = async (
   assign(patch, "consentDate", nullableText(consentDate));
   assign(patch, "consentChannel", nullableEnum(consentChannel));
   assign(patch, "likesCooking", nullableEnum(likesCooking));
+  assign(patch, "cookingTime", nullableEnum(cookingTime));
+  assign(patch, "foodBudget", nullableEnum(foodBudget));
+
+  const patient = await patients().update(id, patch);
+  return patient ? ok(patient) : err("not_found", "no such patient");
+};
+
+/**
+ * The seven fields § A of the brainstorm marks **patient-supplied** — the only
+ * columns of a profile the patient may write through their link.
+ *
+ * A separate service rather than a flag on `updatePatient`, because the list
+ * is the security boundary and a boundary expressed as a list of keys someone
+ * has to remember to check is one that widens the first time the console's
+ * form grows a field. Here the shape cannot carry `medications`, `anamnesis`
+ * or `pseudonym` at all: an action that posts one is not refused at runtime,
+ * it fails to typecheck, and `patientFields.pick` means the validation rules
+ * stay the console's rather than becoming a second opinion that can drift.
+ *
+ * Allergies are in the list on purpose, editable both ways. They are a
+ * mandatory exclusion for every later suggestion, so the safety argument runs
+ * toward letting the person who has the reaction correct them — Morgane is not
+ * in the room when a patient discovers one, and an allergy a patient cannot
+ * remove is one they will work around by ignoring what REMI suggests. The
+ * trail is what makes that safe rather than merely permissive: every change is
+ * its own audit row, attributed to the patient, and the console shows the date
+ * of the last one beside the fields themselves.
+ */
+const patientPreferenceFields = patientFields.pick({
+  dietaryRegime: true,
+  allergies: true,
+  intolerances: true,
+  preferences: true,
+  likesCooking: true,
+  cookingTime: true,
+  foodBudget: true,
+});
+
+export type PatientPreferencesInput = Partial<
+  z.input<typeof patientPreferenceFields>
+>;
+
+/**
+ * The patient's own write to their profile.
+ *
+ * `lastEditedAt` is deliberately not touched: it orders Morgane's roster by
+ * who she last worked on, and a patient editing their own preferences is not
+ * her having worked on them. `preferencesUpdatedByPatientAt` is the fact that
+ * did happen, and it is what the console's profile summary renders.
+ */
+export const updatePatientPreferences = async (
+  id: Id,
+  input: PatientPreferencesInput,
+): Promise<Result<PatientProfile>> => {
+  if (!isValidId(id)) {
+    return err("not_found", "no such patient");
+  }
+  const parsed = patientPreferenceFields.partial().safeParse(input);
+  if (!parsed.success) {
+    return invalid(parsed.error.issues[0]);
+  }
+  const { likesCooking, cookingTime, foodBudget, ...rest } = parsed.data;
+  const patch: Partial<PatientProfile> = {
+    ...rest,
+    preferencesUpdatedByPatientAt: new Date(),
+  };
+  assign(patch, "likesCooking", nullableEnum(likesCooking));
+  assign(patch, "cookingTime", nullableEnum(cookingTime));
+  assign(patch, "foodBudget", nullableEnum(foodBudget));
 
   const patient = await patients().update(id, patch);
   return patient ? ok(patient) : err("not_found", "no such patient");

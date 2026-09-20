@@ -4,8 +4,12 @@ import {
   addMealEntry,
   markMealEntryEaten,
   mealEntryOwner,
+  updatePatientPreferences,
 } from "@remi/services/server";
 import {
+  cookingAffinities,
+  cookingTimes,
+  foodBudgets,
   isLocale,
   mealIntents,
   mealSlots,
@@ -154,6 +158,89 @@ export const markMealEatenAction = async (
     // check a patient posting someone else's id would write into their record.
     target: { type: "meal_entry", id, ownerOf: mealEntryOwner },
     write: async () => markMealEntryEaten(id),
+  });
+
+  return result.ok ? written : { error: asPatientError(result.error) };
+};
+
+/**
+ * One closed set, one turn from a posted string — the shape all three of the
+ * profile's selects share.
+ *
+ * `""` is the « Non renseigné » option and means "clear it", exactly as it
+ * does on the console's own form; anything outside the set is a post no
+ * rendered page can produce, so it is refused rather than quietly dropped.
+ * `undefined` is the refusal, which is why the return type has all three
+ * states and the caller checks for it.
+ */
+const asChoice = <T extends string>(
+  vocabulary: readonly T[],
+  value: string,
+): T | "" | undefined => {
+  if (value === "") {
+    return "";
+  }
+  return (vocabulary as readonly string[]).includes(value)
+    ? (value as T)
+    : undefined;
+};
+
+/**
+ * « Mon profil » — the seven fields § A marks patient-supplied, saved as one
+ * write.
+ *
+ * One action for the whole form rather than one per field: the patient presses
+ * save once, and seven writes would spend seven of their hundred daily slots
+ * to record a single edit. The services layer is what enforces that only these
+ * seven can move — `updatePatientPreferences` cannot express `medications` at
+ * all — so this file's job stops at turning posted strings into the
+ * vocabularies, the same boundary the meal action draws.
+ */
+export const updateProfileAction = async (
+  _previous: WriteState,
+  formData: FormData,
+): Promise<WriteState> => {
+  const token = field(formData, "token");
+  const locale = field(formData, "locale");
+  const likesCooking = asChoice(
+    cookingAffinities,
+    field(formData, "likesCooking"),
+  );
+  const cookingTime = asChoice(cookingTimes, field(formData, "cookingTime"));
+  const foodBudget = asChoice(foodBudgets, field(formData, "foodBudget"));
+
+  if (
+    !isLocale(locale) ||
+    likesCooking === undefined ||
+    cookingTime === undefined ||
+    foodBudget === undefined
+  ) {
+    return refused;
+  }
+
+  const dietaryRegime = field(formData, "dietaryRegime");
+  const allergies = field(formData, "allergies");
+  const intolerances = field(formData, "intolerances");
+  const preferences = field(formData, "preferences");
+
+  const result = await writePatientLink(locale, token, {
+    action: "profile.preferences_updated",
+    // All four are short answers rather than prose — a list of allergens, a
+    // line about fennel — so they are declared against the short cap.
+    text: {
+      shorts: [dietaryRegime, allergies, intolerances, preferences],
+    },
+    target: { type: "patient_profile" },
+    write: async (patient) =>
+      updatePatientPreferences(patient.id, {
+        dietaryRegime,
+        allergies,
+        intolerances,
+        preferences,
+        likesCooking,
+        cookingTime,
+        foodBudget,
+      }),
   });
 
   return result.ok ? written : { error: asPatientError(result.error) };

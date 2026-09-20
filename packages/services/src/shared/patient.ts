@@ -52,6 +52,32 @@ export const recommendationCategories = [
 export const cookingAffinities = ["yes", "somewhat", "no"] as const;
 
 /**
+ * How much time the patient has to cook — her § 7's « temps disponible », and
+ * the old version's three levels rather than a number of minutes.
+ *
+ * Three levels on purpose: brainstorm § 7 rules out asking for a « temps exact
+ * de préparation habituel », because a patient who cooks in twenty minutes on
+ * Tuesday and an hour on Sunday has no such number to give. What a suggestion
+ * actually needs is whether to stay quick, and that is a band.
+ *
+ * `null` until it has been asked, like `likesCooking` and the consent channel:
+ * not asked is a different answer from "no time".
+ */
+export const cookingTimes = ["low", "medium", "high"] as const;
+
+/**
+ * What a suggestion has to cost — § A's budget, closed to three levels the day
+ * the patient became the one answering it.
+ *
+ * It was free text while only Morgane wrote it, which is defensible for a
+ * field one person fills in her own words and indefensible for one a patient
+ * fills from a phone: a prompt cannot filter on « serré, courses au marché »,
+ * and a patient should not have to invent a vocabulary. The migration that
+ * closed the set blanks what was there rather than guessing a mapping.
+ */
+export const foodBudgets = ["economical", "standard", "comfort"] as const;
+
+/**
  * § B of the v2 brainstorm: the twelve areas an anamnesis is taken across, in
  * the order Morgane works through them.
  *

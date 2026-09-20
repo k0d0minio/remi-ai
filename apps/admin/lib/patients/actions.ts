@@ -70,6 +70,8 @@ import {
   consentChannels,
   contextBlocks,
   cookingAffinities,
+  cookingTimes,
+  foodBudgets,
   goalDirections,
   isLocale,
   mealSlots,
@@ -78,6 +80,8 @@ import {
   recommendationCategories,
   type ConsentChannel,
   type CookingAffinity,
+  type CookingTime,
+  type FoodBudget,
   type GoalDirection,
   type MealSlot,
   type PatientSex,
@@ -162,6 +166,22 @@ const asCookingAffinity = (value: string): CookingAffinity | "" =>
     ? (value as CookingAffinity)
     : "";
 
+const asCookingTime = (value: string): CookingTime | "" =>
+  (cookingTimes as readonly string[]).includes(value)
+    ? (value as CookingTime)
+    : "";
+
+/**
+ * Closed since `patient-profile-edit`. A value the select cannot produce falls
+ * to `""` rather than being refused, exactly as the three above do — including
+ * the free text this column used to hold, which is what a stale form would
+ * still post.
+ */
+const asFoodBudget = (value: string): FoodBudget | "" =>
+  (foodBudgets as readonly string[]).includes(value)
+    ? (value as FoodBudget)
+    : "";
+
 const asCategory = (value: string): RecommendationCategory =>
   (recommendationCategories as readonly string[]).includes(value)
     ? (value as RecommendationCategory)
@@ -185,7 +205,8 @@ const patientInputFrom = (formData: FormData): PatientInput => {
     constraints: field(formData, "constraints"),
     preferences: field(formData, "preferences"),
     likesCooking: asCookingAffinity(field(formData, "likesCooking")),
-    foodBudget: field(formData, "foodBudget"),
+    cookingTime: asCookingTime(field(formData, "cookingTime")),
+    foodBudget: asFoodBudget(field(formData, "foodBudget")),
     medications: field(formData, "medications"),
     supplements: field(formData, "supplements"),
     referral: field(formData, "referral"),
