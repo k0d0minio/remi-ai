@@ -31,6 +31,66 @@ type Props = {
   content: Content["patientLink"];
 };
 
+type ChoiceGroupProps<T extends string> = {
+  name: string;
+  label: string;
+  hint?: string;
+  /** `null` is « Non renseigné », which is a real answer and starts selected. */
+  current: T | null;
+  options: readonly T[];
+  labels: Record<T, string>;
+  notRecorded: string;
+};
+
+/**
+ * One closed set as a row of chips, generic in its own vocabulary.
+ *
+ * Generic rather than three near-identical blocks, and generic rather than one
+ * array of three configs: an array would make `labels` a union of three
+ * `Record`s and `options` a union of three tuples, and indexing one with the
+ * other is exactly the mistake the type system should catch. The parameter
+ * keeps each call site's vocabulary tied to its own label map.
+ */
+const ChoiceGroup = <T extends string>({
+  name,
+  label,
+  hint,
+  current,
+  options,
+  labels,
+  notRecorded,
+}: ChoiceGroupProps<T>) => (
+  <fieldset className="flex flex-col gap-2">
+    <legend className="mb-1">
+      <Typography as="span" size="sm" weight="medium">
+        {label}
+      </Typography>
+    </legend>
+    {hint ? (
+      <Typography size="xs" tone="muted">
+        {hint}
+      </Typography>
+    ) : null}
+    <div className="flex flex-wrap gap-2">
+      <ChoiceChip
+        name={name}
+        value=""
+        label={notRecorded}
+        defaultChecked={current === null}
+      />
+      {options.map((option) => (
+        <ChoiceChip
+          key={option}
+          name={name}
+          value={option}
+          label={labels[option]}
+          defaultChecked={current === option}
+        />
+      ))}
+    </div>
+  </fieldset>
+);
+
 /**
  * The seven fields § A marks patient-supplied, as one form the patient saves
  * once.
@@ -52,33 +112,6 @@ export const ProfileForm = ({ token, locale, patient, content }: Props) => {
   const [state, setState] = useState<WriteState>({ error: null });
   const [saved, setSaved] = useState(false);
   const copy = content.profile;
-
-  const groups = [
-    {
-      name: "likesCooking",
-      label: copy.likesCookingLabel,
-      hint: undefined,
-      current: patient.likesCooking,
-      options: cookingAffinities,
-      labels: copy.likesCooking,
-    },
-    {
-      name: "cookingTime",
-      label: copy.cookingTimeLabel,
-      hint: copy.cookingTimeHint,
-      current: patient.cookingTime,
-      options: cookingTimes,
-      labels: copy.cookingTimes,
-    },
-    {
-      name: "foodBudget",
-      label: copy.budgetLabel,
-      hint: undefined,
-      current: patient.foodBudget,
-      options: foodBudgets,
-      labels: copy.budgets,
-    },
-  ] as const;
 
   return (
     <form
@@ -137,37 +170,33 @@ export const ProfileForm = ({ token, locale, patient, content }: Props) => {
         />
       </Field>
 
-      {groups.map((group) => (
-        <fieldset key={group.name} className="flex flex-col gap-2">
-          <legend className="mb-1">
-            <Typography as="span" size="sm" weight="medium">
-              {group.label}
-            </Typography>
-          </legend>
-          {group.hint ? (
-            <Typography size="xs" tone="muted">
-              {group.hint}
-            </Typography>
-          ) : null}
-          <div className="flex flex-wrap gap-2">
-            <ChoiceChip
-              name={group.name}
-              value=""
-              label={copy.notRecorded}
-              defaultChecked={group.current === null}
-            />
-            {group.options.map((option) => (
-              <ChoiceChip
-                key={option}
-                name={group.name}
-                value={option}
-                label={group.labels[option]}
-                defaultChecked={group.current === option}
-              />
-            ))}
-          </div>
-        </fieldset>
-      ))}
+      <ChoiceGroup
+        name="likesCooking"
+        label={copy.likesCookingLabel}
+        current={patient.likesCooking}
+        options={cookingAffinities}
+        labels={copy.likesCooking}
+        notRecorded={copy.notRecorded}
+      />
+
+      <ChoiceGroup
+        name="cookingTime"
+        label={copy.cookingTimeLabel}
+        hint={copy.cookingTimeHint}
+        current={patient.cookingTime}
+        options={cookingTimes}
+        labels={copy.cookingTimes}
+        notRecorded={copy.notRecorded}
+      />
+
+      <ChoiceGroup
+        name="foodBudget"
+        label={copy.budgetLabel}
+        current={patient.foodBudget}
+        options={foodBudgets}
+        labels={copy.budgets}
+        notRecorded={copy.notRecorded}
+      />
 
       {state.error ? (
         <Alert variant="error">

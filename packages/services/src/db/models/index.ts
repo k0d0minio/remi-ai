@@ -40,6 +40,8 @@ export type {
 export type {
   ConsentChannel,
   CookingAffinity,
+  CookingTime,
+  FoodBudget,
   PatientProfile,
   PatientSex,
   PatientStatus,

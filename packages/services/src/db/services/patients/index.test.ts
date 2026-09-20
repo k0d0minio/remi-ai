@@ -335,7 +335,7 @@ describe("the food profile", () => {
         dietaryRegime: "sans gluten",
         allergies: "arachides",
         likesCooking: "no",
-        foodBudget: "moyen",
+        foodBudget: "standard",
       }),
     );
     const updated = unwrapOk(
@@ -345,7 +345,7 @@ describe("the food profile", () => {
     expect(updated.dietaryRegime).toBe("sans gluten");
     expect(updated.allergies).toBe("arachides");
     expect(updated.likesCooking).toBe("no");
-    expect(updated.foodBudget).toBe("moyen");
+    expect(updated.foodBudget).toBe("standard");
   });
 });
 
