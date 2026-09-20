@@ -533,8 +533,6 @@ describe("adapting a recipe for one person", () => {
 describe("the patient's answer on a recipe", () => {
   let annie: string;
   let bruno: string;
-  let soupe: string;
-  let gratin: string;
 
   beforeAll(async () => {
     const one = await createPatient({ pseudonym: "Annie" });
@@ -544,8 +542,6 @@ describe("the patient's answer on a recipe", () => {
     }
     annie = one.data.id;
     bruno = two.data.id;
-    soupe = await recipeNamed("Soupe de potiron");
-    gratin = await recipeNamed("Gratin de courgettes");
   });
 
   const give = async (patient: string, recipe: string, on: string) => {
@@ -556,15 +552,29 @@ describe("the patient's answer on a recipe", () => {
     return given.data[0];
   };
 
+  /**
+   * A dish nobody in this file already holds.
+   *
+   * Holding the same recipe twice at once is a `conflict` by design, so tests
+   * that share a fixture recipe would be asserting that rule rather than the
+   * answers — and only the one that ran first would pass.
+   */
+  const giveFresh = async (patient: string, title: string, on: string) =>
+    give(patient, await recipeNamed(title), on);
+
   it("starts a giving with no answer on it", async () => {
-    const assignment = await give(annie, soupe, "2026-09-01");
+    const assignment = await giveFresh(annie, "Soupe de potiron", "2026-09-01");
     expect(assignment.patientResponse).toBeNull();
     expect(assignment.respondedAt).toBeNull();
     expect(assignment.writtenBy).toBe("practitioner");
   });
 
   it("records the answer on the giving, stamped as the patient's", async () => {
-    const assignment = await give(bruno, soupe, "2026-09-02");
+    const assignment = await giveFresh(
+      bruno,
+      "Velouté de cresson",
+      "2026-09-02",
+    );
     const answered = await respondToRecipeAssignment(assignment.id, "liked");
     expect(answered.ok).toBe(true);
     if (answered.ok) {
@@ -575,6 +585,8 @@ describe("the patient's answer on a recipe", () => {
   });
 
   it("leaves another patient's giving of the same recipe alone", async () => {
+    // One dish, both of them — which is the whole point of the assertion.
+    const gratin = await recipeNamed("Gratin de courgettes");
     const shared = await getRecipe(gratin);
     if (!shared.ok) {
       throw new Error("shared recipe not found");
@@ -597,7 +609,11 @@ describe("the patient's answer on a recipe", () => {
   });
 
   it("switches between the four on one tap, and clears on the same one", async () => {
-    const assignment = await give(annie, soupe, "2026-09-04");
+    const assignment = await giveFresh(
+      annie,
+      "Curry de pois chiches",
+      "2026-09-04",
+    );
 
     const first = await respondToRecipeAssignment(assignment.id, "too_long");
     expect(first.ok && first.data.patientResponse).toBe("too_long");
@@ -619,7 +635,11 @@ describe("the patient's answer on a recipe", () => {
   });
 
   it("refuses an answer that is not one of the four", async () => {
-    const assignment = await give(bruno, soupe, "2026-09-05");
+    const assignment = await giveFresh(
+      bruno,
+      "Salade de lentilles",
+      "2026-09-05",
+    );
     const result = await respondToRecipeAssignment(
       assignment.id,
       "delicious" as never,
@@ -642,7 +662,11 @@ describe("the patient's answer on a recipe", () => {
   });
 
   it("names the owner of a giving, and nobody for one that is not there", async () => {
-    const assignment = await give(annie, gratin, "2026-09-06");
+    const assignment = await giveFresh(
+      annie,
+      "Poêlée de champignons",
+      "2026-09-06",
+    );
     expect(await recipeAssignmentOwner(assignment.id)).toBe(annie);
     expect(await recipeAssignmentOwner("not-a-uuid")).toBeNull();
     expect(
@@ -651,7 +675,11 @@ describe("the patient's answer on a recipe", () => {
   });
 
   it("keeps the answer when the giving is archived", async () => {
-    const assignment = await give(bruno, gratin, "2026-09-07");
+    const assignment = await giveFresh(
+      bruno,
+      "Omelette aux herbes",
+      "2026-09-07",
+    );
     await respondToRecipeAssignment(assignment.id, "would_repeat");
     const archived = await archiveRecipeAssignment(assignment.id, true);
     expect(archived.ok && archived.data.patientResponse).toBe("would_repeat");
