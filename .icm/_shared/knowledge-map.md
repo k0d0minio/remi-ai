@@ -42,8 +42,9 @@ the page — and `.icm/scripts/validate-knowledge-map.sh` proves each one resolv
 ### The changelog — `apps/docs/app/changelog/`
 
 - `changelog/<YYYY-MM-DD>-<slug>` — one page per shipped feature, written by Release (and by a
-  bug or tweak lane when the change is user-visible); registered in `changelog/_meta.ts` and the
-  index `changelog/page.mdx`. The shape is `.icm/_shared/project-rules.md` → Announcing. A record
+  bug or tweak lane when the change is user-visible); registered in `changelog/_meta.ts` alone —
+  the index `changelog/page.mdx` derives its list from the folder. The shape is
+  `.icm/_shared/project-rules.md` → Announcing. A record
   of what shipped — no stage reads it as knowledge.
 
 ## What each stage reads / writes
