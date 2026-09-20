@@ -5,6 +5,7 @@ import {
   getPatientSummary,
   listMealEntries,
   listPantryEssentials,
+  listPatientCheckIns,
   listPatientGoals,
   listPatientRecipes,
   listPatientRecommendations,
@@ -44,6 +45,7 @@ export const loadPatientLink = cache(async (token: string) => {
     essentials,
     recipes,
     meals,
+    checkIns,
   ] = await Promise.all([
     getPatientSummary(patient.id),
     getPatientInstruction(patient.id),
@@ -53,12 +55,13 @@ export const loadPatientLink = cache(async (token: string) => {
     listPantryEssentials(patient.id),
     listPatientRecipes(patient.id),
     listMealEntries(patient.id),
+    listPatientCheckIns(patient.id),
   ]);
 
   // Awaited rather than fired and forgotten: an unawaited promise in a server
   // component can be cut off when the response finishes. The service
   // rate-limits itself, so this is usually a read and no write at all. It
-  // fires on arrival at any of the six routes, so a patient who opens the
+  // fires on arrival at any of the segments, so a patient who opens the
   // link and reads three segments is recorded as having opened it.
   await recordPatientLinkOpened(patient.id);
 
@@ -75,6 +78,9 @@ export const loadPatientLink = cache(async (token: string) => {
     essentials,
     recipes,
     meals,
+    // Both trails, for « Ma progression » and for the home's prompt — which
+    // subject to ask about is a question about what has already been answered.
+    checkIns,
   };
 });
 
@@ -111,6 +117,16 @@ export const visibleSegments = (
     present.push("recettes");
   }
   present.push("repas");
+  // « Ma progression » appears once there is something to plot: an active goal
+  // gives the strip a row even before the first answer, and an answer keeps the
+  // page reachable for a goal she has since archived.
+  if (
+    data.goals.length > 0 ||
+    data.checkIns.goals.some((trail) => trail.checkIns.length > 0) ||
+    data.checkIns.recommendations.some((trail) => trail.checkIns.length > 0)
+  ) {
+    present.push("progression");
+  }
   return present;
 };
 

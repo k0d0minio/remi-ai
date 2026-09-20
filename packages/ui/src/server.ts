@@ -36,6 +36,8 @@ export {
   CardTitle,
   cardVariants,
 } from "./server/card";
+export { CheckInStrip } from "./server/check-in-strip";
+export type { CheckInMark } from "./server/check-in-strip";
 export { ChoiceChip } from "./server/choice-chip";
 export { Container } from "./server/container";
 export { Field } from "./server/field";

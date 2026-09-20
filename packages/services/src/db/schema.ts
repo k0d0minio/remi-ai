@@ -169,6 +169,45 @@ export const patientRecommendations = pgTable("patient_recommendations", {
 });
 
 /**
+ * The patient's own answer to « comment ça se passe ? » about one non-food
+ * recommendation — decision D-9's in-page check-in, the half that has no
+ * console counterpart.
+ *
+ * It is a table of its own rather than a nullable `recommendation_id` beside
+ * `goal_id` on `patient_goal_check_ins`, because that column would make every
+ * existing row answer "which of the two is this?" with a null, and the two
+ * parents cascade from different places. The shape is otherwise deliberately
+ * the same, so the strip on both surfaces reads one vocabulary.
+ *
+ * There is no `written_by`: only the patient writes one. Morgane records a
+ * recommendation's progress in the consultation, not as a dated row, so a
+ * column that would hold one value forever is a promise the schema cannot
+ * keep. It becomes an additive migration the day the console grows its own
+ * recommendation check-in.
+ */
+export const patientRecommendationCheckIns = pgTable(
+  "patient_recommendation_check_ins",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    recommendationId: uuid("recommendation_id")
+      .notNull()
+      .references(() => patientRecommendations.id, { onDelete: "cascade" }),
+    /** The day the patient answered, in their own day — never an instant. */
+    checkedOn: date("checked_on", { mode: "string" }).notNull(),
+    /** A key from `goalDirections`: the three faces share one vocabulary. */
+    direction: text("direction").notNull(),
+    /** The optional word beside the face. */
+    note: text("note").notNull().default(""),
+    /** Set when Morgane marks a « moins bien » seen — as on a goal check-in. */
+    acknowledgedAt: timestamp("acknowledged_at", {
+      withTimezone: true,
+      mode: "date",
+    }),
+    ...timestamps,
+  },
+);
+
+/**
  * The prescribed supplement protocol — brainstorm § G. What Morgane prescribes,
  * as structured rows rather than the prose that lived in the profile's
  * `supplements` column (which is now "what the patient already takes, outside
@@ -319,6 +358,18 @@ export const patientGoalCheckIns = pgTable("patient_goal_check_ins", {
    * path was.
    */
   writtenBy: text("written_by").notNull().default("practitioner"),
+  /**
+   * When Morgane marked a patient's « moins bien » as seen.
+   *
+   * The console counts what is waiting on her the same way the journal does —
+   * by an explicit act, not by a page view and not by the clock. Null on every
+   * row she wrote herself, which is correct: her own check-in was never
+   * waiting on her.
+   */
+  acknowledgedAt: timestamp("acknowledged_at", {
+    withTimezone: true,
+    mode: "date",
+  }),
   ...timestamps,
 });
 

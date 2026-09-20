@@ -13,6 +13,8 @@
  */
 
 import type {
+  CheckInCategory,
+  GoalDirection,
   MealIntent,
   MealSlot,
   PersonalisationDimension,
@@ -290,6 +292,7 @@ export type Content = {
       "placard-frigo": string;
       recettes: string;
       repas: string;
+      progression: string;
     };
     /**
      * Home, in her § 6 order: today and this week, the prioritised
@@ -335,6 +338,43 @@ export type Content = {
       empty: string;
       /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
       errors: Record<PatientWriteError, string>;
+    };
+    /**
+     * The in-page check-in and the progression view — decision D-9, in one
+     * block because the question the home asks and the strip that shows the
+     * answers are one feature in two places.
+     *
+     * The questions are templates carrying `{subject}`: the goal's or the
+     * recommendation's own words go in, so nothing is authored per patient.
+     * `recommendationQuestions` is keyed by `CheckInCategory`, which is what
+     * makes a new askable category a type error in both locales rather than a
+     * silently unasked question.
+     */
+    checkIn: {
+      title: string;
+      goalQuestion: string;
+      recommendationQuestions: Record<CheckInCategory, string>;
+      faces: Record<GoalDirection, string>;
+      directions: Record<GoalDirection, string>;
+      noteLabel: string;
+      notePlaceholder: string;
+      skip: string;
+      errors: Record<PatientWriteError, string>;
+      /** « Ma progression » — the segment the strip lives on. */
+      progressionTitle: string;
+      progressionLead: string;
+      /** Accessible name for one subject's strip of faces. */
+      stripLabel: string;
+      /** Stands in for a strip with nothing on it yet. */
+      stripEmpty: string;
+      /** Heads the goals block, then the recommendations block. */
+      goalsHeading: string;
+      recommendationsHeading: string;
+      /** The week's tallies beneath the strips. */
+      mealsThisWeek: string;
+      /** The consigne, repeated here because progression is read on its own. */
+      instructionLabel: string;
+      empty: string;
     };
     summaryTitle: string;
     recommendationsTitle: string;

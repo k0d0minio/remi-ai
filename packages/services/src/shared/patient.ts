@@ -116,6 +116,30 @@ export const mealIntents = ["planned", "eaten"] as const;
 export const goalDirections = ["better", "stable", "worse"] as const;
 
 /**
+ * The recommendation categories the in-page check-in may ask about — decision
+ * D-9's « comment ça se passe ? », narrowed to what is not food.
+ *
+ * `nutrition` and `supplement` are deliberately absent: the meal loop already
+ * tells Morgane what the patient eats, and the compléments segment carries the
+ * protocol, so asking a fourth time would ask a question two surfaces already
+ * answer.
+ *
+ * The closed set lives here because both apps read it — the link builds the
+ * rotation from it, the console renders what came back. The *wording* does
+ * not: each app's own locale files own the question, the same split as
+ * `goalDirections` and its French labels next door.
+ */
+export const checkInCategories = ["habit", "activity", "monitoring"] as const;
+
+export type CheckInCategory = (typeof checkInCategories)[number];
+
+/** Whether a recommendation's category is one the check-in may ask about. */
+export const isCheckInCategory = (
+  category: string,
+): category is CheckInCategory =>
+  (checkInCategories as readonly string[]).includes(category);
+
+/**
  * The "principales" rule: the first active recommendation of each category, in
  * the category order above.
  *
@@ -137,3 +161,64 @@ export const firstRecommendationPerCategory = <
     );
     return first ? [first] : [];
   });
+
+/**
+ * One thing the in-page check-in may ask about — a goal, or a non-food
+ * recommendation — with the day it was last answered.
+ *
+ * Structurally typed for the same reason `firstRecommendationPerCategory` is:
+ * the caller has already read the rows and this rule only orders them, so it
+ * never has to know what a goal row looks like.
+ */
+export type CheckInSubject = {
+  id: string;
+  kind: "goal" | "recommendation";
+  /** `YYYY-MM-DD`, or null when this subject has never been answered. */
+  lastAnsweredOn: string | null;
+};
+
+/**
+ * The rotation, least-recently-answered first — decision D-9's « comment ça se
+ * passe ? », asked about something different each day without storing a cursor.
+ *
+ * A subject nobody has answered leads, then the oldest answer, and the caller's
+ * own order breaks a tie — goals in Morgane's priority order, recommendations
+ * in hers. That is the whole of it, and it is why nothing here is persisted: a
+ * stored "next subject" pointer would have to be migrated every time she adds
+ * a goal or re-orders the protocol, and it would go stale the moment the
+ * patient answered from another device.
+ *
+ * `sort` is stable (ES2019), so equal subjects keep the order they arrived in.
+ */
+export const orderCheckInRotation = <T extends CheckInSubject>(
+  subjects: readonly T[],
+): readonly T[] =>
+  [...subjects].sort((a, b) => {
+    if (a.lastAnsweredOn === b.lastAnsweredOn) {
+      return 0;
+    }
+    if (a.lastAnsweredOn === null) {
+      return -1;
+    }
+    if (b.lastAnsweredOn === null) {
+      return 1;
+    }
+    return a.lastAnsweredOn < b.lastAnsweredOn ? -1 : 1;
+  });
+
+/**
+ * Whether the patient still owes an answer today — the interval, and the whole
+ * of it.
+ *
+ * Morgane chose "every visit": asked each time the home is opened, at most once
+ * a calendar day. So the question is not "how long since the last one" but
+ * simply "is one of these dated today", which is why nothing schedules and
+ * nothing polls — the prompt's visibility is this comparison, made at render
+ * from rows that are already loaded.
+ */
+export const awaitsCheckInOn = (
+  subjects: readonly CheckInSubject[],
+  day: string,
+): boolean =>
+  subjects.length > 0 &&
+  !subjects.some((subject) => subject.lastAnsweredOn === day);

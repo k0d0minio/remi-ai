@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus } from "lucide-react";
 import NextLink from "next/link";
 import {
+  countCheckInsAwaitingAttention,
   getCiqualImport,
   listPatientRecommendations,
   listPatients,
@@ -58,12 +59,21 @@ const Accueil = async () => {
     patients.map(async (patient) => ({
       patient,
       recommendations: (await listPatientRecommendations(patient.id)).length,
+      // The same per-patient shape, for the same reason: what a « moins bien »
+      // is waiting on is a read across two tables, and the roster is small.
+      awaitingAttention: await countCheckInsAwaitingAttention(patient.id),
     })),
   );
 
   const active = patients.filter((patient) => patient.status === "active");
   const paused = patients.filter((patient) => patient.status === "paused");
   const empty = withCounts.filter((entry) => entry.recommendations === 0);
+  // Decision D-9: a patient who answered « moins bien » and has not been looked
+  // at yet. A real row rather than a tile — this page answers "which profiles
+  // are waiting on Morgane", and this is one of the answers.
+  const worseAnswers = withCounts
+    .filter((entry) => entry.awaitingAttention > 0)
+    .sort((a, b) => b.awaitingAttention - a.awaitingAttention);
   const neverOpened = patients.filter(
     (patient) =>
       patient.status === "active" && patient.linkLastOpenedAt === null,
@@ -163,6 +173,37 @@ const Accueil = async () => {
                   meta: `créé le ${formatDate(patient.createdAt)}`,
                 }))}
                 remaining={Math.max(neverOpened.length - PREVIEW, 0)}
+              />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="xl:col-span-2">
+          <CardHeader>
+            <CardTitle>Réponses « moins bien »</CardTitle>
+            <CardDescription>
+              Ce que les personnes suivies ont signalé comme allant moins bien,
+              et que vous n&apos;avez pas encore regardé. Marquez « Vu » sur le
+              profil pour le retirer d&apos;ici.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {worseAnswers.length === 0 ? (
+              <Typography size="sm" tone="muted">
+                Rien en attente.
+              </Typography>
+            ) : (
+              <PatientLinks
+                rows={worseAnswers.slice(0, PREVIEW).map((entry) => ({
+                  id: entry.patient.id,
+                  pseudonym: entry.patient.pseudonym,
+                  status: entry.patient.status,
+                  meta:
+                    entry.awaitingAttention === 1
+                      ? "1 réponse à regarder"
+                      : `${entry.awaitingAttention} réponses à regarder`,
+                }))}
+                remaining={Math.max(worseAnswers.length - PREVIEW, 0)}
               />
             )}
           </CardContent>

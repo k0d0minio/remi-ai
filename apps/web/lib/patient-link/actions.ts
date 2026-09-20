@@ -1,15 +1,21 @@
 "use server";
 
 import {
+  addGoalCheckIn,
   addMealEntry,
+  addRecommendationCheckIn,
   markMealEntryEaten,
   mealEntryOwner,
+  patientGoalOwner,
+  recommendationCheckInSubjectOwner,
 } from "@remi/services/server";
 import {
+  goalDirections,
   isLocale,
   mealIntents,
   mealSlots,
   todayAtPractice,
+  type GoalDirection,
   type MealIntent,
   type MealSlot,
   type ServiceErrorCode,
@@ -155,6 +161,85 @@ export const markMealEatenAction = async (
     target: { type: "meal_entry", id, ownerOf: mealEntryOwner },
     write: async () => markMealEntryEaten(id),
   });
+
+  return result.ok ? written : { error: asPatientError(result.error) };
+};
+
+const asDirection = (value: string): GoalDirection | null =>
+  (goalDirections as readonly string[]).includes(value)
+    ? (value as GoalDirection)
+    : null;
+
+/**
+ * « Comment ça se passe ? » — one face, maybe a word, against one subject.
+ *
+ * One endpoint for both kinds rather than two, because the patient pressed one
+ * button and the difference is which table the row lands in: the prompt posts
+ * the subject's kind alongside its id, and the branch below is the only place
+ * that distinction exists on this side. Splitting it would mean the client
+ * choosing an endpoint, which is the same decision made somewhere it can be
+ * got wrong.
+ *
+ * Both branches name an existing row by id, so both hand `writeThroughPatientLink`
+ * an `ownerOf` — a goal id is a plain uuid that travels, and without the check
+ * a patient posting someone else's would write into their record.
+ *
+ * The date is `todayAtPractice()` and never a posted field: the interval is
+ * "at most one answer a calendar day", so a client-supplied date would be a
+ * client-supplied way around it.
+ */
+export const logCheckInAction = async (
+  _previous: WriteState,
+  formData: FormData,
+): Promise<WriteState> => {
+  const token = field(formData, "token");
+  const locale = field(formData, "locale");
+  const subjectId = field(formData, "subjectId");
+  const kind = field(formData, "kind");
+  const note = field(formData, "note");
+  const direction = asDirection(field(formData, "direction"));
+
+  if (!isLocale(locale) || direction === null) {
+    return refused;
+  }
+  if (kind !== "goal" && kind !== "recommendation") {
+    return refused;
+  }
+
+  const checkedOn = todayAtPractice();
+  const result =
+    kind === "goal"
+      ? await writePatientLink(locale, token, {
+          action: "goal.checked_in",
+          text: { bodies: [note] },
+          target: {
+            type: "patient_goal",
+            id: subjectId,
+            ownerOf: patientGoalOwner,
+          },
+          write: async () =>
+            addGoalCheckIn(
+              subjectId,
+              // No measure: that field is Morgane's, taken in consultation.
+              { checkedOn, direction, note },
+              "patient",
+            ),
+        })
+      : await writePatientLink(locale, token, {
+          action: "recommendation.checked_in",
+          text: { bodies: [note] },
+          target: {
+            type: "patient_recommendation",
+            id: subjectId,
+            ownerOf: recommendationCheckInSubjectOwner,
+          },
+          write: async () =>
+            addRecommendationCheckIn(subjectId, {
+              checkedOn,
+              direction,
+              note,
+            }),
+        });
 
   return result.ok ? written : { error: asPatientError(result.error) };
 };

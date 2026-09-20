@@ -26,4 +26,9 @@ export type PatientGoalCheckIn = Entity & {
   note: string;
   /** Her consultation check-in, or the patient's own answer through the link. */
   writtenBy: WrittenBy;
+  /**
+   * When Morgane marked a patient's « moins bien » as seen. Null on her own
+   * rows, which were never waiting on her.
+   */
+  acknowledgedAt: Date | null;
 };

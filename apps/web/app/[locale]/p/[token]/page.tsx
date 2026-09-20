@@ -5,6 +5,7 @@ import {
   localePath,
 } from "@remi/services/shared";
 import { Card, CardContent, Typography } from "@remi/ui/server";
+import { CheckInPrompt } from "@/components/patient-link/check-in-prompt";
 import { GoalList } from "@/components/patient-link/goal-list";
 import { HomeSection } from "@/components/patient-link/home-section";
 import { MealEntryPoint } from "@/components/patient-link/meal-entry-point";
@@ -13,6 +14,7 @@ import { RecipeList } from "@/components/patient-link/recipe-list";
 import { RecommendationList } from "@/components/patient-link/recommendation-list";
 import { SegmentPage } from "@/components/patient-link/segment-page";
 import { getContent } from "@/lib/content";
+import { awaitsCheckIn, checkInRotation } from "@/lib/patient-link/check-in";
 import { loadPatientLink } from "@/lib/patient-link/load";
 
 /** Reads the database on every hit — never prerendered. */
@@ -64,6 +66,12 @@ const PatientLinkHome = async ({ params }: { params: Promise<Params> }) => {
   const principales = firstRecommendationPerCategory(recommendations);
   const segment = (path: string) => localePath(locale, `/p/${token}/${path}`);
 
+  // Computed at render from the dates already loaded — no scheduler, no cron,
+  // and no state saying whether the patient is "due": the question is simply
+  // whether anything carries today's date (decision D-9).
+  const asksCheckIn = awaitsCheckIn(data);
+  const rotation = asksCheckIn ? checkInRotation(data) : [];
+
   const hasToday = goals.length > 0 || weekChallenge !== null;
   // The meal invitation renders unconditionally, so "empty" means every block
   // that depends on her having written something is absent — not just the two
@@ -77,6 +85,27 @@ const PatientLinkHome = async ({ params }: { params: Promise<Params> }) => {
 
   return (
     <>
+      {/*
+        Above « Aujourd'hui »: it is the one thing on this page asking
+        something of the patient rather than telling them something, and a
+        question below the fold is a question nobody answers.
+      */}
+      {asksCheckIn && rotation.length > 0 ? (
+        <Card>
+          <CardContent className="flex flex-col gap-3">
+            <Typography as="h2" size="sm" weight="semibold">
+              {content.checkIn.title}
+            </Typography>
+            <CheckInPrompt
+              token={token}
+              locale={locale}
+              rotation={rotation}
+              content={content}
+            />
+          </CardContent>
+        </Card>
+      ) : null}
+
       {hasToday ? (
         <SegmentPage title={content.todayTitle}>
           {goals.length > 0 ? (

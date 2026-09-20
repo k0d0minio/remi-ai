@@ -30,6 +30,8 @@ export const auditActions = [
   "recommendation.deleted",
   "recommendation.reordered",
   "recommendation.batch_saved",
+  /** The patient's own answer about a non-food recommendation — decision D-9. */
+  "recommendation.checked_in",
   "supplement.added",
   "supplement.updated",
   "supplement.archived",

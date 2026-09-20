@@ -1,6 +1,6 @@
 /**
- * The six segments of the patient link, in the order they appear in the
- * navigation. Home is always present; the other five appear only when this
+ * The seven segments of the patient link, in the order they appear in the
+ * navigation. Home is always present; the others appear only when this
  * patient's record holds something for them (brainstorm § J, decision #3).
  *
  * The paths are French because the reader is francophone and the URL is part
@@ -14,6 +14,7 @@ export const patientLinkSegments = [
   "placard-frigo",
   "recettes",
   "repas",
+  "progression",
 ] as const;
 
 export type PatientLinkSegment = (typeof patientLinkSegments)[number];

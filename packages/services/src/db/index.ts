@@ -87,6 +87,7 @@ export type {
 } from "./services/consultations";
 
 export {
+  acknowledgeGoalCheckIn,
   addGoalCheckIn,
   addPatientGoal,
   archivePatientGoal,
@@ -96,6 +97,7 @@ export {
   listGoalCheckIns,
   listPatientGoals,
   movePatientGoal,
+  patientGoalOwner,
   updateGoalCheckIn,
   updatePatientGoal,
   MAX_ACTIVE_GOALS,
@@ -120,6 +122,19 @@ export {
   updatePatientRecommendation,
 } from "./services/patient-recommendations";
 export type { RecommendationInput } from "./services/patient-recommendations";
+
+export {
+  acknowledgeRecommendationCheckIn,
+  addRecommendationCheckIn,
+  listRecommendationCheckIns,
+  recommendationCheckInSubjectOwner,
+} from "./services/patient-recommendation-check-ins";
+export type { RecommendationCheckInInput } from "./services/patient-recommendation-check-ins";
+
+export {
+  countCheckInsAwaitingAttention,
+  listPatientCheckIns,
+} from "./services/patient-check-ins";
 
 export {
   getPatientSummary,

@@ -52,16 +52,19 @@ export { canManageOperators, isAtLeast, operatorRoles } from "./operator";
 export type { OperatorRoleName } from "./operator";
 export {
   anamnesisCategories,
+  checkInCategories,
   consentChannels,
   cookingAffinities,
   firstRecommendationPerCategory,
   goalDirections,
+  isCheckInCategory,
   mealIntents,
   mealSlots,
   patientSexes,
   patientStatuses,
   recommendationCategories,
 } from "./patient";
+export type { CheckInCategory } from "./patient";
 export {
   componentsForRecommendation,
   normaliseNutritionText,
@@ -92,6 +95,7 @@ export type {
   FoodNutrient,
   FramePrinciple,
   GenotypeMarker,
+  GoalCheckInTrail,
   GoalDirection,
   HabitsProfile,
   MealEntry,
@@ -102,6 +106,7 @@ export type {
   OperatorRole,
   PantryEssential,
   PatientAnamnesis,
+  PatientCheckIns,
   PatientGoal,
   PatientGoalCheckIn,
   PatientInstruction,
@@ -110,6 +115,7 @@ export type {
   PatientObservation,
   PatientProfile,
   PatientRecommendation,
+  PatientRecommendationCheckIn,
   PatientSupplement,
   PatientSex,
   PatientStatus,
@@ -130,6 +136,7 @@ export type {
   RecipeAssignment,
   Recommendation,
   RecommendationCategory,
+  RecommendationCheckInTrail,
   RhythmProfile,
   SignalKind,
   SignalSeverity,

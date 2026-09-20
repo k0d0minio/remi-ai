@@ -30,6 +30,11 @@ export type {
   GoalDirection,
   PatientGoalCheckIn,
 } from "./patient-goal-check-in";
+export type {
+  GoalCheckInTrail,
+  PatientCheckIns,
+  RecommendationCheckInTrail,
+} from "./patient-check-in";
 export type { PatientGoal } from "./patient-goal";
 export type { PatientInstruction } from "./patient-instruction";
 export type { PatientNote } from "./patient-note";
@@ -45,6 +50,7 @@ export type {
   PatientStatus,
 } from "./patient-profile";
 export type { PatientRecommendation } from "./patient-recommendation";
+export type { PatientRecommendationCheckIn } from "./patient-recommendation-check-in";
 export type { PatientSummary } from "./patient-summary";
 export type { PatientSupplement } from "./patient-supplement";
 export type {

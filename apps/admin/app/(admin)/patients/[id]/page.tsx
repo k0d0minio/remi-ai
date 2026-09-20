@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import {
   MAX_ACTIVE_GOALS,
+  countCheckInsAwaitingAttention,
   countMealEntriesAwaitingFeedback,
   getPatient,
   getPatientInstruction,
@@ -20,6 +21,7 @@ import {
   listPantryEssentials,
   listPatientGoals,
   listPatientAnamnesis,
+  listPatientCheckIns,
   listPatientLearnings,
   listPatientNotes,
   listPatientRecipes,
@@ -74,6 +76,7 @@ import { SummaryHead } from "@/components/patients/summary-head";
 import { SupplementAddForm } from "@/components/patients/supplement-add-form";
 import { SupplementProtocol } from "@/components/patients/supplement-protocol";
 import { SupplementSection } from "@/components/patients/supplement-section";
+import { CheckInStrips } from "@/components/patients/check-in-strips";
 import { WorkingGoals } from "@/components/patients/working-goals";
 import { WorkingMeals } from "@/components/patients/working-meals";
 import { WorkingRecommendations } from "@/components/patients/working-recommendations";
@@ -191,6 +194,14 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   const checkIns = Object.fromEntries(
     trails.map((trail) => [trail.id, trail.entries]),
   );
+
+  // The strip's own assembly — both tables, active subjects only — and what is
+  // still waiting on her. Separate from `checkIns` above, which is keyed by
+  // goal for the working view and carries the archived goals too.
+  const [checkInPicture, awaitingAttention] = await Promise.all([
+    listPatientCheckIns(patient.id),
+    countCheckInsAwaitingAttention(patient.id),
+  ]);
   // Both halves or neither: a date with no channel says nothing about what the
   // patient actually agreed through, so it still reads as not recorded.
   const consent =
@@ -353,7 +364,17 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
+              {awaitingAttention > 0 ? (
+                <Typography size="sm" tone="muted">
+                  {awaitingAttention === 1
+                    ? "1 réponse « moins bien » à regarder."
+                    : `${awaitingAttention} réponses « moins bien » à regarder.`}
+                </Typography>
+              ) : null}
+
               <WorkingGoals goals={goals} checkIns={checkIns} />
+
+              <CheckInStrips patientId={patient.id} checkIns={checkInPicture} />
 
               {goals.length < MAX_ACTIVE_GOALS ? (
                 <GoalAddForm patientId={patient.id} />

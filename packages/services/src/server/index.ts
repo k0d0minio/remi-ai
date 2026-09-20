@@ -42,6 +42,7 @@ export type { PatientLinkWriteRequest } from "../db/services/patient-link-writes
 export {
   addGoalCheckIn,
   addPatientGoal,
+  acknowledgeGoalCheckIn,
   archivePatientGoal,
   deleteGoalCheckIn,
   deletePatientGoal,
@@ -49,6 +50,7 @@ export {
   listGoalCheckIns,
   listPatientGoals,
   movePatientGoal,
+  patientGoalOwner,
   updateGoalCheckIn,
   updatePatientGoal,
   MAX_ACTIVE_GOALS,
@@ -85,6 +87,19 @@ export type {
   RecommendationInput,
   RecommendationRow,
 } from "../db/services/patient-recommendations";
+
+export {
+  acknowledgeRecommendationCheckIn,
+  addRecommendationCheckIn,
+  listRecommendationCheckIns,
+  recommendationCheckInSubjectOwner,
+} from "../db/services/patient-recommendation-check-ins";
+export type { RecommendationCheckInInput } from "../db/services/patient-recommendation-check-ins";
+
+export {
+  countCheckInsAwaitingAttention,
+  listPatientCheckIns,
+} from "../db/services/patient-check-ins";
 
 export {
   addPatientSupplement,

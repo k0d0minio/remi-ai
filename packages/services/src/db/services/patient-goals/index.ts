@@ -326,7 +326,12 @@ export const addGoalCheckIn = async (
       "a check-in needs a direction, a measure or a note",
     );
   }
-  const created = await checkIns(db).insert({ goalId, ...entry, writtenBy });
+  const created = await checkIns(db).insert({
+    goalId,
+    ...entry,
+    writtenBy,
+    acknowledgedAt: null,
+  });
   await touchPatient(goal.patientId, db);
   return ok(created);
 };
@@ -369,6 +374,46 @@ export const updateGoalCheckIn = async (
     await touchPatient(goal.patientId);
   }
   return ok(updated);
+};
+
+/**
+ * Whose goal is this? The ownership answer `writeThroughPatientLink` needs
+ * before a token may write a check-in against a goal it named by id.
+ *
+ * A goal id is a plain uuid that travels — a screenshot, a pasted link — and
+ * `addGoalCheckIn` answers "does this goal exist", not "is it yours". Without
+ * this, a patient posting someone else's goal id would write health data into
+ * another person's record under `writtenBy: patient`.
+ */
+export const patientGoalOwner = async (goalId: Id): Promise<Id | null> => {
+  if (!uuidSchema.safeParse(goalId).success) {
+    return null;
+  }
+  const goal = await goals().findById(goalId);
+  return goal?.patientId ?? null;
+};
+
+/**
+ * « Vu » — Morgane has looked at a patient's answer.
+ *
+ * Idempotent: the stamp is what the awaiting-attention count reads, so a
+ * second click is a no-op rather than a moved timestamp.
+ */
+export const acknowledgeGoalCheckIn = async (
+  id: Id,
+): Promise<Result<PatientGoalCheckIn>> => {
+  if (!uuidSchema.safeParse(id).success) {
+    return err("not_found", "no such check-in");
+  }
+  const existing = await checkIns().findById(id);
+  if (!existing) {
+    return err("not_found", "no such check-in");
+  }
+  if (existing.acknowledgedAt !== null) {
+    return ok(existing);
+  }
+  const updated = await checkIns().update(id, { acknowledgedAt: new Date() });
+  return updated ? ok(updated) : err("not_found", "no such check-in");
 };
 
 export const deleteGoalCheckIn = async (id: Id): Promise<Result<true>> => {

@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
+  acknowledgeGoalCheckIn,
+  acknowledgeRecommendationCheckIn,
   addGoalCheckIn,
   addMealEntry,
   addPantryEssential,
@@ -969,6 +971,43 @@ export const updateCheckInAction = async (
   });
   revalidatePatient(field(formData, "patientId"));
   return { error: null };
+};
+
+/**
+ * « Vu » — Morgane has looked at a patient's « moins bien ».
+ *
+ * It is what clears the awaiting-attention count, and the count is the reason
+ * it is an explicit act: a mark that cleared itself on a page view would say
+ * "seen" about a page she scrolled past, and one that faded with time would
+ * say it about a week she never opened. The same shape as writing feedback on
+ * a meal, one table further along.
+ *
+ * The kind rides in the form because the two answers live in two tables; the
+ * patient's goal check-in and their recommendation check-in are one gesture to
+ * her and one word on the button.
+ */
+export const acknowledgeCheckInAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const kind = field(formData, "kind");
+
+  const seen =
+    kind === "recommendation"
+      ? await acknowledgeRecommendationCheckIn(id)
+      : await acknowledgeGoalCheckIn(id);
+
+  if (seen.ok) {
+    await audit(operator, "goal.check_in_updated", {
+      type:
+        kind === "recommendation"
+          ? "patient_recommendation_check_in"
+          : "patient_goal_check_in",
+      id,
+      label: field(formData, "title"),
+      detail: "vu",
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
 };
 
 export const deleteCheckInAction = async (formData: FormData) => {
