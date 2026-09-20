@@ -3,7 +3,11 @@
 - commits: see the branch — services (vocabularies, schema, migration, the write
   service and its tests), web (the « Mon profil » segment), admin (the console
   form, summary and context), docs (RETENTION)
-- ci: GREEN — recorded below once settled
+- ci: GREEN on the full gate, ready head `b354ec3`. Three rounds: the first
+  push was RED on `@remi/services#typecheck` (a missing barrel re-export, a
+  stale `foodBudget: "moyen"` in the tests, and a union-indexed label map in the
+  profile form), the second RED on the console's audit vocabulary, which is
+  exhaustive over `AuditActionName` by design.
 
 ## What changed
 
@@ -67,3 +71,34 @@
 - **Preview check worth doing:** the profile segment on a phone. The three chip
   groups are the control the patient meets most, and « Pressé(e) » is the longest
   label in any of them.
+- **The ready head has no preview of its own, and the previews to test are two
+  commits back.** `vercel.json` carries
+  `ignoreCommand: npx turbo-ignore <pkg> --fallback=HEAD^1`, so the contract's
+  post-flip *empty* commit diffs to nothing and every project answers
+  "Skipped - Not affected". The verdict is a real GREEN — nothing failed — but
+  `ci-status.sh` prints "no preview URL to test against". The builds that do
+  cover the final code:
+  - `apps/web` on `bd35208` — nothing after it touches web, so it is the final
+    web code: https://app-git-claude-patient-profile-edit-define-rnkw88-remi21.vercel.app
+  - `apps/admin` on `32ea8fa`, the last non-empty commit:
+    https://admin-git-claude-patient-profile-edit-define-rnkw88-remi21.vercel.app
+
+  Both branch-alias URLs serve the newest successful deployment for the branch.
+  Parked as `intake/triage/ready-flip-empty-commit-builds-no-preview.md`: it
+  hits every spine PR, not this one, and **Ready to merge** attests a preview
+  smoke-test, so it is worth settling before the next Release.
+- **The `food_budget` blanking has already run — read this before the smoke.**
+  The admin build runs `db:migrate` first, and the preview guard in
+  `migrate.mjs` is not in force on that project (`project-rules.md` → The
+  factory, and the open stub
+  `intake/triage/previews-migrate-the-shared-database.md`), so a
+  migration-bearing branch's preview writes its schema into the **shared**
+  database. The admin preview on `32ea8fa` completed, which means migration
+  `0020` — `ALTER`s plus `UPDATE patient_profiles SET food_budget = NULL` — is
+  applied there already, before any merge.
+
+  The blanking is the operator's own decision and the column held only French
+  prose, so nothing mappable was lost. What is worth knowing is the timing: any
+  budget values in the shared database are gone now rather than at merge, and
+  re-picking them is Morgane's to redo whenever she next opens those profiles.
+  Nothing else in `0020` is destructive.
