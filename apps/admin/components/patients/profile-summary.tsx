@@ -1,7 +1,7 @@
 "use client";
 
-import { Pencil, X } from "lucide-react";
-import { useState } from "react";
+import { Pencil } from "lucide-react";
+import { useCallback, useState } from "react";
 import type { PatientProfile } from "@remi/services/shared";
 import { ageInYears } from "@remi/services/shared";
 import { Button } from "@remi/ui";
@@ -41,29 +41,22 @@ type Row = {
  * asks between consultations; « Modifier » swaps in the form itself, whole and
  * unchanged, for the times she is actually encoding.
  *
- * The form is not closed for her on save: it owns its own « Enregistré. » and
- * saying so where she is looking is worth more than collapsing under her.
+ * The way back is a successful save, and only that. A « Fermer » sat at the top
+ * of five hundred fields — the one control reachable without scrolling — and it
+ * unmounted the form, dropping whatever had been typed below it. She opens
+ * « Modifier » to encode, not to look, so the control is gone rather than
+ * guarded: the save collapses the form, and the revalidated summary with its new
+ * « Modifié le … » says it landed where the form's own « Enregistré. » used to.
  */
 export const ProfileSummary = ({ patient, lastEditedAt, consent }: Props) => {
   const [editing, setEditing] = useState(false);
 
+  // Stable, so the form's save notification does not re-fire on every render of
+  // the page around it.
+  const close = useCallback(() => setEditing(false), []);
+
   if (editing) {
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="flex justify-end">
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={() => setEditing(false)}
-          >
-            <X aria-hidden="true" />
-            Fermer
-          </Button>
-        </div>
-        <PatientForm patient={patient} />
-      </div>
-    );
+    return <PatientForm patient={patient} onSaved={close} />;
   }
 
   const age = ageInYears(patient.birthDate);
