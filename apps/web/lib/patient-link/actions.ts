@@ -210,5 +210,14 @@ export const tapChallengeAction = async (
         : setChallengeReadyForNext(id, set),
   });
 
-  return result.ok ? written : { error: asPatientError(result.error) };
+  if (result.ok) {
+    return written;
+  }
+  // « Prêt(e) » refused because « acquis » was cleared elsewhere is a stale
+  // page, not a transient failure: « réessayez » would fail every time, so it
+  // reads as the challenge having changed — reload.
+  return {
+    error:
+      result.error === "conflict" ? "not_found" : asPatientError(result.error),
+  };
 };
