@@ -196,17 +196,19 @@ unless a second analytics vendor arrives with a reader to go with it.
 | `TURBO_TOKEN`               | Turborepo remote cache token — shares the cache between CI and Vercel                                                                                                                                                                                   | Actions   | no      |
 | `TURBO_TEAM`                | Turborepo team slug (a repo **variable**, not a secret)                                                                                                                                                                                                 | Actions   | no      |
 | `VERCEL_TOKEN_REMI21`       | Vercel API token for the **remi21** team — `deploy-status.sh`, `env.sh audit` and `rollback.sh` read with it (`deploy.token_env` in `.icm/project.json`; plain `VERCEL_TOKEN` is the fallback a cloud panel sets). Unset: those scripts stop and say so | local     | no      |
-| `SLACK_BOT_TOKEN`           | Bot token (`xoxb-…`, scope `chat:write`, the app invited to both channels) of the REMI Slack workspace — `.icm/scripts/report.sh` posts with it. Unset: the post is printed and `SKIPPED slack`                                                         | local     | no      |
-| `SLACK_ANNOUNCE_CHANNEL_ID` | Channel id (`C…`) `report.sh announce` posts to after every merge — what shipped, in the changelog's words                                                                                                                                              | local     | no      |
-| `SLACK_ALERTS_CHANNEL_ID`   | Channel id (`C…`) `report.sh alert` posts to — a production health read that failed after a merge (`health-check.sh`)                                                                                                                                   | local     | no      |
+| `SLACK_BOT_TOKEN`           | Bot token (`xoxb-…`, scope `chat:write`, the app invited to both channels) of the REMI Slack workspace — `.icm/scripts/report.sh` posts with it, from `release.yaml`. Unset: the post is printed and `SKIPPED slack`                                    | Actions   | no      |
+| `SLACK_ANNOUNCE_CHANNEL_ID` | Channel id (`C…`) `report.sh announce` posts to after every merge — what shipped, in the changelog's words. An Actions **variable**, not a secret                                                                                                       | Actions   | no      |
+| `SLACK_ALERTS_CHANNEL_ID`   | Channel id (`C…`) `report.sh alert` posts to — an announcement that reached no channel (`release.yaml`), or a production health read that failed after a merge (`health-check.sh`, in session). An Actions **variable**                                 | Actions   | no      |
 | `PIPELINE_REQUIRED_CHECKS`  | Optional **newline-separated** override of `required_checks` in `.icm/project.json` — the checked-in home of the check names `ci-status.sh` waits for. Normally unset                                                                                   | local     | no      |
 
-The four `local` pipeline rows above are read from the **process environment of the session that
-runs Release** — never from a `.env.local`, which no pipeline script loads. On the operator's machine
-that is the shell (export them in the profile, or a directory `.envrc`); in a remote session it is
-the Claude cloud environment panel. `.icm/project.json` → `reporting` and `deploy` carry only the
-**names**; `.icm/scripts/env.sh add <KEY> --ci --github secret|variable` also creates a key in this
-repository's Actions secrets or variables for a CI caller, reading the value from stdin.
+The three Slack rows live in **this repository's Actions secrets and variables** (`gh secret set
+SLACK_BOT_TOKEN`, `gh variable set SLACK_ANNOUNCE_CHANNEL_ID`, `gh variable set
+SLACK_ALERTS_CHANNEL_ID`) because `.github/workflows/release.yaml` is what calls the reporting hook
+(`reporting.announce_from: ci`). Export the same three in the operator's shell only if the
+in-session health probe's alert should reach Slack too. The Vercel token is read from the **process
+environment of the session** — never from a `.env.local`, which no pipeline script loads: the shell
+on the operator's machine, the Claude cloud environment panel in a remote session. `.icm/project.json`
+→ `reporting` and `deploy` carry only the **names**.
 
 The required check names have a checked-in home — `required_checks` in `.icm/project.json` — which
 today holds this repo's one blocking Actions check, `Format, lint, typecheck`, **one name per array

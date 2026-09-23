@@ -25,19 +25,20 @@ when a trigger matches the step — `skills/README.md`); one-job repo skills wou
 
 ## The spine — four stages, three hard gates
 
-| `/pipeline …`    | Stage folder         | Job                                                                                                                            | Gate after                                                                           |
-| ---------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| `scope <input>`  | `stages/01_scope/`   | record the source; settle the scope in session; write `scope.md` with its `D-n` decisions; cut the intake batch                | ✅ the operator reviews `scope.md` + the batch on `main` before running `new`        |
-| `new` (per stub) | `stages/02_define/`  | stub + `scope.md` → approvable `spec.md`, opens the one feature PR; `revise <slug> "<change>"` edits it and re-projects the PR | ✅ **Spec approved** PR checkbox (the operator ticks)                                |
-| `build <slug>`   | `stages/03_build/`   | implement the spec on the run's branch; flip draft PR → open                                                                   | ✅ **Ready to merge** PR checkbox (the operator ticks, after a smoke of the preview) |
-| `release <slug>` | `stages/04_release/` | CI green · reviews · docs + changelog + close-out → squash-merge → one production read → `report.sh announce`                  | — (the merge ends the run)                                                           |
+| `/pipeline …`    | Stage folder         | Job                                                                                                                                     | Gate after                                                                           |
+| ---------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `scope <input>`  | `stages/01_scope/`   | record the source; settle the scope in session; write `scope.md` with its `D-n` decisions; cut the intake batch                         | ✅ the operator reviews `scope.md` + the batch on `main` before running `new`        |
+| `new` (per stub) | `stages/02_define/`  | stub + `scope.md` → approvable `spec.md`, opens the one feature PR; `revise <slug> "<change>"` edits it and re-projects the PR          | ✅ **Spec approved** PR checkbox (the operator ticks)                                |
+| `build <slug>`   | `stages/03_build/`   | implement the spec on the run's branch; flip draft PR → open                                                                            | ✅ **Ready to merge** PR checkbox (the operator ticks, after a smoke of the preview) |
+| `release <slug>` | `stages/04_release/` | CI green · reviews · docs + changelog + close-out → squash-merge → one production read; the release workflow calls `report.sh announce` | — (the merge ends the run)                                                           |
 
 Release is **one stage, one decision**. The operator smoke-tests the preview after Build and ticks
 **Ready to merge**; Release takes that tick as the full manual-testing attestation, holds the
 merge only for a blocking CI failure, a security-critical finding, or deploy-breaking config,
 parks every other finding as an `intake/triage/` stub, archives the run on the branch, merges,
 reads production once (`deploy-status.sh` for the platform's word, `health-check.sh` for the
-application's), and hands the changelog page's one-liner to `scripts/report.sh announce`
+application's) and records `announce: deferred to CI`: `.github/workflows/release.yaml` hands
+the changelog page's one-liner to `scripts/report.sh announce` on the merge
 (`_shared/project-rules.md` → Reporting).
 
 Only two gates are PR checkboxes — **Spec approved** (before Build) and **Ready to merge**
@@ -153,7 +154,7 @@ the monorepo "to be safe".
 
 The one announcement artifact — the changelog page — lives outside the run folder, at
 `apps/docs/app/changelog/<YYYY-MM-DD>-<slug>/page.mdx` (`_shared/project-rules.md` → Announcing
-owns its shape); its H1 is the one-liner `scripts/report.sh announce` posts after the merge.
+owns its shape); its H1 is the one-liner the release workflow posts through `scripts/report.sh announce` after the merge.
 
 ## State lives in two homes
 
@@ -265,6 +266,7 @@ all of theirs at once).
 | GitHub calls, gates, labels, the PR regime                                  | `.icm/_shared/github.md` (+ `.github/labels.yml`)                                                |
 | What the checks are / what green means                                      | `.icm/_shared/ci.md` (+ `.icm/scripts/ci-status.sh`)                                             |
 | What is announced where (the hook is complete as seeded)                    | `.icm/project.json` → `reporting` · `.icm/_shared/project-rules.md` → Reporting                  |
+| Who calls the hook on a merge                                               | `.github/workflows/release.yaml` (seeded once, this repo's own)                                  |
 | Where the repo deploys, its health endpoints, migrations, database, support | `.icm/project.json` → `deploy` · `migrations` · `database` · `support`                           |
 | The changelog page's shape                                                  | `.icm/_shared/project-rules.md` → Reporting                                                      |
 | Is the repo complete, current, configured                                   | `/setup` → `.icm/scripts/setup.sh`                                                               |
