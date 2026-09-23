@@ -19,6 +19,7 @@ import {
   archivePatientSupplement,
   archiveRecipeAssignment,
   assignRecipes,
+  closeChallenge,
   createAndAssignRecipe,
   createPatient,
   deleteGoalCheckIn,
@@ -51,6 +52,8 @@ import {
   setPatientInstruction,
   setPatientNextConsultationPrep,
   setPatientSummary,
+  startChallenge,
+  updateChallenge,
   updateGoalCheckIn,
   updateMealEntry,
   updatePantryEssential,
@@ -67,6 +70,7 @@ import {
 } from "@remi/services/server";
 import {
   appHref,
+  challengeOutcomes,
   consentChannels,
   contextBlocks,
   cookingAffinities,
@@ -77,6 +81,7 @@ import {
   patientStatuses,
   recommendationCategories,
   type ConsentChannel,
+  type ChallengeOutcome,
   type CookingAffinity,
   type GoalDirection,
   type MealSlot,
@@ -112,6 +117,7 @@ export type AnamnesisFormState = { error: string | null };
 export type GoalFormState = { error: string | null };
 export type CheckInFormState = { error: string | null };
 export type InstructionFormState = { error: string | null; saved: boolean };
+export type ChallengeFormState = { error: string | null; saved: boolean };
 export type SummaryFormState = { error: string | null; saved: boolean };
 export type PrepFormState = { error: string | null; saved: boolean };
 export type ConsultationFormState = { error: string | null; saved: boolean };
@@ -157,6 +163,11 @@ const asGoalDirection = (value: string): GoalDirection | "" =>
     : "";
 
 /** `""` is a real answer here too — it is how Morgane clears a recorded one. */
+const asChallengeOutcome = (value: string): ChallengeOutcome | null =>
+  (challengeOutcomes as readonly string[]).includes(value)
+    ? (value as ChallengeOutcome)
+    : null;
+
 const asCookingAffinity = (value: string): CookingAffinity | "" =>
   (cookingAffinities as readonly string[]).includes(value)
     ? (value as CookingAffinity)
@@ -1024,6 +1035,107 @@ export const setInstructionAction = async (
     });
   }
   revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
+/**
+ * The challenge she runs with the patient — one at a time (D-25). Starting one
+ * while another runs closes the running one with the outcome picked in the
+ * same form, in the service's one transaction; the trail records both halves,
+ * because both are things she did.
+ */
+export const startChallengeAction = async (
+  _previous: ChallengeFormState,
+  formData: FormData,
+): Promise<ChallengeFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const posted = optionalField(formData, "closeCurrentWith");
+  const closeCurrentWith =
+    posted === undefined ? undefined : asChallengeOutcome(posted);
+  if (closeCurrentWith === null) {
+    return {
+      error: "Choisissez comment se termine le challenge en cours.",
+      saved: false,
+    };
+  }
+  const result = await startChallenge(
+    patientId,
+    {
+      text: field(formData, "text"),
+      why: field(formData, "why"),
+      startedOn: field(formData, "startedOn"),
+    },
+    closeCurrentWith,
+  );
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  const { created, closed } = result.data;
+  if (closed) {
+    await audit(operator, "challenge.closed", {
+      type: "patient_challenge",
+      id: closed.id,
+      label: closed.text,
+      detail: closed.outcome ?? "",
+    });
+  }
+  await audit(operator, "challenge.started", {
+    type: "patient_challenge",
+    id: created.id,
+    label: created.text,
+  });
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
+export const updateChallengeAction = async (
+  _previous: ChallengeFormState,
+  formData: FormData,
+): Promise<ChallengeFormState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const result = await updateChallenge(id, {
+    text: field(formData, "text"),
+    why: field(formData, "why"),
+    startedOn: field(formData, "startedOn"),
+  });
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  await audit(operator, "challenge.updated", {
+    type: "patient_challenge",
+    id,
+    label: result.data.text,
+  });
+  revalidatePatient(field(formData, "patientId"));
+  return { error: null, saved: true };
+};
+
+export const closeChallengeAction = async (
+  _previous: ChallengeFormState,
+  formData: FormData,
+): Promise<ChallengeFormState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const outcome = asChallengeOutcome(field(formData, "outcome"));
+  if (outcome === null) {
+    return {
+      error: "Choisissez comment se termine le challenge.",
+      saved: false,
+    };
+  }
+  const result = await closeChallenge(id, outcome);
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  await audit(operator, "challenge.closed", {
+    type: "patient_challenge",
+    id,
+    label: result.data.text,
+    detail: outcome,
+  });
+  revalidatePatient(field(formData, "patientId"));
   return { error: null, saved: true };
 };
 

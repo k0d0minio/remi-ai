@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { Plus, Users } from "lucide-react";
 import NextLink from "next/link";
-import { listPatients, type PatientSort } from "@remi/services/server";
+import {
+  listChallengeSignals,
+  listPatients,
+  type ChallengeSignal,
+  type PatientSort,
+} from "@remi/services/server";
 import {
   ageInYears,
   formatDate,
@@ -9,7 +14,7 @@ import {
   type PatientStatus,
 } from "@remi/services/shared";
 import { Button } from "@remi/ui";
-import { Badge, EmptyState, Typography } from "@remi/ui/server";
+import { Badge, EmptyState, Typography, type Intent } from "@remi/ui/server";
 import { RosterFilters } from "@/components/patients/roster-filters";
 import {
   patientStatusIntents,
@@ -42,6 +47,24 @@ const first = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
 
 /**
+ * The challenge signal a row carries — her § 7: « voir lorsqu'un challenge est
+ * validé ; voir lorsqu'un consultant indique qu'il est prêt pour le challenge
+ * suivant ». « Prêt(e) » is the one that asks her to act, so it takes the
+ * louder intent.
+ */
+const challengeSignalBadges: Record<
+  ChallengeSignal,
+  { label: string; intent: Intent; tone: "subtle" | "solid" }
+> = {
+  ready_for_next: {
+    label: "Prêt(e) pour le prochain",
+    intent: "info",
+    tone: "solid",
+  },
+  acquired: { label: "Challenge acquis", intent: "success", tone: "subtle" },
+};
+
+/**
  * The patient roster — real rows from the database. Rows rather than a table:
  * they survive a phone screen, which is where Morgane opens this between
  * consultations.
@@ -59,7 +82,10 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
   const status = asStatus(first(params.status));
   const sort = asSort(first(params.sort));
 
-  const patients = await listPatients({ search, status, sort });
+  const [patients, challengeSignals] = await Promise.all([
+    listPatients({ search, status, sort }),
+    listChallengeSignals(),
+  ]);
   const filtered = search !== "" || status !== "all";
 
   return (
@@ -118,6 +144,10 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
           <ul className="flex flex-col gap-2">
             {patients.map((patient) => {
               const age = ageInYears(patient.birthDate);
+              const signal = challengeSignals.get(patient.id);
+              const challengeBadge = signal
+                ? challengeSignalBadges[signal]
+                : null;
 
               return (
                 <li key={patient.id}>
@@ -139,6 +169,15 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
                       </Typography>
                     ) : null}
                     <span className="ml-auto flex items-center gap-3">
+                      {challengeBadge ? (
+                        <Badge
+                          variant={challengeBadge.intent}
+                          tone={challengeBadge.tone}
+                          size="sm"
+                        >
+                          {challengeBadge.label}
+                        </Badge>
+                      ) : null}
                       <Typography as="span" size="xs" tone="muted">
                         modifié le {formatDate(patient.lastEditedAt)}
                       </Typography>

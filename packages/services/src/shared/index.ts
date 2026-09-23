@@ -52,6 +52,7 @@ export { canManageOperators, isAtLeast, operatorRoles } from "./operator";
 export type { OperatorRoleName } from "./operator";
 export {
   anamnesisCategories,
+  challengeOutcomes,
   consentChannels,
   cookingAffinities,
   firstRecommendationPerCategory,
@@ -83,6 +84,7 @@ export type {
   AssignedRecipe,
   AuditAction,
   AuditEvent,
+  ChallengeOutcome,
   CiqualImport,
   ConfidenceCode,
   ConsentChannel,
@@ -102,6 +104,7 @@ export type {
   OperatorRole,
   PantryEssential,
   PatientAnamnesis,
+  PatientChallenge,
   PatientGoal,
   PatientGoalCheckIn,
   PatientInstruction,
