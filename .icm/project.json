@@ -3,15 +3,20 @@
   "complexity": "standard",
   "docs_path": "apps/docs/app",
   "required_env": [],
-  "required_checks": ["Format, lint, typecheck"],
-  "personas": ["patient", "practitioner", "operator"],
+  "required_checks": [
+    "Format, lint, typecheck"
+  ],
+  "personas": [
+    "patient",
+    "practitioner",
+    "operator"
+  ],
   "runs_archive": ".icm/runs/_done",
   "intake_archive": ".icm/intake/_done",
-
   "deploy": {
     "platform": "vercel",
     "team_slug": "remi21",
-    "token_env": "VERCEL_TOKEN",
+    "token_env": "VERCEL_TOKEN_REMI21",
     "projects": [
       {
         "name": "app",
@@ -59,16 +64,24 @@
       }
     ]
   },
-
-  "uat": { "branch": "", "url": "" },
-
+  "uat": {
+    "branch": "",
+    "url": ""
+  },
   "reporting": {
     "announce_from": "session",
-    "announce": ["github-release", "slack"],
-    "alert": ["slack"],
+    "announce": [
+      "github-release",
+      "slack"
+    ],
+    "alert": [
+      "slack"
+    ],
     "economics": [],
     "channels": {
-      "github-release": { "tag_prefix": "release/" },
+      "github-release": {
+        "tag_prefix": "release/"
+      },
       "slack": {
         "token_env": "SLACK_BOT_TOKEN",
         "announce_channel_env": "SLACK_ANNOUNCE_CHANNEL_ID",
@@ -81,7 +94,6 @@
       }
     }
   },
-
   "migrations": {
     "path": "packages/services/src/db/migrations",
     "reversible": false,
@@ -89,14 +101,20 @@
     "tool": "drizzle",
     "out_of_order": false
   },
-
-  "database": { "url_env": "DATABASE_URL", "isolation": "none", "image": "postgres:16", "name": "remi" },
-
-  "security": { "audit_command": "" },
-
+  "database": {
+    "url_env": "DATABASE_URL",
+    "isolation": "none",
+    "image": "postgres:16",
+    "name": "remi"
+  },
+  "security": {
+    "audit_command": ""
+  },
   "support": {
     "tier": "none",
     "failsafe_page": "",
-    "monitoring": { "sentry_dsn_env": "SENTRY_DSN" }
+    "monitoring": {
+      "sentry_dsn_env": "SENTRY_DSN"
+    }
   }
 }
