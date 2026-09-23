@@ -186,6 +186,12 @@ Every server-side `process.env` read goes through `env()` / `requireEnv()` in
 schema, a row in [`.icm/docs/ENV.md`](.icm/docs/ENV.md), and a `globalEnv` entry in `turbo.json`. Values are
 never committed — they live in Vercel and in GitHub Actions secrets.
 
+A variable an app needs is also declared in that app's `.env.example`, in one shape: an optional
+file header, then per key a `# note` (ending in an optional `[targets]` from `production`,
+`preview`, `development`, `ci`, `cloud`), the `KEY=` line with no value, and a blank line.
+`.claude/hooks/check-env-example.sh` enforces it after every agent edit and runs by hand on any
+file list.
+
 ## The factory owns the checks — you do not
 
 Format, lint, typecheck and build are deterministic work. They belong to Husky, CI and the Vercel

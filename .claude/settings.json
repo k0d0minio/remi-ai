@@ -72,15 +72,19 @@
       "Bash(.icm/skills/database-migration/scripts/preflight.sh:*)",
       "Bash(.icm/skills/preview-deploy/scripts/status.sh:*)"
     ],
-    "deny": [
-      "Read(./.env)",
-      "Read(./.env.*)",
-      "Read(./**/.env)",
-      "Read(./**/.env.*)",
-      "Read(./**/*.pem)",
-      "Read(./**/*.key)",
-      "Read(./**/secrets/**)"
-    ]
+"deny": [
+  "Read(./**/.env)",
+  "Read(./**/.env.local)",
+  "Read(./**/.env.*.local)",
+  "Read(./**/.env.development)",
+  "Read(./**/.env.production)",
+  "Read(./**/.env.preview)",
+  "Read(./**/.env.test)",
+  "Read(./**/.env.vercel)",
+  "Read(./**/*.pem)",
+  "Read(./**/*.key)",
+  "Read(./**/secrets/**)"
+]
   },
   "hooks": {
     "PreToolUse": [
@@ -90,6 +94,17 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-local-checks.sh\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-env-example.sh\""
           }
         ]
       }
