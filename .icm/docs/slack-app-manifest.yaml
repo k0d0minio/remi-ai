@@ -1,0 +1,26 @@
+# Slack app manifest for the pipeline's reporting hook (.icm/scripts/report.sh → chat.postMessage).
+#
+# Import it once, in the REMI workspace: api.slack.com/apps → Create New App → From a manifest →
+# pick the workspace → paste this file → Next → Create. Then OAuth & Permissions → Install to
+# Workspace → Allow: the Bot User OAuth Token (xoxb-…) it shows is SLACK_BOT_TOKEN. Nothing in
+# this file is a secret — names and scopes only (.icm/docs/ENV.md § Pipeline for the variables).
+#
+# chat:write is the one scope the hook needs; chat:write.public lets the bot post in any PUBLIC
+# channel without an invite. A private channel still needs `/invite @REMI pipeline` from inside it.
+display_information:
+  name: REMI pipeline
+  description: Posts what shipped, and what broke after a merge, from the delivery pipeline.
+  background_color: "#1d3557"
+features:
+  bot_user:
+    display_name: REMI pipeline
+    always_online: true
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - chat:write.public
+settings:
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

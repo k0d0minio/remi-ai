@@ -201,7 +201,9 @@ unless a second analytics vendor arrives with a reader to go with it.
 | `SLACK_ALERTS_CHANNEL_ID`   | Channel id (`C…`) `report.sh alert` posts to — an announcement that reached no channel (`release.yaml`), or a production health read that failed after a merge (`health-check.sh`, in session). An Actions **variable**                                 | Actions   | no      |
 | `PIPELINE_REQUIRED_CHECKS`  | Optional **newline-separated** override of `required_checks` in `.icm/project.json` — the checked-in home of the check names `ci-status.sh` waits for. Normally unset                                                                                   | local     | no      |
 
-The three Slack rows live in **this repository's Actions secrets and variables** (`gh secret set
+The Slack app itself is described by [`slack-app-manifest.yaml`](slack-app-manifest.yaml) beside this
+file: import it at api.slack.com/apps (Create New App → From a manifest), install it, and the Bot User
+OAuth Token it shows is the first row. The three Slack rows live in **this repository's Actions secrets and variables** (`gh secret set
 SLACK_BOT_TOKEN`, `gh variable set SLACK_ANNOUNCE_CHANNEL_ID`, `gh variable set
 SLACK_ALERTS_CHANNEL_ID`) because `.github/workflows/release.yaml` is what calls the reporting hook
 (`reporting.announce_from: ci`). Export the same three in the operator's shell only if the
