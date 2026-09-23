@@ -107,8 +107,8 @@ D23; `/setup` — `.icm/scripts/setup.sh` — says whether the two are complete 
   Feedback before a push, never the verdict — CI's `Format, lint, typecheck` is the verdict
   (estate decision D21).
 - **Deploy** — `deploy` in `.icm/project.json`: Vercel, team **`remi21`** — a separate team
-  boundary from the kodominio estate, so the token is this team's own, named `VERCEL_TOKEN` in the
-  session's environment and never written here — six projects, one per app, **all `class:
+  boundary from the kodominio estate, so the token is this team's own — `VERCEL_TOKEN_REMI21` in
+  the operator's shell, plain `VERCEL_TOKEN` the fallback a cloud panel sets — and never written here — six projects, one per app, **all `class:
   product`** because **previews build on every push, draft or ready**: there is no draft
   suppression and no quiet project here, so the contracts' "drafts build no previews" is stricter
   than what happens — a draft head's preview simply exists earlier, and nothing depends on its
@@ -116,7 +116,11 @@ D23; `/setup` — `.icm/scripts/setup.sh` — says whether the two are complete 
   its `vercel.json`, so a project the diff does not affect posts `success` with the description
   `Canceled by Ignored Build Step` — a skip, not a pass (`ci-status.sh` classes it `skipped`).
   `deploy-status.sh` reads all six production deployments once after a merge; `rollback.sh
-  --vercel` names the previous READY one per project and executes nothing.
+  --vercel` names the previous READY one per project and executes nothing. **Known:** a merge
+  that touches no app (docs-only, `.icm`-only) leaves every project CANCELED by the ignore step,
+  which `deploy-status.sh` cannot see through its SHA filter — it waits out its timeout and
+  records `PENDING`; read that as the skip when the diff touched no app (icm-board triage stub
+  `deploy-status-ignore-step-cancel`).
 
   | Context                  | Vercel project  | App                                                           | Production                            |
   | ------------------------ | --------------- | ------------------------------------------------------------- | ------------------------------------- |
@@ -147,7 +151,7 @@ D23; `/setup` — `.icm/scripts/setup.sh` — says whether the two are complete 
   statements for the record, not switches.
 - **Environment surfaces** — six `.env.example`, one per app (`env.sh audit` walks
   `deploy.projects`); `.icm/docs/ENV.md` is the catalogue, with the per-project matrix of which
-  app needs which. The pipeline's own variables — `VERCEL_TOKEN`, `SLACK_BOT_TOKEN`,
+  app needs which. The pipeline's own variables — `VERCEL_TOKEN_REMI21`, `SLACK_BOT_TOKEN`,
   `SLACK_ANNOUNCE_CHANNEL_ID`, `SLACK_ALERTS_CHANNEL_ID`, `GH_TOKEN` — are **not** app variables:
   they live in the session's environment (the operator's shell; the Claude cloud environment
   panel for a remote session) and in this repository's Actions where a CI caller needs them —
