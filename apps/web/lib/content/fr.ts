@@ -279,7 +279,22 @@ export const fr: Content = {
       repas: "Repas",
     },
     todayTitle: "Aujourd'hui / cette semaine",
-    weekChallengeTitle: "Le challenge de la semaine",
+    challenge: {
+      title: "Le challenge du moment",
+      since: "depuis le",
+      acquired: "Challenge acquis",
+      readyForNext: "Prêt(e) pour le prochain",
+      empty:
+        "Pas de challenge en cours pour l'instant — votre praticienne vous en proposera un.",
+      errors: {
+        invalid_input: "Cela n'a pas pu être enregistré. Rechargez la page.",
+        rate_limited:
+          "Vous avez écrit beaucoup de choses d'un coup — réessayez dans un instant.",
+        not_found: "Ce challenge a changé entre-temps. Rechargez la page.",
+        unknown: "Cela n'a pas fonctionné. Réessayez dans un instant.",
+      },
+    },
+    weekConsigneTitle: "La consigne de la semaine",
     goalsTitle: "Ce sur quoi vous travaillez",
     baselineLabel: "Point de départ",
     seeAllLabel: "Tout voir",

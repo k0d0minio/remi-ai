@@ -297,8 +297,23 @@ export type Content = {
      * the living summary last.
      */
     todayTitle: string;
+    /**
+     * The challenge she is running with the patient — first inside
+     * « Aujourd'hui », with the patient's two taps. Always rendered: with none
+     * running, `empty` says so rather than the slot disappearing.
+     */
+    challenge: {
+      title: string;
+      /** Precedes the start date: "depuis le 12 sept.". */
+      since: string;
+      acquired: string;
+      readyForNext: string;
+      empty: string;
+      /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
+      errors: Record<PatientWriteError, string>;
+    };
     /** Heads the week's consigne, when she has written one to the patient. */
-    weekChallengeTitle: string;
+    weekConsigneTitle: string;
     /** Sits above the goals inside « Aujourd'hui ». */
     goalsTitle: string;
     /** Precedes a goal's starting point: "Point de départ : ...". */

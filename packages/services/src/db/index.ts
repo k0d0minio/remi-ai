@@ -106,6 +106,19 @@ export type {
 } from "./services/patient-goals";
 
 export {
+  challengeOwner,
+  closeChallenge,
+  getCurrentChallenge,
+  listChallengeSignals,
+  listPastChallenges,
+  setChallengeAcquired,
+  setChallengeReadyForNext,
+  startChallenge,
+  updateChallenge,
+} from "./services/patient-challenges";
+export type { ChallengeSignal } from "./services/patient-challenges";
+
+export {
   deletePatientInstruction,
   getPatientInstruction,
   listArchivedPatientInstructions,

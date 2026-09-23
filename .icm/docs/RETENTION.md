@@ -23,6 +23,7 @@ One row in `patient_profiles`, plus what hangs off it:
 | The share token, when the link was last opened, last written | `patient_profiles`        | the token is the link                              |
 | The protocol, entry by entry                                 | `patient_recommendations` | yes, unless archived                               |
 | Consultation notes                                           | `patient_notes`           | no                                                 |
+| Challenges — hers, and the patient's two answers to each     | `patient_challenges`      | the running one; closed ones, no                   |
 | What the patient writes through the link                     | the table it belongs to   | yes — they wrote it                                |
 | One timestamp per accepted write through the link            | `patient_link_writes`     | no                                                 |
 
@@ -42,6 +43,11 @@ three are what the code does:
   write — the meal journal and the goal check-ins — carry a `written_by` column that reads
   `practitioner` or `patient`. Rows that predate the write path read `practitioner`, which is what
   they were: Morgane transcribing from WhatsApp. Nothing is inferred from the absence of a value.
+  `patient_challenges` is the one exception, and it needs no such column: Morgane writes the
+  challenge, and the patient writes only its two answers — `acquired_at` (« Challenge acquis ») and
+  `ready_for_next_at` (« Prêt(e) pour le prochain »), two timestamps and nothing else. Those columns
+  are the patient's by construction, and each set or clear of one is in the audit trail as theirs.
+  A closed challenge keeps both, frozen, with the outcome she gave it.
 - **Every write is in the audit trail as the patient's.** `audit_events` records an actor kind
   alongside the actor, so a patient's write cannot be read as an operator's or as the system's. A
   patient actor carries the pseudonym and **no email** — there is no account, and inventing an
@@ -65,6 +71,7 @@ Deleting a patient from the console removes, permanently and in one operation:
 - the profile row — every field in the table above, the real name and the email included;
 - every recommendation encoded for them, archived ones too;
 - every consultation note about them;
+- every challenge she gave them, running or closed, with the patient's answers on each;
 - everything the patient themselves wrote through the link — their meal entries and their
   check-ins go with the rest, marked `patient` or not;
 - the write ledger behind the rate limit, which is timestamps and nothing else;
@@ -87,7 +94,9 @@ not a trail.
 What a row holds is who did what and when: the actor's kind, their name, an operator's email where
 there is one, the action, and the target's type and how it read at the time. It does not hold the
 patient's health data — no constraints, no medication, no notes, and nothing of what a patient
-wrote beyond the fact that they wrote it. So after a deletion, what survives is a set of lines
+wrote beyond the fact that they wrote it. A challenge's row in the trail does carry its one
+sentence as the target's label (« Boire 1,5 L d'eau par jour ») and, on a close, the outcome key —
+the same way a goal's carries its title — so that line survives a deletion too. So after a deletion, what survives is a set of lines
 saying a patient by that pseudonym existed, wrote on these dates, and was deleted on that date by
 that operator; the record itself is gone.
 

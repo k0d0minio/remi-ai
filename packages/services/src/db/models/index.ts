@@ -31,6 +31,7 @@ export type {
   PatientGoalCheckIn,
 } from "./patient-goal-check-in";
 export type { PatientGoal } from "./patient-goal";
+export type { ChallengeOutcome, PatientChallenge } from "./patient-challenge";
 export type { PatientInstruction } from "./patient-instruction";
 export type { PatientNote } from "./patient-note";
 export type {
