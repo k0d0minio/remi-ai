@@ -57,3 +57,21 @@
   The same gate will say `BLOCKED` at Release step 4 until that chore merges — it is not a finding
   this diff introduced. `gitleaks` is not installed in this session: the secrets pass ran the
   built-in patterns only.
+
+## Release
+
+- gate: Ready to merge ticked — merge authorised
+- ci: GREEN on caba7c9 (full gate, before the Release pushes) — re-read after the last push, see the PR
+- reviews: code medium (3 findings: stale « prêt(e) » tap now tells the patient to reload — fixed
+  in db21840; the close/start double-submit race — parked) · security `security-check.sh --branch
+  --audit`: BLOCKED 1 → audit waived — pnpm high/critical advisories pre-existing on main (incl.
+  next <16.3.3 unauthenticated RCE), not introduced by this branch, bumped by
+  `triage/dependency-audit-next-rce.md` (the operator, 2026-09-23); re-read `--branch --no-audit`:
+  OK (gitleaks absent — built-in patterns only) + /security-review — no findings · readiness
+  `env.sh audit --changed`: OK · /production-readiness — n/a, not available in this session
+  (the diff touches the DB: one additive migration, forward-only)
+- parked: challenge-writes-double-submit.md, dependency-audit-next-rce.md
+- migrations: skip — none of this run's own in the stamped form (`check-migrations.sh`); drizzle
+  `check-migration-order.mjs`: 0020 after 0019, order safe; forward-only, additive
+- learned: none — 1 candidate (the pre-existing audit finding) judged not a repo constraint
+- docs: business/roles (the link's « Aujourd'hui » and what a patient can change) · announce: deferred to CI (public — changelog/2026-09-23-challenges)
