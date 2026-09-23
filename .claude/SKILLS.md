@@ -20,13 +20,19 @@ at all. Keep this small.
 | Skill            | What it does                                                                                                |
 | ---------------- | ----------------------------------------------------------------------------------------------------------- |
 | `pipeline`       | The delivery pipeline router. Non-negotiable — it _is_ the workflow. Template-owned: synced from icm-board. |
+| `setup`          | `/setup` — is the repo complete, current and configured for the pipeline; runs `.icm/scripts/setup.sh`.  |
 | `ticket-craft`   | The estate ticket standard as working knowledge (canonical estate asset).                                   |
 | `pr-conventions` | Branches, commits, CI-is-truth, no secrets (canonical estate asset).                                        |
 
-That is the whole list today, and that is the correct size for a repo at this stage. No capability
-skill exists yet; `.icm/_shared/project-rules.md` → Capability skills says what the stages do
-instead. Everything else comes from the globally installed skills (Next.js, Vercel, security,
-accessibility, testing, and so on), which need no copy here.
+That is the whole list today, and that is the correct size for a repo at this stage. The
+**pipeline's own capability skills** live elsewhere — `.icm/skills/<name>/SKILL.md`, three-tier
+(front matter, body, `references/` + `scripts/`), loaded by a stage only when one of their triggers
+matches the step in front of it; `.icm/scripts/list-skills.sh --bare` prints the registry and the
+session-start hook injects it. Three are seeded and template-owned: `security-audit`,
+`database-migration`, `preview-deploy`. No repo-local capability skill exists yet;
+`.icm/_shared/project-rules.md` → Capability skills says what the stages do instead. Everything
+else comes from the globally installed skills (Next.js, Vercel, security, accessibility, testing,
+and so on), which need no copy here.
 
 ## Adding one
 
@@ -54,12 +60,17 @@ a skill when the inline version starts repeating itself — not before.
 
 ## A note on permissions
 
-`.claude/settings.json` allowlists every `.icm/scripts/*.sh` — the same set the estate's reference
-repo allows. Each script is one job, invoked by exactly one contract step the operator triggered,
+`.claude/settings.json` allowlists every `.icm/scripts/*.sh` and the three capability skills'
+scripts. Each script is one job, invoked by exactly one contract step the operator triggered,
 prints what it did, and stops: the read-only ones (`resolve-run.sh`, the validators, `ci-status.sh`,
-`triage-report.sh`, `env-check.sh`), the ones whose effect stays inside the run or its PR
-(`project-labels.sh`, `project-body.sh`, `close-out.sh`, `format.sh`, `lint.sh`), and the two with
-an outward effect — `new-run.sh` opens the run's one draft PR and `notify.sh` sends the post-merge
-note — whose effect is the stage's declared output, not a side effect, and which refuse or skip
-plainly rather than act on a guess. The gates are not scripts: no script ticks a checkbox or
-merges a PR.
+`triage-report.sh`, `env-check.sh`, `setup.sh`, `deploy-status.sh`, `health-check.sh`,
+`client-status.sh`, `select-model.sh`, `list-skills.sh`, `usage-snapshot.sh`), the ones whose
+effect stays inside the run, its PR or the working tree (`project-labels.sh`, `project-body.sh`,
+`close-out.sh`, `run-pack.sh`, `retrospective.sh`, `check-migrations.sh`, `security-check.sh`,
+`db-branch.sh`, `process-raw.sh`, `format.sh`, `lint.sh`), and the few with an outward effect —
+`new-run.sh` opens the run's one draft PR, `promote-uat.sh approve` opens a promotion PR (UAT
+repos only), `env.sh add` creates a variable from stdin, `report.sh` announces or alerts on the
+channels `.icm/project.json` → `reporting` maps — whose effect is the stage's declared output,
+not a side effect, and which refuse or skip plainly rather than act on a guess. `rollback.sh`
+prepares a recovery and executes nothing. The gates are not scripts: no script ticks a checkbox,
+merges a PR, or records a client's approval on its own.

@@ -36,6 +36,12 @@
 - name: "type:chore"
   color: "cfd3d7"
   description: "Fast lane — refactor / dep bump / migration, no user-facing behaviour change"
+- name: "type:hotfix"
+  color: "b60205"
+  description: "Human-invoked lane — production is wrong after a merge; opens READY (rollback.sh prepares)"
+- name: "type:handover"
+  color: "0e8a16"
+  description: "The deal's last lane — accounts, env doc, setup.sh OK, the record into the deal folder"
 
 # --- Complexity — mirrors the spec header, and sets Release's code-review effort ------------------
 - name: "complexity:trivial"
