@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import {
   MAX_ACTIVE_GOALS,
   countMealEntriesAwaitingFeedback,
+  getCurrentChallenge,
   getPatient,
   getPatientInstruction,
   getPatientSummary,
@@ -18,6 +19,7 @@ import {
   listGoalCheckIns,
   listMealEntries,
   listPantryEssentials,
+  listPastChallenges,
   listPatientGoals,
   listPatientAnamnesis,
   listPatientLearnings,
@@ -28,7 +30,12 @@ import {
   listPatientSupplements,
   listRecipes,
 } from "@remi/services/server";
-import { ageInYears, appHref, formatDate } from "@remi/services/shared";
+import {
+  ageInYears,
+  appHref,
+  formatDate,
+  todayAtPractice,
+} from "@remi/services/shared";
 import {
   Badge,
   Card,
@@ -40,6 +47,8 @@ import {
 } from "@remi/ui/server";
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
+import { ChallengeHistory } from "@/components/patients/challenge-history";
+import { ChallengeSection } from "@/components/patients/challenge-section";
 import { CopyContextCard } from "@/components/patients/copy-context-card";
 import { DeletePatient } from "@/components/patients/delete-patient";
 import { GoalAddForm } from "@/components/patients/goal-add-form";
@@ -75,6 +84,7 @@ import { SupplementAddForm } from "@/components/patients/supplement-add-form";
 import { SupplementProtocol } from "@/components/patients/supplement-protocol";
 import { SupplementSection } from "@/components/patients/supplement-section";
 import { WorkingGoals } from "@/components/patients/working-goals";
+import { WorkingChallenge } from "@/components/patients/working-challenge";
 import { WorkingMeals } from "@/components/patients/working-meals";
 import { WorkingRecommendations } from "@/components/patients/working-recommendations";
 import {
@@ -154,6 +164,8 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     instruction,
     supersededInstructions,
     summary,
+    currentChallenge,
+    pastChallenges,
   ] = await Promise.all([
     listPatientRecommendations(patient.id),
     listArchivedPatientRecommendations(patient.id),
@@ -178,6 +190,8 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     getPatientInstruction(patient.id),
     listArchivedPatientInstructions(patient.id),
     getPatientSummary(patient.id),
+    getCurrentChallenge(patient.id),
+    listPastChallenges(patient.id),
   ]);
 
   // One trail per goal, active and archived alike: two or three goals plus
@@ -216,6 +230,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
       label: "Objectifs et consigne",
       segment: "suivi",
       count: goals.length,
+    },
+    {
+      id: "challenges",
+      label: "Challenges",
+      segment: "suivi",
+      count: currentChallenge ? 1 : 0,
     },
     {
       id: "recommendations",
@@ -362,6 +382,19 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                   {`${MAX_ACTIVE_GOALS} objectifs actifs — archivez-en un pour en ajouter un autre.`}
                 </Typography>
               )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Challenge</CardTitle>
+              <CardDescription>
+                L&apos;habitude en cours et ce que la personne en dit — lancer,
+                modifier ou clore se fait dans la section Challenges.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <WorkingChallenge challenge={currentChallenge} />
             </CardContent>
           </Card>
 
@@ -571,6 +604,36 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                     ranked={false}
                     today={today}
                   />
+                </SectionFold>
+              ) : null}
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="challenges" data-segment="suivi" className="scroll-mt-32">
+          <Card>
+            <CardHeader>
+              <CardTitle>Challenges</CardTitle>
+              <CardDescription>
+                Une habitude à la fois, écrite pour la personne. Elle indique
+                sur son lien quand le challenge est acquis et quand elle est
+                prête pour le suivant.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-6">
+              <ChallengeSection
+                patientId={patient.id}
+                current={currentChallenge}
+                today={todayAtPractice()}
+              />
+
+              {pastChallenges.length > 0 ? (
+                <SectionFold
+                  id="past-challenges"
+                  label="Challenges passés"
+                  count={pastChallenges.length}
+                >
+                  <ChallengeHistory challenges={pastChallenges} />
                 </SectionFold>
               ) : null}
             </CardContent>
