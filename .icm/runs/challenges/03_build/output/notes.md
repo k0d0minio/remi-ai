@@ -1,7 +1,7 @@
 # Build notes: challenges
 
 - commits: 5d69654 schema + migration · f41b351 service + tests · d28543c link card + taps + consigne · 3f2f6a2 console section + roster badge · (this commit) retention + run pack
-- ci: pending — see status.md
+- ci: GREEN (cheap tier) on 332c152 — full gate after the ready flip, see status.md
 
 ## What changed
 
@@ -50,3 +50,10 @@
   number; the roster badge carries the cross-patient view.
 - The partial unique index is the only DB-level rule here; the in-memory tests cannot exercise it —
   the preview database applies the migration at the admin build.
+- `security-check.sh challenges --branch` → `BLOCKED 1` on **dependency-audit only** (secrets
+  passed): 20 high/critical advisories already on `main`, two of them **critical — Next.js
+  unauthenticated RCE (next <16.3.3)**. Not this branch's (no manifest or lockfile touched); parked
+  as `.icm/intake/triage/dependency-audit-next-rce.md` (chore, P0) per the security-audit skill.
+  The same gate will say `BLOCKED` at Release step 4 until that chore merges — it is not a finding
+  this diff introduced. `gitleaks` is not installed in this session: the secrets pass ran the
+  built-in patterns only.
