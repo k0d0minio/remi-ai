@@ -2,8 +2,11 @@
 
 import {
   addMealEntry,
+  challengeOwner,
   markMealEntryEaten,
   mealEntryOwner,
+  setChallengeAcquired,
+  setChallengeReadyForNext,
 } from "@remi/services/server";
 import {
   isLocale,
@@ -154,6 +157,57 @@ export const markMealEatenAction = async (
     // check a patient posting someone else's id would write into their record.
     target: { type: "meal_entry", id, ownerOf: mealEntryOwner },
     write: async () => markMealEntryEaten(id),
+  });
+
+  return result.ok ? written : { error: asPatientError(result.error) };
+};
+
+/**
+ * « Challenge acquis » and « Prêt(e) pour le prochain » — one endpoint for
+ * both taps, because they are one row and one rule: the service owns the order
+ * between them and the clearing cascade, so this only says which tap and which
+ * way.
+ *
+ * The form posts the state it wants (`on` = "true" | "false") rather than
+ * "toggle": a double tap then lands where the patient meant instead of
+ * flipping twice, and a page older than the row cannot flip the wrong way.
+ */
+export const tapChallengeAction = async (
+  _previous: WriteState,
+  formData: FormData,
+): Promise<WriteState> => {
+  const token = field(formData, "token");
+  const locale = field(formData, "locale");
+  const id = field(formData, "id");
+  const tap = field(formData, "tap");
+  const on = field(formData, "on");
+
+  if (
+    !isLocale(locale) ||
+    (tap !== "acquired" && tap !== "ready_for_next") ||
+    (on !== "true" && on !== "false")
+  ) {
+    return refused;
+  }
+  const set = on === "true";
+
+  const result = await writePatientLink(locale, token, {
+    action:
+      tap === "acquired"
+        ? set
+          ? "challenge.acquired"
+          : "challenge.acquired_cleared"
+        : set
+          ? "challenge.ready_for_next"
+          : "challenge.ready_for_next_cleared",
+    text: {},
+    // A challenge id is a plain uuid that travels like a meal id does; naming
+    // it makes the ownership check mandatory.
+    target: { type: "patient_challenge", id, ownerOf: challengeOwner },
+    write: async () =>
+      tap === "acquired"
+        ? setChallengeAcquired(id, set)
+        : setChallengeReadyForNext(id, set),
   });
 
   return result.ok ? written : { error: asPatientError(result.error) };

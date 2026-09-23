@@ -279,7 +279,21 @@ export const en: Content = {
       repas: "Meals",
     },
     todayTitle: "Today / this week",
-    weekChallengeTitle: "This week's challenge",
+    challenge: {
+      title: "Your current challenge",
+      since: "since",
+      acquired: "Challenge done",
+      readyForNext: "Ready for the next one",
+      empty: "No challenge right now — your practitioner will suggest one.",
+      errors: {
+        invalid_input: "That could not be saved. Reload the page.",
+        rate_limited: "That is a lot at once — try again in a moment.",
+        not_found:
+          "This challenge has changed in the meantime. Reload the page.",
+        unknown: "That did not work. Try again in a moment.",
+      },
+    },
+    weekConsigneTitle: "This week's focus",
     goalsTitle: "What you are working on",
     baselineLabel: "Starting point",
     seeAllLabel: "See all",
