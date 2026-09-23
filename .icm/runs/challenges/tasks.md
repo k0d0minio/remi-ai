@@ -22,4 +22,10 @@ step, so a resuming session can pick up the first unticked line.
 
 ## Queue
 
-- [ ] <task — small enough for one commit; name the file or area>
+- [x] Schema + generated migration `0020_patient_challenges` (partial unique index) — `packages/services/src/db`
+- [x] Service + in-memory tests — `packages/services/src/db/services/patient-challenges`
+- [x] Audit vocabulary (7 `challenge.*` actions) + console labels/intents
+- [x] Link: challenge card, taps action, loader, copy (fr/en), consigne relabel — `apps/web`
+- [x] Console: challenges section, past fold, working-view card, roster badge, actions — `apps/admin`
+- [x] `.icm/docs/RETENTION.md`
+- [ ] Cheap-tier GREEN → merge main → flip ready → full gate GREEN

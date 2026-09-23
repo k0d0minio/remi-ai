@@ -25,3 +25,7 @@ decision made mid-run has one home.
 - D-28 — Her labels verbatim (« Challenge acquis », « Prêt(e) pour le prochain »); the link's
   instruction card is relabelled « La consigne de la semaine » / « This week's focus ». Define,
   operator.
+- D-29 — The console's two « Challenge de la semaine » labels on the instruction's patient-facing
+  field (instruction block, consultation form) are relabelled « Consigne de la semaine », matching
+  the link's relabel (D-28). Build, 2026-09-23 — a spec gap: the spec named only the link's title,
+  and leaving the console's label beside a real Challenges section would name two things one way.
