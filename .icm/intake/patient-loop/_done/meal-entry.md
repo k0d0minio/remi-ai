@@ -5,7 +5,7 @@
 - personas: patient, practitioner
 - initiative: a patient experience validated on real terrain, in time for the December open day / objective: the patient loop working end to end for one real patient
 - depends-on: link-writes
-- sequence: 3 of 6
+- sequence: 3 of 9
 - priority: P1
 - size: M
 - sources: feedback § 6 ("Interaction repas") · § 8 (the central workflow, "Logique V2") · V2

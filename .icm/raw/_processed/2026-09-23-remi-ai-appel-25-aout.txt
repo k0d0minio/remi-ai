@@ -1,0 +1,389 @@
+@Morgane [1:06]: Demi.
+
+@Jamie [1:07]: Allô, allô, ça va?
+
+@Morgane [1:09]: Ça va, mais je l'ai, c'est marrant, je l'ai installé sur mon téléphone Slack et je voulais faire depuis mon ordinateur je sais pas pourquoi euh il s'est déconnecté à mon ordinateur quand je l'ai connecté à mon téléphone C
+
+@Jamie [1:24]: Genre totalement.
+
+@Morgane [1:25]: A B Quoi?
+
+@Jamie [1:29]: Désinscrit totalement sur ton PC quand tu t'es inscrit sur ton téléphone.
+
+@Morgane [1:34]: Ouais ouais ouais, mais donc quand j'essaie de me relier euh il me met au lieu de le mettre sur mon application Slack il essaye de me connecter sur le navigateur enfin bref je je suispoterai plus tard. Voilà euh j'essaye euh peut-être de d'envoyer Un message à Arnaud parce que je sais pas qu'il avait bien noté
+
+@Morgane [1:56]: Attends, je l'appelle.
+
+@Morgane [2:32]: On dirait qu'il m'a déconnecté quand j'essaie d'appeler Arnaud. Il y a des jours comme ça où la technologie, elle veut pas, tu vois. Et aujourd'hui, elle veut pas.
+
+@Jamie [2:42]: Ouais t'inquiète justement le le le récement que j'ai fait sur Slack, c'est justement pour vous simplifier la vie un maximum parce que je sais ce que c'est de de pas nécessairement être dans dans le monde de la tech et de voir euh naviguer le monde de la tech.
+
+@Morgane [2:50]: OK.
+
+@Jamie [2:59]: C'est pas toujours évident.
+
+@Morgane [3:00]: Mais pas de souci on va essayer d'être efficace du coup euh explique-moi un peu tout ce que t'as fait, moi je montrerai ça à à Arnaud. Je suppose que comme j'ai pas envoyé le lien à Teams sur son agenda il s'en souvient peut-être même pas Donc euh
+
+@Jamie [3:14]: Ah m'inquiète. Ben écoute, je te partage mon écran et et on saute dedans direct. Tu t'arrives à voir depuis ton téléphone?
+
+@Morgane [3:25]: Ah! C'est bon attends a fonctionné sur euh il re connecté sur l'application se rejoindre l'ordinateur sera plus facile, ça va?
+
+@Jamie [3:32]: Mais normalement, tu peux te rejoindre sans même couper l'a- l'appel. Normalement, si tu, si tu vas dans le channel général ou
+
+@Morgane [3:37]: Ah, passer à cet appareil ouais.
+
+@Jamie [3:42]: Ouais, ouais.
+
+@Morgane [3:44]: Voilà! Go.
+
+@Jamie [3:48]: Alors là, tu vois mon écran beaucoup mieux.
+
+@Morgane [3:50]: Ouais, vachement mieux.
+
+@Jamie [3:52]: Faque. Alors, um pour la petite histoire, ce que j'avais euh mis en place, c'est ce que j'ai dans l'autre projet que je fais actuellement, mais l'autre projet que je fais actuellement, il est énorme, très complexe et ah et c'est c'est c'est beaucoup beaucoup beaucoup tech IA et toute plein de fonctionnalité. Alors ça a demandé plus de complexité dans le, l'agencement de Slack. J'ai j'avais fait ce setup là euh au courant du week-end dernier et après au revoir.
+
+@Jamie [4:23]: Pouvoir regarder un petit coup, je me suis dit ouais, ça, ça, c'est pas que ça va être trop compliqué pour vous, mais en règle générale, cela ça doit être pour vous le point de de mise à jour. Alors il faut que un, il n'y ait pas énormément de channel ah et deux que vous saviez ce que vous devez faire au sein de cela, hein.
+
+@Jamie [4:42]: Ah Alors ce qu'on a ici, c'est on a un channel business. Là, c'est c'est c'est tout ce qui a à voir avec le côté business. C'est pas le, c'est pas le, c'est pas, c'est pas les demandes de produits, c'est vraiment, c'est C'est, c'est le côté business où toi et Arnaud, vous droppez un peu tout. Il y a ce qu'on appelle ici la base de connaissances. um et ça explique concrètement à quoi sert le Fel um et tout ce qui est savoir durable um c'est-à-dire euh les le le positionnement de high level de c'est quoi le plan, c'est quoi les idées, les tarifs décidés, euh les apprentissages clients après les démos, les contacts utiles, on met tout ici, on a
+
+@Jamie [5:24]: Un point de repère, on va dire. Est-ce que j'attends de de vous?
+
+@Morgane [5:27]: Mais qu'est-ce que je voulais dire euh il y a différents onglets, on peut trier en disant euh pricing, euh vision et cetera quoi.
+
+@Jamie [5:36]: Tout à fait, mais je je ce que comme je disais, je cherche pour le moment à ce que ça reste assez simple. Um c'est la règle, la règle qui est bien là-dessus, la règle qui est bien là-dessus au lieu de créer tout plein de onglets différents pour le pricing pour le chic pour le.
+
+@Morgane [5:43]: Bah oui, c'est vrai.
+
+@Jamie [5:53]: Ce serait plutôt de faire la séparation quand la séparation est nécessaire. C'est-à-dire que là
+
+@Morgane [5:58]: Préfère, tu vois qu'on mette déjà
+
+@Jamie [5:59]: Là qu'on est
+
+@Morgane [6:01]: Tu vois enfin, ça je peux le faire, je peux rajouter les onglets euh moi-même. Mais par exemple euh retour euh client et cetera et comme ça on voit directement l'information. Tu vois qu'un long texte à lire sera peut-être plus compliqué, non?
+
+@Jamie [6:15]: Oui et non, parce que c'est là qu'il est il est il est, c'est pas juste un système de messagerie. um Il est très bien orchestré pour que le channel soit l'endroit où les points de discussion vivent. Ce que tu vois ici, c'est euh dans le channel business, c'est ici où vous déposez tout sans format et moi je le classifie pour l'appel du lundi matin.
+
+@Jamie [6:37]: Si sur un fil, tu vois ça, c'est que je l'ai classé dans une liste soit de demande de produits, soit de finances. ah Et si tu vois cet emoji-là, c'est-à-dire que ça va discuter au prochain point euh Hebdo, c'est-à-dire le lundi matin. Ce que, ce à quoi ça ressemble concrètement, c'est
+
+@Morgane [6:50]: No. Tu peux me remontrer parce qu'il y avait Arnaud qui m'appelait.
+
+@Jamie [6:57]: Ah.
+
+@Morgane [6:57]: Tu disais, tu disais
+
+@Jamie [6:58]: Va s'ajouter à la tête.
+
+@Morgane [7:00]: Bah, je sais pas, euh, je lui ai dit qu'on est sur cela, qu'on verra si euh il arrive. Tu disais quoi avec les émoticônes?
+
+@Jamie [7:04]: É. Je disais que je vais te montrer un exemple ici parce que c'est c'est plus facile de démontrer l'exemple que d'essayer d'expliquer la théorie derrière. Disons que euh à partir du document qu'il m'a envoyé euh dans le channel euh hier ou hier, on est beaucoup plus focus sur le côté patient pour le moment, parce que tu vas faire tous les allers-retours avec les les les clients. Alors, la première demande de business, on va dire, c'est truc sur fond, on va faire OK um il faut un signing pour les patients. Moi, je vais taper ça comme ça et
+
+@Morgane [7:30]: Ouais.
+
+@Jamie [7:44]: Reply and thread. Je pense qu'en français, ça va être répondre dans le fil, un truc du genre.
+
+@Morgane [7:49]: Mhm.
+
+@Jamie [7:50]: Toute une discussion à nous trois. Sur justement ceci, il faut un signer pour les patients. Alors tu peux mettre des fichiers, tu peux mettre des listes, tu peux ajouter des vidéos, tu peux tu peux ajouter ce que tu veux, mais le, le but de ici, c'est que.
+
+@Jamie [8:07]: Moi, toi qui demandes un un demande de produit, tu le mets en texte simple, tu fais aussi long que tu veux, aussi court que tu veux, tu le tapes dans le dans le le channel business et moi, ce que je fais, c'est que je pose mes questions, je demande est-ce que c'est comme ça que tu imagines la chose, est-ce que c'est comme ça et on fait les allers-retours là au sein du TED et une fois que moi, j'ai noté OK, c'est bon.
+
+@Jamie [8:30]: C'est-à-dire que moi j'ai mis cette demande-ci au sein de la demande de produit. La demande de produit, c'est une liste De des actions que moi je vais faire au sein de la plateforme. Alors à partir de, on va dire le, il faut sign in pour les patients. Moi, je vais na napper ici sign in patient.
+
+@Jamie [8:51]: Demandé par Morgane. Priorité et priorité, c'est quelque chose qu'on discutera au sein du film lui-même, est-ce que c'est quelque chose d'absolument urgent? Est-ce que ça peut attendre? Est-ce que c'est Semi-important Et vous, votre point de vue de ce que, ce qu'est le progrès du projet. C'est ici dans la la la section statut. Nouveau, ça veut dire que je viens de le classifier.
+
+@Jamie [9:14]: à à discuter, c'est que pendant mon, ma phase de recherche pour voir comment je vais l'implémenter. J'ai redécouvert d'autres questions, alors on en discute. Accepter ça veut dire que si on attend du développement, ende, je suis en plein cours de travailler dessus, livrer, c'est que c'est sur la plateforme, ça a été testé et tout est bon. Refuser, c'est que moi, personnellement, à partir du fil que t'as mis dans le channel business. J'ai refusé la demande et la plupart du temps, je noterai ici pourquoi. Maintenant le refus, ça va être.
+
+@Jamie [9:47]: Très très peu, mais pour des raisons peut-être euh financier, peut-être euh la tech qu'on utilise ou peut-être que je pense qu'il y a une meilleure chose de, une meilleure manière de faire les choses. Je je je je sélectionnerai le, le refusé. Mais au moins, on sera enregistré que la demande a été faite et que ça a été remise. um Et le but de faire ça comme ça, c'est que vraiment vous, vous avez un channel dans lequel vous tapez bla bla bla bla bla bla bla bla bla et c'est à moi de trier. C'est à moi de faire le, de, de, de le trier et de mettre dans les bonnes listes. um
+
+@Morgane [10:13]: Ouais. Oui.
+
+@Jamie [10:17]: Pour ce qui est dans ton document de tout ce qui est euh client, parce que tu dis que tu vas trouver 10 à 15 patients et tu vas travailler étroitement avec eux. um C'est ici que tu vas vouloir travailler genre le, comment dire, le
+
+@Morgane [10:26]: Ouais.
+
+@Jamie [10:33]: Le playbook que tu fais avec chacun. Alors, c'est-à-dire que on va leur poser ce type de questions pour développer ce type de protocole pour développer les les les démarches que tu fais pour tous les clients. Je comprends que pour chaque client, c'est différent parce qu'ils ont des phénotypes différents ou des je ne sais pas quoi, mais en règle générale, t'as un playbook de comment tu tu démarches un client et comment tu fais tout le processus pour avoir le, alors il faut le dérouler du démo um pour
+
+@Morgane [10:58]: Mais attends là justement. Euh Comment ça se passe si, euh, je commence vraiment en mode euh, on va dire sauvage, tu vois? Donc en gros, euh moi, je vais essayer de passer euh toutes les informations, par exemple, là, j'en, j'ai déjà une première patiente qui a validé en tout cas euh le programme. Donc ce que je propose, c'est vraiment pas cher parce que je veux, j'ai-, j'ai dit que je voulais des retours patients pour améliorer aussi euh Rémi en gros donc demain j'ai une première consultation et un suivi de 8 semaines où je vais proposer des recettes sur mesure, etc. etc. Si
+
+@Jamie [11:25]: OK.
+
+@Morgane [11:31]: On disait que t'avais déjà la base de Rémy avec les recettes. Moi, je me serais mise à la place de Hélène, enfin, tu vois dans son profil, j'aurais mis toutes les, enfin, je mets toutes les informations qu'elle m'a données et je génère les recettes et puis moi, je transfère pour l'instant par WhatsApp le temps que notre produit euh est finalisé et que les patients puissent les tester un peu en live, tu vois. Du coup, le playbook que dont tu parles, il va sûrement changer et évoluer. Est-ce qu'on met par rapport à ce qu'on voudrait que Rémi l'application fasse ou est-ce que je vais le mettre déjà par rapport à ce que
+
+@Jamie [11:33]: Oui. Ouais.
+
+@Morgane [12:01]: Euh je fais moi-même annuellement, tu vois?
+
+@Jamie [12:02]: Exactement. Ouais, ce que tu fais actuellement, toutes les, toutes les démarches que tu fais manuellement en ce moment, parce que à terme, si t'écris bien, comment tu le fais et si après le rendez-vous de, de demain avec cette patiente, tu te rends compte que ah ben, cette manière-là que je pensais que j'allais le faire, c'est mieux de le faire comme ça. Et ben tu tu mets à jour le le playbook à ce moment-là.
+
+@Morgane [12:22]: Ouais. Mais c'est bien parce que tu vois.
+
+@Jamie [12:26]: Um Mais par exemple, le le nombre de facteurs.
+
+@Morgane [12:31]: Parce que je pense qu'on va tester un peu toutes les fitures et puis essayer de les installer et se dire ben tiens euh là moi je peux demander facilement des photos, des assiettes des gens pour les corriger. Mais là, dans Rémy que tu vas faire, on va pas mettre je pose tout de suite euh le la possibilité de mettre des photos et Crémi Corrige parce que si je me souviens un lien avec Ré, ils expliquaient que c'était une technologie qui était pas encore euh vraiment au point, tu vois?
+
+@Jamie [12:58]: De de qui a dit ça?
+
+@Morgane [13:00]: PNT, mais il y a un an, tu vois que les, les zlards paieraient pas bien ce qui était dans les assiettes au niveau euh nutritionnel. Donc tu vois, c'était plus complexe. Ah je pense qu'Arno.
+
+@Jamie [13:10]: Au niveau nutritionnel, le savoir. ah Arna?
+
+@Morgane [13:15]: Mais il a déconnecté son micro pour l'instant, il l'a peut-être pas encore vu.
+
+@Jamie [13:22]: Je vois trois personnes dans the Huddle.
+
+@Morgane [13:25]: Ouais, il est là.
+
+@Arnaud [13:26]: Ça y est, je suis là salut Jimmy.
+
+@Jamie [13:32]: Ça va, ça va?
+
+@Arnaud [13:32]: Très bien, très bien, merci, j'avais pas compris que c'était cela que Je pensais que c'était à 15 heures et
+
+@Morgane [13:38]: Mais maintenant ouais. Parce que ça enregistre en fait, ce qui est génial, c'est que c'est ça qui enregistre notre conversation et fait des résumés directement dans le groupe Slack et Rémi euh Rémi, Rémi
+
+@Arnaud [13:48]: Excellent.
+
+@Jamie [13:49]: Au lieu d'avoir un, un tiers parti comme euh Firefly ou je ne sais pas tous les autres Slack offre le l'analyse IA de l'appel en direct. Normalement après cet appel, vous recevrez tous les deux un petite notification de la part de Slack pour dire hey your AI summary is ready. um
+
+@Jamie [14:09]: Alors euh voilà, c'est, c'est tout à fait.
+
+@Arnaud [14:09]: C'est génial, je suis curieux de le lire parce que on on utilise plus upload elixis au bureau et je suis curieux de comparer le le résultat ici avec Avec slack. Mais allez-y qu'est-ce que j'ai raté?
+
+@Jamie [14:19]: Moi, je sais. Euh Ben, je vais faire le le le le résumé très rapide parce que en soi, ce que je disais, c'est que cela soit au plus simple pour vous. um Je vois que tu conduis Arnaud, alors je vais être un peu plus descriptif dans ce que je dis plutôt que de montrer l'écran. um Mais ce qu'on a dans slack maintenant, c'est 1, 2, 3, 4, 5 channels. On a le channel général dans lequel on va faire nos appels euh hebdomadaire le lundi matin, on a le channel qui est plus destiné à moi. C'est là où je connecte tous mes github et mes versell et mes machins pour avoir les notifications.
+
+@Jamie [14:52]: De telle chose a marché ou telle chose a fait une erreur. On a le petit Chanel détente pour qu'on s'envoie des petits blagues marrantes. euh On a le channel client. Morgan va va euh taper toutes ses notes et ces ces idées pour les les rendez-vous clients qu'elle fait, enfin les rendez-vous patients plutôt. Et on a le channel business qui est euh le plus important, on va dire pour le progrès de de Rémy et
+
+@Arnaud [15:14]: Oui.
+
+@Jamie [15:21]: Ce que c'est, c'est que on a une liste qui est un peu comme un tableau Xcel qui existe au sein de Slack. Euh On a une liste de demandes de produits. Ça, c'est quand quand quand vous me demandez ben il faut implémenter ça dans la plateforme ou ça dans la plateforme. um Moi, je, je, je, je gère la liste pour que vous ayez une vision globale de ce qui est en cours de développement, ce qui en attendent, ce qui est terminé euh et puis aussi tout ce qui est à voir avec le business, c'est-à-dire euh les paiements qu'on fait vers Vel, vers Slack, euh vers d'éventuels autres outils. um Tout ce qui
+
+@Jamie [15:57]: Tout ce qui a à voir avec le le fonctionnement du business. Toi et Morgane. Tout ce que vous devez faire, c'est de dropper un message dans le le channel business. Et il y a un chouette petit système dans Slack, c'est pas exactement une messagerie euh où c'est tac tac tac tac, on envoie un message, on répond.
+
+@Jamie [16:13]: Si moi je poste un message, t'as créé un film. Et du coup, toi et toi et Morgane, on peut avoir toute une conversation à partir de ce premier message dans le fil. Et ce que ça peut dire, c'est que quand on a, quand on demande un produit, euh l'exemple qu'il y a dans le channel maintenant que je viens de faire avec Morgane, c'est ben, question tout con, il faut un sign in pour les patients. Il faut que les sign il faut que les patients puissent s'inscrivent dans la plateforme. Alors, le premier message envoyé et qui, pour la plupart du temps, ce sera de la part de Morgane, je pense. Il dit ben il faut il faut qu'on implémente ça dans la plateforme. La conversation qui suit au sein du fil entre moi, Morgane et toi, c'est des, des, des, du brainstorming sur on va.
+
+@Jamie [16:53]: On va faire ça comme ça, on va faire comme ça. Toutes les questions ouvertes que j'ai, je les note là. Une fois que toutes les questions sont répondues. um Moi, j'ai le choix de faire euh de mettre deux émojis sur le fil. Soit un émoji vert, c'est-à-dire que ça a été classé, j'ai mis dans une liste et ça va être développé incessamment sous peu, ou bien un petit emoji avec des yeux. Et ça, ça veut dire que c'est à discuter euh au prochain point B Hebdo.
+
+@Jamie [17:19]: Um L'idée de ça, c'est que j'ai j'ai, j'avais joué un peu ce week-end à à copier-coller le, le, le, les workflow que j'avais dans l'autre projet que j'ai. Mais ce que j'ai expliqué à Morgane, c'est que ce projet-là, il est vachement beaucoup plus complexe parce que déjà de un, il a un stade de développement beaucoup plus avancé.
+
+@Arnaud [17:20]: OK.
+
+@Jamie [17:37]: Et on dans au sein de ce projet-là, on parle de beaucoup de fonctionnalités, beaucoup d'intégration avec l'IA, beaucoup d'intégration avec tout plein d'autres outils. Alors le, les, les workflows et les demandes de développement sont un un un un peu plus complexe. Et et moi ce que je voulais pour Cy, c'est que ce soit beaucoup plus simple pour tout le monde.
+
+@Jamie [17:53]: Du coup, le channel business c'est vraiment pour vous de dropper tout ce qu'il y a dans votre cerveau par rapport à Rémi et moi, je vais classer dans la liste de demandes produits, dans la liste finances, dans la liste prospectée des mots. um Alors le le
+
+@Morgane [18:06]: Par exemple. Le work que je t'ai envoyé du coup, ça, c'est quelque chose que tu vas mettre directement, tu veux que je re-, je réécrive sur le, le truc euh business par point pour que tu es plus simple. Ou alors on construit par rapport.
+
+@Jamie [18:22]: C'est le document que tu m'as envoyé hier.
+
+@Morgane [18:25]: Euh Oui, mais peut-être on va le on va le construire par rapport à aussi tous les retours patients que je vais avoir dans les prochaines semaines.
+
+@Jamie [18:27]: Exactement. Le document que tu m'as envoyé, il est génial. Là-dessus, le, le, ton idée du fonctionnement sur les, sur les quelques prochains mois jusqu'à décembre, c'est c'est magique, c'est parfait. Et moi le truc euh que dont j'ai l'habitude euh entre guillemets et que j'ai accepté dans ce, dans ce métier et dans cette industrie, c'est que les gens qui ont une idée de produit, ils ont l'idée bloquée dans leur tête et ils veulent absolument que ce soit comme ça. Et ils arrivent au moment où on montre aux clients et les clients, ils disent ouais, mais je m'attendais à ça. Et du coup, tous les développements changent.
+
+@Jamie [19:03]: Alors faire dans, dans ce temps-ci, c'est génial. Ça veut dire que
+
+@Morgane [19:03]: Ouais.
+
+@Jamie [19:07]: En en règle générale, je pense que une demande de produit, un un message de ta part dans la channel business, Morgane. Du principe que c'est une discussion que t'as eue avec une avec un patient.
+
+@Morgane [19:19]: Ouais.
+
+@Jamie [19:19]: Bien sûr, les trucs de base euh que toute application ont besoin, je vais commencer je vais commencer à travailler là-dessus incessamment sous peu, c'est-à-dire le sign in euh euh pouvoir voir son profil, pouvoir euh ouvrir les pages, les trucs de base qui existent dans toute application, ça, ça va être euh un très, très rapidement. um mais tout ce qui est demande de produits qui sont explicitement pour euh Rémi. um
+
+@Jamie [19:44]: C'est génial que tu fasses des allers-retours avec ces ces ces patients et qu'on ait des demandes de produits qui sont concrets, plutôt que des demandes de produits qui sont, voilà, c'est très cool que le la plateforme fasse ça, mais qu'on n'a jamais testé avec impatience. Maintenant, pour ce qui est de tes appels avec tes patients, je suppose que tu le fais en en visio.
+
+@Morgane [19:50]: Ouais
+
+@Jamie [20:03]: Ou est-ce que tu le fais en
+
+@Morgane [20:04]: Je pense que ce sera en visio via Google Meet, ce sera tout en visio, comme ça je peux tout enregistrer et j'allais regarder euh, pour, euh, pour Alexis du coup, parce que je pense que c'est là que j'ai vu qu'on peut pas euh utiliser tu vois ce qui est enregistre si les personnes ne sont pas en fait dans dans notre compte. Tu vois?
+
+@Jamie [20:25]: Ah oui, ça je savais pas.
+
+@Morgane [20:27]: Quand c'est juste une invitation.
+
+@Jamie [20:27]: Si on fait. Yes, selecting files and directories. Je vais regarder un coup là-dessus parce que dans dans mes souvenirs, c'était tout à fait possible de faire des appels avec des personnes externes et avoir le, l'enregistreur, mais, mais oui, si c'est, s'il y a cette limitation-là, c'est logique qu'on le fasse dans Google Meet avec euh avec un autre système de d'enregistrement il y a um le plus important en fin de compte, c'est d'avoir cet enregistrement pendant tes appels visio um pour que de un, tu puisses te concentrer sur vraiment vendre le le l'idée aux clients.
+
+@Jamie [21:11]: De deux qu'on ait un résumé euh bien bien détaillé sur ce qui a été dit et les demandes qui ont été faites. um
+
+@Morgane [21:19]: Ouais.
+
+@Jamie [21:21]: Maintenant où est-ce que vous voulez en venir euh on a fait ça, je vous ai expliqué, je vous ai montré euh oui, ça, le côté qui sont.
+
+@Arnaud [21:29]: Euh pour pour ce que tu as dit Jimmy, vous faites, vous voulez vous voulez le Vous voulez faire la réunion hebdomadaire euh le lundi matin. Moi le lundi matin à 9 h 30, j'ai systématiquement ma réunion de démarrage avec mes équipes au niveau de du site industriel à Liège. um est-ce qu'on peut faire ça le vendredi après-midi parce que le vendredi après-midi bah ça nous permet de d'avoir la semaine précédente et de de répartir les tâches sur la semaine suivante.
+
+@Jamie [21:48]: T. Tout à fait, moi, ça me va je sais pas si ça te ça te convient à toi Morgane, mais à savoir, on a dans le système qui existe là, on a un appel bihebdomadaire pour mettre les choses au clair. Mais on a aussi un un rappel chaque semaine pour que chacun droppe un petit message dans le channel général pour dire voici ce qui a été fait de la semaine de ma part. Si c'est rien, parce que voilà, rien n'a été fait, c'est, c'est, c'est rien et on le dit. um mais ça, ça permet d'avoir un point de
+
+@Morgane [22:08]: Oui.
+
+@Morgane [22:24]: D'accord.
+
+@Jamie [22:31]: Faire pour quand on fait le l'appel bio bio-hebdomadaire. Ce qui est marrant, on pense.
+
+@Arnaud [22:35]: Oui, et pour ça le les les rôles doivent être doivent être clair, il y a des mon rôle est probablement moins intervenant régulier le tient sur le développement et est le plus euh euh sollicité celui au même titre que celui de Maurienne mais dans un parallèle différent qui est dans l'interface communication immédiate avec les patients clients et moi de mon côté stratégie et euh financement euh c'est le rôle qu'on s'est attribuer s'il y a des choses
+
+@Morgane [23:04]: Mhm.
+
+@Arnaud [23:05]: Qui évolue sur ces rôles là euh moi j'ai pas de problème à prendre des tâches euh limitées parce que euh la majorité de mon temps est dédié à l'usine sur le site industriel et je pourrais bloquer euh des périodes, mais il faudra qu'on définisse sur les tâches ce qui
+
+@Arnaud [23:22]: Qui est pris, mais voilà si j'ai un rappel chaque semaine sur euh de mon côté, je prends je prends pour mon scénario ce sera moins relevant parce que dans le quotidien je pense pas qu'il y aura des tâches qui m'appartiendront
+
+@Morgane [23:35]: Enfin, là, il explique surtout parce que je je
+
+@Jamie [23:37]: Oui, non, tout à fait, il y a un souci.
+
+@Morgane [23:38]: Que dans cinq minutes euh il doit partir. C'était juste expliquer le fonctionnement maintenant oui par rapport aux otages et cetera, on, on communique juste sur ce que Jamie a dit ça va?
+
+@Jamie [23:49]: Ouais ouais. Et en, en, en soit entre sur sur le point de du du développement et de mes responsabilités, je, je comprends entièrement que ça va être beaucoup plus Morgane qui avec qui j'ai à faire pour que les demandes de produit et comment on setup la chose. Mais je vois le, la dynamique entre nous où c'est moi, l'équipe tech, l'équipe et que c'est vous les gérants du business. Du coup, je vais toujours devoir venir principalement vers Morgane, c'est elle qui a l'idée du produit, mais c'est vers vous pour avoir les ré- les réponses.
+
+@Morgane [24:14]: Ouais.
+
+@Jamie [24:19]: Réponse à mes questions que j'ai quoi. Parce que Morgane aurait beau me demander de set up euh telle ou telle base de données, mais il y aura le le le questionnement de OK, quand set up cette base de données, initialement, ça va coûter rien, mais dans le long terme, si on veut rester avec cette base de données, il va avoir tel prix, tel prix, tel prix, tel prix. Alors ton input euh Arnaud.
+
+@Jamie [24:40]: Super important à ce moment-là quoi. um Du coup euh le, le, le système Slack, il est mis en place hyper hyper simplement pour que vous ayez un minimum à à à de voir que j'ai fait quand vous interagissez avec Slack, votre point d'entrée, on va dire, c'est s'il y a une demande à faire, c'est dans le channel business. Si t'as eu un rendez-vous client, Morgane et que t'as le résumé hier, c'est de le poster dans le channel client.
+
+@Arnaud [24:40]: Oui, c'est ça.
+
+@Morgane [25:04]: M. OK.
+
+@Jamie [25:06]: Um Et puis euh dans le channel business. Vous allez voir qu'il y a un un fichier qui s'appelle base de connaissance. Ça, ce sera à Morgane d'un peu remplir tout ce qu'il y a euh de connaissance pour Rémy là-dedans. euh Côté client, il y a il y a un fichier qui s'appelle Playbook client.
+
+@Jamie [25:24]: Grâce à Morgane de taper son déroulement de comment elle onboard un client parce que à terme, Quand elle met à jour ce document, moi, je vais avoir une sorte de blueprint sur comment on fait du onboarding au sein de la plateforme parce que Morgane, elle aurait fait du onboarding manuellement avec des clients euh pendant plusieurs mois et à trouver toutes les erreurs et tous les problèmes à à éviter.
+
+@Jamie [25:45]: Um Et puis quand on va dans le channel général. Il y a le euh le fichier point bbdo ou euh c'est un, c'est un, c'est un fichier que moi je vais tenir à jour plus que vous, mais c'est ça va être les les points de discussion pour notre point un billet euh qui qui qui aura lieu sous les sous les um et ça va nous permettre de, quand on fait le point B Hebdo, de pas se se taper 2 heures dans un appel à faire, ben voilà tout ce qui a été fait et voilà maintenant tout ce dont on doit parler, ça va vraiment être un hors du jour, décisions qui ont été prises et les actions.
+
+@Jamie [26:19]: Prendre um au, au, au sein de du de de l'appel euh de de Mise au point de de du progrès de Rémi. um Maintenant, euh attends, attend, attends moi je
+
+@Arnaud [26:30]: Par famille.
+
+@Jamie [26:35]: Si tu veux que ce soit vendredi, les appels, si ça te va on peut faire le premier cette semaine. um ce que j'avais dit qu'on allait faire le premier lundi prochain um de vendredi prochain euh dans deux semaines, on peut faire ce vendredi-ci.
+
+@Morgane [26:40]: Ouais.
+
+@Jamie [26:51]: Um Pour Une petite question Moran, parce que tu me dis que tu vas tout faire manuellement. euh Est-ce que ce serait pas intéressant dans un premier temps d'avoir une première.
+
+@Morgane [27:04]: Euh parce que j'entends pas bien. Arnaud, je ne sais pas, il y a un truc près de ton micro qui fait et j'entends pas Jamy quand il parle. Et donc il disait
+
+@Jamie [27:15]: Euh Non, je disais que dans un dans dans le sens où tu vas tout faire manuellement en ce moment. um Je, je comprends déjà de un la la facilité parce que tu t'es, tu vas être one on one avec les patients, c'est nickel, mais est-ce que ce serait pas peut-être intéressant de d'avoir une première version de Rémi hyper hyper brut auquel seulement toi tu en fait um à au lieu d'avoir au lieu au lieu d'avoir des sign in pour chacun de tes patients, il y a ton.
+
+@Morgane [27:36]: Oui. Mais c'est euh oui, je voyais.
+
+@Jamie [27:45]: Sign in parce que t'es administratrice de du système et tu peux créer les profils, créer les trucs et euh um à partir des fichiers Xcel ou les fichiers Word que tu crées quand tu le fais manuellement, tu me les envoies et moi je fais en sorte que ça existe sur la plateforme. Et en tout cas dans un premier temps, le développement va être un peu moins cadré parce que ça va être des fichiers que tu m'envoies et juste du copier-coller entre guillemets pour que ça existe sur la plateforme, mais ça te permet à partir du premier patient d'avoir un feeling de ce que
+
+@Jamie [28:15]: C'est d'interagir avec la plateforme, de ce que c'est de mettre les données, comment ils ils orchestrent les données au sein de la plateforme.
+
+@Morgane [28:21]: écoute. C'est un truc encore plus sain, mais ça dépend vraiment de toi. Donc soit tu peux me créer déjà une page praticien avec des patients, soit moi comme je je vois euh surtout le le mois de décembre euh pour euh F Mende où eux, ils ont surtout besoin, en fait, ils ont pas besoin d'accéder à ce que les patients ont. L'idée, c'est vraiment que la première partie soit juste une page patient où ils mettent eux toutes leurs coordonnées ou ils peuvent même uploader euh les recommandations patients et ensuite
+
+@Morgane [28:52]: Ils ont les recettes sur mesure, ils ont les suggestions à chaque repas. Donc c'est un peu euh vraiment vachement autonome. Et puis après quand on a validé le côté, bah ouais, ça ça fonctionne vraiment bien avec les patients. Là, on crée le côté praticien où on fait le lien entre les deux et on améliore euh le lien praticien patient et en être le praticien. Et donc je pensais quand tu me disais ben si toi tu veux déjà interagir et et t'aider de l'outil, je trouve ça très important de le faire, mais c'est finalement moi qui gère le côté patient.
+
+@Jamie [28:59]: Ouais.
+
+@Morgane [29:22]: C'est-à-dire que voilà, demain j'ai déjà un premier rendez-vous avec Hélène Gui- Guillette. Je peux m'inscrire en tant qu'Hélène Guillette et mettre moi-même les le le le PDF et cetera et toutes ces informations communiquées et je le teste et je vois si les recettes que Rémy propose, mais c'est correct ou pas et je t'envoie un message en disant ben non euh franchement les recettes, il faut qu'on recommence parce que euh c'est pas assez loin et des trucs comme ça. Maintenant, ça dépend de toi en me disant, mais j'ai plus facile en faisant directement aux praticiens patients ou si t'as plus facile en faisant que les fiches patients d'abord.
+
+@Jamie [29:52]: On s- on s- on s'est mal compris quand je te dis, quand je disais que toi t'étais administratif de la- du système. Ça voulait, ça voulait pas dire que je créais un truc praticien pour que tu crées tes patients. Je veux dire je me focus entièrement sur le côté patient, comme il est noté dans ton document de, deh, mais que toi.
+
+@Jamie [30:10]: Comme Arnaud, comme moi, on est gérant de la boîte, alors on est administrateur du système. Alors ce que je ferai, c'est focus entièrement sur euh le profil patient et à quoi ça ressemble euh que chaque personne aurait leur login éventuellement, mais dans un premier temps, toi, tu as un un login administrateur pour gérer les profils patients. On s'en fout du côté praticien pour le moment, c'est juste toi une interface où tu peux genre quand, moi ce que j'imagine c'est que tu t'inscris avec ton login d'administrateur.
+
+@Morgane [30:13]: Oui. Ouais ouais ouais, je vois.
+
+@Morgane [30:32]: OK. Ouais.
+
+@Jamie [30:40]: Et tu peux créer un patient et tu peux rentrer dans le profil de ce patient et éditer tout ce que tu veux. Et déjà de un, quand tu fais tes, si, si on fait ça bien, quand tu fais tes rendez-vous patients sur les quelques prochains mois au lieu de leur envoyer des PDF directement dans dans WhatsApp um tu peux leur envoyer des liens vers leur euh profil patient um et avoir déjà un sorte de début de branding pour Rémy euh pour que ça, ça reste en cré chez les gens quoi.
+
+@Morgane [31:07]: Exactement ouais. Ouais, top.
+
+@Jamie [31:11]: Et bien sûr, si on travaille là-dessus, si on travaille sur base dont on leur envoie un lien, ça leur donne une idée de à quoi va ressembler Frémi. Du coup, tu peux aussi leur demander, écoute, voici toute l'information. L'information, elle est top. Dis-moi ce que tu penses de de de de du design du display. Est-ce que c'est intuitif, est-ce que c'est facile à utiliser parce que en dehors de
+
+@Morgane [31:26]: Ouais. Exactement.
+
+@Jamie [31:31]: Dire que en dehors de savoir si oui ou non tes conseils et tes tes tes connaissances sont bonnes. Il faut aussi que la plateforme soit intuitive, soit facile à utiliser, soit agréable à, à, à, à interagir avec. um Du coup, ouais, je pense que te donner, te donner une sorte de de plateforme euh beta où on ne donne pas accès au public, mais que toi en tant qu'administratrice, tu peux déjà commencer à créer les les les les patients. um ça veut dire que quand on le lance
+
+@Morgane [31:44]: Ouais.
+
+@Jamie [32:01]: Sur la V2 officielle avec des vrais patients, mais les patients que t'aurais suivi depuis quelques mois, ils s'inscrivent à une plateforme qui a déjà des mois de historique de leur euh de leur suivi quoi.
+
+@Morgane [32:13]: Ouais. Non, mais on est sur la sur la même.
+
+@Jamie [32:14]: Et surtout pour le pour le le on va dire la démo le 19 décembre à Ah ben alors euh est-ce que t'as des, des sortes de templates que t'as préparé pour ces patients ou ça va vraiment être du cas par cas?
+
+@Morgane [32:28]: Euh bah écoute, je vais les préparer de base. Je m'attendais à avoir mon premier patient la semaine prochaine, mais là je vois que quelqu'un s'est inscrit dès demain, donc je vais les préparer ce soir, mais tu t'auras t'auras au fur et à mesure des thèmes date que je vais créer, ça, c'est sûr.
+
+@Jamie [32:41]: Question, vous avez euh des adresses mails .be. Est-ce que, est-ce que c'est sur Google Word?
+
+@Morgane [32:50]: Non, c'est sur euh GoDaddy.
+
+@Jamie [32:54]: Oui non, mais pour pour pour recevoir les mails de depuis remi.be. Est-ce que vous avez un Google workspace ou est-ce que c'est dans dans Outlook.
+
+@Arnaud [33:00]: Outlook.
+
+@Jamie [33:04]: Ça va. um
+
+@Arnaud [33:04]: Mais moi la mienne, moi la mienne ne fonctionne moi la mienne ne fonctionne plus euh on a fait le choix de garder celle de Morgane et info at remi.be parce que moi j'ai j'ai trop d'adresse mail sinon euh donc euh si on m'écrit, c'est sur Arab.
+
+@Jamie [33:05]: Vous avez un Commence à avoir le même problème. J'ai commencé à avoir les, les mêmes problèmes. um Vous m'avez, vous m'avez donné les accès à non ou bien si.
+
+@Morgane [33:30]: Non, t'as t'as besoin pour euh quoi? Enfin, si tu me fais une liste de tous les accès, moi je t'envoie les accès de tout parce que il y a aussi Digital Ocean où il y a eu du travail de fait, enfin si t'as besoin d'aller voir dans ce qui a déjà été fait pour peut-être réutiliser des choses. Dis-moi les codes d'accès que t'as.
+
+@Jamie [33:43]: Oui, la coupé là, c'est c'est ça.
+
+@Morgane [33:48]: J'ai pas entendu. ça bugue.
+
+@Jamie [33:50]: T'as beaucoup beaucoup coupé.
+
+@Arnaud [33:51]: Ça a coupé, ça a coupé.
+
+@Jamie [33:53]: Ouais, énormément.
+
+@Morgane [33:57]: Donc, on n'a pas entendu ce que j'ai dit ou?
+
+@Arnaud [33:59]: Morgan te disait Jaime de lui donner une liste des accès dont tu avais besoin et qu'elle allait te les fournir.
+
+@Jamie [33:59]: Ouais. Ben ouais je pense que c'est la seule parce que maintenant tout est géré là, tout le code, c'est c'est moi qui a accès, tu m'avais déjà donné accès à l'ancienne bac de code, mais maintenant la question, c'est le le nom de domaine remi AI.BE.
+
+@Jamie [34:22]: Si on veut pouvoir mettre un un site marketing éventuellement um il faudrait que on soit sur euh Rémi.be et pour faire cela, il faut que j'aie accès à GoDaddy, pas pour transpasser le nom de domaine verstel parce que ça, ça va mettre en l'air toute votre adresse mail, mais c'est juste faire un petit changement de DNS pour que ait accès à l'usage de RBII pour le le et l'hébergement.
+
+@Jamie [34:48]: Euh Mais ça, c'est, c'est pas, c'est pas nécessairement hyper hyper euh urgent, hein, c'est juste quelque chose à à tenir en compte.
+
+@Morgane [34:49]: Que moi. Déjà Ouais. J'ai déjà mis un. à à Rémi.
+
+@Jamie [34:56]: Um
+
+@Morgane [34:57]: C'est pas grave.
+
+@Jamie [35:00]: OK. Ben alors, écoute pour euh vendredi, un petit, une petite réussite et une petite victoire facile. Je vais te donner euh avant l'appel de vendredi après, euh je vais te donner la plateforme administrative pour toi, pour créer des patients um ce serait, ce serait euh comment dire, la première version très, très, très rough euh où il y a juste le login et créer un patient, mais de là, on va pouvoir travailler euh sur les les les mois à venir euh en fonction de tes rendez-vous clients.
+
+@Morgane [35:30]: C'est nickel.
+
+@Arnaud [35:32]: Est-ce que vous avez échangé sur le brainstorming qu'on a fait vendredi dernier
+
+@Morgane [35:41]: Bon, eBug.
+
+@Jamie [35:43]: Ouais.
+
+@Morgane [35:43]: Je pense que tu dois partir en demi, c'est ça?
+
+@Jamie [35:48]: T'as t'as coupé l'arme.
+
+@Arnaud [35:50]: Je me demandais si euh si vous avez eu un échange sur le brainstorming que Morgane et moi on avait mené vendredi soir sur le positionnement de Rémy.
+
+@Morgane [35:58]: C'est ça qu'il a dit que c'était très clair. C'est le document que j'ai envoyé euh ouais.
+
+@Jamie [36:02]: C'est exactement ouais, je t'avais justement dit c'est comme, je sais plus je sais plus si t'étais dans l'appel à ce moment-là quand je disais ça, mais c'est l'idée de fonctionner dans ce sens-là où c'est plutôt les retours patients qui vont déterminer le le suivi du développement euh c'est c'est ça va être beaucoup plus efficace sur le temps de développement et sur les ressources utilisées.
+
+@Arnaud [36:21]: Oui. Oui, j'étais à l'heure.
+
+@Jamie [36:24]: Ah c'est, ça fait, ça fait longtemps que j'ai hâte de travailler sur un projet avec cette méthodologie-là, la plupart du temps, les les gérants de business, ils cherchent ce qu'ils veulent et ils demandent leurs fonctionnalités et puis euh trois mois plus tard, après des utilisateurs, il faut tout changer. euh Alors euh ouais, c'est
+
+@Arnaud [36:24]: Ouais ouais, OK. Mais parce qu'on a vécu ça, parce qu'on a vécu ça, on avait notre idée et on se rend compte que on doit répondre au marché et pas et pas l'inverse. OK, mais je ne te retiens pas plus longtemps alors merci.
+
+@Morgane [36:50]: On se voit vendredi?
+
+@Arnaud [36:53]: On se voit vendredi, cette fois c'est chez Jay bug.
+
+@Morgane [36:56]: Ouais mais sinon on s'envoie un message pour les heures. De disponible. Hum.
+
+@Arnaud [37:05]: Ouais, c'est le mieux à faire. OK.
+
+@Morgane [37:06]: Bon, moi je pense ouais
+
+@Arnaud [37:09]: Bisous.

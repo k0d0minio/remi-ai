@@ -1,0 +1,360 @@
+REMI × Fagron Genomics
+MEETING PLAYBOOK — CONFIDENTIAL
+A rehearsal-ready script for Morgane, Arnaud and Jamie
+Strategic discussion with Fagron Genomics · September 2026
+1 Meeting at a glance
+REMI turns personalized nutrition into everyday action.
+By connecting practitioner expertise, biological insights and real-life behaviour.
+REMI turns personalized nutrition into everyday action.
+By connecting practitioner expertise, biological insights and real-life behaviour.
+OUR 3 MESSAGES
+REMI solves a real patient and practitioner problem.
+REMI is not a recipe generator.
+REMI is building a scalable care loop, independently.
+The desired outcome
+OUR 3 ROLES
+Morgane: patient, practitioner and product.
+Jamie:technologyandscalable architecture.
+Arnaud: market, partnerships and discovery.
+MEETING POSTURE
+We know what REMI is building. We see possible overlaps.
+We want to understand Fagron’s priorities first.
+The pitch is not a proposal for a fixed partnership. It is designed to earn a serious working session. The best outcome is a shared view of one Fagron priority, one overlap worth testing, the right people to involve and a concrete next step.
+BEST-CASE
+Fagron identifies a concrete priority around post-result experience, practitioner education, patient activation, digital collaboration or European scale—and introduces the appropriate owners.
+BEST-CASE
+Fagron identifies a concrete priority around post-result experience, practitioner education, patient activation, digital collaboration or European scale—and introduces the appropriate owners.
+MINIMUM ACCEPTABLE
+Fagron confirms where it sees a potential B2B fit and agrees to a focused second working session with an owner, question and date.
+MINIMUM ACCEPTABLE
+Fagron confirms where it sees a potential B2B fit and agrees to a focused second working session with an owner, question and date.
+0:00–0:25OpeningMorgane
+0:00–0:25OpeningMorgane
+7:45–8:20Open discoveryArnaud
+7:45–8:20Open discoveryArnaud
+8:20+Listen first; open at most one or two backups only if relevantArnaud leads
+2 Cover — REMI
+QUI PARLE MORGANE
+QUI PARLE MORGANE
+DURÉE 25–30 sec
+DURÉE 25–30 sec
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que REMI has a clear, independent and human vision for personalized nutrition; we are here to listen as well as to present.
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que REMI has a clear, independent and human vision for personalized nutrition; we are here to listen as well as to present.
+CE QUI EST AFFICHÉ
+REMI logo; “Personalized nutrition that adapts to real life”; “Turning personalized nutrition into everyday action”; Strategic discussion with Fagron Genomics.
+MORGANE — SAY
+“Thank you for taking the time to meet with us. We are very happy to be here. We would like to give you a short introduction to what we are building with REMI, where we have learned from the field, and where we are going. But more importantly, we would like to understand your perspective and what you saw as potentially interesting when you first heard about REMI.”
+MORGANE — SAY
+“Thank you for taking the time to meet with us. We are very happy to be here. We would like to give you a short introduction to what we are building with REMI, where we have learned from the field, and where we are going. But more importantly, we would like to understand your perspective and what you saw as potentially interesting when you first heard about REMI.”
+KEY POINT We are not opening by proposing a collaboration. We are opening a strategic conversation.
+KEY POINT We are not opening by proposing a collaboration. We are opening a strategic conversation.
+TRANSITION  “REMI started from a very simple observation that we kept seeing in the field.”
+TRANSITION  “REMI started from a very simple observation that we kept seeing in the field.”
+Internal note
+Morgane should smile, speak slowly and stay brief. Do not start with Fagron’s role, genetics, an API, a test price or a partnership hypothesis. The confidence comes from saying what REMI is building clearly, then making space for Fagron’s view.
+3 Slide 1 — Why REMI exists
+QUI PARLE MORGANE
+QUI PARLE MORGANE
+DURÉE 1 min 15 sec
+DURÉE 1 min 15 sec
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que REMI began with a validated product-learning problem: patients struggle to apply recommendations, while practitioners need more time, visibility and support.
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que REMI began with a validated product-learning problem: patients struggle to apply recommendations, while practitioners need more time, visibility and support.
+CE QUI EST AFFICHÉ
+30 patients tested at FunMedDev; 50 practitioners interviewed; three practitioner pains: Time, Visibility, Knowledge / Isolation; one key learning.
+MORGANE — SAY
+Nobody likes change. Changing habits, especially food habits, is difficult.
+And sometimes, people also avoid knowing more about their health because they are afraid of what they might discover. Research shows that almost one person in three avoids or may avoid medical information about their health.
+We also saw this very clearly in the field. Knowing that you are APOE2 can be useful, but the real question is: what does that actually change in my breakfast, my lunch or my dinner?
+Knowing what to change is not enough. People need help applying it every day.
+Our ambition with REMI is simple: make change easier, step by step.
+And maybe, if changing becomes easier, people will also be more willing to know themselves better, do biological or genetic tests, and act earlier for their health.
+This is also why FunMedDev trusted us as our first clinical partner. They are a functional medicine clinic in Liège, and they were facing the same problem with their patients. We have an ongoing collaboration with them to test our MVPs, starting with around 30 patients.
+This experience confirmed one thing for us: REMI must help people turn personalized recommendations into real-life habits.”
+MORGANE — SAY
+Nobody likes change. Changing habits, especially food habits, is difficult.
+And sometimes, people also avoid knowing more about their health because they are afraid of what they might discover. Research shows that almost one person in three avoids or may avoid medical information about their health.
+We also saw this very clearly in the field. Knowing that you are APOE2 can be useful, but the real question is: what does that actually change in my breakfast, my lunch or my dinner?
+Knowing what to change is not enough. People need help applying it every day.
+Our ambition with REMI is simple: make change easier, step by step.
+And maybe, if changing becomes easier, people will also be more willing to know themselves better, do biological or genetic tests, and act earlier for their health.
+This is also why FunMedDev trusted us as our first clinical partner. They are a functional medicine clinic in Liège, and they were facing the same problem with their patients. We have an ongoing collaboration with them to test our MVPs, starting with around 30 patients.
+This experience confirmed one thing for us: REMI must help people turn personalized recommendations into real-life habits.”
+Internal guardrail: call these internal product learnings, not clinical evidence, a validated clinical outcome, a representative market study or evidence of purchase intent.
+4 Slide 2 — What REMI is building
+QUI PARLE MORGANE → JAMIE
+QUI PARLE MORGANE → JAMIE
+DURÉE 1 min 30 sec
+DURÉE 1 min 30 sec
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que REMI is a two-sided personalized nutrition platform: a Practitioner Copilot and a Patient Companion, linked by a modular personalization engine.
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que REMI is a two-sided personalized nutrition platform: a Practitioner Copilot and a Patient Companion, linked by a modular personalization engine.
+CE QUI EST AFFICHÉ
+Biology, health context, practitioner expertise, personality/preferences and real-life behaviour flow into REMI; two sides emerge: Practitioner Copilot and Patient Companion.
+MORGANE — SAY
+“The way we think about REMI is broader than recipes, menus, a chatbot or a genetic score. Personalized nutrition becomes meaningful when different layers can be connected: biological insights, health context, practitioner expertise, preferences, personality, lifestyle and what people actually do in real life.
+REMI creates two connected experiences. For practitioners, it becomes a copilot: it helps them understand and structure the case, draft a protocol, personalize it, monitor what happens between consultations and adapt over time. REMI suggests; the practitioner decides.
+For patients, REMI becomes a companion that helps them understand, learn, eat, improve, follow and adapt.”
+MORGANE — SAY
+“The way we think about REMI is broader than recipes, menus, a chatbot or a genetic score. Personalized nutrition becomes meaningful when different layers can be connected: biological insights, health context, practitioner expertise, preferences, personality, lifestyle and what people actually do in real life.
+REMI creates two connected experiences. For practitioners, it becomes a copilot: it helps them understand and structure the case, draft a protocol, personalize it, monitor what happens between consultations and adapt over time. REMI suggests; the practitioner decides.
+For patients, REMI becomes a companion that helps them understand, learn, eat, improve, follow and adapt.”
+TRANSITION “Jamie joined REMI as our technical co-founder and is now rebuilding the platform around this longer-term vision. Jamie, maybe you can explain briefly how we are approaching that.”
+TRANSITION “Jamie joined REMI as our technical co-founder and is now rebuilding the platform around this longer-term vision. Jamie, maybe you can explain briefly how we are approaching that.”
+JAMIE — SAY
+“The first MVP gave us the learning. We are now rebuilding REMI around a more robust architecture because the long-term vision requires multiple data layers, integrations and scalable practitioner–patient workflows. The platform is deliberately being designed to connect relevant and authorized sources over time, rather than to depend on one laboratory, one data type or one partner.”
+JAMIE — SAY
+“The first MVP gave us the learning. We are now rebuilding REMI around a more robust architecture because the long-term vision requires multiple data layers, integrations and scalable practitioner–patient workflows. The platform is deliberately being designed to connect relevant and authorized sources over time, rather than to depend on one laboratory, one data type or one partner.”
+KEY POINT REMI suggests. The practitioner decides.
+KEY POINT REMI suggests. The practitioner decides.
+TRANSITION JAMIE → MORGANE: “And ultimately, the technology only matters if it improves the patient and practitioner experience. Morgane can show you what that means in a very concrete example.”
+TRANSITION JAMIE → MORGANE: “And ultimately, the technology only matters if it improves the patient and practitioner experience. Morgane can show you what that means in a very concrete example.”
+5 Slide 3 — Personalization in real life
+QUI PARLE MORGANE
+QUI PARLE MORGANE
+DURÉE 1 min 10 sec
+DURÉE 1 min 10 sec
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que REMI is not an AI recipe generator; it helps people improve the meal they are actually going to eat, using personalized context.
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que REMI is not an AI recipe generator; it helps people improve the meal they are actually going to eat, using personalized context.
+CE QUI EST AFFICHÉ
+“I’m eating pasta tonight.” Profile A receives “add fibre / change fat source”; Profile B receives “adjust portion / modify side”. Context factors appear discretely.
+MORGANE — SAY
+“The most important product question is not: which recipe should we generate? It is: what is the most relevant nutritional action for this person, in this context, today?
+Imagine a patient says, ‘I’m eating pasta tonight.’ REMI should not automatically answer, ‘Don’t eat pasta.’ It can start with the meal already on the table and say: based on your profile and your practitioner’s guidance, here are one or two changes that could make it more suitable for you.
+One person may need more fibre and a different fat source. Another may adjust the portion or side. The same meal can lead to different guidance because the person is different. Recipes are part of REMI, but they are contextualized outputs. The real product is helping people improve what they are actually going to eat.”
+MORGANE — SAY
+“The most important product question is not: which recipe should we generate? It is: what is the most relevant nutritional action for this person, in this context, today?
+Imagine a patient says, ‘I’m eating pasta tonight.’ REMI should not automatically answer, ‘Don’t eat pasta.’ It can start with the meal already on the table and say: based on your profile and your practitioner’s guidance, here are one or two changes that could make it more suitable for you.
+One person may need more fibre and a different fat source. Another may adjust the portion or side. The same meal can lead to different guidance because the person is different. Recipes are part of REMI, but they are contextualized outputs. The real product is helping people improve what they are actually going to eat.”
+KEY POINT “Recipes are an output — not the product identity.”
+KEY POINT “Recipes are an output — not the product identity.”
+TRANSITION “And beyond the product itself, there is obviously a much larger market shift happening around personalized nutrition. Arnaud can give you a quick perspective on that.”
+TRANSITION “And beyond the product itself, there is obviously a much larger market shift happening around personalized nutrition. Arnaud can give you a quick perspective on that.”
+6 Slide 4 — Why now
+QUI PARLE ARNAUD
+QUI PARLE ARNAUD
+DURÉE 55–65 sec
+DURÉE 55–65 sec
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que The category is growing and consumers are becoming familiar with personalized nutrition apps; REMI is focused on the opportunity to make insights usable every day.
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que The category is growing and consumers are becoming familiar with personalized nutrition apps; REMI is focused on the opportunity to make insights usable every day.
+CE QUI EST AFFICHÉ
+$3.7B European market estimate in 2025 → $12.6B projected in 2034; 14.65% projected CAGR, 2026–2034; 91% comfort signal shown as a secondary survey indicator.
+ARNAUD — SAY
+“We see a category that is moving quickly. One industry estimate sizes the European personalized nutrition market at 3.7 billion dollars in 2025 and projects 12.6 billion dollars by 2034, with 14.65 percent annual growth from 2026 to 2034. We use that as a category signal, not as a forecast for REMI.
+On the demand side, a 2025 consumer survey reported that 91 percent of surveyed European respondents were comfortable with personalized nutrition apps. That is not adoption or willingness to pay. But it tells us that the category is becoming familiar.
+Personalized insights are growing. Everyday application is still the opportunity.”
+ARNAUD — SAY
+“We see a category that is moving quickly. One industry estimate sizes the European personalized nutrition market at 3.7 billion dollars in 2025 and projects 12.6 billion dollars by 2034, with 14.65 percent annual growth from 2026 to 2034. We use that as a category signal, not as a forecast for REMI.
+On the demand side, a 2025 consumer survey reported that 91 percent of surveyed European respondents were comfortable with personalized nutrition apps. That is not adoption or willingness to pay. But it tells us that the category is becoming familiar.
+Personalized insights are growing. Everyday application is still the opportunity.”
+KEY POINT Be precise: the 91% is a comfort signal, not market penetration, adoption or willingness to pay.
+KEY POINT Be precise: the 91% is a comfort signal, not market penetration, adoption or willingness to pay.
+TRANSITION “Our approach is not to chase a market statistic. It is to build the assets needed to own the daily care loop.”
+TRANSITION “Our approach is not to chase a market statistic. It is to build the assets needed to own the daily care loop.”
+Source note: Market Data Forecast, Europe Personalized Nutrition Market, 2026. NutraIngredients, 2025, citing Euromonitor Voice of the Consumer: Health & Nutrition Survey, fielded February 2025 (n=21,061 total). See Source notes on page 14.
+7 Slide 5 — Where REMI is going
+QUI PARLE MORGANE → JAMIE → ARNAUD
+QUI PARLE MORGANE → JAMIE → ARNAUD
+DURÉE 1 min 30 sec
+DURÉE 1 min 30 sec
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que REMI has an independent, staged roadmap that builds patient intelligence, practitioner capability, biological personalization and a reproducible European care loop.
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que REMI has an independent, staged roadmap that builds patient intelligence, practitioner capability, biological personalization and a reproducible European care loop.
+CE QUI EST AFFICHÉ
+2026 Patient Intelligence; 2027 Practitioner Copilot + Biological Personalization; 2027/28 Specialist Network + Remote Care; Europe.
+MORGANE — SAY
+“Our roadmap is built around the assets REMI needs to create. In 2026, the focus is patient intelligence: real-life personalization, education, daily guidance, patient feedback and the next FunMedDev test. We are still running some elements manually on purpose, because we want to understand exactly what creates value before we automate it.
+In 2027, we add the practitioner copilot and broader biological personalization: protocol drafting, monitoring, practitioner education, and progressively genetics, biomarkers and multiple data sources.”
+MORGANE — SAY
+“Our roadmap is built around the assets REMI needs to create. In 2026, the focus is patient intelligence: real-life personalization, education, daily guidance, patient feedback and the next FunMedDev test. We are still running some elements manually on purpose, because we want to understand exactly what creates value before we automate it.
+In 2027, we add the practitioner copilot and broader biological personalization: protocol drafting, monitoring, practitioner education, and progressively genetics, biomarkers and multiple data sources.”
+JAMIE — SAY
+“Technically, that progression is important. We are not building a sequence of disconnected features. We are building a platform architecture that can mature from learning with patients today into scalable practitioner–patient workflows and carefully connected data layers tomorrow.”
+JAMIE — SAY
+“Technically, that progression is important. We are not building a sequence of disconnected features. We are building a platform architecture that can mature from learning with patients today into scalable practitioner–patient workflows and carefully connected data layers tomorrow.”
+ARNAUD — SAY
+“From 2027 into 2028, that can create the basis for a specialist network and a remote personalized nutrition journey, with the potential for online consultations where relevant. Belgium is our starting point. Europe is our ambition. The goal is not to launch everywhere at once; it is to prove a care loop, then reproduce it market by market.”
+ARNAUD — SAY
+“From 2027 into 2028, that can create the basis for a specialist network and a remote personalized nutrition journey, with the potential for online consultations where relevant. Belgium is our starting point. Europe is our ambition. The goal is not to launch everywhere at once; it is to prove a care loop, then reproduce it market by market.”
+TRANSITION “This roadmap belongs to REMI. The reason we were especially interested in meeting you is that we see several possible areas of overlap—but we do not want to assume the answer.”
+TRANSITION “This roadmap belongs to REMI. The reason we were especially interested in meeting you is that we see several possible areas of overlap—but we do not want to assume the answer.”
+8 Slide 6 — The team
+QUI PARLE MORGANE
+QUI PARLE MORGANE
+DURÉE 35–45 sec
+DURÉE 35–45 sec
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que REMI has three complementary founder capabilities behind one shared vision: product and field insight, market and partnerships, and technology architecture.
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que REMI has three complementary founder capabilities behind one shared vision: product and field insight, market and partnerships, and technology architecture.
+CE QUI EST AFFICHÉ
+Three portraits and three capability anchors: Morgane — Product / Patient Experience; Arnaud — Business / Partnerships; Jamie — Technology / Architecture.
+MORGANE — SAY
+“We are building REMI as three complementary founders around the same care loop. I lead the patient, practitioner and product side: the field problem, the product vision and real-life personalization.
+Arnaud leads business, strategy and partnerships, with the focus on how this can become a scalable European opportunity. Jamie is our technical co-founder. He is rebuilding the product architecture so that REMI can support modular data layers, practitioner workflows and future integrations in a robust way.
+One vision. Three complementary capabilities: Product, Market and Technology.”
+MORGANE — SAY
+“We are building REMI as three complementary founders around the same care loop. I lead the patient, practitioner and product side: the field problem, the product vision and real-life personalization.
+Arnaud leads business, strategy and partnerships, with the focus on how this can become a scalable European opportunity. Jamie is our technical co-founder. He is rebuilding the product architecture so that REMI can support modular data layers, practitioner workflows and future integrations in a robust way.
+One vision. Three complementary capabilities: Product, Market and Technology.”
+KEY POINT Jamie is a technical co-founder and platform builder—not the person reserved for API questions.
+KEY POINT Jamie is a technical co-founder and platform builder—not the person reserved for API questions.
+TRANSITION  “With that independent foundation in place, we would like to open the conversation with you.”
+TRANSITION  “With that independent foundation in place, we would like to open the conversation with you.”
+9 Slide 7 — Open discussion with Fagron
+QUI PARLE ARNAUD
+QUI PARLE ARNAUD
+DURÉE  35–45 sec, then stop
+DURÉE  35–45 sec, then stop
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que There may be meaningful complementarity between Fagron and REMI, but Fagron must define the priority and potential fit in its own words before REMI proposes a model.
+OBJECTIF À la fin de cette slide, Fagron doit avoir compris que There may be meaningful complementarity between Fagron and REMI, but Fagron must define the priority and potential fit in its own words before REMI proposes a model.
+CE QUI EST AFFICHÉ
+Fagron Genomics: testing, expertise, scientific knowledge, practitioner education, international footprint. REMI: personalized nutrition platform, copilot, protocol support, education, daily personalization, follow-up and future network.
+ARNAUD — SAY
+“When we look at Fagron and REMI, we can see several possible areas of complementarity: testing, education, practitioners, the patient journey, data and Europe. But we do not want to design the partnership for you.
+We have several ideas about where the overlap could be, but before sharing those, we would really like to understand your perspective.
+When you first heard about REMI, what made you see a strong potential fit?”
+ARNAUD — SAY
+“When we look at Fagron and REMI, we can see several possible areas of complementarity: testing, education, practitioners, the patient journey, data and Europe. But we do not want to design the partnership for you.
+We have several ideas about where the overlap could be, but before sharing those, we would really like to understand your perspective.
+When you first heard about REMI, what made you see a strong potential fit?”
+STOP TALKING.
+LET FAGRON ANSWER.
+DO NOT OPEN A BACKUP SLIDE YET.
+STOP TALKING.
+LET FAGRON ANSWER.
+DO NOT OPEN A BACKUP SLIDE YET.
+TRANSITION  “That is helpful. Let me make sure I understand what you mean…”
+TRANSITION  “That is helpful. Let me make sure I understand what you mean…”
+10 Discovery — Arnaud’s guide
+THE RULE Ask in this order. Listen for the real priority. Reflect it back. Only then test one relevant hypothesis.
+THE RULE Ask in this order. Listen for the real priority. Reflect it back. Only then test one relevant hypothesis.
+“When you first heard about REMI, what made you see a strong potential fit?”
+Why we ask: It exposes Fagron’s real entry point. Listen for: post-result experience, practitioner education, new patients, data, testing, Europe, or a specific business challenge. Follow-up: “What would success look like from your perspective?”
+“What are you currently trying to develop around NutriGen?”
+Why we ask: It distinguishes an immediate priority from a general interest. Listen for: product, channel, report interpretation, education, conversion, integration. Follow-up: “Which part is hardest to move today?”
+“What happens today after a patient receives their results?”
+Why we ask: It surfaces the post-result and activation journey. Listen for: drop-off, practitioner workflow, report comprehension, lack of follow-up. Follow-up: “Where do you see the biggest loss of value?”
+“Where do practitioners struggle most when working with nutrigenetic information?”
+Why we ask: It tests the strength of the practitioner enablement hypothesis. Listen for: confidence, interpretation, time, protocol creation, content, demand generation. Follow-up: “How do you currently support that step?”
+“How important is practitioner education in your growth strategy?”
+Why we ask: It qualifies B2. Listen for: webinar activity, certification, community, case support, quality assurance. Follow-up: “How do you measure whether education changes adoption?”
+“Are you looking to expand your practitioner network or patient reach?”
+Why we ask: It qualifies B3 or B4. Listen for: access, retention, volumes, new specialties, acquisition economics. Follow-up: “Which audience is most strategic right now?”
+“What kind of digital partnerships are you currently exploring?”
+Why we ask: It tests technology and partnership appetite. Listen for: integration, portal, reporting, patient engagement, data governance. Follow-up: “What would have to be true for that to create value?”
+“Where do you personally see the strongest overlap between Fagron and REMI?”
+Why we ask: It converts the conversation into prioritization. Follow-up: “Would it be useful to select that one hypothesis and explore it with the right people?”
+11 Backups — priority 1 to 3
+Priority order is a guide, not a presentation sequence. Open no more than one or two backups unless Fagron explicitly asks for more detail.
+B2 — Practitioner Education
+WHEN TO OPEN  Only if Fagron raises education, training, interpretation, practitioner confidence or network growth.
+ARNAUD — SAY “That is interesting because practitioner education is one of the areas we have been thinking about. We believe knowledge becomes more valuable when practitioners can learn it, apply it in a workflow, and follow patients over time. This is an exploratory hypothesis, not a decided program.”
+ASK FAGRON “How do you currently see the role of education in increasing practitioner adoption of NutriGen?”
+B2 — Practitioner Education
+WHEN TO OPEN  Only if Fagron raises education, training, interpretation, practitioner confidence or network growth.
+ARNAUD — SAY “That is interesting because practitioner education is one of the areas we have been thinking about. We believe knowledge becomes more valuable when practitioners can learn it, apply it in a workflow, and follow patients over time. This is an exploratory hypothesis, not a decided program.”
+ASK FAGRON “How do you currently see the role of education in increasing practitioner adoption of NutriGen?”
+B1 — Patient Journey
+WHEN TO OPEN Only if Fagron raises post-test experience, patient follow-up, activation or adherence.
+MORGANE — SAY “One possible direction is to extend the value of a biological insight beyond the result itself. The practitioner interprets the context, REMI translates it into education and daily action, and the feedback loop allows adaptation. This is only a discussion hypothesis.”
+ASK FAGRON “Where do you believe the patient journey creates or loses the most value after the result?”
+B1 — Patient Journey
+WHEN TO OPEN Only if Fagron raises post-test experience, patient follow-up, activation or adherence.
+MORGANE — SAY “One possible direction is to extend the value of a biological insight beyond the result itself. The practitioner interprets the context, REMI translates it into education and daily action, and the feedback loop allows adaptation. This is only a discussion hypothesis.”
+ASK FAGRON “Where do you believe the patient journey creates or loses the most value after the result?”
+B5 — Technology / Data
+WHEN TO OPEN Only if Fagron raises integration, data flows, API, lab portals or future digital partnerships.
+JAMIE — SAY “The principle is progressive personalization and partner connectivity. We are building REMI for multiple authorized sources over time. We are not assuming a specific integration today; first we would want to understand which data exchange would create useful value for both sides.”
+ASK FAGRON “Which data or workflow connection would be most valuable for your teams and practitioners?”
+B5 — Technology / Data
+WHEN TO OPEN Only if Fagron raises integration, data flows, API, lab portals or future digital partnerships.
+JAMIE — SAY “The principle is progressive personalization and partner connectivity. We are building REMI for multiple authorized sources over time. We are not assuming a specific integration today; first we would want to understand which data exchange would create useful value for both sides.”
+ASK FAGRON “Which data or workflow connection would be most valuable for your teams and practitioners?”
+12 Backups — priority 4 to 6
+B3 — Growth Flywheel
+WHEN TO OPEN Only if Fagron raises growth, distribution, practitioner network, volume, adoption or test usage.
+ARNAUD — SAY “We have sketched one possible flywheel: scientific education and testing support practitioner capability; REMI makes the workflow and daily experience easier; patients receive more personalized journeys; and that can increase the value and use of the overall ecosystem. It is a hypothesis, not a committed strategy.”
+ASK FAGRON “Where do you see the main adoption bottleneck today: awareness, practitioner confidence, patient activation or ongoing use?”
+B3 — Growth Flywheel
+WHEN TO OPEN Only if Fagron raises growth, distribution, practitioner network, volume, adoption or test usage.
+ARNAUD — SAY “We have sketched one possible flywheel: scientific education and testing support practitioner capability; REMI makes the workflow and daily experience easier; patients receive more personalized journeys; and that can increase the value and use of the overall ecosystem. It is a hypothesis, not a committed strategy.”
+ASK FAGRON “Where do you see the main adoption bottleneck today: awareness, practitioner confidence, patient activation or ongoing use?”
+B4 — Business Models
+WHEN TO OPEN Only if Fagron asks who pays, how value is captured, distribution, B2B or B2C routes.
+ARNAUD — SAY “We see several routes to shared value: referral, a test plus REMI journey, a practitioner-led pathway, practitioner SaaS, patient continuity or future virtual care. We have deliberately not fixed a commercial model because it should follow the strategic fit and the evidence we validate together.”
+ASK FAGRON “Which value-creation route is most aligned with how Fagron thinks about NutriGen today?”
+B4 — Business Models
+WHEN TO OPEN Only if Fagron asks who pays, how value is captured, distribution, B2B or B2C routes.
+ARNAUD — SAY “We see several routes to shared value: referral, a test plus REMI journey, a practitioner-led pathway, practitioner SaaS, patient continuity or future virtual care. We have deliberately not fixed a commercial model because it should follow the strategic fit and the evidence we validate together.”
+ASK FAGRON “Which value-creation route is most aligned with how Fagron thinks about NutriGen today?”
+B6 — Europe
+WHEN TO OPEN Only if Fagron itself raises scale, country priorities or European footprint.
+ARNAUD — SAY “Belgium is where we want to prove the care loop first. The Netherlands, France, Spain and Germany are markets to assess afterwards using practitioner ecosystem, digital readiness, partner availability, language and economics. They are not announced launches.”
+ASK FAGRON “Which European markets are strategically important for Fagron in the next phase, and why?”
+B6 — Europe
+WHEN TO OPEN Only if Fagron itself raises scale, country priorities or European footprint.
+ARNAUD — SAY “Belgium is where we want to prove the care loop first. The Netherlands, France, Spain and Germany are markets to assess afterwards using practitioner ecosystem, digital readiness, partner availability, language and economics. They are not announced launches.”
+ASK FAGRON “Which European markets are strategically important for Fagron in the next phase, and why?”
+BACKUP DECISION RULE Use the conversation to select the slide. Never use the slides to replace the conversation.
+BACKUP DECISION RULE Use the conversation to select the slide. Never use the slides to replace the conversation.
+13 If Fagron asks…
+What exactly is REMI today?
+“REMI is an early-stage personalized nutrition platform. The current focus is learning from patients and practitioners while rebuilding the product around a more robust architecture.”
+How many users do you have?
+“We have around 30 MVP patients from the FunMedDev learning phase. We do not present this as commercial traction or a clinical cohort.”
+Is REMI a medical device?
+“REMI is being built as a personalized nutrition and workflow platform. We will assess any regulatory implications carefully as product capabilities and markets evolve.”
+Do you work with another laboratory?
+“REMI is designed to remain an independent platform, able to work with authorized sources over time. We are here to understand what differentiated value a Fagron relationship could create.”
+How would a business model work?
+“There are several possible models. We would choose one only after clarifying the strategic role, target user and validated value creation.”
+What is already built?
+“We have tested an early MVP and learned from field use. We are now rebuilding core workflows and architecture. We will be transparent about what is live versus what is planned.”
+Are you replacing practitioners?
+“No. REMI is designed to make practitioners more effective and to support the patient between consultations. REMI suggests; the practitioner decides.”
+How will genetics be used?
+“Genetics can enrich the context; it does not determine a perfect diet and does not replace practitioner judgement. It is one potential layer among several.”
+Are you seeking exclusivity?
+“No exclusivity request is on the table today. We first want to understand strategic fit and whether a specific collaboration creates differentiated value.”
+What do you want from Fagron?
+“First, perspective. We would like to understand your priorities, the current NutriGen journey and where you see the strongest potential overlap.”
+DO NOT SAY
+“Fagron will power REMI.” · “We want an exclusive partnership.” · “We need an API.” · “We already know the partnership model.” · “Genetics determines the perfect diet.” · “REMI replaces the practitioner.” · “The 30-patient test proved clinical efficacy.” · “50 practitioners want to buy REMI.” · “We are launching a virtual clinic in 2027.”
+PREFER “We are exploring…” · “We are building toward…” · “One possible direction is…” · “We would like to understand…” · “Our current hypothesis is…”
+DO NOT SAY
+“Fagron will power REMI.” · “We want an exclusive partnership.” · “We need an API.” · “We already know the partnership model.” · “Genetics determines the perfect diet.” · “REMI replaces the practitioner.” · “The 30-patient test proved clinical efficacy.” · “50 practitioners want to buy REMI.” · “We are launching a virtual clinic in 2027.”
+PREFER “We are exploring…” · “We are building toward…” · “One possible direction is…” · “We would like to understand…” · “Our current hypothesis is…”
+Source caveat: 3.7𝐵 →12.6B and 14.65% are a commercial third-party market estimate. The 91% is a secondary-reported comfort signal from a survey and must never be described as adoption, willingness to pay or market penetration.
+14 One-page cheat sheet
+OUR 3 MESSAGES
+REMI solves a real patient/practitioner problem: application, time, visibility and complexity.
+REMI is a Practitioner Copilot + Patient Companion, not a recipe generator.
+REMI builds an independent, scalable care loop with biological personalization as one layer.
+OUR 3 MESSAGES
+REMI solves a real patient/practitioner problem: application, time, visibility and complexity.
+REMI is a Practitioner Copilot + Patient Companion, not a recipe generator.
+REMI builds an independent, scalable care loop with biological personalization as one layer.
+MORGANE
+Origin · patient insight · practitioner insight · product vision · personalization · Roadmap 2026.
+JAMIE
+Robustarchitecture·multiple authorized  sources  ·modularity
+· practitioner–patient workflows · scale.
+ARNAUD
+Market · Europe · partnerships · Fagron slide · discovery lead · close.
+Question that opens Fagron
+“When you first heard about REMI, what made you see a strong potential fit?”
+“When you first heard about REMI, what made you see a strong potential fit?”
+Six questions to keep in view
+What are you currently trying to develop around NutriGen?
+What happens today after a patient receives their results?
+Where do practitioners struggle most with nutrigenetic information?
+How important is practitioner education in your growth strategy?
+Are you looking to expand your practitioner network or patient reach?
+What kind of digital partnerships are you currently exploring?
+Where do you personally see the strongest overlap between Fagron and REMI?
+BACKUP RULE  Priority: B2 Education → B1 Patient Journey → B5 Technology → B3 Growth → B4 Models
+→ B6 Europe. Open maximum one or two.
+BACKUP RULE  Priority: B2 Education → B1 Patient Journey → B5 Technology → B3 Growth → B4 Models
+→ B6 Europe. Open maximum one or two.
+Desired next step
+ARNAUD — SAY
+“Let me make sure we understood correctly. From what we heard, your priority seems to be [X], and the most interesting overlap may be [Y]. Would it make sense to organize a working session around [X] with [Y] to explore that in more detail?”
+ARNAUD — SAY
+“Let me make sure we understood correctly. From what we heard, your priority seems to be [X], and the most interesting overlap may be [Y]. Would it make sense to organize a working session around [X] with [Y] to explore that in more detail?”
+Leave with an owner · a working question · a next meeting · a date.

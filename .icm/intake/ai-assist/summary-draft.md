@@ -4,7 +4,7 @@
 - scope: ai-assist
 - personas: practitioner
 - initiative: a patient experience validated on real terrain, in time for the December open day / objective: a usable patient version for the partner clinic to test on 1 December
-- depends-on: mistral-adapter
+- depends-on: ai-gateway-adapter
 - sequence: 4 of 5
 - priority: P1
 - size: M

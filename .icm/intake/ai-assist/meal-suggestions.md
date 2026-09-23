@@ -4,7 +4,7 @@
 - scope: ai-assist
 - personas: patient, practitioner
 - initiative: a patient experience validated on real terrain, in time for the December open day / objective: the patient loop working end to end for one real patient
-- depends-on: mistral-adapter
+- depends-on: ai-gateway-adapter
 - sequence: 2 of 5
 - priority: P1
 - size: L

@@ -5,7 +5,7 @@
 - personas: patient, practitioner
 - initiative: a patient experience validated on real terrain, in time for the December open day / objective: the patient loop working end to end for one real patient
 - depends-on: patient-home-today
-- sequence: 6 of 6
+- sequence: 7 of 9
 - priority: P1
 - size: M
 - sources: V2 explication (« Feedback régulier » every 1–2 days, smiley answer, questions from the
@@ -48,7 +48,8 @@ drops the outbound channel: **in-page, when the patient opens the link**, no ema
 
 ## Notes for Define
 
-- **Decisions that bind** ([`README.md § Decisions of record`](../README.md)): D-9 (in-page, no outbound channel; a simple progression view on both sides).
+- **Decisions that bind** ([`README.md § Decisions of record`](../README.md)): D-9 (in-page, no outbound channel; a simple progression view on both sides) · D-19 (her 14 Sept document: a weekly 0–5 score per objective is her proposal; `general-feedback` is the free text she asked for first).
+- « Ma progression » also lists past challenges and their outcome (`challenges` stores them).
 
 - No scheduler, no cron: the prompt is computed at render from the last check-in date. The email
   nudge is `beyond-december` if she ever wants it.
@@ -59,7 +60,11 @@ drops the outbound channel: **in-page, when the patient opens the link**, no ema
 
 **Open for Define** — settled with the operator before the spec is approved, never assumed:
 
-- Interval: every visit, every two days, weekly — hers.
+- Interval: every visit, every two days, weekly — hers. Her § 1 asks « Possibilité de côté chaque
+  semaine ? 0 à 5 » on each of the three objectives: three faces or a 0–5 score, and weekly or
+  on every visit — one answer for both.
+- Whether the one-tap question sits beside the `general-feedback` box on the home or is replaced by
+  it — one decision for both stubs.
 - Should a "worse" answer notify her (an awaiting-attention count on the console, like meals) or
   just show in the strip? A count is cheap; ask which she would act on.
 

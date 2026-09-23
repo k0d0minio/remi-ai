@@ -5,7 +5,7 @@
 - personas: patient
 - initiative: a patient experience validated on real terrain, in time for the December open day / objective: a usable patient version for the partner clinic to test on 1 December
 - depends-on: patient-accounts
-- sequence: 2 of 6
+- sequence: 2 of 8
 - priority: P2
 - size: L
 - sources: V2 explication (« Profil Patient autonome FunMedDev qui n'utilise pas le côté
@@ -26,8 +26,8 @@ the self-serve path for the FunMedDev patients who have a practitioner outside R
 
 - **Self-onboarding**: sign-up without an invitation (accounts from `patient-accounts`), the
   profile the patient fills (`patient-loop/patient-profile-edit`'s fields plus identity).
-- **PDF import**: upload a recommendations document; a files seam (blob storage — an owner
-  vendor decision shared with `meal-photos`) stores it; a parse step (PDF → text; a structured
+- **PDF import**: upload a recommendations document; the files seam (Vercel Blob, D-18 — built by
+  `patient-loop/patient-documents-and-links`) stores it; a parse step (PDF → text; a structured
   `balanced` call → recommendation, supplement and essentials rows in the section schemas) fills
   a review screen; the patient accepts rows into their own record. The braindump's parser, at
   patient scale.
@@ -43,15 +43,15 @@ the self-serve path for the FunMedDev patients who have a practitioner outside R
 
 ## Out of scope (this feature)
 
-- Choosing the blob-storage or PDF-extraction vendor in passing — both are owner decisions; answering an autonomous patient's meals with the model alone (D-6 extended, needs its own yes)
+- Choosing the PDF-extraction vendor in passing — an owner decision (blob storage is settled, D-18); answering an autonomous patient's meals with the model alone (D-6 extended, needs its own yes)
 
 ## Notes for Define
 
 - **Decisions that bind** ([`README.md § Decisions of record`](../README.md)): D-10 (not needed for 1 December) · D-6 (the model answering with no practitioner needs a separate decision).
 
-- Two vendor questions gate it — blob storage and PDF text extraction (the v1 report records
-  LlamaParse; a plain extractor may do for typed PDFs). Both are owner decisions, flagged, never
-  picked in passing.
+- One vendor question still gates it — PDF text extraction (the v1 report records LlamaParse; a
+  plain extractor may do for typed PDFs). An owner decision, flagged, never picked in passing.
+  Blob storage is settled (D-18, Vercel Blob behind the files seam).
 - A patient-supplied PDF is untrusted input into a prompt; the parse runs with no patient context
   beyond the file and its output is rows for review, never a write.
 
@@ -63,4 +63,4 @@ the self-serve path for the FunMedDev patients who have a practitioner outside R
 
 ## Prompt
 
-Run `/pipeline new autonomous-patient-pdf-import` in the remi-ai repo — **only after the owner has moved this stub onto the live path and answered the blob and PDF-extraction vendor questions**. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.
+Run `/pipeline new autonomous-patient-pdf-import` in the remi-ai repo — **only after the owner has moved this stub onto the live path and answered the PDF-extraction vendor question**. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.

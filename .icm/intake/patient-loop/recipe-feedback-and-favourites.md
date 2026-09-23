@@ -5,8 +5,8 @@
 - personas: patient, practitioner
 - initiative: a patient experience validated on real terrain, in time for the December open day / objective: the patient loop working end to end for one real patient
 - depends-on: link-writes
-- sequence: 4 of 6
-- priority: P1
+- sequence: 9 of 9
+- priority: P2
 - size: S
 - sources: feedback § 7 ("Feedback patient : J'aime · Pas pour moi · Trop long · À refaire") · V2
   explication (« Enregistrer cette recette », onglet « Mes recettes préférées ») · brainstorm § 5
@@ -46,7 +46,7 @@ version had:
 
 ## Notes for Define
 
-- **Decisions that bind** ([`README.md § Decisions of record`](../README.md)): D-5 (the library stays; feedback is per assignment) · D-9 (in-page, no outbound channel).
+- **Decisions that bind** ([`README.md § Decisions of record`](../README.md)): D-5 (the library stays; feedback is per assignment) · D-9 (in-page, no outbound channel) · D-19 (**P2 since 2026-09-23** — her 14 Sept § 3: « Je n'ai pas besoin pour l'instant d'un système complexe de notation recette par recette »; the four buttons return when generated recipes need the signal, before `ai-assist/recipe-generation`).
 
 - One nullable enum column on `patient_recipe_assignments` (`patient_response`) plus a timestamp;
   migration generated, audited through `link-writes`.
@@ -61,4 +61,4 @@ version had:
 
 ## Prompt
 
-Run `/pipeline new recipe-feedback-and-favourites` in the remi-ai repo. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.
+Run `/pipeline new recipe-feedback-and-favourites` in the remi-ai repo — **P2 by D-19: pick it up when `ai-assist/recipe-generation` is next, or when the owner lifts it**. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.

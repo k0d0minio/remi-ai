@@ -5,7 +5,7 @@
 - personas: patient
 - initiative: a patient experience validated on real terrain, in time for the December open day / objective: the patient loop working end to end for one real patient
 - depends-on: link-writes
-- sequence: 2 of 6
+- sequence: 2 of 9
 - priority: P1
 - size: M
 - sources: feedback § 6 ("Accueil patient — éléments essentiels") · V2 explication (« Accueil » :

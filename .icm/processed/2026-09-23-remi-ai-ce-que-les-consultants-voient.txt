@@ -1,0 +1,66 @@
+Ce que les consultants doivent voir
+1. Les 3 objectifs
+Les trois objectifs définis ensemble au début de l’accompagnement doivent être clairement visibles.
+Exemple :
+Diminuer les fringales
+Améliorer l’énergie
+Réduire les ballonnements
+Ils doivent rester visibles comme fil conducteur de l’accompagnement.
+Possibilité de côté chaque semaine ? 0 à 5
+2. Les challenges
+Je voudrais pouvoir lancer des challenges personnalisés à chaque consultant.
+Exemples :
+Boire 1,5 L d’eau par jour
+Manger plus lentement
+Ajouter une source de protéines au petit-déjeuner
+Tester deux nouveaux lunchs cette semaine
+Le challenge en cours doit être facilement visible.
+Idéalement, le consultant pourrait claiquer sur:
+« Challenge acquis » « Prêt(e) pour le prochain »
+Cela me permettrait de voir quand la personne estime avoir intégré l’habitude et qu’elle souhaite avancer.
+De mon côté, je dois pouvoir :
+créer un nouveau challenge ;
+modifier le challenge ;
+voir si le consultant l’a validé ;
+voir s’il indique qu’il est prêt pour le suivant.
+3. Les recettes
+Je voudrais qu’ils puissent retrouver facilement les recettes que je leur propose.
+Deux possibilités selon ce qui est le plus simple techniquement :
+Option 1
+Les recettes sont directement visibles dans REMI.
+Option 2
+Je peux simplement ajouter les PDF des recettes que je leur envoie actuellement.
+Un onglet ou une section « Mes recettes » serait suffisant.
+Je n’ai pas besoin pour l’instant d’un système complexe de notation recette par recette.
+4. Les documents personnels
+Je voudrais pouvoir ajouter certains documents propres au consultant.
+Par exemple :
+sa liste personnalisée des 15 aliments ;
+un feedback sur ses repas ;
+un document avec des recommandations spécifiques ;
+d’autres documents créés pendant l’accompagnement.
+La liste des 15 aliments ne doit donc pas nécessairement devenir une fonctionnalité spécifique de REMI.
+Un document accessible dans son espace est suffisant.
+(5. Mes ressources
+Je voudrais une section pédagogique où je peux ajouter les contenus (ou lien) que je crée pour eux.
+Par exemple :
+vidéo sur l’importance de l’eau ;
+vidéo sur les oméga-3 ;
+vidéo sur les matières grasses ;
+documents pédagogiques ;
+liens éventuels.
+L’objectif est qu’ils puissent retrouver facilement ces contenus sans devoir retourner chercher dans WhatsApp.) pas prioritaire je peux envoyer sur whatsapp
+6. Feedback du consultant
+Je voudrais un endroit très simple où le consultant peut laisser un commentaire général.
+Par exemple :
+« Comment se passe votre accompagnement cette semaine ? Vous pouvez également indiquer ici ce que vous avez pensé des recettes, des challenges ou des recommandations proposées. »
+Il ne faut pas nécessairement créer des commentaires partout dans l’application.
+Un espace général de feedback peut suffire.
+7. Ce que je voudrais voir de mon côté
+Ce dont j’ai surtout besoin en complément :
+voir les feedbacks laissés par les consultants ;
+voir lorsqu’un challenge est validé ;
+voir lorsqu’un consultant indique qu’il est prêt pour le challenge suivant ;
+pouvoir consulter le profil du consultant comme lui le voit ;
+éventuellement voir simplement son activité dans son espace.
+L’idée est que je puisse facilement comprendre où en est chaque personne sans devoir aller rechercher les informations dans WhatsApp.
