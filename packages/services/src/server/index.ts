@@ -59,6 +59,19 @@ export type {
 } from "../db/services/patient-goals";
 
 export {
+  challengeOwner,
+  closeChallenge,
+  getCurrentChallenge,
+  listChallengeSignals,
+  listPastChallenges,
+  setChallengeAcquired,
+  setChallengeReadyForNext,
+  startChallenge,
+  updateChallenge,
+} from "../db/services/patient-challenges";
+export type { ChallengeSignal } from "../db/services/patient-challenges";
+
+export {
   deletePatientInstruction,
   getPatientInstruction,
   listArchivedPatientInstructions,

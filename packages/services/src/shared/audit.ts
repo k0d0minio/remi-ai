@@ -90,6 +90,19 @@ export const auditActions = [
   "goal.check_in_deleted",
   "instruction.updated",
   "instruction.cleared",
+  /**
+   * The challenge lifecycle (`challenges`). `started`, `updated` and `closed`
+   * are hers; the four tap events are the patient's, recorded with the
+   * `patient` actor through the link — set and cleared are separate actions so
+   * the journal reads « prêt(e) pour le prochain » without opening the row.
+   */
+  "challenge.started",
+  "challenge.updated",
+  "challenge.closed",
+  "challenge.acquired",
+  "challenge.acquired_cleared",
+  "challenge.ready_for_next",
+  "challenge.ready_for_next_cleared",
   "summary.updated",
   "summary.cleared",
   "next_consultation_prep.updated",
