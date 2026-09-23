@@ -1,0 +1,331 @@
+## Slide 1
+
+REMI
+Personalized nutrition that adapts to real life.
+Strategic discussion with Fagron Genomics · September 2026
+Turns personalized nutrition into everyday action.
+2026
+
+[notes]
+1
+
+## Slide 2
+
+REMI / WHY REMI EXISTS
+Change is hard.
+Knowing what to change is not the same as knowing how to change.
+≈ 1 in 3
+avoid or may avoid medical
+information about their health
+Medical information avoidance meta-analysis, 2025.
+YOU DISCOVER YOU ARE
+APOE2.
+What does that actually change
+in my breakfast, lunch or dinner?
+The practical question starts after the insight.
+Knowing what to change is not enough.
+People need help applying it every day.
+REMI
+Make change easier.
+Step by step. In real life.
+What if easier change made us want to know ourselves better?
+FIRST CLINICAL PARTNER
+FunMedDev
+Functional Medicine Clinic · Liège · ≈30 patients tested with our first MVP
+Ongoing collaboration to test REMI MVPs. Shared observation: patients understood recommendations, but struggled to apply them in daily life.
+Sources: Offer et al., 2025, systematic review and meta-analysis; REMI / FunMedDev internal product-learning collaboration, 2026.
+02
+
+[notes]
+2
+
+## Slide 3
+
+REMI / PRODUCT MODEL
+REMI turns personalized nutrition into everyday action.
+By connecting practitioner expertise, biological insights and real-life behaviour.
+Biology
+Health context
+Practitioner expertise
+Personality &
+preferences
+Lifestyle & real-life
+behaviour
+REMI
+PERSONALIZATION ENGINE
+PRACTITIONER COPILOT
+Understand → Structure → Draft protocol
+Personalize → Monitor → Adapt
+REMI suggests. The practitioner decides.
+PATIENT COMPANION
+Understand → Learn → Eat → Improve
+Follow → Adapt
+Personalized support between consultations.
+Source: REMI product vision and roadmap, 2026.
+02
+
+[notes]
+3
+
+## Slide 4
+
+REMI / REAL-LIFE PERSONALIZATION
+Personalization starts with the meal already on the table.
+“
+I’m eating pasta tonight.
+”
+Improve what you are actually
+going to eat.
+ONE MEAL. TWO PERSONALIZED PATHS.
+PROFILE A
+Add fibre
+Change fat source
+PROFILE B
+Adjust portion
+Modify side
+Recipes are an output — not the product identity.
+Genetics · Practitioner guidance · Health context · Symptoms · Preferences · Personality · Habits · Real-life behaviour
+Source: REMI product vision; FunMedDev MVP learning, 2026.
+03
+
+[notes]
+4
+
+## Slide 5
+
+REMI / WHY NOW
+Personalized nutrition is growing.
+Everyday application is still the opportunity.
+$3.7B
+→
+$12.6B
+Europe personalized nutrition
+market estimate · 2025 → 2034
+Industry estimate, not a REMI forecast.
+14.65%
+Projected annual growth
+2026–2034
+European category signal.
+91%
+Comfort with personalized
+nutrition apps
+Survey signal, not adoption.
+Personalized insights are growing. Everyday application is still the opportunity.
+Sources: Market Data Forecast, Europe Personalized Nutrition Market, 2026; NutraIngredients, 2025, citing Euromonitor Voice of the Consumer: Health & Nutrition Survey (Feb 2025; n=21,061 total).
+04
+
+[notes]
+5
+
+## Slide 6
+
+REMI / ROADMAP
+Build patient intelligence. Expand personalization. Scale the care loop.
+A REMI-owned platform roadmap — designed to learn first, then scale.
+2026
+PATIENT
+INTELLIGENCE
+Real-life personalization
+Education · daily guidance
+Feedback · FunMedDev V2
+2027
+PRACTITIONER COPILOT
++ BIOLOGICAL DATA
+Protocol drafting · monitoring
+Education · genetics
+Biomarkers · multiple sources
+2027 / 28
+SPECIALIST NETWORK
++ REMOTE CARE
+Trained practitioners
+Online consultations
+Personalized care pathways
+EUROPE
+PERSONALIZED
+NUTRITION
+Replicate the
+care loop
+market by market
+Belgium is the starting point. Europe is the ambition.
+Source: REMI product roadmap, 2026. 2027+ stages are strategic build ambitions.
+05
+
+[notes]
+6
+
+## Slide 7
+
+REMI / THE TEAM
+One vision. Three complementary capabilities.
+Product / Market / Technology — built around the same care loop.
+MORGANE PAQUET
+PRODUCT / PATIENT EXPERIENCE
+Nutrition · practitioner research
+Patient insight · product vision
+Real-life personalization
+ARNAUD RUELLE
+BUSINESS / PARTNERSHIPS
+Strategy · partnerships
+Commercial development
+Scale · European opportunity
+JAMIE NISBET
+TECHNOLOGY / ARCHITECTURE
+Product engineering · integrations
+Data layers · modularity
+Scalability · platform architecture
+ONE VISION · THREE COMPLEMENTARY CAPABILITIES
+Source: REMI founding team and internal company information, 2026.
+06
+
+[notes]
+7
+
+## Slide 8
+
+REMI / OPEN DISCUSSION
+Where do our ambitions overlap?
+FAGRON GENOMICS
+Genetic testing
+Genetic expertise
+Scientific knowledge
+Practitioner education
+International footprint
+Publicly described capabilities
+×
+REMI
+Personalized nutrition platform
+Practitioner Copilot
+Protocol support
+Patient education
+Daily personalization
+Longitudinal follow-up
+Future practitioner network
+REMI-owned platform ambition
+Where could these capabilities create the most value together?
+Testing · Education · Practitioners · Patient journey · Data · Europe
+Fagron capabilities: public information from Fagron Genomics website and 2025 annual-report materials. REMI capabilities: internal product vision.
+07
+
+[notes]
+8
+
+## Slide 9
+
+BACKUP / DISCUSSION IF RELEVANT
+One possible path from biological insight to daily action.
+A hypothesis to explore if post-test experience, follow-up or activation are priorities.
+Test
++ insight
+Biological
+information
+Practitioner
+interpretation
+Context and
+judgement
+Personalized
+protocol
+Clear next
+steps
+REMI
+education
+Daily action in
+real life
+Feedback
++ adaptation
+Longitudinal
+follow-up
+Hypothesis for discussion — not a final partnership model.
+Conceptual discussion slide based on REMI product vision and publicly described Fagron Genomics result pathway.
+B1
+
+[notes]
+9
+
+## Slide 10
+
+BACKUP / DISCUSSION IF RELEVANT
+From scientific knowledge to everyday practitioner capability.
+A strategic possibility to explore if practitioner education and adoption are priorities.
+FAGRON EXPERTISE
+Scientific knowledge
+Genetic insight · clinical cases
+Training content
++
+REMI
+Practitioner workflow
+Protocol-building tools
+Community · patient follow-up
+PRACTITIONERS BETTER EQUIPPED TO USE NUTRIGENETICS
+LEARN
+→
+APPLY
+→
+FOLLOW
+Nutrigenetics · Polymorphisms · NutriGen interpretation · Limits · Protocol building · Patient communication
+Potential area to explore — not a decided practitioner program.
+Public basis: Fagron Genomics webinars and NutriGen materials. REMI elements: internal product and community vision.
+B2
+
+[notes]
+10
+
+## Slide 11
+
+BACKUP / DISCUSSION IF RELEVANT
+A potential practitioner–patient growth flywheel.
+How scientific value, activation and adoption could reinforce a stronger ecosystem.
+FAGRON
+Scientific
+education + testing
+PRACTITIONERS
+More
+capability
+REMI
+Workflow +
+daily activation
+PATIENTS
+More personalized
+journeys
+OUTCOME
+More value
+from the test
+OUTCOME
+More adoption
+& ecosystem
+VALUE FOR FAGRON
+More test value · usage · practitioner / patient adoption
+VALUE FOR REMI
+Practitioner adoption · engagement · stronger care loop
+Hypothesis for discussion — not a committed growth strategy.
+Conceptual discussion slide based on REMI platform vision and publicly described Fagron Genomics education capabilities.
+B3
+
+[notes]
+11
+
+## Slide 12
+
+BACKUP / DISCUSSION IF RELEVANT
+Belgium proves the care loop. Europe can reproduce it.
+A market-by-market expansion hypothesis — not an announced launch plan.
+BELGIUM
+Prove the
+care loop
+THEN ASSESS
+NETHERLANDS
+Adjacent · digital readiness
+FRANCE
+Language · ecosystem
+SPAIN
+Digital infrastructure
+GERMANY
+Scale · localization
+MARKET SELECTION CRITERIA
+Practitioner ecosystem · Digital readiness · Partner availability · Language · Economics
+Potential markets to assess after Belgium — not announced launches.
+Sources: European Commission Digital Decade Country Reports 2025 (Netherlands, France, Spain, Germany); REMI strategic market assessment.
+B6
+
+[notes]
+12
+

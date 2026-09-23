@@ -1,0 +1,89 @@
+Nouvelle méthodologie de développement de REMI
+Jamie,
+Après t’avoir envoyé l’ensemble des fonctionnalités imaginées pour la V2, nous avons pris un peu de recul ce week-end avec Arnaud sur la manière dont nous voulons réellement avancer avec REMI.
+La conclusion est assez simple : puisque nous repartons pratiquement de zéro avec toi, nous ne voulons surtout pas reconstruire un produit complet pendant plusieurs mois pour seulement ensuite le confronter aux utilisateurs.
+Nous voulons faire l’inverse : partir du terrain, tester immédiatement avec de vrais patients, puis construire REMI progressivement autour de ce qui apporte réellement de la valeur.
+1. Commencer par une « version terrain »
+Je vais commencer mes consultations avec environ 10 à 15 clients.
+Au départ, une grande partie du suivi pourra volontairement être faite de manière très simple, notamment via WhatsApp.
+Pour chaque patient, je vais :
+réaliser l’anamnèse et définir son profil ;
+établir mes recommandations nutritionnelles ;
+créer des recettes personnalisées adaptées à son profil et à mes recommandations ; ( d’abord via à chat mais dès que possible via REMI V2)
+lui demander régulièrement des photos de ses repas ; analyser ses repas et lui apporter des corrections et conseils personnalisés ;
+assurer un suivi, de la motivation et du soutien entre les consultations.
+L'objectif est d'observer concrètement ce dont les patients ont besoin et ce qui leur apporte réellement de la valeur au quotidien.
+2. Construire REMI en parallèle de ces tests
+Même si certaines actions seront encore manuelles au départ, elles permettront déjà de tester les futures fonctionnalités de REMI.
+Par exemple, pour les recettes personnalisées, je pourrai te transmettre :
+le profil du patient ;
+mon protocole / mes recommandations ;
+ses contraintes et préférences.
+Nous testerons ensemble la génération de recettes par REMI.
+Je vérifierai les résultats avant de les envoyer au patient via WhatsApp. Cela nous permettra déjà de comprendre ce qui fonctionne, ce qui ne fonctionne pas et ce que nous devons améliorer dans la logique de personnalisation.
+Même logique pour le suivi des repas, les recommandations, les feedbacks, etc. La fonctionnalité « suggestion »
+Le principe serait donc :
+Terrain → Test → Feedback → Développement → Nouveau test → Amélioration
+Plutôt que :
+Développement complet → Lancement → Découverte des problèmes.
+3. Première priorité : l'expérience patient
+Pour cette première phase, nous voulons donc mettre temporairement de côté une grande partie de l'espace praticien et nous concentrer sur la partie patient.
+Tu construis progressivement cette première version en fonction de mes retours terrain.
+De mon côté, je continue à tester avec mes 10–15 clients
+Dès qu'une première version utilisable existe, nous avons donc immédiatement de vrais patients disponibles pour la tester en conditions réelles.
+Cela nous permettra d'itérer très rapidement.
+4. Valider avant de passer à la suite
+Une fois que nous avons validé que cette première partie fonctionne réellement — que les patients l'utilisent, qu'ils apprécient l'expérience et surtout que REMI les aide à mieux appliquer leurs recommandations, nous pouvons considérer cette première brique comme validée.
+À ce moment-là seulement, nous passons à la deuxième grande partie : l'espace praticien.
+5. Construire ensuite l'espace praticien
+Cette phase sera également beaucoup plus pertinente parce qu'entre-temps, j'aurai moi-même accompagné plusieurs patients avec cette méthodologie.
+Je pourrai donc identifier concrètement :
+ce dont j'ai besoin pendant une consultation ;
+ce qui me fait perdre du temps ;
+quelles informations sont importantes entre deux consultations ;
+comment structurer les protocoles ;
+comment suivre l'adhérence ;
+quelles informations REMI devrait synthétiser ;
+quelles fonctionnalités faciliteraient réellement mon travail.
+Nous construirons alors cette partie sur la base de cette expérience.
+Ensuite, même méthodologie : quelques praticiens pilotes → utilisation réelle → feedback → amélioration.
+6. Intégrer progressivement les génotypes
+En parallèle, nous pensons également orienter davantage REMI vers la personnalisation via les génotypes, qui pourrait devenir un véritable différenciateur du produit.
+J'ai commencé à contacter des laboratoires et sociétés externes pour comprendre comment nous pourrions organiser les tests de génotypage.
+L'objectif serait ensuite de pouvoir intégrer certaines informations génétiques pertinentes dans le profil nutritionnel et notamment dans la personnalisation des recommandations et des recettes.
+Cela viendra progressivement, sans bloquer le développement de la première version.
+En résumé
+Notre nouvelle logique serait :
+Je commence immédiatement avec de vrais patients, même avec des outils très simples.
+Nous testons déjà certaines briques de REMI en parallèle, notamment la génération de recettes personnalisées.
+Tu construis progressivement la partie patient en fonction des besoins observés.
+Je teste chaque évolution avec mes patients.
+Nous améliorons jusqu'à avoir une expérience patient réellement validée.
+Ensuite seulement, nous construisons la partie praticien.
+Nous la testons à son tour avec quelques praticiens et nous continuons à itérer.
+En parallèle, nous explorons l'intégration des génotypes comme élément de personnalisation et de différenciation.
+L'objectif est vraiment de ne plus construire REMI sur ce que nous pensons que les utilisateurs voudront, mais sur ce que nous observons réellement sur le terrain.
+On préfère construire moins, mais construire juste.
+Dis-nous ce que tu en penses et surtout si, d'un point de vue technique, cette manière d'avancer te semble également la plus pertinente.
+Objectif et calendrier – Phase 1
+Pour nous donner un objectif concret, nous aimerions que la première partie de REMI — l'expérience patient — soit fonctionnelle pour fin novembre.
+L'objectif est de pouvoir présenter et commencer à commercialiser cette nouvelle version lors de la journée portes ouvertes de FunMedDev, le 19 décembre.
+Deadline cible : 1er décembre
+Pour le 1er décembre, nous aimerions avoir une première version patient suffisamment aboutie pour être testée directement par l'équipe FunMedDev.
+Cela nous laisserait environ deux semaines avant la journée portes ouvertes pour :
+laisser l'équipe FunMedDev utiliser et tester REMI ;
+récupérer leurs feedbacks ;
+identifier les derniers bugs ou points de friction ;
+effectuer les dernières adaptations ;
+arriver le 19 décembre avec une version stable et présentable.
+Ce que doit permettre cette première version
+À ce stade, le patient doit pouvoir utiliser REMI sans qu'un espace praticien complet soit nécessaire.
+Il doit notamment pouvoir créer/utiliser son profil et intégrer les recommandations reçues de son médecin, nutrithérapeute ou autre praticien afin que REMI puisse ensuite personnaliser son accompagnement et ses recettes.
+Pour mes propres patients, je fonctionnerai exactement avec cette même interface : je créerai leur profil et j'encoderai moi-même leurs recommandations/protocoles dans leur espace patient.
+Cela nous permet d'éviter de développer tout de suite un dashboard praticien tout en testant déjà le fonctionnement réel du produit.
+Roadmap
+Maintenant → fin novembreDéveloppement itératif de la partie patient + tests continus avec mes propres patients.
+1er décembrePremière version patient fonctionnelle → test par l'équipe FunMedDev.
+1er → 18 décembreFeedback FunMedDev + corrections + amélioration de l'expérience.
+19 décembreJournée portes ouvertes FunMedDev → présentation et promotion de la nouvelle version de REMI.
+L'objectif n'est donc pas d'avoir « toute la V2 » terminée pour décembre. L'objectif est beaucoup plus précis : avoir une expérience patient simple, solide et réellement utile, que nous avons déjà testée sur le terrain et que nous pouvons commencer à vendre.

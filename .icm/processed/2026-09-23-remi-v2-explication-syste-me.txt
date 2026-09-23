@@ -1,0 +1,198 @@
+REMI V2 – Fonctionnement :
+Profil Praticien :
+Écran Onboarding : Bouton : "Je suis praticien"
+Action : → Redirection vers le formulaire de demande d'inscription.
+Formulaire de demande
+Champs à compléterBouton : Envoyer ma demande
+Actions système :
+Création d'une demande avec statut = Pending
+Notification administrateur
+Email de confirmation au praticien
+Page d'attenteMessage : "Votre demande est en cours d'analyse. Nous vous contacterons rapidement."
+Back-office administrateurListe des demandes avec : Accepter ou Refuser
+Si Accepter :
+Statut = Approved
+Envoi d'un email d'acceptation contenant un lien Stripe
+Si Refuser :
+Statut = Rejected
+Envoi d'un email de refus (optionnel)
+Paiement StripeLe praticien clique sur le lien Stripe Checkout.
+Paiement réussi :
+Réception webhook Stripe
+Statut = Active
+Activation complète du compte
+Email de bienvenue
+Paiement échoué ou non réalisé :
+Statut = Awaiting Payment
+Accès à la plateformeSeuls les comptes Active disposent d'un accès complet à REMI.
+Page d’accueil – Praticien :
+Gestion d'un nouveau patient
+Ajouter un patient
+Depuis son tableau de bord, le praticien clique sur :
+Bouton : "Ajouter un patient"
+Formulaire : Prénom, Nom, Adresse email
+Bouton : Créer le dossier patient
+Actions système :
+Création du patient dans la base de données
+Création automatique d'un dossier patient
+Statut du patient : Préparation consultation
+Redirection vers la fiche patient.
+Préparation de la consultation
+La fiche patient contient :
+Zone 1 : Notes brutes
+Objectif : Permettre au praticien de noter librement tout ce qui est discuté pendant la consultation.
+Fonctionnalités :
+Champ texte libre
+Sauvegarde automatique
+Historique conservé
+Bouton Sauvegarder
+Ou Option supplémentaire : Import PDF
+Action : Extraction des données.
+Important : Les notes brutes restent toujours accessibles et modifiables.L'IA ne les remplace jamais.
+Structuration IA
+Bouton : "Structurer avec IA"
+Action utilisateur :Le praticien clique sur le bouton.
+Actions système :
+Analyse des notes brutes
+Analyse éventuelle des documents importés
+Génération d'une synthèse structurée
+La synthèse apparaît dans une nouvelle zone et remplace l’ancienne page « recommandation »
+Le praticien peut :
+Modifier la synthèse
+Supprimer des éléments
+Ajouter des éléments
+Invitation du patient dans REMI
+Une fois les notes structurées validées, le praticien accède à la fiche patient.
+Bouton : "Inviter le patient"
+Action utilisateur : Le praticien clique sur "Inviter le patient".
+Actions système :
+Génération d'un lien d'invitation unique
+Association du patient au praticien
+Création du compte patient en statut "Invitation en attente"
+Le praticien visualise :Statut de l'invitation
+Envoi de l'invitation
+Bouton :"Envoyer par email"
+Action utilisateur :Le praticien clique sur le bouton.
+Actions système : « mailto » email pré-rempli s’ouvre via la boite mail du praticien
+Activation du compte patient
+Le patient reçoit l'email. Il clique sur le lien d'invitation. (voir suite sur fiche patient)
+« Page suivi »  est encore à développer pour les prochaines consultations
+« Page Feedback » est encore à développer pour consulter les progrès ou problème entre les consultations.
+Page patient lié à un praticien.
+Onboarding du patient
+Le patient clique sur le lien reçu par email.
+Actions système :
+Vérification du lien d'invitation
+Association du patient au praticien
+Création du compte patient
+Le patient complète son profil.
+Informations personnelles : Prénom, Nom, Date de naissance, Sexe, Taille, Poids
+Préférences alimentaires : Régime alimentaire
+Restrictions alimentaires :
+Allergies
+Intolérances
+Mode de vie :
+Aime cuisiner
+Temps disponible pour cuisiner :
+Faible
+Moyen
+Important
+Budget alimentaire :
+Économique
+Standard
+Confort
+Objectif principal
+Bouton :"Terminer mon profil"
+Activation de l'accès patient
+Actions système :
+Enregistrement du profil
+Activation du compte
+Association aux recommandations du praticien
+Important :
+Les patients invités par un praticien bénéficient automatiquement :
+3 mois gratuits
+Sans paiement Stripe
+Date d'expiration calculée automatiquement : Date d'activation + 3 mois
+Génération du profil REMI déjà activé et utilisable directement.
+Génération des contenus personnalisés
+REMI génère automatiquement :
+Suggestions de repas
+Recettes adaptées
+Toutes les propositions doivent respecter :
+A. Les recommandations du praticien (liste aiments, a eviter, a limiter, a favoriser)
+B. Les objectifs thérapeutiques fixer par le praticien
+C. Les caractéristiques du patient
+Régime alimentaire
+Allergies
+Intolérances
+Préférences alimentaires
+Budget
+Temps disponible
+Aime cuisiner ou non
+Génotype
+Pour les génotypes, je veux être sure qu’il va bien chercher l’information du livre du docteur Mouton et son tableau.
+Principe fondamental :
+Les recommandations du praticien sont prioritaires.
+Première connexion
+Accueil (page principale)
+Le patient peut dialoguer avec REMI à tout moment.
+Champ : « je vais manger » ou « j’ai mangé »
+Actions système : REMI analyse :
+Les recommandations du praticien
+Les objectifs du patient
+Les restrictions alimentaires
+Les préférences du patient
+Objectif : Expliqué ce qu’il y a de bien et proposer des solutions d’amélioration instantané
+Feedback rapide (je fais, pas pour moi, plus tard, signaler) – Quid du signaler ?
+Feedback régulier
+Tous les 1 à 2 jours, REMI sollicite un retour rapide.
+« comment ça se passe ? »
+Les questions sont générées à partir des recommandations non alimentaire du praticien.
+Réponse rapide : smiley
+Construction automatique du suivi
+Toutes les interactions du patient sont enregistrées :
+Réponses aux feedbacks (suggestion , comment allez-vous et suivi hebdomadaire)
+Ces données alimentent automatiquement un historique de suivi.  Progression patient – Le praticien et Le patient dispose d'une page "Ma progression". Pas encore créé
+Page Recommandations
+Objectif : Permettre au patient de consulter à tout moment l'ensemble des recommandations définies par son praticien.
+La page affiche :
+Les objectifs de santé définis lors de la consultation
+Les recommandations non alimentaires (activité physique, sommeil, hydratation, compléments, etc.)
+Les aliments à privilégier
+Les aliments à limiter
+Les aliments à éviter
+Les recommandations sont modifiables par le praticien lors des consultations suivantes et sont automatiquement mises à jour dans l'espace patient.
+Cette page constitue la référence principale utilisée par REMI pour personnaliser ses suggestions, ses recettes et ses interactions avec le patient.
+Page Recettes Cette page est encore à développer.
+Objectif :Proposer chaque jour au patient des idées de repas 100 % personnalisées selon :
+Les recommandations du praticien
+Les objectifs de santé
+Les aliments à privilégier, limiter ou éviter
+Les allergies et intolérances
+Le régime alimentaire
+Le budget
+Le temps disponible
+Le fait que le patient aime cuisiner ou non
+Fonctionnement souhaité :
+REMI génère automatiquement 7 jours de suggestions par semaine afin de limiter la consommation de tokens.
+Chaque jour, le patient voit :
+Une idée de petit-déjeuner
+Une idée de repas de midi
+Une idée d'en-cas
+Une idée de repas du soir
+Chaque recette peut être enregistrée dans les favoris.
+Une section "Mes recettes préférées" devra permettre au patient de retrouver les recettes qu'il a sauvegardées.
+À prévoir :
+Page Recettes
+Bouton "Enregistrer cette recette"
+Onglet "Mes recettes préférées"
+Affichage des recettes sauvegardées
+Page Profil – modifiable
+Point à définir : Lorsqu'un patient passe en mode autonome après un suivi praticien :
+Le lien historique avec le praticien est conservé.
+Le patient peut être placé dans un statut "archivé".
+Les nouveaux feedbacks et activités ne sont plus transmis au praticien.
+Le praticien peut réactiver le patient en cas de nouvelle consultation.
+Cette règle reste à confirmer. Je vais y réfléchir
+Profil Patient autonome FunMedDev qui n’utilise pas le côté praticien
+Omboarding sans lien praticien. En soit tout reste identique sauf que c’est le patient qui importe le PDF de chez FunMedDev dans la page recommandation ou REMI lit et structure directement.  Ajouter des feedbacks personnels pour suivre sa propre progression et motivation via REMI (A faire)

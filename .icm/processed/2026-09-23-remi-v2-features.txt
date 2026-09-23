@@ -1,0 +1,394 @@
+REMI V2
+Vision produit, fonctionnalités & priorités du Proof of Concept
+1. Objectif de REMI V2
+REMI V2 est un Proof of Concept.
+L'objectif n'est pas de construire immédiatement la version commerciale définitive de REMI, mais de mettre une version suffisamment aboutie entre les mains d'environ 15 praticiens pilotes et de leurs patients, afin de valider la proposition de valeur.
+Idéalement, les praticiens pilotes paient déjà un abonnement mensuel réduit à REMI. Ils peuvent ensuite offrir REMI gratuitement à leurs patients pendant les trois premiers mois.
+Nous voulons valider trois hypothèses principales :
+REMI apporte suffisamment de valeur au praticien pour qu'il accepte de payer chaque mois.
+REMI aide réellement les patients à appliquer les recommandations entre deux consultations.
+Après trois mois, REMI apporte suffisamment de valeur au patient pour qu'il souhaite continuer à l'utiliser en payant lui-même son abonnement.
+La V2 doit donc rester volontairement simple.
+Principe : maximum de valeur utilisateur avec un minimum de complexité technique, de coûts IA et de développement.
+Les 15 praticiens pilotes serviront également à améliorer le produit avant une V3 commerciale plus robuste.
+2. La proposition de valeur
+REMI doit créer de la valeur pour deux utilisateurs différents.
+Pour le praticien
+REMI doit l'aider à :
+gagner du temps avant, pendant et après ses consultations ;
+centraliser ses dossiers patients ;
+structurer plus facilement ses consultations ;
+transformer ses notes en recommandations exploitables ;
+créer et envoyer ses protocoles ;
+éventuellement suggérer des pistes de protocole ;
+suivre ce que le patient applique réellement ;
+identifier rapidement les difficultés entre deux consultations ;
+préparer plus efficacement la consultation suivante.
+Pour le patient
+REMI doit l'aider à transformer les recommandations du praticien en actions concrètes dans sa vie quotidienne.
+La question centrale côté patient est :
+« Mon praticien m'a donné toutes ces recommandations. Concrètement, qu'est-ce que je fais aujourd'hui ? »
+REMI devient le lien entre la consultation et la vraie vie.
+3. Boucle générale de REMI
+Le fonctionnement idéal peut être résumé ainsi :
+PRATICIEN
+↓ Consultation + recommandations
+REMI structure les informations
+↓ Le praticien valide
+PATIENT
+↓ REMI transforme les recommandations en actions concrètes
+Recettes + suggestions + objectifs + pédagogie
+↓ Le patient agit et donne des micro-feedbacks
+REMI observe ce qui fonctionne ou non
+↓
+Le praticien voit l'évolution
+↓
+Nouvelle consultation → le protocole évolue
+Cette boucle est le cœur du produit.
+4. Le dossier patient : cœur de REMI côté praticien
+Le dossier patient doit être une des priorités UX de la V2. Aujourd'hui, cette partie doit être retravaillée afin que le praticien puisse comprendre la situation de son patient en quelques secondes.
+En ouvrant un patient, il devrait retrouver facilement :
+informations essentielles ;
+protocole actuellement actif ;
+recommandations prioritaires ;
+objectifs en cours ;
+dernières informations importantes ;
+adhérence ;
+derniers feedbacks ;
+évolution des bilans hebdomadaires ;
+consultations précédentes ;
+historique des protocoles ;
+bouton très visible « Nouvelle consultation ».
+La logique générale doit être chronologique :
+Consultation 1 → Suivi entre les consultations → Bilan
+→ Consultation 2 → Nouveau protocole → Suivi
+→ Consultation 3
+Aucune nouvelle consultation ne doit écraser la précédente.
+Pour le POC, nous devons construire une excellente base, puis utiliser les retours des praticiens pilotes pour déterminer quelles informations doivent réellement être prioritaires dans le dossier patient.
+5. Première consultation
+Le praticien crée son patient et ouvre une première consultation. Il doit pouvoir fournir ses informations à REMI de plusieurs manières.
+P0 — Prise de notes directement dans REMI
+Une interface simple permet au praticien de prendre ses notes pendant ou après la consultation.
+P0 — Import d'un document
+Le praticien peut importer des notes ou un document existant. Cela permet de ne pas obliger immédiatement chaque praticien à changer complètement sa manière de travailler.
+À étudier — Enregistrement de consultation
+Idéalement, le praticien pourrait enregistrer sa consultation. REMI pourrait alors :
+transcrire la conversation ;
+identifier les informations importantes ;
+produire un résumé ;
+structurer ces informations pour préparer le protocole.
+Cette fonctionnalité ne doit toutefois pas retarder le POC si elle nécessite une infrastructure importante ou augmente fortement les coûts. Elle doit donc être évaluée en fonction de son ratio valeur / complexité / coût.
+6. Structuration automatique de la consultation
+À partir des notes ou documents du praticien, REMI structure les informations. Par exemple :
+objectifs prioritaires ;
+recommandations alimentaires ;
+aliments à favoriser ;
+aliments à limiter ;
+habitudes alimentaires ;
+activité physique ;
+sommeil ;
+gestion du stress ;
+hydratation ;
+compléments ou recommandations spécifiques ;
+autres objectifs définis par le praticien.
+Le praticien peut modifier, ajouter, supprimer, réorganiser.
+REMI assiste. Le praticien décide.
+La version validée devient le protocole actif du patient et sert également de base à la personnalisation de REMI côté patient.
+7. Suggestion de protocole par REMI
+Plusieurs praticiens ont exprimé le souhait que REMI puisse aller plus loin que la simple structuration et suggérer directement des pistes de protocole. C'est une proposition de valeur potentiellement très importante.
+Pour la V2, il n'est cependant pas nécessaire de construire immédiatement une IA capable « d'apprendre » complètement la méthode de chaque praticien. Une première version simple pourrait fonctionner ainsi :
+Notes de consultation + données patient + protocole précédent
++ éventuels modèles du praticien
+↓
+REMI → « Suggérer des pistes de protocole »
+REMI génère alors un brouillon structuré. Le praticien peut accepter, modifier, supprimer, compléter. Puis, seulement ensuite : valider le protocole.
+Aucune suggestion de REMI ne doit devenir automatiquement une recommandation patient. La validation humaine du praticien reste obligatoire.
+8. Modèles de protocoles du praticien
+Une manière relativement simple de commencer à personnaliser REMI serait de permettre au praticien d'enregistrer ses propres modèles. Exemples :
+Soutien digestif — base ;
+Petit-déjeuner protéiné ;
+Gestion du stress ;
+Insulinorésistance — base ;
+Sommeil — niveau 1.
+Lors d'une nouvelle consultation, le praticien pourrait réutiliser un modèle et l'adapter au patient. REMI pourrait également utiliser ces modèles comme contexte lorsqu'il suggère un protocole.
+Cela permet d'obtenir une première forme de personnalisation sans devoir construire immédiatement un système d'apprentissage complexe.
+9. Vision V3 — REMI apprend progressivement la manière de travailler du praticien
+La vision à terme est plus ambitieuse. REMI pourrait progressivement observer :
+les protocoles créés ;
+les suggestions acceptées ;
+les suggestions refusées ;
+les modifications réalisées ;
+les recommandations fréquemment utilisées ;
+l'ordre dans lequel certaines problématiques sont généralement abordées ;
+les modèles récurrents.
+Après plusieurs mois, REMI pourrait proposer :
+« Pour ce type de profil, voici les pistes que vous utilisez habituellement. »
+Ou :
+« Dans des situations similaires, vous commencez généralement par travailler sur X et Y. Voulez-vous repartir de cette approche ? »
+La proposition de valeur devient alors : REMI ne remplace pas votre méthode. Il apprend progressivement votre manière de travailler pour vous faire gagner du temps.
+Cette fonctionnalité appartient plutôt à la V3. Mais la V2 doit déjà conserver correctement les données nécessaires pour permettre cette évolution, notamment :
+Suggestion initiale REMI → modifications du praticien → version finale validée
+Ces informations peuvent devenir extrêmement précieuses pour les futures versions.
+10. Bibliothèque de protocoles/pathologies
+Une autre possibilité serait de construire une base de connaissances avec des modèles de protocoles liés à certaines problématiques. Cette approche peut être intéressante à terme, éventuellement avec des experts ou formateurs partenaires.
+Cependant, elle ne doit pas devenir un prérequis pour la V2. Construire, vérifier et maintenir une grande bibliothèque thérapeutique pourrait rapidement devenir complexe.
+À étudier en V3, en fonction des retours des praticiens pilotes.
+11. Invitation du patient
+Une fois le protocole validé, le praticien invite son patient dans REMI via un lien. Le patient crée son compte et réalise son onboarding.
+12. Onboarding patient
+L'objectif est de récupérer uniquement les informations nécessaires à une personnalisation pertinente. Exemples :
+régime/type d'alimentation ;
+allergies et intolérances ;
+aliments aimés/non aimés ;
+habitudes alimentaires ;
+niveau en cuisine ;
+aime cuisiner / n'aime pas cuisiner ;
+temps disponible ;
+budget ;
+préférences alimentaires ;
+contraintes quotidiennes ;
+éventuelles informations spécifiques demandées par le praticien.
+Pour certaines approches, notamment FunMedDev, des informations spécifiques doivent pouvoir être intégrées : génotypes, régime intermittent, autres paramètres spécifiques.
+REMI combine :
+protocole praticien + données patient + préférences + contraintes
+→ accompagnement personnalisé
+13. Recettes 100 % personnalisées
+Les recettes constituent une des principales fonctionnalités patient. Elles doivent tenir compte :
+du protocole ;
+des objectifs ;
+des restrictions ;
+des préférences ;
+du budget ;
+du niveau en cuisine ;
+du temps disponible ;
+des habitudes du patient.
+Les recettes doivent être :
+savoureuses, avec des associations d'aliments justes ;
+réalistes ;
+suffisamment détaillées (par exemple préciser si des lentilles doivent être trempées au préalable) ;
+faciles à comprendre ;
+variées ;
+nutritionnellement cohérentes ;
+adaptées aux recommandations du praticien ;
+construites autant que possible avec des légumes et fruits de saison.
+REMI doit avoir une logique nutritionnelle large (en s'appuyant sur la base Ciqual de l'ANSES) : protéines, glucides, lipides, fibres, acides gras, vitamines, minéraux, diversité végétale, polyphénols lorsque pertinent.
+Il faut néanmoins éviter toute fausse précision nutritionnelle lorsque les données disponibles ne permettent pas un calcul fiable.
+14. Génération hebdomadaire des recettes
+Pour limiter les coûts IA, il n'est probablement pas nécessaire de générer des recettes chaque jour. Une génération hebdomadaire pourrait créer plusieurs recettes adaptées au patient, ensuite dévoilées progressivement au cours de la semaine.
+Cela permet :
+de conserver une sensation de nouveauté ;
+de réduire les appels IA ;
+de contrôler les coûts ;
+éventuellement de mieux vérifier la qualité des recettes.
+15. Favoris
+Le patient peut enregistrer les recettes qu'il apprécie. Il constitue progressivement sa propre bibliothèque de recettes compatibles avec ses recommandations.
+16. Liste de courses
+À partir des recettes sélectionnées ou favorites, REMI pourrait générer une liste de courses. Idéalement :
+ingrédients regroupés ;
+quantités consolidées ;
+classement par catégories ;
+possibilité de l'envoyer par email.
+P1, si l'implémentation reste légère.
+17. Fonction phare : « Que mangez-vous ? »
+Le patient indique ce qu'il prévoit de manger. Exemple : « Ce soir : pâtes carbonara. »
+REMI analyse le repas par rapport au protocole, aux objectifs, aux recommandations du praticien, et éventuellement aux autres repas enregistrés dans la journée.
+La réponse doit être pédagogique et relativement neutre. REMI ne doit ni féliciter systématiquement ni culpabiliser.
+Structure possible :
+Ce que votre repas apporte — une explication simple.
+Ce qui pourrait être amélioré — une information pertinente par rapport aux objectifs.
+Une amélioration concrète — par exemple : « Pour mieux correspondre à votre objectif, vous pourriez ajouter une portion de légumes et compléter le repas avec une source de protéines adaptée. »
+Le but est que REMI transforme progressivement chaque repas en opportunité d'apprentissage.
+18. Feedback sur les suggestions
+Après une suggestion, le patient peut répondre rapidement : « Je le fais », « Pas pour moi », « Une prochaine fois », « Signaler ».
+Ces micro-feedbacks permettent :
+d'améliorer la personnalisation ;
+de comprendre les préférences ;
+d'identifier les recommandations réellement appliquées ;
+d'alimenter le suivi du praticien.
+Si le patient sélectionne « Pas pour moi », REMI peut éventuellement proposer d'obtenir une autre suggestion. Le nombre de nouvelles générations doit néanmoins être limité pour contrôler les coûts IA.
+19. Journal alimentaire simplifié
+Le patient pourrait enregistrer les repas réellement consommés. Le but n'est pas de construire un MyFitnessPal avec pesée systématique et saisie complexe : l'expérience doit rester légère.
+Exemple : Petit-déjeuner → enregistré. Déjeuner → enregistré. Dîner → enregistré.
+Ces informations peuvent ensuite servir à REMI pour comprendre qualitativement la journée alimentaire.
+20. Bilan nutritionnel quotidien
+À partir des repas enregistrés, REMI pourrait fournir un retour en fin de journée. Pour le POC, il est préférable de privilégier une analyse qualitative plutôt qu'une fausse précision. Par exemple :
+« Votre journée semble avoir été suffisamment riche en végétaux et en fibres. Votre apport en protéines paraît cependant relativement faible. Demain, essayez d'intégrer une source de protéines dès le petit-déjeuner ou le déjeuner. »
+REMI peut observer notamment : équilibre protéines/glucides/lipides, fibres, diversité végétale, sources d'oméga-3, certaines vitamines/minéraux lorsque suffisamment identifiables, diversité en polyphénols.
+Les informations doivent être présentées comme des estimations lorsqu'elles reposent sur une description libre.
+Principe : observer → comprendre → améliorer.
+21. Objectifs non alimentaires
+Le praticien peut définir d'autres objectifs : activité physique, sommeil, gestion du stress, hydratation, respiration, pratiques alimentaires, routines, autres habitudes.
+Exemple : « Marcher 10 minutes après le repas du soir. »
+Le patient indique simplement s'il a réalisé son objectif.
+S'il réussit : petite récompense visuelle, confettis, encouragement.
+S'il ne réussit pas : message court et encourageant, aucune culpabilisation.
+22. Bilan hebdomadaire
+Une fois par semaine, REMI demande au patient de répondre à environ 5–6 questions pertinentes. Le bilan peut apparaître le dimanche et rester disponible dimanche, lundi et mardi afin de maximiser les réponses. Il doit pouvoir être fermé sans empêcher son retour pendant cette période s'il n'a pas encore été complété.
+Le bilan peut mesurer : adhérence, difficultés, évolution, symptômes, ressenti, énergie, obstacles, besoin d'adaptation.
+Les questions doivent rester courtes.
+23. Historique des bilans
+Chaque bilan doit être conservé. Le nouveau bilan ne doit jamais écraser le précédent.
+Le praticien doit pouvoir observer une évolution :
+Semaine 1 → 62 %
+Semaine 2 → 68 %
+Semaine 3 → 74 %
+Semaine 4 → 81 %
+Une visualisation simple suffit : courbe, score, tendance, historique chronologique. Le praticien doit comprendre immédiatement : amélioration / stagnation / dégradation.
+24. Tableau de suivi praticien
+Le praticien ne doit pas avoir besoin d'ouvrir chaque dossier quotidiennement. Le tableau général doit lui permettre de voir rapidement :
+qui va bien ;
+qui rencontre des difficultés ;
+qui applique ses recommandations ;
+qui décroche ;
+quels patients nécessitent éventuellement son attention.
+Informations possibles : adhérence, dernier bilan, objectifs réalisés, suggestions acceptées/refusées, tendance générale, éventuel signal nécessitant une attention.
+Le tableau doit rester très simple.
+25. Synthèse automatique entre deux consultations
+Cette fonctionnalité pourrait être particulièrement importante pour démontrer le gain de temps côté praticien. Avant la consultation suivante, REMI résume automatiquement ce qui s'est passé.
+« Depuis la dernière consultation : environ 72 % des objectifs ont été réalisés ; les recommandations alimentaires semblent globalement bien suivies ; difficulté récurrente concernant le petit-déjeuner ; plusieurs suggestions ont été refusées sur ce point ; amélioration déclarée de l'énergie ; sommeil toujours problématique. »
+Le praticien arrive ainsi au rendez-vous avec une vision immédiate de la période écoulée.
+26. Questionnaires préconsultation
+Une évolution intéressante consiste à permettre au praticien d'envoyer un questionnaire avant la consultation. Version simple :
+Praticien choisit un questionnaire
+→ Patient répond avant le rendez-vous
+→ REMI analyse les réponses
+→ Le praticien reçoit un résumé
+Exemple de résumé : « Fatigue accrue depuis trois semaines, sommeil perturbé, digestion améliorée, difficulté principale : organisation des repas. »
+Cela permettrait au praticien d'arriver à la consultation mieux préparé. Pour la V2/V2.1, quelques templates simples peuvent suffire. Un véritable constructeur de questionnaires personnalisés ou une génération automatique par IA peut être envisagé en V3.
+27. Nouvelle consultation
+Lors du rendez-vous suivant, le praticien clique sur « Nouvelle consultation ». Il retrouve : ancien protocole, évolution depuis la dernière consultation, synthèse REMI, derniers bilans, éventuels points nécessitant une attention.
+Il peut ensuite : prendre de nouvelles notes, conserver certaines recommandations, modifier certaines recommandations, supprimer celles qui ne sont plus pertinentes, en ajouter, éventuellement demander des suggestions à REMI.
+Après validation, le nouveau protocole devient le protocole actif côté patient. L'ancien protocole reste accessible dans l'historique.
+28. Progression / gamification
+La progression doit devenir visible côté patient. Le but n'est pas de transformer REMI en jeu, mais de créer une sensation : « J'avance. »
+Une page « Ma progression » pourrait montrer : objectifs réalisés, régularité, évolution hebdomadaire, recommandations progressivement intégrées, petites victoires, éventuellement des séries, évolution de certains indicateurs.
+Pour le POC : progression simple + quelques récompenses visuelles. Une gamification avancée n'est pas nécessaire.
+29. Photos des repas
+Certains praticiens souhaitent que les patients puissent photographier leurs repas. Cela pourrait aider à comprendre : portions, composition réelle, différences entre ce que le patient pense manger et la réalité, raisons de certaines stagnations.
+Mais cela implique potentiellement : stockage d'images, analyse multimodale, coûts supplémentaires, données supplémentaires à gérer, complexité UX.
+Cette fonctionnalité ne doit donc pas ralentir la V2. → Backlog V2.1/V3.
+30. Export du dossier patient
+Un praticien ne doit jamais avoir l'impression que ses dossiers patients sont « enfermés » dans REMI. S'il décide d'arrêter son abonnement, il doit pouvoir récupérer ses informations.
+La V2 pourrait proposer un bouton « Exporter le dossier patient », avec génération d'un document lisible contenant notamment : informations essentielles, consultations, protocoles successifs, recommandations, évolution, bilans pertinents, historique utile.
+Un PDF simple peut suffire pour le POC. À terme, des formats structurés permettant une migration vers d'autres logiciels pourront être étudiés.
+Principe : REMI doit retenir les praticiens par sa valeur, pas en rendant leur départ difficile.
+31. Préparer dès la V2 la future « mémoire du praticien »
+Même si l'apprentissage avancé appartient à la V3, l'architecture de données V2 doit éviter de perdre les informations qui permettront de le construire. Il est donc important de conserver :
+protocole suggéré par REMI ;
+modifications apportées par le praticien ;
+protocole finalement validé ;
+modèles utilisés ;
+recommandations ajoutées ;
+recommandations supprimées ;
+historique des versions.
+Cela permettra plus tard de comprendre progressivement « comment ce praticien travaille-t-il ? », sans devoir reconstruire cet historique après plusieurs mois d'utilisation.
+32. Priorisation V2 — P0 (indispensable pour lancer le POC)
+Praticien
+dossier patient retravaillé ;
+création/gestion patient ;
+première consultation ;
+prise de notes ;
+import des notes/document ;
+structuration automatique des informations ;
+modification et validation du protocole ;
+invitation du patient ;
+nouvelle consultation ;
+historique des consultations ;
+historique des protocoles ;
+historique des bilans ;
+tableau de suivi simple ;
+export du dossier patient.
+Patient
+onboarding ;
+accès au protocole/recommandations ;
+recettes personnalisées ;
+favoris ;
+« Que mangez-vous ? » ;
+suggestions d'amélioration ;
+feedbacks simples ;
+objectifs alimentaires et non alimentaires ;
+bilan hebdomadaire ;
+progression simple.
+33. Priorisation V2 — P1 (forte valeur si développement raisonnable)
+À intégrer si cela ne retarde pas le lancement :
+suggestion de protocole par REMI, avec validation obligatoire ;
+modèles de protocoles enregistrables ;
+synthèse automatique avant nouvelle consultation ;
+journal alimentaire simplifié ;
+bilan nutritionnel quotidien qualitatif ;
+liste de courses ;
+génération hebdomadaire anticipée des recettes ;
+questionnaire préconsultation simple ;
+meilleure visualisation de la progression.
+Ces fonctionnalités doivent être arbitrées selon : valeur utilisateur / temps de développement / complexité / coût IA.
+34. Priorisation V2 — P2 (ne doit pas retarder le pilote)
+enregistrement audio complet des consultations ;
+transcription automatique ;
+analyse des photos de repas ;
+gamification avancée ;
+analyse micronutritionnelle très poussée ;
+constructeur avancé de questionnaires ;
+génération automatique complexe des questionnaires ;
+bibliothèque complète de protocoles/pathologies ;
+fonctionnalités avancées du patient autonome.
+35. V3 — Vision produit
+Une fois le Proof of Concept validé, REMI pourra aller beaucoup plus loin :
+Mémoire professionnelle du praticien — REMI apprend progressivement sa manière de travailler.
+Protocoles intelligents — REMI suggère des pistes de plus en plus proches de la méthodologie propre au praticien.
+Questionnaires intelligents — REMI adapte les questions préconsultation au patient et au contexte.
+Base de connaissances experte — possibilité d'intégrer des protocoles ou méthodologies développés avec des experts/formateurs.
+Patient autonome — après sa période d'accompagnement, le patient peut éventuellement continuer REMI indépendamment de son praticien.
+Personnalisation continue — plus le patient et le praticien utilisent REMI, plus l'accompagnement devient pertinent.
+36. Principe essentiel concernant l'IA
+Trois niveaux doivent rester clairement séparés :
+1. Données et décisions du praticien — priorité absolue.
+2. Informations déclarées par le patient — elles permettent la personnalisation.
+3. Suggestions générées par REMI — elles doivent respecter les deux niveaux précédents.
+REMI peut proposer. Le praticien valide les décisions relevant de son accompagnement.
+REMI ne remplace pas le praticien. REMI augmente sa capacité à accompagner efficacement ses patients.
+37. Principe de confiance
+REMI doit être construit autour d'une relation de confiance avec le praticien. Cela implique notamment :
+données accessibles ;
+historique conservé ;
+distinction claire entre suggestions IA et décisions du praticien ;
+possibilité de corriger les suggestions ;
+possibilité d'exporter les dossiers ;
+pas de dépendance artificielle au logiciel.
+L'objectif est que le praticien reste parce que REMI lui apporte de la valeur.
+38. Règle de décision pour chaque nouvelle fonctionnalité
+Avant d'ajouter une feature au POC, nous devons nous poser quatre questions :
+Est-ce que cela fait gagner du temps au praticien ?
+Est-ce que cela augmente l'adhérence ou la compréhension du patient ?
+Est-ce que cela augmente suffisamment la valeur perçue pour favoriser le paiement ou la rétention ?
+Peut-on le développer simplement sans fragiliser ou retarder le POC ?
+Si la réponse est non aux trois premières questions → ne pas développer.
+Si la valeur est forte mais la complexité importante → backlog V3.
+39. Ce que nous devons mesurer pendant le pilote
+La V2 doit également permettre de répondre à des questions business.
+Praticien
+Utilise-t-il réellement REMI ?
+Quelles fonctionnalités utilise-t-il ?
+REMI lui fait-il gagner du temps ? À quel moment ?
+Consulte-t-il les feedbacks patients ?
+Utilise-t-il REMI lors de la consultation suivante ?
+Serait-il prêt à continuer à payer ?
+Quelle fonctionnalité justifie principalement son abonnement ?
+Patient
+Active-t-il son compte ?
+Revient-il régulièrement ?
+Consulte-t-il les recettes ? Enregistre-t-il des favoris ?
+Utilise-t-il « Que mangez-vous ? » ?
+Applique-t-il les suggestions ?
+Répond-il au bilan hebdomadaire ?
+Utilise-t-il encore REMI après plusieurs semaines ?
+Serait-il prêt à payer après la période offerte ?
+Le POC doit tester un comportement, pas uniquement recueillir des opinions.
+40. Définition du succès de REMI V2
+Le succès du pilote ne sera pas : « Nous avons développé beaucoup de fonctionnalités. »
+Le succès sera d'obtenir deux réactions :
+Côté praticien — « REMI me fait réellement gagner du temps, m'aide à mieux suivre mes patients, et je ne voudrais plus revenir à ma manière de travailler précédente. »
+Côté patient — « REMI m'aide concrètement à appliquer les recommandations de mon praticien et j'ai envie de continuer à l'utiliser. »
+Si nous obtenons ces deux comportements auprès d'une proportion significative des pilotes, nous aurons validé le cœur de la proposition de valeur.
+41. Vision en une phrase
+REMI transforme les recommandations du praticien en actions quotidiennes personnalisées pour le patient, tout en donnant au praticien les outils et les informations nécessaires pour travailler plus efficacement et améliorer son suivi.
+À terme : plus REMI est utilisé, plus il comprend le patient et la manière de travailler de son praticien, et plus il devient utile aux deux.

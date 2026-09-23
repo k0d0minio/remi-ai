@@ -1,0 +1,270 @@
+Structure patient-first pour le développement
+Vision de fonctionnement
+Patient / questionnaire
+Consultation enregistrée
+IA extrait & synthétise
+Praticien valide
+REMI génère
+Patient reçoit
+Suivi & adaptation
+Un profil patient léger contenant les données de base réellement utiles.
+Une structure d’anamnèse capable d’être alimentée soit par un questionnaire, soit par l’extraction automatique du transcript de consultation.
+Une synthèse patient générée automatiquement puis validée/corrigée par le praticien.
+Un espace simple pour définir 2 à 3 objectifs prioritaires et, si nécessaire, donner une consigne libre à REMI.
+Des sorties générées par l’IA : recommandations, compléments, essentiels placard/frigo, recettes et feedbacks.
+Une boucle de suivi : repas/photos → feedback → apprentissage de ce qui fonctionne → nouvelles recettes et adaptations chaque semaine.
+PérimètreLe back-office praticien est un moyen de structurer et valider l’expérience patient. Il n’est pas, à ce stade, le produit principal à développer.
+2. Répartition du travail : patient, praticien et IA
+Type d’information
+Qui l’apporte ?
+Comment ?
+Données de base
+Patient
+Questionnaire court / onboarding
+Anamnèse
+Patient + praticien
+Questionnaire préalable et/ou consultation enregistrée
+Extraction des pathologies, symptômes, habitudes…
+REMI
+Analyse automatique du questionnaire et du transcript
+Synthèse patient
+REMI puis praticien
+Génération automatique → validation/correction
+2–3 objectifs prioritaires
+Praticien
+Sélection manuelle, éventuellement à partir de suggestions IA
+Recommandations et contenus
+REMI puis praticien
+Génération → valider / modifier / supprimer / ajouter
+Photos repas et retours
+Patient + REMI
+Photo / commentaire → proposition de feedback
+Adaptations et nouvelles recettes
+REMI puis praticien
+Chaque semaine selon résultats, préférences et difficultés observées
+3. Tables / blocs de données essentiels
+A. PATIENT_PROFILE — données de base
+Champ
+Pourquoi il est utile
+Saisie
+Nom / prénom
+Identifier la personne
+Patient
+Âge ou date de naissance
+Contexte physiologique et règles d’accès
+Patient
+Sexe
+Personnalisation du contexte physiologique
+Patient
+Taille / poids
+Repères de base
+Patient
+Régime alimentaire
+Filtre permanent pour les recommandations et recettes
+Patient
+Allergies
+Sécurité : exclusions obligatoires
+Patient
+Intolérances
+Éviter les aliments non tolérés
+Patient
+Aliments aimés / non aimés
+Personnaliser les propositions
+Patient
+Aime cuisiner : oui / non
+Adapter le niveau de simplicité des idées et recettes
+Patient
+Budget alimentaire
+Éviter des propositions irréalistes
+Patient
+B. ANAMNESIS — anamnèse structurée
+L’anamnèse reprend les grandes catégories du questionnaire actuel, mais l’objectif est de réduire le réencodage. Le patient peut compléter une partie avant le rendez-vous ; la consultation est ensuite enregistrée et REMI extrait automatiquement les informations utiles.
+Catégorie
+Informations essentielles à repérer / stocker
+Motif et attentes
+Motif de consultation, souhaits, attentes prioritaires
+Santé
+Pathologies / antécédents importants, médicaments actuels (nom), compléments actuels si pertinents, allergies / intolérances
+Alimentation
+Repas habituels, grignotages, faim, écarts, contexte des repas, restrictions
+Hydratation + quantité
+Eau, café, thé, tisanes, jus, alcool si pertinent
+Digestion
+Douleurs, lourdeurs, ballonnements, reflux, transit / selles
+Élimination
+Urinaire / rénal et cutané si pertinent
+Sommeil / stress / énergie
+Qualité du sommeil, stress, énergie, coups de pompe, humeur / mémoire
+Immunité / ORL / respiration
+Éléments pertinents signalés par la personne
+Cardiovasculaire / lymphatique
+Éléments pertinents signalés par la personne
+Ostéo-articulaire / activité
+Douleurs, limitations, activité physique / relaxation
+Endocrinien / gynéco
+Thyroïde, pancréas, cycle, SPM, libido si pertinent
+Contexte de vie
+Travail, loisirs, famille — uniquement ce qui influence l’accompagnement
+Important : REMI doit extraire et préremplir ces éléments depuis le transcript. Le praticien doit pouvoir corriger rapidement sans ressaisir la consultation.
+C. PATIENT_SUMMARY — synthèse automatique
+Contexte général et motif de consultation.
+Pathologies et points de vigilance pertinents.
+Médicaments actuels : nom uniquement, pour sécuriser les propositions et vérifier les précautions/interactions lorsque nécessaire.
+Symptômes / difficultés principales.
+Habitudes alimentaires et contraintes utiles.
+Points positifs déjà présents.
+Éléments nécessitant une validation ou une clarification.
+Interface souhaitée : Valider | Modifier | Ajouter | Supprimer. Pas de ressaisie systématique.
+D. PRIORITY_GOALS — 2 à 3 objectifs actifs
+Champ
+Exemple
+Règle
+Objectif
+Améliorer l’énergie
+2–3 maximum
+Priorité
+1
+Ordre clair
+Point de départ
+Énergie 3/10
+Si mesurable simplement
+Évolution
+À revoir au suivi
+Mieux / stable / moins bien ou mesure simple
+REMI peut proposer des objectifs à partir de l’anamnèse, mais le choix final appartient au praticien. Les outputs générés doivent rester cohérents avec ces objectifs prioritaires.
+E. PRACTITIONER_INSTRUCTION — consigne libre à REMI
+Zone courte permettant au praticien d’orienter la génération sans encoder des dizaines de champs.
+Exemple de consigne
+Ce que REMI doit en faire
+“Priorité énergie et alimentation anti-inflammatoire. Peu de changements la première semaine.”
+Limiter et hiérarchiser les recommandations.
+“Prépare une liste d’essentiels pour les placards. Pense aux oméga-3, polyphénols et fibres.”
+Proposer une liste complète, expliquer brièvement pourquoi, puis attendre validation.
+“Elle est très fatiguée, ne veut pas de petit-déjeuner et je veux que le dîner puisse servir au déjeuner du lendemain.”
+Adapter la logique des recettes sans ajouter ces contraintes comme champs permanents si elles sont ponctuelles.
+4. Sorties générées par REMI — avec validation humaine
+Principe d’interface : REMI génère d’abord. Le praticien valide, modifie, supprime ou ajoute. Les tables techniques peuvent exister en arrière-plan, mais elles ne doivent pas devenir une charge de saisie manuelle.
+F. RECOMMENDATIONS — premières recommandations
+Générées à partir du profil, de l’anamnèse, des objectifs et de la consigne du praticien.
+Peu nombreuses et hiérarchisées : éviter de surcharger le patient.
+Présentées avec une explication courte, compréhensible et personnalisée.
+Le praticien peut valider, modifier, supprimer ou ajouter une recommandation.
+G. SUPPLEMENTS — compléments
+REMI peut proposer des compléments si cela fait partie de l’accompagnement.
+Affichage minimal : nom, dose si nécessaire, moment de prise si nécessaire, raison.
+Les médicaments actuels servent uniquement à sécuriser les propositions et à signaler les précautions ou interactions éventuelles ; REMI ne gère pas la médication.
+Le praticien reste valideur avant transmission au patient.
+H. PANTRY_ESSENTIALS — essentiels placard / frigo
+REMI doit générer une courte liste adaptée au patient. Le praticien peut partir de zéro ou citer quelques aliments qu’il veut absolument inclure ; REMI complète ensuite.
+Entrées utilisées
+Output attendu
+Objectifs + santé + habitudes + régime + allergies/intolérances + goûts + budget + consigne praticien
+Liste courte d’aliments pertinents avec une justification simple et personnalisée.
+Connaissance nutritionnelle REMI
+Compléter la sélection : sources d’oméga-3, fibres, polyphénols, diversité végétale, etc., lorsque pertinent.
+Saisonnalité
+Favoriser les fruits et légumes de saison ; autoriser surgelés lorsque pratique ou pertinent.
+Le praticien ne doit pas encoder aliment par aliment des champs comme “pourquoi / quantité / saison / nutriments”. REMI doit produire ces éléments à partir de ses connaissances, puis le praticien valide.
+I. RECIPES — recettes inspiration
+Respecter automatiquement : régime, allergies, intolérances, goûts, budget, objectifs et règles nutritionnelles pertinentes.
+Adapter la complexité au fait que la personne aime ou non cuisiner.
+Favoriser une alimentation globalement anti-inflammatoire lorsque cela est cohérent avec l’accompagnement.
+Favoriser la variété et la saisonnalité ; les fruits/légumes surgelés restent possibles pour simplifier le quotidien.
+Pouvoir utiliser une consigne contextuelle : fatigue, repas à réutiliser le lendemain, envie de repas rapide, pas de petit-déjeuner, etc.
+Chaque semaine, générer de nouvelles recettes inspiration en tenant compte de ce qui a été essayé, apprécié, refusé ou difficile.
+J. PATIENT_OUTPUT — mise en forme patient
+Résumé de la consultation et des objectifs.
+Recommandations prioritaires.
+Compléments validés.
+Essentiels placard / frigo.
+Recettes inspiration.
+Contenu lisible et agréable sans devoir copier-coller dans plusieurs outils externes.
+5. Boucle hebdomadaire : photos, feedback, amélioration des repas et nouvelles recettes
+Cette boucle est importante : REMI ne doit pas seulement commenter une photo. Il doit utiliser les repas réellement consommés pour améliorer progressivement les propositions et préparer les inspirations de la semaine suivante.
+Photo / repas réel
+Analyse REMI
+Feedback court
+Patient applique
+REMI observe ce qui fonctionne
+Nouvelles recettes
+Étape
+Comportement attendu de REMI
+1. Photo / description du repas
+Le patient envoie une photo et éventuellement un commentaire.
+2. Analyse
+REMI tient compte des objectifs et recommandations actives. Il repère surtout les améliorations simples et réalistes.
+3. Feedback
+Proposer un retour court : ce qui est déjà bien + 1 ou 2 améliorations prioritaires. Au début, validation par le praticien.
+4. Mémorisation utile
+Retenir les habitudes observées : aliments souvent choisis, recettes appréciées, difficultés récurrentes, contraintes réelles.
+5. Amélioration de l’alimentation
+Les prochains conseils doivent s’appuyer sur les repas réels de la personne, pas uniquement sur une théorie nutritionnelle générique.
+6. Recettes de la semaine suivante
+Générer de nouvelles recettes inspiration selon ce qui a fonctionné ou non, en gardant les objectifs, la saison, les goûts, le budget et le niveau d’envie de cuisiner.
+Exemple : si le patient mange souvent steak-frites-salade, REMI ne doit pas imposer un changement complet. Il peut proposer une évolution progressive : plus de légumes, portion de frites adaptée, variation des sources de protéines, puis proposer des recettes proches de ses habitudes mais améliorées.
+6. Connaissance nutritionnelle derrière REMI
+Pour générer correctement aliments, recommandations et recettes, REMI aura besoin d’une couche de connaissance nutritionnelle. Cette couche ne doit pas être remplie manuellement pendant une consultation.
+Bases alimentaires et composition nutritionnelle.
+Principes nutritionnels généraux et règles de sécurité.
+Informations utiles sur aliments, nutriments, saisonnalité et profils alimentaires.
+Sources / contenus validés que l’équipe choisira progressivement.
+Possibilité de construire ou enrichir ces bases avec l’aide d’IA, puis de les valider avant intégration.
+À discuter avec Jamie : quelles connaissances doivent être stockées dans REMI, lesquelles peuvent être récupérées depuis des sources externes, et lesquelles peuvent être générées à la volée. Ce chantier est distinct de la saisie patient.
+7. Ce que nous ne voulons pas développer maintenant
+Un dossier médical exhaustif.
+Une gestion détaillée des médicaments : le nom suffit pour le besoin actuel, hors contrôles de sécurité.
+Des dizaines de champs manuels pour chaque aliment, recette ou recommandation.
+Une base praticien exhaustive couvrant toutes les méthodes de tous les métiers de la nutrition.
+Des champs fins peu utiles comme équipement de cuisine, temps exact de préparation habituel, inventaire du foyer, etc.
+Une automatisation sans validation humaine dès le départ : le niveau d’autonomie de REMI doit augmenter progressivement après tests.
+8. Architecture fonctionnelle résumée pour Jamie
+Bloc logique
+Contenu minimal
+Mode d’alimentation
+PATIENT_PROFILE
+Identité + profil alimentaire + préférences + budget
+Patient / onboarding
+ANAMNESIS
+Santé, habitudes, symptômes et contexte pertinents
+Questionnaire + transcript → extraction IA
+PATIENT_SUMMARY
+Synthèse structurée
+IA → validation praticien
+PRIORITY_GOALS
+2–3 objectifs actifs
+Praticien
+PRACTITIONER_INSTRUCTION
+Consigne libre ponctuelle
+Praticien
+RECOMMENDATIONS
+Recommandations prioritaires
+IA → validation praticien
+SUPPLEMENTS
+Compléments éventuels
+IA / praticien → validation
+PANTRY_ESSENTIALS
+Essentiels personnalisés
+IA → validation praticien
+RECIPES
+Recettes inspiration personnalisées
+IA → validation / feedback patient
+MEAL_FEEDBACK
+Retour sur repas réels
+Photo + IA → validation au début
+PROGRESS
+Ce qui fonctionne / ne fonctionne pas
+Suivis + feedbacks
+WEEKLY_ADAPTATION
+Nouvelles recettes et ajustements
+IA à partir de PROGRESS + objectifs
+9. Critère de réussite de la V2 à court terme
+Morgane doit pouvoir réaliser un suivi patient en restant principalement dans REMI : les informations sont préremplies ou extraites, l’IA propose les contenus, Morgane contrôle ce qui part au patient, puis REMI apprend des retours réels pour améliorer les recommandations et les recettes suivantes.
+En pratique, la valeur n’est pas que Morgane remplisse une base de données plus détaillée. La valeur est que la bonne structure de données existe derrière l’interface afin que l’IA puisse travailler correctement, tout en réduisant progressivement le travail manuel du praticien.
+10. Questions à valider ensemble
+Quelle partie du questionnaire patient doit être remplie avant la consultation ?
+Quelle partie de l’anamnèse peut être extraite automatiquement du transcript dès la première version ?
+Quels outputs sont prioritaires en premier : synthèse, recommandations, placard/frigo, recettes, feedback repas ?
+Comment organiser le bouton / mécanisme “générer → valider → modifier → envoyer” ?
+Quelles données doivent être conservées pour que les recettes de la semaine suivante tiennent compte de ce qui a réellement fonctionné ?
+Quelle couche de connaissance nutritionnelle doit être stockée dès maintenant et laquelle peut arriver ensuite ?
+As-tu besoin de base de donnée: Légumes de saison, Base ciqual, description de pathologiqes traitement,… ?

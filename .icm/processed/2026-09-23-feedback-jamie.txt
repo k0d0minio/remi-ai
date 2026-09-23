@@ -1,0 +1,159 @@
+REMI V2
+Ce qui doit changer avant que je puisse l’utiliser au quotidien
+Feedback sur le workflow actuel côté admin/praticien et sur l’expérience patient
+Point principal
+Je comprends la logique de construire d’abord une version structurée qui fonctionne sans IA et qui permet de collecter des données propres. Je suis d’accord avec ce principe. Le problème concerne l’expérience utilisateur actuelle : dans sa forme présente, je passerais beaucoup trop de temps à encoder les informations champ par champ, et je ne peux pas l’utiliser de manière réaliste avec plusieurs personnes accompagnées. La structure de données peut rester ; la couche d’interaction doit être beaucoup plus simple et opérationnelle.
+1. Ce qui est positif dans la direction actuelle
+Un modèle de données structuré est utile et nécessaire pour la future couche d’IA.
+Le système doit d’abord pouvoir fonctionner sans IA ; l’IA doit ensuite accélérer et automatiser les tâches, sans être indispensable au fonctionnement de base du produit.
+Séparer les recommandations, compléments, essentiels, repas, consultations et l’anamnèse est pertinent au niveau de la base de données.
+Le concept de « résumé vivant » est pertinent et devrait être conservé.
+2. Le problème principal : la page est construite autour de l’encodage des données, pas autour du travail réel du praticien
+Expérience actuelle
+Expérience nécessaire
+Une très longue page patient avec de nombreuses sections différentes.
+D’abord une vue opérationnelle courte ; les données détaillées dans des sections ou onglets secondaires.
+Recommandations, compléments et essentiels ajoutés un par un.
+Édition groupée rapide, saisie multiple et duplication afin d’ajouter plusieurs éléments en une seule fois.
+Le praticien doit se souvenir de l’endroit où chaque information doit être encodée.
+L’interface suit le workflow de consultation : comprendre → décider → agir → suivre.
+La page expose directement une grande partie de la structure de la base de données.
+La base de données peut rester structurée, mais l’utilisateur ne devrait pas ressentir cette structure.
+Les recettes sont créées séparément dans une bibliothèque, puis attribuées ensuite.
+Les recettes doivent être faciles à créer, dupliquer, adapter et attribuer directement à un patient ou à un groupe.
+Règle produit
+Un praticien ne devrait jamais devoir encoder deux fois la même information, et la mise à jour d’un patient après une consultation ne devrait prendre que quelques minutes.
+3. Séparer clairement les trois expériences
+A. Console admin REMI
+Pour la gestion interne, les tests, la vérification des données et la configuration. Elle peut contenir des informations plus détaillées et plus techniques.
+B. Espace praticien
+Pour le travail quotidien avec les personnes accompagnées. Il doit être rapide, clair et centré sur les décisions et le suivi, pas sur l’administration de la base de données.
+C. Page patient
+C’est la partie sur laquelle j’aimerais mettre beaucoup plus de focus maintenant. C’est là que REMI tient sa promesse principale : aider la personne à appliquer concrètement les recommandations dans sa vie quotidienne.
+4. La fiche patient devrait s’ouvrir sur une vue de travail « en un coup d’œil »
+Quand j’ouvre un patient, le premier écran devrait répondre immédiatement à quatre questions : Où en est-on ? Sur quoi travaille-t-on ? Que s’est-il passé depuis la dernière fois ? Que dois-je faire maintenant ?
+Premier écran proposé
+Nom du patient + statut actuel• 2 à 3 objectifs actifs et leur évolution• Challenge / consigne de la semaine• Résumé vivant court• Derniers repas / feedbacks• Principales recommandations actives• Ce qu’il faut préparer pour la prochaine consultation• Actions rapides : Nouvelle consultation / Ajouter une recommandation / Proposer une recette / Ajouter un feedback repas
+L’anamnèse détaillée, le profil complet, le consentement et les données administratives doivent rester accessibles, mais ils ne doivent pas occuper la page de travail principale.
+5. Réduire fortement l’encodage manuel, même avant l’IA
+Le système peut rester 100 % fonctionnel sans IA tout en évitant les saisies répétitives. La première amélioration doit donc porter sur l’ergonomie et le workflow, pas sur l’IA.
+Permettre d’ajouter plusieurs recommandations dans un même mode d’édition, au lieu d’enregistrer chaque élément séparément.
+Permettre d’encoder plusieurs compléments en une fois, avec dose / moment / raison visibles dans un tableau compact.
+Permettre d’ajouter plusieurs « essentiels » en une seule fois.
+Ajouter des fonctions de duplication / réutilisation pour les recommandations, compléments et recettes récurrentes.
+Permettre d’« attribuer au patient » directement lors de la création d’une recette, sans devoir revenir ensuite dans sa fiche.
+Utiliser autant que possible une seule action d’enregistrement par section logique, plutôt qu’un enregistrement pour chaque élément.
+Garder les détails optionnels repliables afin que l’action de base reste rapide.
+Ensuite, l’IA pourra améliorer ce fonctionnement sans devoir modifier le workflow
+Exemple : j’écris ou je dicte « Oméga-3 2 g/jour au repas, magnésium bisglycinate 300 mg le soir, vitamine D 2 000 UI/jour ». REMI transforme ensuite cela en champs structurés. Mais même sans IA, la version actuelle devrait déjà me permettre d’encoder ces informations rapidement dans une seule section.
+6. La page patient doit devenir une priorité (prêt pour novembre)
+Pour le pilote, je veux surtout tester si REMI aide réellement les personnes à appliquer leurs recommandations nutritionnelles entre deux consultations. La page patient doit donc être beaucoup plus qu’un affichage statique du profil et des recommandations.
+Accueil patient — éléments essentiels
+Aujourd’hui / cette semaine : objectif actuel et challenge du moment.
+Mes recommandations : simples, lisibles et priorisées.
+Mes recettes : recettes actuellement suggérées ou attribuées.
+Mes essentiels : aliments à avoir à la maison / au frigo / dans les placards.
+Interaction repas : « Je vais manger » et « J’ai mangé ».
+L’expérience vers laquelle je veux aller
+« Je vais manger » → proposer des idées de repas / recettes adaptées au profil du patient et à ses recommandations actuelles.« J’ai mangé » → enregistrer le repas et donner ou conserver un feedback sur la manière de l’améliorer selon les recommandations actuelles.
+7. Recettes : rendre la création et l’attribution beaucoup plus rapides
+L’objectif n’est pas que le praticien crée les recettes une par une dans une bibliothèque. REMI doit générer des recettes à partir du profil du patient et des recommandations du praticien. ( 100 % personnalisé)
+Pour la V2, la logique doit rester simple :
+Profil patientREMI tient d’abord compte de :
+allergies et intolérances ;
+régime alimentaire ;
+temps disponible ; (énergie ;)
+aime cuisiner ou non ;
+budget.
+Recommandations du praticienExemples :
+augmenter les protéines ;
+favoriser les oméga-3 ;
+augmenter le magnésium ;
+augmenter les fibres ;
+limiter les sucres raffinés.
+Sélection des alimentsREMI élimine d’abord les aliments incompatibles avec le profil, puis sélectionne ceux qui correspondent le mieux aux recommandations.
+À terme, la base CIQUAL et d’autres bases nutritionnelles permettront d’utiliser la composition précise des aliments pour faire cette sélection.
+Génération de la recetteREMI génère ensuite une recette adaptée (« tel un chef de cuisine »):
+aux recommandations ;
+au temps disponible ;
+au budget ;
+au niveau et à l’envie de cuisiner ;
+aux goûts du patient.
+Contrôle avant affichageLa recette doit être vérifiée avant d’être proposée :
+allergies / intolérances respectées ;
+régime respecté ;
+recommandations respectées ;
+temps et niveau de difficulté cohérents.
+Feedback patientLe patient peut indiquer :
+J’aime
+Pas pour moi
+Trop long
+À refaire
+Ces retours permettent d’améliorer les prochaines propositions.
+Pour la V2
+La fonction principale devrait donc être :
+Profil patient + recommandations praticien→ REMI génère automatiquement plusieurs recettes adaptées.
+Le praticien ne devrait pas avoir à créer puis attribuer chaque recette manuellement.
+Fagron peut venir enrichir ce moteur si le patient a réalisé un test génétique, notamment pour ajouter des aliments ou nutriments à favoriser. Mais REMI doit fonctionner de la même manière sans test génétique.
+Vision finale
+À terme, le moteur pourra devenir plus avancé avec plusieurs expertises :
+IA spécialisée en physiologie, nutriments et molécules ;
+moteur de composition alimentaire basé sur CIQUAL et d’autres bases ;
+IA spécialisée en cuisine, associations, cuissons, trempage, etc. ;
+contrôle final de cohérence et de sécurité.
+La V2 doit surtout poser les bonnes bases pour pouvoir évoluer vers cette architecture sans devoir reconstruire toute la fonctionnalité recette.
+8. Le feedback et l’amélioration des repas doivent devenir un workflow central
+L’un des workflows centraux de REMI doit être le bouton « Je vais manger ».
+Le patient indique simplement ce qu’il prévoit de manger, par exemple :
+« Spaghetti sauce tomate »
+Puis il clique sur :
+« Suggestions »
+REMI analyse le repas en fonction :
+de son profil ;
+de ses allergies / intolérances ;
+de son régime alimentaire ;
+des recommandations actives du praticien ;
+de ses objectifs.
+REMI donne ensuite immédiatement :
+Ce qui est déjà positif dans le repas
+Exemple :« La sauce tomate apporte notamment des composés antioxydants intéressants. »
+Ce qui pourrait être amélioré
+Exemple :« Ce repas contient peu de protéines et peu de légumes. »
+Une action simple à faire maintenant
+Exemple :« Ajoute une source de protéines comme du poulet, du tofu ou des lentilles, et si possible une portion de légumes. »
+L’objectif est que la réponse soit courte, concrète et directement applicable.
+Fonction pédagogique
+REMI ne doit pas seulement dire quoi changer.
+Il doit aussi expliquer simplement pourquoi.
+Exemple :
+« Ajouter une source de protéines peut rendre le repas plus rassasiant et correspond mieux à ta recommandation actuelle d’augmenter les protéines. »
+Le patient apprend ainsi progressivement à améliorer lui-même ses repas.
+Logique V2
+Patient :« Je vais manger des spaghetti tomate »
+↓Bouton « Suggestions »
+↓REMI répond :
+ce qui est bien ;
+ce qui manque ;
+une amélioration simple ;
+pourquoi cette amélioration est pertinente pour lui.
+Le praticien ne doit pas devoir commenter chaque repas manuellement.
+Le journal alimentaire peut exister en arrière-plan pour garder l’historique, mais ce n’est pas la fonction principale.
+La fonction principale est :
+Repas prévu → suggestion immédiate → amélioration concrète → explication pédagogique.
+Vision finale
+À terme, REMI pourra aussi :
+reconnaître automatiquement un repas depuis une photo ;
+comparer le repas aux recommandations du praticien ;
+proposer plusieurs variantes ;
+tenir compte des repas précédents de la journée ;
+adapter progressivement ses suggestions selon les habitudes et les feedbacks du patient.
+9. Définition de « utilisable pour moi »
+Avant d’ajouter davantage de profondeur ou de fonctionnalités, j’ai besoin que la version actuelle passe un test très simple en conditions réelles :
+Je peux ouvrir un patient et comprendre immédiatement sa situation actuelle.
+Je peux mettre à jour les objectifs, la consigne du moment, les recommandations et les notes importantes sans parcourir un très long formulaire.
+Je peux ajouter efficacement plusieurs recommandations, compléments ou essentiels. ( Pas un à un)
+Je peux généré des recettes et l’attribuer sans navigation inutile. ( ou simplement les copier/coller et je les génère avec chatgpt)
+Je peux recevoir mettre l’ensemble de repas et REMI propose des améliorations directement utile au patient.
+Le système fonctionne sans IA, mais chaque workflow est conçu pour que l’IA puisse ensuite préremplir, suggérer et automatiser.
+En résumé
+La version actuelle nous donne une base de données utile et structurée, mais je ne peux pas utiliser l’interface telle quelle au quotidien : l’encodage manuel champ par champ me prendrait beaucoup trop de temps. La prochaine étape devrait donc être de simplifier le workflow praticien et de mettre beaucoup plus de focus sur l’expérience patient — en particulier les recettes, le feedback sur les repas et les suggestions concrètes basées sur les recommandations de la personne. Une fois que ces parcours fonctionneront bien manuellement, l’IA pourra les rendre beaucoup plus puissants au lieu de devoir compenser une interface trop lourde.

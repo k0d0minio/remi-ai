@@ -1,0 +1,531 @@
+@Jamie [0:17]: Hello.
+
+@Morgane [0:18]: Coucou attends je je mais je comprends. Prenez des notes euh il y a pas mal.
+
+@Jamie [0:25]: Je l'ai déjà allumé alors euh je vais déjà allumé, il faut juste que une personne l'allume.
+
+@Morgane [0:32]: Salut.
+
+@Jamie [0:33]: Ça va?
+
+@Morgane [0:34]: Ça va et toi?
+
+@Jamie [0:36]: Très bien, très bien. um je sais que je l'ai envoyé euh il y a à peine cinq minutes, mais t'as eu le temps d'ouvrir le le lien que je t'ai envoyé?
+
+@Morgane [0:44]: Pas du tout, non, pas du tout.
+
+@Jamie [0:45]: Pas du tout, mais c'est un peu, c'est un peu le C'est le résumé de toutes les questions que tu m'as posé et ce que moi je vois pour euh le le développement sur les Les semaines et mois et années à venir. Le le long terme pour le le côté développement euh ainsi que euh tout ce qui est côté produit à partir du one note et de tous les documents que j'ai pu, j'ai pu ingérer. Alors, en termes de
+
+@Jamie [1:14]: Document sur lequel se baser pour cet appel, je pense que c'est c'est une bonne petite référence à avoir.
+
+@Morgane [1:20]: OK. euh mais c'est ça que je me demandais euh si t'avais pu lire parce que il y a peut-être des choses qui vont changer ou être mise à jour euh là je vois attends je viens de vous dire
+
+@Jamie [1:30]: Entre le loveable que j'ai analysé et les et les One note que tu m'as envoyé, il y avait tout plein de décisions qui ont été prises sur la direction du produit. Vu ça avec euh avec le ton journal du créateur ainsi que les, les pivots qui a été, qui a été fait, la, la V1 ou la V2, la version que tu m'as envoyé euh de de sur GitHub. um Moi, j'ai, j'avais déjà commencé pas mal de planification à partir de ce docu- de ce de cette base de code-là, bah avec les documents que tu m'as envoyé et tout, j'ai vu que ouais, à partir de la V1, il y a eu du feedback et vous avez presque totalement pivoté sur
+
+@Morgane [1:55]: Ouais.
+
+@Jamie [2:11]: La direction de l'application. um Alors justement le le planning qu'il y a sur cette page-là um au au dossier um
+
+@Morgane [2:14]: Mhm.
+
+@Jamie [2:25]: Je te l'envoie là. Ça répond à toutes les questions startup boost um ça répond à Toutes tes questions, attends, je fais deux trucs en même temps là.
+
+@Jamie [2:42]: Voilà. Um Ça répond aux questions startup boost, on est tout à fait capable de rentrer dans les critères de startup boost la seule contrainte, c'est que pour avoir la la catégorie de IA souveraine, on va devoir aller avec un pas un cloud ou un TPT mais avec un Mistral ou un comme, comme tu m'aurais envoyé, mais en en règle générale, le prix est beaucoup plus élevé.
+
+@Morgane [2:52]: C.
+
+@Jamie [3:11]: Euh Quand on est, quand on est là-dessus. Alors je sais pas exactement les tout petits critères qu'il faut mais pour avoir une IA souveraine, il faut avoir une application euh avec une IA tout à fait souveraine au pays où elle habite, alors ça veut dire pas faire code, pas faire chat GPT um mais est-ce que les critères tombent aussi dans le côté développement, c'est-à-dire pendant qu'on est dans la phase de développement, si on utilise cloud et quatre GPT et les trucs-là pour faire le testing.
+
+@Morgane [3:38]: Mhm.
+
+@Jamie [3:38]: ça marche, est-ce qu'on est encore dans les critères où on utilise une IA souveraine en production ou est-ce qu'on défie les critères en quelque sorte si on utilise euh en interne pour le développement. um Mais ça, c'est tout des trucs que que je vais rechercher un peu plus profondément euh maintenant ce que je cherche là, c'est le document.
+
+@Morgane [3:53]: L.
+
+@Jamie [4:04]: Voilà. Oui. T'arrives à ouvrir le lien?
+
+@Morgane [4:12]: Oui oui, je suis dessus. Loi Startup boost société de moins de trois ans, siège d'exploitation donc ça c'était bon c'était surtout
+
+@Jamie [4:20]: Ça doit être ma 4G.
+
+@Morgane [4:23]: Ouais. Peut-être.
+
+@Jamie [4:24]: Puisque moi j'arrive pas à l'ouvrir de mon côté. Genre tout le reste fonctionne, je suis en appel, euh je sais checker mes mails, mais Toi tu toi tu l'as devant toi.
+
+@Morgane [4:35]: Tu veux que j'enlève mon ma caméra peut-être que ça sera mieux pour toi.
+
+@Jamie [4:39]: Non, c'est pas du, c'est pas du tout ça. C'est, c'est, je suis en, je suis au Portugal avec ma 4G belge puisque j'ai un problème avec mon numéro portugais en ce moment et je sais pas, elle doit se dire que je peux pas ouvrir la page.
+
+@Morgane [4:57]: Ah c'est bizarre.
+
+@Jamie [4:59]: Franchement ouais c'est vraiment bizarre. Tu me donnes deux secondes.
+
+@Morgane [5:05]: Ouais ouais.
+
+@Jamie [5:05]: Mais um mais ouais startup boost, ça peut être vraiment bien. C'est juste la deadline de dans 15 jours qui qui me fait un peu peur entre guillemets. euh pas que ce serait impossible, mais voilà, c'est, c'est beaucoup plus que les deux jours semaines euh
+
+@Jamie [5:22]: Promise.
+
+@Morgane [5:23]: En même temps, en même temps euh c'est quoi quand tu vas dans le startup boost, c'est 15 minutes de pitch où tu expliques le projet où tu expliques comment il va être développé, même s'il l'est pas encore, c'est pas grave tu vois. Simplement que ils vont poser des questions euh peut-être techniques pour expliquer parce qu'ils ne veulent pas financer un un chatbot. Donc il faut prouver que la technologie fera autre chose que juste aller chercher des données et répondre par rapport aux données.
+
+@Morgane [5:49]: Que pour l'instant Rémi faisait, tu vois.
+
+@Jamie [5:50]: OK, ouais. OK, ouais. Alors le le ouais. Alors le produit, il doit pas nécessairement être tout à fait opérationnel. C'est juste qu'on remplit les critères d'une d'une IA souveraine et les les les les deux autres qui sont listés là.
+
+@Morgane [5:55]: Maintenant, c'est Bah au pire euh on passe pas. Tu vois ce que je veux dire. On on explique ce qu'est Rémi, le projet euh comment il sera développé euh les ambitions et après eux, ils décident s'ils souhaitent financer ou pas.
+
+@Jamie [6:24]: Mais ça ne ça ne ça ne nous demande pas de leur de soumettre à eux notre base de code et tout produit comme ça.
+
+@Morgane [6:30]: Non. Pas du tout. Non, non, non. Maintenant, il faudra voir, c'est bien que c'est 15 minutes de pitch devant un jury, puis ils décident maintenant est-ce que après ils vont plus loin, ils posent plus de questions euh ça je sais pas encore tu vois.
+
+@Jamie [6:35]: OK, ouais. Je pense qu'il poserait des questions, c'est c'est sûr s'il y a 100 000 € en jeu euh
+
+@Morgane [6:51]: Je serais surpris euh justement, enfin tu vois, ils regardent par rapport euh à la société, l'année et après euh si tu as un dossier complet. I ils savent bien, enfin tu vois, c'est pas l'idée de de mentir. Ils savent bien que ça va être développé que c'est pas encore le cas.
+
+@Morgane [7:07]: C'est pour ça que attention que startup boost, c'est vraiment pour les start-ups, tu vois. Dans la phase où on est. Sinon, ils financeraient déjà des sociétés qui euh ont déjà des les leurs produits et cetera et qui qui est vendu. Là, c'est pas du tout le principe de startup boost.
+
+@Jamie [7:07]: OK, ouais. Et et et moi ce que j'ai pas trop compris, est-ce qu'il faut remplir tous les critères pour être éligible pour la chose ou est-ce qu'il faut juste remplir une majorité?
+
+@Morgane [7:33]: Euh Non, je pense que ce que je t'ai envoyé, enfin, il y a évidemment, tu vois moins de trois ans, la société euh en Wallonie et cetera maintenant
+
+@Jamie [7:40]: C'est.
+
+@Morgane [7:42]: C'est le thème euh c'est le thème de l'IA et donc c'est les différents trucs de l'IA qui doit être retenu et ça doit être conforme, tu vois? Tu ne dois pas cocher tout par rapport à l'IA, mais comme ça tu vois euh tu avec un critère en disant bah nous on rentre dans cette catégorie-là, mais ton ton dossier est déjà sélectionné pour passer devant un jury. Tu vois. Maintenant il y a plusieurs étapes sûrement et on on verra jusqu'où ça ça ça va.
+
+@Jamie [7:51]: Québec. Oh cool um et ouais, ça c'est pour le startup boost de toute façon, peu importe la direction dans laquelle on va là, ça va être vert remplir les critères pour le start-up boost euh du 15 septembre. Maintenant pour ce qui est du du planning sur le long terme euh dans la section des tickets.
+
+@Jamie [8:27]: Um je vais te laisser quelques secondes pour le lire le temps que j'essaie de réparer ce truc. Je sais toujours pas ouvrir sur mon PC.
+
+@Morgane [8:38]: Mais c'est quoi? La section des tickets.
+
+@Jamie [8:42]: Euh ah il doit avoir un autre il y a une section sur la page.
+
+@Morgane [8:45]: Dans le compte de l'Av.
+
+@Jamie [8:48]: Il y a, il y a toute une section qui donne, je pense que c'est sept ou huit phases euh pour le développement sur euh les les les quelques prochains mois, voire années en fonction de du travail nécessaire, mais c'est un un planning.
+
+@Jamie [9:05]: Au niveau de dans quelle direction on va.
+
+@Morgane [9:10]: A. C'est plus bas alors, c'est ça?
+
+@Jamie [9:18]: Ouais ouais, c'est sur la même.
+
+@Morgane [9:19]: Je vois l'appel hors du musée. Mes sdières sont légales.
+
+@Jamie [9:33]: Ah! ah! ah! ah! come on!
+
+@Morgane [9:38]: Ou alors je peux partager mon écran. C'est possible, non?
+
+@Jamie [9:40]: Voilà, non, c'est bon. Voilà, la partie qui s'appelle
+
+@Morgane [9:58]: Attends, il y a overview tu re- tu parles de sur le côté ou vraiment dans la même page où il y avait le startup boost plus bas.
+
+@Jamie [10:08]: Non, non, elle doit être en interne. C'est c'est une page auquel moi j'ai accès j'aurais j'aurais pu voir ça si j'avais su ouvrir cette fiche page mais là j'y suis. um
+
+@Jamie [10:25]: Tu me donnes deux secondes. Ja.
+
+@Jamie [11:05]: OK, moi, j'ai là sur ma page, alors euh je vais plutôt te te l'expliquer. Rien cette semaine, elle a été. Incroyablement, busy.
+
+@Morgane [11:23]: Pas de souci.
+
+@Jamie [11:24]: Mais ici, OK. Alors, euh c'est des points de c'est des points d'information qu'il me faut sur la prise de décision pour la tech stac. um C'est-à-dire, j'ai une idée de dans quelle direction on doit aller purement pour les choix et les décisions de la tech. Tout ce qui est euh tout ce qui est implémentation de produits et de logique que que tu aurais um se passe après qu'on ait pris ces décisions-là. um
+
+@Morgane [11:46]: Oui.
+
+@Jamie [11:57]: Concrètement, ça, ça nous permet, si on prend les bonnes décisions maintenant, ça évite de devoir faire des réécritures quand on grandit plus tard. um C'est-à-dire, c'est pas nécessairement faire tout un truc complexe là tout de suite, mais c'est de mettre en place les
+
+@Morgane [12:08]: Ouais.
+
+@Jamie [12:16]: La les choses pour que quand on commence à se scaler, quand on commence à à à devoir changer par exemple tout ce qui est là dans la V1 de cette version-ci. Quand on travaille dessus, on va être en interne, alors qu'on ne doit pas trop se préoccuper de protection de données, à partir du moment où on a les premiers clients et les premiers patients um il faut pouvoir très rapidement switcher vers OK ben on a un contrôle sur les données. um Alors une des toutes premières choses à
+
+@Jamie [12:46]: à régler. Est-ce que quand tu utilisais Super Base euh dans Lovable, c'était un choix que Lovable a fait ou est-ce que c'était toi qui aimais bien l'inter?
+
+@Morgane [12:54]: Non, c'était cranté, c'est Créé qui avait mis euh de base dans super base.
+
+@Jamie [13:00]: OK, OK. um Est-ce que tu es lié de manière intransigeante tout ce qu'il y a moyen de faire d'autres types de base de données ou est-ce qu'on est content avec Superbase? Personnellement, pour le
+
+@Morgane [13:11]: Oh mais c'est oui.
+
+@Jamie [13:15]: Soup B, c'est super bien. C'est le but du nom. um mais leur euh comment dire? Leur Leurs tiers qui sont payants, les limites, elles sont très hautes, c'est-à-dire que dans ce si on a euh 10 000 utilisateurs.
+
+@Jamie [13:33]: Um On reste encore euh sur le tiers gratuit, mais le l'application va être lent à partir de du- du tiers payant, c'est pas un prix par mois, c'est un prix par écriture vers la base de données. Um Et du coup ça, ça peut vite monter vite monter. um Moi, j'ai tendance à utiliser un, un, une autre base de données qui s'appelle Neon.
+
+@Jamie [13:56]: Um Elle est beaucoup moins chère, elle est beaucoup plus accessible et um en termes de interface pour que moi je travaille avec. um Moi, je préfère 1000 fois. Alors euh si t'es d'accord qu'on switch vers, je fais.
+
+@Morgane [14:10]: Mais et qu'est-ce qui se passe parce que je sais bien que base euh pour les premiers, allez comme tu disais euh ça peut supporter quand même pas mal de premiers utilisateur et pour euh l'autre mien c'est ça?
+
+@Jamie [14:12]: S. Neon, NEE.O.N.
+
+@Morgane [14:25]: N EON ça supporte combien avant de De devoir passer peut-être à autre chose ou alors t'es content parce que ça peut vraiment euh enfin le monde peut être
+
+@Jamie [14:36]: C'est c'est
+
+@Morgane [14:38]: Ouais.
+
+@Jamie [14:38]: Le le le truc avec, c'est que le La rapidité à laquelle je peux développer euh sur le court terme là, il est nickel, comparé à Super Base. um Je te donne les prix maintenant de neon um
+
+@Jamie [14:57]: Ça te dit gigabytes. Ouais. C'est un peu les mêmes euh comment dire les métriques dommageuses euh que en termes de euh GB par mois, euh usage de CPU pour avoir la rapidité de la base de données. um Mais ici.
+
+@Jamie [15:18]: Gigabyte ouais, à partir du moment où on commence à voir, disons. Euh Ouais, 10 000 utilisateurs. On serait aux alentours de
+
+@Jamie [15:36]: Et c'est approximatif hein, ne me prends pas au pied de la lettre là-dessus, mais 40, 50, 60 € par mois. Qui grandirait en fonction des nombres de d'utilisateurs. Euh sur base de de ratio.
+
+@Morgane [15:52]: Et c'est quoi la différence avec Super Base finalement et euh j'ai envie de dire néon.
+
+@Jamie [15:59]: Sur le le prix ou sur l'usage?
+
+@Morgane [16:01]: Mais les deux?
+
+@Jamie [16:02]: Les 2. Um Ben, sur l'usage, je peux te dire avec l'expérience. um C'est um Vu que je travaille tout le temps avec mon IA, j'ai ma pipeline qui marche, je suis très rarement dans le code, je suis très rarement en train de lancer des vraies commandes de développement comme je faisais il y a il y a trois quatre ans.
+
+@Jamie [16:25]: Euh Je délègue beaucoup de mon boulot, Alia pour pouvoir aller rapidement. um Et Super Base, il est bien en termes d'interface quand tu t'as quand tu t'inscris dans la plateforme de Super Base. Tu vois bien tous les boutons et tout est bien intuitif et c'est chouette à utiliser. um Mais du point de vue connexion à ta base de code, c'est pratique, mais c'est un peu chiant, tandis qu'avec Neon.
+
+@Jamie [16:53]: Euh les migrations, les backup, la la provision rapide de ba- de base de données parce que par exemple, quand on va devoir faire des démos, on va devoir euh remplir la base de données avec tout plein de fausses données et pas nécessairement devoir nous-mêmes créer tous les comptes et créer tous les les les PDF et les trucs au sein du truc pour pouvoir montrer aux clients à quoi ça ressemblerait. euh Ben tout ce côté-là, le, qui s'appelle le de data ah la migration, les backup, la sécurité.
+
+@Jamie [17:23]: Avec Mon tout est est est beaucoup plus. étroitement packagé. um Et l'avantage de en en termes de neon B, c'est que on peut switcher à tout moment. Parce que le la la technologie sous-jacente, c'est le SQL um t'as des bases de données euh SQL étaient des bases de données no SQL um tu utilises l'un et l'autre pour des raisons différentes. En règle générale, pour tout ce qui est logique euh de condition et de si ça fait ça, si ça fait ça. euh ben SQL c'est
+
+@Jamie [17:57]: C'est c'est c'est mieux que no SQL et du coup, Neon et Soup Base travaillent tous les deux dans le langage, on va dire euh SQL. Alors si dans six mois. Après que j'ai fait mon développement facile avec Neon, on décide de switcher vers Soup base, on peut et ça serait au maximum un ou deux jours de travail de migration.
+
+@Jamie [18:20]: Um Alors, ouais, pour pour pour un, dans un premier temps um Moi je préférerais neon maintenant je je je reste tout à fait ouvert à une discussion un peu plus là-dessus euh
+
+@Morgane [18:34]: Bref, ouais, faudrait que je regarde un petit peu et que je me renseigne pour voir euh Euh entre les deux et je te je te tiens au courant. Maintenant je je prends note que toi tu préfères euh néon.
+
+@Jamie [18:43]: Le.
+
+@Morgane [18:47]: Oui.
+
+@Jamie [18:47]: Je préfère néon dans dans le sens où c'est c'est rapide pour le début de développement. Je si je m'installe.
+
+@Morgane [18:53]: Maintenant euh il y a quand même pas mal de choses déjà dans Spa base maintenant, je ne sais pas si on va reprendre les données qui sont dessus par rapport aux aux précédentes versions de de Rémi.
+
+@Jamie [18:57]: Par. Justement, c'est c'était une autre question les les les autres versions de de prémi qui ont une base de données dans Super Base euh Peu importe si on utilise su base, onion ou encore un un une troisième option. um et j'aurais soit besoin d'accès à ce compte superbase ou une invitation um ou bien que tu exportes la base de données et que tu me l'envoies.
+
+@Morgane [19:11]: Mhm. Mhm. Ouais.
+
+@Jamie [19:26]: Histoire de juste voir à quoi ressemblent euh les anciennes données parce que ça va informer beaucoup du du développement de maintenant. um Maintenant, oui, les um comment dire, les, la différence des fonctionnalités listées dans la V1 dans la base de code et dans les documents OneNote que tu m'as envoyé et tout, il y a il y a pas mal de choses qui, qui se
+
+@Morgane [19:54]: Contredite.
+
+@Jamie [19:55]: Ouais, qui se contredisent. um Alors ce qu'il faudrait aussi, c'est d'avoir vraiment la liste, vraiment juste le titre et la petite description de toutes les fonctionnalités et la raison pour laquelle elle existe. um
+
+@Morgane [19:58]: Qui C'est de ça que je voulais aussi te parler aujourd'hui parce que euh moi je continue à à parler avec pas mal de de diététiciens et nutris et cetera mais c'est vrai que pour l'instant je suis focus sur les diététiciens.
+
+@Jamie [20:18]: Ça fait tout le temps.
+
+@Morgane [20:21]: Et je voulais savoir euh ce qui est possible ou pas parce que j'ai des choses où je me dis tiens ça il faudrait euh ça ce serait vraiment à wow si les les praticiens l'ont et je ne sais pas si c'est quelque chose qu'on doit reporter pour plus tard ou si c'est quelque chose de facile à construire tu vois et donc ça c'est peut-être un truc où on devrait regarder ensemble toutes les features qu'on va mettre dans la prochaine version euh qui nécessite pas énormément non plus de développement parce que ça doit rester très simple. euh mais
+
+@Jamie [20:31]: Mais Ouais.
+
+@Jamie [20:50]: Ouais.
+
+@Morgane [20:51]: Qui apporte énormément euh aux aux aux praticiens ou aux patients, tu vois. Et donc euh ça j'ai besoin de savoir avec toi, enfin de voir avec toi ce qui est faisable facilement ou ce qui représente vraiment une grosse complexité qui est mieux de reporter à plus tard.
+
+@Jamie [21:06]: Um en en général, ce que j'aime faire quand il y a justement tous ces allers retours de il faut lister ces documents, il faut lister ces trucs et na na na au lieu de faire Google Docs ou OneNote comme tu dis, ou, ou que sais-je, c'est, je l'ai pas encore fait. Ça, c'est, c'est à moi de le faire, je vais essayer de le faire avant fin de semaine. euh Je je vais faire avant fin de semaine. um c'est de set up le slack avec toute
+
+@Jamie [21:36]: Les fonctionnalités que Slack pro euh permettre. um Et ça, ça va nous permettre de un avoir un endroit où le côté développement et décision produits existent euh en un seul endroit. um et tu verras une fois que j'ai tout mis en place euh Slack est est très bien organisé pour justement ce type de challenge, avoir euh des de de la collaboration et une sorte de, puisque slack, si c'est bien organisé, ça
+
+@Jamie [22:06]: C'est un peu structuré comme un OneNote. T'as des canvas, t'as des listes euh et les channels euh divisent un peu les, les responsabilités de chaque chose. C'est ton, il y aura un channel business pour tout ce qui est euh investisseurs et machin bidule, il y aura un channel démo où comment tout faire la démo existe là, il y aura un channel développement interne, il y aura il y aura tout. Et um
+
+@Morgane [22:09]: Ouais.
+
+@Jamie [22:30]: Toutes les les alertes de base de données, d'erreur euh de de la plateforme, une fois qu'elle est en production, tout, tout rentre dans ce lac. um Et ce qui est encore meilleur, c'est que avec la version pro qu'on a euh quand on, quand on parle, quand tu parles avec les diététiciens et les les patients potentiels et tout ça, si tu, si jamais tu le fais en appel visio plutôt qu'en personne. um tu peux envoyer un un lien d'invitation.
+
+@Jamie [23:00]: Euh à cette personne qui pourrait juste euh faire l'appel sans faire de compte et tu auras la transcription.
+
+@Morgane [23:07]: Mais par contre, il devrait télécharger sac.
+
+@Jamie [23:11]: Euh s'ils font l'appel depuis leur PC non, c'est cela qui existe dans le browser.
+
+@Morgane [23:16]: OK.
+
+@Jamie [23:18]: Um Et ce qui permettrait d'avoir euh les résumés il y a avec ces personnes-là, chaque fois que tu fais un appel euh et
+
+@Morgane [23:26]: Ouais. Mais ce qui est intéressant ça, c'est vrai que si euh enfin parce que là pour l'instant moi je prends note de ce qu'ils me disent, tu vois. Et de temps en temps, je suis dans la conversation et donc s'il y a que si si ça pouvait prendre note à ma place serait bien.
+
+@Jamie [23:39]: Ouais, c'est vraiment et et justement le comme je disais, je fais tout avec l'IA en ce moment, c'est c'est ça qui me permet de d'avoir autant de projets qui tournent en même temps. um mais ce que ça fait, c'est que je dois je je me je me dois de donner à à mon IA tout le contexte d'un projet à à tout moment. Sinon, il va briller, il va partir dans tous les sens et c'est, c'est avec l'expérience, c'est beaucoup plus chiant d'aller réparer que de prévoir et de de de d'être très
+
+@Morgane [23:57]: Ben oui, ouais.
+
+@Jamie [24:09]: Restreint sur ce que l'IA peut faire euh que de le laisser un peu vagabonder, aller vérifier et puis devoir tout rechanger. um Mais slack sur ce niveau-là, euh l'intégration avec euh Claude, ChatGPT et tous les autres euh provider de de IA il est vraiment vraiment vraiment bien. C'est-à-dire que moi avec
+
+@Morgane [24:29]: Bah ouais, j'ai hâte de découvrir toutes les fonctionnalités de slack parce que je sais bien que et on on en a déjà parlé souvent, mais c'est vrai que moi j'avais comme je l'utilisais un peu comme un WhatsApp, je voyais pas euh l'utilité, tu vois.
+
+@Jamie [24:41]: Il est, il est, c'est très très très puissant, très puissant. um Mais du coup, une des premières choses que je vais f- que qu'il va avoir dans cela, c'est une liste avec les fonctionnalités euh qu'on veut pour euh cette V1 ou V3 euh il va falloir aussi
+
+@Morgane [24:56]: Mais je t'avoue euh demain j'ai rendez-vous aussi avec Bastien, tu vois, c'est mon coach dans CBCBC qui euh des fois me permet de d'avancer parce que tu vois, il a l'expérience de comment on commence une startup et cetera. Et c'est vrai que moi, quand je parle avec les diététiciens et cetera, bah j'ai plein d'idées qui arrivent et des fois j'ai envie limite même de pivoter alors que c'est pas encore nécessaire, tu vois de pivoter le produit tant qu'on l'a pas testé mais euh et comme ça peut-être demain j'aurais mis mes idéaux claires avec Bastien, je crois que je
+
+@Jamie [25:02]: Ok.
+
+@Morgane [25:26]: Plus facilement une direction euh ça serait bien une fois enfin on fera sûrement un call avec lui comme ça je te présente et euh qu'est-ce que j'allais dire euh maintenant j'ai une question c'est que combien de temps tu penses euh qu'on pourra euh avoir la version combien de temps ça prendrait de développer chez mec, c'est compliqué parce qu'on n'a pas justement scellé l'écriture, mais
+
+@Jamie [25:27]: Ouais. Nickel, ouais.
+
+@Jamie [25:48]: Le ouais, c'est les listes, c'est ça qui me faut. um Mais je je t'avoue en ce en ce moment.
+
+@Morgane [25:49]: Ouais.
+
+@Jamie [25:56]: Euh J'ai, j'ai Je suis à fond, niveau boulot. J'ai beaucoup de choses, mais je suis je suis pas pas dans le sens où je vais pas savoir le faire. Je dis juste je suis en mode um.
+
+@Morgane [26:03]: Mhm
+
+@Jamie [26:10]: Très très très busy et du coup, mon ma ma mon agenda entre guillemets, il est très rigide, c'est-à-dire que um en en termes de développement sur les quelques prochains mois. um Tout va dépendre des informations dont j'ai besoin de vous. um C'est-à-dire euh justement cette liste de fonctionnalités, l'explication des fonctionnalités et ce qui est clairement
+
+@Morgane [26:17]: Mhm. Mhm
+
+@Morgane [26:34]: Imaginons que tu l'as pour lundi prochain. On va se fixer lundi prochain, t'as tout, c'est clair et net. Il me faut que je travaille tout le week-end pour être sûr qu'on qu'on cadre bien et et alors comme ça, tu peux au moins me donner une deadline parce que comme ça, je sais.
+
+@Jamie [26:38]: Pour avoir la liste. Ouais, lundi, si tu me donnes ça lundi, lundi, je peux te donner une deadline. euh Maintenant ce que je vais faire aujourd'hui, c'est que je vais t'envoyer un une sorte de structure pour répondre à une structure pour donner à chaque fonctionnalité.
+
+@Jamie [27:04]: C'est-à-dire ça va être une liste de questions qui a pour chaque fonctionnalité. Et tu vois la fonctionnalité à euh je sais pas moi euh truc débile suivi patient euh pour et il y aurait toute une liste de questions, pas une énorme liste, mais une liste de questions à laquelle il faut répondre pour cette fonctionnalité-là.
+
+@Morgane [27:22]: Ouais.
+
+@Jamie [27:22]: Et tu fais ça pour chaque fonctionnalité que tu veux pour cette première version. Et si lundi tu me tu me donnes ce ce document lundi soir, je pourrais te donner une une vraie date fixe de on a pas cette version live.
+
+@Morgane [27:33]: Ouais. OK ça va comme ça je, après je peux je peux déjà tu vois m'occuper de du marketing, de retrouver euh des des des praticiens pilotes et même tu vois par exemple avec euh Startit de CBC on a des qui s'appelle des ER où on se met des des deadline en disant ben voilà ça c'est notre objectif euh avoir autant de démo
+
+@Morgane [27:55]: Avoir autant de contrats signés et cetera donc euh comme ça je peux leur euh leur donner aussi euh des feedbacks. Du coup, tu vois, j'ai l'impression de reculer parce que moi la V2 avec les pilotes, ça devait commencer en septembre mais je sais bien qu'on va être décalé euh de de quelques mois parce qu'on va tout recompenser finalement, tu vois? Parce que je sais bien que c'était pas possible avec cette version-là que quand il y a des pilotes qui te disent bah ce serait bien d'ajouter ça, de supprimer ça et cetera. C'était impossible de le faire avec du low code.
+
+@Jamie [27:57]: Ouais.
+
+@Jamie [28:15]: Ouais.
+
+@Morgane [28:21]: Ou tu vois ou euh de c'est il faut mieux recommencer, ouais, c'est ça.
+
+@Jamie [28:22]: Ouais non impossible le le le le le modèle euh comment dire, le le le modèle qui fonctionne très très bien euh en ce moment pour des des produits un peu de toute ampleur. um Mais où le le la valeur, c'est vraiment l'usage de l'application ou du site web. um c'est le modèle qui fonctionne, c'est le moins cher et le plus rapide, juste au moment où il y a des utilisateurs, et c'est les utilisateurs qui vont informer la la valeur du produit, c'est tout.
+
+@Morgane [28:45]: Oui, euh ouais. Exactement ouais.
+
+@Jamie [28:52]: C'est um il faut les démos, c'est pas c'est pas nécessairement qu'il faut le le vendre le produit comme la solution de qui va leur faciliter la vie. C'est, tu leur expliques la la vision de la chose et tu leur dis, écoute, on a une première version, on pense que les nickels utilisez le à prix réduit ou gratuit ou je ne sais pas quoi, ça c'est ça c'est à vous de voir.
+
+@Morgane [29:05]: Oui. Voilà. Et on le, et maintenant, tu vois, c'est ça que j'ai
+
+@Jamie [29:14]: Mhm.
+
+@Morgane [29:16]: C'est vrai que avec Bastien, il me disait, allez, il faut peut-être se concentrer sur un secteur euh pour répondre totalement euh au au principe donc par exemple les diététiciens si c'était versus calorie, on met vacc- l'accent sur d'abord chercher les diététiciens. C'est vrai que moi je je vais je vais pêcher dans l'ensemble des des des des des des des métiers où il y a un changement alimentaire à mettre en place, tu vois. Maintenant j'ai une question par rapport.
+
+@Jamie [29:42]: J'ai j'ai pensé parce que j'en j'en parlais avec un ami ici qui est infirmier à Lisbonne. um
+
+@Morgane [29:50]: Oui.
+
+@Jamie [29:50]: Voulait un peu son avis externe de à quoi ressemblait le le le truc marketing que j'avais fait. um Et lui, il avait posé une question vraiment toute toute conne et toute simple. um Est-ce que Cette logique de suivi entre consultation pourrait s'appliquer à quelque chose qui n'est pas basé dans la nutrition.
+
+@Morgane [30:12]: Comme quoi?
+
+@Jamie [30:12]: Est-ce que ça pourrait être, est-ce que ça pourrait être à à vision un peu plus globale sur la médecine que Peu importe le type de maladie ou le type de um De incapacité que que tu as si tu as des suivis réguliers avec un médecin.
+
+@Jamie [30:32]: Et que les consultations sont comme comme comme comme dit Rémi, entre cinq et six semaines et qu'il n'y a pas de vision sur euh sur ce que le patient fait? Est-ce qu'il n'y a pas moyen de f- de d'appliquer cette même logique euh sur d'autres secteurs dans le monde médical.
+
+@Morgane [30:49]: ça dépend ce qui est important pour eux de savoir entre les consultations. Tu vois? Je ne sais pas ce que ton ami avait en tête. Donc euh là par exemple, moi je sais que pour les diététiciens et naturaux et cetera. Ce qui est important, c'est voir s'ils arrivent à mettre en place des objectifs fixés et euh s'ils arrivent à changer et introduire dans leur aliment enfin dans leur alimentation maintenant, si lui il dit ben pour moi c'est important de savoir ça et ça et ça durant leur absence, ben c'est possible, tu vois.
+
+@Jamie [30:51]: Oui oui oui oui. S
+
+@Morgane [31:16]: Mais bon, tu vas voir que bien souvent on va te dire ah c'est bien que ce soit dans le sport, serait bien que ce soit dedans et tu dis ben non, il faut que je reste focus sur d'abord.
+
+@Jamie [31:16]: Ouais.
+
+@Morgane [31:25]: Je trouve que ça fonctionne dans le secteur que je choisis.
+
+@Jamie [31:26]: Ah oui non je je je parlais je parlais pas de je parlais pas de ça dans le sens où euh on devrait pivoter et faire ça maintenant, mais je dis sur le sur le long terme, sur le long terme, est-ce que l'idée de le pousser au-delà de juste le domaine nutrition médicale.
+
+@Morgane [31:34]: Non, je sais.
+
+@Jamie [31:43]: Euh Est-ce qu'il y a déjà eu des des des discussions ou une une idée là-dessus.
+
+@Morgane [31:47]: Jamie, on suivra le flow si on voit qu'il y a il y a des des des trucs intéressants à faire et de d'ajouter. Parce que moi dans dans un moment je me disais tiens, ce qui serait génial, c'est que bien souvent ben quand tu veux par exemple, ne serait-ce que perdre du poids. Tu vois un coach sportif, tu vois peut-être un kiné, tu vois un nutri et alors ils peuvent donner peut-être chacun des objectifs et que tout soit regroupé dans Rémy finalement, tu vois?
+
+@Jamie [31:52]: Des demandes. Ouais.
+
+@Jamie [32:13]: Ah ouais.
+
+@Morgane [32:14]: Donc ça c'est aussi une possible.
+
+@Jamie [32:19]: Ouais, et puis c'est ouais, non, on va, on va trop se perdre là Morgane.
+
+@Morgane [32:24]: Ben oui, je sais, je sais, c'est pour ça que des fois j'ai besoin de bah tiens qu'ils me recent en disant oui ça il faut mettre plus tard, il faut que la V2 ce soit quoi ce soit euh vraiment le euh go to market. Donc ça veut dire que il faut qu'on trouve 15 praticiens qui euh qui qui croient en Rémy et qui veulent le le tester et l'améliorer et on voit qu'il y a un intérêt. Et quand on a mesuré un intérêt ah ben alors on on on on on on grandit, on le fait l'améliorer, on cherche plus de praticiens.
+
+@Jamie [32:25]: Euh Ouais.
+
+@Morgane [32:54]: Et cetera maintenant euh On va se focus du coup sur les fonctionnalités. Ma question pour toi c'était euh j'ai eu hier par exemple une nutrithérapeute qui m'expliquait euh enfin, c'est pour ça que je je vise les personnes qui vont commencer parce que elle, elle note tout à la main. Elle me dit mais moi ça va me faire plus de travail. Je vais devoir tout renoter manuel enfin par écrit alors je ben oui c'est vrai que tu vois, je parle avec elle depuis presque un an et ça elle me l'avait jamais dit, tu vois qu'elles notaient tout le temps à la main euh lors des
+
+@Jamie [33:23]: Oui
+
+@Morgane [33:27]: Consultation. Et alors j'ai dit mais qu'est-ce qui toi t'aiderait finalement euh qu'est-ce que pourquoi tu utiliserais Rémi finalement si euh ça ça ça enfin comment il pourrait t'aider. Et alors elle m'expliquait que elle, elle envoyait un questionnaire à ses patients euh et puis si par exemple, tu vois, Rémi pouvait envoyer ce questionnaire, faire un résumé et que les protocoles qu'elle a sont déjà limite préenregistrés et que Rémi crée le protocole et qu'elle n'a plus qu'à modifier ou valider, tu vois ça ça pourrait
+
+@Morgane [33:57]: Pour l'aider. Mais j'ai l'impression que c'est vachement complexe.
+
+@Jamie [34:01]: Oui, moi moi ma question parce que même en dehors de cette euh ouais, c'est est-ce que dans les dans les documents que j'ai lu ça parlait de un protocole qui existe dans toutes les cliniques de Mende.
+
+@Morgane [34:16]: Mhm.
+
+@Jamie [34:16]: Um Et du coup, ce serait d'avoir une protocole pour tous les les cliniciens qui Qui qui utiliserait la plateforme alors ce côté-là, c'est un peu plus simple d'avoir un protocole pour plusieurs, mais sur le le l'idée d'avoir un protocole par
+
+@Jamie [34:34]: Clinicien ou diététicien qui est sur la plateforme. Ma question, c'est ça ressemble à quoi exactement ces protocoles? Parce que si c'est tout simplement genre, si, si le niveau de, je je vais dire des conneries hein, mais si le niveau de glucémie élevé, enlever les oxysalates, si c'est des, si c'est des, si ça fait ça pour toute une protocole, c'est bien, mais s'il y a des nuances dans une protocole, s'il y a des, c'est dur de de de faire confiance à l'IA pour le donner, tu vois?
+
+@Morgane [34:43]: Mais.
+
+@Morgane [35:00]: Mais, c'est ça qui est Oui, c'est ça qui serait intéressant, c'est que tu vois tout ce, tu vois euh métiers confondus, leur difficulté, ce qui prend plus de temps, c'est créer ces fameux protocoles et j'ai eu une femme qui expliquait que elle dans une clinique qu'elle a eu, il y avait un Excel où il y avait des trucs de base et elle n'avait plus qu'à modifier. Donc comme tu dis, il faut un truc finalement très large donc euh diabète, voici comment je soigne quelqu'un avec du diabète, mais comme tout le monde est différent, ce sera toujours enfin l'IA va faire un truc général.
+
+@Morgane [35:33]: Pour euh pour que ce soit rapide. Mais c'est toujours le le le praticien qui devra changer et euh modifier parce que ça ne peut pas être ennemi qui fait un protocole. Il faut vraiment limite que ce soir Rémy, c'est comme si c'était euh un brouillon que t'as déjà enregistré et il le mets juste et que toi tu le modifies avant envie d'e-mails, tu comprends?
+
+@Jamie [35:52]: Ouais.
+
+@Morgane [35:54]: Donc il faudrait, mais le problème le problème de ça, c'est que je réfléchis à ça depuis euh quelques jours maintenant, c'est que soit parce que tout le monde travaille de façon différente. Il y a tout le temps des des des similitudes dans certains domaines, mais il faudrait que soit euh ils prennent le truc que Rémy fait automatiquement et l'adapte au fur et à mesure ou soit qu'il passe son temps à encoder lui sa façon de de de de de travailler et ces différents plans par rapport aux différentes pathologies ou situations perte de poids femmes.
+
+@Jamie [35:54]: Euh
+
+@Morgane [36:24]: Homme et cetera mais ça, ça prendra tellement de temps que personne ne fera, tu vois?
+
+@Jamie [36:28]: Alors Ta ta ta ta ta! Résolution de ce problème vraiment tout con.
+
+@Morgane [36:37]: Ouais.
+
+@Jamie [36:38]: Um c'est que quand on on on laisse le le côté automatique de ces protocoles de côté, on ne se concentre pas du tout dessus et vu qu'on est petit, vu qu'on n'a pas d'utilisateur, quand on onboard les 15 premiers.
+
+@Morgane [36:56]: Hm.
+
+@Jamie [36:56]: On peut faire sur mesure. On leur donne, on leur dit envoyez-nous tous les documents et sur base de 15 cliniciens avec des protocoles sûrement tout à fait différents, même même peut-être similaires, on peut Reverse engineer. Je ne sais pas comment on est en français. On peut, à partir de de d'un d'un
+
+@Morgane [37:14]: Voilà.
+
+@Jamie [37:18]: Grand set d'exemples On peut déterminer c'est quoi la meilleur moyen d'automatiser ce processus là?
+
+@Morgane [37:24]: Ouais.
+
+@Jamie [37:25]: Plutôt que d'essayer de par magie, euh savoir euh
+
+@Morgane [37:27]: De trouver des solutions maintenant, oui. Faudrait, t'as raison.
+
+@Jamie [37:31]: Et et justement, quand on onboard les quelques les 15 premiers par exemple, ça va ajouter une petite touche de, ah oui, OK, alors ça va vraiment être pour moi. C'est pas juste, je teste une autre plateforme euh qui qui fonctionne comme toutes les autres, toutes les autres qui ont mes données bla bla bla bla bla bla bla. Une fois qu'on a les les les 15 premiers, le le truc qui pourrait potentiellement leur faire dire oui ou non, c'est ah et d'ailleurs, on va faire du travail en amont avec vous pour que votre protocole à vous soit sur la plateforme et pas la nôtre.
+
+@Morgane [37:39]: Ouais.
+
+@Morgane [38:01]: OK.
+
+@Jamie [38:02]: Ça nous enlève du temps de développement maintenant et
+
+@Morgane [38:03]: Génère mais est-ce que est-ce est-ce que ça ça sera pas trop compliqué à mettre en place parce que ça veut dire à ajouter de la data dans chaque profil.
+
+@Jamie [38:10]: Quand on a 15, quand on a 15 utilisateurs qui paient et avec des prospects de plusieurs si c'est complexe, on trouvera. Et il y a des choses beaucoup plus complexes qui existent euh dans le monde de de la tech, ça va pas être impossible, ça va être un défi, mais un défi qu'on devrait affronter quand on a des revenus.
+
+@Morgane [38:33]: OK et euh Et alors j'aimerais bien que ce soit que Rémi soit vraiment très performant par rapport aux macro et micronutriments et la basicale ça je peux te l'envoyer dans les les fritures les les
+
+@Jamie [38:46]: Ouais, euh
+
+@Morgane [38:48]: Parce que ça, ça ne devrait pas être c'est enfin parce qu'il y a la donnée qui existe déjà, tu vois.
+
+@Jamie [38:49]: Ah Oui.
+
+@Morgane [38:53]: Donc euh ça ça devrait simplement euh je sais pas si ce sera dans Neon ou pas base mais je suppose qu'il ira chercher des informations là-dessus.
+
+@Jamie [39:01]: Ouais tu tu m'avais parlé la dernière fois d'une base de données genre publique, accès à tout le monde ou est-ce que c'est genre, est-ce que c'est une page web avec euh un tableau. Je suis vraiment OK.
+
+@Morgane [39:05]: Ouais. Ouais. Page web, mais tu peux exporter. C'est une page web, c'est basical comme ça tu peux chercher, mais tu peux exporter quand même pas mal d'infos. Donc ça je pourrais passer mon temps. Tu vois, je suis comme ta petite main moi. Tu me dis euh il me faut ça et alors j'exporte comme ça, tu perds pas de temps là-dedans, tu vois? Comme toi, t'es débordé, s'il y a des choses que je peux faire moi, n'hésite pas hein, tu m'envoies et moi je le fais.
+
+@Jamie [39:28]: Nickel ou l'idée, c'est une fois que, une fois que c'est quoi je vais faire slack aujourd'hui parce que ça va être en tête une fois que je je je raccroche. um Je vais, je vais faire le slack et la la petite main là, tout ce qu'elle fait, c'est de dropper toute l'information possible de partout dans le slack. um Je vais, je vais je vais désigner des zones où certaines informations sont listées. um et ouais, c'est là que ça va devenir le le book de Rémy et et tout tout va exister là. um Et vous deux, à terme, genre.
+
+@Morgane [39:49]: B.
+
+@Jamie [40:08]: Quand on travaille beaucoup plus en asynchrone parce que chacun a sa vie et machin. On n'est pas obligé de faire des appels toutes les semaines parce que bah, il y a le il y a le statut, il y a il y a le
+
+@Morgane [40:14]: Non, non. Bien.
+
+@Jamie [40:19]: Il y a le progrès en direct de de du développement, il y a toute euh si tu fais des appels des mots, moi, je serai notifié parce que il y a eu un appel avec un client externe euh au sein de de Slack genre tout, tout ça et chaque fois que euh un enregistrement d'une démo est faite via Slack les résumés sont euh automatiquement collectés, ils sont automatiquement mis avec le reste et c'est automatiquement pris en compte et ouais, le le le but, c'est vraiment d'avoir Slack euh qui travaille pour nous, plutôt que nous qui travaillent.
+
+@Jamie [40:49]: Mon cours. Um Et moi le le le but ultime entre guillemets, um parce que c'est comme ça que je je j'organise tout le reste de mon travail, c'est que je passe, je passe souvent mon lundi, mardi et moitié de mercredi, à juste planifier ce qui doit être fait.
+
+@Morgane [41:10]: Mhm.
+
+@Jamie [41:11]: Et j'ai créé tout plein de tickets. Je sais pas si tu connais le concept de ticket dans le monde de de de tech.
+
+@Morgane [41:18]: C'est tu mettre des notes euh avec euh après fait euh à retester et cetera, c'est pas ça?
+
+@Jamie [41:22]: Hm Tout le processus de développement fonctionne à base de tickets. Tu décides, tu me donnes une fonctionnalité euh exemple euh le le truc qui va um analyser le PDF euh et le le mettre dans la base de données au bon endroit. Et ben à partir de cette fonctionnalité-là, je vais créer peut-être une dizaine quinzaine de tickets qui répartit le boulot de mettre cette fonctionnalité sur la plateforme.
+
+@Jamie [41:50]: En en en tâche hyper simple, hyper efficace um et facile à mettre en place. um Et le l'utilité de faire ça à l'époque, c'était justement pour que un petit qui ne sait pas nécessairement tout ce qu'il doit faire et et et c'est
+
+@Jamie [42:08]: Explicitement ce qu'il doit faire parce que le ticket lisse exactement ce qu'il doit aller faire dans le code. um moi j'ai pris ça et je l'applique à mes agents IA. C'est-à-dire que j'utilise un IA un peu plus puissant en début de semaine pour planifier tous les tickets pour tous mes projets. um et puis l'autre moitié de la semaine, je passe mon temps euh là parfois sur mon téléphone, à juste dire à à Claude bah prends un ticket 1, 2, 3, prends un ticket 1, 2, 4, prends tickets, 1, 2,5. um et tout est organisé pour que chaque
+
+@Jamie [42:38]: Fois que je lance un ticket, je puisse aller tester le ticket sur un vrai URL, dire que ça marche ou ça marche pas, dire de changer un truc et puis pouf, il le met en production. um Du coup, le le goal ultime, c'est que tous ces fonctionnalités soient hyper hyper hyper bien défini dans Slack pour que moi, quand je, j'ai les les deux jours semaine où je suis travail été.
+
+@Morgane [42:59]: Comment tu puisses avancer quoi.
+
+@Jamie [43:02]: Ouais.
+
+@Morgane [43:02]: OK.
+
+@Jamie [43:03]: Et si on, si on trouve un bon bon système pour faire le pour que, pour donner un peu du testing à toi. um Moi je peux, je peux je peux concrètement lancer tout plein de ticket un jour où je suis occupé à faire autre chose. um et toi tu me dis si tel ticket fonctionne, si tel ticket fonctionne, si tel ticket fonctionne, ça veut dire fin de journée, il y a eu du progrès, mais moi, tout ce que j'ai fait, c'est de lancer des, des, des sessions cloud où j'ai pas dû aller perdre mon temps entre guillemets, à aller faire du testing. Mais ça, c'est
+
+@Morgane [43:33]: Mhm
+
+@Jamie [43:33]: Quand on a euh ça, c'est quand on a le le la pipeline entre guillemets euh qui fonctionne vraiment bien. En ce moment, j'ai pris une pipeline d'un d'un
+
+@Morgane [43:40]: C'est ça.
+
+@Jamie [43:43]: Le la pipeline IA dont je parlais là, c'est quelque chose que je créais par projet um et en fonction des demandes du projet, j'adapte, je change et quand on aura passé peut-être. Un à deux mois à travailler avec cette pipeline si, je vais voir où il y a les les trous et des améliorations. euh je vais changer un peu la pipeline, je vous expliquerai à ce moment-là, sur base de que, j'ai vu que vous préférez travailler comme ça ou que c'est plus facile de faire les choses ainsi. um On aurait un un un sorte de processus qui est hyper hyper facile pour chacun à à donner de l'input et donner du feedback.
+
+@Morgane [44:12]: Mhm.
+
+@Jamie [44:22]: Et à terme, quand on aura une équipe euh de de on on peut se justifier de ne pas les payer la blinde parce que leur tâche serait explicitement être teste um parce que la pipeline elle fonctionne bien quoi.
+
+@Morgane [44:38]: OK, ça va. Donc euh aujourd'hui toi tu fais slack, moi je vérifie euh je je check tout ce que tu mets dedans et je je corrige parce que tu me disais qu'il y avait des trucs qui se contredisaient.
+
+@Jamie [44:43]: Du cô C'est pas qui se contredisait, j'ai j'ai bien compris que c'est ce qui se passait, c'est que la V1 que tu m'as envoyé dans euh Github, c'est ce que t'as fait avec loveable. Et puis dans le OneNote tu parles d'une d'une V2 où il y a eu tout un changement de direction parce que vous avez rendu compte que euh euh le um
+
+@Jamie [45:11]: Le onboarding pour le patient, il est trop compliqué et le le le le c'est dans la V2 que vous avez switché vers OK, on n'est pas vraiment axé sur le patient, on est plutôt axé sur le clinicien pour euh la la vente du produit um et du coup, la première version que tu m'as envoyé dans Github sur le sur base de laquelle j'ai fait tout plein de recherches sur comment faire le planning. Quand j'ai reçu tous les documents OneNote et quand j'ai été regarder ça, um bah il y avait tout plein de trucs qui se contredisaient dans mon planning.
+
+@Morgane [45:23]: Mhm.
+
+@Jamie [45:41]: Qui existait déjà dans la base de code, VS tous les documents qui sont rentrés. Moi, je je je me, je me dis dans toute logique que toutes les spécifications de la V2 sont plus importantes que celles de la V1, puisque, c'est comme ça que ça marche.
+
+@Morgane [45:56]: Et c'est lavé deux que t'as reçu, c'est pas lavé hein, je pense pas que tu es tu es vu euh laver hein.
+
+@Jamie [46:02]: Bien sûr.
+
+@Morgane [46:04]: Ouais.
+
+@Jamie [46:05]: Parce qu'il y a pas mal de différence entre le planning que j'ai fait à partir du parce que tu m'as envoyé le Github et puis c'est une semaine après que tu m'as envoyé le One note du coup sur la sur sur le sur le le temps de la semaine, j'ai fait les analyses sur la base de.
+
+@Morgane [46:23]: Ça dépend quel-, en fait, c'est vrai que dans le, t'as peut-être été dans la V1, mais peut-être pas dans la V2 alors ça dépend dans quel euh où tu étais dedans.
+
+@Jamie [46:31]: Ah! attends.
+
+@Morgane [46:33]: C'était dans New app ou
+
+@Jamie [46:34]: Est-ce que New up ouais.
+
+@Morgane [46:38]: C'était dans nous. Alors ça devait être la B2.
+
+@Jamie [46:48]: Ah. Revenue Up La V1, c'est quelque chose que t'avais fait avec Lovable.
+
+@Morgane [47:02]: C'était écritanté qu'il avait fait, mais ils avaient utilisé en effet Lovable.
+
+@Jamie [47:14]: Là, par exemple, la dernière push que je vois sur l'app, c'est sécurité et nettoyage pré V2, alors avant la V2. Je sais pas, en tout cas genre c'est ce ce problème là en en en particulier, le problème de savoir quoi faire entre V1 et V2. le ce que j'ai tendance à faire avec les gens, c'est plutôt OK, partons de zéro. J'ai compris le concept, j'ai compris ce qu'on essaie de de créer. um
+
+@Morgane [47:37]: Oui.
+
+@Jamie [47:46]: Toi dans ta tête, vu que tu avais un EV2 et que tu sais ce que tu veux de, de chaque et ce que tu ne veux pas euh travaillons sur une liste de fonctionnalités neuve.
+
+@Morgane [47:55]: Ouais, ouais ouais ouais.
+
+@Jamie [47:57]: Euh et et on fait ça. um Ouais ouais, du coup.
+
+@Morgane [47:58]: OK. Et alors tu, mais comment comment on fait pour travailler parce que dans, j'ai besoin de devoir me connecter avec euh une diététicienne, j'ai rendez-vous à 11 heures, mais juste, donc c'est dans cela que je vais aller voir tout ce que tu fais et je complète les les features, c'est ça hein?
+
+@Jamie [48:14]: Ouais. Je vais en fait, ce que je vais faire, c'est que je vais, je vais créer tout plein de channels, j'ai créé tout plein de documents et de listes. Et il va y avoir un document central que je vais vous envoyer dans le le channel central qui va être un sorte de guide de comment utiliser le slack. Je veux, je veux pas vous livrer euh à vous tout seul, à essayer de déchiffrer euh tous les trucs et tous les boutons à appuyer. um je vais, le document va expliquer comment cela fonctionne, comment tout est orchestré et il va expliquer la logique de la pipeline actuelle. Comme ça, vous comprenez et vous savez à quoi vous attendre quand vous dites OK, cette semaine, on fait cette fonctionnalité.
+
+@Morgane [48:31]: OK.
+
+@Jamie [48:52]: Et bah alors c'est quoi vos responsabilités, c'est quoi mes responsabilités, tu vois?
+
+@Morgane [48:53]: Voilà. OK, OK, OK, ça va hop.
+
+@Jamie [48:57]: Tout tout sera là.
+
+@Morgane [48:58]: Allez merci Jamie, je te souhaite une belle journée.
+
+@Jamie [48:59]: D. Inquiète. Ben pareil.
+
+@Morgane [49:04]: Et à bientôt. C'est-à-dire.
+
+@Jamie [49:06]: T. Bon.

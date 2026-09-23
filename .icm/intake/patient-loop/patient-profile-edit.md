@@ -5,7 +5,7 @@
 - personas: patient
 - initiative: a patient experience validated on real terrain, in time for the December open day / objective: the patient loop working end to end for one real patient
 - depends-on: link-writes
-- sequence: 5 of 6
+- sequence: 8 of 9
 - priority: P1
 - size: S
 - sources: feedback § 7 ("Profil patient : allergies et intolérances, régime, temps disponible,
@@ -51,7 +51,7 @@ three-level vocabularies the generation prompt will read.
 
 ## Notes for Define
 
-- **Decisions that bind** ([`README.md § Decisions of record`](../README.md)): D-2 (the same token, read + write) · brainstorm § 7 (no exact preparation time — a three-level field is not that).
+- **Decisions that bind** ([`README.md § Decisions of record`](../README.md)): D-2 (the same token, read + write) · D-23 (the 18+ rule and « age, not date of birth » from the 28 Aug call are open points here) · brainstorm § 7 (no exact preparation time — a three-level field is not that).
 
 - Allergies are safety-critical inputs to recipe generation; a patient editing them is the right
   owner, and the audit trail keeps who changed what.
@@ -64,6 +64,10 @@ three-level vocabularies the generation prompt will read.
   starting point).
 - Should the patient be able to edit allergies at all, or only add (never remove) without Morgane
   confirming? Safety argues add-only; autonomy argues full edit.
+- The 28 Aug call (D-23): « il faudra qu'ils aient absolument 18 ans » and age rather than date of
+  birth. `birth_date` is stored today and age derived at read. Does the rule mean refusing a profile
+  under 18, and does she want the stored date replaced by an age band — her call, and RETENTION's
+  row follows it.
 
 ## Prompt
 

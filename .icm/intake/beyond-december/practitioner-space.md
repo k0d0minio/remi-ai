@@ -5,7 +5,7 @@
 - personas: practitioner, operator
 - initiative: a patient experience validated on real terrain, in time for the December open day / objective: the database and accounts under it
 - depends-on: patient-accounts
-- sequence: 3 of 6
+- sequence: 3 of 8
 - priority: P2
 - size: L
 - sources: V2 explication (« Profil Praticien » : demande → Pending → back-office Accepter /

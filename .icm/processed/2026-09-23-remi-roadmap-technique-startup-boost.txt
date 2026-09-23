@@ -1,0 +1,163 @@
+REMI
+Roadmap technique & utilisation du financement Startup Boost
+Document de synthèse – septembre 2026
+Positionnement technique
+REMI ne cherche pas à créer son propre LLM à court terme. La valeur technologique est construite dans la couche spécialisée qui structure les données nutritionnelles et patient, contextualise les recommandations, orchestre des modèles IA interchangeables et contrôle la qualité des résultats.
+1. Résumé exécutif
+REMI est actuellement en phase de reconstruction produit après un premier MVP testé début 2026 avec FunMedDev auprès d’environ 30 patients. Ce MVP proposait des recettes 100 % personnalisées du lundi au dimanche, en fonction du profil, de la personnalité et des recommandations du praticien.
+Le test a confirmé l’intérêt de la personnalisation, mais a également montré qu’un programme alimentaire complet reste trop prescriptif pour de nombreux utilisateurs. Le principal apprentissage est que REMI doit davantage partir de ce que les personnes mangent réellement et les aider à améliorer progressivement leurs choix, plutôt que de remplacer entièrement leurs habitudes par un menu imposé.
+La deuxième phase de REMI repose donc sur deux axes : l’amélioration contextuelle des repas existants et une dimension pédagogique forte. L’hypothèse produit est qu’une personne passe plus facilement à l’action lorsqu’elle reçoit une suggestion simple, applicable immédiatement, et qu’elle comprend pourquoi cette suggestion est pertinente pour elle.
+Le développement technique suit la même philosophie : ne pas automatiser trop tôt. La plateforme, les données et les règles métier sont structurées en premier ; les comportements IA sont ensuite testés, évalués et progressivement intégrés.
+2. MVP 1 : ce qui a été testé et ce que REMI en a appris
+MVP testé
+Conclusion / décision produit
+Recettes personnalisées pour toute la semaine
+Conserver les recettes comme inspiration, mais ne plus en faire le cœur exclusif de l’expérience.
+Personnalisation selon profil et recommandations
+Conserver cette logique, mais l’appliquer aussi aux repas réellement choisis par l’utilisateur.
+Programme nutritionnel très structuré
+Passer à des micro-améliorations simples et progressives.
+Produit construit à partir d’hypothèses internes
+Construire désormais avec de vrais utilisateurs et mesurer ce qui les aide réellement à agir.
+Valeur principalement dans le contenu généré
+Faire évoluer la valeur vers un système de décision contextuel, pédagogique et continuellement évalué.
+3. Phase actuelle : construire le produit avec les utilisateurs
+Depuis septembre 2026, Morgane suit 7 consultants dans un programme de 8 semaines. Cette phase n’a pas pour objectif de simuler un produit fini, mais de tester en conditions réelles les comportements et workflows que REMI doit ensuite automatiser.
+identifier les freins réels au changement alimentaire ;
+comparer l’utilité des recettes, challenges, feedbacks, ressources et suggestions d’amélioration ;
+observer la fréquence à laquelle les utilisateurs ont réellement besoin d’aide ;
+comprendre quelles explications pédagogiques favorisent l’adhésion ;
+mesurer ce qui est utilisé, ignoré, répété ou abandonné ;
+identifier quelles tâches doivent rester sous supervision du praticien et lesquelles peuvent être automatisées.
+4. Nouvelle logique produit : de la recommandation à l’action
+Le cœur du produit n’est plus “générer un menu”, mais transformer une recommandation existante en action quotidienne adaptée à une situation concrète.
+Entrée
+Traitement REMI
+Sortie utilisateur
+“Je vais manger des spaghetti tomate”
+Profil + objectifs + recommandations + contraintes + données alimentaires
+1 amélioration simple + pourquoi elle est utile
+Repas déjà consommé
+Analyse contextuelle et cohérence avec le plan
+Feedback à tester la prochaine fois
+Besoin d’inspiration
+Sélection/génération selon contexte réel
+Recette personnalisée, réaliste et compatible avec les préférences
+La dimension pédagogique est volontairement intégrée au produit : REMI doit expliquer suffisamment le “pourquoi” pour faciliter l’adhésion, sans transformer chaque interaction en cours théorique.
+5. Fondation technique : construire REMI avant d’automatiser l’IA
+La roadmap proposée par Jamie repose sur un principe central : ne pas dépendre de la qualité spontanée d’un modèle génératif. REMI doit d’abord structurer son propre contexte métier, ses données, ses règles et ses critères de sortie.
+profil patient structuré ;
+recommandations du praticien ;
+allergies, intolérances et exclusions ;
+objectifs et contraintes ;
+base alimentaire macro- et micronutritionnelle ;
+règles de préparation et de cohérence culinaire ;
+historique des essais, feedbacks et comportements.
+Cette approche permet de rendre le modèle sous-jacent interchangeable. Claude, Gemini, Mistral, OpenAI ou un autre modèle peuvent être utilisés comme moteur de génération, tandis que la logique spécifique reste chez REMI.
+6. Validation IA : human-in-the-loop avant automatisation
+À court terme, le testing IA sera volontairement supervisé. Morgane pourra comparer plusieurs versions d’un même prompt ou d’une même méthode de contextualisation sur un profil patient identique, puis évaluer précisément la qualité de chaque résultat.
+Critère de scoring
+Exemple de mesure
+Objectif
+Pertinence nutritionnelle
+1 à 5
+La suggestion est cohérente avec l’objectif
+Respect des contraintes
+Oui / non + erreur critique
+Aucun allergène ou conflit
+Qualité culinaire
+1 à 5
+Le plat reste réaliste et mangeable
+Personnalisation
+1 à 5
+Réponse adaptée au profil et au contexte
+Pédagogie
+1 à 5
+Explication claire et utile
+Correction experte
+Texte libre
+Ce que l’expert aurait changé
+Amélioration recommandée : conserver ces tests sous forme structurée afin de créer progressivement un benchmark propriétaire REMI. Ce benchmark deviendra un actif de R&D permettant de comparer modèles, prompts, règles et nouvelles versions du moteur.
+7. Amélioration recommandée : une couche de validation REMI
+Pour renforcer la fiabilité du système, une couche de contrôle explicite devrait se situer entre la génération IA et l’utilisateur. Le but est d’éviter qu’une réponse soit transmise uniquement parce qu’elle “semble plausible”.
+allergène détecté → rejet automatique ;
+ingrédient incompatible avec une recommandation active → rejet ou régénération ;
+proportions nutritionnelles incohérentes → recalcul ;
+association culinaire manifestement incohérente → nouvelle génération ;
+contradiction avec une exclusion patient → blocage ;
+absence de justification suffisante → reformulation pédagogique.
+Cette couche de validation renforce fortement l’argument Startup Boost : REMI ne délègue pas aveuglément la décision à un LLM généraliste ; il construit un système spécialisé autour de celui-ci.
+8. Roadmap technique Startup Boost
+Période
+Priorité
+Livrables
+Résultat attendu
+Q4 2026
+Validate
+Page patient, liens individuels, données structurées, premiers workflows, benchmark prompts
+Comprendre ce qui crée réellement de la valeur pour les utilisateurs
+H1 2027
+Build
+Moteur nutritionnel, orchestration IA, interface praticien, logique recette/repas, couche de validation
+Passer d’un prototype assisté à une plateforme fonctionnelle
+H2 2027
+Scale intelligence
+Évaluation automatisée, tests plus larges, optimisation coûts, intégration progressive génotype
+Améliorer fiabilité, couverture des cas et scalabilité
+2028
+Build the data moat
+Boucle recommandation → action → comportement, connaissance structurée, expansion
+Transformer l’usage accumulé en avantage défendable
+9. Intégration future du génotype
+Le génotype ne change pas le problème de départ de REMI : il enrichit la source des recommandations. L’objectif reste d’aider une personne à appliquer une recommandation dans sa vie réelle.
+À terme, l’architecture doit pouvoir intégrer : recommandations du praticien + contexte individuel + données issues d’un test génotypique + comportements observés. Le partenariat Fagron Genomics en discussion peut devenir un levier important, mais REMI doit rester technologiquement indépendant du fournisseur du test.
+Point de vigilance : REMI ne doit pas présenter les données Fagron comme des données propriétaires. La valeur propre proviendra plutôt de la manière dont ces recommandations sont contextualisées, appliquées, observées et améliorées dans le temps.
+10. Ce qui peut devenir propriétaire et défendable
+Le moat de REMI ne reposera probablement pas sur un seul élément. Il sera construit par combinaison de plusieurs actifs complémentaires :
+Le dataset potentiellement le plus différenciant à moyen terme n’est pas la simple donnée alimentaire, mais la relation entre profil, recommandation, suggestion, comportement réel, adhérence et adaptation. C’est cette boucle qui est directement liée à la mission de REMI : comprendre ce qui aide réellement quelqu’un à passer à l’action.
+11. Utilisation proposée des 100 000 € Startup Boost
+Le financement doit être présenté comme un accélérateur de R&D et de time-to-market. Il ne s’agit pas de financer “des tokens”, mais d’acheter la capacité de tester, comparer, fiabiliser et intégrer rapidement une intelligence nutritionnelle spécialisée.
+Poste
+Budget indicatif
+Ce qui est financé
+Milestone associé
+Moteur IA & orchestration
+35 k€
+Contextualisation, règles, génération, contrôles, routage modèles
+Moteur REMI V1
+Architecture de données
+20 k€
+Schémas patient, nutrition, praticien, usage, historique
+Data foundation exploitable
+Tests & évaluation IA
+15 k€
+Cas de test, appels API, scoring expert, tests de robustesse
+Benchmark propriétaire
+Produit & intégrations
+15 k€
+Surfaces patient/praticien, intégrations, génotype/API
+Plateforme fonctionnelle
+Sécurité & conformité
+10 k€
+RGPD, données sensibles, sécurité, audit
+Base conforme pour scaler
+Infrastructure & monitoring
+5 k€
+Stockage, API, observabilité, budgets IA
+Environnement stable
+Hypothèses à valider : la ventilation ci-dessus est une proposition de travail et devra être alignée sur les règles exactes d’éligibilité des dépenses Startup Boost et sur les estimations techniques de Jamie.
+12. Message à retenir pour Startup Boost
+REMI n’est pas un chatbot nutritionnel.
+REMI ne cherche pas à remplacer le praticien.
+REMI ne dépend pas de la possession d’un modèle d’IA généraliste.
+REMI construit une couche d’intelligence spécialisée qui transforme des recommandations existantes en actions quotidiennes personnalisées, pédagogiques et évaluables.
+Le financement doit accélérer la construction de cette couche, sa fiabilisation et la transformation des apprentissages terrain en actifs technologiques et données structurées propres.
+13. Points à finaliser avant le pitch deck
+Nommer clairement l’architecture propriétaire (éviter de dépendre du terme “ICM” si le jury ne le connaît pas).
+Définir les sources de données exactes et les droits d’utilisation associés.
+Chiffrer le coût de développement et de testing IA 2027 avec Jamie.
+Déterminer les critères d’évaluation des outputs et le mode de stockage du benchmark.
+Définir précisément la couche de validation et ce qui pourra être automatisé dès 2027.
+Clarifier le rôle du génotype et les modalités d’intégration Fagron sans surpromettre.
+Aligner les 100 000 € avec les dépenses réellement éligibles et les milestones mesurables.
+Base de travail : échanges REMI / Jamie / Arnaud de septembre 2026 et synthèse produit actuelle. Les budgets et jalons restent à confirmer avant soumission.
