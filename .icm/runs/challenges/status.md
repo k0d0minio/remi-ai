@@ -4,7 +4,7 @@ Where the run is, in five lines. Updated at every stage start and stop, and when
 flips. A resuming session reads this first, then `handoff.md` (`_shared/stage-preamble.md`).
 
 - phase: build
-- step: 11 — cheap tier GREEN on 332c152, main merged (no-op), flipping ready
-- ci: GREEN (cheap tier, 332c152)
+- step: done — PR open, full gate GREEN
+- ci: GREEN (full gate, 21dd702; tests 412/412)
 - blocked: no
 - updated: 2026-09-23

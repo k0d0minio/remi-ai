@@ -1,7 +1,7 @@
 # Build notes: challenges
 
 - commits: 5d69654 schema + migration · f41b351 service + tests · d28543c link card + taps + consigne · 3f2f6a2 console section + roster badge · (this commit) retention + run pack
-- ci: GREEN (cheap tier) on 332c152 — full gate after the ready flip, see status.md
+- ci: GREEN — cheap tier on 332c152 (admin + app previews built); full gate on 21dd702 after the flip, `pnpm test` 412/412 incl. 16 `patient-challenges`
 
 ## What changed
 
