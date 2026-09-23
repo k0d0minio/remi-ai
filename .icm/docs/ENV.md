@@ -187,17 +187,26 @@ unless a second analytics vendor arrives with a reader to go with it.
 
 ## Pipeline & CI (GitHub Actions)
 
-| Variable                   | Purpose                                                                                                                                                               | Where set | Public? |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
-| `GITHUB_TOKEN`             | Injected automatically by Actions — do **not** add it                                                                                                                 | Actions   | no      |
-| `GH_TOKEN`                 | Local alternative for the pipeline scripts — every GitHub call goes through `.icm/scripts/lib/gh.sh`, which takes either token, else a logged-in `gh`                 | local     | no      |
-| `GITHUB_REPO`              | Optional `owner/repo` override for the pipeline scripts. Default: derived from `origin`                                                                               | local     | no      |
-| `GITHUB_API_URL`           | API base for the same scripts — Actions injects it; set it locally only for an override. Default: `https://api.github.com`                                            | both      | no      |
-| `TURBO_TOKEN`              | Turborepo remote cache token — shares the cache between CI and Vercel                                                                                                 | Actions   | no      |
-| `TURBO_TEAM`               | Turborepo team slug (a repo **variable**, not a secret)                                                                                                               | Actions   | no      |
-| `SHIP_NOTE_FROM`           | From-address for the post-merge note (`.icm/scripts/notify.sh`); falls back to `EMAIL_FROM`                                                                           | local     | no      |
-| `SHIP_NOTE_RECIPIENTS`     | Where the post-merge note goes — normally one channel inbox address. Unset in a remote session: the note is printed, not sent (`RESULT: SKIPPED`)                     | local     | no      |
-| `PIPELINE_REQUIRED_CHECKS` | Optional **newline-separated** override of `required_checks` in `.icm/project.json` — the checked-in home of the check names `ci-status.sh` waits for. Normally unset | local     | no      |
+| Variable                    | Purpose                                                                                                                                                                                         | Where set | Public? |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
+| `GITHUB_TOKEN`              | Injected automatically by Actions — do **not** add it                                                                                                                                           | Actions   | no      |
+| `GH_TOKEN`                  | Local alternative for the pipeline scripts — every GitHub call goes through `.icm/scripts/lib/gh.sh`, which takes either token, else a logged-in `gh`                                           | local     | no      |
+| `GITHUB_REPO`               | Optional `owner/repo` override for the pipeline scripts. Default: derived from `origin`                                                                                                         | local     | no      |
+| `GITHUB_API_URL`            | API base for the same scripts — Actions injects it; set it locally only for an override. Default: `https://api.github.com`                                                                      | both      | no      |
+| `TURBO_TOKEN`               | Turborepo remote cache token — shares the cache between CI and Vercel                                                                                                                           | Actions   | no      |
+| `TURBO_TEAM`                | Turborepo team slug (a repo **variable**, not a secret)                                                                                                                                         | Actions   | no      |
+| `VERCEL_TOKEN`              | Vercel API token for the **remi21** team — `deploy-status.sh`, `env.sh audit` and `rollback.sh` read with it (`deploy.token_env` in `.icm/project.json`). Unset: those scripts stop and say so  | local     | no      |
+| `SLACK_BOT_TOKEN`           | Bot token (`xoxb-…`, scope `chat:write`, the app invited to both channels) of the REMI Slack workspace — `.icm/scripts/report.sh` posts with it. Unset: the post is printed and `SKIPPED slack` | local     | no      |
+| `SLACK_ANNOUNCE_CHANNEL_ID` | Channel id (`C…`) `report.sh announce` posts to after every merge — what shipped, in the changelog's words                                                                                      | local     | no      |
+| `SLACK_ALERTS_CHANNEL_ID`   | Channel id (`C…`) `report.sh alert` posts to — a production health read that failed after a merge (`health-check.sh`)                                                                           | local     | no      |
+| `PIPELINE_REQUIRED_CHECKS`  | Optional **newline-separated** override of `required_checks` in `.icm/project.json` — the checked-in home of the check names `ci-status.sh` waits for. Normally unset                           | local     | no      |
+
+The four `local` pipeline rows above are read from the **process environment of the session that
+runs Release** — never from a `.env.local`, which no pipeline script loads. On the operator's machine
+that is the shell (export them in the profile, or a directory `.envrc`); in a remote session it is
+the Claude cloud environment panel. `.icm/project.json` → `reporting` and `deploy` carry only the
+**names**; `.icm/scripts/env.sh add <KEY> --ci --github secret|variable` also creates a key in this
+repository's Actions secrets or variables for a CI caller, reading the value from stdin.
 
 The required check names have a checked-in home — `required_checks` in `.icm/project.json` — which
 today holds this repo's one blocking Actions check, `Format, lint, typecheck`, **one name per array

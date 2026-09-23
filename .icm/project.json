@@ -1,10 +1,102 @@
 {
   "name": "remi-ai",
-  "profile": "pipeline",
+  "complexity": "standard",
   "docs_path": "apps/docs/app",
   "required_env": [],
   "required_checks": ["Format, lint, typecheck"],
   "personas": ["patient", "practitioner", "operator"],
   "runs_archive": ".icm/runs/_done",
-  "intake_archive": ".icm/intake/_done"
+  "intake_archive": ".icm/intake/_done",
+
+  "deploy": {
+    "platform": "vercel",
+    "team_slug": "remi21",
+    "token_env": "VERCEL_TOKEN",
+    "projects": [
+      {
+        "name": "app",
+        "path": "apps/web",
+        "status_context": "Vercel – app",
+        "class": "product",
+        "production_url": "https://app-remi21.vercel.app"
+      },
+      {
+        "name": "admin",
+        "path": "apps/admin",
+        "status_context": "Vercel – admin",
+        "class": "product",
+        "production_url": "https://admin.remi-ai.tech",
+        "health_endpoint": "https://admin.remi-ai.tech/sign-in"
+      },
+      {
+        "name": "marketing",
+        "path": "apps/marketing",
+        "status_context": "Vercel – marketing",
+        "class": "product",
+        "production_url": "https://marketing-remi21.vercel.app"
+      },
+      {
+        "name": "documentation",
+        "path": "apps/docs",
+        "status_context": "Vercel – documentation",
+        "class": "product",
+        "production_url": "https://docs.remi-ai.tech",
+        "health_endpoint": "https://docs.remi-ai.tech/"
+      },
+      {
+        "name": "support",
+        "path": "apps/support",
+        "status_context": "Vercel – support",
+        "class": "product",
+        "production_url": "https://support-remi21.vercel.app"
+      },
+      {
+        "name": "demo",
+        "path": "apps/demo",
+        "status_context": "Vercel – demo",
+        "class": "product",
+        "production_url": "https://demo-remi21.vercel.app"
+      }
+    ]
+  },
+
+  "uat": { "branch": "", "url": "" },
+
+  "reporting": {
+    "announce_from": "session",
+    "announce": ["github-release", "slack"],
+    "alert": ["slack"],
+    "economics": [],
+    "channels": {
+      "github-release": { "tag_prefix": "release/" },
+      "slack": {
+        "token_env": "SLACK_BOT_TOKEN",
+        "announce_channel_env": "SLACK_ANNOUNCE_CHANNEL_ID",
+        "alert_channel_env": "SLACK_ALERTS_CHANNEL_ID"
+      },
+      "email": {
+        "api_key_env": "RESEND_API_KEY",
+        "from_env": "REPORT_EMAIL_FROM",
+        "to_env": "REPORT_EMAIL_TO"
+      }
+    }
+  },
+
+  "migrations": {
+    "path": "packages/services/src/db/migrations",
+    "reversible": false,
+    "stamp": "millis",
+    "tool": "drizzle",
+    "out_of_order": false
+  },
+
+  "database": { "url_env": "DATABASE_URL", "isolation": "none", "image": "postgres:16", "name": "remi" },
+
+  "security": { "audit_command": "" },
+
+  "support": {
+    "tier": "none",
+    "failsafe_page": "",
+    "monitoring": { "sentry_dsn_env": "SENTRY_DSN" }
+  }
 }

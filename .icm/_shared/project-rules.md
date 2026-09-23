@@ -1,15 +1,17 @@
 # Project rules — what is true of THIS repo (Layer 3 reference, project-owned)
 
 The stage and lane contracts under `stages/` and `lanes/`, the shared doctrine in `_shared/`
-(`github`, `ci`, `stage-preamble`, `scope-template`, `conventions`), `intake/CONTEXT.md` and the
-factory scripts are **template-owned**: byte-identical in every pipeline repo in the estate,
-synced from `icm-board/_system/template/icm-pipeline/` by `icm-sync.sh`, and carrying no repo's
-identity. Everything specific to Remi AI lives in the project-owned files the sync never touches —
-`.icm/project.json` for the values a script reads, `_shared/knowledge-map.md` for the doc pages,
-`scripts/{format,lint,validate-knowledge-map,notify}.sh` for this repo's own hooks,
+(`github`, `ci`, `stage-preamble`, `scope-template`, `conventions`, the `run-pack/` files),
+`intake/CONTEXT.md`, `uat/CONTEXT.md`, the capability skills under `skills/` and the factory
+scripts are **template-owned**: byte-identical in every pipeline repo in the estate, listed in
+`.icm/MANIFEST`, synced from `icm-board/_system/template/icm-pipeline/` by `icm-sync.sh`
+(`.icm/template-version` says which template this copy was last brought up to), and carrying no
+repo's identity. Everything specific to Remi AI lives in the project-owned files the sync never
+touches — `.icm/project.json` for the values a script reads, `_shared/knowledge-map.md` for the
+doc pages, `scripts/{format,lint,validate-knowledge-map,report}.sh` for this repo's own hooks,
 `runs/README.md`, and **this file** for the rules a stage reads. A contract that says "see
-`_shared/project-rules.md`" means: the answer is here, and it is ours. (Estate decision D20,
-2026-09-18.)
+`_shared/project-rules.md`" means: the answer is here, and it is ours. (Estate decisions D20 and
+D23; `/setup` — `.icm/scripts/setup.sh` — says whether the two are complete and in step.)
 
 ## People and gates
 
@@ -37,6 +39,17 @@ identity. Everything specific to Remi AI lives in the project-owned files the sy
   A refused push is a **ruleset problem to fix** (add the identity to the bypass list), never a
   reason to open a PR: Scope STOPs and reports it. Record the answer for any newly verified
   identity here.
+
+- **The client contact** — no client-facing report leaves the pipeline on its own: the operator
+  relays. What shipped reaches the founders through the REMI Slack workspace (`report.sh
+  announce` → the channel `SLACK_ANNOUNCE_CHANNEL_ID` names) and the public changelog;
+  `/pipeline status` compiles `.icm/output/client-status-latest.md` in their words when a written
+  account is wanted, and handing it to them is the operator's act.
+- **UAT sign-off** — none: `uat` in `.icm/project.json` is undeclared, so every run merges into
+  `main` and ships on the merge, and the operator's own smoke of the preview before **Ready to
+  merge** is the whole test. A persistent UAT environment (one branch, one fixed address, a batch
+  the founders sign off before it reaches production — `.icm/uat/CONTEXT.md`) is `/setup`'s to
+  declare, the day they want to test a batch rather than a feature.
 
 - **The GitHub repo** is `k0d0minio/remi-ai`, and it is **public**. The scripts derive it from
   `origin`; a remote session's GitHub connection provides the credential (`GH_TOKEN`), a local
@@ -93,27 +106,73 @@ identity. Everything specific to Remi AI lives in the project-owned files the sy
   package with its own config, no `--fix`, zero warnings — the ceiling `quality.yaml` enforces).
   Feedback before a push, never the verdict — CI's `Format, lint, typecheck` is the verdict
   (estate decision D21).
-- **Deploy projects (Vercel)** — six, one per app. **Previews build on every push, draft or
-  ready** — there is no draft suppression here, so the contracts' "drafts build no previews" is
-  stricter than what happens: a draft head's preview simply exists earlier, and nothing depends
-  on its absence. Each project carries `ignoreCommand: npx turbo-ignore <package>
-  --fallback=HEAD^1` in its `vercel.json`, so a project the diff does not affect posts `success`
-  with the description `Canceled by Ignored Build Step` — a skip, not a pass (`ci-status.sh`
-  classes it `skipped`).
+- **Deploy** — `deploy` in `.icm/project.json`: Vercel, team **`remi21`** — a separate team
+  boundary from the kodominio estate, so the token is this team's own, named `VERCEL_TOKEN` in the
+  session's environment and never written here — six projects, one per app, **all `class:
+  product`** because **previews build on every push, draft or ready**: there is no draft
+  suppression and no quiet project here, so the contracts' "drafts build no previews" is stricter
+  than what happens — a draft head's preview simply exists earlier, and nothing depends on its
+  absence. Each project carries `ignoreCommand: npx turbo-ignore <package> --fallback=HEAD^1` in
+  its `vercel.json`, so a project the diff does not affect posts `success` with the description
+  `Canceled by Ignored Build Step` — a skip, not a pass (`ci-status.sh` classes it `skipped`).
+  `deploy-status.sh` reads all six production deployments once after a merge; `rollback.sh
+  --vercel` names the previous READY one per project and executes nothing.
 
-  | Context                  | App                                                            |
-  | ------------------------ | -------------------------------------------------------------- |
-  | `Vercel – app`           | `apps/web` — the product                                       |
-  | `Vercel – admin`         | `apps/admin` — the console; its build runs `db:migrate` first  |
-  | `Vercel – marketing`     | `apps/marketing`                                               |
-  | `Vercel – documentation` | `apps/docs` — where Release's docs and changelog pages land    |
-  | `Vercel – support`       | `apps/support`                                                 |
-  | `Vercel – demo`          | `apps/demo` — mock data only, no backend                       |
+  | Context                  | Vercel project  | App                                                           | Production                            |
+  | ------------------------ | --------------- | ------------------------------------------------------------- | ------------------------------------- |
+  | `Vercel – app`           | `app`           | `apps/web` — the product                                      | `app-remi21.vercel.app` (no domain yet) |
+  | `Vercel – admin`         | `admin`         | `apps/admin` — the console; its build runs `db:migrate` first | `admin.remi-ai.tech`                  |
+  | `Vercel – marketing`     | `marketing`     | `apps/marketing`                                              | `marketing-remi21.vercel.app` (no domain yet) |
+  | `Vercel – documentation` | `documentation` | `apps/docs` — where Release's docs and changelog pages land   | `docs.remi-ai.tech`                   |
+  | `Vercel – support`       | `support`       | `apps/support`                                                | `support-remi21.vercel.app` (no domain yet) |
+  | `Vercel – demo`          | `demo`          | `apps/demo` — mock data only, no backend                      | `demo-remi21.vercel.app` (no domain yet) |
+
+  `remi-ai.tech` is registered with Vercel on the team; `remiai.be` is held elsewhere and not
+  assigned. The four projects without a custom domain answer on their `*.vercel.app` production
+  alias **behind Vercel's deployment protection** (a 302 to Vercel SSO) — reachable to a signed-in
+  team member, not to the public, until a domain is assigned.
 
   The admin build migrates whatever `DATABASE_URL` it is given, and the preview guard in
   `packages/services/scripts/migrate.mjs` is not in force on the admin project today — the open
   stub `intake/triage/previews-migrate-the-shared-database.md` is where that gets settled. Until
   it is, a migration-bearing branch's preview writes its schema into the shared database.
+- **Migrations** — `migrations` in `.icm/project.json`: Drizzle, `packages/services/src/db/migrations/`,
+  forward-only (no `down` scripts — a code revert must tolerate the newer schema; `rollback.sh`
+  says so). **Drizzle names the files** (`NNNN_<words>.sql` beside `meta/_journal.json`, from
+  `pnpm db:generate`) and the repo's own `Migration order` CI step orders them
+  (`CONVENTIONS.md` § the factory: regenerate on the merged tree, never renumber, never
+  hand-edit `idx`). The template's `check-migrations.sh` reads only stamped files
+  (`V<17 digits>__` or `<14 digits>_`), finds none here and reports `SKIP` — correct, not a gap.
+  Never use its `--new` in this repo; `stamp: millis` and `out_of_order: false` in the block are
+  statements for the record, not switches.
+- **Environment surfaces** — six `.env.example`, one per app (`env.sh audit` walks
+  `deploy.projects`); `.icm/docs/ENV.md` is the catalogue, with the per-project matrix of which
+  app needs which. The pipeline's own variables — `VERCEL_TOKEN`, `SLACK_BOT_TOKEN`,
+  `SLACK_ANNOUNCE_CHANNEL_ID`, `SLACK_ALERTS_CHANNEL_ID`, `GH_TOKEN` — are **not** app variables:
+  they live in the session's environment (the operator's shell; the Claude cloud environment
+  panel for a remote session) and in this repository's Actions where a CI caller needs them —
+  never in an app's manifest, never on a Vercel project. The three-edit rule for an app variable
+  (the zod schema, `turbo.json` `globalEnv`, an ENV.md row) stands.
+- **The security gate** — `scripts/security-check.sh` runs before every commit in Build and
+  before every lane's push (template-owned; the one local check that is a gate). Not wired as a
+  git hook: `.husky/pre-commit` runs `lint-staged` only, and the stages call the gate themselves.
+  gitleaks is not installed on the operator's machine — the built-in patterns are the floor, and
+  the script says so aloud; `pnpm audit --audit-level=high` runs when the lockfile moved on the
+  staged scope. `security.audit_command` is empty: pnpm is detected.
+- **The run's database** — `database.isolation: none`, deliberately for now: the one Neon
+  database serves production, previews and CI alike, and the **admin** build applies migrations
+  behind `migrate.mjs`'s production-only guard (`.icm/docs/ENV.md` § Storage), so a run's schema
+  reaches the live database on the merge and not before. A schema per run (`schema` — `run_<slug>`
+  on the database `DATABASE_URL` names) is the natural next step once the open triage stub
+  `previews-migrate-the-shared-database` settles where previews migrate; until then
+  `db-branch.sh` reports `SKIP`.
+- **Health endpoint** — per project under `deploy.projects[]`: `https://admin.remi-ai.tech/sign-in`
+  and `https://docs.remi-ai.tech/`, the two custom domains, both answering 200
+  (`health-check.sh` follows redirects, so the console's `/` → `/sign-in` counts). The other four
+  have none until a custom domain is assigned: their `*.vercel.app` alias answers 302 to Vercel
+  SSO, which would read as healthy after the redirect whether or not the app is up. Add each
+  project's endpoint the day its domain lands — `/api/health` if one is ever built, else the
+  public page.
 - **Archive** — the estate defaults: `runs_archive` = `.icm/runs/_done`, `intake_archive` =
   `.icm/intake/_done` (both in `.icm/project.json`). Nothing serves them; git is the record. The
   close-out's path guard is `.icm/runs/**` and `.icm/intake/**`, nothing else. Older archived runs
@@ -125,17 +184,26 @@ identity. Everything specific to Remi AI lives in the project-owned files the sy
   own label at step 1). The job diffs `origin/$BASE_REF...$HEAD_SHA` — the PR's own files, never
   what `main` did in the meantime — and labels only a run whose `run.md` points at this PR.
 
-## Announcing
+## Reporting
 
-- **Post-merge notification** — `scripts/notify.sh` **is wired**: it sends the one-line summary
-  Release (or a lane with a user-visible change) hands it as an email through Resend — the mail
-  vendor the product already uses — to `SHIP_NOTE_RECIPIENTS` (normally one channel inbox) from
-  `SHIP_NOTE_FROM` or `EMAIL_FROM`, with `RESEND_API_KEY`, all read from the process environment
-  (`.icm/docs/ENV.md` § Pipeline). When any of those is unset — a remote session rarely carries
-  them — it prints the note and reports `RESULT: SKIPPED`, exit 0: **written, not sent** is a
-  normal outcome to record in the `## Release` record, not a failure, and a release is complete
-  at the merge either way. No CI workflow announces and there is no alert channel; nothing
-  verifies the archive after the merge — the close-out riding the PR is the whole guarantee.
+- **Kinds → channels** — `reporting` in `.icm/project.json`: `announce` → `github-release` (the
+  estate default: one Release per merge on `k0d0minio/remi-ai`, public like the changelog; tag
+  `release/<date>-<slug>` on the merge SHA, idempotent by tag) **+ `slack`** — the REMI Slack
+  workspace, the channel `SLACK_ANNOUNCE_CHANNEL_ID` names; `alert` → `slack` — the channel
+  `SLACK_ALERTS_CHANNEL_ID` names, where `health-check.sh` posts a production read that failed
+  after a merge; `economics` → none — icm-board's `run-economics.sh` writes it into the deal
+  folder. The Slack app posts with `SLACK_BOT_TOKEN` (scope `chat:write`, the app invited to both
+  channels). Channel variables are NAMES here and in `project.json`; the values live in the
+  process environment of the session that runs Release (`.icm/docs/ENV.md` § Pipeline). A
+  variable unset where `report.sh` runs — a remote session rarely carries them — prints
+  `SKIPPED slack` and exits 0: **written, not sent** is a normal outcome to record in the
+  `## Release` record, not a failure, and a release is complete at the merge either way. Email
+  through Resend is configured by name (`REPORT_EMAIL_FROM`, `REPORT_EMAIL_TO`, `RESEND_API_KEY`)
+  and mapped to nothing; adding `"email"` to an array turns it on. Nothing verifies the archive
+  after the merge — the close-out riding the PR is the whole guarantee.
+- **Who calls the hook** — `announce_from: session`: Release step 9 (and a lane's last step, for
+  a user-visible change) calls `report.sh announce` with the changelog page's H1, `--audience
+  internal` for an internal change (no Release, Slack only). No CI workflow announces.
 - **Changelog** — `apps/docs/app/changelog/<YYYY-MM-DD>-<slug>/page.mdx` (date = the merge
   date), one page per shipped feature, in the user's voice: sentence case, what changed for the
   person reading, no internal terms, no slugs, no file paths. The H1 is the outcome in one line —
@@ -147,12 +215,40 @@ identity. Everything specific to Remi AI lives in the project-owned files the sy
   note alone, framed as reliability or trust (`announce: internal`); nothing worth saying is
   `announce: none`. Bug and tweak lanes write a page when the change is user-visible; chore never
   does.
+- **Workflows** — the reference `release.yaml` is absent, deliberately: `announce_from` is
+  `session`, and a second caller would announce every merge twice.
+  The reference `labels.yaml` is absent too: `pipeline.yaml` is this repo's labels job and
+  `gates.yaml` its advisory gate read (§ The factory). Neither is to be seeded here.
+
+## Support
+
+- **Tier** — `support.tier: none`: no after-handover support line is agreed — the operator is
+  also the builder, on call by being in delivery. No fail-safe page. Sentry is not wired
+  (`.icm/docs/ENV.md` § Not wired yet — the top unstarted ops item), so
+  `monitoring.sentry_dsn_env` names `SENTRY_DSN` for the day it is. Revisit at handover.
 
 ## Capability skills the stages may call
 
-None yet — `.claude/SKILLS.md` says why, and names the candidates (`shared-component`,
-`service-adapter`, `changelog-entry`, `docs-sync`). Until one exists the contracts' fallbacks
-apply: Release and the knowledge lane edit `apps/docs` pages under Nextra's own conventions
-(MDX, `_meta.ts` for navigation, the register `CONVENTIONS.md` § Working languages sets), Scope
-writes in the same register, and the changelog shape is the section above. There is no router
-hook: `/pipeline` is explicit and the bare forms route through the skill's own description.
+- **Pipeline capability skills** — `.icm/skills/<name>/SKILL.md` (three-tier, loaded on a
+  trigger; `.icm/skills/README.md`; `list-skills.sh --bare` is the registry the session-start
+  hook prints). Seeded and template-owned: `security-audit`, `database-migration`,
+  `preview-deploy`. This repo's own additions: none.
+- **Repo skills** — none yet — `.claude/SKILLS.md` says why, and names the candidates
+  (`shared-component`, `service-adapter`, `changelog-entry`, `docs-sync`). Until one exists the
+  contracts' fallbacks apply: Release and the knowledge lane edit `apps/docs` pages under
+  Nextra's own conventions (MDX, `_meta.ts` for navigation, the register `CONVENTIONS.md` §
+  Working languages sets), Scope writes in the same register, and the changelog shape is the
+  section above. There is no router hook: `/pipeline` is explicit and the bare forms route
+  through the skill's own description.
+
+## Learned rules
+
+*The constraints earlier runs paid for, appended before each close-out by two writers with one
+shape: `.icm/scripts/retrospective.sh --apply` (at Release and at the end of every lane — one
+line per error class a run fixed and flagged with `- rule:` in its `error.log`, or fixed again
+after an earlier run already had, counted across the archive's `error.log`s) and
+`.icm/scripts/run-pack.sh --sync-rules` (called by `close-out.sh` — the `## Learned rules` a run
+wrote in its `FAILURE.md`: what no tool logged — a wrong assumption, a STOP, a skipped step).
+Each line carries the run it was learned in. Build and the lanes read this section before their
+first edit, with the same standing as the code rules. Edit or delete lines freely — this file is
+the repo's own, never synced — and delete a line that reads as a slip rather than a constraint.*

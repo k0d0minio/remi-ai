@@ -19,5 +19,14 @@ pnpm-lock.yaml
 .icm/stages/
 .icm/lanes/
 .icm/_shared/
+.icm/skills/
+.icm/uat/
+.icm/raw/
 .icm/intake/CONTEXT.md
+.icm/MANIFEST
 .github/pull_request_template.md
+
+# Compiled by the pipeline's own scripts, never by hand — `process-raw.sh` writes `.icm/processed/`,
+# `client-status.sh` writes `.icm/output/`; formatting either only churns a generated file.
+.icm/processed/
+.icm/output/

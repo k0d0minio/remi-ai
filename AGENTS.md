@@ -101,12 +101,15 @@ icm-board and carry no repo identity; what is true of this repo is in
 | **Scope**   | record the source, settle it with the operator in session → `scope.md` (`D-n` decisions) → cut the intake batch. No PR. |
 | **Define**  | one stub → an approvable `spec.md`; opens the run's **one** feature PR (draft)                                          |
 | **Build**   | implement the spec on the branch, prove CI green, flip the PR draft → open                                              |
-| **Release** | review passes · docs + changelog + close-out in-PR → gated squash-merge → `notify.sh`                                   |
+| **Release** | review passes · docs + changelog + close-out in-PR → gated squash-merge → one production read → `report.sh announce`    |
 
 `/pipeline scope <input>` for anything new; `/pipeline new` for the next stub; `/pipeline bug | tweak |
 chore "<request>"` (or `<stub-name>` from `.icm/intake/triage/`) for the fast lanes; `/pipeline
-knowledge add|edit|remove "<what>"` to change a docs page outside a Release. The bare forms route the
-same without the slash. Every stage has a human gate at its boundary and the agent never crosses one
+knowledge add|edit|remove "<what>"` to change a docs page outside a Release; `/pipeline hotfix
+"<incident>"` (human-invoked) when production is wrong after a merge; `/pipeline status` for the
+client's view of what shipped, what is in progress and what is queued; `/setup` to check the repo
+is complete, current and configured for the pipeline. The bare forms route the same without the
+slash. Every stage has a human gate at its boundary and the agent never crosses one
 on its own.
 
 **Two binding gates, both PR checkboxes, both the operator's to tick.** **Spec approved** before
