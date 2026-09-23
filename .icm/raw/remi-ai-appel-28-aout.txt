@@ -1,0 +1,667 @@
+@Morgane [0:15]: Bonjour Jamie.
+
+@Jamie [0:17]: ça va?
+
+@Morgane [0:20]: ça va dans cinq minutes, j'arrive chez moi, j'ai eu du retard. J'ai été voir le laboratoire l'IMS.
+
+@Jamie [0:26]: Oui.
+
+@Morgane [0:27]: Et je viens de partir et donc j'arrive, mais voilà, on commence déjà en ligne. Ah ben nous a rejoint là non?
+
+@Jamie [0:35]: Ah, pourquoi non?
+
+@Arnaud [0:36]: Salut les amis!
+
+@Jamie [0:39]: Comment allez-vous?
+
+@Arnaud [0:41]: Bien et toi?
+
+@Jamie [0:43]: Très bien, très bien. Euh je vous partage, Morgane, tout est encore dans la voiture là.
+
+@Morgane [0:51]: Oui, mais j'arrive bientôt chez moi, tu peux déjà partager l'écran.
+
+@Jamie [0:55]: Ouais okay.
+
+@Arnaud [1:01]: Comment tu vas?
+
+@Jamie [1:03]: Très bien, très bien, trop bien les nouvelles sont assez sympa vis-à-vis de Rémy. Voilà. Ouais, j'ai vu le truc avec le labo, ça a l'air hyper intéressant ça.
+
+@Arnaud [1:17]: Ouais hein.
+
+@Morgane [1:18]: évidemment, je suis en train de préparer. Déjà le pitch deck. J'aimerais bien vous l'en. Voyez Comme ça, vous venez avec vos commentaires et euh préparer un peu tout ce qu'on va dire, la vision.
+
+@Arnaud [1:30]: Pas toi Jamy, mais moi, Mane, je t'entends pas. Il y a des y a des coupures.
+
+@Morgane [1:35]: Ah c'est parce que je suis encore en voiture.
+
+@Arnaud [1:37]: Il y a des coupures.
+
+@Jamie [1:41]: ça propose.
+
+@Morgane [1:41]: Je vous expliquais quand je suis arrivée à la maison alors.
+
+@Jamie [1:43]: Ouais. Euh Mais voilà, pour euh ce que on s'était dit euh mercredi, euh j'ai ce qu'il faut. euh Normalement, vous avez tous les deux déjà reçu un e-mail euh vous invitant à la plateforme de Rémy. euh Il faut pas cliquer sur ce lien-là, une petite mise configuration en train d'être préparé maintenant, mais vous allez recevoir les invitations pour accéder à cette plateformeci.
+
+@Jamie [2:14]: Et c'est exactement ce qu'on avait dit mercredi. Morgane, toi tu as accès à créer euh les profils patients comme tu le souhaites. um J'étais assez complet dans toutes les choses que tu peux noter pour euh un un patient. Maintenant à toi de à toi de me dire si tu veux le restreindre, si tu veux l'ajouter, mais si tu veux ajouter des, des, des points de données pour les patients. um Mais concrètement, tu as ton petit manager de patients pour le le court terme, pour pouvoir faire tes
+
+@Jamie [2:43]: Des rendez-vous patient en face-à-face au manuel. um Ici, il y aura euh la section équipes à partir d'ici que je vais vous inviter. euh ça vous permet l'accès à la plateforme admin pointremi A. tech um et concrètement, ça, c'est ceci qu'on va sur lesquels on va travailler sur les mois à venir pour bien peaufiner ce que c'est de créer un un un profil patient et comment toutes les fonctionnalités agissent sur le profil patient.
+
+@Jamie [3:14]: Um Et à terme, ça, ça va être assez court terme, parce que c'est pas trop compliqué à mettre en place. um Morgane, tu vas pouvoir envoyer des, des liens spécifiques privés à tes patients pour qu'ils voient certains aspects de la plateforme qu'on décidera ensemble.
+
+@Jamie [3:30]: Alors, au lieu de leur donner un accès euh global à leurs patients, euh à leur profils de patients, euh tu peux leur envoyer des genre des résultats, des synthèses de de l'IAF à base de de ton encodement euh mais ce serait vraiment juste des pages qu'on peut leur envoyer avec des liens privés, pas plus.
+
+@Morgane [3:50]: OK, donc ce sera des pages avec des liens et clic y voit la page et la mise à jour.
+
+@Jamie [3:55]: Ouais, c'est un lien que tu partagerais avec eux et si eux ne s'amusent pas à aller le partager aux autres, personne d'autre ira voir, personne d'autre aura accès. Um On pourra éventuellement leur donner accès à à un à un profil de passion et leur dire que c'est hyper restreint et qu'on est en mode bêta. Mais là, tant qu'on est sur le développement vraiment actif sur les mois à venir. Je pense que ce serait mieux de de garder les utilisateurs en dor mais quand même leur donner un, un tout petit peu par petit peu quoi.
+
+@Morgane [4:04]: OK.
+
+@Morgane [4:23]: Oui, et pour avoir des des indications euh parce que justement si je prends les patients pilotes, c'est pour justement avoir un peu le retour et voir ce qui est intéressant ou pas. Donc ce sera intéressant de leur montrer la page en disant tiens est-ce que ça ça te parle? Est-ce que tu ajouterais quelque chose, quelque chose qui t'aidera et cetera, donc ce sera intéressant d'avoir le retour quand même.
+
+@Jamie [4:26]: Je suis mon.
+
+@Jamie [4:45]: Um mais du coup um je vais te laisser t'installer à ton à ton euh Morgane et ce qu'on va faire, c'est que je vais t'envoyer une invitation et je vais te laisser créer un un patient en temps réel, comme ça tu vois les fonctionnalités et tu peux me dire ce qui
+
+@Morgane [5:03]: OK, c'est une bonne idée ça. Et en attendant que j'arrive euh T'avais fini ta phrase peut-être?
+
+@Jamie [5:11]: Ouais, j'ai, j'allais dire le premier abord, les, les choses qui sont les plus flagrantes pour toi à changer ou à ajouter, c'est ce sur quoi je vais travailler la semaine prochaine quoi.
+
+@Morgane [5:19]: OK. Et sinon je peux aussi le tester euh maintenant et te faire un rapport pour la semaine prochaine si tu veux euh déjà j'installe un premier pour voir comment ça
+
+@Jamie [5:26]: En chier.
+
+@Morgane [5:28]: ça fonctionne et j'irai plus loin euh peut-être dedans en mettant toutes les infos déjà de de d'Hélène.
+
+@Jamie [5:35]: Et les templates aussi, c'est c'est c'est utile parce que là, je me suis basé sur ce qui me semblait être logique, base de la V1 et la V2 et tous, tous les documents que tu m'as dû envoyer, mais tu as sûrement des templates vraiment bien définis euh que tu pourrais m'envoyer pour pouvoir euh peaufiner un peu plus la plateforme patient.
+
+@Morgane [5:41]: Oui. Ah ouais, je vais regarder à ça aussi les choses intéressantes à mettre euh qu'est-ce que j'allais dire oui euh maintenant que vous m'entendez mieux, je disais que j'étais en train de travailler sur la présentation euh pour euh fake run tu vois? Genetics euh
+
+@Jamie [6:10]: Ouais.
+
+@Morgane [6:10]: Donc je suis un pitch deck, je suis en train de de mettre la vision de Rémi sur du long terme, les milestones et les roadmap et je vous envoie donc cet après-midi et si je pouvais avoir votre feedback Pour lundi, comme ça, on met à jour l'ensemble des choses et on est prêt pour euh mardi pour la présentation.
+
+@Arnaud [6:31]: De journée lundi puisque Jimmy nous a dit il ne travaille pas le week-end, mais nous on peut regarder ça ensemble, il y a pas de problème.
+
+@Morgane [6:37]: Oui, oui, oui, bah justement euh
+
+@Jamie [6:37]: Pour le côté technique lundi je suis jamais ajouter des russes.
+
+@Morgane [6:40]: C'est pour ça que J'essaie de le faire euh d'ici euh quelques heures d'avoir euh clôturé de d'envoyer un premier version donc peut-être déjà jeter un coup d'oeil aujourd'hui, de manière le pitch deck en soi, c'est 12 slides hein. Donc euh maintenant à côté, je vais mettre un dossier qu'on peut lire et ajouter et ce sera surtout du bla bla euh devant eux.
+
+@Arnaud [6:55]: Ouais. Oui, oui.
+
+@Jamie [7:03]: Et ma question, le le le le côté technique, ils s'attendent à quoi comme explication ou comme rassur rassurance, rassuration, rassurance.
+
+@Morgane [7:15]: Euh aucune idée. Franchement euh je pense que eux ils sont très intéressés parce que c'est vrai qu'il y a un fort potentiel entre euh entre Rémi et eux parce que eux, ils font tout ce qui est test, mais ils ont pas encore comment aider les personnes à appliquer les recommandations et je pense que c'est ça qui qui cherche chez nous. Donc c'est simplement voir peut-être notre vision à long terme et comment on pourrait collaborer ensemble donc euh voilà maintenant le but c'est vraiment que on ne reparte pas juste avec euh on est un de leurs clients, mais euh on va être un partenaire euh
+
+@Morgane [7:45]: Avec eux quoi. Ce qu'on va donner, c'est écoutez d'un point de vue technique, on se donnera les moyens d'y arriver aujourd'hui, on a notre cof cofondateur qui est également présent dans la société qui a de l'expérience. Donc ce serait bien d'a- d'avoir un un petit CV ou quelques expériences où tu nous mettes ah
+
+@Jamie [7:46]: OK.
+
+@Arnaud [8:02]: Quelques exemples de ce que t'as réalisé pour qu'on puisse dire ben nous on a Jimmy dans notre équipe et voilà ce qu'il a déjà fait, voilà ce qu'il fait, voilà le genre de projets sur lesquels il travaille. Ça, ça va nous aider et d'un point de vue technique, bah on se donnera les moyens, on est une entreprise en construction donc on on arrive vers le futur, on se présente, voilà Mane elle a ça comme fait d'armes. Moi, c'est Arnaud, voilà ce que j'ai réalisé et à trois, on constitue le noyau dur. Après au-delà de ça, on a des prestataires qu'on fera intervenir en fonction de la taille des projets et des rentrées qu'on est capable d'avoir. Donc vous
+
+@Jamie [8:10]: Je je.
+
+@Arnaud [8:32]: Client potentiel, vous êtes au bon endroit au bon moment pour encore donner une direction, mais voilà la vision de Rémy, voilà son parcours, voilà son futur. Quelle place voulez-vous prendre là-dedans euh et là ça deviendrait une discussion ouverte.
+
+@Jamie [8:46]: Eh.
+
+@Morgane [8:46]: Ouais.
+
+@Jamie [8:48]: Mais du coup eux ils pourront assumer en tout cas pour la Belgique dans un premier temps, toutes les demandes de test des patients pour Rémi. C'est ça l'idée.
+
+@Arnaud [8:57]: On verra, on verra ce qui ce qui nous répond
+
+@Morgane [9:01]: J'ai été donc euh cet après midi euh chez l'IMS en disant ben voilà nous on a déjà un rendez-vous avec Fay Grand, mais vous, vous êtes une entreprise belge. J'aimerais quand même vous laisser la possibilité de de voir Rémy et d'évoluer aussi potentiellement avec vous. Maintenant c'était la commerciale, donc elle m'a proposé de lui envoyer un email et elle me mettrait en relation avec des des des personnes des décideurs mais euh je sais plus pourquoi je parlais. Ah oui, mais elle m'a expliqué que en Belgique, le truc avec le
+
+@Morgane [9:31]: Il faut que ce soit un médecin qui fasse sa demande maintenant avec eux qui est hors Europe, est-ce que c'est possible que les les personnes fassent la commande eux mêmes ou alors comme c'est un citoyen belge, ils sont obligés de respecter euh le côté médecin et donc ça voudra dire pour Rémy qui devra avoir une euh un un bord de médecins qui valide ou une personne, un docteur qui sera avec nous, qui valide l'ensemble des demandes génotypes.
+
+@Arnaud [9:58]: Ce qui changera toute l'histoire hein donc c'est c'est en fonction des réponses que nous donnons.
+
+@Morgane [9:59]: Difficile à trouver, tu sais. Donc voilà, mais ça, ce sera qu'on soit par la suite déjà voyons euh comment euh on peut collaborer avec euh avec eux. Construit.
+
+@Arnaud [10:12]: Oui, mais construisons notre notre discours et le pitch deck qui va être réalisé pendant le week-end ou enfin aujourd'hui les les premières bases euh sur ce que nous on attend d'eux, on peut leur dire et c'est toujours bien de clôturer leur entretien par de qu'est-ce que vous attendez de nous et inversement voilà nous ce qu'on attend de vous.
+
+@Morgane [10:30]: Voilà, mais moi, dans le je pensais à mettre trois euh trois possibilités de partenariat, mais je vais peut-être l'enlever du coup.
+
+@Jamie [10:30]: Ouais. OK.
+
+@Arnaud [10:38]: On veut absolument collaborer alors que ce n'est pas le cas, on dit nous on a notre vision, notre positionnement, c'est vous qui vous venez vous greffer à nous euh on est on est on est on est ravi euh effectivement ça nous fait plaisir, mais euh ce qu'on attend de vous, c'est ça ça et ça, est-ce qu'on se rencontre sur ce point là ou pas?
+
+@Arnaud [10:54]: Et ça permet de diriger beaucoup plus que de subir leur vision.
+
+@Morgane [10:55]: Voilà. Exactement. Maintenant, ce qui est positif, c'est qu'ils ne nous ont pas traités comme des clients en disant Voici les les tarifs euh pour euh les tests, c'est qu'ils veulent vraiment nous- nous nous rencontrer parce qu'ils voient un potentiel.
+
+@Jamie [11:12]: Ouais.
+
+@Arnaud [11:14]: De la boîte, c'est des gens sérieux hein on est sur une boîte en centaines de millions, ils ont les reins solides c'est des gens qui ont recherché le développement, les yeux ouverts, c'est des boîtes qui se donnent les moyens Donc ça tout ne se fait pas du jour au lendemain par contre c'est des gens généralement qui savent prendre des décisions mais il faut les amener, il faut les construire, les rassurer, avoir plusieurs étapes et à un moment donné quand ils y vont, ils y vont, c'est juste qu'ils ont des budgets qui sont autres que que nous euh petit retail.
+
+@Jamie [11:42]: Ouais. Euh là normalement vous avez tous les deux reçus euh le lien d'invitation dans le euh Chanel général. Normalement aujourd'hui aussi aussi.
+
+@Arnaud [11:51]: Oui. Oui, aussi oui. Ouais.
+
+@Jamie [11:54]: Ça, ça va lui donner accès euh à la plateforme euh alors dans un premier temps, c'est accès sur admin. RAI. tech um Du coup là c'est euh
+
+@Morgane [12:06]: Donc j'y pense, tu sais que je reçois de temps en temps des SMS, enfin des e mails de certaines personnes qui me contactent via la plateforme.
+
+@Jamie [12:08]: Demain. Lié à la plateforme.
+
+@Morgane [12:18]: Ouais.
+
+@Jamie [12:18]: Il y a le marketing.
+
+@Morgane [12:19]: Rentrée. J'avais fait des screenshots, mais je les ai peut-être effacés entre temps, mais j'en ai un nouveau qui m'a a été envoyé, mais je demanderai mais bah celle que Jamie a a
+
+@Arnaud [12:25]: Y a quelle plateforme?
+
+@Morgane [12:30]: Mis en ligne remi. A tech, j'ai des messages de personnes.
+
+@Jamie [12:37]: Ou c'est du spam?
+
+@Morgane [12:38]: Spam, sûrement.
+
+@Arnaud [12:41]: Ah.
+
+@Jamie [12:42]: J'ai j'ai lancé ça euh très rapidement, il est connecté avec une base de données, mais oui, le le le truc automatique, c'est que ça renvoie un mail après midi. Ce qui est possible, c'est que t'as des bottes qui scannent qui remplissent la page pour voir s'il y a quelque chose, mais c'est connecté à rien, alors il n'y a rien, tu vois.
+
+@Morgane [12:52]: Ouais. Ouais. Ouais. Ah.
+
+@Jamie [12:56]: Um.
+
+@Morgane [12:57]: C'est ça, je pense bien que ce soit des spams avec des bottes.
+
+@Jamie [13:00]: Des vrais personne, ça me chercherait parce qu'on a on a mis ce lien nulle part, on l'a partagé nulle part.
+
+@Morgane [13:01]: Tu m'envoies des massages.
+
+@Jamie [13:05]: Um ça doit sûrement être, tu, tu, tu le verrais si le nom et le, le bloc de comment est-ce qu'on peut aider, c'est juste des lettres et des chiffres quoi, c'est ça, ça va être.
+
+@Morgane [13:16]: Je vais te montrer quand je serai connectée, mais je suis dans un je suis tombée au feu rouge avec un bouchon parce qu'il est 15 h 10 donc euh j'ai pris du retard mais so continue donc.
+
+@Jamie [13:29]: Ah, OK.
+
+@Arnaud [13:31]: Jimmy sur la partie de la construction, comment est-ce que t'oriente le travail pour que ça puisse supporter une quantité de visiteurs euh je pose la question parce que alors je te donne du contexte tout récemment, j'ai découvert Codex que je connaissais pas enfin j'avais jamais utilisé cet outil est magique euh à mon niveau qui ne suis pas un codeur développeur, ça me permet d'avoir un accès à un monde auquel je je n'avais pas accès jusqu'à présent donc je me suis codé une petite
+
+@Arnaud [14:01]: Petite application qui fait qui screen les marchés financiers et qui me fait un rapport euh toutes les semaines, ça marche super bien, je suis impressionné par ce cet outil. Et ce que je voudrais savoir c'est nous au niveau de Rémy, on part sur une dimension où il y a le besoin à un moment donné d'avoir du volume. Comment tu vas savoir gérer la quantité de personnes qui l'utilisent dans le temps et qu'est-ce que tu construis pour que les fondations, que les bases soient solides?
+
+@Jamie [14:25]: Très bonne question euh très très bonne question. Alors, ce qu'il faut en sorte pour des bases solides pour que ce soit scalable. C'est une base de données qui est prête à l'accepter. c'est un système de serveur qui est prêt à assumer les centaines de milliers de requêtes en même temps um
+
+@Jamie [14:45]: Et pour ce qui est du côté euh IA euh le côté codex, moi je les utilise, c'est cloud code, c'est compétiteur direct. Um Des raisons pour aller avec Codex, il y a des raisons pour aller avec Claude Cote. Moi les raisons avec Claude Cote, c'est que je connais, j'aime bien et je sais que c'est une des entreprises qui vont. um Mais pour ce qui est de préparer les centaines de milliers d'utilisateurs par exemple.
+
+@Jamie [15:11]: Tout ça est plein de championne le matin. um L'idée, c'est de utiliser des Comment dire, des technologies qui sont versatiles. Alors, ce que, ce que je veux dire par cela, c'est que dans le cas de la base de données, là, j'ai argumenté qu'on utilise neon parce que c'est gratuit, c'est facile à utiliser, c'est facile à lancer. um La technologie sous-jacente d'Union, ça s'appelle du post graisse ou du SQL. C'est le type de langage de base de données. Alors, à partir du moment où on veut être prêt à accepter des centaines de milliers d'utilisateurs, qu'on aille vers SPB, qu'on aille vers AWS, qu'on aille vers tous ces autres trucs.
+
+@Jamie [15:50]: La technologie sous-jacente, c'est du post Grèce ou du SQL. Alors le fait qu'on créé l'application maintenant avec ces bases là veut dire que quand on doit commencer à accepter des grosses d'utilisateur, on peut migrer, on va toujours devoir migrer. C'est impossible de créer un système rapidement maintenant qui déjà peut accueillir des centaines de milliers de lisateurs. Mais le but du jeu entre guillemets, c'est de faire en sorte que les migrations soient au minimum.
+
+@Jamie [16:16]: Et affecte un minimum de choses. Un exemple point là-dedans, c'est que par exemple, euh quand je créé tout ce qui est euh connexion à la base de données et détermination de OK ben un patient, il a tel nombre de points de nez, il a tel chic, il a tel check. um La connexion même à la base de données est écrit dans un endroit du code tout à fait séparé de la logique de l'application. Ce que ça permet, c'est que quand on doit commencer à à vraiment grandir et pouvoir accueillir des centaines de milliers d'utilisateurs. um La logique de l'ap- de l'application reste intacte.
+
+@Jamie [16:49]: Et c'est l'interface connecteur qu'on migre et qu'on change. Euh Ce qui permettra à l'application qu'on aura développée avec toutes les règles et toute la logique de rester intacte. Et en même temps pouvoir donner des outils plus puissants à l'application pour pouvoir accueillir plus de gens.
+
+@Jamie [17:06]: Um Dans le, le, le, comment dire, dans le très, très très lointain euh qu'on a vraiment.
+
+@Arnaud [17:11]: J'ai perdu une partie de l'application, je sais pas si
+
+@Jamie [17:13]: Pardon?
+
+@Morgane [17:14]: Transcription.
+
+@Jamie [17:19]: Allô?
+
+@Morgane [17:21]: Oui, c'est parce que je suis passée sur l'ordinateur je pense que c'est.
+
+@Arnaud [17:22]: Ouais.
+
+@Jamie [17:24]: Ah, OK. um Non, pour tout ce qui est euh scalabilité um les, les, je peux vous préparer un rapport qui explique beaucoup plus en détail les technologies que j'utilise.
+
+@Arnaud [17:36]: Non.
+
+@Jamie [17:36]: De technologies qui sont.
+
+@Morgane [17:37]: Qui m'intéresse ne serait-ce que pour tout ce qui est euh ICT GRPD et cetera pour euh montrer qu'on est euh
+
+@Arnaud [17:44]: OK. Documenté, ouais.
+
+@Morgane [17:47]: Fait attention à la gouvernance et cetera. Et moi, c'est pour ça, je sais pas si t'avais lu euh par rapport à Neon et euh Super Base. euh enfin que moi on on j'ai j'ai regardé un peu les deux et qu'il n'y avait aucun souci pour passer euh si toi tu préfères à néant. Mais c'était le côté justement euh plus le côté euh protection des données euh où on j'avais cru comprendre que c'était plus facile de de de prendre la clé super base pour la mettre, euh, après sur euh un, une protection plus euh.
+
+@Morgane [18:17]: Plus adéquate, il faudrait que je je regarde mon analyse euh
+
+@Jamie [18:20]: Là-dessus, je je vois où le rapport voulait en venir. Mais concrètement ce qui va se passer, c'est que quand on décide de bouger de neon à SuperbS ou AWS ou je sais pas quoi. um Le, le, le concept que tu dis là de pouvoir prendre la clé de c'est trans- transférer les données. Moi, il me suffit juste de prendre un backup de la base de données.
+
+@Jamie [18:44]: Et puis appliquer le backup dans Super Base, c'est pas, c'est pas compliqué. C'est pas, c'est c'est pas une chose qui, qui bloque entre guillemets. Moi, le l'argument pour utiliser néon maintenant, um c'est très concrètement, toute ma journée, je passe sur un nombre de tables ouvert hallucinant. Et du coup, moi, le but du jeu pour que mon, mon, mon travail soit efficace, rapide et diriger vers les résultats plutôt que um que vers le reste euh il me faut un minimum d'écran ouvert possible. Soup B, c'est la manière dont ça.
+
+@Morgane [18:49]: OK.
+
+@Jamie [19:18]: ça fonctionne, ça demande un peu implicitement côté la page web superbase ouverte, tandis qu'avec néon, um toutes les migrations et toutes les changements que je peux faire avec la pipeline IA dont je vous ai expliqué euh un peu euh la semaine dernière ou la semaine d'avant. euh la pipeline a un accès quasi total sur la base de données sans lui donner un accès euh direct. C'est-à-dire que au lieu de euh lui donner un accès direct, il a les instructions pour pouvoir écrire les bons scripts et les bonnes.
+
+@Jamie [19:48]: Pour que quand moi-même j'effectue les commandes pour effectuer les migrations et et et les les scripts euh c'est moi qui ai le contrôle, mais c'est le pipeline qui a généré le truc compliqué à générer. Je ne sais pas si je me suis bien expliqué là, mais concrètement pour le.
+
+@Arnaud [20:06]: Oui oui oui oui.
+
+@Morgane [20:08]: Simple destination pour toi et tu peux autant maigrer sous à base que Neon euh dans quand justement la data sera trop volumineuse, ce sera facile de reprendre les informations dedans et euh
+
+@Jamie [20:08]: Pour le court terme. OK. Même si vous voulez, si vous voulez être dans l'exemple des serveurs euh souverains euh j'oublie le nom de la société maintenant, mais dont t'avais parlé la semaine dernière Arnaud euh quand, quand on sera à un stade où on, on aura nos propres serveurs, notre propre hébergement euh et qu'on n'utilise pas un truc comme Versel ou AWS ou que sais-je. um
+
+@Jamie [20:40]: Le, le comment dire, le On peut avoir une base de données sur ces serveur et le backup peut être mis là-dedans aussi facilement que si c'était avec soup base ou si c'était avec autre chose. um Les la proposition, la proposition de valeur entre guillemets, de tout ce qui est super base, néon et machin, c'est que c'est une interface web qui permet aux gens qui sont low code d'interagir avec une base de données.
+
+@Morgane [20:52]: OK. Et euh je pense que
+
+@Jamie [21:06]: Moi en en amont, si on avait les, si on avait les ressources et les, la capacité de payer un, un, une équipe de comment dire, de mainteneur de de base de données, je pourrais set up sur un serveur vide, exactement la même chose que soup base moins l'interface.
+
+@Jamie [21:27]: Est-ce que la technologie sous-jacente, elle est libre au public, elle elle va à tout le monde. Ce que tu paies avec Super Base ou avec euh Neon quand tu veux, quand tu vas vers les trucs payants, c'est justement l'interface web qui, c'est des boutons à cliquer et pas des configurations à faire sur un serveur. um Mais en règle générale, si on avait les moyens et la capacité, je pourrais set up sur un serveur une base de données exactement comme il y a dans Neon ou exactement comme il y aurait dans Spa B. Je me casserai juste pas la tête et sur le court terme, c'est qu'il y a beaucoup de maintenance à faire.
+
+@Morgane [21:51]: Et ça sera possible.
+
+@Jamie [21:57]: Les, les, les, le le le le côté chouette avec Neon et avec, c'est que il s'occupe de pas mal de choses en amont. um Et dans dans dans
+
+@Morgane [22:07]: Le plus important que ce que tu construis maintenant, on pourra le mettre à un moment euh comme tu dis sur notre propre c'est tout et pour l'instant t'as raison on va on va rester sur Neon euh enfin on va alors du coup aller dessus. euh Maintenant, est-ce que c'est intéressant pour toi d'a- d'avoir accès à Digital Ocean ou à Super Base enfin il faut que tu me dises les accès que t'as besoin.
+
+@Jamie [22:12]: Ah il y a y a aucun souci. Regarder les, je dois encore aller regarder les, les meilleurs choix à faire pour garder les coups bas. Mais je veux, je veux qu'on, qu'on commence à travailler avec l'IH souverain dès le départ. euh parce que on on parce qu'on va être restreint à cet IA là tant qu'on on veut rester dans ce cette classification euh et je préférerais qu'on commence le testing dès le départ avec, voilà, euh le, le, le truc souverain. euh Du coup, je dois regarder un peu le lequel est la même.
+
+@Morgane [22:33]: Ouais. Oui, c'est important.
+
+@Morgane [22:52]: Ouais.
+
+@Jamie [22:57]: Meilleure option.
+
+@Morgane [22:58]: Ouais.
+
+@Jamie [22:59]: En termes de prix, mais aussi en termes de qualité du du modèle quoi, parce qu'on on veut quand même quelque chose qui marche et qui est raisonnable en termes de prix. um Mais digital ocean, c'est juste un, digital ocean, c'est un peu l'équivalent de Versailles. C'est un compétiteur. Lors avec Versel, le fait qu'on paie le pro et le fait que tout est hébergé là, on n'a plus vraiment besoin de digital ocean.
+
+@Morgane [23:02]: Oui. Exactement.
+
+@Jamie [23:19]: Um.
+
+@Morgane [23:19]: Mais par contre il y a un travail dessus sur Digital Ocean qui a été fait par et je sais pas si c'est intéressant pour toi de voir peut-être qu'ils ont déjà testé et qui a pas fonctionné pour te faire gagner du temps. Je sais pas hein quoi?
+
+@Jamie [23:28]: Non, tout à fait. Tout à fait, ça m'intéresse, mais, mais du coup, ils ont fait quoi comme travail, il n'y a pas de URL disponible à les regarder?
+
+@Morgane [23:39]: C'est le prompt engineering qu'ils ont fait et qu'ils ont testé pour les recettes. Je pense que ça, c'est c'est le plus gros travail euh
+
+@Jamie [23:45]: Nages.
+
+@Morgane [23:48]: Qui peut être. C'est ce que j'avais réutilisé justement pour la B2 de Rémy euh mais que j'ai comme j'ai stoppé le paiement de Digital Ocean j'ai mis en pause euh leur travail, mais je peux le réactiver pour que t'ailles voir ou je sais pas s'il y a moyen de de le voir sans le réactiver mais je suppose que c'est possible.
+
+@Jamie [24:07]: Je je je suppose que ils ont écrit du code, c'est pas qu'ils ont été touchés à des configurations dans Digital ocean. Ils ont écrit du vrai code.
+
+@Morgane [24:14]: Je pense bien que c'est du vrai code maintenant euh je ne je n'ai jamais
+
+@Jamie [24:17]: Le lien vers le diplôme.
+
+@Arnaud [24:20]: Ils l'ont, ils ont écrit du vrai code et ils nous l'ont donné. On a tout le le script du code en question et c'est le bon moment d'ailleurs de de le transmettre, que tu jettes un coup d'oeil euh voilà, il y a il y a une base de travail qui a été faite là-dessus et qui est qui est énorme d'ailleurs, c'est c'était je sais plus combien de milliers de lignes qui avaient été faites.
+
+@Morgane [24:24]: Oui, c'est vrai.
+
+@Jamie [24:34]: Vous? Vous savez quel langage a été utilisé?
+
+@Arnaud [24:40]: Non.
+
+@Morgane [24:41]: Si tu m'en cites, je pourrais peut-être te dire oui, celui-là.
+
+@Arnaud [24:44]: Mais Python, je pense, mais je suis pas sûr.
+
+@Morgane [24:46]: Oui, c'est c'est mais c'est pas oui si c'est Python, si.
+
+@Jamie [24:49]: OK Ouais non, c'est sûr que si tu sais m'avoir le code, j'ai pas nécessairement besoin de d'avoir accès à la digital ocean. Euh garde l'argent mais si tu sais avoir le code, c'est super intéressant. um
+
+@Morgane [24:57]: Je regardais ce voyez, je regarda.
+
+@Jamie [25:05]: Mais ouais. Ce que je peux faire si ça vous intéresse et je pense que ça pourrait vous donner un peu de clarité sur comment je travaille et si tu commences à t'intéresser à Codex, Arnaud euh cette euh cette méthodologie que j'utilise euh pour être euh très intéressant pour toi. euh mais je peux vous préparer un petit rapport sur exactement.
+
+@Jamie [25:25]: Qu'est-ce que c'est la pipeline dont je parle parce que ça peut sembler un peu abstrait quand j'ai, quand j'y parle, mais une petite présentation pour que vous compreniez comment je travaille en interne, comme ça on pourrait peut-être mieux collaborer euh sur les mois à venir quand on demande une fonctionnalité et surtout quand vous voulez voir le progrès, qu'est-ce qui se passe comme ça vous voyez à quoi ça ressemble euh l'application.
+
+@Arnaud [25:45]: Ouais, très bien et ça donne une vue sur les jalons et les étapes futures vers quoi on se dirige. Ce sera bien à présenter et à garder quand on a même un audit, c'est une bonne chose.
+
+@Jamie [25:55]: Ouais, c'est ça, nickel. euh Ben écoute ça, je préparerai euh je préparais ça au courant de la semaine prochaine. Euh Morgane là, t'es posé dans ton PC.
+
+@Morgane [26:06]: Web je vois euh créer mon accès.
+
+@Jamie [26:10]: Créer mon accès, OK bah, créer.
+
+@Morgane [26:11]: J'ai reçu deux. Un à 14 h 47 et un à.
+
+@Jamie [26:16]: Le lien dans le slack.
+
+@Arnaud [26:16]: J'ai pas de plus-value, ça j'ai pas de plus-value là-dessus donc je vous laisse faire à vous deux, est-ce qu'il y a une question en particulier pour moi?
+
+@Jamie [26:22]: Euh Qu'est-ce que tu fais du week-end Arna?
+
+@Arnaud [26:26]: Je vais voir ce soir un concert à l'abbaye de Maretou d'un d'un DJ curé Un pasteur, DJ.
+
+@Jamie [26:37]: What the fuck?
+
+@Arnaud [26:40]: Je crois que ça va être marrant.
+
+@Jamie [26:42]: Ça je je je j'imagine. J'imagine, je doute pas, franchement.
+
+@Arnaud [26:46]: Et toi?
+
+@Jamie [26:48]: Alors moi je vais rentrer à la maison, je vais faire à manger avec les enfants et on va sûrement aller à la plage.
+
+@Arnaud [26:53]: Ah bah, c'est un bon programme aussi. OK, je vous laisse.
+
+@Jamie [27:00]: Ah.
+
+@Arnaud [27:01]: Salut Jimmy. Tô chérie.
+
+@Morgane [27:05]: Est-ce que Un de ces quatre Est-ce que je partage mon écran ou tu partages l'écran, j'ai.
+
+@Jamie [27:15]: Non, parce que je veux, je veux te voir toi euh utiliser la plateforme le le vont vont prendre le plus gros de ce que tu flags comme euh premier abord et puis tu pourrais me donner le rapport euh pour lundi, mais en attendant euh je peux déjà avoir à partir de de base de cette conversation et de cet enregistrement avoir une une direction prévue quoi.
+
+@Morgane [27:37]: Attends, je dois autoriser Slack à enregistrer mon écran. Slack ne pourra peut-être pas enregistrer le contenu de votre écran. Jusqu'à sa fermeture.
+
+@Jamie [27:46]: Les voleurs.
+
+@Morgane [27:48]: Quitter et rouvrir plus tard. Je crois que mon Mac protège le fait que
+
+@Jamie [28:02]: Je peux partager mon ex.
+
+@Morgane [28:03]: Que ça. Ouais. Attends. Ça le tient là.
+
+@Jamie [28:11]: Ouais, j'aime bien um écoute, faisons, voilà, euh faisons le truc comme ça et Tu le verras apparaître dans ton écran une fois que c'est c'est rempli de toute façon. Alors um ça, c'était une grosse question qu'on qu'il faut décider, mais c'est pas euh c'est, est-ce qu'on veut qu'il a anonymise euh les données. C'est-à-dire qu'on peut leer.
+
+@Morgane [28:35]: Ben c'est un avantage. Oui, parce que le RGPD du coup ne s'appliquerait peut-être pas.
+
+@Jamie [28:43]: Ouais, je pense que c'est la meilleure idée. Alors il faut donner genre un, un pseudonyme, un surnom.
+
+@Morgane [28:43]: Le déc
+
+@Jamie [28:48]: Un patient A, on va dire comme ça. Et puis tu m'as dit que c'était Hélène, c'est ça?
+
+@Morgane [28:55]: Oui, Guillet.
+
+@Jamie [28:58]: Brigitte.
+
+@Morgane [28:59]: Non Guy Guyit, c'est GUI2LI2TE. C'est trop bizarre. Ouais.
+
+@Jamie [29:08]: Euh je vais mettre ton adresse mail.
+
+@Morgane [29:11]: Changerai.
+
+@Jamie [29:11]: Comme ça, pas français. Est-ce que les choses comme ça, c'est C'est utile.
+
+@Morgane [29:18]: Oui euh oui, c'est bien de savoir l'âge du du patient. De consultant.
+
+@Jamie [29:25]: La mauvaise direction, elle va pas être née en 2040.
+
+@Morgane [29:29]: Quoi?
+
+@Jamie [29:30]: T'as t'as la date ou je plus.
+
+@Morgane [29:32]: L'âge en fait euh euh ce qui est intéressant quand on va faire les profils euh des des personnes, c'est parce que euh il faudra qu'ils aient absolument 18 ans pour utiliser la plateforme Rémy. Donc il faudra qu'ils mettent quand même leur date de naissance maintenant moi je peux mettre simplement l'âge parce que les gens ils me demandent, ils me donnent pas spécialement leur date de naissance mais mais je peux leur demander du coup.
+
+@Jamie [29:54]: Ouais. Du coup, t'as t'as l'âge de Hélène ou je mets un truc au pifre?
+
+@Morgane [29:58]: J'ai son âge, 38 ans. Mais je connais pas sa date de naissance.
+
+@Jamie [30:05]: Non, je prends 92.
+
+@Morgane [30:06]: 38 ans, c'est 88 comme moi.
+
+@Jamie [30:09]: Hm
+
+@Morgane [30:12]: La meilleure année.
+
+@Jamie [30:15]: C'est une femme de taille moyenne 100.
+
+@Morgane [30:19]: Attends, je, j'ai ces infos. Hop.
+
+@Morgane [30:36]: Quelques questions. Alors euh taille 1,57, 63 kg.
+
+@Jamie [30:46]: Optionnel, optionnel, tu pourrais les changer après, orientation c'est Morgane, c'est la personne qui a orienté la personne. Accompagnement pack pack pack, créer le profil. Op.
+
+@Morgane [30:58]: Quand tu dis orientation, c'est par où ils sont venus.
+
+@Jamie [31:03]: Oui, pas que ce soit le le praticien ou par toi ou oui, c'est c'est, c'est ça l'idée. um Du coup avec le Le la création du profil. um Là, ici, c'est le même bug que j'avais avec les premières invitations. Concrètement, ça a pris les anciens noms de domaine.
+
+@Jamie [31:22]: Euh maintenant, on est sur du nouveau, alors ça, ça va pas marcher tout de suite, mais de toute façon ça c'est pour qu'ils voient leur leur leur information.
+
+@Morgane [31:29]: Alors.
+
+@Jamie [31:30]: Par suite. Mais du coup, tu peux donner des recommandations.
+
+@Morgane [31:31]: Oui. C'est quoi ça là le protocole encodé entrée par entrée.
+
+@Jamie [31:42]: C'est le même, c'est, c'est un peu le même système que tu m'avais montré dans la V1 euh où euh tu recommandes euh de aller courir ou marcher après le repas ou euh aller faire telle activité ou telle activité. à notre consultation qu'il y avait aussi sur euh la V1.
+
+@Jamie [32:02]: Euh je pense.
+
+@Morgane [32:03]: Ouais, mais là, je dois l'ajouter un par un, manuellement, ça va prendre du temps ça.
+
+@Jamie [32:09]: Comment ça?
+
+@Morgane [32:10]: Ce que tu veux euh ajouter une recommandation.
+
+@Jamie [32:15]: Oui, mais ils ont ils ont combien de par recommandation par euh par patient?
+
+@Morgane [32:20]: Il y en a pas mal, il y en a beaucoup, surtout pour elle, elle est Elle a pas mal de de tu parles ou alors tu parles de objectif.
+
+@Jamie [32:27]: Vous pouvez passer les, les infos de comment Il les en doivent ajuster.
+
+@Morgane [32:33]: Parce qu'il y a diff Quoi?
+
+@Jamie [32:36]: Les recommandations actuelles quand c'est en manuel, tu les re-, tu les tu les collectionnes dans un Excel ou dans quoi?
+
+@Morgane [32:43]: Pour l'instant, je travaille avec un email avec euh mes conclusions, euh ce que je recommande. Parce que tu vois, il y a il y a beaucoup de il y a il y a beaucoup de choses euh euh tu vois, il y a autant une catégorie euh complément alimentaire avec les compléments que moi je recommande, l'alimentation vers quoi on va se diriger, euh la gestion du stress etc. Mais c'est beaucoup de choses, mais du coup ça veut dire quoi? Par exemple si je dis les compléments alimentaires là j'en mets dans la recommandation plusieurs ou alors je mets tout dans des
+
+@Morgane [33:13]: Enfin tu vois ce que je veux dire?
+
+@Jamie [33:16]: Oui, je vois euh ce qui ce qui ce qui me serait vraiment, et du coup, la manière dont tu opères maintenant, c'est que t'as une boîte mail spécifique où tu, tu, tu envoies. Aux patients les recommandations et si tu veux aller consulter les recommandations, tu vas aller voir la boîte mail.
+
+@Morgane [33:34]: Bah franchement pour l'instant euh je je fais enfin comme je j'ai décidé de faire ça et la semaine passée, euh je construis au fur et à mesure, tu vois et je teste et je vois ce qui ce qui fonctionne. Et euh là ce que j'ai fait avec Hélène, c'est que je lui ai envoyé un enfin déjà, je me suis enregistrée lors de la consultation, lors de l'anamnèse avec toutes mes questions par rapport à sa santé. Donc euh tu passes de la digestion jusqu'à ces cycles, etc. Là, c'est Lixi qui a tout enregistré. Tu vois comme ça, j'ai un transcrit.
+
+@Morgane [34:04]: Complet de la consultation. On a décidé à la fin de la consultation euh trois objectifs principaux parce que tu peux pas tout régler euh en un coup et euh de toute façon il y a il y a des limites parce que je ne suis pas un médecin non plus. euh Et alors là, l'idée, c'est pendant huit semaines, c'est de l'aider euh dans le changement alimentaire par rapport aux objectifs donc elle ses objectifs, c'est éviter de grignoter le soir parce qu'elle a des pics comme ça de glycémie. Donc réduire ces pics de glycémie.
+
+@Morgane [34:34]: Euh se sentir mieux et éviter la prise de poids parce qu'elle doit arrêter le sport avec ces différentes maladies et euh donc et d'alimentation anti-inflammatoire. Donc là, la la prochaine enfin ce que je lui ai envoyé comme deuxième email après le récap de ce qu'on avait dit euh des objectifs, c'est que je lui ai envoyé une liste d'aliments que je lui conseille d'acheter pour avoir dans ses placards, tu vois. Et à chaque fois, pourquoi par rapport à elle. Et là, ce que je vais lui renvoyer maintenant, c'est les différentes recettes sur mesure que je lui propose.
+
+@Morgane [35:04]: D'essayer. Et entre temps, je dis de m'envoyer des des WhatsApp avec tout ce qu'elle mange pour que j'essaie d'améliorer déjà ces repas habituels. Tu vois pour pas qu'il y ait trop de changements non plus d'un coup.
+
+@Jamie [35:15]: OK. Alors, ce qui, OK alors la je pense que c'était la meilleure chose parce que t'es t'es encore en train de déterminer comment toi-même tu vas organiser le le le taf alors au lieu de Au lieu de toi trouver ta manière dans euh mail ou Excel ou OneNote ou que sais-je. um Ce que je vais te demander de faire, c'est un un diagramme. euh Tu connais Miro?
+
+@Morgane [35:41]: Ah oui, j'allais faire ça dans le ocean moi.
+
+@Jamie [35:44]: Est-ce que notion a le concept ouais, il y a le concept de table. Alors, ce que je voulais te demander, c'est un peu de visualiser la base de données. Pas de rémis, pas d'impatient, mais vraiment une base de données de ce dont toi tu as besoin pour tout stocker par rapport à un patient.
+
+@Jamie [36:04]: Alors, d'après ce que tu viens de me dire, des exemples seraient une table listée spécifiquement ingrédients euh recommandés. Et puis notables serait euh recommandation de truc physiques à faire. Mais vraiment essayer de les, de faire un maximum de catégorie et donner des colonnes à chacune de ces catégories. C'est-à-dire avec les ingrédients, ça va être le nom de l'ingrédient. euh peut-être raison pourquoi cet ingrédient um et puis, je sais pas moi, calories, je sais que t'as pas envie de compter, mais c'est juste pour le le le le le le but de l'exemple quoi. Et moi, ce que ça va me permettre de faire avec un diagramme pareil, c'est de
+
+@Morgane [36:37]: Oui.
+
+@Jamie [36:43]: La mettre dans la base de données avec le contexte de Rémi et du coup, cette interface-ci pour toi. De manipuler les patients, euh ça va être ton, ton point d'appui. C'est ce qu'on peut faire très très rapidement euh une fois qu'on a remis AI.be licit sur, c'est que au lieu de toi manuellement envoyer des mails, tu peux avoir des, on peut te faire des templates de mail où une fois que t'as rempli le profil comme tu veux avec les recommandations que tu veux et les, les je sais pas quoi que tu veux, tu n'auras qu'à appuyer un bouton envoyer mail et ils recevront la mail template avec les documents dont ils ont
+
+@Jamie [37:20]: Ont besoin quoi ou les liens dont ils ont besoin. euh
+
+@Morgane [37:22]: Que donc je vais faire, je vais justement, c'est ce que j'allais faire parce que je sais bien que tu attendais aussi de moi euh les les différents euh formulaires, mais j'ai eu d'autres priorités du coup avec Hélène qui attendait ses ses ses recommandations plus Fran et enfin bref, j'ai eu beaucoup euh sur euh le dernier jour. euh Et je me suis dit que ce week-end, j'allais justement plus structuré. Toi, tu préfères, je peux le faire sur notion, mais il y en a un autre que tu me dis que tu préférerais pour les diagrammes?
+
+@Jamie [37:48]: Micro, mais j'essaie juste de montrer un peu le concept de ce que je recherche parce que concrètement avec avec Notion, tu peux le faire et si tu connais Nan, c'est mieux. um.
+
+@Morgane [37:54]: Oui. N'est pas donc moi si tu me dis avec l'autre, c'est c'est mieux.
+
+@Jamie [38:01]: Voilà, c'est est-ce que il y a moyen de le faire avec un snack. Si je viens là.
+
+@Morgane [38:14]: T'as été sur Canvas, c'est ça?
+
+@Jamie [38:16]: Oui. Tu veux dire que la table à ses ingrédients. Et la première colonne, ça va être le nom de l'ingrédient. Um raison de pourquoi la cet ingrédients-là et puis toutes les autres colonnes. Et puis tu tu me donnes deux ou trois exemples de chaque et puis tu fais la même chose pour euh je sais pas donner.
+
+@Jamie [38:40]: Patient Alors le nom, prénom, email, c'est, c'est obvious, mais les trucs qui sont moins obvious euh comme l'âge au lieu de la- de la date de naissance, date de naissance, tu les tapes dans une colonne. Et moi ce qui ce qui ce que ce à quoi je m'attends de ta part, c'est vraiment juste, même si c'est juste un screenshot et que tu me donnes pas accès à la page notion, mais juste un screenshot de voici ce que j'imagine pour les tables. Et ce que ça va me permettre, c'est d'avoir un endroit où tu peux stocker toute l'information dont tu as besoin pour chaque patient.
+
+@Jamie [39:11]: Um Du coup, le but du jeu là, c'est d'essayer de oui, prendre le contexte de Hélène, mais aussi essayer de de d'imaginer genre tous les autres variabilités, les, les possibilités qui existent euh euh avec les patients. Je sais que c'est varié, mais Avoir juste un maximum de points de données, comme ça dès le départ, au lieu de faire tout du texte libre euh t'as des endroits spécifiques où elle est cochée, ben, voilà les ingrédients que tu dois manger. um Voilà les, les, les activités que tu dois faire et au fur et à mesure de faire ça, à partir du moment où on connecte l'IA au service um on va pouvoir dire Alia ben écoute si tu dois générer des recettes.
+
+@Morgane [39:32]: Mais euh
+
+@Jamie [39:52]: Va regarder les ingrédients que ce patient peut avoir et génère les recettes à partir de ça. Du coup le le
+
+@Morgane [39:57]: Mais c'est
+
+@Jamie [39:59]: Ouais.
+
+@Morgane [39:59]: C'est pour moi euh les données que je dois mettre sur euh le enfin que que Rémy a besoin pour générer des recettes, des suggestions et cetera euh C'est peut-être pas la même chose que ce que je vais mettre parce que moi par exemple, je fais une liste de fonds de placard, mais il faudrait que Rémy aille générer eux-mêmes et que ce soit pas moi qui le fasse. Enfin, tu vois, moi, je dis par exemple comment je travaille pour l'instant, c'est que je dis à Chat, voilà, par rapport à ça, moi, je veux aimerais bien qu'elle prenne tel, tel, tel, tel, tel, tels aliments et lui il me refait ça en une page euh une jolie page PDF avec les les les les belles images et cetera. euh mais ça je peux te le montrer, mais de base à un moment, il faudrait
+
+@Morgane [40:43]: Limite ce soir Rémy qui propose directement euh ça par rapport à au profil de la personne, tu vois. En étant orienté par le par le praticien. Donc par exemple, euh je lui ai demandé aussi, mais par rapport à tout ce que j'ai dit, est-ce qu'il y a d'autres aliments que j'aurais oublié. Et là, il me suggérait d'autres choses. Tu vois?
+
+@Jamie [41:01]: OK. um Je vois ce que tu veux dire euh mais si je peux, comment expliquer ça? Alors, il y a le workflow de Rémy, de A à Z, de patient et onboardé, il met son profil, le praticien met son ses ses recommandations, le protocol, bla bla bla bla, pour arriver au moment où Rémy peut suggérer des des recettes, je dirais des des activités, tout ça. Ça, c'est le flot on va dire idéal de Rémi et c'est ce qu'on vise. Là, ce qu'on a actuellement et ce sur
+
+@Jamie [41:31]: La base sur laquelle on s'est décidé, on va travailler là-dessus sur les mois à venir, c'est ce que tu fais. Parce que en, en, en règle générale, là, ce que tu fais, c'est ce qu'on veut que Rémy fasse.
+
+@Morgane [41:37]: Ouais. Ouais, alors ça.
+
+@Jamie [41:44]: D'accord, le le le le le travail que tu fais manuellement là avec Hélène, avec Pierre, avec je ne sais pas qui. C'est le boulot qu'on va vouloir que Rémy fasse ultimement. Alors, au lieu d'essayer de travailler sur les parties dont on n'a pas encore le contrôle, on va travailler sur les parties sur lesquelles on a le contrôle et on a une visibilité totale. Et ça, c'est ce que toi tu fais au quotidien.
+
+@Jamie [42:06]: Et ce que toi tu fais au quotidien, c'est compiler les ingrédients sur base de ce que les les les les gens comme maladie ou comme euh pathologie. um Et à faire ça, à travailler sur les tables de ingrédients et les tables de recommandations physiques et les tables de données de patients, ça va nous permettre d'avoir une base de architecture de données. Et c'est avec cette architecture de données qu'on va pouvoir programmer Ry à faire les choses correctement.
+
+@Jamie [42:35]: Mais pour commencer avant de donner, il y a accès à des des des données entre guillemets libres et sans structure, um il faut être sûr que quelqu'un qui sait faire le boulot, c'est-à-dire toi, c'est opéré à partir de cette donnée. Parce que si quelqu'un qui ne sait pas faire le, si quelqu'un qui sait faire le boulot manuellement, on n'arrive pas à utiliser l'outil de base sans l'AI.
+
+@Jamie [42:58]: Ah ben l'Aï il va pas savoir faire le boul justement non plus. C'est, c'est, c'est aussi, c'est aussi simple que ça. Parce qu'on peut prompter, on peut lui expliquer ah ben si c'est ça fait ça et si c'est ça fait ça et si c'est ça fait ça. Mais concrètement, si l'architecture de données N'est pas Correcte pour que une vraie personne l'utilise comme outil pour faciliter la tâche de consultation et de suivi de consultation, et ben, ce serait presque.
+
+@Jamie [43:23]: Pas du tout raisonnable de demander à une AI à qui on essaie d'expliquer les instructions de le faire.
+
+@Morgane [43:28]: Mhm.
+
+@Jamie [43:30]: Alors là, ce que j'ai vraiment envie que tu garde en tête sur les les quelques semaines à venir parce que je sens que si on fait ça bien, ça va être assez rapide comme développement. C'est vraiment qu'est-ce que toi tu fais, que ce dont tu as besoin um comme outil pour gérer ton euh ton euh ton patient au sein de la plateforme pour que tu n'aies pas à quitter la plateforme.
+
+@Jamie [43:51]: Que tu n'as à à part pour le moment. Aller vers Cloud ou ChatGPT pour générer un document ou générer un je ne sais pas quoi. J'ai pas envie que t'ailles dans mail pour envoyer un mail. J'ai pas envie que t'ailles euh nécessairement de de aller faire des recherches ailleurs, s'il y a une base de données ou une page de référence que tu consultes régulièrement, faisons en sorte qu'elle existe au sein de l'application. Pour que quand toi tu fasses ton ton suivi patient.
+
+@Morgane [44:12]: Est-ce que
+
+@Jamie [44:15]: Limite tout ce que, tout ce dont t'as besoin comme page ouverte, c'est admin.III. tag.
+
+@Morgane [44:21]: OK, ça va, on fait ça.
+
+@Jamie [44:23]: Et à partir de ça, ça va être hyper facile de, de, de créer les prompts pour Rémi, parce que ça, ça va juste être moi qui te demande, OK, écris ce que tu fais tous les jours avec tes patients. Écris-le, comme tu veux que dans le format que tu veux, dans le langage que tu veux, co- comme tu veux, mais écris ce que tu fais au quotidien, sur ta journée, sur la plateforme avec tes patients. Et à partir de ça, on va pouvoir créer une très bonne série de prompts pour que Rémy puisse agir à ta place.
+
+@Morgane [44:50]: Ouais.
+
+@Jamie [44:52]: Et c'est à partir de ce point qu'on va pouvoir de dire à ces patients que tu as actuellement, écoute là, on va vraiment lancer le le la phase bêta. On va avoir Rémi qui qui qui va faire le le à ma place, moi je serai de toi, tu seras encore en backup s'ils ont aucun problème, s'ils ont quoi que ce soit comme problème à crie um mais c'est ça va être le le le shift graduel vers OK c'est c'est Morgane à temps plein, c'est un, c'est un nutritionniste, euh elle va tout faire pour toi via la plateforme et puis petit à petit, on va faire OK chémie prend le relais sur telle chose.
+
+@Morgane [44:52]: OK donc
+
+@Jamie [45:22]: Rémi prend le relais sur telle chose pour qu'éventuellement Rémy soit le truc de la plateforme euh et on on vise le moment où euh les patients s'inscrivent et qu'ils ne connaissent pas le nom Morganis. Ce qu'ils connaissent, c'est Rémi. Tu vois?
+
+@Morgane [45:36]: Ouais.
+
+@Jamie [45:39]: Um
+
+@Morgane [45:39]: OK. ça me paraît que
+
+@Jamie [45:43]: M Avant d'avoir, je vais, je vais prendre sur de, je vais, parce qu'il y a pas vraiment eu de. Décision à part changer date de naissance en âge. Je vais attendre ton rapport lundi pour savoir euh um mais je vais préparer ce petit rapport et quelques liens euh vers la méthodologie que j'utilise pour que toi et Arnaud, vous compreniez un peu plus en détail et que vous puissiez, si jamais quelqu'un vous, vous vous interroge là-dessus euh et que je suis pas présent ou que c'est je suis pas disponible, vous avez au moins euh les les les les arguments de base pour justifier pourquoi un tel produit
+
+@Morgane [45:55]: Ouais bah ouais.
+
+@Morgane [46:15]: Ouais euh ouais
+
+@Jamie [46:20]: On n'a qu'un seul développeur qui travaille sans devoir nécessairement euh parler de euh on est en startup, on n'a pas les fonds, na na ni na na na tu vois, genre euh il n'a rien d'expliquer la chose pour que ça passe très trop et très euh enterprise.
+
+@Morgane [46:36]: Um qu'est-ce que j'allais dire euh du coup euh Je crée quand même, je continue, je vais dans ce que tu as créé, je me crée mon compte, je peux récupérer ce que tu as déjà fait ou alors je recommence le le truc de Hélène. Comme ça je vois déjà ce qu'il y a.
+
+@Jamie [46:50]: Donc, euh, là, tu t'inscris. Si tu t'inscris, tu fais ton compte, euh tu auras accès à Hélène, tu pourrais l'avoir.
+
+@Morgane [46:54]: Ouais. OK, OK, ça va. Et donc complète comme ça je vois déjà ce qui a été fait, peut-être que je pense à des choses à ajouter, des remarques et en même temps ben je te fais la structure euh que je mets passe avec mes mes mes mes patients, enfin mes consultants qu'on dit euh avec mes consultants euh ce que j'ai besoin et comment je vais travailler et donc comment faire pour euh que que Rémy euh le passe et m'aide directement sur la plateforme quoi.
+
+@Jamie [47:09]: Culture.
+
+@Jamie [47:25]: Là, là on on s'in- on s'intéresse pas du tout à comment le lien patient praticien va se faire avec rien du tout avec le crime, vraiment.
+
+@Morgane [47:32]: Non.
+
+@Jamie [47:34]: Toi, si tu devais imaginer une base de données pour que tu puisses faire le boulot facilement. Ou est-ce que c'est c'est quoi la taxonomie de, de la chose quoi, tu vois?
+
+@Morgane [47:40]: Oui.
+
+@Jamie [47:44]: Est-ce que il y a il y a une table ingrédients, il y a une table euh recette, il y a une table euh patient, il y a une table pathologie, um.
+
+@Morgane [47:44]: Mhm Le le truc c'est jusqu'où tu peux aller, tu vois?
+
+@Jamie [47:53]: Si, si t'as une liste de peut-être une douzaine ou une vingtaine de pathologies qui sont communs et qui ont des, des causes et effets communes. ah ben c'est tout à fait faisable d'avoir une table pathologie avec euh je sais pas moi, diabète, moins de sucre, euh j'ai vraiment pas d'autres exemples dans ce métier.
+
+@Morgane [48:13]: Ouais, je vais te donner un exemple est-ce que l'inflammation crée pas mal de pathologies au niveau des cancers cardiovasculaires, euh on vous trouve métabolique et cetera. Donc déjà l'inflammation en général, c'est un, un, une base commune à toutes les maladies.
+
+@Jamie [48:22]: Mar. Est-ce que tu connais ce que c'est un tree?
+
+@Morgane [48:33]: À quoi?
+
+@Jamie [48:35]: A fault tree.
+
+@Morgane [48:37]: Na.
+
+@Jamie [48:39]: Non. um Un bon exemple pour expliquer ce que c'est, c'est que la NASA l'ont utilisé pour euh ils utilisent encore ce système pour euh prévoir des tout tout type de projets dans l'espace. Ce que c'est concrètement, c'est que t'as le le but final, l'objectif euh dans le cas de la NASA, c'est euh atterrir sur la lune. um et toutes les choses qui découlent, qui pourront aller mal.
+
+@Jamie [49:07]: Sont créés en sorte de peindre avec des branches.
+
+@Morgane [49:08]: Ah oui, si j'ai bien vu, si si, bien sûr. Oui.
+
+@Jamie [49:12]: L'idée pour tout ce qui est pathologie, je sais que c'est pas évident de le faire, mais pour tout ce qui est commun, ce qui est d'avoir un fa tri de joueur hockey, le but, l'objectif, c'est d'être en santé. Alors qu'est-ce qui pourrait se passer? Ben c'est euh diabète ou c'est inflammation ou c'est chic ou c'est check. OK, si c'est inflammation.
+
+@Morgane [49:15]: Ouais.
+
+@Jamie [49:31]: C'est c'est quoi le pire qui pourrait arriver? Est-ce que c'est inflammation au niveau euh les artères ou est-ce que c'est inflammation au niveau les joints, est-ce que, et, et
+
+@Morgane [49:38]: S'est lancée.
+
+@Jamie [49:38]: Essayer de faire. J.
+
+@Morgane [49:41]: Ça s'appelle la formation de bas de grade en fait.
+
+@Jamie [49:44]: Je te dis moi que quand on parle d'exemple, je vais toujours dire de la merde il faut, faut, faut être clair là-dessus, mais le, le, le, l'idée, c'est d'avoir une sorte de, parce qu'au plus on peut schématiser et détailler les choses. Au plus, on peut créer la plateforme avant l'AI.
+
+@Morgane [49:44]: C'est pas de technique.
+
+@Jamie [50:02]: Qui est puissant. Puis l'ajout de l'I va que faire rendre la chose encore plus puissante. E Alors, ouais, dans un premier temps, faisons juste les tables.
+
+@Morgane [50:12]: Ouais. Les meilleur euh par rapport à au à la au protocole suggéré au médecin et surtout par rapport aux aux recettes comme elles seront euh parfaitement adaptés à une personne et une pathologie, tu vois. Ça, c'est, ce sera notre différenciation, c'est vraiment euh et le lien entre patients et en fait on va avoir plein de choses, ça va être génial.
+
+@Jamie [50:34]: Bah alors euh alors. Comment comment um si on si on se passe principalement sur le patient, bah lorsque tu fais une perte, c'est avoir la table patiente. Avec nom, prénom, e-mail, euh âge, taille, sexe, poids, tout le truc de base que tout patient. Et puis tu peux avoir attaché à la table patient des autres tables.
+
+@Morgane [50:54]: Ouais.
+
+@Jamie [50:59]: C'est-à-dire c'est c'est comme ça que la base de données euh les bases de données classiques fonctionnent, c'est-à-dire t'as la base de, t'as la base de données euh patient ou t'as voici qui c'est et puis attaché à la base de données patients avec une colonne pathologie et une colonne recommandation et une colonne ingrédients, t'as les autres tables qui en découlent.
+
+@Jamie [51:19]: Et qui du coup, pour la pathologie, ça veut dire ben écoute, tel patient à telle pathologie. Alors, on fait telle recommandation et on fait tel ingrédient. Ouais, c'est, ça va être ça le but du jeu, c'est c'est, c'est tous les chaînes de If Health FD Do that, otherwise do.
+
+@Jamie [51:38]: Oui, c'est dur de faire ça dans le monde de de médical, je te, je te l'admets. Je ne sais pas que ça va être une chose facile à faire, mais c'est ça un peu le but de, de Rémi, c'est de d'essayer de le faire. Un encadrer un maximum les six ça, faisons ça, si pas ça, faisons ça alors. um Et à à sur base de ça, au mieux, on prend la plateforme puissante sans l'AI
+
+@Jamie [52:02]: L'ajout de laï ça va encore améliorer la chose. Parce que ce que je vois beaucoup en ce moment, c'est des start-ups qui se basent trop sur la valeur ajoutée CIA.
+
+@Morgane [52:05]: Mhm. Non, c'est la base de données.
+
+@Jamie [52:11]: C'est fun. C'est c'est c'est la base de données, c'est comment l'IA est structuré et si on peut faire attention et le rapport que je vais vous renvoyer, il est quelques liens de lecture sur la la la méthodologie que j'utilise, elle prône justement ça. C'est um c'est, c'est tous les.
+
+@Morgane [52:16]: Ouais.
+
+@Jamie [52:27]: Tous les start-ups qui se vendent euh oh on est agent ci, agent ça, agent machin. Si la seule valeur ajoutée, c'est le fait qu'il y a dans le, dans le, dans le truc. C'est pas que c'est, c'est pas que c'est un produit de merde de base.
+
+@Morgane [52:31]: On.
+
+@Jamie [52:40]: Mais voilà, il faut avoir une valeur ajoutée aux produit sans l'IA pour que l'IA soit utile. Pour qu'il y ait un un argument.
+
+@Morgane [52:45]: Ouais, ouais.
+
+@Jamie [52:48]: Alors là, faisons en sorte que toi, que toi, tu es l'outil parfait sans IA pour faire tout ce dont tu as besoin pour un patient. Et pour ça, pour que moi je puisse créer le truc rapidement et efficacement. Il faut vraiment que tu te poses et que tu fasses toutes les tables dans ta tête.
+
+@Morgane [52:48]: Est d'accord.
+
+@Jamie [53:02]: À vrai dire, je vais sûrement prendre le rapport que tu me rends et je vais changer deux ou trois trucs parce que je vais essayer de le mettre dans le contexte de Rémi. um Mais concrètement, l'idée, c'est que tu tu tu tu t'enferme dans une chambre, tu fermes les yeux, tu prends des champilles, je sais pas quoi, mais tu, tu, tu mets vraiment beaucoup, beaucoup, beaucoup d'efforts dans
+
+@Morgane [53:23]: Dans quoi?
+
+@Jamie [53:23]: Les caches.
+
+@Morgane [53:25]: J'ai pas entendu, t'as dit de me mettre beaucoup d'efforts dedans.
+
+@Jamie [53:29]: Met beaucoup d'efforts dans ça, la création de ça. Tu te mets dans une chambre dans le noir, tu prennes des champilles, que tu réfléchissent vraiment à voilà toutes les tables qu'il me faut. um Et sur base de ça, ça va être une première ébauche, on va pouvoir discuter. Et moi, je vais pouvoir te poser des questions de genre, ah OK, pourquoi cette table-là? ah parce que c'est ça comme connexion qu'il y a avec ça parce que moi, je connais rien à ce milieu.
+
+@Morgane [53:32]: Mhm.
+
+@Morgane [53:52]: Ouais mais tu vas voir, tu vas avoir plein de choses.
+
+@Jamie [53:52]: Mais Ouais, j'ai hâte, j'ai hâte. um nickel, top. um Moi, je pense que je vais devoir te laisser. J'ai votre appel euh mais j'ai
+
+@Morgane [54:01]: OK, ça va. Ben c'est moi je vous envoie le deck euh le plus vite possible euh aujourd'hui pour euh.
+
+@Jamie [54:09]: Et euh ouais, j'attends ton rapport lundi et en attendant, je vais, je vais compiler un peu ton, le le rapport de la, le, le workflow processus interne que moi j'utilise et qu'on va sûrement appliquer à Rémy quand euh quand on lui donne la vie.
+
+@Morgane [54:24]: OK, top. Allez, merci.
+
+@Jamie [54:27]: OK.
+
+@Morgane [54:28]: Et euh à la semaine prochaine, passez un bon week-end.
+
+@Jamie [54:29]: Okay.
+
+@Morgane [54:33]: Ciao.
