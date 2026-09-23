@@ -116,6 +116,20 @@ export const mealIntents = ["planned", "eaten"] as const;
 export const goalDirections = ["better", "stable", "worse"] as const;
 
 /**
+ * How a challenge ended, picked by Morgane when she closes it (decision D-27).
+ *
+ * English keys because they are what `patient_challenges.outcome` stores; the
+ * French she reads (Acquis / Non acquis / Abandonné) lives in the console's
+ * `vocabulary.ts`. An open challenge has no outcome at all — null is the
+ * state, not a fourth key.
+ */
+export const challengeOutcomes = [
+  "acquired",
+  "not_acquired",
+  "abandoned",
+] as const;
+
+/**
  * The "principales" rule: the first active recommendation of each category, in
  * the category order above.
  *

@@ -448,9 +448,9 @@ export const ConsultationForm = ({
           </Field>
           <Field
             id="consultation-patient-instruction"
-            label="Challenge de la semaine"
+            label="Consigne de la semaine"
             optional
-            hint="Pour la personne suivie — elle le lit en haut de son lien. Vider le champ le retire."
+            hint="Pour la personne suivie — elle la lit sur son lien, sous son challenge. Vider le champ la retire."
           >
             <Textarea
               id="consultation-patient-instruction"

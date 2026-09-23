@@ -9,9 +9,11 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 /**
  * The Drizzle schema — the single definition the checked-in migrations under
@@ -354,6 +356,58 @@ export const patientInstructions = pgTable("patient_instructions", {
   archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
   ...timestamps,
 });
+
+/**
+ * The one habit Morgane is running with a patient at a time — « Boire 1,5 L
+ * d'eau par jour », « Manger plus lentement » (her 14 Sept document, § 2).
+ *
+ * A challenge is written to the patient, not to REMI, and it has a lifecycle
+ * the standing instruction does not: it opens, the patient says when it is
+ * acquired and when they are ready for the next, and she closes it with an
+ * outcome. So it is a table of its own rather than a column on
+ * `patient_instructions` — the consigne stays what it is.
+ *
+ * At most one open row per patient, and here the rule IS a partial unique
+ * index, unlike the instruction's: she settled one-at-a-time (decision D-25),
+ * and a replacement that closes the current row and opens the next inside one
+ * transaction must never leave two open under a concurrent double submit.
+ *
+ * `acquired_at` and `ready_for_next_at` are the patient's two taps, written
+ * through the link. They need no `written_by`: only the patient ever sets
+ * them, and the audit trail carries the `patient` actor on every change.
+ */
+export const patientChallenges = pgTable(
+  "patient_challenges",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    /** One sentence, as she says it to the patient. */
+    text: text("text").notNull(),
+    /** Why this habit, for the patient. Empty when she gives none. */
+    why: text("why").notNull().default(""),
+    /** A day, not an instant — the same reasoning as `checked_on`. */
+    startedOn: date("started_on", { mode: "string" }).notNull(),
+    /** Null while the challenge is the current one. */
+    closedOn: date("closed_on", { mode: "string" }),
+    /** A key from `challengeOutcomes`; null while open, set on close. */
+    outcome: text("outcome"),
+    /** « Challenge acquis » — the patient's first tap. */
+    acquiredAt: timestamp("acquired_at", { withTimezone: true, mode: "date" }),
+    /** « Prêt(e) pour le prochain » — only ever set after `acquired_at`. */
+    readyForNextAt: timestamp("ready_for_next_at", {
+      withTimezone: true,
+      mode: "date",
+    }),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("patient_challenges_one_open")
+      .on(table.patientId)
+      .where(sql`${table.closedOn} is null`),
+  ],
+);
 
 /**
  * The living summary — brainstorm § C's PATIENT_SUMMARY, written by Morgane

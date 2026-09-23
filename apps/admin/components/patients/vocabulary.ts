@@ -1,6 +1,7 @@
 import { recommendationCategories } from "@remi/services/shared";
 import type {
   AnamnesisCategory,
+  ChallengeOutcome,
   ConsentChannel,
   CookingAffinity,
   GoalDirection,
@@ -176,6 +177,22 @@ export const goalDirectionIntents: Record<GoalDirection, Intent> = {
   better: "success",
   stable: "neutral",
   worse: "warning",
+};
+
+/**
+ * How she closes a challenge (decision D-27). The keys are what
+ * `patient_challenges.outcome` stores, so rewording one is an edit here alone.
+ */
+export const challengeOutcomeLabels: Record<ChallengeOutcome, string> = {
+  acquired: "Acquis",
+  not_acquired: "Non acquis",
+  abandoned: "Abandonné",
+};
+
+export const challengeOutcomeIntents: Record<ChallengeOutcome, Intent> = {
+  acquired: "success",
+  not_acquired: "neutral",
+  abandoned: "neutral",
 };
 
 /**

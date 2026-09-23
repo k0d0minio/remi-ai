@@ -5,6 +5,7 @@ import {
   localePath,
 } from "@remi/services/shared";
 import { Card, CardContent, Typography } from "@remi/ui/server";
+import { ChallengeCard } from "@/components/patient-link/challenge-card";
 import { GoalList } from "@/components/patient-link/goal-list";
 import { HomeSection } from "@/components/patient-link/home-section";
 import { MealEntryPoint } from "@/components/patient-link/meal-entry-point";
@@ -22,7 +23,8 @@ type Params = { locale: string; token: string };
 
 /**
  * Home: the patient's today, in her § 6 order — « Aujourd'hui / cette semaine »
- * (the goals, then the week's consigne), the prioritised recommendations, the
+ * (the running challenge, the goals, then the week's consigne), the
+ * prioritised recommendations, the
  * current recipes, the essentials, the way in to a meal, and the living summary
  * last.
  *
@@ -57,14 +59,24 @@ const PatientLinkHome = async ({ params }: { params: Promise<Params> }) => {
     notFound();
   }
 
-  const { summary, instruction, goals, recommendations, essentials, recipes } =
-    data;
+  const {
+    summary,
+    instruction,
+    challenge,
+    goals,
+    recommendations,
+    essentials,
+    recipes,
+  } = data;
 
-  const weekChallenge = instruction?.patientBody ?? null;
+  const weekConsigne = instruction?.patientBody ?? null;
   const principales = firstRecommendationPerCategory(recommendations);
   const segment = (path: string) => localePath(locale, `/p/${token}/${path}`);
 
-  const hasToday = goals.length > 0 || weekChallenge !== null;
+  // « Aujourd'hui » always renders now — the challenge slot says when none is
+  // running — so this only decides whether the page also says it is empty.
+  const hasToday =
+    challenge !== null || goals.length > 0 || weekConsigne !== null;
   // The meal invitation renders unconditionally, so "empty" means every block
   // that depends on her having written something is absent — not just the two
   // the home used to carry.
@@ -77,31 +89,36 @@ const PatientLinkHome = async ({ params }: { params: Promise<Params> }) => {
 
   return (
     <>
-      {hasToday ? (
-        <SegmentPage title={content.todayTitle}>
-          {goals.length > 0 ? (
-            <div className="flex flex-col gap-3">
-              <Typography as="h3" size="sm" weight="medium" tone="muted">
-                {content.goalsTitle}
-              </Typography>
-              <GoalList goals={goals} content={content} />
-            </div>
-          ) : null}
+      <SegmentPage title={content.todayTitle}>
+        <ChallengeCard
+          challenge={challenge}
+          locale={locale}
+          token={token}
+          content={content}
+        />
 
-          {weekChallenge !== null ? (
-            <Card variant="success">
-              <CardContent className="flex flex-col gap-2">
-                <Typography as="h3" size="sm" weight="semibold">
-                  {content.weekChallengeTitle}
-                </Typography>
-                <Typography size="sm" className="whitespace-pre-line">
-                  {weekChallenge}
-                </Typography>
-              </CardContent>
-            </Card>
-          ) : null}
-        </SegmentPage>
-      ) : null}
+        {goals.length > 0 ? (
+          <div className="flex flex-col gap-3">
+            <Typography as="h3" size="sm" weight="medium" tone="muted">
+              {content.goalsTitle}
+            </Typography>
+            <GoalList goals={goals} content={content} />
+          </div>
+        ) : null}
+
+        {weekConsigne !== null ? (
+          <Card variant="success">
+            <CardContent className="flex flex-col gap-2">
+              <Typography as="h3" size="sm" weight="semibold">
+                {content.weekConsigneTitle}
+              </Typography>
+              <Typography size="sm" className="whitespace-pre-line">
+                {weekConsigne}
+              </Typography>
+            </CardContent>
+          </Card>
+        ) : null}
+      </SegmentPage>
 
       <MealEntryPoint content={content} href={segment("repas")} />
 
