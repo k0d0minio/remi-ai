@@ -4,7 +4,7 @@
 - scope: ai-assist
 - personas: practitioner, patient
 - initiative: a patient experience validated on real terrain, in time for the December open day / objective: a usable patient version for the partner clinic to test on 1 December
-- depends-on: mistral-adapter
+- depends-on: ai-gateway-adapter
 - sequence: 3 of 5
 - priority: P1
 - size: L
@@ -38,7 +38,9 @@ four steps become four pieces of code around one model call:
    tags. Validated rules retrieved by tag are in the prompt so the recipes reflect her nutrition.
 4. **Contrôle avant affichage** — in code: every ingredient against allergies, intolerances and
    the diet's exclusions; time against the patient's level; a recipe that fails is dropped and
-   logged, never shown. A second, cheap model pass "does this recipe respect these
+   logged, never shown. Plus a **culinary-coherence check** (decision D-20 — Arnaud's pumpkin soup
+   with a chocolate bar, Morgane's « éplucher la banane »): edible pairings, a detail level that
+   follows the patient's cooking appetite, no false nutritional precision. A second, cheap model pass "does this recipe respect these
    recommendations?" is optional and Define decides whether it earns its cost.
 
 **Where it lands** (decision D-5 + D-6): each surviving recipe is written to the library through
@@ -68,7 +70,7 @@ Morgane's until the log says patients want a button.
 
 ## Notes for Define
 
-- **Decisions that bind** ([`README.md § Decisions of record`](../README.md)): D-5 (the library stays; generation writes into it and assigns) · D-6 (an automated check, no manual gate) · D-7 (CIQUAL and her rules).
+- **Decisions that bind** ([`README.md § Decisions of record`](../README.md)): D-5 (the library stays; generation writes into it and assigns) · D-6 (an automated check, no manual gate) · D-7 (CIQUAL and her rules) · D-20 (seed base or not is Define's question; the coherence check is not).
 
 - The recipe body is single-field prose today; this stub (or `recipe-in-place`, whichever ships
   first — flag, do not do both) splits it into ingredients + steps + meta, with the prose kept as
@@ -82,6 +84,12 @@ Morgane's until the log says patients want a button.
 
 **Open for Define** — settled with the operator before the spec is approved, never assumed:
 
+- **Seed base or pure generation** (D-20, from the 11 Sept call [36:56]–[43:20]): the proposal to
+  put to her is ~20 anti-inflammatory recipes she supplies, in the library, that generation
+  transforms per patient; the alternative is CIQUAL-only generation, which she says she always let
+  the model do. Her call; if the seed wins, authoring those recipes is a small stub before this one.
+- The shape of the culinary-coherence check: a code rule set (pairings, steps per cooking level)
+  or a second cheap model pass — and whether it earns its cost.
 - N per generation (3? 5?) and the servings default — hers.
 - The ingredients / steps split: does she want quantities, or is "tel un chef" prose enough for
   the patient? It changes the schema and the check's precision.

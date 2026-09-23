@@ -5,7 +5,7 @@
 - personas: practitioner, patient
 - initiative: a patient experience validated on real terrain, in time for the December open day / objective: the data question answered before the first real record exists
 - depends-on: none
-- sequence: 6 of 6
+- sequence: 6 of 8
 - priority: P2
 - size: M
 - blocked: the rights to the source table are unestablished — Dr Mouton's book and its table are
@@ -55,6 +55,9 @@ foods or nutrients. So the layer is small and additive:
   consumes none of it — that decision stands until the owner reopens it here.
 - Genetic data is a special category under GDPR alongside health data; RETENTION gains a row and
   consent may need a separate line.
+- **A second blocker, from the 28 Aug call [9:31]–[9:59] (D-23):** in Belgium a doctor must order
+  the genotype test. A patient of Morgane's cannot simply buy one, so the layer may need a medical
+  validation step before REMI ever reads a result — settle with the owner alongside the rights.
 
 **Open for Define** — settled with the operator before the spec is approved, never assumed:
 

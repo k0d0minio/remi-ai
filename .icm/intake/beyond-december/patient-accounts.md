@@ -5,7 +5,7 @@
 - personas: patient
 - initiative: a patient experience validated on real terrain, in time for the December open day / objective: the database and accounts under it
 - depends-on: none
-- sequence: 1 of 6
+- sequence: 1 of 8
 - priority: P2
 - size: L
 - sources: V2 explication (« Inviter le patient », lien d'invitation unique, statut « Invitation

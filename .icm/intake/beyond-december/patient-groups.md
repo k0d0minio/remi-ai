@@ -5,7 +5,7 @@
 - personas: practitioner
 - initiative: a patient experience validated on real terrain, in time for the December open day / objective: a usable patient version for the partner clinic to test on 1 December
 - depends-on: none
-- sequence: 5 of 6
+- sequence: 5 of 8
 - priority: P2
 - size: S
 - sources: feedback § 2 row 5 ("attribuer directement à un patient ou à un groupe") · decision D-5

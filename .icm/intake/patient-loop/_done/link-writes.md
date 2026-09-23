@@ -1,7 +1,7 @@
 # Stub: Link writes — the token accepts writes, attributed, rate-limited, audited
 
 - feature-slug: link-writes
-- sequence: 1 of 6
+- sequence: 1 of 9
 - depends-on: none
 - priority: P1
 - size: M

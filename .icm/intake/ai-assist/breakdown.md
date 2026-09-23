@@ -16,7 +16,8 @@ into workflows that exist. Every stub here writes into a table and a screen that
 
 Decisions of record (2026-09-10,
 [`README.md § Decisions of record`](../README.md)) that
-bind this epic: **D-3** — Mistral, EU-hosted, behind the `TextProvider` seam; **D-6** — meal
+bind this epic: **D-16** (2026-09-23, supersedes D-3) — the Vercel AI Gateway behind the
+`TextProvider` seam, cheapest capable models first, EU-hosted inference later; **D-6** — meal
 suggestions straight to the patient, generated recipes gated by an automated check, not a manual
 one; **D-7** — CIQUAL and her rules are the knowledge the prompts retrieve; **D-8** — the first round
 is meal suggestions, recipe generation and consultation notes → summary draft; free text →
@@ -57,20 +58,20 @@ The patient loop (meal entry → suggestion) and the recipe library (generation 
 
 ## Build order
 
-1. `mistral-adapter` — the adapter, `generateJson`, the generation log, the env variable —
+1. `ai-gateway-adapter` — the adapter, `generateJson`, the generation log, the env variable —
    depends-on: none
 2. `meal-suggestions` — « Je vais manger → Suggestions » and the « J'ai mangé » feedback, instant,
-   to the patient — depends-on: mistral-adapter (cross-epic: `patient-loop/meal-entry`;
+   to the patient — depends-on: ai-gateway-adapter (cross-epic: `patient-loop/meal-entry`;
    `nutrition-knowledge/nutrition-rules` soft)
 3. `recipe-generation` — several recipes from profile + recommendations, checked, into the library
-   and assigned — depends-on: mistral-adapter (cross-epic: `practitioner-workflow/recipe-in-place`,
+   and assigned — depends-on: ai-gateway-adapter (cross-epic: `practitioner-workflow/recipe-in-place`,
    `patient-loop/patient-profile-edit`, `patient-loop/recipe-feedback-and-favourites`,
    `nutrition-knowledge/*`)
 4. `summary-draft` — consultation notes → a proposed living-summary revision and anamnesis
-   fields, for Morgane to edit — depends-on: mistral-adapter (cross-epic:
+   fields, for Morgane to edit — depends-on: ai-gateway-adapter (cross-epic:
    `practitioner-workflow/consultation-update`)
 5. `free-text-to-rows` — P2, excluded from the first round by decision D-8 — depends-on:
-   mistral-adapter (cross-epic: `practitioner-workflow/bulk-entry`)
+   ai-gateway-adapter (cross-epic: `practitioner-workflow/bulk-entry`)
 
 ## Parallelizable
 
@@ -85,4 +86,6 @@ P2, not just for 1.
 - Autonomy beyond what D-6 grants: nothing here archives, changes or sends a protocol on its own.
 - Embeddings, agents, tool use — a single structured call per capability is the whole design
   until the log says otherwise.
-- Any vendor other than the adapter's; a second adapter is a new stub with an owner decision.
+- A direct vendor SDK or a second adapter; EU-hosted inference is an owner decision for later
+  (D-16), reached by changing a model id behind the gateway, not by a new adapter.
+- The recipe seed base is Define's question inside `recipe-generation` (D-20), not a stub here.
