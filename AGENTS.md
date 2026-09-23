@@ -96,12 +96,12 @@ the estate's standard set: the contracts are synced from `_system/template/icm-p
 icm-board and carry no repo identity; what is true of this repo is in
 [`.icm/_shared/project-rules.md`](.icm/_shared/project-rules.md) and [`.icm/project.json`](.icm/project.json).
 
-| Stage       | What it owns                                                                                                            |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------- |
-| **Scope**   | record the source, settle it with the operator in session → `scope.md` (`D-n` decisions) → cut the intake batch. No PR. |
-| **Define**  | one stub → an approvable `spec.md`; opens the run's **one** feature PR (draft)                                          |
-| **Build**   | implement the spec on the branch, prove CI green, flip the PR draft → open                                              |
-| **Release** | review passes · docs + changelog + close-out in-PR → gated squash-merge → one production read → `report.sh announce`    |
+| Stage       | What it owns                                                                                                                 |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Scope**   | record the source, settle it with the operator in session → `scope.md` (`D-n` decisions) → cut the intake batch. No PR.      |
+| **Define**  | one stub → an approvable `spec.md`; opens the run's **one** feature PR (draft)                                               |
+| **Build**   | implement the spec on the branch, prove CI green, flip the PR draft → open                                                   |
+| **Release** | review passes · docs + changelog + close-out in-PR → gated squash-merge → one production read → `report.sh announce` from CI |
 
 `/pipeline scope <input>` for anything new; `/pipeline new` for the next stub; `/pipeline bug | tweak |
 chore "<request>"` (or `<stub-name>` from `.icm/intake/triage/`) for the fast lanes; `/pipeline

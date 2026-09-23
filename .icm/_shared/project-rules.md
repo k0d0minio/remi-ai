@@ -197,17 +197,24 @@ D23; `/setup` — `.icm/scripts/setup.sh` — says whether the two are complete 
   `SLACK_ALERTS_CHANNEL_ID` names, where `health-check.sh` posts a production read that failed
   after a merge; `economics` → none — icm-board's `run-economics.sh` writes it into the deal
   folder. The Slack app posts with `SLACK_BOT_TOKEN` (scope `chat:write`, the app invited to both
-  channels). Channel variables are NAMES here and in `project.json`; the values live in the
-  process environment of the session that runs Release (`.icm/docs/ENV.md` § Pipeline). A
-  variable unset where `report.sh` runs — a remote session rarely carries them — prints
-  `SKIPPED slack` and exits 0: **written, not sent** is a normal outcome to record in the
-  `## Release` record, not a failure, and a release is complete at the merge either way. Email
-  through Resend is configured by name (`REPORT_EMAIL_FROM`, `REPORT_EMAIL_TO`, `RESEND_API_KEY`)
-  and mapped to nothing; adding `"email"` to an array turns it on. Nothing verifies the archive
-  after the merge — the close-out riding the PR is the whole guarantee.
-- **Who calls the hook** — `announce_from: session`: Release step 9 (and a lane's last step, for
-  a user-visible change) calls `report.sh announce` with the changelog page's H1, `--audience
-  internal` for an internal change (no Release, Slack only). No CI workflow announces.
+  channels). Channel variables are NAMES here and in `project.json`; the values live in **this
+  repository's Actions secrets and variables** — `SLACK_BOT_TOKEN` a secret, the two channel ids
+  variables (`.icm/docs/ENV.md` § Pipeline) — because the hook is called from CI (below). A
+  variable unset where `report.sh` runs prints `SKIPPED slack` and exits 0; in the workflow a
+  message no channel took is a red job, and that red job alerts. Email through Resend is
+  configured by name (`REPORT_EMAIL_FROM`, `REPORT_EMAIL_TO`, `RESEND_API_KEY`) and mapped to
+  nothing; adding `"email"` to an array and its lines to the workflow turns it on. Nothing
+  verifies the archive after the merge — the close-out riding the PR is the whole guarantee.
+- **Who calls the hook** — `announce_from: ci`: `.github/workflows/release.yaml` calls
+  `report.sh announce` when a PR merges into `main` — every merge, whether or not a session was
+  open, since the operator merges from GitHub. The session's `## Release` record says
+  `announce: deferred to CI`. The workflow is the seeded reference with three per-repo edits:
+  the Slack lines live in both steps, and the message is the changelog page's H1 with the
+  page's address on `docs.remi-ai.tech` as the link (§ Changelog) — the PR's Summary line and
+  URL stand in when a run shipped no page. `announce: none` or `audience: internal` in the PR
+  body is honoured. **One caveat:** the health probe (Release step 9a) still runs in the
+  session, so its `report.sh alert` posts only where the session's shell carries the Slack
+  variables; otherwise the parked bug stub and the stop message are the alert.
 - **Changelog** — `apps/docs/app/changelog/<YYYY-MM-DD>-<slug>/page.mdx` (date = the merge
   date), one page per shipped feature, in the user's voice: sentence case, what changed for the
   person reading, no internal terms, no slugs, no file paths. The H1 is the outcome in one line —
@@ -219,10 +226,11 @@ D23; `/setup` — `.icm/scripts/setup.sh` — says whether the two are complete 
   note alone, framed as reliability or trust (`announce: internal`); nothing worth saying is
   `announce: none`. Bug and tweak lanes write a page when the change is user-visible; chore never
   does.
-- **Workflows** — the reference `release.yaml` is absent, deliberately: `announce_from` is
-  `session`, and a second caller would announce every merge twice.
-  The reference `labels.yaml` is absent too: `pipeline.yaml` is this repo's labels job and
-  `gates.yaml` its advisory gate read (§ The factory). Neither is to be seeded here.
+- **Workflows** — `release.yaml` present: the reference announce-on-merge workflow, seeded
+  once on 2026-09-23 and this repo's own since (the edits above); `workflow_dispatch` with a slug
+  re-announces from `main`. The reference `labels.yaml` is absent: `pipeline.yaml` is this
+  repo's labels job and `gates.yaml` its advisory gate read (§ The factory); it is not to be
+  seeded here.
 
 ## Support
 
