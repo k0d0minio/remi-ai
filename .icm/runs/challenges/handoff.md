@@ -6,13 +6,17 @@ stops, so nothing is carried in anyone's head.
 
 ## Next steps
 
-1. <the very next action, with the exact command or file>
+1. The operator reads `02_define/output/spec.md` and ticks **Spec approved** on
+   https://github.com/k0d0minio/remi-ai/pull/120 — or runs `revise challenges "<change>"`.
+2. Then `build challenges`, following `plan.md` pass by pass.
 
 ## Blockers
 
-- <what blocks, and who unblocks it — or "none">
+- The Spec approved tick — the operator's.
 
 ## Do not
 
-- <what the next session must not do — a branch not to touch, a gate not to tick, a file
-  another run owns>
+- Do not start Build before the tick; never tick it.
+- Do not open a second PR for this run; `revise` re-projects #120.
+- Do not run `patient-documents-and-links` or `general-feedback` beside this run — they share
+  `schema.ts` and the migrations journal and are sequenced after it.

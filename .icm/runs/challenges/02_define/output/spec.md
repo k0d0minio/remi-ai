@@ -129,4 +129,5 @@ writes, its deletion cascade, and what the audit trail keeps after a deletion.
 - none — the four points under the stub's Open for Define were settled with the operator on
   2026-09-23: her labels verbatim (« Challenge acquis », « Prêt(e) pour le prochain »); « prêt(e)
   pour le prochain » raises an awaiting item and a row badge; one active challenge, a new one closes
-  the current with an outcome she picks; taps are sequential and undoable until close.
+  the current with an outcome she picks; taps are sequential and undoable until close (D-25 to
+  D-28 in `decisions.md`).
