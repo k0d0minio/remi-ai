@@ -5,6 +5,8 @@
  * browser code may import them.
  */
 
+import { addDays } from "./format";
+
 export const patientStatuses = ["active", "paused", "ended"] as const;
 
 /**
@@ -114,6 +116,60 @@ export const mealIntents = ["planned", "eaten"] as const;
  * direction *or* a simple measure, and one of the two is enough.
  */
 export const goalDirections = ["better", "stable", "worse"] as const;
+
+/**
+ * The patient's weekly score for a goal — her 14 Sept § 1, « 0 à 5 », read as
+ * how the week went for it (decisions D-30 and D-31): 0 is « pas bien du
+ * tout », 5 is « très bien ».
+ */
+export const goalScores = [0, 1, 2, 3, 4, 5] as const;
+
+/** One question a week, counted in days from the patient's last answer (D-30). */
+export const WEEKLY_CHECK_IN_DAYS = 7;
+
+export type WeeklyCheckInState = {
+  /** The card is shown: nothing answered yet, or the last answer is a week old. */
+  due: boolean;
+  /** The day of the patient's last own check-in, or `null` before the first. */
+  lastOn: string | null;
+  /** The day the next question opens, or `null` when it is open now. */
+  nextOn: string | null;
+};
+
+/**
+ * Whether the weekly question is open, computed from a date at render — there
+ * is no scheduler behind it (D-9), so this is the whole rule.
+ */
+export const weeklyCheckInState = (
+  lastOn: string | null,
+  today: string,
+): WeeklyCheckInState => {
+  if (lastOn === null) {
+    return { due: true, lastOn, nextOn: null };
+  }
+  const opensOn = addDays(lastOn, WEEKLY_CHECK_IN_DAYS);
+  return opensOn <= today
+    ? { due: true, lastOn, nextOn: null }
+    : { due: false, lastOn, nextOn: opensOn };
+};
+
+/**
+ * How a score moved against the patient's previous one on the same goal
+ * (D-31): lower is `worse`, equal `stable`, higher `better`. A first score has
+ * nothing to move from, so it carries no direction.
+ */
+export const scoreDirection = (
+  previous: number | null,
+  next: number,
+): (typeof goalDirections)[number] | null => {
+  if (previous === null) {
+    return null;
+  }
+  if (next < previous) {
+    return "worse";
+  }
+  return next > previous ? "better" : "stable";
+};
 
 /**
  * How a challenge ended, picked by Morgane when she closes it (decision D-27).

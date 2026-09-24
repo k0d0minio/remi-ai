@@ -26,4 +26,8 @@ export type PatientGoalCheckIn = Entity & {
   note: string;
   /** Her consultation check-in, or the patient's own answer through the link. */
   writtenBy: WrittenBy;
+  /** The patient's weekly 0–5; `null` on every row she writes. */
+  score: number | null;
+  /** When she marked a patient's lower score « vu »; `null` until then. */
+  seenAt: Date | null;
 };

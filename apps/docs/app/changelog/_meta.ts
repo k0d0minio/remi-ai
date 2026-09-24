@@ -3,6 +3,8 @@
 // a new entry goes at the top of this object, which is what puts newest first.
 export default {
   index: "Overview",
+  "2026-09-24-check-in-and-progression":
+    "Once a week, each goal gets a number from 0 to 5",
   "2026-09-24-patient-documents-and-links":
     "Your PDFs and links, on the person's page",
   "2026-09-23-challenges": "One habit at a time, and you see when it sticks",

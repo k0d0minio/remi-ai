@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { firstRecommendationPerCategory } from "./patient";
+import {
+  firstRecommendationPerCategory,
+  scoreDirection,
+  weeklyCheckInState,
+} from "./patient";
 
 /**
  * The "principales" rule the console's at-a-glance and the patient link's home
@@ -58,5 +62,47 @@ describe("the first recommendation of each category", () => {
     ]);
 
     expect(picked[0].title).toBe("Position 0");
+  });
+});
+
+/**
+ * The weekly question (D-30) is computed at render from one date — there is no
+ * scheduler — so the whole rule is this pure function.
+ */
+describe("the weekly check-in window", () => {
+  it("is open before the patient's first answer", () => {
+    expect(weeklyCheckInState(null, "2026-10-01")).toEqual({
+      due: true,
+      lastOn: null,
+      nextOn: null,
+    });
+  });
+
+  it("stays closed for seven days after an answer, and says when it opens", () => {
+    expect(weeklyCheckInState("2026-10-01", "2026-10-07")).toEqual({
+      due: false,
+      lastOn: "2026-10-01",
+      nextOn: "2026-10-08",
+    });
+  });
+
+  it("opens again on the seventh day, across a month end", () => {
+    expect(weeklyCheckInState("2026-10-28", "2026-11-04").due).toBe(true);
+    expect(weeklyCheckInState("2026-10-28", "2026-11-03").nextOn).toBe(
+      "2026-11-04",
+    );
+  });
+});
+
+describe("how a weekly score moved", () => {
+  it("has no direction for a first score", () => {
+    expect(scoreDirection(null, 3)).toBeNull();
+  });
+
+  it("reads lower as worse, equal as stable, higher as better", () => {
+    expect(scoreDirection(3, 2)).toBe("worse");
+    expect(scoreDirection(3, 3)).toBe("stable");
+    expect(scoreDirection(3, 5)).toBe("better");
+    expect(scoreDirection(1, 0)).toBe("worse");
   });
 });

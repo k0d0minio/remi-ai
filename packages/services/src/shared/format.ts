@@ -65,6 +65,16 @@ export const todayAtPractice = (at: Date = new Date()) => {
   return `${part("year")}-${part("month")}-${part("day")}`;
 };
 
+/**
+ * A `YYYY-MM-DD` day moved by whole days — calendar arithmetic, done in UTC so
+ * no daylight-saving shift can land it on the neighbouring day.
+ */
+export const addDays = (day: string, days: number) => {
+  const at = new Date(`${day}T00:00:00Z`);
+  at.setUTCDate(at.getUTCDate() + days);
+  return at.toISOString().slice(0, 10);
+};
+
 export const formatDate = (value: Date | string, locale = DEFAULT_LOCALE) =>
   new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
     typeof value === "string" ? new Date(value) : value,

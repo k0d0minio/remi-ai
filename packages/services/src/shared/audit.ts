@@ -88,6 +88,12 @@ export const auditActions = [
   "goal.checked_in",
   "goal.check_in_updated",
   "goal.check_in_deleted",
+  /**
+   * Her « vu » on a patient's lower weekly score (`check-in-and-progression`,
+   * D-33). The patient's own weekly answer is `goal.checked_in` under the
+   * `patient` actor, the same action her consultation check-in records.
+   */
+  "goal.check_in_seen",
   "instruction.updated",
   "instruction.cleared",
   /**
