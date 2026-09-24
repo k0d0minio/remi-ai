@@ -38,6 +38,7 @@ import {
   getPatient,
   getPatientInstruction,
   getPatientSummary,
+  markGoalCheckInSeen,
   movePantryEssential,
   movePatientGoal,
   movePatientRecommendation,
@@ -1033,6 +1034,26 @@ export const deleteCheckInAction = async (formData: FormData) => {
       id,
       label: field(formData, "title"),
       detail: field(formData, "checkedOn"),
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+/**
+ * Her « vu » on a patient's lower weekly score (D-33): it leaves the awaiting
+ * count and stays in the trail. The service keeps the first time she saw it,
+ * so a second click changes nothing but the button is already gone by then.
+ */
+export const markCheckInSeenAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const seen = await markGoalCheckInSeen(id);
+  if (seen.ok) {
+    await audit(operator, "goal.check_in_seen", {
+      type: "patient_goal_check_in",
+      id,
+      label: field(formData, "title"),
+      detail: seen.data.checkedOn,
     });
   }
   revalidatePatient(field(formData, "patientId"));

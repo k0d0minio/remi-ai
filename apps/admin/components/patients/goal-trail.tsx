@@ -6,7 +6,10 @@ import type { PatientGoal, PatientGoalCheckIn } from "@remi/services/shared";
 import { formatDate } from "@remi/services/shared";
 import { Badge, Typography } from "@remi/ui/server";
 import { Button } from "@remi/ui";
-import { deleteCheckInAction } from "@/lib/patients/actions";
+import {
+  deleteCheckInAction,
+  markCheckInSeenAction,
+} from "@/lib/patients/actions";
 import { GoalCheckInForm } from "@/components/patients/goal-check-in-form";
 import {
   goalDirectionIntents,
@@ -44,6 +47,12 @@ const TrailEntry = ({
   today: string;
 }) => {
   const [editing, setEditing] = useState(false);
+  // A patient's lower weekly score waits for her « vu » (D-33); her own rows
+  // never do, whatever direction she gave them.
+  const awaitsAttention =
+    entry.writtenBy === "patient" &&
+    entry.direction === "worse" &&
+    entry.seenAt === null;
 
   if (editing) {
     return (
@@ -79,6 +88,28 @@ const TrailEntry = ({
           <Typography size="sm" weight="medium">
             {entry.measure}
           </Typography>
+        ) : null}
+        {entry.score !== null ? (
+          <Typography size="sm" weight="medium">
+            {`${entry.score}/5`}
+          </Typography>
+        ) : null}
+        {/* Named by the act, not the person — the same mark the meal journal
+            uses for a row the patient wrote through the link. */}
+        {entry.writtenBy === "patient" ? (
+          <Badge variant="info" tone="subtle" size="sm">
+            écrit depuis le lien
+          </Badge>
+        ) : null}
+        {awaitsAttention ? (
+          <form action={markCheckInSeenAction}>
+            <input type="hidden" name="id" value={entry.id} />
+            <input type="hidden" name="patientId" value={goal.patientId} />
+            <input type="hidden" name="title" value={goal.title} />
+            <Button type="submit" size="sm" variant="outline">
+              Vu
+            </Button>
+          </form>
         ) : null}
 
         <Button
