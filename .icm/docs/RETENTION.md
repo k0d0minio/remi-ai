@@ -24,6 +24,7 @@ One row in `patient_profiles`, plus what hangs off it:
 | The protocol, entry by entry                                 | `patient_recommendations` | yes, unless archived                               |
 | Consultation notes                                           | `patient_notes`           | no                                                 |
 | Challenges — hers, and the patient's two answers to each     | `patient_challenges`      | the running one; closed ones, no                   |
+| The general thread — the patient's messages and her replies  | `patient_messages`        | yes — the whole thread                             |
 | What the patient writes through the link                     | the table it belongs to   | yes — they wrote it                                |
 | One timestamp per accepted write through the link            | `patient_link_writes`     | no                                                 |
 
@@ -48,6 +49,14 @@ three are what the code does:
   `ready_for_next_at` (« Prêt(e) pour le prochain »), two timestamps and nothing else. Those columns
   are the patient's by construction, and each set or clear of one is in the audit trail as theirs.
   A closed challenge keeps both, frozen, with the outcome she gave it.
+  `patient_messages` needs no `written_by` either, for the opposite reason: its `author` column
+  _is_ that marker — `patient` for what the patient sent through the link, `practitioner` for her
+  replies, which also carry the replying operator's id (set to null if that account is removed, so
+  the reply stays readable). The thread is append-only on both sides, and `read_at` — set on a
+  patient message when she replies after it or marks it read — records only that she dealt with
+  it. The whole thread is deleted with the patient (`on delete cascade`); what remains is the
+  audit trail's lines (`message.sent`, `message.replied`, `message.marked_read`), which carry no
+  message text.
 - **Every write is in the audit trail as the patient's.** `audit_events` records an actor kind
   alongside the actor, so a patient's write cannot be read as an operator's or as the system's. A
   patient actor carries the pseudonym and **no email** — there is no account, and inventing an
@@ -72,6 +81,7 @@ Deleting a patient from the console removes, permanently and in one operation:
 - every recommendation encoded for them, archived ones too;
 - every consultation note about them;
 - every challenge she gave them, running or closed, with the patient's answers on each;
+- the whole general thread — every message the patient sent and every reply to it;
 - everything the patient themselves wrote through the link — their meal entries and their
   check-ins go with the rest, marked `patient` or not;
 - the write ledger behind the rate limit, which is timestamps and nothing else;

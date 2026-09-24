@@ -212,3 +212,13 @@ export const summaryVisibilityNote =
  */
 export const summaryChecklistHint =
   "Contexte et motif, points de vigilance, médicaments en cours, principales difficultés, habitudes et contraintes utiles, ce qui va déjà bien, ce qui reste à clarifier.";
+
+/**
+ * The general thread's backlog, worded like the meals' « N repas attendent un
+ * retour » — the working view, the Messages section and the roster badge all
+ * read it, so the count says one thing everywhere.
+ */
+export const messagesAwaitingLabel = (count: number) =>
+  count === 1
+    ? "1 message attend une réponse"
+    : `${count} messages attendent une réponse`;
