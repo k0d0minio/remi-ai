@@ -267,3 +267,5 @@ the repo's own, never synced — and delete a line that reads as a slip rather t
 
 <!-- Retrospective Learned Rule [2026-09-24] -->
 - `security-check.sh` has no baseline: any change that moves the lockfile, and every `--branch --audit` read, re-reports main's own high/critical advisories (20 on 2026-09-24, parked as the P0 chore `triage/dependency-audit-next-rce`). Compare `pnpm audit --audit-level=high` on `origin/main` against the branch; an identical set is not the branch's — record it in `error.log`, commit behind the secret scan with `--no-audit`, name it in Notes for Release, and at Release ask the operator for the waiver. Never bump `next` or clear them inside a feature PR. (`security-check/dependency-audit`, seen 4× — patient-documents-and-links, challenges)
+<!-- Retrospective Learned Rule [2026-09-24] -->
+- After a push, check that the head `ci-status.sh` names is `git rev-parse HEAD` before trusting its verdict; re-run it when it names an older commit. (`FAILURE.md` — patient-documents-and-links)
