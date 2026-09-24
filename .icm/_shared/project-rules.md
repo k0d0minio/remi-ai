@@ -272,3 +272,5 @@ the repo's own, never synced — and delete a line that reads as a slip rather t
 
 <!-- Retrospective Learned Rule [2026-09-24] -->
 - A new `AuditAction` in `packages/services/src/shared/audit.ts` needs a label and an intent in `apps/admin/components/audit/vocabulary.ts` in the same commit — both records are exhaustive. (`TS2741`, seen 1× — check-in-and-progression; apps/admin, apps/docs, apps/web, packages/services)
+<!-- Retrospective Learned Rule [2026-09-24] -->
+- Run the Release reviews against `origin/main...HEAD` (and `git remote set-head origin main` first in a cloud session) — the local `main` ref is stale and widens the review to other runs' code. (`FAILURE.md` — check-in-and-progression)
