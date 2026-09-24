@@ -22,6 +22,7 @@ import {
   listPastChallenges,
   listPatientGoals,
   listPatientAnamnesis,
+  listPatientDocuments,
   listPatientLearnings,
   listPatientNotes,
   listPatientRecipes,
@@ -34,6 +35,7 @@ import {
   ageInYears,
   appHref,
   formatDate,
+  patientLinkPreviewParam,
   todayAtPractice,
 } from "@remi/services/shared";
 import {
@@ -51,6 +53,10 @@ import { ChallengeHistory } from "@/components/patients/challenge-history";
 import { ChallengeSection } from "@/components/patients/challenge-section";
 import { CopyContextCard } from "@/components/patients/copy-context-card";
 import { DeletePatient } from "@/components/patients/delete-patient";
+import {
+  DocumentSection,
+  type AttachmentOption,
+} from "@/components/patients/document-section";
 import { GoalAddForm } from "@/components/patients/goal-add-form";
 import { GoalList } from "@/components/patients/goal-list";
 import { InstructionBlock } from "@/components/patients/instruction-block";
@@ -97,6 +103,7 @@ import {
 } from "@/components/patients/vocabulary";
 import { patientContextInput } from "@/lib/patients/context";
 import { ensureDatabase } from "@/lib/database";
+import { fileStoreReady } from "@/lib/files";
 
 /** Reads the database on every hit — never prerendered. */
 export const dynamic = "force-dynamic";
@@ -166,6 +173,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     summary,
     currentChallenge,
     pastChallenges,
+    documents,
   ] = await Promise.all([
     listPatientRecommendations(patient.id),
     listArchivedPatientRecommendations(patient.id),
@@ -192,6 +200,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     getPatientSummary(patient.id),
     getCurrentChallenge(patient.id),
     listPastChallenges(patient.id),
+    listPatientDocuments(patient.id),
   ]);
 
   // One trail per goal, active and archived alike: two or three goals plus
@@ -212,6 +221,29 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
       ? `Recueilli le ${formatDate(patient.consentDate)} · ${consentChannelLabels[patient.consentChannel]}`
       : null;
   const shareUrl = appHref("web", `/p/${patient.shareToken}`, patient.locale);
+  // « Voir comme la patiente » — the same link, marked so her look is not
+  // recorded as the patient opening it.
+  const previewUrl = `${shareUrl}?${patientLinkPreviewParam}=1`;
+  // What a document can hang from: this patient's goals and recipes, archived
+  // ones included so an edit never silently drops an existing attachment.
+  const attachments: AttachmentOption[] = [
+    ...goals.map((goal) => ({
+      value: `goal:${goal.id}`,
+      label: `Objectif · ${goal.title}`,
+    })),
+    ...archivedGoals.map((goal) => ({
+      value: `goal:${goal.id}`,
+      label: `Objectif · ${goal.title} (archivé)`,
+    })),
+    ...assignedRecipes.map(({ assignment, recipe }) => ({
+      value: `recipe:${assignment.id}`,
+      label: `Recette · ${recipe.title}`,
+    })),
+    ...pastRecipes.map(({ assignment, recipe }) => ({
+      value: `recipe:${assignment.id}`,
+      label: `Recette · ${recipe.title} (précédente)`,
+    })),
+  ];
   const age = ageInYears(patient.birthDate);
 
   // The default consultation date, resolved server-side: a date input seeded
@@ -260,6 +292,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
       label: "Recettes",
       segment: "dossier",
       count: assignedRecipes.length,
+    },
+    {
+      id: "documents",
+      label: "Documents",
+      segment: "dossier",
+      count: documents.length,
     },
     {
       id: "meals",
@@ -502,7 +540,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
 
           {/* It reads the segment from the URL, same as the navigation. */}
           <Suspense fallback={null}>
-            <QuickActions patientId={patient.id} />
+            <QuickActions patientId={patient.id} previewUrl={previewUrl} />
           </Suspense>
         </section>
 
@@ -800,6 +838,27 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                   <RecipeAssignments entries={pastRecipes} today={today} />
                 </SectionFold>
               ) : null}
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="documents" data-segment="dossier" className="scroll-mt-32">
+          <Card>
+            <CardHeader>
+              <CardTitle>Documents</CardTitle>
+              <CardDescription>
+                Les PDF, images et liens de cette personne — elle les lit dans «
+                Mes documents », et ceux classés comme recette aussi dans « Mes
+                recettes ».
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DocumentSection
+                patientId={patient.id}
+                documents={documents}
+                attachments={attachments}
+                uploadsAvailable={fileStoreReady()}
+              />
             </CardContent>
           </Card>
         </section>

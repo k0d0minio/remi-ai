@@ -65,6 +65,7 @@ export {
   goalDirections,
   mealIntents,
   mealSlots,
+  patientLinkPreviewParam,
   patientSexes,
   patientStatuses,
   recommendationCategories,

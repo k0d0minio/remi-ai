@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import {
   addGoalCheckIn,
   addMealEntry,
+  addPatientDocumentFile,
+  addPatientDocumentLink,
   addPantryEssential,
   addPatientGoal,
   addPatientNote,
@@ -43,6 +45,7 @@ import {
   patientLinkEmail,
   recordConsultation,
   regenerateShareToken,
+  removePatientDocument,
   removeRecipeAssignment,
   savePantryEssentials,
   savePatientRecommendations,
@@ -62,6 +65,7 @@ import {
   updatePatientNote,
   updatePatientObservation,
   updatePatientRecommendation,
+  updatePatientDocument,
   updatePatientSupplement,
   updateRecipeAssignment,
   type ConsultationCheckInInput,
@@ -74,6 +78,7 @@ import {
   consentChannels,
   contextBlocks,
   cookingAffinities,
+  documentTags,
   goalDirections,
   isLocale,
   mealSlots,
@@ -83,6 +88,7 @@ import {
   type ConsentChannel,
   type ChallengeOutcome,
   type CookingAffinity,
+  type DocumentTag,
   type GoalDirection,
   type MealSlot,
   type PatientSex,
@@ -91,6 +97,7 @@ import {
 } from "@remi/services/shared";
 import { audit } from "@/lib/audit";
 import { requireOperator } from "@/lib/auth/session";
+import { fileStoreReady } from "@/lib/files";
 import { mailerReady } from "@/lib/mailer";
 
 /**
@@ -122,6 +129,8 @@ export type SummaryFormState = { error: string | null; saved: boolean };
 export type PrepFormState = { error: string | null; saved: boolean };
 export type ConsultationFormState = { error: string | null; saved: boolean };
 export type ShareFormState = { error: string | null; sent: boolean };
+export type DocumentFormState = { error: string | null; saved: boolean };
+export type DeletePatientState = { error: string | null };
 
 const field = (formData: FormData, name: string) =>
   String(formData.get(name) ?? "");
@@ -167,6 +176,25 @@ const asChallengeOutcome = (value: string): ChallengeOutcome | null =>
   (challengeOutcomes as readonly string[]).includes(value)
     ? (value as ChallengeOutcome)
     : null;
+
+/** Anything unrecognised files as a plain document — the default she sees. */
+const asDocumentTag = (value: string): DocumentTag =>
+  (documentTags as readonly string[]).includes(value)
+    ? (value as DocumentTag)
+    : "document";
+
+/**
+ * The one parent a document may have, from the form's single picker: its value
+ * is `goal:<id>`, `recipe:<id>` or empty — one control, so the form can never
+ * post both (D-26).
+ */
+const attachmentFrom = (formData: FormData) => {
+  const [kind, id] = field(formData, "attachTo").split(":");
+  return {
+    goalId: kind === "goal" ? (id ?? "") : "",
+    recipeAssignmentId: kind === "recipe" ? (id ?? "") : "",
+  };
+};
 
 const asCookingAffinity = (value: string): CookingAffinity | "" =>
   (cookingAffinities as readonly string[]).includes(value)
@@ -251,11 +279,24 @@ export const savePatientAction = async (
   return { error: null, saved: true };
 };
 
-export const deletePatientAction = async (formData: FormData) => {
+/**
+ * Deletes the patient — and first their files in the store, which is why the
+ * file store is registered before the call: `deletePatient` refuses to leave a
+ * patient's files behind, and a refusal is shown in the dialog rather than
+ * lost in a redirect.
+ */
+export const deletePatientAction = async (
+  _previous: DeletePatientState,
+  formData: FormData,
+): Promise<DeletePatientState> => {
   const operator = await requireOperator();
   const id = field(formData, "id");
+  fileStoreReady();
   const existing = await getPatient(id);
   const removed = await deletePatient(id);
+  if (!removed.ok && removed.error !== "not_found") {
+    return { error: removed.message };
+  }
   if (removed.ok) {
     await audit(operator, "patient.deleted", {
       type: "patient",
@@ -1742,5 +1783,118 @@ export const savePantrySectionAction = async (
     detail: countsSummary(result.data),
   });
   revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
+/**
+ * Her documents and links on the patient's page. A file has already reached
+ * the store when this runs — the widget uploaded it under a grant — so this
+ * records it, and the service checks what landed before the row exists.
+ */
+export const addDocumentLinkAction = async (
+  _previous: DocumentFormState,
+  formData: FormData,
+): Promise<DocumentFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const result = await addPatientDocumentLink(
+    patientId,
+    {
+      title: field(formData, "title"),
+      url: field(formData, "url"),
+      tag: asDocumentTag(field(formData, "tag")),
+      ...attachmentFrom(formData),
+    },
+    operator.email,
+  );
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  await audit(operator, "document.added", {
+    type: "patient_document",
+    id: result.data.id,
+    label: result.data.title,
+    detail: "link",
+  });
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
+export const addDocumentFileAction = async (
+  _previous: DocumentFormState,
+  formData: FormData,
+): Promise<DocumentFormState> => {
+  const operator = await requireOperator();
+  if (!fileStoreReady()) {
+    return {
+      error: "Aucun stockage de fichiers n’est configuré sur ce déploiement.",
+      saved: false,
+    };
+  }
+  const patientId = field(formData, "patientId");
+  const result = await addPatientDocumentFile(
+    patientId,
+    {
+      title: field(formData, "title"),
+      key: field(formData, "key"),
+      tag: asDocumentTag(field(formData, "tag")),
+      ...attachmentFrom(formData),
+    },
+    operator.email,
+  );
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  await audit(operator, "document.added", {
+    type: "patient_document",
+    id: result.data.id,
+    label: result.data.title,
+    detail: result.data.mime ?? "file",
+  });
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
+export const updateDocumentAction = async (
+  _previous: DocumentFormState,
+  formData: FormData,
+): Promise<DocumentFormState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const result = await updatePatientDocument(id, {
+    title: field(formData, "title"),
+    tag: asDocumentTag(field(formData, "tag")),
+    ...attachmentFrom(formData),
+  });
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  await audit(operator, "document.updated", {
+    type: "patient_document",
+    id,
+    label: result.data.title,
+  });
+  revalidatePatient(result.data.patientId);
+  return { error: null, saved: true };
+};
+
+/** A removed file leaves the store first; the trail records it only then. */
+export const removeDocumentAction = async (
+  _previous: DocumentFormState,
+  formData: FormData,
+): Promise<DocumentFormState> => {
+  const operator = await requireOperator();
+  fileStoreReady();
+  const id = field(formData, "id");
+  const result = await removePatientDocument(id);
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  await audit(operator, "document.removed", {
+    type: "patient_document",
+    id,
+    label: result.data.title,
+  });
+  revalidatePatient(result.data.patientId);
   return { error: null, saved: true };
 };
