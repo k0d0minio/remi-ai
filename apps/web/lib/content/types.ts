@@ -293,6 +293,7 @@ export type Content = {
       documents: string;
       repas: string;
       progression: string;
+      messages: string;
     };
     /**
      * Home, in her § 6 order: today and this week, the prioritised
@@ -387,6 +388,30 @@ export type Content = {
       /** Stands in for the answer until Morgane — or, later, REMI — writes one. */
       awaitingResponse: string;
       /** The journal before the patient has written anything into it. */
+      empty: string;
+      /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
+      errors: Record<PatientWriteError, string>;
+    };
+    /**
+     * The general thread — her § 6: one place for how the week went. The home
+     * card and the Messages segment share every string, the prompt above all:
+     * D-35 fixes it as her own two sentences.
+     */
+    messages: {
+      title: string;
+      /** Her § 6 question, verbatim in French. */
+      prompt: string;
+      bodyLabel: string;
+      send: string;
+      /** Precedes the date of the patient's last message. */
+      lastSent: string;
+      /** How the patient's own messages are signed in the thread. */
+      you: string;
+      /** A reply whose author's account no longer exists. */
+      practitioner: string;
+      /** The home card's way through to the whole thread. */
+      seeThread: string;
+      threadTitle: string;
       empty: string;
       /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
       errors: Record<PatientWriteError, string>;

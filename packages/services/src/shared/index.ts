@@ -122,6 +122,8 @@ export type {
   PatientGoalCheckIn,
   PatientInstruction,
   PatientLearning,
+  PatientMessage,
+  PatientMessageEntry,
   PatientNote,
   PatientObservation,
   PatientProfile,

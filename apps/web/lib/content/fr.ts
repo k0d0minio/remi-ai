@@ -279,6 +279,7 @@ export const fr: Content = {
       documents: "Documents",
       repas: "Repas",
       progression: "Ma progression",
+      messages: "Messages",
     },
     todayTitle: "Aujourd'hui / cette semaine",
     challenge: {
@@ -328,6 +329,29 @@ export const fr: Content = {
         acquired: "Acquis",
         not_acquired: "Non acquis",
         abandoned: "Abandonné",
+      },
+    },
+    messages: {
+      title: "Votre accompagnement",
+      prompt:
+        "Comment se passe votre accompagnement cette semaine ? Vous pouvez également indiquer ici ce que vous avez pensé des recettes, des challenges ou des recommandations proposées.",
+      bodyLabel: "Votre message",
+      send: "Envoyer",
+      lastSent: "Dernier message envoyé le",
+      you: "Vous",
+      practitioner: "Votre praticienne",
+      seeThread: "Voir vos messages",
+      threadTitle: "Vos échanges",
+      empty:
+        "Vous n'avez encore rien écrit. Votre premier message apparaîtra ici.",
+      errors: {
+        invalid_input:
+          "Ce message n'a pas pu être envoyé : il est vide ou dépasse 2000 caractères.",
+        rate_limited:
+          "Vous avez écrit beaucoup de choses d'un coup — réessayez dans un instant.",
+        not_found:
+          "Ce lien n'est plus valable. Demandez-en un nouveau à votre praticienne.",
+        unknown: "Cela n'a pas fonctionné. Réessayez dans un instant.",
       },
     },
     weekConsigneTitle: "La consigne de la semaine",

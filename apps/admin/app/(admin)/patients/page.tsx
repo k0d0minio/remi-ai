@@ -4,6 +4,7 @@ import NextLink from "next/link";
 import {
   listChallengeSignals,
   listPatients,
+  listUnreadMessageCounts,
   type ChallengeSignal,
   type PatientSort,
 } from "@remi/services/server";
@@ -17,6 +18,7 @@ import { Button } from "@remi/ui";
 import { Badge, EmptyState, Typography, type Intent } from "@remi/ui/server";
 import { RosterFilters } from "@/components/patients/roster-filters";
 import {
+  messagesAwaitingLabel,
   patientStatusIntents,
   patientStatusLabels,
 } from "@/components/patients/vocabulary";
@@ -82,9 +84,10 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
   const status = asStatus(first(params.status));
   const sort = asSort(first(params.sort));
 
-  const [patients, challengeSignals] = await Promise.all([
+  const [patients, challengeSignals, unreadMessages] = await Promise.all([
     listPatients({ search, status, sort }),
     listChallengeSignals(),
+    listUnreadMessageCounts(),
   ]);
   const filtered = search !== "" || status !== "all";
 
@@ -148,6 +151,7 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
               const challengeBadge = signal
                 ? challengeSignalBadges[signal]
                 : null;
+              const unread = unreadMessages.get(patient.id) ?? 0;
 
               return (
                 <li key={patient.id}>
@@ -176,6 +180,13 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
                           size="sm"
                         >
                           {challengeBadge.label}
+                        </Badge>
+                      ) : null}
+                      {/* A patient writing is the signal she acts on, so it
+                          reads as loud as « prêt(e) ». */}
+                      {unread > 0 ? (
+                        <Badge variant="info" tone="solid" size="sm">
+                          {messagesAwaitingLabel(unread)}
                         </Badge>
                       ) : null}
                       <Typography as="span" size="xs" tone="muted">

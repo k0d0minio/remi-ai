@@ -88,6 +88,15 @@ export {
 } from "../db/services/patient-documents";
 
 export {
+  countUnreadPatientMessages,
+  listPatientMessages,
+  listUnreadMessageCounts,
+  markPatientMessageRead,
+  replyToPatient,
+  sendPatientMessage,
+} from "../db/services/patient-messages";
+
+export {
   deletePatientInstruction,
   getPatientInstruction,
   listArchivedPatientInstructions,

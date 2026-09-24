@@ -39,6 +39,7 @@ import {
   getPatientInstruction,
   getPatientSummary,
   markGoalCheckInSeen,
+  markPatientMessageRead,
   movePantryEssential,
   movePatientGoal,
   movePatientRecommendation,
@@ -47,6 +48,7 @@ import {
   recordConsultation,
   regenerateShareToken,
   removePatientDocument,
+  replyToPatient,
   removeRecipeAssignment,
   savePantryEssentials,
   savePatientRecommendations,
@@ -126,6 +128,7 @@ export type GoalFormState = { error: string | null };
 export type CheckInFormState = { error: string | null };
 export type InstructionFormState = { error: string | null; saved: boolean };
 export type ChallengeFormState = { error: string | null; saved: boolean };
+export type MessageFormState = { error: string | null; saved: boolean };
 export type SummaryFormState = { error: string | null; saved: boolean };
 export type PrepFormState = { error: string | null; saved: boolean };
 export type ConsultationFormState = { error: string | null; saved: boolean };
@@ -1198,6 +1201,64 @@ export const closeChallengeAction = async (
     detail: outcome,
   });
   revalidatePatient(field(formData, "patientId"));
+  return { error: null, saved: true };
+};
+
+/**
+ * Her reply in the patient's general thread (§ 6). The service marks every
+ * patient message sent up to the reply read in the same transaction (D-37), so
+ * the trail records the reply with how many it answered.
+ */
+export const replyToPatientAction = async (
+  _previous: MessageFormState,
+  formData: FormData,
+): Promise<MessageFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  const result = await replyToPatient(
+    patientId,
+    operator.id,
+    field(formData, "body"),
+  );
+  if (!result.ok) {
+    return {
+      error:
+        result.error === "invalid_input"
+          ? "Écrivez une réponse — 2000 caractères au plus."
+          : result.message,
+      saved: false,
+    };
+  }
+  await audit(operator, "message.replied", {
+    type: "patient_message",
+    id: result.data.reply.id,
+    label: field(formData, "pseudonym"),
+    detail:
+      result.data.markedRead === 0
+        ? undefined
+        : `${result.data.markedRead} message(s) marqué(s) comme lu(s)`,
+  });
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
+/** « Marquer comme lu » — a patient message that needs no answer (D-37). */
+export const markMessageReadAction = async (
+  _previous: MessageFormState,
+  formData: FormData,
+): Promise<MessageFormState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const result = await markPatientMessageRead(id);
+  if (!result.ok) {
+    return { error: result.message, saved: false };
+  }
+  await audit(operator, "message.marked_read", {
+    type: "patient_message",
+    id,
+    label: field(formData, "pseudonym"),
+  });
+  revalidatePatient(result.data.patientId);
   return { error: null, saved: true };
 };
 

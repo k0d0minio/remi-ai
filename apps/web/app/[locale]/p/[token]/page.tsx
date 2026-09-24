@@ -10,6 +10,7 @@ import { DocumentList } from "@/components/patient-link/document-list";
 import { GoalList } from "@/components/patient-link/goal-list";
 import { HomeSection } from "@/components/patient-link/home-section";
 import { MealEntryPoint } from "@/components/patient-link/meal-entry-point";
+import { MessageCard } from "@/components/patient-link/message-card";
 import { PantryList } from "@/components/patient-link/pantry-list";
 import { RecipeList } from "@/components/patient-link/recipe-list";
 import { RecommendationList } from "@/components/patient-link/recommendation-list";
@@ -31,8 +32,8 @@ const HOME_DOCUMENTS = 3;
  * (the running challenge, the goals and their weekly question, then the
  * week's consigne), the
  * prioritised recommendations, the
- * current recipes, the essentials, the way in to a meal, and the living summary
- * last.
+ * current recipes, the essentials, the way in to a meal, her § 6 feedback box,
+ * and the living summary last.
  *
  * The summary used to lead. It was the right page when the link was something
  * to read and the wrong one now that it is something to act in: a patient
@@ -75,6 +76,7 @@ const PatientLinkHome = async ({ params }: { params: Promise<Params> }) => {
     recipes,
     documents,
     weeklyCheckIn,
+    messages,
   } = data;
 
   const weekConsigne = instruction?.patientBody ?? null;
@@ -144,6 +146,14 @@ const PatientLinkHome = async ({ params }: { params: Promise<Params> }) => {
       </SegmentPage>
 
       <MealEntryPoint content={content} href={segment("repas")} />
+
+      <MessageCard
+        messages={messages}
+        token={token}
+        locale={locale}
+        href={segment("messages")}
+        content={content}
+      />
 
       {principales.length > 0 ? (
         <HomeSection

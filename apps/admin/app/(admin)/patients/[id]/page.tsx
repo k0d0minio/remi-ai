@@ -26,6 +26,7 @@ import {
   listPatientAnamnesis,
   listPatientDocuments,
   listPatientLearnings,
+  listPatientMessages,
   listPatientNotes,
   listPatientRecipes,
   listPatientRecommendations,
@@ -96,10 +97,13 @@ import {
   WorkingGoals,
 } from "@/components/patients/working-goals";
 import { WorkingChallenge } from "@/components/patients/working-challenge";
+import { MessageThread } from "@/components/patients/message-thread";
 import { WorkingMeals } from "@/components/patients/working-meals";
+import { WorkingMessages } from "@/components/patients/working-messages";
 import { WorkingRecommendations } from "@/components/patients/working-recommendations";
 import {
   consentChannelLabels,
+  messagesAwaitingLabel,
   patientSegments,
   patientSexLabels,
   patientStatusIntents,
@@ -181,6 +185,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     documents,
     scoreStrips,
     goalsAwaitingAttention,
+    messages,
   ] = await Promise.all([
     listPatientRecommendations(patient.id),
     listArchivedPatientRecommendations(patient.id),
@@ -210,7 +215,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     listPatientDocuments(patient.id),
     listGoalScoreStrips(patient.id),
     countGoalCheckInsAwaitingAttention(patient.id),
+    listPatientMessages(patient.id),
   ]);
+  // Derived from the thread already in hand rather than a second read.
+  const unreadMessages = messages.filter(
+    (message) => message.author === "patient" && message.readAt === null,
+  ).length;
 
   // One trail per goal, active and archived alike: two or three goals plus
   // what has been set down is a handful of reads, and they run together.
@@ -310,6 +320,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
       label: "Documents",
       segment: "dossier",
       count: documents.length,
+    },
+    {
+      id: "messages",
+      label: "Messages",
+      segment: "journal",
+      count: messages.length,
     },
     {
       id: "meals",
@@ -497,6 +513,19 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 entries={mealEntries}
                 awaitingFeedback={awaitingFeedback}
               />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Messages</CardTitle>
+              <CardDescription>
+                Ce que la personne écrit depuis son lien — répondre se fait dans
+                la section Messages.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <WorkingMessages messages={messages} unread={unreadMessages} />
             </CardContent>
           </Card>
 
@@ -876,6 +905,31 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 documents={documents}
                 attachments={attachments}
                 uploadsAvailable={fileStoreReady()}
+              />
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="messages" data-segment="journal" className="scroll-mt-32">
+          <Card>
+            <CardHeader>
+              <CardTitle>Messages</CardTitle>
+              <CardDescription>
+                L&apos;endroit général où la personne dit comment se passe son
+                accompagnement. Votre réponse s&apos;affiche sur son lien, sous
+                votre nom.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-6">
+              {unreadMessages > 0 ? (
+                <Typography size="sm" tone="muted">
+                  {`${messagesAwaitingLabel(unreadMessages)}.`}
+                </Typography>
+              ) : null}
+              <MessageThread
+                patientId={patient.id}
+                pseudonym={patient.pseudonym}
+                messages={messages}
               />
             </CardContent>
           </Card>
