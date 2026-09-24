@@ -3,9 +3,7 @@
   "complexity": "standard",
   "docs_path": "apps/docs/app",
   "required_env": [],
-  "required_checks": [
-    "Format, lint, typecheck"
-  ],
+  "required_checks": [],
   "personas": [
     "patient",
     "practitioner",
