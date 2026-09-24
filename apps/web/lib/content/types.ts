@@ -289,6 +289,7 @@ export type Content = {
       complements: string;
       "placard-frigo": string;
       recettes: string;
+      documents: string;
       repas: string;
       messages: string;
     };
@@ -394,6 +395,18 @@ export type Content = {
     /** Recettes: her per-patient « pourquoi pour toi » note. */
     recipesTitle: string;
     recipeNoteLabel: string;
+    /**
+     * Documents: what she put on the page — her PDFs, images and links, newest
+     * first, each with the day she added it. Those she classed as a recipe are
+     * listed under Recettes too, and one attached to a goal or a recipe also
+     * sits beside it.
+     */
+    documentsTitle: string;
+    documentAddedLabel: string;
+    /** Above the documents a goal or a recipe carries. */
+    attachedDocumentsLabel: string;
+    /** Under Recettes, above the recipe documents that hang from no recipe. */
+    recipeDocumentsTitle: string;
     /** Repas: the journal, with her feedback beneath an entry when written. */
     mealsTitle: string;
     mealSlots: Record<MealSlot, string>;

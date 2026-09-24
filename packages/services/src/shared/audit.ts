@@ -104,6 +104,15 @@ export const auditActions = [
   "challenge.ready_for_next",
   "challenge.ready_for_next_cleared",
   /**
+   * Her documents and links on the patient's page (`patient-documents-and-
+   * links`). The target label is the document's title; a removal is recorded
+   * after the file has left the store, so the line never claims a deletion
+   * the store refused.
+   */
+  "document.added",
+  "document.updated",
+  "document.removed",
+  /**
    * The general thread (`general-feedback`). `sent` is the patient's, through
    * the link; `replied` and `marked_read` are hers — both clear the unread
    * count, so both are worth a line.

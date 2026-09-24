@@ -14,6 +14,7 @@ export const patientLinkSegments = [
   "complements",
   "placard-frigo",
   "recettes",
+  "documents",
   "repas",
   "messages",
 ] as const;

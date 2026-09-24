@@ -122,3 +122,32 @@ page until Morgane and Arnaud answer them.
   pool. They are sized on that basis — small, with an idle timeout, and with an `error` listener,
   because an idle connection dropped by Neon emits on the pool and an unhandled `error` event ends
   the process.
+
+## Files — 2026-09-24
+
+- **Vercel Blob behind a files seam** (decision D-18). `FileStore` in
+  `packages/services/src/files/` is the fourth seam, beside storage, email and AI; the one adapter
+  (`files/adapters/vercel-blob.ts`) is the only server file naming the vendor, and its browser
+  half is the only client code that does — the apps import `@remi/services/files/client` and
+  never name it. Registered lazily, through `@remi/services/server`, in both the console and the
+  patient link.
+- **A private store in an EU region.** Both are settings of the store, fixed when it is created
+  and not changeable afterwards; every call passes `access: "private"`, so nothing in it has a
+  public address. Each environment has its own store and its own `BLOB_READ_WRITE_TOKEN`
+  (`.icm/docs/ENV.md` § Files). Residency is the store's region; retention is the document's
+  life — a file is deleted when its document is removed, and every file of a patient is swept
+  from the store before the patient is deleted (`.icm/docs/RETENTION.md`).
+- **The rules are the seam's.** PDF, JPEG, PNG and WebP only, 10 MB each — carried on every
+  upload grant to the store, and checked again on the object that actually landed before any row
+  points at it; an object that fails is removed on the spot. Reads are signed URLs that live five
+  minutes, issued only after the caller proved the file is theirs: the operator's session in the
+  console, the patient's token on the link.
+- **Uploads go from the browser to the store.** A 10 MB body cannot pass through a server action
+  or a function on Vercel, so the server only answers the uploader's grant request — for a key
+  under that patient's prefix, `patients/<id>/` — and records the row afterwards. The store's
+  upload-completed callback is deliberately unused: it needs a public URL that preview protection
+  refuses, and the second check on the stored object does its job.
+- **A removal leaves the store first.** A document's file is deleted before its row, and a patient's
+  prefix before the patient; when the store refuses, nothing is deleted and the console says so.
+  Reopen this entry if patient volume or a residency requirement outgrows Blob's EU region.
+

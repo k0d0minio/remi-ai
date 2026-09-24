@@ -60,6 +60,8 @@ delivery it did not make.
 app/
   (admin)/       every operator route — the group carries the boundary
   sign-in/       and invitation/[token]/ — the two routes reached without a session
+  api/files/     the upload grant and the file opener — route handlers, outside the layout's
+                 guard, so each checks the operator session itself and answers 401 without one
 components/      composition only, grouped by capability
 lib/             queries, actions, types, the audit and mailer helpers
 ```

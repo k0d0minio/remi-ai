@@ -151,3 +151,12 @@ export const firstRecommendationPerCategory = <
     );
     return first ? [first] : [];
   });
+
+/**
+ * The query parameter the console adds to a patient's link when Morgane opens
+ * it « comme la patiente » (her 14 Sept § 7). The link sees it once, clears it
+ * from the address bar and remembers the preview for an hour, so her looking
+ * is never recorded as the patient opening their link. Shared because two apps
+ * speak it: the console writes it, the link reads it.
+ */
+export const patientLinkPreviewParam = "apercu";

@@ -4,6 +4,8 @@ import type {
   ChallengeOutcome,
   ConsentChannel,
   CookingAffinity,
+  DocumentKind,
+  DocumentTag,
   GoalDirection,
   Locale,
   MealSlot,
@@ -187,6 +189,16 @@ export const challengeOutcomeLabels: Record<ChallengeOutcome, string> = {
   acquired: "Acquis",
   not_acquired: "Non acquis",
   abandoned: "Abandonné",
+};
+
+export const documentKindLabels: Record<DocumentKind, string> = {
+  file: "Fichier",
+  link: "Lien",
+};
+
+export const documentTagLabels: Record<DocumentTag, string> = {
+  document: "Document",
+  recipe: "Recette",
 };
 
 export const challengeOutcomeIntents: Record<ChallengeOutcome, Intent> = {

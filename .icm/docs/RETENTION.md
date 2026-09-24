@@ -24,6 +24,8 @@ One row in `patient_profiles`, plus what hangs off it:
 | The protocol, entry by entry                                 | `patient_recommendations` | yes, unless archived                               |
 | Consultation notes                                           | `patient_notes`           | no                                                 |
 | Challenges — hers, and the patient's two answers to each     | `patient_challenges`      | the running one; closed ones, no                   |
+| Documents she put on their page — PDFs, images, links        | `patient_documents`       | the title and the day added; who added it, no      |
+| The files behind those documents                             | the file store (below)    | through a five-minute signed link only             |
 | The general thread — the patient's messages and her replies  | `patient_messages`        | yes — the whole thread                             |
 | What the patient writes through the link                     | the table it belongs to   | yes — they wrote it                                |
 | One timestamp per accepted write through the link            | `patient_link_writes`     | no                                                 |
@@ -33,6 +35,25 @@ else — no page views, no device, no address. Those are two timestamps, not a t
 first answers "did they look?", the second "is something waiting for me?", and they are separate
 columns because Morgane acts on them differently. The open is rate-limited to one write per five
 minutes; the second moves on every accepted write.
+
+## Where a patient's files are, and who can read them
+
+Morgane can put documents on a patient's page — the recipe PDFs she used to send over WhatsApp,
+the personalised list of fifteen foods, an image, or a link. A link is a row with a title and an
+address. A file is a row **and** an object in the file store: a **private** Vercel Blob store in
+an **EU region** (decision D-18), where each patient's files sit under a prefix of their own.
+Only PDF, JPEG, PNG and WebP are accepted, at 10 MB each.
+
+Nothing in the store has a public address. The patient's link opens a file by asking the web app,
+which checks that the token owns the document and then hands the browser a signed address that
+stops working after five minutes; the console does the same behind the operator's session. The
+patient never uploads anything — the link has no file or image route at all.
+
+Removing a document in the console removes its file from the store first and the row after; if
+the store refuses, both stay and the console says so, so there is never a file left that nothing
+points at. The audit trail keeps one line per document added, edited or removed, with the
+document's title as the target label — the way a goal's title is kept — and nothing of its
+content.
 
 ## What the patient writes, and how it is marked
 
@@ -84,12 +105,16 @@ Deleting a patient from the console removes, permanently and in one operation:
 - the whole general thread — every message the patient sent and every reply to it;
 - everything the patient themselves wrote through the link — their meal entries and their
   check-ins go with the rest, marked `patient` or not;
+- every document she put on their page, and every file behind them in the file store — the files
+  are removed from the store **before** the profile, and if the store refuses (or no store is
+  configured while the patient has files), nothing is deleted and the console says why;
 - the write ledger behind the rate limit, which is timestamps and nothing else;
 - the share link — the token goes with the row, so the URL stops resolving. Anyone still holding it
   gets a not-found page.
 
 This is a database cascade (`onDelete: "cascade"` on every child table, the write ledger
-included), not a status flag: there
+included) — plus the file store's sweep of the patient's prefix just before it, since no database
+cascade reaches outside the database — not a status flag: there
 is no soft-deleted copy, no recycle bin, and nothing to undo it with. The console asks for
 confirmation first for that reason.
 

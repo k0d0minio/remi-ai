@@ -1,8 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { isLocale, pickLocaleFromHeader } from "@remi/services/shared";
+import { previewRedirect } from "@/lib/patient-link/preview";
 
 /**
- * Every page lives under /en or /fr; this redirects the bare paths there.
+ * Every page lives under /en or /fr; this redirects the bare paths there. It
+ * also starts a « voir comme la patiente » preview of a patient link
+ * (`lib/patient-link/preview.ts`).
  *
  * A 307, not a 308, because the answer depends on a request header and must not
  * be cached as permanent. Route handlers are excluded by the matcher — /api is
@@ -13,7 +16,7 @@ const proxy = (request: NextRequest) => {
   const first = pathname.split("/")[1];
 
   if (isLocale(first)) {
-    return NextResponse.next();
+    return previewRedirect(request) ?? NextResponse.next();
   }
 
   const locale = pickLocaleFromHeader(request.headers.get("accept-language"));

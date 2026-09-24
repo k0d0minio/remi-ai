@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { cache } from "react";
 import {
   getCurrentChallenge,
@@ -6,6 +7,7 @@ import {
   getPatientSummary,
   listMealEntries,
   listPantryEssentials,
+  listPatientDocuments,
   listPatientGoals,
   listPatientMessages,
   listPatientRecipes,
@@ -14,6 +16,7 @@ import {
   recordPatientLinkOpened,
 } from "@remi/services/server";
 import { ensureDatabase } from "@/lib/database";
+import { LINK_PREVIEW_COOKIE } from "./preview";
 import type { PatientLinkSegment } from "./segments";
 
 /**
@@ -48,6 +51,7 @@ export const loadPatientLink = cache(async (token: string) => {
     essentials,
     recipes,
     meals,
+    documents,
     messages,
   ] = await Promise.all([
     getPatientSummary(patient.id),
@@ -59,15 +63,23 @@ export const loadPatientLink = cache(async (token: string) => {
     listPantryEssentials(patient.id),
     listPatientRecipes(patient.id),
     listMealEntries(patient.id),
+    listPatientDocuments(patient.id),
     listPatientMessages(patient.id),
   ]);
 
   // Awaited rather than fired and forgotten: an unawaited promise in a server
   // component can be cut off when the response finishes. The service
   // rate-limits itself, so this is usually a read and no write at all. It
-  // fires on arrival at any of the six routes, so a patient who opens the
+  // fires on arrival at any of its routes, so a patient who opens the
   // link and reads three segments is recorded as having opened it.
-  await recordPatientLinkOpened(patient.id);
+  //
+  // Not while Morgane is looking « comme la patiente »: the console marks that
+  // visit (`./preview.ts`), and her look is not the patient opening their link.
+  const previewing =
+    (await cookies()).get(LINK_PREVIEW_COOKIE)?.value === patient.shareToken;
+  if (!previewing) {
+    await recordPatientLinkOpened(patient.id);
+  }
 
   return {
     patient,
@@ -83,6 +95,7 @@ export const loadPatientLink = cache(async (token: string) => {
     essentials,
     recipes,
     meals,
+    documents,
     // The general thread, newest first. Only the body, the author, the date
     // and a reply's operator name ever render.
     messages,
@@ -119,8 +132,14 @@ export const visibleSegments = (
   if (data.essentials.length > 0) {
     present.push("placard-frigo");
   }
-  if (data.recipes.length > 0) {
+  if (
+    data.recipes.length > 0 ||
+    data.documents.some((document) => document.tag === "recipe")
+  ) {
     present.push("recettes");
+  }
+  if (data.documents.length > 0) {
+    present.push("documents");
   }
   present.push("repas", "messages");
   return present;

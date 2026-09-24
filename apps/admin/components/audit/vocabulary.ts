@@ -87,6 +87,9 @@ export const actionLabels: Record<AuditActionName, string> = {
   "challenge.acquired_cleared": "challenge acquis retiré",
   "challenge.ready_for_next": "prêt(e) pour le prochain challenge",
   "challenge.ready_for_next_cleared": "prêt(e) pour le prochain retiré",
+  "document.added": "document ajouté",
+  "document.updated": "document modifié",
+  "document.removed": "document retiré",
   "message.sent": "message envoyé",
   "message.replied": "réponse envoyée",
   "message.marked_read": "message marqué comme lu",
@@ -197,6 +200,9 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   // The patient asking for the next one is the signal she acts on.
   "challenge.ready_for_next": "info",
   "challenge.ready_for_next_cleared": "neutral",
+  "document.added": "neutral",
+  "document.updated": "neutral",
+  "document.removed": "neutral",
   // A patient writing is the signal she acts on, like « prêt(e) ».
   "message.sent": "info",
   "message.replied": "neutral",
