@@ -67,6 +67,7 @@ const PatientLinkHome = async ({ params }: { params: Promise<Params> }) => {
     recommendations,
     essentials,
     recipes,
+    documents,
   } = data;
 
   const weekConsigne = instruction?.patientBody ?? null;
@@ -85,7 +86,8 @@ const PatientLinkHome = async ({ params }: { params: Promise<Params> }) => {
     summary === null &&
     principales.length === 0 &&
     recipes.length === 0 &&
-    essentials.length === 0;
+    essentials.length === 0 &&
+    documents.length === 0;
 
   return (
     <>
@@ -102,7 +104,13 @@ const PatientLinkHome = async ({ params }: { params: Promise<Params> }) => {
             <Typography as="h3" size="sm" weight="medium" tone="muted">
               {content.goalsTitle}
             </Typography>
-            <GoalList goals={goals} content={content} />
+            <GoalList
+              goals={goals}
+              content={content}
+              documents={documents}
+              locale={locale}
+              token={token}
+            />
           </div>
         ) : null}
 
