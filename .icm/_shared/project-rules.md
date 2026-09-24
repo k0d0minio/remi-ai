@@ -79,34 +79,37 @@ D23; `/setup` — `.icm/scripts/setup.sh` — says whether the two are complete 
 
 ## The factory
 
-- **Required CI check** — `Format, lint, typecheck` (`required_checks` in `.icm/project.json`;
-  the name contains commas, which is why the list is an array and `PIPELINE_REQUIRED_CHECKS`,
-  when used as an override, is newline-separated). The workflow is `Quality`
-  (`.github/workflows/quality.yaml`); the **check run** is named after its one job. It runs on
-  every PR and on `main`, with no path filter and **no tiering**: a draft head and a ready head
-  run the same whole job — the migration-order check (`Migration order`, pull requests only:
-  `CONVENTIONS.md` § the factory), a format check over `**/*.{ts,tsx,md}`, lint with a
-  zero-warning ceiling, the type check, and the `@remi/services` vitest suite — so here the
-  "cheap tier" and the "full gate" the contracts distinguish are one and the same verdict, and
-  `ci-status.sh` names the tier by the PR's draft state alone. The full sweep is blocked in-session by
-  `.claude/hooks/block-local-checks.sh`; Husky (`lint-staged`) formats staged `.ts/.tsx/.md` on
-  commit wherever `node_modules` is installed.
-- **The other check runs on a PR:**
-
-  | Name                        | Class    | What it means                                                                                                                                                                                                                                                                                                                                       |
-  | --------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-  | `Project run labels`        | blocking | `Pipeline` (`.github/workflows/pipeline.yaml`) — one job: projects `stage:*` / `type:*` / `persona:*` / `complexity:*` from the run's outputs, then re-validates spec structure, intake bookkeeping, release completeness and the knowledge map as **advisory steps** — summary lines and `::warning::`s; only a label-projection fault can red it. |
-  | `Pipeline gates (advisory)` | advisory | `Gates` (`.github/workflows/gates.yaml`) — reads the two gate anchors in the PR body and is red while a present gate is unticked. A visible signal for the human, not a factory verdict: the stage contracts read the checkbox itself, and the ruleset does not require this check. Advisory by name, so `ci-status.sh` never reds on it.           |
+- **The verdict** — the six deploy statuses (`deploy.projects[].status_context`;
+  `_shared/ci.md` → the cost floor, D43). `required_checks` in `.icm/project.json` is
+  **empty**. The ruleset on `main` requires the deploy statuses and nothing else (it required
+  `Format, lint, typecheck` until 2026-09-24 — the operator re-points it before the PR that
+  renames the job merges).
+- **The advisory quality job** — `Quality (advisory)` in `.github/workflows/quality.yaml`:
+  the migration-order check (`CONVENTIONS.md` § the factory) · format check over
+  `**/*.{ts,tsx,md}` · lint with a zero-warning ceiling · typecheck · the `@remi/services`
+  vitest suite, as steps of one job, on a **ready** head only (`ready_for_review` /
+  `synchronize` / `reopened` with a job-level draft guard), path-filtered out of `.icm/**`,
+  markdown and `.github/**`, never on `main`, no build. Reported by `ci-status.sh`, never
+  required: a red run is a finding the stage fixes on the branch. **A draft head owes CI
+  nothing** — `format.sh` before a commit where Husky is not installed, `lint.sh` before every
+  push, `security-check.sh` before every commit, are the pre-flip check. The full sweep stays
+  blocked in-session by `.claude/hooks/block-local-checks.sh`; Husky (`lint-staged`) formats
+  staged `.ts/.tsx/.md` on commit wherever `node_modules` is installed.
+- **Every other workflow, and what each costs** — `Release` (`.github/workflows/release.yaml`,
+  PR merged: announces through `report.sh`). Nothing else. Retired 2026-09-24 (D43): `Pipeline`
+  (Build and Release run `project-labels.sh` themselves; the validations run before the gate as
+  they always did) and `Gates` (the stage reads the checkbox from the PR body; nothing needed the
+  projection). The repo is public, so its minutes were free — the shape is the estate's.
 
   `Vercel Preview Comments` is noise (`_shared/ci.md`). There is no smoke check (`smoke_check`
-  is absent from `.icm/project.json`) — the operator's smoke is by hand.
-
+  is absent from `.icm/project.json`) — the walk is the operator's, at Ready-to-merge, from the
+  preview URLs `ci-status.sh` printed.
 - **Local feedback scripts** — `.icm/scripts/format.sh` (the repo's formatter over the
   `.ts/.tsx/.md` files the branch changed, honouring `.prettierignore`) and
   `.icm/scripts/lint.sh` (the repo's linter over the same files, run inside each workspace
   package with its own config, no `--fix`, zero warnings — the ceiling `quality.yaml` enforces).
-  Feedback before a push, never the verdict — CI's `Format, lint, typecheck` is the verdict
-  (estate decision D21).
+  Feedback before a push, never the verdict — the deploy is the verdict (estate decisions D21,
+  D43).
 - **Deploy** — `deploy` in `.icm/project.json`: Vercel, team **`remi21`** — a separate team
   boundary from the kodominio estate, so the token is this team's own — `VERCEL_TOKEN_REMI21` in
   the operator's shell, plain `VERCEL_TOKEN` the fallback a cloud panel sets — and never written here — six projects, one per app, **all `class:
@@ -183,12 +186,10 @@ D23; `/setup` — `.icm/scripts/setup.sh` — says whether the two are complete 
   close-out's path guard is `.icm/runs/**` and `.icm/intake/**`, nothing else. Older archived runs
   carry the folder shape they were written in; nothing is renumbered and nothing reads them but a
   human.
-- **The labels job** — `pipeline.yaml` re-projects labels on every push touching `.icm/runs/**`
-  and derives `stage:*` from which outputs exist, which is why the contracts tell stages to
-  commit their output rather than call `project-labels.sh` (Release excepted — it projects its
-  own label at step 1). The job diffs `origin/$BASE_REF...$HEAD_SHA` — the PR's own files, never
-  what `main` did in the meantime — and labels only a run whose `run.md` points at this PR.
-
+- **The labels** — the session projects them (D43; no workflow does): `new-run.sh` at Define,
+  `project-labels.sh <slug> --stage auto` in Build after the first push that carries `notes.md`,
+  `--stage release` at Release's step 1. The script derives `stage:*` from which outputs exist
+  and PUTs the full set; a run's PR is the one `run.md` points at.
 ## Reporting
 
 - **Kinds → channels** — `reporting` in `.icm/project.json`: `announce` → `github-release` (the
@@ -231,10 +232,8 @@ D23; `/setup` — `.icm/scripts/setup.sh` — says whether the two are complete 
   does.
 - **Workflows** — `release.yaml` present: the reference announce-on-merge workflow, seeded
   once on 2026-09-23 and this repo's own since (the edits above); `workflow_dispatch` with a slug
-  re-announces from `main`. The reference `labels.yaml` is absent: `pipeline.yaml` is this
-  repo's labels job and `gates.yaml` its advisory gate read (§ The factory); it is not to be
-  seeded here.
-
+  re-announces from `main`. `quality.yaml` is this repo's own advisory job (§ The factory). The
+  reference `labels.yaml` was retired with `pipeline.yaml` and `gates.yaml` on 2026-09-24 (D43).
 ## Support
 
 - **Tier** — `support.tier: none`: no after-handover support line is agreed — the operator is
