@@ -8,6 +8,7 @@ import {
   recordWeeklyCheckIn,
   setChallengeAcquired,
   setChallengeReadyForNext,
+  type WeeklyAnswer,
 } from "@remi/services/server";
 import {
   goalScores,
@@ -247,7 +248,7 @@ export const weeklyCheckInAction = async (
     return refused;
   }
 
-  const answers = [];
+  const answers: WeeklyAnswer[] = [];
   for (const goalId of formData.getAll("goal").map(String)) {
     const posted = field(formData, `score-${goalId}`);
     const score = posted === "" ? null : Number(posted);

@@ -433,6 +433,8 @@ const weeklyAnswer = z.object({
   note: z.string().trim().max(2000).optional(),
 });
 
+type ParsedAnswer = z.infer<typeof weeklyAnswer>;
+
 /** The patient's own rows on one goal, oldest first. */
 const patientRowsOldestFirst = async (
   goalId: Id,
@@ -505,7 +507,7 @@ export const recordWeeklyCheckIn = async (
     return err("not_found", "no such goal");
   }
   const rated = parsed.data.filter(
-    (answer): answer is typeof answer & { score: number } =>
+    (answer): answer is ParsedAnswer & { score: number } =>
       answer.score !== null && answer.score !== undefined,
   );
   if (rated.length === 0) {
