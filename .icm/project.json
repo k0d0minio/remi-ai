@@ -65,7 +65,7 @@
     ]
   },
   "uat": {
-    "branch": "",
+    "target": "",
     "url": ""
   },
   "reporting": {
