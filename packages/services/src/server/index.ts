@@ -72,6 +72,16 @@ export {
 export type { ChallengeSignal } from "../db/services/patient-challenges";
 
 export {
+  countUnreadPatientMessages,
+  listPatientMessages,
+  listUnreadMessageCounts,
+  markPatientMessageRead,
+  replyToPatient,
+  sendPatientMessage,
+} from "../db/services/patient-messages";
+export type { PatientMessageEntry } from "../db/services/patient-messages";
+
+export {
   deletePatientInstruction,
   getPatientInstruction,
   listArchivedPatientInstructions,

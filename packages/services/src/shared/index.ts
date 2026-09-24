@@ -109,6 +109,7 @@ export type {
   PatientGoalCheckIn,
   PatientInstruction,
   PatientLearning,
+  PatientMessage,
   PatientNote,
   PatientObservation,
   PatientProfile,
