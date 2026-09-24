@@ -410,6 +410,47 @@ export const patientChallenges = pgTable(
 );
 
 /**
+ * The one general thread between a patient and Morgane — her 14 Sept document,
+ * § 6: « un endroit très simple où le consultant peut laisser un commentaire
+ * général ». One thread per patient, so there is no thread table: every row
+ * belongs to its patient's only conversation, newest first.
+ *
+ * Append-only. Neither side edits or deletes a message; the thread goes with
+ * the patient (cascade), and RETENTION says so.
+ *
+ * `read_at` is only ever set on the patient's rows — it is what the console's
+ * « N messages attendent une réponse » counts, and a reply or « Marquer comme
+ * lu » is what sets it (decision D-32). Her own replies carry the operator who
+ * wrote them, because the link names the practitioner under each reply and
+ * nothing else on the patient's page knows her name; `set null` keeps the
+ * reply readable if that account is ever removed.
+ */
+export const patientMessages = pgTable(
+  "patient_messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    /** A key from `writtenByKinds` — the patient, or her reply. */
+    author: text("author").notNull(),
+    /** Plain text, as typed. */
+    body: text("body").notNull(),
+    sentAt: timestamp("sent_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+    /** Null on a patient message she has not yet read; always null on hers. */
+    readAt: timestamp("read_at", { withTimezone: true, mode: "date" }),
+    /** Who replied — null on the patient's rows. */
+    operatorId: uuid("operator_id").references(() => operators.id, {
+      onDelete: "set null",
+    }),
+    ...timestamps,
+  },
+  (table) => [index().on(table.patientId)],
+);
+
+/**
  * The living summary — brainstorm § C's PATIENT_SUMMARY, written by Morgane
  * now and drafted by the AI later.
  *
