@@ -18,3 +18,8 @@ dependency-audit  pnpm reports 20 high/critical advisor(y|ies) — run: pnpm aud
 (unresolved until the session adds a `- resolved:` line: remove the secret from the change, have the operator rotate it, re-run the gate, then write what was wrong and what is true now)
 - resolved: same finding at branch scope, same cause; `security-check.sh --branch --no-audit` → OK. Parked, not fixed here — the spec's `touches:` does not cover the manifest (security-audit skill → Dependency findings).
 
+
+## 2026-09-24T13:50:00Z ci Vercel – admin — db:migrate failed on 4e003d7
+@remi/admin:build: ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL @remi/services@1.0.0 db:migrate: `node scripts/migrate.mjs`
+- resolved: the f844131 admin preview (the project opts previews into migrating, and the database is shared with production) had already applied this run's table as `0022_patient_messages`, `created_at` 1790253892075 (row 32, after #125's row 31). Regenerating it as `0023` after #125 merged gave it a new `when`, so the next migrate re-ran `CREATE TABLE` on an existing, identical table. `0023`'s journal `when` is pinned to the applied 1790253892075 — still later than `main`'s newest (1790253409725), `check-migration-order` safe — so drizzle reads it as applied there and applies it normally on a fresh database. Nothing was written to the database.
+- rule: once a preview has migrated a branch's schema into the shared database, a regenerated migration must keep the `when` already recorded in `drizzle.__drizzle_migrations` (read it first), provided that stamp still sorts after `main`'s newest — otherwise the next migrate replays DDL that already ran.
