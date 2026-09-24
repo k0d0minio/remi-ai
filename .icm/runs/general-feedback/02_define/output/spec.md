@@ -63,12 +63,12 @@ updated in the same PR). One migration.
 
 **Decided in Define (2026-09-24, with the operator):**
 
-- The prompt is her § 6 example verbatim, both sentences, as the prompt above the box.
-- The feedback box sits **beside** the one-tap check-in on the home; it does not replace it.
+- D-30 — The prompt is her § 6 example verbatim, both sentences, as the prompt above the box.
+- D-31 — The feedback box sits **beside** the one-tap check-in on the home; it does not replace it.
   `check-in-and-progression` keeps its own home card — this answers the same open point in that
   stub.
-- Unread clears on a reply or on « Marquer comme lu »; nothing clears on its own.
-- Run ahead of `patient-documents-and-links` (5 of 9): both add a migration; whichever merges
+- D-32 — Unread clears on a reply or on « Marquer comme lu »; nothing clears on its own.
+- D-33 — Run ahead of `patient-documents-and-links` (5 of 9): both add a migration; whichever merges
   second renumbers its own.
 
 ## Acceptance criteria

@@ -8,9 +8,18 @@ decision made mid-run has one home.
 
 ## From the scope
 
-- <D-n — the decision, one line, as the scope worded it>
+- D-2 — The patient link becomes read + write on the same token; patient accounts wait.
+- D-9 — Check-ins are in-page, with no outbound channel; a simple progression view on both sides.
+- D-19 — The patient link gets what she asked for on 14 September, before any model: `challenges`,
+  `patient-documents-and-links`, `general-feedback` (one free-text box, weekly framing, listed in
+  the console).
 
 ## Made in this run
 
-- <D-n (the next free id) — the decision, why, which stage made it. A decision Build had to
-  make is a spec gap: say so in `notes.md` → Notes for Release>
+- D-30 — The prompt is her § 6 example verbatim, both sentences. Define, operator, 2026-09-24.
+- D-31 — The feedback box sits beside the one-tap check-in on the home; it does not replace it
+  (answers the same open point in `check-in-and-progression`). Define, operator.
+- D-32 — A patient message's unread mark clears on a reply (every earlier unread one) or on
+  « Marquer comme lu »; opening the page clears nothing. Define, operator.
+- D-33 — Run ahead of `patient-documents-and-links`; whichever merges second renumbers its
+  migration. Define, operator.
