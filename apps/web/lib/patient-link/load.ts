@@ -2,10 +2,13 @@ import { cookies } from "next/headers";
 import { cache } from "react";
 import {
   getCurrentChallenge,
+  getWeeklyCheckIn,
   getPatientByShareToken,
   getPatientInstruction,
   getPatientSummary,
+  listGoalScoreStrips,
   listMealEntries,
+  listPastChallenges,
   listPantryEssentials,
   listPatientDocuments,
   listPatientGoals,
@@ -51,6 +54,9 @@ export const loadPatientLink = cache(async (token: string) => {
     recipes,
     meals,
     documents,
+    weeklyCheckIn,
+    scoreStrips,
+    pastChallenges,
   ] = await Promise.all([
     getPatientSummary(patient.id),
     getPatientInstruction(patient.id),
@@ -62,6 +68,9 @@ export const loadPatientLink = cache(async (token: string) => {
     listPatientRecipes(patient.id),
     listMealEntries(patient.id),
     listPatientDocuments(patient.id),
+    getWeeklyCheckIn(patient.id),
+    listGoalScoreStrips(patient.id),
+    listPastChallenges(patient.id),
   ]);
 
   // Awaited rather than fired and forgotten: an unawaited promise in a server
@@ -93,6 +102,9 @@ export const loadPatientLink = cache(async (token: string) => {
     recipes,
     meals,
     documents,
+    weeklyCheckIn,
+    scoreStrips,
+    pastChallenges,
   };
 });
 
@@ -106,6 +118,9 @@ export type PatientLinkData = NonNullable<
  * A segment whose read came back empty appears in no navigation and 404s at
  * its own URL: a nav entry leading to an empty page and a reachable empty page
  * are the same broken product, and Morgane fills patients at her own pace.
+ *
+ * Progression shows when there is a goal to score or a challenge behind the
+ * patient — the two things it is made of.
  *
  * Two segments are exempt, and for the same reason — they are not waiting on
  * her. Home carries the greeting. Repas carries « Je vais manger » / « J'ai
@@ -135,6 +150,9 @@ export const visibleSegments = (
     present.push("documents");
   }
   present.push("repas");
+  if (data.goals.length > 0 || data.pastChallenges.length > 0) {
+    present.push("progression");
+  }
   return present;
 };
 
