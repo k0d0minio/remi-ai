@@ -28,12 +28,19 @@ type Props = {
  */
 export const WeeklyCheckInForm = ({ goals, token, locale, content }: Props) => {
   const [state, setState] = useState<WriteState>({ error: null });
+  // Held off while the answer is in flight, so a double tap sends it once.
+  const [sending, setSending] = useState(false);
   const copy = content.weeklyCheckIn;
 
   return (
     <form
       action={async (formData: FormData) => {
-        setState(await weeklyCheckInAction({ error: null }, formData));
+        setSending(true);
+        try {
+          setState(await weeklyCheckInAction({ error: null }, formData));
+        } finally {
+          setSending(false);
+        }
       }}
       className="flex flex-col gap-5"
     >
@@ -77,7 +84,11 @@ export const WeeklyCheckInForm = ({ goals, token, locale, content }: Props) => {
       </Typography>
 
       <div className="flex flex-col gap-2">
-        <Button type="submit" className="min-h-11 self-start">
+        <Button
+          type="submit"
+          className="min-h-11 self-start"
+          disabled={sending}
+        >
           {copy.submit}
         </Button>
         {state.error ? (
