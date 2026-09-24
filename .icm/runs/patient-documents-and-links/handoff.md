@@ -6,13 +6,17 @@ stops, so nothing is carried in anyone's head.
 
 ## Next steps
 
-1. <the very next action, with the exact command or file>
+1. Operator: read `02_define/output/spec.md`, tick **Spec approved** on
+   https://github.com/k0d0minio/remi-ai/pull/122, then run `build patient-documents-and-links`.
+2. Before Build's pass 3 can be smoked: create a **private** Vercel Blob store in an **EU region**
+   and give its token to the admin and web projects (the variable is catalogued in ENV.md by pass 1).
 
 ## Blockers
 
-- <what blocks, and who unblocks it — or "none">
+- The Spec approved tick (operator).
 
 ## Do not
 
-- <what the next session must not do — a branch not to touch, a gate not to tick, a file
-  another run owns>
+- Do not tick either gate; do not start Build before the tick.
+- Do not create a public or non-EU Blob store — region and privacy cannot be changed afterwards.
+- Do not touch `beyond-december/meal-photos` scope: meals stay text-only (D-12).

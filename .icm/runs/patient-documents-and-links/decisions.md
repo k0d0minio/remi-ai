@@ -8,9 +8,16 @@ decision made mid-run has one home.
 
 ## From the scope
 
-- <D-n — the decision, one line, as the scope worded it>
+- D-2 — the patient link's token reads and writes; patient accounts wait.
+- D-12 — the meal journal stays text-only; photos parked (the vendor is now D-18's).
+- D-18 — files: a files seam with Vercel Blob as its one adapter, EU region.
+- D-19 — the link gets challenges, documents and links, general feedback before any model.
 
 ## Made in this run
 
-- <D-n (the next free id) — the decision, why, which stage made it. A decision Build had to
-  make is a spec gap: say so in `notes.md` → Notes for Release>
+- D-25 — accepted types PDF, JPEG, PNG, WebP; 10 MB cap; enforced in the seam (Define, operator, 2026-09-24).
+- D-26 — a document belongs to the patient and attaches to at most one of a goal or the patient's
+  recipe assignment; deleting the parent sets it null (Define, operator, 2026-09-24).
+- D-27 — the patient sees a document's title and date added, no author (Define, operator, 2026-09-24).
+- D-28 — recipe-tagged files and links show under « Mes recettes » and in « Mes documents » (Define,
+  operator, 2026-09-24).
