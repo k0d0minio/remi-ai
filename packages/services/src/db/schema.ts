@@ -304,26 +304,47 @@ export const patientGoals = pgTable("patient_goals", {
  * the measure as alternatives; that at least one is present is the service's
  * rule, since "a row that says nothing" is a validation question, not a shape.
  */
-export const patientGoalCheckIns = pgTable("patient_goal_check_ins", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  goalId: uuid("goal_id")
-    .notNull()
-    .references(() => patientGoals.id, { onDelete: "cascade" }),
-  checkedOn: date("checked_on", { mode: "string" }).notNull(),
-  /** A key from `goalDirections` in `shared/patient.ts`, or nothing. */
-  direction: text("direction"),
-  /** The simple measure on the day — "4/10", "presque plus de réveils". */
-  measure: text("measure").notNull().default(""),
-  note: text("note").notNull().default(""),
-  /**
-   * A key from `writtenByKinds`. Morgane's consultation check-in and the
-   * patient's own in-page answer share this table, and the console needs to
-   * tell them apart; the default is what every row predating the link's write
-   * path was.
-   */
-  writtenBy: text("written_by").notNull().default("practitioner"),
-  ...timestamps,
-});
+export const patientGoalCheckIns = pgTable(
+  "patient_goal_check_ins",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    goalId: uuid("goal_id")
+      .notNull()
+      .references(() => patientGoals.id, { onDelete: "cascade" }),
+    checkedOn: date("checked_on", { mode: "string" }).notNull(),
+    /** A key from `goalDirections` in `shared/patient.ts`, or nothing. */
+    direction: text("direction"),
+    /** The simple measure on the day — "4/10", "presque plus de réveils". */
+    measure: text("measure").notNull().default(""),
+    note: text("note").notNull().default(""),
+    /**
+     * A key from `writtenByKinds`. Morgane's consultation check-in and the
+     * patient's own in-page answer share this table, and the console needs to
+     * tell them apart; the default is what every row predating the link's write
+     * path was.
+     */
+    writtenBy: text("written_by").notNull().default("practitioner"),
+    /**
+     * The patient's weekly 0–5 — how the week went for this goal (her 14 Sept
+     * § 1, decisions D-30 and D-31). Only the patient's own check-in writes
+     * one; her consultation rows keep the free-text measure and leave it null.
+     */
+    score: integer("score"),
+    /**
+     * When she acknowledged a patient's lower score (D-33). Null on every row
+     * she has not marked « vu », which only matters on a patient-written
+     * `worse` row: that is the one kind that waits for her.
+     */
+    seenAt: timestamp("seen_at", { withTimezone: true, mode: "date" }),
+    ...timestamps,
+  },
+  (table) => [
+    check(
+      "patient_goal_check_ins_score_range",
+      sql`${table.score} is null or (${table.score} >= 0 and ${table.score} <= 5)`,
+    ),
+  ],
+);
 
 /**
  * The standing consigne Morgane steers by — brainstorm § E.

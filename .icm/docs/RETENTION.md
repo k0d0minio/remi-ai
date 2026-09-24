@@ -68,6 +68,9 @@ three are what the code does:
   challenge, and the patient writes only its two answers — `acquired_at` (« Challenge acquis ») and
   `ready_for_next_at` (« Prêt(e) pour le prochain »), two timestamps and nothing else. Those columns
   are the patient's by construction, and each set or clear of one is in the audit trail as theirs.
+  The goal check-ins gained two columns with `check-in-and-progression`: `score`, the patient's
+  weekly 0–5 on a goal, written only on a `patient` row, and `seen_at`, the moment Morgane marked a
+  lower score « vu ». Both go with the goal they belong to.
   A closed challenge keeps both, frozen, with the outcome she gave it.
 - **Every write is in the audit trail as the patient's.** `audit_events` records an actor kind
   alongside the actor, so a patient's write cannot be read as an operator's or as the system's. A

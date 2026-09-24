@@ -278,6 +278,7 @@ export const en: Content = {
       recettes: "Recipes",
       documents: "Documents",
       repas: "Meals",
+      progression: "My progress",
     },
     todayTitle: "Today / this week",
     challenge: {
@@ -292,6 +293,39 @@ export const en: Content = {
         not_found:
           "This challenge has changed in the meantime. Reload the page.",
         unknown: "That did not work. Try again in a moment.",
+      },
+    },
+    weeklyCheckIn: {
+      title: "Your week",
+      lead: "One number per goal, from 0 to 5 — your practitioner will see it.",
+      question: "This week, how did it go for:",
+      scaleLow: "0 — not well at all",
+      scaleHigh: "5 — very well",
+      noteLabel: "A word (optional)",
+      submit: "Send",
+      answeredOn: "Thank you! Answer sent on",
+      nextOn: "Next question on",
+      errors: {
+        invalid_input: "Pick at least one number before sending.",
+        rate_limited: "That is a lot at once — try again in a moment.",
+        not_found: "You have already answered this week. Reload the page.",
+        unknown: "That did not work. Try again in a moment.",
+      },
+    },
+    progression: {
+      title: "My progress",
+      lead: "Your answers each week, goal by goal.",
+      stripLabel: "your weekly numbers, from 0 to 5",
+      noScores:
+        "No number yet — the first question is waiting on the home page.",
+      instructionTitle: "Your current focus",
+      mealsLabel: "Meals logged in the last 7 days:",
+      pastChallengesTitle: "My past challenges",
+      challengeUntil: "→",
+      outcomes: {
+        acquired: "Done",
+        not_acquired: "Not yet",
+        abandoned: "Dropped",
       },
     },
     weekConsigneTitle: "This week's focus",

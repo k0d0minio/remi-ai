@@ -13,6 +13,7 @@
  */
 
 import type {
+  ChallengeOutcome,
   MealIntent,
   MealSlot,
   PersonalisationDimension,
@@ -291,6 +292,7 @@ export type Content = {
       recettes: string;
       documents: string;
       repas: string;
+      progression: string;
     };
     /**
      * Home, in her § 6 order: today and this week, the prioritised
@@ -312,6 +314,43 @@ export type Content = {
       empty: string;
       /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
       errors: Record<PatientWriteError, string>;
+    };
+    /**
+     * The weekly question on the home (D-30, D-31): every active goal scored
+     * 0–5 on one card, with an optional word each. `question` precedes the
+     * goal's title. Once answered, the card gives way to `answeredOn` and
+     * `nextOn`, each followed by a date.
+     */
+    weeklyCheckIn: {
+      title: string;
+      lead: string;
+      question: string;
+      scaleLow: string;
+      scaleHigh: string;
+      noteLabel: string;
+      submit: string;
+      answeredOn: string;
+      nextOn: string;
+      /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
+      errors: Record<PatientWriteError, string>;
+    };
+    /**
+     * « Ma progression »: each goal's weekly scores as a strip, the current
+     * consigne, the meals logged in the last seven days and the challenges
+     * behind the patient with how each ended.
+     */
+    progression: {
+      title: string;
+      lead: string;
+      /** The strip's accessible name, after the goal's title. */
+      stripLabel: string;
+      noScores: string;
+      instructionTitle: string;
+      mealsLabel: string;
+      pastChallengesTitle: string;
+      /** Between a challenge's start and end dates: "12 sept. → 26 sept.". */
+      challengeUntil: string;
+      outcomes: Record<ChallengeOutcome, string>;
     };
     /** Heads the week's consigne, when she has written one to the patient. */
     weekConsigneTitle: string;
