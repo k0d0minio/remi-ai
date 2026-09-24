@@ -260,7 +260,7 @@ export const weeklyCheckInAction = async (
 
   const result = await writePatientLink(locale, token, {
     action: "goal.checked_in",
-    text: { bodies: answers.map((answer) => answer.note) },
+    text: { bodies: answers.map((answer) => answer.note ?? "") },
     target: { type: "patient_goal_check_in" },
     write: async (patient) => recordWeeklyCheckIn(patient.id, answers),
   });

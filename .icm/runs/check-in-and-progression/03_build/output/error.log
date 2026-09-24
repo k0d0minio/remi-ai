@@ -1,0 +1,3 @@
+## 2026-09-24T12:47:31Z ci Format, lint, typecheck — @remi/web typecheck: optional note in the link-write text
+lib/patient-link/actions.ts(263,13): error TS2322: Type '(string | undefined)[]' is not assignable to type 'readonly string[]'.
+- resolved: `WeeklyAnswer.note` is optional, so mapping it straight into `text.bodies` typed as `(string | undefined)[]`; the action now declares `answer.note ?? ""`.
