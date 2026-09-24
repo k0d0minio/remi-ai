@@ -3,8 +3,8 @@
 Where the run is, in five lines. Updated at every stage start and stop, and whenever a flag
 flips. A resuming session reads this first, then `handoff.md` (`_shared/stage-preamble.md`).
 
-- phase: define
-- step: 7 — spec written, draft PR #124 open; waiting on the Spec approved tick
-- ci: none yet
+- phase: build
+- step: 9 — code complete (4 passes); pushing for the draft-tier verdict
+- ci: pending
 - blocked: no
 - updated: 2026-09-24

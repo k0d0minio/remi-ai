@@ -22,4 +22,8 @@ step, so a resuming session can pick up the first unticked line.
 
 ## Queue
 
-- [ ] <task — small enough for one commit; name the file or area>
+- [x] Schema + migration — `patient_messages`, `0021_patient_messages.sql` (70139a5)
+- [x] Service + tests — `db/services/patient-messages/`, model, exports, audit actions (96ed8fd)
+- [x] Link — `messages` segment, home card, composer/thread/form, fr/en copy, `sendMessageAction` (d306325)
+- [x] Console — thread with reply and « Marquer comme lu », working-view glance, roster badge, RETENTION (5a75e53)
+- [ ] CI green on the draft tier, `main` merged in, ready flip, full gate green
