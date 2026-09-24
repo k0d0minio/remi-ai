@@ -1,5 +1,6 @@
 import {
   boolean,
+  check,
   date,
   doublePrecision,
   index,
@@ -547,6 +548,72 @@ export const patientRecipeAssignments = pgTable("patient_recipe_assignments", {
   archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
   ...timestamps,
 });
+
+/**
+ * A document Morgane put on a patient's page — her recipe PDFs, the
+ * personalised list of fifteen foods, a meal feedback — or a link to one
+ * (her 14 Sept document, § 3 option 2 and § 4; decision D-18).
+ *
+ * A file row holds the key of a private object in the file store, never a URL:
+ * the patient reads it through a five-minute signed link the web app issues
+ * after checking the token. A link row holds the URL and nothing of the store.
+ * The check below keeps the two shapes apart, so no row is half of each.
+ *
+ * It attaches to at most one parent — one of the patient's goals, or one of
+ * their recipe assignments (the assignment, not the library recipe, so it
+ * stays this patient's) — and `set null` on both is decision D-26: deleting
+ * the goal or the assignment leaves the document on the patient, unattached.
+ * The patient cascade removes the rows; the files themselves are removed from
+ * the store by `deletePatient` before the row goes, because a cascade cannot
+ * reach outside the database.
+ *
+ * `added_by_email` is text rather than a key, the same reasoning as the
+ * invitation's `invited_by_email`: who added it should outlive the account.
+ */
+export const patientDocuments = pgTable(
+  "patient_documents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    /** A key from `documentKinds` — `file` or `link`. */
+    kind: text("kind").notNull(),
+    /** A key from `documentTags` — `document` or `recipe`. */
+    tag: text("tag").notNull().default("document"),
+    title: text("title").notNull(),
+    /** Links only. */
+    url: text("url"),
+    /** Files only — the object's key in the store, under the patient's prefix. */
+    blobKey: text("blob_key"),
+    /** Files only — one of `documentFileTypes`. */
+    mime: text("mime"),
+    /** Files only — bytes, as the store measured them. */
+    size: integer("size"),
+    goalId: uuid("goal_id").references(() => patientGoals.id, {
+      onDelete: "set null",
+    }),
+    recipeAssignmentId: uuid("recipe_assignment_id").references(
+      () => patientRecipeAssignments.id,
+      { onDelete: "set null" },
+    ),
+    addedByEmail: text("added_by_email").notNull().default(""),
+    /** A day at the practice — what the patient sees beside the title. */
+    addedOn: date("added_on", { mode: "string" }).notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    index("patient_documents_patient").on(table.patientId),
+    check(
+      "patient_documents_shape",
+      sql`(${table.kind} = 'file' and ${table.blobKey} is not null and ${table.url} is null) or (${table.kind} = 'link' and ${table.url} is not null and ${table.blobKey} is null)`,
+    ),
+    check(
+      "patient_documents_one_parent",
+      sql`${table.goalId} is null or ${table.recipeAssignmentId} is null`,
+    ),
+  ],
+);
 
 /**
  * One meal, transcribed — the § 5 loop, with both halves of the exchange on one

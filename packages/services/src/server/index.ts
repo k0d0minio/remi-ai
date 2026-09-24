@@ -72,6 +72,21 @@ export {
 export type { ChallengeSignal } from "../db/services/patient-challenges";
 
 export {
+  addPatientDocumentFile,
+  addPatientDocumentLink,
+  documentOwner,
+  getPatientDocument,
+  listPatientDocuments,
+  removePatientDocument,
+  updatePatientDocument,
+} from "../db/services/patient-documents";
+export type {
+  DocumentFileInput,
+  DocumentInput,
+  DocumentLinkInput,
+} from "../db/services/patient-documents";
+
+export {
   deletePatientInstruction,
   getPatientInstruction,
   listArchivedPatientInstructions,

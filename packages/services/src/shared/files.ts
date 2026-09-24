@@ -51,3 +51,12 @@ export const patientFileKey = (patientId: string, fileName: string) => {
   const safeExtension = slug(extension).slice(0, 8);
   return `${patientFilesPrefix(patientId)}${safeStem}${safeExtension ? `.${safeExtension}` : ""}`;
 };
+
+/** What a patient document is: a stored file, or a link to somewhere else. */
+export const documentKinds = ["file", "link"] as const;
+
+/**
+ * How she files it. `recipe` also lists it under « Mes recettes » on the link
+ * (D-28) — her option 2 beside the recipes REMI holds; `document` is the rest.
+ */
+export const documentTags = ["document", "recipe"] as const;

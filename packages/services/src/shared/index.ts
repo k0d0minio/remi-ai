@@ -29,6 +29,7 @@ export type { AuditActionName } from "./audit";
 export { appHref, appOrigin } from "./links";
 export {
   documentFileTypes,
+  documentTags,
   MAX_DOCUMENT_FILE_BYTES,
   patientFilesPrefix,
 } from "./files";
@@ -95,6 +96,8 @@ export type {
   ConsentChannel,
   Consultation,
   CookingAffinity,
+  DocumentKind,
+  DocumentTag,
   Food,
   FoodNutrient,
   FramePrinciple,
@@ -110,6 +113,7 @@ export type {
   PantryEssential,
   PatientAnamnesis,
   PatientChallenge,
+  PatientDocument,
   PatientGoal,
   PatientGoalCheckIn,
   PatientInstruction,
