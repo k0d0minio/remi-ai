@@ -126,6 +126,15 @@ export {
 export type { ChallengeSignal } from "./services/patient-challenges";
 
 export {
+  countUnreadPatientMessages,
+  listPatientMessages,
+  listUnreadMessageCounts,
+  markPatientMessageRead,
+  replyToPatient,
+  sendPatientMessage,
+} from "./services/patient-messages";
+
+export {
   deletePatientInstruction,
   getPatientInstruction,
   listArchivedPatientInstructions,

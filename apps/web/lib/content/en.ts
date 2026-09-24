@@ -279,6 +279,7 @@ export const en: Content = {
       documents: "Documents",
       repas: "Meals",
       progression: "My progress",
+      messages: "Messages",
     },
     todayTitle: "Today / this week",
     challenge: {
@@ -326,6 +327,28 @@ export const en: Content = {
         acquired: "Done",
         not_acquired: "Not yet",
         abandoned: "Dropped",
+      },
+    },
+    messages: {
+      title: "Your follow-up",
+      prompt:
+        "How is your follow-up going this week? You can also tell us here what you thought of the recipes, challenges or recommendations you were given.",
+      bodyLabel: "Your message",
+      send: "Send",
+      lastSent: "Last message sent on",
+      you: "You",
+      practitioner: "Your practitioner",
+      seeThread: "See your messages",
+      threadTitle: "Your conversation",
+      empty:
+        "You have not written anything yet. Your first message will appear here.",
+      errors: {
+        invalid_input:
+          "This message could not be sent: it is empty or longer than 2000 characters.",
+        rate_limited: "That is a lot at once — try again in a moment.",
+        not_found:
+          "This link is no longer valid. Ask your practitioner for a new one.",
+        unknown: "That did not work. Try again in a moment.",
       },
     },
     weekConsigneTitle: "This week's focus",

@@ -118,6 +118,14 @@ export const auditActions = [
   "document.added",
   "document.updated",
   "document.removed",
+  /**
+   * The general thread (`general-feedback`). `sent` is the patient's, through
+   * the link; `replied` and `marked_read` are hers — both clear the unread
+   * count, so both are worth a line.
+   */
+  "message.sent",
+  "message.replied",
+  "message.marked_read",
   "summary.updated",
   "summary.cleared",
   "next_consultation_prep.updated",

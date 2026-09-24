@@ -37,6 +37,7 @@ export type {
   DocumentTag,
   PatientDocument,
 } from "./patient-document";
+export type { PatientMessage, PatientMessageEntry } from "./patient-message";
 export type { PatientInstruction } from "./patient-instruction";
 export type { PatientNote } from "./patient-note";
 export type {
