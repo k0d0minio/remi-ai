@@ -13,6 +13,8 @@ export default defineConfig({
     "src/db/index.ts",
     "src/ai/index.ts",
     "src/email/index.ts",
+    "src/files/index.ts",
+    "src/files/client.ts",
   ],
   format: ["esm"],
   dts: { resolve: false, respectExternal: true },

@@ -18,6 +18,7 @@ const schema = z.object({
   OPERATOR_EMAIL: z.string().optional(),
   EMAIL_FROM: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
+  BLOB_READ_WRITE_TOKEN: z.string().optional(),
   AI_GATEWAY_API_KEY: z.string().optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
 });

@@ -2,7 +2,7 @@
  * @remi/services/server — the Node-only surface.
  *
  * This is the entrypoint apps import for anything that touches storage, secrets,
- * or an outbound provider. It is a barrel over /db, /email and /ai plus the
+ * or an outbound provider. It is a barrel over /db, /email, /files and /ai plus the
  * environment reader — importing it from a client component is a build error,
  * which is the point: the import path itself states where the code runs.
  *
@@ -319,6 +319,19 @@ export {
   sendEmail,
 } from "../email";
 export type { EmailMessage, Mailer, SendResult } from "../email";
+
+/**
+ * The files seam — apps register and call it through this entrypoint only, so
+ * the registry they fill is the one `deletePatient` reads (a seam's registry
+ * belongs to the entrypoint it was reached through; see AGENTS.md).
+ */
+export {
+  answerUploadRequest,
+  createVercelBlobFileStore,
+  isFileStoreConfigured,
+  registerFileStore,
+  signedFileUrl,
+} from "../files";
 
 export {
   DEFAULTS as AI_DEFAULTS,

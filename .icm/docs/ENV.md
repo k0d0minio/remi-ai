@@ -167,6 +167,23 @@ rather than acknowledging a message that went nowhere. The contact form tells th
 to the founders directly; the admin console falls back to a copyable invitation link and says on
 screen that no email will go out, and refuses to claim it emailed a patient their link.
 
+## Files
+
+| Variable                | Purpose                                                                                                    | Where set | Public? |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------- | --------- | ------- |
+| `BLOB_READ_WRITE_TOKEN` | Read-write token of the private Vercel Blob store — read by the Blob adapter on every upload, read, delete | Vercel    | no      |
+
+Vercel Blob is the registered file vendor (decision D-18): `packages/services/src/files/adapters/vercel-blob.ts`
+implements the `FileStore` seam. **The store must be created private and in an EU region** — both are
+fixed at creation and cannot be changed afterwards; a public or non-EU store means a new store. Two
+apps register it: `apps/admin` (uploads, removals, a patient's deletion) and `apps/web` (the patient
+opening a file through a five-minute signed URL). **The same token is required on both projects**,
+per environment — production and preview each point at their own store.
+
+With the variable unset, nothing is registered and `@remi/services/files` keeps its unconfigured
+fallback: uploads are refused, the console says so where it offers one, links still work, and a
+file cannot be opened. Nothing is ever reported as stored when it was not.
+
 ## AI
 
 | Variable             | Purpose                                               | Where set | Public? |
