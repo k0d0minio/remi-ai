@@ -34,3 +34,14 @@
 - `main` was merged in before the flip (fef3101): `patient-documents-and-links` (#122) landed `0021_patient_documents` first, as D-33 expected. This branch's migration was deleted and regenerated on the merged tree as `0022_patient_messages` (CONVENTIONS → regenerate, never renumber); `check-migration-order` → safe. The other conflicts were both-sides additions (exports, audit actions, the link's segments and loader, the console's registry and sections, RETENTION) — kept both.
 - `security-check.sh --branch` was BLOCKED on dependency-audit only (`main`'s 20 advisories) until `next-rce-dep-bump` (#123) merged; `main` merged in again, the branch gate with the audit → OK, `pnpm audit`: no high/critical.
 - The admin preview build runs `db:migrate` against the shared Neon database and the preview guard is not in force there (`_shared/project-rules.md` → Deploy; `triage/previews-migrate-the-shared-database.md`), so the ready-phase admin preview may create `patient_messages` in the live database before the merge. The migration only adds a table, as `challenges`' did; forward-only, no rollback script (`migrations.reversible: false`).
+
+## Release
+
+- gate: Ready to merge ticked — merge authorised
+- ci: GREEN on f844131 (ci-status.sh, full gate; all six previews built) — re-read after the record and close-out pushes
+- reviews: code medium — no finding in this run's code; two in the shipped `challenges` service, parked · security `security-check.sh --branch --audit`: OK (`pnpm audit`: no high/critical, since #123) + /security-review — no finding (token-only write path, no cross-patient read or write, no raw SQL, React text only) · readiness `env.sh audit --changed`: OK
+- parked: challenge-start-closes-unseen-challenge.md (the other code-review finding is already `challenge-writes-double-submit.md`)
+- migrations: skip — drizzle, none in the stamped form (`check-migrations.sh`); `check-migration-order` safe (`0022_patient_messages` after `0021_patient_documents`); forward-only, additive
+- learned: 1 rule appended to _shared/project-rules.md (retrospective.sh) + 2 from FAILURE.md at close-out
+- docs: business/roles (the patient's messages; the working view's count) · announce: deferred to CI (public — changelog/2026-09-24-general-feedback)
+

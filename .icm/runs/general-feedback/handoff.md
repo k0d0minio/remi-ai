@@ -6,17 +6,12 @@ stops, so nothing is carried in anyone's head.
 
 ## Next steps
 
-1. Operator: read `02_define/output/spec.md`, tick **Spec approved** on
-   https://github.com/k0d0minio/remi-ai/pull/124.
-2. Then `build general-feedback` — Build follows `plan.md` pass by pass.
+1. None — merged and archived; nothing to pick up. The announcement is the release workflow's.
 
 ## Blockers
 
-- The Spec approved tick (the operator's).
+- none
 
 ## Do not
 
-- Do not tick either gate box. Do not start Build before the tick.
-- Do not touch `patient-documents-and-links`'s migration if it lands first — renumber this run's own (D-33).
-- Do not change the `check-in-and-progression` stub from this run; D-31 answers its open point and
-  its Define carries it.
+- Do not reopen this run; follow-ups are the parked triage stubs.

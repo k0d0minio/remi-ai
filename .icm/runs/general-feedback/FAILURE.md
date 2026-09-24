@@ -13,12 +13,19 @@ general; keep the retrospectives specific; never restate an `error.log` entry he
 
 ## Retrospectives
 
-### <YYYY-MM-DD> — <what failed, one line>
+### 2026-09-24 — CI never started on a pushed head
 
-- what happened: <the observable — the check, the error, the wrong file>
-- why: <the cause, once it was known>
-- fixed by: <the commit, or the action>
+- what happened: `ci-status.sh` sat `PENDING` for 900 s with `Format, lint, typecheck` never registered; no workflow ran for the push at all.
+- why: `patient-documents-and-links` (#122) had merged into `main` meanwhile and the PR conflicted with it — GitHub runs no `pull_request` workflow on a PR it cannot merge. D-33 had predicted the migration clash.
+- fixed by: merging `main` (fef3101) and regenerating this branch's migration as `0022` on the merged tree.
+
+### 2026-09-24 — the ready head built no preview
+
+- what happened: the full gate settled `GREEN` on e8ed21f with every Vercel project `Canceled by Ignored Build Step` — no preview for the smoke; every earlier head was the same.
+- why: `turbo-ignore --fallback=HEAD^1` compares a push's head with its parent when the branch has no successful deployment yet, and every pushed head after the code landed was an `.icm/`-only commit. `Ready to merge` was ticked before any preview of this code existed.
+- fixed by: merging `main` (#123, lockfile + app manifests) and keeping that merge commit as the pushed head (f844131) — every project then built.
 
 ## Learned rules
 
-- <one sentence, imperative, general enough to apply to the next run in this repo>
+- Before a push that should produce previews, make sure its head commit touches app or package code against its parent — fold `.icm/` run-file updates into the code commit rather than pushing them on top, or the Vercel ignore step skips every project.
+- A PR that sits `PENDING` with its required check never registered is first a merge-conflict question: check `mergeable` before re-running anything.
