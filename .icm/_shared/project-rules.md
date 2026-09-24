@@ -272,3 +272,7 @@ the repo's own, never synced — and delete a line that reads as a slip rather t
 
 <!-- Retrospective Learned Rule [2026-09-24] -->
 - never write a literal to a `token:`/`password:`-style key in a test — derive it from a created row (`patient.shareToken`) so `security-check.sh` stays quiet. (`security-check/generic-secret-assignment`, seen 1× — general-feedback; apps/admin, apps/docs, apps/web, packages/services)
+<!-- Retrospective Learned Rule [2026-09-24] -->
+- Before a push that should produce previews, make sure its head commit touches app or package code against its parent — fold `.icm/` run-file updates into the code commit rather than pushing them on top, or the Vercel ignore step skips every project. (`FAILURE.md` — general-feedback)
+<!-- Retrospective Learned Rule [2026-09-24] -->
+- A PR that sits `PENDING` with its required check never registered is first a merge-conflict question: check `mergeable` before re-running anything. (`FAILURE.md` — general-feedback)
