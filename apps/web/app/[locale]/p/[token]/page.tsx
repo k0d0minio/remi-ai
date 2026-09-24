@@ -6,6 +6,7 @@ import {
 } from "@remi/services/shared";
 import { Card, CardContent, Typography } from "@remi/ui/server";
 import { ChallengeCard } from "@/components/patient-link/challenge-card";
+import { DocumentList } from "@/components/patient-link/document-list";
 import { GoalList } from "@/components/patient-link/goal-list";
 import { HomeSection } from "@/components/patient-link/home-section";
 import { MealEntryPoint } from "@/components/patient-link/meal-entry-point";
@@ -20,6 +21,9 @@ import { loadPatientLink } from "@/lib/patient-link/load";
 export const dynamic = "force-dynamic";
 
 type Params = { locale: string; token: string };
+
+/** The newest few on the home; the segment holds them all. */
+const HOME_DOCUMENTS = 3;
 
 /**
  * Home: the patient's today, in her § 6 order — « Aujourd'hui / cette semaine »
@@ -148,6 +152,21 @@ const PatientLinkHome = async ({ params }: { params: Promise<Params> }) => {
           seeAll={{ href: segment("recettes"), label: content.seeAllLabel }}
         >
           <RecipeList recipes={recipes} content={content} compact />
+        </HomeSection>
+      ) : null}
+
+      {documents.length > 0 ? (
+        <HomeSection
+          title={content.documentsTitle}
+          seeAll={{ href: segment("documents"), label: content.seeAllLabel }}
+        >
+          <DocumentList
+            documents={documents.slice(0, HOME_DOCUMENTS)}
+            locale={locale}
+            token={token}
+            content={content}
+            inline
+          />
         </HomeSection>
       ) : null}
 

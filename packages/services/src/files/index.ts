@@ -1,6 +1,7 @@
 import {
   documentFileTypes,
   isDocumentFileType,
+  isPatientFileKey,
   MAX_DOCUMENT_FILE_BYTES,
   type DocumentFileType,
 } from "../shared/files";
@@ -131,15 +132,15 @@ export type AcceptedFile = StoredFile & { contentType: DocumentFileType };
 
 /**
  * Check what actually landed under `key` before a row points at it. The key
- * must sit under `prefix` (the patient's), and the stored object must be an
- * accepted type within the cap — an object that is not is removed on the spot,
- * so a refused upload leaves nothing behind in the store.
+ * must be one of this patient's (`isPatientFileKey`), and the stored object
+ * must be an accepted type within the cap — an object that is not is removed
+ * on the spot, so a refused upload leaves nothing behind in the store.
  */
 export const acceptStoredFile = async (
   key: string,
-  prefix: string,
+  patientId: string,
 ): Promise<Result<AcceptedFile>> => {
-  if (!key.startsWith(prefix) || key.includes("..")) {
+  if (!isPatientFileKey(key, patientId)) {
     return err("not_permitted", "that file does not belong to this patient");
   }
   const stored = await store.inspect(key);

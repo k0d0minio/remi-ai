@@ -4,3 +4,8 @@ dependency-audit  pnpm reports 20 high/critical advisor(y|ies) — run: pnpm aud
 (unresolved until the session adds a `- resolved:` line: remove the secret from the change, have the operator rotate it, re-run the gate, then write what was wrong and what is true now)
 
 - resolved: the 20 high/critical advisories are main's own — `pnpm audit --audit-level=high` lists the identical set on origin/main and on this branch (none reaches @vercel/blob, the one dependency this run adds); they are already parked as the P0 chore `triage/dependency-audit-next-rce`, so this run commits behind the secret scan with `--no-audit` and names the finding in Notes for Release rather than bumping `next` inside a feature PR.
+## 2026-09-24T12:01:17Z security-check.sh — dependency-audit
+scope=branch head=b8f9309 branch=claude/quirky-bohr-vd6jm2 — BLOCKED 1 (redacted trace; the secret itself is never written)
+dependency-audit  pnpm reports 20 high/critical advisor(y|ies) — run: pnpm audit --audit-level=high
+(unresolved until the session adds a `- resolved:` line: remove the secret from the change, have the operator rotate it, re-run the gate, then write what was wrong and what is true now)
+

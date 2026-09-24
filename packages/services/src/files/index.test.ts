@@ -102,35 +102,44 @@ describe("the files seam", () => {
   });
 
   it("accepts a stored PDF under the patient's prefix", async () => {
-    const accepted = await acceptStoredFile(`${prefix}recette-abc.pdf`, prefix);
+    const accepted = await acceptStoredFile(
+      `${prefix}recette-abc.pdf`,
+      patientId,
+    );
     expect(accepted.ok && accepted.data.contentType).toBe("application/pdf");
     expect(seen.removed).toEqual([]);
   });
 
   it("refuses a stored type outside the list and removes it from the store", async () => {
-    const accepted = await acceptStoredFile(`${prefix}photo-abc.heic`, prefix);
+    const accepted = await acceptStoredFile(
+      `${prefix}photo-abc.heic`,
+      patientId,
+    );
     expect(accepted.ok).toBe(false);
     expect(!accepted.ok && accepted.error).toBe("invalid_input");
     expect(seen.removed).toEqual([`${prefix}photo-abc.heic`]);
   });
 
   it("refuses a stored file over 10 MB and removes it from the store", async () => {
-    const accepted = await acceptStoredFile(`${prefix}scan-abc.pdf`, prefix);
+    const accepted = await acceptStoredFile(`${prefix}scan-abc.pdf`, patientId);
     expect(!accepted.ok && accepted.error).toBe("invalid_input");
     expect(seen.removed).toEqual([`${prefix}scan-abc.pdf`]);
   });
 
   it("refuses a key outside the patient's prefix without touching the store", async () => {
     const other = patientFilesPrefix("0e9d8c7b-6a5f-4e3d-8c2b-1a0f9e8d7c6b");
-    const accepted = await acceptStoredFile(`${other}recette-abc.pdf`, prefix);
+    const accepted = await acceptStoredFile(
+      `${other}recette-abc.pdf`,
+      patientId,
+    );
     expect(!accepted.ok && accepted.error).toBe("not_permitted");
-    const climbing = await acceptStoredFile(`${prefix}../x.pdf`, prefix);
+    const climbing = await acceptStoredFile(`${prefix}../x.pdf`, patientId);
     expect(!climbing.ok && climbing.error).toBe("not_permitted");
     expect(seen.removed).toEqual([]);
   });
 
   it("says when nothing reached the store", async () => {
-    const accepted = await acceptStoredFile(`${prefix}missing.pdf`, prefix);
+    const accepted = await acceptStoredFile(`${prefix}missing.pdf`, patientId);
     expect(!accepted.ok && accepted.error).toBe("not_found");
   });
 

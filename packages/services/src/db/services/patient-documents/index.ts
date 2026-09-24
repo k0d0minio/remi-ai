@@ -2,7 +2,7 @@ import { z } from "zod";
 import { acceptStoredFile, getFileStore } from "../../../files";
 import {
   documentTags,
-  patientFilesPrefix,
+  isPatientFileKey,
   type DocumentFileType,
 } from "../../../shared/files";
 import { todayAtPractice } from "../../../shared/format";
@@ -122,10 +122,6 @@ export const getPatientDocument = async (
   return documents().findById(id);
 };
 
-/** Whose document is this? The console's ownership check reads it. */
-export const documentOwner = async (id: Id): Promise<Id | null> =>
-  (await getPatientDocument(id))?.patientId ?? null;
-
 /** Add a link — a title and an https URL she wants the patient to open. */
 export const addPatientDocumentLink = async (
   patientId: Id,
@@ -162,6 +158,33 @@ export const addPatientDocumentLink = async (
 };
 
 /**
+ * A refused add leaves nothing behind: the browser already put the bytes in
+ * the store, so a refusal before `acceptStoredFile` (which removes on its own
+ * refusals) removes them here — only ever a key of this patient's, and never
+ * one a row already points at. Best effort: a store that fails here leaves an
+ * object the patient's deletion still sweeps.
+ */
+const discardUpload = async (patientId: Id, key: unknown) => {
+  if (typeof key !== "string" || !isPatientFileKey(key, patientId)) {
+    return;
+  }
+  const held = await documents().findMany(
+    { patientId, blobKey: key },
+    {
+      limit: 1,
+    },
+  );
+  if (held.items.length > 0) {
+    return;
+  }
+  try {
+    await getFileStore().remove(key);
+  } catch {
+    // Swept with the patient; nothing a caller could do differently.
+  }
+};
+
+/**
  * Record a file the browser has uploaded under `key`. The seam checks the key
  * is under this patient's prefix and that what landed is an accepted type
  * within the cap — and removes it from the store when it is not.
@@ -176,16 +199,24 @@ export const addPatientDocumentFile = async (
   }
   const parsed = fileFields.safeParse(input);
   if (!parsed.success) {
+    await discardUpload(patientId, input.key);
     return err("invalid_input", parsed.error.issues[0].message);
   }
   const attachment = await checkAttachment(patientId, parsed.data);
   if (!attachment.ok) {
+    await discardUpload(patientId, parsed.data.key);
     return attachment;
   }
-  const stored = await acceptStoredFile(
-    parsed.data.key,
-    patientFilesPrefix(patientId),
+  // A replayed or retried submit names a key a row already holds: that row is
+  // the answer, and a second one would lose its file when either is removed.
+  const existing = await documents().findMany(
+    { patientId, blobKey: parsed.data.key },
+    { limit: 1 },
   );
+  if (existing.items.length > 0) {
+    return ok(existing.items[0]);
+  }
+  const stored = await acceptStoredFile(parsed.data.key, patientId);
   if (!stored.ok) {
     return stored;
   }

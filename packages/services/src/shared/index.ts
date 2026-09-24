@@ -30,8 +30,8 @@ export { appHref, appOrigin } from "./links";
 export {
   documentFileTypes,
   documentTags,
+  isPatientFileKey,
   MAX_DOCUMENT_FILE_BYTES,
-  patientFilesPrefix,
 } from "./files";
 export { nutritionRuleKinds, nutritionRuleStatuses } from "./nutrition-rules";
 export type { NutritionRuleKind, NutritionRuleStatus } from "./nutrition-rules";

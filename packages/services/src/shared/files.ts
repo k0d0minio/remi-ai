@@ -31,6 +31,14 @@ export const patientFilesPrefix = (patientId: string) =>
   `patients/${patientId}/`;
 
 /**
+ * Whether `key` names a file of this patient: under their prefix, and never
+ * climbing out of it. The upload grant and the check on what landed both ask
+ * this one question, so they cannot drift apart.
+ */
+export const isPatientFileKey = (key: string, patientId: string) =>
+  key.startsWith(patientFilesPrefix(patientId)) && !key.includes("..");
+
+/**
  * The key the browser asks to write: the patient's prefix plus the file's
  * name reduced to a safe, readable slug. The store appends a random suffix,
  * so two uploads of « recette.pdf » never collide.

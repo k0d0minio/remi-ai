@@ -1,5 +1,5 @@
 import { answerUploadRequest, getPatient } from "@remi/services/server";
-import { patientFilesPrefix } from "@remi/services/shared";
+import { isPatientFileKey } from "@remi/services/shared";
 import { getOperatorSession } from "@/lib/auth/session";
 import { fileStoreReady } from "@/lib/files";
 
@@ -51,10 +51,6 @@ export const POST = async (request: Request): Promise<Response> => {
       return false;
     }
     const patient = await getPatient(patientId);
-    return (
-      patient.ok &&
-      key.startsWith(patientFilesPrefix(patientId)) &&
-      !key.includes("..")
-    );
+    return patient.ok && isPatientFileKey(key, patientId);
   });
 };

@@ -14,7 +14,6 @@ import { createPatient, deletePatient } from "../patients";
 import {
   addPatientDocumentFile,
   addPatientDocumentLink,
-  documentOwner,
   listPatientDocuments,
   removePatientDocument,
   updatePatientDocument,
@@ -174,6 +173,32 @@ describe("adding a document", () => {
     expect(await listPatientDocuments(patient.id)).toEqual([]);
   });
 
+  it("removes the upload from the store when the add is refused", async () => {
+    const patient = await newPatient("Olga");
+    const other = await newPatient("Paul");
+    const goal = await goalOf(other.id);
+    const key = uploaded(patient.id, "liste.pdf", "application/pdf");
+    const result = await addPatientDocumentFile(
+      patient.id,
+      { title: "Liste", key, tag: "document", goalId: goal.id },
+      "",
+    );
+    expect(!result.ok && result.error).toBe("invalid_input");
+    expect(removed).toEqual([key]);
+  });
+
+  it("answers a repeated submit with the row it already made", async () => {
+    const patient = await newPatient("Quentin");
+    const key = uploaded(patient.id, "menu.pdf", "application/pdf");
+    const input = { title: "Menu", key, tag: "document" as const };
+    const first = await addPatientDocumentFile(patient.id, input, "");
+    const second = await addPatientDocumentFile(patient.id, input, "");
+    expect(first.ok && second.ok && second.data.id).toBe(
+      first.ok ? first.data.id : "",
+    );
+    expect(await listPatientDocuments(patient.id)).toHaveLength(1);
+  });
+
   it("refuses a file uploaded under another patient's prefix", async () => {
     const patient = await newPatient("Noé");
     const other = await newPatient("Zoé");
@@ -288,16 +313,6 @@ describe("editing and removing a document", () => {
     const result = await removePatientDocument(created.data.id);
     expect(!result.ok && result.error).toBe("upstream_failed");
     expect(await listPatientDocuments(patient.id)).toHaveLength(1);
-  });
-
-  it("names the owner, and nobody for an unknown id", async () => {
-    const patient = await newPatient("Iris");
-    const created = await addPatientDocumentLink(patient.id, link, "");
-    if (!created.ok) {
-      throw new Error(created.message);
-    }
-    expect(await documentOwner(created.data.id)).toBe(patient.id);
-    expect(await documentOwner("not-a-uuid")).toBeNull();
   });
 });
 

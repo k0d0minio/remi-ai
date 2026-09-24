@@ -424,9 +424,12 @@ export const deletePatient = async (id: Id): Promise<Result<true>> => {
     try {
       await getFileStore().removePrefix(patientFilesPrefix(id));
     } catch {
+      // The sweep goes page by page, so a failure can come after some files
+      // are gone. The profile and its rows stay; the sweep is safe to repeat,
+      // so the answer is to try again, and the message says exactly that.
       return err(
         "upstream_failed",
-        "the patient's files could not be removed from the store — nothing was deleted",
+        "the patient's files could not all be removed from the store — the profile was kept; try the deletion again",
       );
     }
   } else {

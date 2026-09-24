@@ -169,9 +169,13 @@ export const DocumentSection = ({
     ) =>
     async (formData: FormData) => {
       setPending(true);
-      const result = await action(initial, formData);
-      setPending(false);
-      finish(result);
+      try {
+        finish(await action(initial, formData));
+      } catch {
+        setError("L’enregistrement a échoué — réessayez.");
+      } finally {
+        setPending(false);
+      }
     };
 
   const addFile = async (formData: FormData) => {
