@@ -4,7 +4,7 @@ Where the run is, in five lines. Updated at every stage start and stop, and when
 flips. A resuming session reads this first, then `handoff.md` (`_shared/stage-preamble.md`).
 
 - phase: build
-- step: 9 — code complete (4 passes); pushing for the draft-tier verdict
-- ci: pending
+- step: 12 — ready; settling the full gate on the post-flip head
+- ci: GREEN (draft tier, c559969)
 - blocked: no
 - updated: 2026-09-24
