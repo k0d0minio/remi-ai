@@ -43,19 +43,26 @@ export {
   addGoalCheckIn,
   addPatientGoal,
   archivePatientGoal,
+  countGoalCheckInsAwaitingAttention,
   deleteGoalCheckIn,
   deletePatientGoal,
+  getWeeklyCheckIn,
   listArchivedPatientGoals,
   listGoalCheckIns,
+  listGoalScoreStrips,
   listPatientGoals,
+  markGoalCheckInSeen,
   movePatientGoal,
+  recordWeeklyCheckIn,
   updateGoalCheckIn,
   updatePatientGoal,
   MAX_ACTIVE_GOALS,
 } from "../db/services/patient-goals";
 export type {
   GoalCheckInInput,
+  GoalScoreStrip,
   PatientGoalInput,
+  WeeklyAnswer,
 } from "../db/services/patient-goals";
 
 export {
