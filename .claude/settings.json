@@ -62,7 +62,7 @@
       "Bash(.icm/scripts/health-check.sh:*)",
       "Bash(.icm/scripts/usage-snapshot.sh:*)",
       "Bash(.icm/scripts/client-status.sh:*)",
-      "Bash(.icm/scripts/promote-uat.sh:*)",
+      "Bash(.icm/scripts/promote.sh:*)",
       "Bash(.icm/scripts/list-skills.sh:*)",
       "Bash(.icm/scripts/db-branch.sh:*)",
       "Bash(.icm/scripts/security-check.sh:*)",

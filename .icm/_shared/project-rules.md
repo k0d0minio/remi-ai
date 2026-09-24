@@ -2,7 +2,7 @@
 
 The stage and lane contracts under `stages/` and `lanes/`, the shared doctrine in `_shared/`
 (`github`, `ci`, `stage-preamble`, `scope-template`, `conventions`, the `run-pack/` files),
-`intake/CONTEXT.md`, `uat/CONTEXT.md`, the capability skills under `skills/` and the factory
+`intake/CONTEXT.md`, the capability skills under `skills/` and the factory
 scripts are **template-owned**: byte-identical in every pipeline repo in the estate, listed in
 `.icm/MANIFEST`, synced from `icm-board/_system/template/icm-pipeline/` by `icm-sync.sh`
 (`.icm/template-version` says which template this copy was last brought up to), and carrying no
@@ -47,9 +47,10 @@ D23; `/setup` — `.icm/scripts/setup.sh` — says whether the two are complete 
   account is wanted, and handing it to them is the operator's act.
 - **UAT sign-off** — none: `uat` in `.icm/project.json` is undeclared, so every run merges into
   `main` and ships on the merge, and the operator's own smoke of the preview before **Ready to
-  merge** is the whole test. A persistent UAT environment (one branch, one fixed address, a batch
-  the founders sign off before it reaches production — `.icm/uat/CONTEXT.md`) is `/setup`'s to
-  declare, the day they want to test a batch rather than a feature.
+  merge** is the whole test. A persistent UAT environment (a Vercel custom environment deployed
+  from `main`, one fixed address, a batch the founders sign off before it is promoted to
+  production — `.icm/_shared/promotion.md`) is `/setup`'s to declare, the day they want to test a
+  batch rather than a feature.
 
 - **The GitHub repo** is `k0d0minio/remi-ai`, and it is **public**. The scripts derive it from
   `origin`; a remote session's GitHub connection provides the credential (`GH_TOKEN`), a local
@@ -208,10 +209,12 @@ D23; `/setup` — `.icm/scripts/setup.sh` — says whether the two are complete 
 - **Who calls the hook** — `announce_from: ci`: `.github/workflows/release.yaml` calls
   `report.sh announce` when a PR merges into `main` — every merge, whether or not a session was
   open, since the operator merges from GitHub. The session's `## Release` record says
-  `announce: deferred to CI`. The workflow is the seeded reference with three per-repo edits:
-  the Slack lines live in both steps, and the message is the changelog page's H1 with the
-  page's address on `docs.remi-ai.tech` as the link (§ Changelog) — the PR's Summary line and
-  URL stand in when a run shipped no page. `announce: none` or `audience: internal` in the PR
+  `announce: deferred to CI`. The workflow is the reference (refreshed to the D39 template on
+  2026-09-24) with three per-repo edits: the Slack lines live in every announce and alert step;
+  the message is the changelog page's H1 with the page's address on `docs.remi-ai.tech` as the
+  link (§ Changelog) — the PR's Summary line and URL stand in when a run shipped no page; and
+  the `migrate` job is gone — no `db-migrate.yml` here, and without UAT the Release half never
+  runs. `announce: none` or `audience: internal` in the PR
   body is honoured. **One caveat:** the health probe (Release step 9a) still runs in the
   session, so its `report.sh alert` posts only where the session's shell carries the Slack
   variables; otherwise the parked bug stub and the stop message are the alert.

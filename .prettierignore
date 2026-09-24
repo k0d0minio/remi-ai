@@ -20,7 +20,6 @@ pnpm-lock.yaml
 .icm/lanes/
 .icm/_shared/
 .icm/skills/
-.icm/uat/
 .icm/raw/
 .icm/intake/CONTEXT.md
 .icm/MANIFEST

@@ -125,17 +125,16 @@ the monorepo "to be safe".
   stages/                  # the spine — add a folder to add a stage
     01_scope/CONTEXT.md      02_define/CONTEXT.md     03_build/CONTEXT.md     04_release/CONTEXT.md
   lanes/                   # fast lanes — bug / tweak / chore · knowledge (docs-only, no run) · hotfix (human-invoked) · handover
-  uat/CONTEXT.md           # the persistent client UAT environment — inert here: uat is undeclared in project.json
   skills/                  # the pipeline's capability skills, three-tier, loaded on a trigger (template-owned)
     README.md  security-audit/  database-migration/  preview-deploy/
-  _shared/                 # L3: project-rules · knowledge-map (project-owned) · github · ci · stage-preamble · scope-template · conventions
+  _shared/                 # L3: project-rules · knowledge-map (project-owned) · github · ci · stage-preamble · scope-template · conventions · promotion (inert here: uat is undeclared)
     run-pack/                # the seven canonical run files run-pack.sh seeds into every run (template-owned)
   scripts/                 # the deterministic factory — one job, one RESULT line, env config
     lib/{gh,changed-files,project,vercel}.sh  lib/model-prices.json
     resolve-run.sh validate-spec.sh validate-intake.sh validate-decisions.sh new-run.sh run-pack.sh
     project-body.sh project-labels.sh ci-status.sh close-out.sh triage-report.sh env-check.sh env.sh setup.sh
     select-model.sh check-migrations.sh db-branch.sh security-check.sh process-raw.sh list-skills.sh
-    deploy-status.sh health-check.sh rollback.sh usage-snapshot.sh retrospective.sh client-status.sh promote-uat.sh
+    deploy-status.sh health-check.sh rollback.sh usage-snapshot.sh retrospective.sh client-status.sh promote.sh
     format.sh lint.sh validate-knowledge-map.sh report.sh      # project-owned: this repo's own hooks
   raw/  processed/         # what a client sent, and the text process-raw.sh extracted from it (media never committed)
   output/                  # client-status.sh → client-status-latest.md, the client's view
@@ -216,7 +215,7 @@ all of theirs at once).
   `build <slug>`, `release <slug>`, `revise <slug> "<what to change>"`,
   `bug|tweak|chore <stub-name or "report">`, `hotfix "<incident>"`, `handover`,
   `scope <anything>`, `triage report|batch|prune`, `knowledge add|edit|remove "<what>"`,
-  `status` (the client's view — `client-status.sh`). `uat status|approve|sync` exist only where
+  `status` (the client's view — `client-status.sh`). `promote status|approve|init` exist only where
   `project.json` declares a UAT environment, which this repo does not. There is no router hook in
   this repo; the skill's own description carries the routing, and `/pipeline <sub>` remains the
   explicit form.
