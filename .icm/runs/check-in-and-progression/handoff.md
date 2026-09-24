@@ -6,13 +6,16 @@ stops, so nothing is carried in anyone's head.
 
 ## Next steps
 
-1. <the very next action, with the exact command or file>
+1. Operator: read `02_define/output/spec.md` and tick **Spec approved** on PR #125.
+2. Then `build check-in-and-progression` (executor: `sonnet`), following `plan.md` pass by pass.
 
 ## Blockers
 
-- <what blocks, and who unblocks it — or "none">
+- The Spec approved tick — the operator's.
 
 ## Do not
 
-- <what the next session must not do — a branch not to touch, a gate not to tick, a file
-  another run owns>
+- Do not tick either gate checkbox, and do not start Build before the tick.
+- Do not reintroduce recommendation check-ins, faces or "recipes tried" (D-30, D-34) — `revise` the
+  spec instead.
+- Do not add a scheduler, cron, email or push (D-9).

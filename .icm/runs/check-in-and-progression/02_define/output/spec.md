@@ -22,18 +22,18 @@ between consultations, and a weekly score per goal is the patient's own answer t
 Decisions settled with the operator in Define (2026-09-24), answering the stub's **Open for Define**
 points:
 
-- **The form is her weekly 0–5 score per goal** (D-19's open point, closed). It replaces the stub's
+- **D-30 — The form is her weekly 0–5 score per goal** (D-19's open point, closed). It replaces the stub's
   three faces every two days. It asks about goals only. Recommendation check-ins and their new table
   are dropped (see Out of scope).
-- **The score means how the week went for that goal**: « Cette semaine, comment ça s'est passé pour :
+- **D-31 — The score means how the week went for that goal**: « Cette semaine, comment ça s'est passé pour :
   <objectif> ? », where 0 = pas bien du tout and 5 = très bien. A score **lower than the patient's
   previous score on the same goal** is _worse_. Equal is _stable_, higher is _better_, and a first
   score has no direction.
-- **The check-in card sits beside the general-feedback box on the home**, as two separate cards.
+- **D-32 — The check-in card sits beside the general-feedback box on the home**, as two separate cards.
   This settles the same point for `general-feedback`.
-- **A worse score raises an awaiting-attention count in the console**, worded like the meals
+- **D-33 — A worse score raises an awaiting-attention count in the console**, worded like the meals
   awaiting a reply, and it is cleared when she marks the row seen.
-- **"Recipes tried" is dropped from « Ma progression »**: no data records it today, and it returns
+- **D-34 — "Recipes tried" is dropped from « Ma progression »**: no data records it today, and it returns
   with `recipe-feedback-and-favourites`.
 
 **On the patient link (D-2, D-9):**

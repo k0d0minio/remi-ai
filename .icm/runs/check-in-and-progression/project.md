@@ -13,9 +13,17 @@ not copies: the spec stays the spec, the scope stays the scope. Seeded when the 
 
 ## Constraints
 
-- <what must stay true while this run is built — from the spec's Out of scope, the `D-n`
-  decisions in `decisions.md`, and `_shared/project-rules.md`>
+- Goals only, weekly, 0–5 (D-30, D-31); no recommendation check-ins and no new table.
+- No scheduler, cron, email, push or model call (D-9); no chart library.
+- Writes go through the link-writes path only (D-2): token-scoped, rate-limited, audited.
+- Morgane's consultation check-in form and existing rows are unchanged; practitioner rows never count
+  as awaiting (D-33).
+- The home keeps room for `general-feedback`'s card beside this one (D-32).
+- No app imports another app: a strip shared by `web` and `admin` lives in `@remi/ui` or is twinned.
 
 ## Context budget
 
-- <what was loaded beyond the stage's Inputs, and why — the stage's overrun note lives here>
+- Beyond Define's Inputs: targeted greps of `schema.ts`, `shared/patient.ts`, the link's loader,
+  segments and content, the console's goal trail, and her 14 Sept text in
+  `runs/september-sources/01_scope/output/scope.md` — to ground the open points (no data for
+  "recipes tried"; the vocabulary has no sleep/hydration categories).
