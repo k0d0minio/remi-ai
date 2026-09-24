@@ -1,7 +1,7 @@
 # Build notes: check-in-and-progression
 
-- commits: 4e726b2 schema + migration · 923135d services + tests · 1a1750e patient link · fb2cdcb console · fbf3cba types
-- ci: pending — see status.md
+- commits: 4e726b2 schema + migration · 923135d services + tests · 1a1750e patient link · fb2cdcb console · fbf3cba types · e984d6c + 7da1fdb CI fixes · 44e55be main merged
+- ci: GREEN on 44e55be (cheap tier); full tier on the post-flip head — see status.md
 
 ## What changed
 
@@ -54,3 +54,6 @@
   migration carries only the two columns, so no index was added.
 - The console strip's wrapper and the link's wrapper are thin per-app shells over `ScoreStrip`
   (dates and wording differ); the primitive is shared.
+- **Ready to merge was ticked before the ready flip**, so before any post-flip preview existed. The
+  tick attests the operator's own smoke of the preview; Release should confirm it was given after
+  the previews below, not on the draft.

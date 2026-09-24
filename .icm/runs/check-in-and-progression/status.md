@@ -4,7 +4,7 @@ Where the run is, in five lines. Updated at every stage start and stop, and when
 flips. A resuming session reads this first, then `handoff.md` (`_shared/stage-preamble.md`).
 
 - phase: build
-- step: 9 (cheap-tier verdict)
-- ci: pending on fbf3cba
+- step: 12 (full-tier verdict after the ready flip)
+- ci: GREEN on 44e55be (cheap tier); full tier pending
 - blocked: no
 - updated: 2026-09-24

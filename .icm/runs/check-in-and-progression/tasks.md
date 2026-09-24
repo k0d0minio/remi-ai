@@ -24,4 +24,6 @@ step, so a resuming session can pick up the first unticked line.
 - [x] Link: weekly card on the home, « Ma progression » segment, `ScoreStrip` in `@remi/ui` (1a1750e)
 - [x] Console: strip in the working view, trail score / link mark / « Vu », awaiting line, RETENTION (fb2cdcb)
 - [x] Name the weekly answer types (fbf3cba)
-- [ ] Cheap-tier GREEN → merge main → flip ready → full-tier GREEN
+- [x] Fix: absent note declared as empty text (e984d6c) · audit vocabulary for « vu » (7da1fdb)
+- [x] Cheap-tier GREEN (7da1fdb) → merge main (44e55be, GREEN) → flip ready
+- [ ] Full-tier GREEN on the post-flip head
