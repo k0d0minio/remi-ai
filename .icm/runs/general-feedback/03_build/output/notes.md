@@ -1,11 +1,11 @@
 # Build notes: general-feedback
 
-- commits: 70139a5 schema + migration · 96ed8fd service + tests · d306325 link · 5a75e53 console + RETENTION
+- commits: 70139a5 schema + migration (regenerated as `0022` in the merge)  · 96ed8fd service + tests · d306325 link · 5a75e53 console + RETENTION
 - ci: pending — see status.md
 
 ## What changed
 
-- `packages/services/src/db/schema.ts`, `migrations/0021_patient_messages.sql`: the one-thread table — `author` (`patient` | `practitioner`), `body`, `sent_at`, `read_at` (patient rows only), `operator_id` (`set null`), cascade on the patient, an index on `patient_id`.
+- `packages/services/src/db/schema.ts`, `migrations/0022_patient_messages.sql`: the one-thread table — `author` (`patient` | `practitioner`), `body`, `sent_at`, `read_at` (patient rows only), `operator_id` (`set null`), cascade on the patient, an index on `patient_id`.
 - `packages/services/src/db/services/patient-messages/`: `sendPatientMessage`, `replyToPatient` (marks every unread patient message sent up to the reply read, in one transaction — D-32), `markPatientMessageRead` (idempotent; refuses her own replies), `listPatientMessages` (newest first, each reply with its operator's name), `countUnreadPatientMessages`, `listUnreadMessageCounts` (paged, for the roster). Tests written from the criteria.
 - `packages/services/src/shared/audit.ts` + `apps/admin/components/audit/vocabulary.ts`: `message.sent` (patient), `message.replied`, `message.marked_read`.
 - `apps/web`: the `messages` segment — always visible like Repas; `/p/[token]/messages` (composer, then thread); the home's `MessageCard` beside the meal invitation (D-31); `MessageComposer` renders her § 6 prompt once for both placements (D-30) with « Dernier message envoyé le … »; `sendMessageAction` goes through `writePatientLink` (token-only, ceilings, audit as the patient); fr/en copy.
@@ -31,3 +31,5 @@
 
 - The Neon adapter's `transaction()` is a passthrough (`patient-link-writes` says so), so reply + mark-read is sequential rather than atomic in production; a failure between them leaves messages unread, never read without a reply. Same standing as `challenges`' close-and-create.
 - The security gate blocked one commit on a test fixture literal (`error.log`); the literal was removed before anything was pushed.
+- `main` was merged in before the flip (fef3101): `patient-documents-and-links` (#122) landed `0021_patient_documents` first, as D-33 expected. This branch's migration was deleted and regenerated on the merged tree as `0022_patient_messages` (CONVENTIONS → regenerate, never renumber); `check-migration-order` → safe. The other conflicts were both-sides additions (exports, audit actions, the link's segments and loader, the console's registry and sections, RETENTION) — kept both.
+- `security-check.sh --branch` → BLOCKED 1 on **dependency-audit only**: the 20 high/critical pnpm advisories on `main`, already parked as `triage/dependency-audit-next-rce.md` (chore, P0). This branch's lockfile equals `main`'s. `--branch --no-audit` → OK. Release step 4 will see the same until that chore merges.
