@@ -1,20 +1,35 @@
 name: Quality
 
-# No path filter, deliberately. A check that some PRs never produce cannot be a required
-# check: branch protection would either deadlock those PRs or let a red run block nothing.
-# Every PR runs this, and doc-only diffs stay cheap on their own merits — `format:check`
-# covers markdown anyway, and lint/typecheck restore from the shared Turborepo cache
-# instead of recomputing. Never reintroduce a skip here (audit F-22).
+# The ONE quality job this repo runs in CI — the estate's cost floor (icm-board decision D43,
+# `.icm/_shared/ci.md` → What CI is for). The repo is public, so the minutes are free; the shape
+# is the estate's so nothing changes if that ever does:
+#
+#   • ADVISORY, by name. The job is `Quality (advisory)`: `ci-status.sh` reports it and never
+#     reds on it, and the ruleset on `main` requires the deploy statuses, not this. The merge
+#     waits on the deploy — Vercel already built the head, which is why there is no build step.
+#   • READY HEADS ONLY. A draft owes CI nothing: `format.sh` / `lint.sh` / `security-check.sh`
+#     over the changed files are the session's pre-flip check. The `types:` list REPLACES
+#     GitHub's default — `ready_for_review` is named so the flip itself runs it, and the
+#     job-level `if:` keeps a draft's `synchronize` free.
+#   • NEVER ON `main`. The merge commit's proof is Vercel's build of `main`. No `push:` trigger.
+#   • PATH-FILTERED. Nothing waits on this job, so it skips `.icm/**`, markdown and `.github/**`.
+#   • ONE JOB, cheapest first: the migration-order check, then format · lint · typecheck · the
+#     @remi/services vitest suite.
+#   • SUPERSEDED RUNS ARE CANCELLED. One run per branch; a newer push replaces the one in flight.
+#
+# A red run here is a finding the stage fixes on the branch — advisory means the merge never
+# waits on it, not that it may be ignored.
+
 on:
   pull_request:
-  push:
-    branches:
-      - main
+    types: [ready_for_review, synchronize, reopened]
+    paths-ignore:
+      - ".icm/**"
+      - "**/*.md"
+      - "**/*.mdx"
+      - ".github/**"
   workflow_dispatch:
 
-# Cancel superseded runs on the same PR, but never cancel a main build: head_ref is only
-# set for pull_request events, so pushes fall back to the unique run_id and each gets its
-# own concurrency group.
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
@@ -22,24 +37,20 @@ concurrency:
 permissions:
   contents: read
 
-# Share the Turborepo remote cache with Vercel. `typecheck` dependsOn ["^build"], so the
-# @remi/ui and @remi/services builds it needs are restored from the shared cache instead of
-# recompiled here. TURBO_TOKEN is a secret (absent on forked-PR runs — the cache then
-# silently no-ops as a miss, never a failure); TURBO_TEAM is a non-secret repo variable.
 env:
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
   quality:
+    name: Quality (advisory)
     runs-on: ubuntu-latest
-    name: Format, lint, typecheck
     timeout-minutes: 15
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # pnpm must be installed before setup-node so its `cache: pnpm` can resolve the store path.
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -51,12 +62,6 @@ jobs:
           node-version: 22
           cache: "pnpm"
 
-      # Before the install, because it needs neither: plain node and git, and it is the
-      # cheapest thing on the branch to fail. Drizzle applies migrations by comparing the
-      # journal's `when` against the newest already applied — never by hash — so one
-      # generated before something already on main is recorded as applied and never run.
-      # Two PRs cut from the same main both numbered theirs 0013 once. The base ref is
-      # fetched shallowly because actions/checkout leaves it out at fetch-depth 1.
       - name: Migration order
         if: github.event_name == 'pull_request'
         run: |
@@ -71,16 +76,11 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
-      # The repo starts clean, so the ceiling starts at zero and stays there. If a rule
-      # is ever relaxed to a warning during a migration, raise this to the exact current
-      # count and lower it as they are cleared — never raise it to make one PR pass.
       - name: Lint
         run: pnpm lint -- --max-warnings=0
 
       - name: Typecheck
         run: pnpm typecheck
 
-      # The service-layer suite (vitest, in @remi/services). No database and no
-      # network: the db services run against an in-memory client at the seam.
       - name: Test
         run: pnpm test
