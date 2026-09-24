@@ -1,5 +1,10 @@
-import type { AssignedRecipe } from "@remi/services/shared";
+import type {
+  AssignedRecipe,
+  Locale,
+  PatientDocument,
+} from "@remi/services/shared";
 import { Card, CardContent, Typography } from "@remi/ui/server";
+import { DocumentList } from "@/components/patient-link/document-list";
 import type { Content } from "@/lib/content/types";
 
 type Props = {
@@ -7,6 +12,15 @@ type Props = {
   content: Content["patientLink"];
   /** Titles only, for the home's preview — the segment carries the rest. */
   compact?: boolean;
+  /**
+   * The documents attached to these recipes, shown under the one each hangs
+   * from — the segment passes them, the home's preview does not.
+   */
+  attached?: {
+    documents: readonly PatientDocument[];
+    locale: Locale;
+    token: string;
+  };
 };
 
 /**
@@ -22,32 +36,52 @@ type Props = {
  * a title to recognise and tap, and four recipes' worth of method would bury
  * everything under it.
  */
-export const RecipeList = ({ recipes, content, compact }: Props) => (
+export const RecipeList = ({ recipes, content, compact, attached }: Props) => (
   <ul className="flex flex-col gap-3">
-    {recipes.map(({ assignment, recipe }) => (
-      <li key={assignment.id}>
-        <Card>
-          <CardContent className="flex flex-col gap-2">
-            <Typography as="h3" size="sm" weight="medium">
-              {recipe.title}
-            </Typography>
-            {!compact && recipe.body.trim() !== "" ? (
-              <Typography size="sm" className="whitespace-pre-line">
-                {recipe.body}
+    {recipes.map(({ assignment, recipe }) => {
+      const documents =
+        attached?.documents.filter(
+          (document) => document.recipeAssignmentId === assignment.id,
+        ) ?? [];
+      return (
+        <li key={assignment.id}>
+          <Card>
+            <CardContent className="flex flex-col gap-2">
+              <Typography as="h3" size="sm" weight="medium">
+                {recipe.title}
               </Typography>
-            ) : null}
-            {!compact && assignment.note.trim() !== "" ? (
-              <Typography
-                size="sm"
-                tone="muted"
-                className="whitespace-pre-line"
-              >
-                {content.recipeNoteLabel} : {assignment.note}
-              </Typography>
-            ) : null}
-          </CardContent>
-        </Card>
-      </li>
-    ))}
+              {!compact && recipe.body.trim() !== "" ? (
+                <Typography size="sm" className="whitespace-pre-line">
+                  {recipe.body}
+                </Typography>
+              ) : null}
+              {!compact && assignment.note.trim() !== "" ? (
+                <Typography
+                  size="sm"
+                  tone="muted"
+                  className="whitespace-pre-line"
+                >
+                  {content.recipeNoteLabel} : {assignment.note}
+                </Typography>
+              ) : null}
+              {attached && documents.length > 0 ? (
+                <div className="flex flex-col gap-1">
+                  <Typography size="xs" tone="muted" weight="medium">
+                    {content.attachedDocumentsLabel}
+                  </Typography>
+                  <DocumentList
+                    documents={documents}
+                    locale={attached.locale}
+                    token={attached.token}
+                    content={content}
+                    inline
+                  />
+                </div>
+              ) : null}
+            </CardContent>
+          </Card>
+        </li>
+      );
+    })}
   </ul>
 );

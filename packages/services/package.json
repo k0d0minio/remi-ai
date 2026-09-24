@@ -29,6 +29,14 @@
     "./email": {
       "types": "./dist/email/index.d.ts",
       "import": "./dist/email/index.js"
+    },
+    "./files": {
+      "types": "./dist/files/index.d.ts",
+      "import": "./dist/files/index.js"
+    },
+    "./files/client": {
+      "types": "./dist/files/client.d.ts",
+      "import": "./dist/files/client.js"
     }
   },
   "scripts": {
@@ -45,6 +53,7 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
+    "@vercel/blob": "^2.8.0",
     "drizzle-orm": "^0.45.2",
     "zod": "catalog:"
   },

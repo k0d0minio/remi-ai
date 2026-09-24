@@ -5,7 +5,7 @@ what is specific to this package.
 
 ## Seams, not integrations — AI still has no vendor, and that is the design
 
-Storage, email and AI are **seams**: each defines an interface and a `register*()` call; the
+Storage, email, files and AI are **seams**: each defines an interface and a `register*()` call; the
 concrete adapter is registered by the app that owns the process — **lazily, at first use**, from
 an idempotent `ensure*()` helper beside the code that reads (`apps/marketing/lib/mailer.ts`,
 `apps/admin/lib/database.ts`, `apps/web/lib/database.ts`). Never from `instrumentation.ts`:
@@ -14,11 +14,12 @@ never reaches them — that mistake shipped once and threw "no database adapter 
 production with the variable set. Nothing above a seam names a vendor, so changing one is a new
 file plus one registration line — never a rewrite of the callers.
 
-| Seam    | Interface        | Register with            | Adapter                         | Default if unregistered             |
-| ------- | ---------------- | ------------------------ | ------------------------------- | ----------------------------------- |
-| Storage | `DatabaseClient` | `registerDatabase()`     | Neon (`createNeonDatabase()`)   | throws — a missing DB must be loud  |
-| Email   | `Mailer`         | `registerMailer()`       | Resend (`createResendMailer()`) | `consoleMailer` — logs, never sends |
-| AI      | `TextProvider`   | `registerTextProvider()` | none yet                        | throws                              |
+| Seam    | Interface        | Register with            | Adapter                                     | Default if unregistered                                           |
+| ------- | ---------------- | ------------------------ | ------------------------------------------- | ----------------------------------------------------------------- |
+| Storage | `DatabaseClient` | `registerDatabase()`     | Neon (`createNeonDatabase()`)               | throws — a missing DB must be loud                                |
+| Email   | `Mailer`         | `registerMailer()`       | Resend (`createResendMailer()`)             | `consoleMailer` — logs, never sends                               |
+| Files   | `FileStore`      | `registerFileStore()`    | Vercel Blob (`createVercelBlobFileStore()`) | stores nothing — uploads refused, `isFileStoreConfigured()` false |
+| AI      | `TextProvider`   | `registerTextProvider()` | none yet                                    | throws                                                            |
 
 Storage's vendor is **Neon Postgres** (owner decision, 27 Aug 2026 — supersedes the earlier
 Supabase leaning), queried with Drizzle against `src/db/schema.ts`. The schema is the single
@@ -35,14 +36,16 @@ it is one POST to one endpoint, so it uses `fetch` and the package stays at a si
 
 ## Entrypoints — pick the one that matches where the code runs
 
-| Import                  | Contains                                                                                | Runs on          |
-| ----------------------- | --------------------------------------------------------------------------------------- | ---------------- |
-| `@remi/services/shared` | types, domain vocabulary, formatters, `Result`, locales, app URLs, the AI context block | browser + server |
-| `@remi/services/server` | storage, email, AI, env — the whole Node surface                                        | server only      |
-| `@remi/services/db`     | the storage seam alone                                                                  | server only      |
-| `@remi/services/ai`     | model roles, the provider seam, the context block                                       | server only      |
-| `@remi/services/email`  | the mailer seam                                                                         | server only      |
-| `@remi/services`        | types only — apps are lint-blocked from it                                              | —                |
+| Import                        | Contains                                                                                | Runs on          |
+| ----------------------------- | --------------------------------------------------------------------------------------- | ---------------- |
+| `@remi/services/shared`       | types, domain vocabulary, formatters, `Result`, locales, app URLs, the AI context block | browser + server |
+| `@remi/services/server`       | storage, email, AI, env — the whole Node surface                                        | server only      |
+| `@remi/services/db`           | the storage seam alone                                                                  | server only      |
+| `@remi/services/ai`           | model roles, the provider seam, the context block                                       | server only      |
+| `@remi/services/email`        | the mailer seam                                                                         | server only      |
+| `@remi/services/files`        | the files seam and its rules (types, cap, read-link lifetime)                           | server only      |
+| `@remi/services/files/client` | the browser uploader — bytes go to the store under a grant the server issued            | browser          |
+| `@remi/services`              | types only — apps are lint-blocked from it                                              | —                |
 
 Adding an entrypoint means editing **two** places that must agree: `exports` in `package.json` and
 `entry` in `tsup.config.ts`.
@@ -61,7 +64,9 @@ export may join it is the same one: does it import anything at all?
 independently, so `@remi/services/email` and `@remi/services/server` carry their own copy of the
 module-level `mailer` — register through one and send through the other and the send silently uses
 the fallback. Pick one entrypoint per seam per app and stay on it; `apps/marketing` uses `/server`
-for both.
+for both. The files seam is the same: the apps register and call it through `/server` only, which is
+also the copy `deletePatient` reads — a store registered through `/files` would leave a deleted
+patient's files behind.
 
 ## Environment
 
@@ -101,6 +106,7 @@ src/
   auth/        password hashing + session tokens — vendor-free, `node:crypto` only
   db/          client.ts (the seam) · schema.ts (Drizzle) · adapters/ · models/ · services/ · migrations/
   email/       the mailer seam + templates
+  files/       the files seam · adapters/ (the server adapter and its browser half) · client.ts
   ai/          model roles · the provider seam · context.ts (the prompt's context block)
 ```
 

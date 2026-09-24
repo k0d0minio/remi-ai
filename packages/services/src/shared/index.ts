@@ -27,6 +27,12 @@ export type { Locale } from "./i18n";
 export { auditActions } from "./audit";
 export type { AuditActionName } from "./audit";
 export { appHref, appOrigin } from "./links";
+export {
+  documentFileTypes,
+  documentTags,
+  isPatientFileKey,
+  MAX_DOCUMENT_FILE_BYTES,
+} from "./files";
 export { nutritionRuleKinds, nutritionRuleStatuses } from "./nutrition-rules";
 export type { NutritionRuleKind, NutritionRuleStatus } from "./nutrition-rules";
 export {
@@ -59,6 +65,7 @@ export {
   goalDirections,
   mealIntents,
   mealSlots,
+  patientLinkPreviewParam,
   patientSexes,
   patientStatuses,
   recommendationCategories,
@@ -90,6 +97,8 @@ export type {
   ConsentChannel,
   Consultation,
   CookingAffinity,
+  DocumentKind,
+  DocumentTag,
   Food,
   FoodNutrient,
   FramePrinciple,
@@ -105,6 +114,7 @@ export type {
   PantryEssential,
   PatientAnamnesis,
   PatientChallenge,
+  PatientDocument,
   PatientGoal,
   PatientGoalCheckIn,
   PatientInstruction,
