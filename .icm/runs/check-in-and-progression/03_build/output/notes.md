@@ -57,3 +57,13 @@
 - **Ready to merge was ticked before the ready flip**, so before any post-flip preview existed. The
   tick attests the operator's own smoke of the preview; Release should confirm it was given after
   the previews below, not on the draft.
+
+## Release
+
+- gate: Ready to merge ticked — merge authorised (ticked before the ready flip; the operator's attestation, read as given)
+- ci: GREEN on 42305f8 (full gate); re-read after the last push below
+- reviews: code medium — 3 findings: send button held while in flight (fixed, in-ticket), two parked, one not this run's (covered by `triage/challenge-writes-double-submit.md`) · security `security-check.sh --branch --audit`: OK + /security-review — no high-confidence findings · readiness `env.sh audit --changed`: OK · /production-readiness n/a — not installed in this repo
+- parked: weekly-check-in-concurrent-submit.md, weekly-check-in-note-without-score.md
+- migrations: skip — drizzle-generated, no stamped migrations of this run's own (`0022_goal_check_in_scores`, additive, forward-only)
+- learned: 1 rule appended to _shared/project-rules.md (+1 from FAILURE.md at close-out)
+- docs: no docs impact · announce: deferred to CI (public — changelog/2026-09-24-check-in-and-progression)

@@ -13,12 +13,16 @@ general; keep the retrospectives specific; never restate an `error.log` entry he
 
 ## Retrospectives
 
-### <YYYY-MM-DD> — <what failed, one line>
+### 2026-09-24 — Release reviews read a stale base
 
-- what happened: <the observable — the check, the error, the wrong file>
-- why: <the cause, once it was known>
-- fixed by: <the commit, or the action>
+- what happened: `/code-review main...HEAD` reported a finding in `challenge-section.tsx`, a file
+  this run never touched, and `/security-review` failed on `origin/HEAD...` (unknown revision).
+- why: a cloud session's local `main` is the clone-time ref, far behind `origin/main`, and the
+  clone sets no `origin/HEAD`.
+- fixed by: triaging the stray finding as not this ticket's (already covered by
+  `triage/challenge-writes-double-submit.md`) and `git remote set-head origin main` before the
+  security review.
 
 ## Learned rules
 
-- <one sentence, imperative, general enough to apply to the next run in this repo>
+- Run the Release reviews against `origin/main...HEAD` (and `git remote set-head origin main` first in a cloud session) — the local `main` ref is stale and widens the review to other runs' code.
