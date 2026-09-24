@@ -1,7 +1,7 @@
 # Build notes: general-feedback
 
 - commits: 70139a5 schema + migration (regenerated as `0022` in the merge)  · 96ed8fd service + tests · d306325 link · 5a75e53 console + RETENTION
-- ci: GREEN (draft tier) on c559969 — Format, lint, typecheck incl. 455 tests (14 new); full gate on the post-flip head
+- ci: GREEN (draft tier) on c559969 — Format, lint, typecheck incl. 455 tests (14 new); full gate GREEN on e8ed21f with no preview (every head since the code landed was `.icm`-only against its parent, so `turbo-ignore --fallback=HEAD^1` skipped all six projects); re-settled after merging #123
 
 ## What changed
 
@@ -32,5 +32,5 @@
 - The Neon adapter's `transaction()` is a passthrough (`patient-link-writes` says so), so reply + mark-read is sequential rather than atomic in production; a failure between them leaves messages unread, never read without a reply. Same standing as `challenges`' close-and-create.
 - The security gate blocked one commit on a test fixture literal (`error.log`); the literal was removed before anything was pushed.
 - `main` was merged in before the flip (fef3101): `patient-documents-and-links` (#122) landed `0021_patient_documents` first, as D-33 expected. This branch's migration was deleted and regenerated on the merged tree as `0022_patient_messages` (CONVENTIONS → regenerate, never renumber); `check-migration-order` → safe. The other conflicts were both-sides additions (exports, audit actions, the link's segments and loader, the console's registry and sections, RETENTION) — kept both.
-- `security-check.sh --branch` → BLOCKED 1 on **dependency-audit only**: the 20 high/critical pnpm advisories on `main`, already parked as `triage/dependency-audit-next-rce.md` (chore, P0). This branch's lockfile equals `main`'s. `--branch --no-audit` → OK. Release step 4 will see the same until that chore merges.
+- `security-check.sh --branch` was BLOCKED on dependency-audit only (`main`'s 20 advisories) until `next-rce-dep-bump` (#123) merged; `main` merged in again, the branch gate with the audit → OK, `pnpm audit`: no high/critical.
 - The admin preview build runs `db:migrate` against the shared Neon database and the preview guard is not in force there (`_shared/project-rules.md` → Deploy; `triage/previews-migrate-the-shared-database.md`), so the ready-phase admin preview may create `patient_messages` in the live database before the merge. The migration only adds a table, as `challenges`' did; forward-only, no rollback script (`migrations.reversible: false`).
