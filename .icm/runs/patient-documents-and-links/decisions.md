@@ -21,3 +21,11 @@ decision made mid-run has one home.
 - D-27 — the patient sees a document's title and date added, no author (Define, operator, 2026-09-24).
 - D-28 — recipe-tagged files and links show under « Mes recettes » and in « Mes documents » (Define,
   operator, 2026-09-24).
+
+- D-29 — « Voir comme la patiente » is marked by a one-hour HttpOnly cookie holding the token, set
+  by the web proxy from `?apercu=1`; while it names the token being read, the link records no
+  open. A layout cannot read search params, so the marker has to outlive the first request. It
+  grants nothing. (Build — a spec gap, noted for Release.)
+- D-30 — Files upload from the browser under a grant (`@remi/services/files/client`); the server
+  never carries the bytes (a 10 MB body cannot pass through a function) and re-checks the stored
+  object before any row points at it. (Build.)
