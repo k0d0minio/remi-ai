@@ -19,7 +19,7 @@ step, so a resuming session can pick up the first unticked line.
 - [x] Deleting a goal or a recipe assignment keeps its documents on the patient, unattached
 - [x] Deleting a patient deletes their document rows and their files in the store; RETENTION.md says so
 - [x] The console's patient page has a one-click « Voir comme la patiente » that opens the patient's link in a new tab
-- [ ] `technical/decisions` records the files seam: Vercel Blob, private EU store, residency and retention terms, the cap and the allow-list
+- [x] `technical/decisions` records the files seam: Vercel Blob, private EU store, residency and retention terms, the cap and the allow-list
 
 ## Queue
 
@@ -28,4 +28,4 @@ step, so a resuming session can pick up the first unticked line.
 - [x] Pass 3 — the console's Documents section, the upload grant and file opener routes, the stateful delete dialog, « Voir comme la patiente » (88961a5)
 - [x] Pass 4 — the link's Documents segment, the token-checked file route, documents under recipes and goals, the preview marker (8c3729d)
 - [x] Pass 5 — RETENTION.md, build notes, run pack
-- [ ] Release — the `technical/decisions` files-seam entry (the docs tree is Release's to edit; see Notes for Release)
+- [x] Release — the `technical/decisions` files-seam entry (the docs tree is Release's to edit; see Notes for Release)

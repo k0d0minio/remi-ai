@@ -92,3 +92,13 @@
 - **Look closely at:** `apps/admin/app/api/files/upload/route.ts` (the grant's permission check)
   and `apps/web/app/[locale]/p/[token]/documents/[id]/route.ts` (the ownership check) — both are
   trust boundaries.
+
+## Release
+
+- gate: Ready to merge ticked — merge authorised
+- ci: GREEN on b8f9309 before the reviews (full gate); re-read on the head that merges after the last push
+- reviews: code high — 10 findings: 7 fixed in-ticket (c271db5: one `isPatientFileKey` rule for the grant and the check; a refused add removes its upload; a replayed add answers with the existing row; the patient-delete message says the profile was kept and to retry after a partial sweep; the home previews the newest documents; the console form resets on a thrown action; unused barrel exports removed), 2 parked, 1 no change (per-app `fileStoreReady` is the repo's `ensure*` pattern) · security `security-check.sh --branch --audit: BLOCKED` on 20 pre-existing advisories → audit waived — 20 high/critical advisories already on main (the Next.js RCE among them), not introduced by this diff, parked as the P0 chore `dependency-audit-next-rce` (the operator, 2026-09-24); re-read `--branch --no-audit: OK` (gitleaks absent — built-in patterns) + /security-review — no finding at or above confidence 8 (upload grant, token-checked file route, signed URLs, https-only links, blob keys, preview cookie) · /production-readiness — n/a, not available in this session (the diff touches DB and env: covered by the migration check and `env.sh audit --changed: OK`) · readiness `env.sh audit --changed: OK`
+- parked: files-registry-per-entrypoint.md, document-attachment-encoding.md
+- migrations: skip — none of this run's own stamped (drizzle `0021_patient_documents`, journal-ordered; `check-migrations.sh` SKIP after main)
+- learned: 1 rule appended to _shared/project-rules.md (the dependency-audit baseline, generalised)
+- docs: technical/decisions (Files — 2026-09-24), business/roles (the patient's documents) · announce: deferred to CI

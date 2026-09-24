@@ -13,12 +13,15 @@ general; keep the retrospectives specific; never restate an `error.log` entry he
 
 ## Retrospectives
 
-### <YYYY-MM-DD> — <what failed, one line>
+### 2026-09-24 — the post-flip verdict was first read on the previous head
 
-- what happened: <the observable — the check, the error, the wrong file>
-- why: <the cause, once it was known>
-- fixed by: <the commit, or the action>
+- what happened: `ci-status.sh` ran straight after the ready push and reported "head d5e6599 —
+  settling the full gate", one commit behind the pushed `a511db7`; its GREEN was about the wrong
+  commit.
+- why: GitHub had not registered the push when the script read the PR's head.
+- fixed by: comparing the reported head with `git rev-parse HEAD` and re-running the call, which
+  settled GREEN on `a511db7`.
 
 ## Learned rules
 
-- <one sentence, imperative, general enough to apply to the next run in this repo>
+- After a push, check that the head `ci-status.sh` names is `git rev-parse HEAD` before trusting its verdict; re-run it when it names an older commit.

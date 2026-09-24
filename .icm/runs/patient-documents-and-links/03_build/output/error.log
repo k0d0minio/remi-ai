@@ -9,3 +9,4 @@ scope=branch head=b8f9309 branch=claude/quirky-bohr-vd6jm2 — BLOCKED 1 (redact
 dependency-audit  pnpm reports 20 high/critical advisor(y|ies) — run: pnpm audit --audit-level=high
 (unresolved until the session adds a `- resolved:` line: remove the secret from the change, have the operator rotate it, re-run the gate, then write what was wrong and what is true now)
 
+- resolved: the same 20 pre-existing advisories on main (not introduced by this diff) — the operator waived the audit for this merge on 2026-09-24; the gate was re-read with `--branch --no-audit` → OK, and the bump stays the P0 chore `triage/dependency-audit-next-rce`.
