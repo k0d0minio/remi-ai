@@ -16,10 +16,11 @@ decision made mid-run has one home.
 
 ## Made in this run
 
-- D-30 — The prompt is her § 6 example verbatim, both sentences. Define, operator, 2026-09-24.
-- D-31 — The feedback box sits beside the one-tap check-in on the home; it does not replace it
+- D-35 — The prompt is her § 6 example verbatim, both sentences. Define, operator, 2026-09-24.
+- D-36 — The feedback box sits beside the one-tap check-in on the home; it does not replace it
   (answers the same open point in `check-in-and-progression`). Define, operator.
-- D-32 — A patient message's unread mark clears on a reply (every earlier unread one) or on
+- D-37 — A patient message's unread mark clears on a reply (every earlier unread one) or on
   « Marquer comme lu »; opening the page clears nothing. Define, operator.
-- D-33 — Run ahead of `patient-documents-and-links`; whichever merges second renumbers its
+- D-38 — Run ahead of `patient-documents-and-links`; whichever merges second renumbers its
   migration. Define, operator.
+- Renumbered at Release (2026-09-24): Define picked D-30–D-33 while `check-in-and-progression` picked the same ids in parallel and merged first (#125); this run's four are D-35–D-38. Its D-32 (the two home cards side by side) and this run's D-36 say the same thing.

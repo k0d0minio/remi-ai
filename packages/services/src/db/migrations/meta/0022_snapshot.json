@@ -1,5 +1,5 @@
 {
-  "id": "78266473-2189-4ccd-af45-2db0cb5f3b04",
+  "id": "13186a3f-eabc-4e34-8ef6-c32f20bbd3dd",
   "prevId": "a7a25142-5df4-4515-8ad9-c1dc651f1498",
   "version": "7",
   "dialect": "postgresql",
@@ -1029,6 +1029,18 @@
           "notNull": true,
           "default": "'practitioner'"
         },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seen_at": {
+          "name": "seen_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -1063,7 +1075,12 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "patient_goal_check_ins_score_range": {
+          "name": "patient_goal_check_ins_score_range",
+          "value": "\"patient_goal_check_ins\".\"score\" is null or (\"patient_goal_check_ins\".\"score\" >= 0 and \"patient_goal_check_ins\".\"score\" <= 5)"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.patient_goals": {
@@ -1382,120 +1399,6 @@
             "id"
           ],
           "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.patient_messages": {
-      "name": "patient_messages",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "patient_id": {
-          "name": "patient_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "author": {
-          "name": "author",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "body": {
-          "name": "body",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "sent_at": {
-          "name": "sent_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "read_at": {
-          "name": "read_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "operator_id": {
-          "name": "operator_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "patient_messages_patient_id_index": {
-          "name": "patient_messages_patient_id_index",
-          "columns": [
-            {
-              "expression": "patient_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "patient_messages_patient_id_patient_profiles_id_fk": {
-          "name": "patient_messages_patient_id_patient_profiles_id_fk",
-          "tableFrom": "patient_messages",
-          "tableTo": "patient_profiles",
-          "columnsFrom": [
-            "patient_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "patient_messages_operator_id_operators_id_fk": {
-          "name": "patient_messages_operator_id_operators_id_fk",
-          "tableFrom": "patient_messages",
-          "tableTo": "operators",
-          "columnsFrom": [
-            "operator_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },

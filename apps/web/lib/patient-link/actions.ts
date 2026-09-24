@@ -5,11 +5,14 @@ import {
   challengeOwner,
   markMealEntryEaten,
   mealEntryOwner,
+  recordWeeklyCheckIn,
   sendPatientMessage,
   setChallengeAcquired,
   setChallengeReadyForNext,
+  type WeeklyAnswer,
 } from "@remi/services/server";
 import {
+  goalScores,
   isLocale,
   mealIntents,
   mealSlots,
@@ -217,6 +220,57 @@ export const tapChallengeAction = async (
   // « Prêt(e) » refused because « acquis » was cleared elsewhere is a stale
   // page, not a transient failure: « réessayez » would fail every time, so it
   // reads as the challenge having changed — reload.
+  return {
+    error:
+      result.error === "conflict" ? "not_found" : asPatientError(result.error),
+  };
+};
+
+/**
+ * The weekly « comment ça s'est passé ? » — her 0–5 per goal (D-30, D-31), one
+ * submit for every goal on the card.
+ *
+ * The form names its goals in hidden `goal` fields and posts `score-<id>` and
+ * `note-<id>` beside each. A goal id is a plain uuid like a meal's, but no
+ * `target.id` is named here: the write can span three goals, and the service
+ * checks every one against the patient the token resolved before it writes any
+ * row — the same guarantee, held where the rows are.
+ *
+ * A score that is posted but not one of 0–5 is refused rather than dropped:
+ * nothing on the card can produce one. An absent score is an unrated goal.
+ */
+export const weeklyCheckInAction = async (
+  _previous: WriteState,
+  formData: FormData,
+): Promise<WriteState> => {
+  const token = field(formData, "token");
+  const locale = field(formData, "locale");
+  if (!isLocale(locale)) {
+    return refused;
+  }
+
+  const answers: WeeklyAnswer[] = [];
+  for (const goalId of formData.getAll("goal").map(String)) {
+    const posted = field(formData, `score-${goalId}`);
+    const score = posted === "" ? null : Number(posted);
+    if (score !== null && !(goalScores as readonly number[]).includes(score)) {
+      return refused;
+    }
+    answers.push({ goalId, score, note: field(formData, `note-${goalId}`) });
+  }
+
+  const result = await writePatientLink(locale, token, {
+    action: "goal.checked_in",
+    text: { bodies: answers.map((answer) => answer.note ?? "") },
+    target: { type: "patient_goal_check_in" },
+    write: async (patient) => recordWeeklyCheckIn(patient.id, answers),
+  });
+
+  if (result.ok) {
+    return written;
+  }
+  // Already answered this week — a second tab, or a page left open across the
+  // first submit. Retrying would fail every time; reloading shows the answer.
   return {
     error:
       result.error === "conflict" ? "not_found" : asPatientError(result.error),

@@ -59,8 +59,9 @@ Her § 6: « Je voudrais un endroit très simple où le consultant peut laisser 
 **Open for Define** — settled with the operator before the spec is approved, never assumed:
 
 - The prompt sentence, verbatim, in the patient's register.
-- Whether this box replaces the one-tap check-in question on the home (`check-in-and-progression`)
-  or sits beside it — one decision for both stubs.
+- ~~Whether this box replaces the one-tap check-in question on the home or sits beside it.~~
+  Settled 2026-09-24 in `check-in-and-progression`'s Define: **beside it**, as two separate cards
+  (the check-in became her weekly 0–5 score per goal).
 
 ## Prompt
 

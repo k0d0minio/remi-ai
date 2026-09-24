@@ -10,6 +10,7 @@
 export {
   ageInYears,
   formatCurrency,
+  addDays,
   formatDate,
   formatDateTime,
   formatNumber,
@@ -63,6 +64,7 @@ export {
   cookingAffinities,
   firstRecommendationPerCategory,
   goalDirections,
+  goalScores,
   mealIntents,
   mealSlots,
   patientLinkPreviewParam,
@@ -70,6 +72,7 @@ export {
   patientStatuses,
   recommendationCategories,
 } from "./patient";
+export type { WeeklyCheckInState } from "./patient";
 export {
   componentsForRecommendation,
   normaliseNutritionText,

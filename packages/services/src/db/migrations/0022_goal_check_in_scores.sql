@@ -1,0 +1,3 @@
+ALTER TABLE "patient_goal_check_ins" ADD COLUMN "score" integer;--> statement-breakpoint
+ALTER TABLE "patient_goal_check_ins" ADD COLUMN "seen_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "patient_goal_check_ins" ADD CONSTRAINT "patient_goal_check_ins_score_range" CHECK ("patient_goal_check_ins"."score" is null or ("patient_goal_check_ins"."score" >= 0 and "patient_goal_check_ins"."score" <= 5));

@@ -16,7 +16,7 @@ not copies: the spec stays the spec, the scope stays the scope. Seeded when the 
 - One general thread per patient; no per-recipe / per-recommendation comments (her § 6).
 - The token is the whole credential (D-2): writes go through the existing link-writes path only.
 - No outbound channel — no email, push, scheduler or cron (D-9).
-- Messages are append-only; nothing clears unread on its own (D-32).
+- Messages are append-only; nothing clears unread on its own (D-37).
 - Reuse the meal journal's awaiting pattern and components; no second design.
 
 ## Context budget

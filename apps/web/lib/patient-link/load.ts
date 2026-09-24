@@ -2,10 +2,13 @@ import { cookies } from "next/headers";
 import { cache } from "react";
 import {
   getCurrentChallenge,
+  getWeeklyCheckIn,
   getPatientByShareToken,
   getPatientInstruction,
   getPatientSummary,
+  listGoalScoreStrips,
   listMealEntries,
+  listPastChallenges,
   listPantryEssentials,
   listPatientDocuments,
   listPatientGoals,
@@ -52,6 +55,9 @@ export const loadPatientLink = cache(async (token: string) => {
     recipes,
     meals,
     documents,
+    weeklyCheckIn,
+    scoreStrips,
+    pastChallenges,
     messages,
   ] = await Promise.all([
     getPatientSummary(patient.id),
@@ -64,6 +70,9 @@ export const loadPatientLink = cache(async (token: string) => {
     listPatientRecipes(patient.id),
     listMealEntries(patient.id),
     listPatientDocuments(patient.id),
+    getWeeklyCheckIn(patient.id),
+    listGoalScoreStrips(patient.id),
+    listPastChallenges(patient.id),
     listPatientMessages(patient.id),
   ]);
 
@@ -96,6 +105,9 @@ export const loadPatientLink = cache(async (token: string) => {
     recipes,
     meals,
     documents,
+    weeklyCheckIn,
+    scoreStrips,
+    pastChallenges,
     // The general thread, newest first. Only the body, the author, the date
     // and a reply's operator name ever render.
     messages,
@@ -112,6 +124,9 @@ export type PatientLinkData = NonNullable<
  * A segment whose read came back empty appears in no navigation and 404s at
  * its own URL: a nav entry leading to an empty page and a reachable empty page
  * are the same broken product, and Morgane fills patients at her own pace.
+ *
+ * Progression shows when there is a goal to score or a challenge behind the
+ * patient — the two things it is made of.
  *
  * Three segments are exempt, and for the same reason — they are not waiting on
  * her. Home carries the greeting. Repas carries « Je vais manger » / « J'ai
@@ -141,7 +156,11 @@ export const visibleSegments = (
   if (data.documents.length > 0) {
     present.push("documents");
   }
-  present.push("repas", "messages");
+  present.push("repas");
+  if (data.goals.length > 0 || data.pastChallenges.length > 0) {
+    present.push("progression");
+  }
+  present.push("messages");
   return present;
 };
 

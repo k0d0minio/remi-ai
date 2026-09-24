@@ -16,7 +16,7 @@ general; keep the retrospectives specific; never restate an `error.log` entry he
 ### 2026-09-24 — CI never started on a pushed head
 
 - what happened: `ci-status.sh` sat `PENDING` for 900 s with `Format, lint, typecheck` never registered; no workflow ran for the push at all.
-- why: `patient-documents-and-links` (#122) had merged into `main` meanwhile and the PR conflicted with it — GitHub runs no `pull_request` workflow on a PR it cannot merge. D-33 had predicted the migration clash.
+- why: `patient-documents-and-links` (#122) had merged into `main` meanwhile and the PR conflicted with it — GitHub runs no `pull_request` workflow on a PR it cannot merge. D-38 had predicted the migration clash.
 - fixed by: merging `main` (fef3101) and regenerating this branch's migration as `0022` on the merged tree.
 
 ### 2026-09-24 — the ready head built no preview

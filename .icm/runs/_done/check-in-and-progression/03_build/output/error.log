@@ -1,0 +1,9 @@
+## 2026-09-24T12:47:31Z ci Format, lint, typecheck — @remi/web typecheck: optional note in the link-write text
+lib/patient-link/actions.ts(263,13): error TS2322: Type '(string | undefined)[]' is not assignable to type 'readonly string[]'.
+- resolved: `WeeklyAnswer.note` is optional, so mapping it straight into `text.bodies` typed as `(string | undefined)[]`; the action now declares `answer.note ?? ""`.
+
+## 2026-09-24T12:49:42Z ci Format, lint, typecheck — @remi/admin typecheck: new audit action missing from the console's vocabulary
+components/audit/vocabulary.ts(12,14): error TS2741: Property '"goal.check_in_seen"' is missing in type '{ … }' but required in type 'Record<…, string>'.
+components/audit/vocabulary.ts(119,14): error TS2741: Property '"goal.check_in_seen"' is missing in type '{ … }' but required in type 'Record<…, "success" | … | "neutral">'.
+- resolved: `apps/admin/components/audit/vocabulary.ts` keys two exhaustive records by `AuditAction`; `goal.check_in_seen` now has its label (« baisse vue ») and its intent (neutral).
+- rule: A new `AuditAction` in `packages/services/src/shared/audit.ts` needs a label and an intent in `apps/admin/components/audit/vocabulary.ts` in the same commit — both records are exhaustive.

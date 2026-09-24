@@ -24,7 +24,7 @@ type Props = {
  * The patient's general thread (§ 6, § 7 « voir les feedbacks »): the reply box
  * first, then every message newest first, unread ones marked.
  *
- * Nothing clears on its own (D-32): a reply marks every earlier message read,
+ * Nothing clears on its own (D-37): a reply marks every earlier message read,
  * and « Marquer comme lu » is there for the one that needs no answer.
  */
 export const MessageThread = ({ patientId, pseudonym, messages }: Props) => {

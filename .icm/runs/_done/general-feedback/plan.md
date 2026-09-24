@@ -12,7 +12,7 @@ reality disagrees with it — never left describing a plan that was abandoned.
    `read_at` nullable, `operator_id` nullable → operators, an index on `(patient_id, sent_at)`) and
    a generated migration under `packages/services/src/db/migrations/` (load the
    `database-migration` skill; the journal is shared with `patient-documents-and-links`, which may
-   merge first — D-33) — done when: the migration is generated from `schema.ts`, checked in, and
+   merge first — D-38) — done when: the migration is generated from `schema.ts`, checked in, and
    `Migration order` is green.
 2. **Service** — `packages/services/src/db/services/patient-messages/` + `db/models/patient-message.ts`,
    exported from the server entrypoint: `sendPatientMessage` (patient, 1–2000 trimmed), `replyToPatient`
@@ -25,7 +25,7 @@ reality disagrees with it — never left describing a plan that was abandoned.
    server action through the link-writes path, rate-limited, `written_by: patient`, audited),
    `apps/web/app/[locale]/p/[token]/messages/page.tsx`, `apps/web/components/patient-link/`
    (a message form + thread list; a home card on `page.tsx` beside the existing sections),
-   `apps/web/lib/content/{fr,en,types}.ts` (her § 6 prompt verbatim in `fr` — D-30 — the last-sent
+   `apps/web/lib/content/{fr,en,types}.ts` (her § 6 prompt verbatim in `fr` — D-35 — the last-sent
    line, errors) — done when: a message sent on the preview shows in the thread and on the home card's
    last-sent line; an empty or 2001-character body is refused.
 4. **Console** — `apps/admin/components/patients/` (a messages card: thread, unread marks,
@@ -45,4 +45,4 @@ reality disagrees with it — never left describing a plan that was abandoned.
   written. Signal: `/p/<token>/messages` 404s for a patient with no messages.
 - Migration journal collision with `patient-documents-and-links`. Signal: `Migration order` red after
   merging `main`; renumber per the `database-migration` skill, never hand-edit `idx`.
-- The prompt paraphrased in `fr`. Signal: the string differs from D-30 by a character.
+- The prompt paraphrased in `fr`. Signal: the string differs from D-35 by a character.

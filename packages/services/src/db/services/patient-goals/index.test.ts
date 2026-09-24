@@ -7,12 +7,17 @@ import {
   addGoalCheckIn,
   addPatientGoal,
   archivePatientGoal,
+  countGoalCheckInsAwaitingAttention,
   deleteGoalCheckIn,
   deletePatientGoal,
+  getWeeklyCheckIn,
   listArchivedPatientGoals,
   listGoalCheckIns,
+  listGoalScoreStrips,
   listPatientGoals,
+  markGoalCheckInSeen,
   movePatientGoal,
+  recordWeeklyCheckIn,
   updateGoalCheckIn,
   updatePatientGoal,
 } from "./index";
@@ -254,5 +259,221 @@ describe("goal check-ins", () => {
 
     expect((await deletePatientGoal(goal.id)).ok).toBe(true);
     expect(await listGoalCheckIns(goal.id)).toHaveLength(0);
+  });
+});
+
+/**
+ * The patient's weekly 0–5 per goal (D-30 to D-33), asserted from the spec's
+ * acceptance criteria. Each test takes a patient of its own: the window is a
+ * property of the patient, and a shared one would make the order matter.
+ */
+describe("the weekly check-in", () => {
+  const freshPatient = async (goalTitles: readonly string[]) => {
+    const created = await createPatient({ pseudonym: "Inès" });
+    if (!created.ok) {
+      throw new Error("test patient not created");
+    }
+    const goals = [];
+    for (const title of goalTitles) {
+      const goal = await addPatientGoal(created.data.id, { title });
+      if (!goal.ok) {
+        throw new Error(`goal "${title}" refused`);
+      }
+      goals.push(goal.data);
+    }
+    return { id: created.data.id, goals };
+  };
+
+  it("is open until the patient answers, then closed for the week", async () => {
+    const patient = await freshPatient(["Moins de fringales"]);
+    expect((await getWeeklyCheckIn(patient.id, "2026-10-01")).due).toBe(true);
+
+    await recordWeeklyCheckIn(
+      patient.id,
+      [{ goalId: patient.goals[0].id, score: 3 }],
+      "2026-10-01",
+    );
+
+    expect(await getWeeklyCheckIn(patient.id, "2026-10-05")).toEqual({
+      due: false,
+      lastOn: "2026-10-01",
+      nextOn: "2026-10-08",
+    });
+    expect((await getWeeklyCheckIn(patient.id, "2026-10-08")).due).toBe(true);
+  });
+
+  it("writes one patient row per rated goal, and nothing for an unrated one", async () => {
+    const patient = await freshPatient(["Énergie", "Ballonnements"]);
+    const [energy, bloating] = patient.goals;
+
+    const result = await recordWeeklyCheckIn(
+      patient.id,
+      [
+        { goalId: energy.id, score: 4, note: "  mieux dormi  " },
+        { goalId: bloating.id, score: null },
+      ],
+      "2026-10-01",
+    );
+
+    expect(result.ok).toBe(true);
+    const [row] = await listGoalCheckIns(energy.id);
+    expect(row).toMatchObject({
+      checkedOn: "2026-10-01",
+      score: 4,
+      note: "mieux dormi",
+      writtenBy: "patient",
+      direction: null,
+      seenAt: null,
+    });
+    expect(await listGoalCheckIns(bloating.id)).toHaveLength(0);
+  });
+
+  it("refuses a submission that rates nothing, and writes nothing", async () => {
+    const patient = await freshPatient(["Énergie"]);
+    const result = await recordWeeklyCheckIn(
+      patient.id,
+      [{ goalId: patient.goals[0].id, note: "rien à dire" }],
+      "2026-10-01",
+    );
+
+    expect(result.ok).toBe(false);
+    expect(await listGoalCheckIns(patient.goals[0].id)).toHaveLength(0);
+  });
+
+  it("refuses a score outside 0–5", async () => {
+    const patient = await freshPatient(["Énergie"]);
+    for (const score of [-1, 6, 2.5]) {
+      const result = await recordWeeklyCheckIn(
+        patient.id,
+        [{ goalId: patient.goals[0].id, score }],
+        "2026-10-01",
+      );
+      expect(result.ok).toBe(false);
+    }
+    expect(await listGoalCheckIns(patient.goals[0].id)).toHaveLength(0);
+  });
+
+  it("refuses a goal that is not this patient's, before writing any row", async () => {
+    const mine = await freshPatient(["Énergie"]);
+    const theirs = await freshPatient(["Sommeil"]);
+
+    const result = await recordWeeklyCheckIn(
+      mine.id,
+      [
+        { goalId: mine.goals[0].id, score: 3 },
+        { goalId: theirs.goals[0].id, score: 1 },
+      ],
+      "2026-10-01",
+    );
+
+    expect(result).toMatchObject({ ok: false, error: "not_found" });
+    expect(await listGoalCheckIns(mine.goals[0].id)).toHaveLength(0);
+    expect(await listGoalCheckIns(theirs.goals[0].id)).toHaveLength(0);
+  });
+
+  it("writes nothing on a second submission inside the week", async () => {
+    const patient = await freshPatient(["Énergie"]);
+    const goalId = patient.goals[0].id;
+    await recordWeeklyCheckIn(patient.id, [{ goalId, score: 3 }], "2026-10-01");
+
+    const again = await recordWeeklyCheckIn(
+      patient.id,
+      [{ goalId, score: 1 }],
+      "2026-10-03",
+    );
+
+    expect(again).toMatchObject({ ok: false, error: "conflict" });
+    expect(await listGoalCheckIns(goalId)).toHaveLength(1);
+  });
+
+  it("reads each score against the goal's previous patient score", async () => {
+    const patient = await freshPatient(["Énergie"]);
+    const goalId = patient.goals[0].id;
+    // Her consultation row carries no score, so it is never the baseline.
+    await addGoalCheckIn(goalId, { checkedOn: "2026-10-02", measure: "4/10" });
+
+    const weeks: [string, number][] = [
+      ["2026-10-01", 3],
+      ["2026-10-08", 3],
+      ["2026-10-15", 1],
+      ["2026-10-22", 4],
+    ];
+    for (const [day, score] of weeks) {
+      await recordWeeklyCheckIn(patient.id, [{ goalId, score }], day);
+    }
+
+    const byDay = (await listGoalCheckIns(goalId))
+      .filter((row) => row.writtenBy === "patient")
+      .map((row) => [row.checkedOn, row.direction]);
+    expect(byDay).toEqual([
+      ["2026-10-22", "better"],
+      ["2026-10-15", "worse"],
+      ["2026-10-08", "stable"],
+      ["2026-10-01", null],
+    ]);
+  });
+
+  it("gives each active goal a strip of its last twelve scores, oldest first", async () => {
+    const patient = await freshPatient(["Énergie", "Sommeil"]);
+    const [energy, sleep] = patient.goals;
+    let day = "2026-01-01";
+    for (let week = 0; week < 14; week += 1) {
+      await recordWeeklyCheckIn(
+        patient.id,
+        [{ goalId: energy.id, score: week % 6 }],
+        day,
+      );
+      day = new Date(new Date(`${day}T00:00:00Z`).getTime() + 7 * 864e5)
+        .toISOString()
+        .slice(0, 10);
+    }
+
+    const strips = await listGoalScoreStrips(patient.id);
+
+    expect(strips.map((strip) => strip.goalId)).toEqual([energy.id, sleep.id]);
+    expect(strips[0].scores).toHaveLength(12);
+    expect(strips[0].scores[0].checkedOn).toBe("2026-01-15");
+    expect(strips[0].scores.at(-1)?.checkedOn).toBe("2026-04-02");
+    expect(strips[1].scores).toEqual([]);
+  });
+
+  it("counts a patient's unseen lower score until she marks it seen", async () => {
+    const patient = await freshPatient(["Énergie"]);
+    const goalId = patient.goals[0].id;
+    await recordWeeklyCheckIn(patient.id, [{ goalId, score: 4 }], "2026-10-01");
+    await recordWeeklyCheckIn(patient.id, [{ goalId, score: 2 }], "2026-10-08");
+    // Her own row saying "worse" is hers — it never waits for her.
+    await addGoalCheckIn(goalId, {
+      checkedOn: "2026-10-09",
+      direction: "worse",
+    });
+
+    expect(await countGoalCheckInsAwaitingAttention(patient.id)).toBe(1);
+
+    const worse = (await listGoalCheckIns(goalId)).find(
+      (row) => row.writtenBy === "patient" && row.direction === "worse",
+    );
+    const seen = await markGoalCheckInSeen(worse?.id ?? "");
+    expect(seen.ok && seen.data.seenAt).toBeInstanceOf(Date);
+    expect(await countGoalCheckInsAwaitingAttention(patient.id)).toBe(0);
+
+    const again = await markGoalCheckInSeen(worse?.id ?? "");
+    expect(again.ok && again.data.seenAt).toEqual(seen.ok && seen.data.seenAt);
+  });
+
+  it("leaves her consultation check-ins without a score", async () => {
+    const patient = await freshPatient(["Énergie"]);
+    const created = await addGoalCheckIn(patient.goals[0].id, {
+      checkedOn: "2026-10-01",
+      direction: "better",
+    });
+
+    expect(created.ok && created.data).toMatchObject({
+      score: null,
+      seenAt: null,
+      writtenBy: "practitioner",
+    });
+    // Her row does not close the patient's weekly question.
+    expect((await getWeeklyCheckIn(patient.id, "2026-10-02")).due).toBe(true);
   });
 });

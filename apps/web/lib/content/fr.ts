@@ -278,6 +278,7 @@ export const fr: Content = {
       recettes: "Recettes",
       documents: "Documents",
       repas: "Repas",
+      progression: "Ma progression",
       messages: "Messages",
     },
     todayTitle: "Aujourd'hui / cette semaine",
@@ -294,6 +295,40 @@ export const fr: Content = {
           "Vous avez écrit beaucoup de choses d'un coup — réessayez dans un instant.",
         not_found: "Ce challenge a changé entre-temps. Rechargez la page.",
         unknown: "Cela n'a pas fonctionné. Réessayez dans un instant.",
+      },
+    },
+    weeklyCheckIn: {
+      title: "Votre semaine",
+      lead: "Un chiffre par objectif, de 0 à 5 — votre praticienne le verra.",
+      question: "Cette semaine, comment ça s'est passé pour :",
+      scaleLow: "0 — pas bien du tout",
+      scaleHigh: "5 — très bien",
+      noteLabel: "Un mot (facultatif)",
+      submit: "Envoyer",
+      answeredOn: "Merci ! Réponse envoyée le",
+      nextOn: "Prochaine question le",
+      errors: {
+        invalid_input: "Choisissez au moins un chiffre avant d'envoyer.",
+        rate_limited:
+          "Vous avez écrit beaucoup de choses d'un coup — réessayez dans un instant.",
+        not_found: "Vous avez déjà répondu cette semaine. Rechargez la page.",
+        unknown: "Cela n'a pas fonctionné. Réessayez dans un instant.",
+      },
+    },
+    progression: {
+      title: "Ma progression",
+      lead: "Vos réponses de chaque semaine, objectif par objectif.",
+      stripLabel: "vos chiffres de la semaine, de 0 à 5",
+      noScores:
+        "Pas encore de chiffre — la première question vous attend sur l'accueil.",
+      instructionTitle: "La consigne du moment",
+      mealsLabel: "Repas notés ces 7 derniers jours :",
+      pastChallengesTitle: "Mes challenges passés",
+      challengeUntil: "→",
+      outcomes: {
+        acquired: "Acquis",
+        not_acquired: "Non acquis",
+        abandoned: "Abandonné",
       },
     },
     messages: {

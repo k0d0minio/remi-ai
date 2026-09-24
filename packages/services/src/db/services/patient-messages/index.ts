@@ -16,7 +16,7 @@ import { touchPatient } from "../patients";
  *
  * - **Append-only.** Nothing here edits or deletes a message; the thread goes
  *   with the patient.
- * - **Unread is hers to clear** (D-32). A patient message stays unread until
+ * - **Unread is hers to clear** (D-37). A patient message stays unread until
  *   she replies after it or marks it read; reading the page clears nothing.
  * - **A reply clears what it answers.** Every patient message sent up to the
  *   reply is marked read with it, so answering once settles the backlog.

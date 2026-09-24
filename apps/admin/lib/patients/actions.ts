@@ -38,6 +38,7 @@ import {
   getPatient,
   getPatientInstruction,
   getPatientSummary,
+  markGoalCheckInSeen,
   markPatientMessageRead,
   movePantryEssential,
   movePatientGoal,
@@ -1042,6 +1043,26 @@ export const deleteCheckInAction = async (formData: FormData) => {
 };
 
 /**
+ * Her « vu » on a patient's lower weekly score (D-33): it leaves the awaiting
+ * count and stays in the trail. The service keeps the first time she saw it,
+ * so a second click changes nothing but the button is already gone by then.
+ */
+export const markCheckInSeenAction = async (formData: FormData) => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const seen = await markGoalCheckInSeen(id);
+  if (seen.ok) {
+    await audit(operator, "goal.check_in_seen", {
+      type: "patient_goal_check_in",
+      id,
+      label: field(formData, "title"),
+      detail: seen.data.checkedOn,
+    });
+  }
+  revalidatePatient(field(formData, "patientId"));
+};
+
+/**
  * Replacing the consigne archives the one it replaces — that is the service's
  * doing, not a second call from here. Empty fields are how Morgane says there
  * is no standing instruction, so that is a save, not a validation error.
@@ -1185,7 +1206,7 @@ export const closeChallengeAction = async (
 
 /**
  * Her reply in the patient's general thread (§ 6). The service marks every
- * patient message sent up to the reply read in the same transaction (D-32), so
+ * patient message sent up to the reply read in the same transaction (D-37), so
  * the trail records the reply with how many it answered.
  */
 export const replyToPatientAction = async (
@@ -1221,7 +1242,7 @@ export const replyToPatientAction = async (
   return { error: null, saved: true };
 };
 
-/** « Marquer comme lu » — a patient message that needs no answer (D-32). */
+/** « Marquer comme lu » — a patient message that needs no answer (D-37). */
 export const markMessageReadAction = async (
   _previous: MessageFormState,
   formData: FormData,

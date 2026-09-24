@@ -274,6 +274,10 @@ the repo's own, never synced — and delete a line that reads as a slip rather t
 - After a push, check that the head `ci-status.sh` names is `git rev-parse HEAD` before trusting its verdict; re-run it when it names an older commit. (`FAILURE.md` — patient-documents-and-links)
 
 <!-- Retrospective Learned Rule [2026-09-24] -->
+- A new `AuditAction` in `packages/services/src/shared/audit.ts` needs a label and an intent in `apps/admin/components/audit/vocabulary.ts` in the same commit — both records are exhaustive. (`TS2741`, seen 1× — check-in-and-progression; apps/admin, apps/docs, apps/web, packages/services)
+<!-- Retrospective Learned Rule [2026-09-24] -->
+- Run the Release reviews against `origin/main...HEAD` (and `git remote set-head origin main` first in a cloud session) — the local `main` ref is stale and widens the review to other runs' code. (`FAILURE.md` — check-in-and-progression)
+<!-- Retrospective Learned Rule [2026-09-24] -->
 - never write a literal to a `token:`/`password:`-style key in a test — derive it from a created row (`patient.shareToken`) so `security-check.sh` stays quiet. (`security-check/generic-secret-assignment`, seen 1× — general-feedback; apps/admin, apps/docs, apps/web, packages/services)
 <!-- Retrospective Learned Rule [2026-09-24] -->
 - Before a push that should produce previews, make sure its head commit touches app or package code against its parent — fold `.icm/` run-file updates into the code commit rather than pushing them on top, or the Vercel ignore step skips every project. (`FAILURE.md` — general-feedback)

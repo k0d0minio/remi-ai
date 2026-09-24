@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import {
   MAX_ACTIVE_GOALS,
+  countGoalCheckInsAwaitingAttention,
   countMealEntriesAwaitingFeedback,
   getCurrentChallenge,
   getPatient,
@@ -17,6 +18,7 @@ import {
   listArchivedPatientRecipes,
   listArchivedPatientRecommendations,
   listGoalCheckIns,
+  listGoalScoreStrips,
   listMealEntries,
   listPantryEssentials,
   listPastChallenges,
@@ -90,7 +92,10 @@ import { SummaryHead } from "@/components/patients/summary-head";
 import { SupplementAddForm } from "@/components/patients/supplement-add-form";
 import { SupplementProtocol } from "@/components/patients/supplement-protocol";
 import { SupplementSection } from "@/components/patients/supplement-section";
-import { WorkingGoals } from "@/components/patients/working-goals";
+import {
+  GoalsAwaitingAttention,
+  WorkingGoals,
+} from "@/components/patients/working-goals";
 import { WorkingChallenge } from "@/components/patients/working-challenge";
 import { MessageThread } from "@/components/patients/message-thread";
 import { WorkingMeals } from "@/components/patients/working-meals";
@@ -178,6 +183,8 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     currentChallenge,
     pastChallenges,
     documents,
+    scoreStrips,
+    goalsAwaitingAttention,
     messages,
   ] = await Promise.all([
     listPatientRecommendations(patient.id),
@@ -206,6 +213,8 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     getCurrentChallenge(patient.id),
     listPastChallenges(patient.id),
     listPatientDocuments(patient.id),
+    listGoalScoreStrips(patient.id),
+    countGoalCheckInsAwaitingAttention(patient.id),
     listPatientMessages(patient.id),
   ]);
   // Derived from the thread already in hand rather than a second read.
@@ -223,6 +232,9 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   );
   const checkIns = Object.fromEntries(
     trails.map((trail) => [trail.id, trail.entries]),
+  );
+  const strips = Object.fromEntries(
+    scoreStrips.map((strip) => [strip.goalId, strip.scores]),
   );
   // Both halves or neither: a date with no channel says nothing about what the
   // patient actually agreed through, so it still reads as not recorded.
@@ -427,7 +439,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
-              <WorkingGoals goals={goals} checkIns={checkIns} />
+              <WorkingGoals
+                goals={goals}
+                checkIns={checkIns}
+                scoreStrips={strips}
+                awaitingAttention={goalsAwaitingAttention}
+              />
 
               {goals.length < MAX_ACTIVE_GOALS ? (
                 <GoalAddForm patientId={patient.id} />
@@ -629,6 +646,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
+              <GoalsAwaitingAttention count={goalsAwaitingAttention} />
               {goals.length === 0 ? (
                 <Typography size="sm" tone="muted">
                   Aucun objectif pour le moment.

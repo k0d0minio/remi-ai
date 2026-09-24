@@ -15,8 +15,8 @@ type Props = {
 
 /**
  * The home's feedback card — her § 6 box, writable from the home, with the
- * way through to the whole thread. It sits beside the future one-tap check-in
- * rather than replacing it (D-31), and renders for every patient: it is an
+ * way through to the whole thread. It sits beside the weekly check-in card
+ * rather than replacing it (D-36), and renders for every patient: it is an
  * invitation, not a view of data.
  */
 export const MessageCard = ({

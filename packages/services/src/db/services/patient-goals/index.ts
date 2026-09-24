@@ -1,5 +1,12 @@
 import { z } from "zod";
-import { goalDirections } from "../../../shared/patient";
+import { todayAtPractice } from "../../../shared/format";
+import {
+  goalDirections,
+  goalScores,
+  scoreDirection,
+  weeklyCheckInState,
+  type WeeklyCheckInState,
+} from "../../../shared/patient";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
@@ -326,7 +333,13 @@ export const addGoalCheckIn = async (
       "a check-in needs a direction, a measure or a note",
     );
   }
-  const created = await checkIns(db).insert({ goalId, ...entry, writtenBy });
+  const created = await checkIns(db).insert({
+    goalId,
+    ...entry,
+    writtenBy,
+    score: null,
+    seenAt: null,
+  });
   await touchPatient(goal.patientId, db);
   return ok(created);
 };
@@ -387,4 +400,229 @@ export const deleteGoalCheckIn = async (id: Id): Promise<Result<true>> => {
     }
   }
   return ok(true);
+};
+
+/**
+ * The patient's weekly score, goal by goal — her 14 Sept § 1 through the link
+ * (decisions D-30 to D-33).
+ *
+ * Only the patient writes these rows, and only through `writeThroughPatientLink`:
+ * the caller hands in the patient the token resolved, never an id from the
+ * payload, and every goal named here is checked against that patient before
+ * anything is written.
+ */
+
+export type WeeklyAnswer = {
+  goalId: string;
+  /** `null`, or absent, leaves the goal unrated — it writes nothing. */
+  score?: number | null;
+  note?: string;
+};
+
+const weeklyAnswer = z.object({
+  goalId: z.string(),
+  score: z
+    .number()
+    .int()
+    .refine(
+      (value) => (goalScores as readonly number[]).includes(value),
+      "a score runs from 0 to 5",
+    )
+    .nullable()
+    .optional(),
+  note: z.string().trim().max(2000).optional(),
+});
+
+type ParsedAnswer = z.infer<typeof weeklyAnswer>;
+
+/** The patient's own rows on one goal, oldest first. */
+const patientRowsOldestFirst = async (
+  goalId: Id,
+  db?: DatabaseClient,
+): Promise<readonly PatientGoalCheckIn[]> => {
+  const page = await checkIns(db).findMany(
+    { goalId, writtenBy: "patient" },
+    { limit: 500 },
+  );
+  return [...page.items].sort((a, b) => {
+    if (a.checkedOn !== b.checkedOn) {
+      return a.checkedOn < b.checkedOn ? -1 : 1;
+    }
+    return a.createdAt.getTime() - b.createdAt.getTime();
+  });
+};
+
+/** The newest score the patient gave this goal, or `null` before the first. */
+const previousScore = (rows: readonly PatientGoalCheckIn[]): number | null =>
+  rows.reduce<number | null>((last, row) => row.score ?? last, null);
+
+/**
+ * The day of the patient's last own check-in across their active goals — the
+ * one date the weekly question is computed from (D-9: no scheduler).
+ */
+const lastPatientCheckInOn = async (
+  patientId: Id,
+  db?: DatabaseClient,
+): Promise<string | null> => {
+  let last: string | null = null;
+  for (const goal of await listPatientGoals(patientId)) {
+    for (const row of await patientRowsOldestFirst(goal.id, db)) {
+      if (last === null || row.checkedOn > last) {
+        last = row.checkedOn;
+      }
+    }
+  }
+  return last;
+};
+
+/** Whether the patient's weekly question is open today, and since or until when. */
+export const getWeeklyCheckIn = async (
+  patientId: Id,
+  today: string = todayAtPractice(),
+): Promise<WeeklyCheckInState> =>
+  weeklyCheckInState(await lastPatientCheckInOn(patientId), today);
+
+/**
+ * Writes one row per rated goal, or nothing at all.
+ *
+ * Every rule refuses before the first insert — the ownership of each goal, the
+ * range of each score, that at least one goal is rated, and that the week's
+ * question is open — so a refusal never leaves half an answer behind. A second
+ * submission inside the week (a double tap, a second tab) finds the first one's
+ * rows and is refused in the same way: it writes nothing.
+ */
+export const recordWeeklyCheckIn = async (
+  patientId: Id,
+  answers: readonly WeeklyAnswer[],
+  today: string = todayAtPractice(),
+): Promise<Result<readonly PatientGoalCheckIn[]>> => {
+  const parsed = z.array(weeklyAnswer).max(20).safeParse(answers);
+  if (!parsed.success) {
+    return err("invalid_input", parsed.error.issues[0].message);
+  }
+  const active = new Map(
+    (await listPatientGoals(patientId)).map((goal) => [goal.id, goal]),
+  );
+  if (parsed.data.some((answer) => !active.has(answer.goalId))) {
+    return err("not_found", "no such goal");
+  }
+  const rated = parsed.data.filter(
+    (answer): answer is ParsedAnswer & { score: number } =>
+      answer.score !== null && answer.score !== undefined,
+  );
+  if (rated.length === 0) {
+    return err("invalid_input", "rate at least one goal");
+  }
+  if (new Set(rated.map((answer) => answer.goalId)).size !== rated.length) {
+    return err("invalid_input", "one score per goal");
+  }
+
+  return getDatabase().transaction(
+    async (tx): Promise<Result<readonly PatientGoalCheckIn[]>> => {
+      const state = weeklyCheckInState(
+        await lastPatientCheckInOn(patientId, tx),
+        today,
+      );
+      if (!state.due) {
+        return err("conflict", "this week's question is already answered");
+      }
+      const created: PatientGoalCheckIn[] = [];
+      for (const answer of rated) {
+        const previous = previousScore(
+          await patientRowsOldestFirst(answer.goalId, tx),
+        );
+        created.push(
+          await checkIns(tx).insert({
+            goalId: answer.goalId,
+            checkedOn: today,
+            direction: scoreDirection(previous, answer.score),
+            measure: "",
+            note: answer.note ?? "",
+            writtenBy: "patient",
+            score: answer.score,
+            seenAt: null,
+          }),
+        );
+      }
+      return ok(created);
+    },
+  );
+};
+
+export type GoalScoreStrip = {
+  goalId: Id;
+  /** The patient's last scores on this goal, oldest first. */
+  scores: readonly { id: Id; checkedOn: string; score: number }[];
+};
+
+/** How many weekly scores a strip shows — about a season (spec, pass 4). */
+export const GOAL_SCORE_STRIP_LENGTH = 12;
+
+/**
+ * « Ma progression »'s strip for each active goal, in her order — the same
+ * data on the link and in the console's at-a-glance slot (D-9).
+ */
+export const listGoalScoreStrips = async (
+  patientId: Id,
+): Promise<readonly GoalScoreStrip[]> => {
+  const strips: GoalScoreStrip[] = [];
+  for (const goal of await listPatientGoals(patientId)) {
+    const scored = (await patientRowsOldestFirst(goal.id)).flatMap((row) =>
+      row.score === null || row.score === undefined
+        ? []
+        : [{ id: row.id, checkedOn: row.checkedOn, score: row.score }],
+    );
+    strips.push({
+      goalId: goal.id,
+      scores: scored.slice(-GOAL_SCORE_STRIP_LENGTH),
+    });
+  }
+  return strips;
+};
+
+/** A patient's lower score she has not yet marked « vu » (D-33). */
+const awaitsAttention = (row: PatientGoalCheckIn) =>
+  row.writtenBy === "patient" &&
+  row.direction === "worse" &&
+  (row.seenAt ?? null) === null;
+
+/** How many of the patient's lower scores wait for her, across active goals. */
+export const countGoalCheckInsAwaitingAttention = async (
+  patientId: Id,
+): Promise<number> => {
+  let count = 0;
+  for (const goal of await listPatientGoals(patientId)) {
+    count += (await patientRowsOldestFirst(goal.id)).filter(
+      awaitsAttention,
+    ).length;
+  }
+  return count;
+};
+
+/**
+ * Her « vu » on a patient's lower score. Idempotent: a row already seen keeps
+ * the first time she saw it, so the trail says when she first knew.
+ */
+export const markGoalCheckInSeen = async (
+  id: Id,
+): Promise<Result<PatientGoalCheckIn>> => {
+  if (!uuidSchema.safeParse(id).success) {
+    return err("not_found", "no such check-in");
+  }
+  const existing = await checkIns().findById(id);
+  if (!existing) {
+    return err("not_found", "no such check-in");
+  }
+  if (existing.seenAt) {
+    return ok(existing);
+  }
+  const updated = await checkIns().update(id, { seenAt: new Date() });
+  if (!updated) {
+    return err("not_found", "no such check-in");
+  }
+  const goal = await goals().findById(existing.goalId);
+  if (goal) {
+    await touchPatient(goal.patientId);
+  }
+  return ok(updated);
 };

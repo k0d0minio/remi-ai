@@ -15,7 +15,7 @@ type Props = {
 
 /**
  * Her § 6 question, when the patient last answered it, and the box — the same
- * block on the home and on Messages, so the prompt (D-30) has one rendering.
+ * block on the home and on Messages, so the prompt (D-35) has one rendering.
  *
  * The last-sent line is the weekly framing without a scheduler: the prompt is
  * the same every visit, and the date says how long it has been.

@@ -15,6 +15,7 @@ import { PantryList } from "@/components/patient-link/pantry-list";
 import { RecipeList } from "@/components/patient-link/recipe-list";
 import { RecommendationList } from "@/components/patient-link/recommendation-list";
 import { SegmentPage } from "@/components/patient-link/segment-page";
+import { WeeklyCheckInCard } from "@/components/patient-link/weekly-check-in-card";
 import { getContent } from "@/lib/content";
 import { loadPatientLink } from "@/lib/patient-link/load";
 
@@ -28,7 +29,8 @@ const HOME_DOCUMENTS = 3;
 
 /**
  * Home: the patient's today, in her § 6 order — « Aujourd'hui / cette semaine »
- * (the running challenge, the goals, then the week's consigne), the
+ * (the running challenge, the goals and their weekly question, then the
+ * week's consigne), the
  * prioritised recommendations, the
  * current recipes, the essentials, the way in to a meal, her § 6 feedback box,
  * and the living summary last.
@@ -73,6 +75,7 @@ const PatientLinkHome = async ({ params }: { params: Promise<Params> }) => {
     essentials,
     recipes,
     documents,
+    weeklyCheckIn,
     messages,
   } = data;
 
@@ -119,6 +122,14 @@ const PatientLinkHome = async ({ params }: { params: Promise<Params> }) => {
             />
           </div>
         ) : null}
+
+        <WeeklyCheckInCard
+          goals={goals}
+          state={weeklyCheckIn}
+          locale={locale}
+          token={token}
+          content={content}
+        />
 
         {weekConsigne !== null ? (
           <Card variant="success">
