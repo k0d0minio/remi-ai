@@ -68,8 +68,8 @@ prints what it did, and stops: the read-only ones (`resolve-run.sh`, the validat
 effect stays inside the run, its PR or the working tree (`project-labels.sh`, `project-body.sh`,
 `close-out.sh`, `run-pack.sh`, `retrospective.sh`, `check-migrations.sh`, `security-check.sh`,
 `db-branch.sh`, `process-raw.sh`, `format.sh`, `lint.sh`), and the few with an outward effect —
-`new-run.sh` opens the run's one draft PR, `promote-uat.sh approve` opens a promotion PR (UAT
-repos only), `env.sh add` creates a variable from stdin, `report.sh` announces or alerts on the
+`new-run.sh` opens the run's one draft PR, `promote.sh approve` drafts a promotion Release (UAT
+repos only; the operator publishes it), `env.sh add` creates a variable from stdin, `report.sh` announces or alerts on the
 channels `.icm/project.json` → `reporting` maps — whose effect is the stage's declared output,
 not a side effect, and which refuse or skip plainly rather than act on a guess. `rollback.sh`
 prepares a recovery and executes nothing. The gates are not scripts: no script ticks a checkbox,
