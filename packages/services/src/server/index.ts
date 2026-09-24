@@ -79,7 +79,6 @@ export {
   replyToPatient,
   sendPatientMessage,
 } from "../db/services/patient-messages";
-export type { PatientMessageEntry } from "../db/services/patient-messages";
 
 export {
   deletePatientInstruction,

@@ -21,3 +21,9 @@ export type PatientMessage = Entity & {
   /** The operator who replied; null on the patient's messages. */
   operatorId: Id | null;
 };
+
+/** A message as a thread shows it: her replies carry who wrote them, by name. */
+export type PatientMessageEntry = PatientMessage & {
+  /** The replying operator's name; null on the patient's own messages. */
+  operatorName: string | null;
+};

@@ -110,6 +110,7 @@ export type {
   PatientInstruction,
   PatientLearning,
   PatientMessage,
+  PatientMessageEntry,
   PatientNote,
   PatientObservation,
   PatientProfile,

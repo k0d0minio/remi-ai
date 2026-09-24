@@ -5,6 +5,7 @@ import {
   challengeOwner,
   markMealEntryEaten,
   mealEntryOwner,
+  sendPatientMessage,
   setChallengeAcquired,
   setChallengeReadyForNext,
 } from "@remi/services/server";
@@ -220,4 +221,31 @@ export const tapChallengeAction = async (
     error:
       result.error === "conflict" ? "not_found" : asPatientError(result.error),
   };
+};
+
+/**
+ * Her § 6 box — one general message, written as the patient. The body is
+ * declared as a body so the link's ceiling applies to it; its own rules (not
+ * empty, 2000 at most) are the thread's, in the service.
+ */
+export const sendMessageAction = async (
+  _previous: WriteState,
+  formData: FormData,
+): Promise<WriteState> => {
+  const token = field(formData, "token");
+  const locale = field(formData, "locale");
+  const body = field(formData, "body");
+
+  if (!isLocale(locale)) {
+    return refused;
+  }
+
+  const result = await writePatientLink(locale, token, {
+    action: "message.sent",
+    text: { bodies: [body] },
+    target: { type: "patient_message" },
+    write: async (patient) => sendPatientMessage(patient.id, body),
+  });
+
+  return result.ok ? written : { error: asPatientError(result.error) };
 };

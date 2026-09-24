@@ -2,7 +2,10 @@ import { z } from "zod";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
-import type { PatientMessage } from "../../models/patient-message";
+import type {
+  PatientMessage,
+  PatientMessageEntry,
+} from "../../models/patient-message";
 import { getOperator } from "../operators";
 import { touchPatient } from "../patients";
 
@@ -32,12 +35,6 @@ const bodySchema = z
   .trim()
   .min(1, "a message is required")
   .max(MESSAGE_MAX, "that message is too long");
-
-/** A message as a thread shows it: who replied, by name, when it was her. */
-export type PatientMessageEntry = PatientMessage & {
-  /** The replying operator's name; null on the patient's own messages. */
-  operatorName: string | null;
-};
 
 /**
  * Every row for one patient. A patient who writes weekly and gets a reply each

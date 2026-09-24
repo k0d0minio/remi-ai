@@ -277,6 +277,7 @@ export const en: Content = {
       "placard-frigo": "Pantry & fridge",
       recettes: "Recipes",
       repas: "Meals",
+      messages: "Messages",
     },
     todayTitle: "Today / this week",
     challenge: {
@@ -290,6 +291,28 @@ export const en: Content = {
         rate_limited: "That is a lot at once — try again in a moment.",
         not_found:
           "This challenge has changed in the meantime. Reload the page.",
+        unknown: "That did not work. Try again in a moment.",
+      },
+    },
+    messages: {
+      title: "Your follow-up",
+      prompt:
+        "How is your follow-up going this week? You can also tell us here what you thought of the recipes, challenges or recommendations you were given.",
+      bodyLabel: "Your message",
+      send: "Send",
+      lastSent: "Last message sent on",
+      you: "You",
+      practitioner: "Your practitioner",
+      seeThread: "See your messages",
+      threadTitle: "Your conversation",
+      empty:
+        "You have not written anything yet. Your first message will appear here.",
+      errors: {
+        invalid_input:
+          "This message could not be sent: it is empty or longer than 2000 characters.",
+        rate_limited: "That is a lot at once — try again in a moment.",
+        not_found:
+          "This link is no longer valid. Ask your practitioner for a new one.",
         unknown: "That did not work. Try again in a moment.",
       },
     },

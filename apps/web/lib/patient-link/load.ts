@@ -7,6 +7,7 @@ import {
   listMealEntries,
   listPantryEssentials,
   listPatientGoals,
+  listPatientMessages,
   listPatientRecipes,
   listPatientRecommendations,
   listPatientSupplements,
@@ -16,7 +17,7 @@ import { ensureDatabase } from "@/lib/database";
 import type { PatientLinkSegment } from "./segments";
 
 /**
- * Everything the six segments render, read once per request.
+ * Everything the segments render, read once per request.
  *
  * The standing instruction and the running challenge ride along for the home's
  * « cette semaine » block: two more reads on the same patient, under the same
@@ -47,6 +48,7 @@ export const loadPatientLink = cache(async (token: string) => {
     essentials,
     recipes,
     meals,
+    messages,
   ] = await Promise.all([
     getPatientSummary(patient.id),
     getPatientInstruction(patient.id),
@@ -57,6 +59,7 @@ export const loadPatientLink = cache(async (token: string) => {
     listPantryEssentials(patient.id),
     listPatientRecipes(patient.id),
     listMealEntries(patient.id),
+    listPatientMessages(patient.id),
   ]);
 
   // Awaited rather than fired and forgotten: an unawaited promise in a server
@@ -80,6 +83,9 @@ export const loadPatientLink = cache(async (token: string) => {
     essentials,
     recipes,
     meals,
+    // The general thread, newest first. Only the body, the author, the date
+    // and a reply's operator name ever render.
+    messages,
   };
 });
 
@@ -94,10 +100,11 @@ export type PatientLinkData = NonNullable<
  * its own URL: a nav entry leading to an empty page and a reachable empty page
  * are the same broken product, and Morgane fills patients at her own pace.
  *
- * Two segments are exempt, and for the same reason — they are not waiting on
+ * Three segments are exempt, and for the same reason — they are not waiting on
  * her. Home carries the greeting. Repas carries « Je vais manger » / « J'ai
- * mangé », so it is where the patient's first entry is written: hiding it
- * until an entry exists would make the first one impossible to make.
+ * mangé », and Messages carries her § 6 question, so each is where the
+ * patient's first entry is written: hiding one until an entry exists would
+ * make the first one impossible to make.
  */
 export const visibleSegments = (
   data: PatientLinkData,
@@ -115,7 +122,7 @@ export const visibleSegments = (
   if (data.recipes.length > 0) {
     present.push("recettes");
   }
-  present.push("repas");
+  present.push("repas", "messages");
   return present;
 };
 

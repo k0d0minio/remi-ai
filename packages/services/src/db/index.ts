@@ -126,7 +126,6 @@ export {
   replyToPatient,
   sendPatientMessage,
 } from "./services/patient-messages";
-export type { PatientMessageEntry } from "./services/patient-messages";
 
 export {
   deletePatientInstruction,
