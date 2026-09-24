@@ -1,5 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
+import { getFileStore, isFileStoreConfigured } from "../../../files";
+import { patientFilesPrefix } from "../../../shared/files";
 import { locales } from "../../../shared/i18n";
 import {
   consentChannels,
@@ -10,6 +12,7 @@ import {
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
+import type { PatientDocument } from "../../models/patient-document";
 import type { PatientProfile } from "../../models/patient-profile";
 
 /**
@@ -406,10 +409,39 @@ export const setPatientNextConsultationPrep = async (
   return patient ? ok(patient) : err("not_found", "no such patient");
 };
 
-/** Removes the profile and, by cascade, its recommendations and notes. */
+/**
+ * Removes the profile and, by cascade, everything that hangs off it — and,
+ * first, the patient's files in the store, which no database cascade reaches.
+ * A store that refuses stops the deletion: a patient is never deleted while
+ * their files stay behind. Without a configured store, a patient who has
+ * files is refused for the same reason; one who has none is deleted as ever.
+ */
 export const deletePatient = async (id: Id): Promise<Result<true>> => {
   if (!isValidId(id)) {
     return err("not_found", "no such patient");
+  }
+  if (isFileStoreConfigured()) {
+    try {
+      await getFileStore().removePrefix(patientFilesPrefix(id));
+    } catch {
+      // The sweep goes page by page, so a failure can come after some files
+      // are gone. The profile and its rows stay; the sweep is safe to repeat,
+      // so the answer is to try again, and the message says exactly that.
+      return err(
+        "upstream_failed",
+        "the patient's files could not all be removed from the store — the profile was kept; try the deletion again",
+      );
+    }
+  } else {
+    const files = await getDatabase()
+      .collection<PatientDocument>("patient_documents")
+      .findMany({ patientId: id, kind: "file" }, { limit: 1 });
+    if (files.items.length > 0) {
+      return err(
+        "upstream_failed",
+        "no file store is configured, so the patient's files cannot be removed — nothing was deleted",
+      );
+    }
   }
   const removed = await patients().remove(id);
   return removed ? ok(true) : err("not_found", "no such patient");

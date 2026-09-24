@@ -276,6 +276,7 @@ export const en: Content = {
       complements: "Supplements",
       "placard-frigo": "Pantry & fridge",
       recettes: "Recipes",
+      documents: "Documents",
       repas: "Meals",
     },
     todayTitle: "Today / this week",
@@ -342,6 +343,10 @@ export const en: Content = {
     whyLabel: "Why this one",
     recipesTitle: "Your recipes",
     recipeNoteLabel: "Why this one for you",
+    documentsTitle: "Your documents",
+    documentAddedLabel: "Added",
+    attachedDocumentsLabel: "To read",
+    recipeDocumentsTitle: "Your recipe documents",
     mealsTitle: "Your meals",
     mealSlots: {
       petit_dejeuner: "Breakfast",
