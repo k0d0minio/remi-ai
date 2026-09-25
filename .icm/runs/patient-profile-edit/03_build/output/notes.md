@@ -1,7 +1,7 @@
 # Build notes: patient-profile-edit
 
-- commits: feat: patient-profile-edit — « Mon profil » on the patient link, three-level time and budget, the console marker
-- ci: draft — nothing owed; `lint.sh` OK, `format.sh` clean, `security-check.sh` OK (full verdict after the ready flip)
+- commits: d0fe237 feat (the feature) · 8290b03 fix (0024 idempotent against the shared database) · c90ca8b merge of main · 609568d fix (`.icm/CONTEXT.md` format from main, the nav's stale view-only note)
+- ci: GREEN (full gate) on 609568d — web preview built there; admin preview built on c90ca8b (identical admin code); Quality (advisory) pass
 
 ## What changed
 
@@ -30,6 +30,9 @@
 - [x] RETENTION.md rows
 
 ## Notes for Release
+
+- **0024 is already applied to production** — by this branch's admin preview, which migrates the shared database (`triage/previews-migrate-the-shared-database`). The operator accepted that in session before the push (`decisions.md`). The one production patient's free-text budget is now in `preferences` as « Budget : … » with the budget unset, as D-28 intends. The ledger has 0024, so the merge's production build finds nothing to apply.
+- `.icm/CONTEXT.md` was formatted here because `main` leaves it failing the full format check (from #129). The change is table padding only and no-ops once `main` carries the same fix.
 
 - **The shared database already carried part of this schema.** An abandoned earlier attempt at this stub (`claude/patient-profile-edit-define-rnkw88`, 20 Sept) had its preview add `cooking_time` and `preferences_updated_by_patient_at` to production and make `food_budget` nullable, without a ledger row. 0024 is written `IF NOT EXISTS` and idempotent for that reason. `preferences_updated_by_patient_at` is an orphan column no code reads — left in place; dropping it is a separate chore.
 - **Forward-only migration** (`migrations.reversible: false`): `food_budget` loses its NOT NULL and default, and the old free text is rewritten. Reverting the code after it runs would leave pre-change code reading NULL where it expected a string — a revert needs a fix-forward, not a code rollback.
