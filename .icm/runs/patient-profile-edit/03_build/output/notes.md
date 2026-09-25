@@ -40,3 +40,13 @@
 - The admin selects post `unset` for « Non renseigné »; the action narrows anything outside a set to `""`, which clears the column.
 - The patient-side edit reuses `patient.updated` as its audit action under the `patient` actor (no new `AuditAction`, so no vocabulary change in the console journal).
 - Context budget: read `.icm/docs/RETENTION.md` and the web/admin components the change touches beyond `touches:` (`segment-page.tsx`, `message-form.tsx` as the pattern, `choice-chip.tsx`, `field.tsx`, `typography.tsx`).
+
+## Release
+
+- gate: Ready to merge ticked — merge authorised
+- ci: GREEN on e14d48b (ci-status.sh, full gate); re-read after the last push below
+- reviews: code medium (two correctness findings, both parked) · security security-check.sh --branch --audit: OK + /security-review — n/a: no auth, payments or route-policy change; the patient link's write path is unchanged apart from the opt-in `changedAnything` · readiness env.sh audit --changed: OK · /production-readiness — n/a: the DB change was proven on a replica and is already applied to production (operator-accepted), no env or auth change
+- parked: profile-edit-long-text-blocks-patient-save.md, console-save-overwrites-patient-profile-edit.md (P1 — allergies), orphan-patient-profile-edit-attempt.md (from Build)
+- migrations: skip — check-migrations.sh SKIP (drizzle; 0024 already recorded in production's ledger by the preview, idempotent)
+- learned: 1 rule appended to _shared/project-rules.md
+- docs: business/roles (« Their profile » and what they can change) · announce: deferred to CI (public — changelog 2026-09-25-patient-profile-edit)
