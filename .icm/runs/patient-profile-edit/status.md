@@ -3,8 +3,8 @@
 Where the run is, in five lines. Updated at every stage start and stop, and whenever a flag
 flips. A resuming session reads this first, then `handoff.md` (`_shared/stage-preamble.md`).
 
-- phase: define
-- step: 7 — spec drafted, waiting on Spec approved
-- ci: not read (draft)
-- blocked: yes — on the operator's Spec approved tick
+- phase: build
+- step: 8 — code committed on the draft head, pre-flip checks
+- ci: draft — lint.sh OK
+- blocked: no
 - updated: 2026-09-25

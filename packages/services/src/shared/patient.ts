@@ -54,6 +54,43 @@ export const recommendationCategories = [
 export const cookingAffinities = ["yes", "somewhat", "no"] as const;
 
 /**
+ * How much time the person has to cook — the old version's three levels
+ * (« faible / moyen / important »), her feedback § 7's « temps disponible ».
+ * Three levels on purpose: brainstorm § 7 rules out an exact preparation time,
+ * and a recipe filter only needs to know how short to keep things. Not
+ * recorded is `null`, like the two sets above.
+ */
+export const cookingTimes = ["low", "medium", "high"] as const;
+
+/**
+ * The food budget, in the old version's three levels (« économique /
+ * standard / confort »). A closed set rather than the free text it was, so the
+ * generation prompt and D-6's automated check read one vocabulary instead of
+ * whatever was typed. Not recorded is `null`.
+ */
+export const foodBudgets = ["economical", "standard", "comfort"] as const;
+
+/**
+ * The seven profile fields the patient keeps true themselves, from « Mon
+ * profil » on their link (`patient-profile-edit`) — brainstorm § A's
+ * patient-supplied fields, plus the time to cook. Everything else on the
+ * profile is the practitioner's record and is never written through the link.
+ *
+ * The profile remembers, per field, when the patient last changed it
+ * (`patientEditedAt`), so the console can say « modifié par la patiente le … »
+ * until Morgane next changes that field herself.
+ */
+export const patientEditableProfileFields = [
+  "dietaryRegime",
+  "allergies",
+  "intolerances",
+  "preferences",
+  "likesCooking",
+  "cookingTime",
+  "foodBudget",
+] as const;
+
+/**
  * § B of the v2 brainstorm: the twelve areas an anamnesis is taken across, in
  * the order Morgane works through them.
  *

@@ -352,6 +352,27 @@ describe("writing through a patient link", () => {
     }
   });
 
+  it("records nothing and stamps nothing when a write changed nothing", async () => {
+    const patient = await newPatient("Noor");
+
+    const result = await writeThroughPatientLink({
+      token: patient.shareToken,
+      action: "patient.updated",
+      text: {},
+      write: async () => ok({ changed: [] as string[] }),
+      changedAnything: (data) => data.changed.length > 0,
+    });
+
+    expect(result.ok).toBe(true);
+    const after = await getPatient(patient.id);
+    expect(after.ok && after.data.linkLastWroteAt).toBeNull();
+    expect(
+      (await listAuditEvents({ actorKind: "patient" })).some(
+        (event) => event.actorId === patient.id,
+      ),
+    ).toBe(false);
+  });
+
   it("records nothing and stamps nothing when the write itself fails", async () => {
     const patient = await newPatient("Yasmine");
 

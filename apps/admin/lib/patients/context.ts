@@ -13,6 +13,8 @@ import {
 import {
   categoryLabels,
   cookingAffinityLabels,
+  cookingTimeLabels,
+  foodBudgetLabels,
   patientSexLabels,
 } from "@/components/patients/vocabulary";
 
@@ -62,7 +64,10 @@ export const patientContextInput = ({
     likesCooking: patient.likesCooking
       ? cookingAffinityLabels[patient.likesCooking]
       : "",
-    foodBudget: patient.foodBudget,
+    cookingTime: patient.cookingTime
+      ? cookingTimeLabels[patient.cookingTime]
+      : "",
+    foodBudget: patient.foodBudget ? foodBudgetLabels[patient.foodBudget] : "",
     medications: patient.medications,
     supplements: patient.supplements,
   },

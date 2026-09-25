@@ -1064,6 +1064,11 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 patient={patient}
                 lastEditedAt={formatDate(patient.lastEditedAt)}
                 consent={consent}
+                patientEditedOn={Object.fromEntries(
+                  Object.entries(patient.patientEditedAt).flatMap(
+                    ([field, at]) => (at ? [[field, formatDate(at)]] : []),
+                  ),
+                )}
               />
 
               <SectionFold id="danger-zone" label="Zone sensible" tone="error">

@@ -126,6 +126,13 @@ export type PatientLinkWriteRequest<T> = {
    * credential.
    */
   write: (patient: PatientProfile) => Promise<Result<T>>;
+  /**
+   * Whether a successful write changed anything worth recording. A save that
+   * changed nothing — « Mon profil » submitted as it was — must not claim a
+   * write in the trail or tell Morgane something is waiting for her. Absent
+   * means every successful write is recorded, which is every caller but one.
+   */
+  changedAnything?: (data: T) => boolean;
 };
 
 const tooLong = (values: readonly string[], max: number): boolean =>
@@ -261,6 +268,9 @@ export const writeThroughPatientLink = async <T>(
   const result = await request.write(patient);
   if (!result.ok) {
     return result;
+  }
+  if (request.changedAnything && !request.changedAnything(result.data)) {
+    return ok(result.data);
   }
 
   // Everything below records the write rather than being part of it, so none of

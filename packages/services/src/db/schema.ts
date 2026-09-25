@@ -84,7 +84,14 @@ export const patientProfiles = pgTable("patient_profiles", {
    * consent channel: not asked yet is a different answer from "no".
    */
   likesCooking: text("likes_cooking"),
-  foodBudget: text("food_budget").notNull().default(""),
+  /** « Temps disponible pour cuisiner » — three levels, nullable like the above. */
+  cookingTime: text("cooking_time"),
+  /**
+   * Three levels since `patient-profile-edit`; free text before it. The
+   * migration mapped what named a level and moved the rest into `preferences`
+   * as « Budget : … », so nothing typed was lost. Nullable: not asked yet.
+   */
+  foodBudget: text("food_budget"),
   /**
    * Kept out of `constraints` on purpose — an interaction has to be legible at
    * a glance, not recovered from a paragraph of prose.
@@ -149,6 +156,17 @@ export const patientProfiles = pgTable("patient_profiles", {
     withTimezone: true,
     mode: "date",
   }),
+  /**
+   * Per patient-editable field, when the patient last changed it through
+   * « Mon profil » — `{ allergies: "<iso>" }`. One small map rather than seven
+   * timestamp columns: it only ever answers « modifié par la patiente le … »,
+   * and Morgane changing a field removes its key rather than stamping a date of
+   * her own. The audit trail keeps the full history; this is the current state.
+   */
+  patientEditedAt: jsonb("patient_edited_at")
+    .$type<Record<string, string>>()
+    .notNull()
+    .default({}),
   ...timestamps,
 });
 

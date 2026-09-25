@@ -6,6 +6,9 @@ import { locales } from "../../../shared/i18n";
 import {
   consentChannels,
   cookingAffinities,
+  cookingTimes,
+  foodBudgets,
+  patientEditableProfileFields,
   patientSexes,
   patientStatuses,
 } from "../../../shared/patient";
@@ -13,7 +16,10 @@ import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientDocument } from "../../models/patient-document";
-import type { PatientProfile } from "../../models/patient-profile";
+import type {
+  PatientEditableProfileField,
+  PatientProfile,
+} from "../../models/patient-profile";
 
 /**
  * The patient-profile service — the callable surface behind Morgane's admin
@@ -97,7 +103,8 @@ const patientFields = z.object({
   preferences: text,
   /** `""` clears it; the enum is what a later recipe filter can branch on. */
   likesCooking: z.union([z.literal(""), z.enum(cookingAffinities)]),
-  foodBudget: text,
+  cookingTime: z.union([z.literal(""), z.enum(cookingTimes)]),
+  foodBudget: z.union([z.literal(""), z.enum(foodBudgets)]),
   medications: text,
   supplements: text,
   referral: text,
@@ -229,7 +236,8 @@ export const createPatient = async (
     constraints: data.constraints ?? "",
     preferences: data.preferences ?? "",
     likesCooking: data.likesCooking ? data.likesCooking : null,
-    foodBudget: data.foodBudget ?? "",
+    cookingTime: data.cookingTime ? data.cookingTime : null,
+    foodBudget: data.foodBudget ? data.foodBudget : null,
     medications: data.medications ?? "",
     supplements: data.supplements ?? "",
     referral: data.referral ?? "",
@@ -241,8 +249,35 @@ export const createPatient = async (
     shareToken: newShareToken(),
     linkLastOpenedAt: null,
     linkLastWroteAt: null,
+    patientEditedAt: {},
   });
   return ok(patient);
+};
+
+type EditableValues = Pick<PatientProfile, PatientEditableProfileField>;
+
+/** The fields of a patch that would actually change what the row holds. */
+const changedEditableFields = (
+  current: PatientProfile,
+  patch: Partial<EditableValues>,
+): PatientEditableProfileField[] =>
+  patientEditableProfileFields.filter(
+    (field) => patch[field] !== undefined && patch[field] !== current[field],
+  );
+
+/** The map without the given fields — `undefined` when nothing was dropped. */
+const withoutEdits = (
+  edits: PatientProfile["patientEditedAt"],
+  fields: readonly PatientEditableProfileField[],
+): PatientProfile["patientEditedAt"] | undefined => {
+  if (!fields.some((field) => edits[field] !== undefined)) {
+    return undefined;
+  }
+  const kept = { ...edits };
+  for (const field of fields) {
+    delete kept[field];
+  }
+  return kept;
 };
 
 export const updatePatient = async (
@@ -265,6 +300,8 @@ export const updatePatient = async (
     consentDate,
     consentChannel,
     likesCooking,
+    cookingTime,
+    foodBudget,
     ...rest
   } = parsed.data;
   const patch: Partial<PatientProfile> = { ...rest, lastEditedAt: new Date() };
@@ -276,9 +313,106 @@ export const updatePatient = async (
   assign(patch, "consentDate", nullableText(consentDate));
   assign(patch, "consentChannel", nullableEnum(consentChannel));
   assign(patch, "likesCooking", nullableEnum(likesCooking));
+  assign(patch, "cookingTime", nullableEnum(cookingTime));
+  assign(patch, "foodBudget", nullableEnum(foodBudget));
+
+  // Her change to a field the patient last changed makes the value hers again,
+  // so « modifié par la patiente » comes off that field — and only that one.
+  // The console form posts every field on each save, so the test is whether
+  // the value moved, not whether it was sent.
+  const current = await patients().findById(id);
+  if (!current) {
+    return err("not_found", "no such patient");
+  }
+  assign(
+    patch,
+    "patientEditedAt",
+    withoutEdits(
+      current.patientEditedAt,
+      changedEditableFields(current, patch),
+    ),
+  );
 
   const patient = await patients().update(id, patch);
   return patient ? ok(patient) : err("not_found", "no such patient");
+};
+
+/**
+ * The seven fields of « Mon profil », as the patient's form posts them. Every
+ * field is required: the form always sends all seven, and a missing one is a
+ * post nothing on the page can produce.
+ */
+const patientProfileEditFields = patientFields
+  .pick({
+    dietaryRegime: true,
+    allergies: true,
+    intolerances: true,
+    preferences: true,
+    likesCooking: true,
+    cookingTime: true,
+    foodBudget: true,
+  })
+  .required();
+
+export type PatientProfileEdit = z.input<typeof patientProfileEditFields>;
+
+export type PatientProfileEdited = {
+  patient: PatientProfile;
+  /** The fields this save changed; empty when it changed nothing. */
+  changed: readonly PatientEditableProfileField[];
+};
+
+/**
+ * The patient keeping their own food profile true, from « Mon profil »
+ * (`patient-profile-edit`). Reached only through `writeThroughPatientLink`,
+ * which resolves the token, applies the link's ceilings and records the write.
+ *
+ * Only the seven patient-editable fields can move — the rest of the profile is
+ * the practitioner's record and this function cannot name it. A save that
+ * changes nothing writes nothing, so the caller can leave it out of the trail.
+ * It never moves `lastEditedAt`: that column means Morgane worked on this
+ * patient and sorts her roster.
+ */
+export const updatePatientProfileByPatient = async (
+  id: Id,
+  input: PatientProfileEdit,
+): Promise<Result<PatientProfileEdited>> => {
+  if (!isValidId(id)) {
+    return err("not_found", "no such patient");
+  }
+  const parsed = patientProfileEditFields.safeParse(input);
+  if (!parsed.success) {
+    return invalid(parsed.error.issues[0]);
+  }
+  const current = await patients().findById(id);
+  if (!current) {
+    return err("not_found", "no such patient");
+  }
+
+  const { likesCooking, cookingTime, foodBudget, ...texts } = parsed.data;
+  const next: EditableValues = {
+    ...texts,
+    likesCooking: likesCooking === "" ? null : likesCooking,
+    cookingTime: cookingTime === "" ? null : cookingTime,
+    foodBudget: foodBudget === "" ? null : foodBudget,
+  };
+  const changed = changedEditableFields(current, next);
+  if (changed.length === 0) {
+    return ok({ patient: current, changed });
+  }
+
+  const at = new Date().toISOString();
+  const edits = { ...current.patientEditedAt };
+  const patch: Partial<PatientProfile> = {};
+  for (const field of changed) {
+    Object.assign(patch, { [field]: next[field] });
+    edits[field] = at;
+  }
+  patch.patientEditedAt = edits;
+  const patient = await patients().update(id, patch);
+  return patient
+    ? ok({ patient, changed })
+    : err("not_found", "no such patient");
 };
 
 /**

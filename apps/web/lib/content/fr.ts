@@ -280,6 +280,7 @@ export const fr: Content = {
       repas: "Repas",
       progression: "Ma progression",
       messages: "Messages",
+      profil: "Mon profil",
     },
     todayTitle: "Aujourd'hui / cette semaine",
     challenge: {
@@ -330,6 +331,47 @@ export const fr: Content = {
         not_acquired: "Non acquis",
         abandoned: "Abandonné",
       },
+    },
+    profile: {
+      title: "Mon profil",
+      lead: "Ce que vous mangez, ce que vous évitez et le temps que vous avez : gardez-le à jour, votre praticienne et REMI s'en servent pour vos suggestions.",
+      dietaryRegimeLabel: "Régime alimentaire",
+      allergiesLabel: "Allergies",
+      allergiesHint:
+        "Ce que vous ne devez jamais manger. Votre praticienne verra chaque changement.",
+      intolerancesLabel: "Intolérances",
+      preferencesLabel: "Aliments aimés / non aimés",
+      preferencesHint: "Ce que vous aimez, ce que vous n'aimez pas.",
+      likesCookingLabel: "Aimez-vous cuisiner ?",
+      cookingTimeLabel: "Temps disponible pour cuisiner",
+      foodBudgetLabel: "Budget alimentaire",
+      unset: "Pas renseigné",
+      likesCooking: { yes: "Oui", somewhat: "Un peu", no: "Non" },
+      cookingTime: { low: "Faible", medium: "Moyen", high: "Important" },
+      foodBudget: {
+        economical: "Économique",
+        standard: "Standard",
+        comfort: "Confort",
+      },
+      save: "Enregistrer",
+      saved: "Enregistré. Votre praticienne verra ce qui a changé.",
+      errors: {
+        invalid_input:
+          "Ce profil n'a pas pu être enregistré : un champ dépasse 2000 caractères.",
+        rate_limited:
+          "Vous avez écrit beaucoup de choses d'un coup — réessayez dans un instant.",
+        not_found:
+          "Ce lien n'est plus valable. Demandez-en un nouveau à votre praticienne.",
+        unknown: "Cela n'a pas fonctionné. Réessayez dans un instant.",
+      },
+      recordTitle: "Ce que votre praticienne a noté",
+      recordLead: "Pour le modifier, parlez-en à votre praticienne.",
+      nameLabel: "Nom",
+      ageLabel: "Âge",
+      ageValue: "{age} ans",
+      heightLabel: "Taille",
+      weightLabel: "Poids",
+      notRecorded: "Pas encore noté",
     },
     messages: {
       title: "Votre accompagnement",

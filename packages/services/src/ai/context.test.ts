@@ -22,7 +22,8 @@ const full: PatientContextInput = {
     constraints: "reflux, éviter les plats épicés",
     preferences: "aime le poisson, n'aime pas les abats",
     likesCooking: "un peu",
-    foodBudget: "moyen",
+    cookingTime: "faible",
+    foodBudget: "économique",
     medications: "lévothyroxine",
     supplements: "magnésium acheté en pharmacie",
   },
@@ -74,6 +75,7 @@ const empty: PatientContextInput = {
     constraints: "",
     preferences: "",
     likesCooking: "",
+    cookingTime: "",
     foodBudget: "",
     medications: "",
     supplements: "",
@@ -93,6 +95,9 @@ describe("patientContextText", () => {
     expect(text.startsWith(DEFAULT_CONTEXT_PREAMBLE)).toBe(true);
     expect(text).toContain("Profil\n- Patiente A · 41 ans · femme");
     expect(text).toContain("- Allergies : arachides");
+    expect(text).toContain(
+      "- Aime cuisiner : un peu\n- Temps disponible pour cuisiner : faible\n- Budget : économique",
+    );
     expect(text).toContain("- Médicaments : lévothyroxine");
     expect(text).toContain("- Compléments hors protocole : magnésium");
     expect(text).toContain(
