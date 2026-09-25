@@ -5,3 +5,8 @@ patient_profiles already has cooking_time and preferences_updated_by_patient_at,
 added 2026-09-20 by the preview of the abandoned branch claude/patient-profile-edit-define-rnkw88, never recorded in drizzle's ledger)
 - resolved: 0024's plain `ADD COLUMN "cooking_time"` hit 42701 on the shared database, which admin previews migrate (triage/previews-migrate-the-shared-database); the migration now adds both columns IF NOT EXISTS and its budget mapping maps the stored level keys to themselves, so it applies on the drifted database and a second run changes nothing (proven on a scratch Postgres 16 replica of that state).
 - rule: A migration in this repo must be safe to run twice and against columns an unmerged branch's preview may already have added — `ADD COLUMN IF NOT EXISTS`, data updates that map their own output to itself — because admin previews migrate the shared production database.
+
+## 2026-09-25T12:49:09Z ci Quality (advisory) — format:check on the ready head c90ca8b
+[warn] .icm/CONTEXT.md
+[warn] Code style issues found in the above file. Run Prettier with --write to fix.
+- resolved: `main`'s #129 added a table row to the project-owned `.icm/CONTEXT.md` without re-padding the table; draft heads only check changed files, so it surfaced on the first full check after the ready flip. Formatted with `format.sh --base e333b26~1` (the file alone) and committed here — it no-ops once `main` carries the same fix.
