@@ -13,9 +13,12 @@ not copies: the spec stays the spec, the scope stays the scope. Seeded when the 
 
 ## Constraints
 
-- <what must stay true while this run is built — from the spec's Out of scope, the `D-n`
-  decisions in `decisions.md`, and `_shared/project-rules.md`>
+- D-2: every patient write goes through `patient-link-writes` — the token is the only credential.
+- D-23 is out of scope: `birth_date` and the console's identity fields do not change.
+- The patient never edits identity, measures, objective, constraints, medications or supplements.
+- The admin patient form changes only for the time select and the budget select.
+- Brainstorm § 7: no exact preparation time — three levels only.
 
 ## Context budget
 
-- <what was loaded beyond the stage's Inputs, and why — the stage's overrun note lives here>
+- Define read `.icm/docs/RETENTION.md`, the old version's onboarding (`.icm/processed/…remi-v2-explication-syste-me.txt`) and the 28 Aug transcript around [29:32], to close the stub's open points.
