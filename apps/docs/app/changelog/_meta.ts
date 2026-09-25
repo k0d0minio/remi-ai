@@ -3,6 +3,8 @@
 // a new entry goes at the top of this object, which is what puts newest first.
 export default {
   index: "Overview",
+  "2026-09-25-fix-console-today-timezone":
+    "Today means Brussels, not the server",
   "2026-09-24-check-in-and-progression":
     "Once a week, each goal gets a number from 0 to 5",
   "2026-09-24-general-feedback": "One place for how their week is going",
