@@ -1,0 +1,7 @@
+## 2026-09-25T12:40:00Z ci Vercel – admin — db:migrate failed on the draft head d0fe237
+@remi/admin:build: ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @remi/services@1.0.0 db:migrate: `node scripts/migrate.mjs`
+(drizzle-kit's spinner swallows the SQL error; read from the shared database instead:
+patient_profiles already has cooking_time and preferences_updated_by_patient_at, food_budget already nullable —
+added 2026-09-20 by the preview of the abandoned branch claude/patient-profile-edit-define-rnkw88, never recorded in drizzle's ledger)
+- resolved: 0024's plain `ADD COLUMN "cooking_time"` hit 42701 on the shared database, which admin previews migrate (triage/previews-migrate-the-shared-database); the migration now adds both columns IF NOT EXISTS and its budget mapping maps the stored level keys to themselves, so it applies on the drifted database and a second run changes nothing (proven on a scratch Postgres 16 replica of that state).
+- rule: A migration in this repo must be safe to run twice and against columns an unmerged branch's preview may already have added — `ADD COLUMN IF NOT EXISTS`, data updates that map their own output to itself — because admin previews migrate the shared production database.

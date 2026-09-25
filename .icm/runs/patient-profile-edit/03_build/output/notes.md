@@ -31,6 +31,7 @@
 
 ## Notes for Release
 
+- **The shared database already carried part of this schema.** An abandoned earlier attempt at this stub (`claude/patient-profile-edit-define-rnkw88`, 20 Sept) had its preview add `cooking_time` and `preferences_updated_by_patient_at` to production and make `food_budget` nullable, without a ledger row. 0024 is written `IF NOT EXISTS` and idempotent for that reason. `preferences_updated_by_patient_at` is an orphan column no code reads — left in place; dropping it is a separate chore.
 - **Forward-only migration** (`migrations.reversible: false`): `food_budget` loses its NOT NULL and default, and the old free text is rewritten. Reverting the code after it runs would leave pre-change code reading NULL where it expected a string — a revert needs a fix-forward, not a code rollback.
 - The profile summary's food group now also shows « Aliments aimés / non aimés » (`preferences`), which it did not before — needed for the marker on all seven fields.
 - The admin selects post `unset` for « Non renseigné »; the action narrows anything outside a set to `""`, which clears the column.
