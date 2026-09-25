@@ -271,7 +271,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   // The default consultation date, resolved server-side: a date input seeded
   // from the browser's clock disagrees with the server the moment someone is
   // working across midnight or from another timezone.
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayAtPractice();
 
   // The section registry — the one list the desktop index, the phone segments
   // and the medium anchor row all read. Every rendered section, in DOM order.
