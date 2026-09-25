@@ -8,6 +8,7 @@ import {
   listGoalCheckIns,
   listPatientGoals,
 } from "@remi/services/server";
+import { todayAtPractice } from "@remi/services/shared";
 import { Typography } from "@remi/ui/server";
 import {
   ConsultationForm,
@@ -73,7 +74,7 @@ const NewConsultation = async ({ params }: PageProps) => {
 
   // Resolved server-side: a date input seeded from the browser's clock
   // disagrees with the server the moment someone works across midnight.
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayAtPractice();
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
