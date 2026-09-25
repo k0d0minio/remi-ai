@@ -23,3 +23,4 @@ Settled with the operator in Define, 2026-09-25:
 - D-26 — The patient edits allergies freely (add, change, remove); the console's « modifié par la patiente le … » marker and the audit trail are the safeguard, not a confirmation step.
 - D-27 — D-23 is out of scope here: the patient does not edit identity, `birth_date` stays, age stays derived; the 18+ check belongs to `beyond-december/patient-accounts`.
 - D-28 — Existing free-text `food_budget` values that name no level move into `preferences` as « Budget : <text> »; nothing typed is lost.
+- The operator accepted, in session on 2026-09-25, that this branch's admin preview applies 0024 to the shared production database before the merge (the one patient's budget text moved into `preferences` early).
