@@ -3,6 +3,9 @@ import type { Locale } from "../../shared/i18n";
 import type {
   consentChannels,
   cookingAffinities,
+  cookingTimes,
+  foodBudgets,
+  patientEditableProfileFields,
   patientSexes,
   patientStatuses,
 } from "../../shared/patient";
@@ -11,6 +14,10 @@ export type PatientStatus = (typeof patientStatuses)[number];
 export type PatientSex = (typeof patientSexes)[number];
 export type ConsentChannel = (typeof consentChannels)[number];
 export type CookingAffinity = (typeof cookingAffinities)[number];
+export type CookingTime = (typeof cookingTimes)[number];
+export type FoodBudget = (typeof foodBudgets)[number];
+export type PatientEditableProfileField =
+  (typeof patientEditableProfileFields)[number];
 
 /**
  * The profile Morgane creates and maintains for each of her patients — the
@@ -45,7 +52,10 @@ export type PatientProfile = Entity & {
   preferences: string;
   /** `null` until Morgane has asked — not the same answer as `"no"`. */
   likesCooking: CookingAffinity | null;
-  foodBudget: string;
+  /** `null` until asked, like `likesCooking`. */
+  cookingTime: CookingTime | null;
+  /** `null` until asked. Was free text before `patient-profile-edit`. */
+  foodBudget: FoodBudget | null;
   medications: string;
   supplements: string;
   referral: string;
@@ -76,4 +86,11 @@ export type PatientProfile = Entity & {
    * and only the second one is waiting for Morgane.
    */
   linkLastWroteAt: Date | null;
+  /**
+   * Per patient-editable field, when the patient last changed it through their
+   * link — an ISO instant. A field is absent when its latest change was
+   * Morgane's (or nobody's): her own change to a field removes its entry, so
+   * « modifié par la patiente le … » only ever describes the value on screen.
+   */
+  patientEditedAt: Partial<Record<PatientEditableProfileField, string>>;
 };

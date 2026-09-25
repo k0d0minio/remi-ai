@@ -282,3 +282,6 @@ the repo's own, never synced — and delete a line that reads as a slip rather t
 - Before a push that should produce previews, make sure its head commit touches app or package code against its parent — fold `.icm/` run-file updates into the code commit rather than pushing them on top, or the Vercel ignore step skips every project. (`FAILURE.md` — general-feedback)
 <!-- Retrospective Learned Rule [2026-09-24] -->
 - A PR that sits `PENDING` with its required check never registered is first a merge-conflict question: check `mergeable` before re-running anything. (`FAILURE.md` — general-feedback)
+
+<!-- Retrospective Learned Rule [2026-09-25] -->
+- A migration in this repo must be safe to run twice and against columns an unmerged branch's preview may already have added — `ADD COLUMN IF NOT EXISTS`, data updates that map their own output to itself — because admin previews migrate the shared production database. (`ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL`, seen 2× — patient-profile-edit, general-feedback; apps/admin, apps/docs, apps/web, packages/services)

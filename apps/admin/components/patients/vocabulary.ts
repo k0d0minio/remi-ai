@@ -4,8 +4,10 @@ import type {
   ChallengeOutcome,
   ConsentChannel,
   CookingAffinity,
+  CookingTime,
   DocumentKind,
   DocumentTag,
+  FoodBudget,
   GoalDirection,
   Locale,
   MealSlot,
@@ -107,6 +109,20 @@ export const cookingAffinityLabels: Record<CookingAffinity, string> = {
   yes: "oui",
   somewhat: "un peu",
   no: "non",
+};
+
+/** « Temps disponible pour cuisiner » — the old version's three levels (D-25). */
+export const cookingTimeLabels: Record<CookingTime, string> = {
+  low: "faible",
+  medium: "moyen",
+  high: "important",
+};
+
+/** The food budget — the old version's three levels (D-25). */
+export const foodBudgetLabels: Record<FoodBudget, string> = {
+  economical: "économique",
+  standard: "standard",
+  comfort: "confort",
 };
 
 /**

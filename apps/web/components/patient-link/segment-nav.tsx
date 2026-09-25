@@ -21,8 +21,8 @@ type Props = {
 /**
  * The segment navigation — a client island purely because the current route
  * decides which link is highlighted, the same reason the signed-in shell's
- * nav is one. Nothing here is a form, an input or a mutation: the link stays
- * view-only (decision #1).
+ * nav is one. Nothing here is a form, an input or a mutation — the segments
+ * it leads to are where the patient writes (decision D-2).
  *
  * Phone-first is the acceptance bar rather than a preference, because patients
  * open this from a WhatsApp message: the row wraps instead of scrolling

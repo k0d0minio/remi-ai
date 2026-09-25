@@ -5,6 +5,8 @@ import type { PatientProfile } from "@remi/services/shared";
 import {
   consentChannels,
   cookingAffinities,
+  cookingTimes,
+  foodBudgets,
   formatDate,
   locales,
   patientSexes,
@@ -33,13 +35,23 @@ import {
 import {
   consentChannelLabels,
   cookingAffinityLabels,
+  cookingTimeLabels,
   dietaryRegimeSuggestions,
+  foodBudgetLabels,
   localeLabels,
   patientSexLabels,
   patientStatusLabels,
 } from "@/components/patients/vocabulary";
 
 const initial: PatientFormState = { error: null, saved: false };
+
+/**
+ * The « non renseigné » choice of the three-level selects. A select item
+ * cannot carry `""`, so it posts this word, which no vocabulary contains — the
+ * action narrows anything outside a set to `""`, and `""` clears the column.
+ */
+const UNSET = "unset";
+const UNSET_LABEL = "Non renseigné";
 
 type Props = {
   /** Present when editing; absent on `/patients/new`. */
@@ -451,9 +463,10 @@ export const PatientForm = ({ patient, onSaved }: Props) => {
               defaultValue={patient?.likesCooking ?? ""}
             >
               <SelectTrigger id="likesCooking">
-                <SelectValue placeholder="Non renseigné" />
+                <SelectValue placeholder={UNSET_LABEL} />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value={UNSET}>{UNSET_LABEL}</SelectItem>
                 {cookingAffinities.map((affinity) => (
                   <SelectItem key={affinity} value={affinity}>
                     {cookingAffinityLabels[affinity]}
@@ -464,16 +477,48 @@ export const PatientForm = ({ patient, onSaved }: Props) => {
           </Field>
 
           <Field
+            id="cookingTime"
+            label="Temps disponible pour cuisiner"
+            optional
+            hint="Détermine à quel point une recette doit rester courte."
+          >
+            <Select
+              name="cookingTime"
+              defaultValue={patient?.cookingTime ?? ""}
+            >
+              <SelectTrigger id="cookingTime">
+                <SelectValue placeholder={UNSET_LABEL} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={UNSET}>{UNSET_LABEL}</SelectItem>
+                {cookingTimes.map((time) => (
+                  <SelectItem key={time} value={time}>
+                    {cookingTimeLabels[time]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          <Field
             id="foodBudget"
             label="Budget alimentaire"
             optional
-            hint="Ce qui garde les suggestions réalistes. Texte libre."
+            hint="Ce qui garde les suggestions réalistes."
           >
-            <Input
-              id="foodBudget"
-              name="foodBudget"
-              defaultValue={patient?.foodBudget ?? ""}
-            />
+            <Select name="foodBudget" defaultValue={patient?.foodBudget ?? ""}>
+              <SelectTrigger id="foodBudget">
+                <SelectValue placeholder={UNSET_LABEL} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={UNSET}>{UNSET_LABEL}</SelectItem>
+                {foodBudgets.map((budget) => (
+                  <SelectItem key={budget} value={budget}>
+                    {foodBudgetLabels[budget]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Field>
         </div>
 

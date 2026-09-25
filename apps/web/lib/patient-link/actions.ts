@@ -9,9 +9,13 @@ import {
   sendPatientMessage,
   setChallengeAcquired,
   setChallengeReadyForNext,
+  updatePatientProfileByPatient,
   type WeeklyAnswer,
 } from "@remi/services/server";
 import {
+  cookingAffinities,
+  cookingTimes,
+  foodBudgets,
   goalScores,
   isLocale,
   mealIntents,
@@ -299,6 +303,82 @@ export const sendMessageAction = async (
     text: { bodies: [body] },
     target: { type: "patient_message" },
     write: async (patient) => sendPatientMessage(patient.id, body),
+  });
+
+  return result.ok ? written : { error: asPatientError(result.error) };
+};
+
+/**
+ * `""` is « pas renseigné », a real answer. Anything else outside the set is a
+ * post nothing on the page can produce, so it is refused (`undefined`) rather
+ * than quietly saved as unanswered.
+ */
+const asLevel = <T extends string>(
+  levels: readonly T[],
+  value: string,
+): T | "" | undefined => {
+  if (value === "") {
+    return "";
+  }
+  return (levels as readonly string[]).includes(value)
+    ? (value as T)
+    : undefined;
+};
+
+/**
+ * « Mon profil » — the seven fields the patient keeps true, saved together.
+ *
+ * The four texts are declared as bodies so the link's cap applies to each;
+ * the three levels as shorts. A save that changed nothing is still a success
+ * for the patient, but the write path leaves it out of the trail and does not
+ * tell Morgane something is waiting (`changedAnything`).
+ */
+export const saveProfileAction = async (
+  _previous: WriteState,
+  formData: FormData,
+): Promise<WriteState> => {
+  const token = field(formData, "token");
+  const locale = field(formData, "locale");
+  const dietaryRegime = field(formData, "dietaryRegime");
+  const allergies = field(formData, "allergies");
+  const intolerances = field(formData, "intolerances");
+  const preferences = field(formData, "preferences");
+  const postedLevels = [
+    field(formData, "likesCooking"),
+    field(formData, "cookingTime"),
+    field(formData, "foodBudget"),
+  ];
+  const likesCooking = asLevel(cookingAffinities, postedLevels[0]);
+  const cookingTime = asLevel(cookingTimes, postedLevels[1]);
+  const foodBudget = asLevel(foodBudgets, postedLevels[2]);
+
+  if (
+    !isLocale(locale) ||
+    likesCooking === undefined ||
+    cookingTime === undefined ||
+    foodBudget === undefined
+  ) {
+    return refused;
+  }
+
+  const result = await writePatientLink(locale, token, {
+    action: "patient.updated",
+    text: {
+      bodies: [dietaryRegime, allergies, intolerances, preferences],
+      shorts: postedLevels,
+    },
+    target: { type: "patient" },
+    write: async (patient) =>
+      updatePatientProfileByPatient(patient.id, {
+        dietaryRegime,
+        allergies,
+        intolerances,
+        preferences,
+        likesCooking,
+        cookingTime,
+        foodBudget,
+      }),
+    changedAnything: (edited) => edited.changed.length > 0,
   });
 
   return result.ok ? written : { error: asPatientError(result.error) };
