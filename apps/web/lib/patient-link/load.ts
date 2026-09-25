@@ -128,11 +128,12 @@ export type PatientLinkData = NonNullable<
  * Progression shows when there is a goal to score or a challenge behind the
  * patient — the two things it is made of.
  *
- * Three segments are exempt, and for the same reason — they are not waiting on
+ * Four segments are exempt, and for the same reason — they are not waiting on
  * her. Home carries the greeting. Repas carries « Je vais manger » / « J'ai
- * mangé », and Messages carries her § 6 question, so each is where the
- * patient's first entry is written: hiding one until an entry exists would
- * make the first one impossible to make.
+ * mangé », Messages carries her § 6 question, and Mon profil is where the
+ * patient fills in what she has not asked yet, so each is where the patient's
+ * first entry is written: hiding one until an entry exists would make the
+ * first one impossible to make.
  */
 export const visibleSegments = (
   data: PatientLinkData,
@@ -161,6 +162,7 @@ export const visibleSegments = (
     present.push("progression");
   }
   present.push("messages");
+  present.push("profil");
   return present;
 };
 

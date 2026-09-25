@@ -169,6 +169,13 @@
       "when": 1790253892075,
       "tag": "0023_patient_messages",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1790339079182,
+      "tag": "0024_patient_profile_edit",
+      "breakpoints": true
     }
   ]
 }

@@ -11,6 +11,8 @@ import {
   regenerateShareToken,
   setPatientNextConsultationPrep,
   updatePatient,
+  updatePatientProfileByPatient,
+  type PatientProfileEdit,
 } from "./index";
 
 beforeAll(() => {
@@ -269,7 +271,8 @@ describe("the food profile", () => {
         intolerances: "lactose",
         constraints: "hypothyroïdie",
         likesCooking: "somewhat",
-        foodBudget: "serré, courses au marché",
+        cookingTime: "low",
+        foodBudget: "economical",
       }),
     );
     expect(created.dietaryRegime).toBe("végétarien, sans gluten");
@@ -278,7 +281,8 @@ describe("the food profile", () => {
     expect(created.intolerances).toBe("lactose");
     expect(created.constraints).toBe("hypothyroïdie");
     expect(created.likesCooking).toBe("somewhat");
-    expect(created.foodBudget).toBe("serré, courses au marché");
+    expect(created.cookingTime).toBe("low");
+    expect(created.foodBudget).toBe("economical");
   });
 
   it("leaves them empty, and the affinity not recorded, when nothing is given", async () => {
@@ -286,9 +290,11 @@ describe("the food profile", () => {
     expect(created.dietaryRegime).toBe("");
     expect(created.allergies).toBe("");
     expect(created.intolerances).toBe("");
-    expect(created.foodBudget).toBe("");
-    // Not asked yet is a different answer from "no".
+    // Not asked yet is a different answer from any level.
+    expect(created.foodBudget).toBeNull();
+    expect(created.cookingTime).toBeNull();
     expect(created.likesCooking).toBeNull();
+    expect(created.patientEditedAt).toEqual({});
   });
 
   it("takes each value of the affinity, and refuses one outside the set", async () => {
@@ -303,6 +309,37 @@ describe("the food profile", () => {
         await createPatient({
           pseudonym: "Bad",
           likesCooking: "sometimes" as never,
+        })
+      ).ok,
+    ).toBe(false);
+  });
+
+  it("takes each level of time and budget, and refuses free text", async () => {
+    for (const cookingTime of ["low", "medium", "high"] as const) {
+      const created = unwrapOk(
+        await createPatient({ pseudonym: "Time", cookingTime }),
+      );
+      expect(created.cookingTime).toBe(cookingTime);
+    }
+    for (const foodBudget of ["economical", "standard", "comfort"] as const) {
+      const created = unwrapOk(
+        await createPatient({ pseudonym: "Budget", foodBudget }),
+      );
+      expect(created.foodBudget).toBe(foodBudget);
+    }
+    expect(
+      (
+        await createPatient({
+          pseudonym: "Bad",
+          foodBudget: "serré, courses au marché" as never,
+        })
+      ).ok,
+    ).toBe(false);
+    expect(
+      (
+        await createPatient({
+          pseudonym: "Bad",
+          cookingTime: "30 min" as never,
         })
       ).ok,
     ).toBe(false);
@@ -330,7 +367,7 @@ describe("the food profile", () => {
         dietaryRegime: "sans gluten",
         allergies: "arachides",
         likesCooking: "no",
-        foodBudget: "moyen",
+        foodBudget: "standard",
       }),
     );
     const updated = unwrapOk(
@@ -340,7 +377,153 @@ describe("the food profile", () => {
     expect(updated.dietaryRegime).toBe("sans gluten");
     expect(updated.allergies).toBe("arachides");
     expect(updated.likesCooking).toBe("no");
-    expect(updated.foodBudget).toBe("moyen");
+    expect(updated.foodBudget).toBe("standard");
+  });
+});
+
+/** « Mon profil » as the patient's form posts it — all seven, every time. */
+const profileEdit = (
+  overrides: Partial<PatientProfileEdit> = {},
+): PatientProfileEdit => ({
+  dietaryRegime: "",
+  allergies: "",
+  intolerances: "",
+  preferences: "",
+  likesCooking: "",
+  cookingTime: "",
+  foodBudget: "",
+  ...overrides,
+});
+
+describe("the patient editing their own food profile", () => {
+  it("saves the seven fields and dates each one it changed", async () => {
+    const created = unwrapOk(
+      await createPatient({ pseudonym: "Lina", allergies: "arachides" }),
+    );
+    const edited = unwrapOk(
+      await updatePatientProfileByPatient(
+        created.id,
+        profileEdit({
+          dietaryRegime: "végétarien",
+          allergies: "arachides",
+          preferences: "aime les lentilles, pas le chou",
+          likesCooking: "somewhat",
+          cookingTime: "medium",
+          foodBudget: "comfort",
+        }),
+      ),
+    );
+
+    expect(edited.changed).toEqual([
+      "dietaryRegime",
+      "preferences",
+      "likesCooking",
+      "cookingTime",
+      "foodBudget",
+    ]);
+    const saved = unwrapOk(await getPatient(created.id));
+    expect(saved.dietaryRegime).toBe("végétarien");
+    expect(saved.cookingTime).toBe("medium");
+    expect(saved.foodBudget).toBe("comfort");
+    // Allergies were posted as they were, so they are not the patient's edit.
+    expect(Object.keys(saved.patientEditedAt).sort()).toEqual(
+      [...edited.changed].sort(),
+    );
+    expect(saved.patientEditedAt.allergies).toBeUndefined();
+  });
+
+  it("lets the patient remove an allergy, and dates it", async () => {
+    const created = unwrapOk(
+      await createPatient({ pseudonym: "Maé", allergies: "arachides" }),
+    );
+    const edited = unwrapOk(
+      await updatePatientProfileByPatient(created.id, profileEdit()),
+    );
+    expect(edited.changed).toContain("allergies");
+    const saved = unwrapOk(await getPatient(created.id));
+    expect(saved.allergies).toBe("");
+    expect(saved.patientEditedAt.allergies).toBeDefined();
+  });
+
+  it("changes nothing, and dates nothing, when the form is posted as it was", async () => {
+    const created = unwrapOk(
+      await createPatient({
+        pseudonym: "Same",
+        allergies: "lactose",
+        likesCooking: "yes",
+      }),
+    );
+    const edited = unwrapOk(
+      await updatePatientProfileByPatient(
+        created.id,
+        profileEdit({ allergies: " lactose ", likesCooking: "yes" }),
+      ),
+    );
+    expect(edited.changed).toEqual([]);
+    expect(unwrapOk(await getPatient(created.id)).patientEditedAt).toEqual({});
+  });
+
+  it("never moves the roster timestamp — that one is Morgane's", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "Roster" }));
+    await tick();
+    unwrapOk(
+      await updatePatientProfileByPatient(
+        created.id,
+        profileEdit({ cookingTime: "high" }),
+      ),
+    );
+    expect(unwrapOk(await getPatient(created.id)).lastEditedAt.getTime()).toBe(
+      created.lastEditedAt.getTime(),
+    );
+  });
+
+  it("refuses a level outside the set and an unknown patient", async () => {
+    const created = unwrapOk(await createPatient({ pseudonym: "Strict" }));
+    expect(
+      (
+        await updatePatientProfileByPatient(
+          created.id,
+          profileEdit({ foodBudget: "cher" as never }),
+        )
+      ).ok,
+    ).toBe(false);
+    const missing = await updatePatientProfileByPatient(
+      "00000000-0000-4000-8000-000000000000",
+      profileEdit(),
+    );
+    expect(missing.ok).toBe(false);
+  });
+
+  it("drops the patient's date from a field only when Morgane changes that field", async () => {
+    const created = unwrapOk(
+      await createPatient({ pseudonym: "Handover", allergies: "arachides" }),
+    );
+    unwrapOk(
+      await updatePatientProfileByPatient(
+        created.id,
+        profileEdit({ allergies: "arachides, sésame", cookingTime: "low" }),
+      ),
+    );
+
+    // Her console form posts every field; only the budget actually moves.
+    const after = unwrapOk(
+      await updatePatient(created.id, {
+        allergies: "arachides, sésame",
+        cookingTime: "low",
+        foodBudget: "standard",
+      }),
+    );
+    expect(Object.keys(after.patientEditedAt).sort()).toEqual([
+      "allergies",
+      "cookingTime",
+    ]);
+
+    // Now she rewrites the allergies herself: that field is hers again.
+    const rewritten = unwrapOk(
+      await updatePatient(created.id, { allergies: "arachides" }),
+    );
+    expect(rewritten.patientEditedAt.allergies).toBeUndefined();
+    expect(rewritten.patientEditedAt.cookingTime).toBeDefined();
   });
 });
 

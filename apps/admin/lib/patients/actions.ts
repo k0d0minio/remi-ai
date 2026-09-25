@@ -81,7 +81,9 @@ import {
   consentChannels,
   contextBlocks,
   cookingAffinities,
+  cookingTimes,
   documentTags,
+  foodBudgets,
   goalDirections,
   isLocale,
   mealSlots,
@@ -91,7 +93,9 @@ import {
   type ConsentChannel,
   type ChallengeOutcome,
   type CookingAffinity,
+  type CookingTime,
   type DocumentTag,
+  type FoodBudget,
   type GoalDirection,
   type MealSlot,
   type PatientSex,
@@ -205,6 +209,17 @@ const asCookingAffinity = (value: string): CookingAffinity | "" =>
     ? (value as CookingAffinity)
     : "";
 
+/** `""` clears it — the select's « non renseigné » posts a word outside the set. */
+const asCookingTime = (value: string): CookingTime | "" =>
+  (cookingTimes as readonly string[]).includes(value)
+    ? (value as CookingTime)
+    : "";
+
+const asFoodBudget = (value: string): FoodBudget | "" =>
+  (foodBudgets as readonly string[]).includes(value)
+    ? (value as FoodBudget)
+    : "";
+
 const asCategory = (value: string): RecommendationCategory =>
   (recommendationCategories as readonly string[]).includes(value)
     ? (value as RecommendationCategory)
@@ -228,7 +243,8 @@ const patientInputFrom = (formData: FormData): PatientInput => {
     constraints: field(formData, "constraints"),
     preferences: field(formData, "preferences"),
     likesCooking: asCookingAffinity(field(formData, "likesCooking")),
-    foodBudget: field(formData, "foodBudget"),
+    cookingTime: asCookingTime(field(formData, "cookingTime")),
+    foodBudget: asFoodBudget(field(formData, "foodBudget")),
     medications: field(formData, "medications"),
     supplements: field(formData, "supplements"),
     referral: field(formData, "referral"),

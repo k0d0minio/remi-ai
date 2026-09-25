@@ -257,31 +257,31 @@ all of theirs at once).
 
 ## Where each thing is defined (edit exactly one home)
 
-| To change…                                                                  | Edit                                                                                             |
-| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Routing / a subcommand                                                      | `.claude/skills/pipeline/SKILL.md` (template-owned)                                              |
-| A stage's or lane's behaviour                                               | `.icm/stages/NN_*/` · `.icm/lanes/*/CONTEXT.md` (template-owned)                                 |
-| What is true of this repo — people, factory, announcing                     | `.icm/_shared/project-rules.md`                                                                  |
-| The values a script reads — checks, personas, docs path, archives           | `.icm/project.json`                                                                              |
-| Revising a spec (`revise <slug>`)                                           | `.icm/stages/02_define/CONTEXT.md` step 6 + `.icm/scripts/project-body.sh`                       |
-| The breakdown/stub formats · triage                                         | `.icm/intake/CONTEXT.md` (template-owned)                                                        |
-| This repo's backlog, decisions of record, milestones                        | `.icm/intake/README.md`                                                                          |
-| GitHub calls, gates, labels, the PR regime                                  | `.icm/_shared/github.md` (+ `.github/labels.yml`)                                                |
-| What the checks are / what green means                                      | `.icm/_shared/ci.md` (+ `.icm/scripts/ci-status.sh`)                                             |
-| What is announced where (the hook is complete as seeded)                    | `.icm/project.json` → `reporting` · `.icm/_shared/project-rules.md` → Reporting                  |
-| Who calls the hook on a merge                                               | `.github/workflows/release.yaml` (seeded once, this repo's own)                                  |
-| Where the repo deploys, its health endpoints, migrations, database, support | `.icm/project.json` → `deploy` · `migrations` · `database` · `support`                           |
-| The changelog page's shape                                                  | `.icm/_shared/project-rules.md` → Reporting                                                      |
-| Is the repo complete, current, configured                                   | `/setup` → `.icm/scripts/setup.sh`                                                               |
-| The client's status report                                                  | `status` → `.icm/scripts/client-status.sh` → `.icm/output/client-status-latest.md`               |
-| The pipeline's capability skills                                            | `.icm/skills/<name>/SKILL.md` (template-owned)                                                   |
-| What a run learned                                                          | `.icm/_shared/project-rules.md` → Learned rules (`retrospective.sh`, `run-pack.sh --sync-rules`) |
-| Which doc pages a stage reads                                               | `.icm/_shared/knowledge-map.md`                                                                  |
-| Project knowledge outside a Release                                         | `knowledge add\|edit\|remove "<what>"` → `.icm/lanes/knowledge/CONTEXT.md`                       |
-| Run adoption                                                                | `.icm/_shared/stage-preamble.md`                                                                 |
-| The shape of the settled scope                                              | `.icm/_shared/scope-template.md`                                                                 |
-| Local feedback before a push                                                | `.icm/scripts/format.sh` · `.icm/scripts/lint.sh`                                                |
+| To change…                                                                               | Edit                                                                                                                    |
+| ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Routing / a subcommand                                                                   | `.claude/skills/pipeline/SKILL.md` (template-owned)                                                                     |
+| A stage's or lane's behaviour                                                            | `.icm/stages/NN_*/` · `.icm/lanes/*/CONTEXT.md` (template-owned)                                                        |
+| What is true of this repo — people, factory, announcing                                  | `.icm/_shared/project-rules.md`                                                                                         |
+| The values a script reads — checks, personas, docs path, archives                        | `.icm/project.json`                                                                                                     |
+| Revising a spec (`revise <slug>`)                                                        | `.icm/stages/02_define/CONTEXT.md` step 6 + `.icm/scripts/project-body.sh`                                              |
+| The breakdown/stub formats · triage                                                      | `.icm/intake/CONTEXT.md` (template-owned)                                                                               |
+| This repo's backlog, decisions of record, milestones                                     | `.icm/intake/README.md`                                                                                                 |
+| GitHub calls, gates, labels, the PR regime                                               | `.icm/_shared/github.md` (+ `.github/labels.yml`)                                                                       |
+| What the checks are / what green means                                                   | `.icm/_shared/ci.md` (+ `.icm/scripts/ci-status.sh`)                                                                    |
+| What is announced where (the hook is complete as seeded)                                 | `.icm/project.json` → `reporting` · `.icm/_shared/project-rules.md` → Reporting                                         |
+| Who calls the hook on a merge                                                            | `.github/workflows/release.yaml` (seeded once, this repo's own)                                                         |
+| Where the repo deploys, its health endpoints, migrations, database, support              | `.icm/project.json` → `deploy` · `migrations` · `database` · `support`                                                  |
+| The changelog page's shape                                                               | `.icm/_shared/project-rules.md` → Reporting                                                                             |
+| Is the repo complete, current, configured                                                | `/setup` → `.icm/scripts/setup.sh`                                                                                      |
+| The client's status report                                                               | `status` → `.icm/scripts/client-status.sh` → `.icm/output/client-status-latest.md`                                      |
+| The pipeline's capability skills                                                         | `.icm/skills/<name>/SKILL.md` (template-owned)                                                                          |
+| What a run learned                                                                       | `.icm/_shared/project-rules.md` → Learned rules (`retrospective.sh`, `run-pack.sh --sync-rules`)                        |
+| Which doc pages a stage reads                                                            | `.icm/_shared/knowledge-map.md`                                                                                         |
+| Project knowledge outside a Release                                                      | `knowledge add\|edit\|remove "<what>"` → `.icm/lanes/knowledge/CONTEXT.md`                                              |
+| Run adoption                                                                             | `.icm/_shared/stage-preamble.md`                                                                                        |
+| The shape of the settled scope                                                           | `.icm/_shared/scope-template.md`                                                                                        |
+| Local feedback before a push                                                             | `.icm/scripts/format.sh` · `.icm/scripts/lint.sh`                                                                       |
 | The labels and the validations — the session's, at the step that changes the thing (D43) | `.icm/scripts/project-labels.sh` · `.icm/scripts/validate-spec.sh` · `validate-intake.sh` · `validate-knowledge-map.sh` |
-| How a source becomes `scope.md` + a batch                                   | `.icm/stages/01_scope/CONTEXT.md`                                                                |
-| What may stop a merge                                                       | `.icm/stages/04_release/CONTEXT.md`                                                              |
-| Code rules                                                                  | `/CONVENTIONS.md` + `apps/*/AGENTS.md` · `packages/*/AGENTS.md`                                  |
+| How a source becomes `scope.md` + a batch                                                | `.icm/stages/01_scope/CONTEXT.md`                                                                                       |
+| What may stop a merge                                                                    | `.icm/stages/04_release/CONTEXT.md`                                                                                     |
+| Code rules                                                                               | `/CONVENTIONS.md` + `apps/*/AGENTS.md` · `packages/*/AGENTS.md`                                                         |

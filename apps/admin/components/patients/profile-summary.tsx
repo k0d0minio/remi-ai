@@ -2,13 +2,18 @@
 
 import { Pencil } from "lucide-react";
 import { useCallback, useState } from "react";
-import type { PatientProfile } from "@remi/services/shared";
+import type {
+  PatientEditableProfileField,
+  PatientProfile,
+} from "@remi/services/shared";
 import { ageInYears } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Badge, Separator, Typography } from "@remi/ui/server";
 import { PatientForm } from "@/components/patients/patient-form";
 import {
   cookingAffinityLabels,
+  cookingTimeLabels,
+  foodBudgetLabels,
   localeLabels,
   patientSexLabels,
   patientStatusLabels,
@@ -25,12 +30,19 @@ type Props = {
   lastEditedAt: string;
   /** « Recueilli le … · WhatsApp », or `null` when it is not recorded. */
   consent: string | null;
+  /**
+   * Per field the patient last changed from « Mon profil », the day they did —
+   * formatted on the server for the same reason as the two dates above.
+   */
+  patientEditedOn: Partial<Record<PatientEditableProfileField, string>>;
 };
 
 /** One line of the read summary. `null` reads as an em dash. */
 type Row = {
   label: string;
   value: string | null;
+  /** « modifié par la patiente le … » — the value on screen is theirs. */
+  patientEditedOn?: string;
 };
 
 /**
@@ -48,7 +60,12 @@ type Row = {
  * guarded: the save collapses the form, and the revalidated summary with its new
  * « Modifié le … » says it landed where the form's own « Enregistré. » used to.
  */
-export const ProfileSummary = ({ patient, lastEditedAt, consent }: Props) => {
+export const ProfileSummary = ({
+  patient,
+  lastEditedAt,
+  consent,
+  patientEditedOn,
+}: Props) => {
   const [editing, setEditing] = useState(false);
 
   // Stable, so the form's save notification does not re-fire on every render of
@@ -86,17 +103,52 @@ export const ProfileSummary = ({ patient, lastEditedAt, consent }: Props) => {
     },
   ];
 
+  // The seven fields the patient also writes, each carrying the day they last
+  // changed it — absent once Morgane has changed that field herself.
   const food: Row[] = [
-    { label: "Régime alimentaire", value: patient.dietaryRegime },
-    { label: "Allergies", value: patient.allergies },
-    { label: "Intolérances", value: patient.intolerances },
-    { label: "Budget alimentaire", value: patient.foodBudget },
+    {
+      label: "Régime alimentaire",
+      value: patient.dietaryRegime,
+      patientEditedOn: patientEditedOn.dietaryRegime,
+    },
+    {
+      label: "Allergies",
+      value: patient.allergies,
+      patientEditedOn: patientEditedOn.allergies,
+    },
+    {
+      label: "Intolérances",
+      value: patient.intolerances,
+      patientEditedOn: patientEditedOn.intolerances,
+    },
+    {
+      label: "Aliments aimés / non aimés",
+      value: patient.preferences,
+      patientEditedOn: patientEditedOn.preferences,
+    },
     {
       label: "Aime cuisiner",
       value:
         patient.likesCooking === null
           ? null
           : cookingAffinityLabels[patient.likesCooking],
+      patientEditedOn: patientEditedOn.likesCooking,
+    },
+    {
+      label: "Temps disponible pour cuisiner",
+      value:
+        patient.cookingTime === null
+          ? null
+          : cookingTimeLabels[patient.cookingTime],
+      patientEditedOn: patientEditedOn.cookingTime,
+    },
+    {
+      label: "Budget alimentaire",
+      value:
+        patient.foodBudget === null
+          ? null
+          : foodBudgetLabels[patient.foodBudget],
+      patientEditedOn: patientEditedOn.foodBudget,
     },
   ];
 
@@ -151,12 +203,19 @@ type GroupProps = {
 
 const hasValue = (row: Row) => row.value !== null && row.value.trim() !== "";
 
+/**
+ * A group with nothing encoded still shows its rows when the patient touched
+ * one: an allergy the patient removed is an empty field Morgane has to see.
+ */
+const hasContent = (row: Row) =>
+  hasValue(row) || row.patientEditedOn !== undefined;
+
 const SummaryGroup = ({ title, rows }: GroupProps) => (
   <div className="flex flex-col gap-2">
     <Typography as="h3" variant="eyebrow" tone="muted">
       {title}
     </Typography>
-    {rows.some(hasValue) ? (
+    {rows.some(hasContent) ? (
       <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
         {rows.map((row) => (
           <div key={row.label} className="flex flex-col gap-0.5">
@@ -165,10 +224,15 @@ const SummaryGroup = ({ title, rows }: GroupProps) => (
                 {row.label}
               </Typography>
             </dt>
-            <dd>
+            <dd className="flex flex-col items-start gap-1">
               <Typography size="sm" className="whitespace-pre-line">
                 {hasValue(row) ? row.value : "—"}
               </Typography>
+              {row.patientEditedOn ? (
+                <Badge variant="info" tone="subtle" size="sm">
+                  {`Modifié par la patiente le ${row.patientEditedOn}`}
+                </Badge>
+              ) : null}
             </dd>
           </div>
         ))}

@@ -13,22 +13,24 @@ sits behind any of this.
 
 One row in `patient_profiles`, plus what hangs off it:
 
-| What                                                         | Where                     | Reaches the patient's link                         |
-| ------------------------------------------------------------ | ------------------------- | -------------------------------------------------- |
-| Pseudonym, real name, email, language, status                | `patient_profiles`        | the real name; the rest, no                        |
-| Birth date, sex, height, weight                              | `patient_profiles`        | age, height and weight — the birth date itself, no |
-| Objective, constraints, preferences, medication, supplements | `patient_profiles`        | yes                                                |
-| Referral, anamnesis                                          | `patient_profiles`        | no — practitioner's working record                 |
-| Consent date and channel                                     | `patient_profiles`        | no                                                 |
-| The share token, when the link was last opened, last written | `patient_profiles`        | the token is the link                              |
-| The protocol, entry by entry                                 | `patient_recommendations` | yes, unless archived                               |
-| Consultation notes                                           | `patient_notes`           | no                                                 |
-| Challenges — hers, and the patient's two answers to each     | `patient_challenges`      | the running one; closed ones, no                   |
-| Documents she put on their page — PDFs, images, links        | `patient_documents`       | the title and the day added; who added it, no      |
-| The files behind those documents                             | the file store (below)    | through a five-minute signed link only             |
-| The general thread — the patient's messages and her replies  | `patient_messages`        | yes — the whole thread                             |
-| What the patient writes through the link                     | the table it belongs to   | yes — they wrote it                                |
-| One timestamp per accepted write through the link            | `patient_link_writes`     | no                                                 |
+| What                                                               | Where                     | Reaches the patient's link                         |
+| ------------------------------------------------------------------ | ------------------------- | -------------------------------------------------- |
+| Pseudonym, real name, email, language, status                      | `patient_profiles`        | the real name; the rest, no                        |
+| Birth date, sex, height, weight                                    | `patient_profiles`        | age, height and weight — the birth date itself, no |
+| Objective, constraints, preferences, medication, supplements       | `patient_profiles`        | yes                                                |
+| Diet, allergies, intolerances, likes cooking, time to cook, budget | `patient_profiles`        | yes — the patient edits them on « Mon profil »     |
+| When the patient last changed each of those fields                 | `patient_profiles`        | no                                                 |
+| Referral, anamnesis                                                | `patient_profiles`        | no — practitioner's working record                 |
+| Consent date and channel                                           | `patient_profiles`        | no                                                 |
+| The share token, when the link was last opened, last written       | `patient_profiles`        | the token is the link                              |
+| The protocol, entry by entry                                       | `patient_recommendations` | yes, unless archived                               |
+| Consultation notes                                                 | `patient_notes`           | no                                                 |
+| Challenges — hers, and the patient's two answers to each           | `patient_challenges`      | the running one; closed ones, no                   |
+| Documents she put on their page — PDFs, images, links              | `patient_documents`       | the title and the day added; who added it, no      |
+| The files behind those documents                                   | the file store (below)    | through a five-minute signed link only             |
+| The general thread — the patient's messages and her replies        | `patient_messages`        | yes — the whole thread                             |
+| What the patient writes through the link                           | the table it belongs to   | yes — they wrote it                                |
+| One timestamp per accepted write through the link                  | `patient_link_writes`     | no                                                 |
 
 The link records **when** it was last opened and **when** it was last written into, and nothing
 else — no page views, no device, no address. Those are two timestamps, not a tracking table: the
@@ -81,6 +83,16 @@ three are what the code does:
   it. The whole thread is deleted with the patient (`on delete cascade`); what remains is the
   audit trail's lines (`message.sent`, `message.replied`, `message.marked_read`), which carry no
   message text.
+  The profile is the one row the patient **edits** rather than creates. Since
+  `patient-profile-edit`, « Mon profil » lets them change seven fields of their own record and no
+  others: diet, allergies, intolerances, foods liked and disliked (`preferences`), whether they
+  like cooking, the time they have to cook (`cooking_time`, three levels) and their budget
+  (`food_budget`, three levels — free text before, the leftover words moved into `preferences`).
+  They can clear an allergy as freely as add one; the safeguard is that Morgane sees it. Per field,
+  `patient_edited_at` keeps only the moment the patient last changed it, so the console can say
+  « modifié par la patiente le … »; her own change to a field removes its entry. It is deleted with
+  the profile. Identity, measures, medication, supplements, referral, consent and anamnesis are
+  never written through the link, and the birth date never reaches it — the page shows the age.
 - **Every write is in the audit trail as the patient's.** `audit_events` records an actor kind
   alongside the actor, so a patient's write cannot be read as an operator's or as the system's. A
   patient actor carries the pseudonym and **no email** — there is no account, and inventing an

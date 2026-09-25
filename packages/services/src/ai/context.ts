@@ -66,6 +66,9 @@ export type ContextProfile = {
   preferences: string;
   /** Already French ("oui" / "un peu" / "non"), `""` when not recorded. */
   likesCooking: string;
+  /** Already French ("faible" / "moyen" / "important"), `""` when not recorded. */
+  cookingTime: string;
+  /** Already French ("économique" / "standard" / "confort"), `""` when not recorded. */
   foodBudget: string;
   medications: string;
   /** What the patient takes outside the protocol — prose, not the rows below. */
@@ -152,6 +155,7 @@ const profileBlock = (profile: ContextProfile): string => {
     line("- Contraintes", profile.constraints),
     line("- Goûts et aversions", profile.preferences),
     line("- Aime cuisiner", profile.likesCooking),
+    line("- Temps disponible pour cuisiner", profile.cookingTime),
     line("- Budget", profile.foodBudget),
     line("- Médicaments", profile.medications),
     line("- Compléments hors protocole", profile.supplements),

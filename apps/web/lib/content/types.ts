@@ -14,6 +14,9 @@
 
 import type {
   ChallengeOutcome,
+  CookingAffinity,
+  CookingTime,
+  FoodBudget,
   MealIntent,
   MealSlot,
   PersonalisationDimension,
@@ -294,6 +297,7 @@ export type Content = {
       repas: string;
       progression: string;
       messages: string;
+      profil: string;
     };
     /**
      * Home, in her § 6 order: today and this week, the prioritised
@@ -397,6 +401,42 @@ export type Content = {
      * card and the Messages segment share every string, the prompt above all:
      * D-35 fixes it as her own two sentences.
      */
+    /**
+     * « Mon profil » — the seven fields the patient keeps true themselves
+     * (`patient-profile-edit`), then what is on record about them, read-only.
+     * The three-level labels are D-25's: the old version's own words.
+     */
+    profile: {
+      title: string;
+      lead: string;
+      dietaryRegimeLabel: string;
+      allergiesLabel: string;
+      allergiesHint: string;
+      intolerancesLabel: string;
+      preferencesLabel: string;
+      preferencesHint: string;
+      likesCookingLabel: string;
+      cookingTimeLabel: string;
+      foodBudgetLabel: string;
+      /** The « not answered yet » choice of each three-level field. */
+      unset: string;
+      likesCooking: Record<CookingAffinity, string>;
+      cookingTime: Record<CookingTime, string>;
+      foodBudget: Record<FoodBudget, string>;
+      save: string;
+      saved: string;
+      /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
+      errors: Record<PatientWriteError, string>;
+      recordTitle: string;
+      recordLead: string;
+      nameLabel: string;
+      ageLabel: string;
+      /** « {age} ans » */
+      ageValue: string;
+      heightLabel: string;
+      weightLabel: string;
+      notRecorded: string;
+    };
     messages: {
       title: string;
       /** Her § 6 question, verbatim in French. */
