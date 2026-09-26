@@ -1,4 +1,5 @@
 # Stub: `.icm/CONTEXT.md` fails `pnpm format:check` — pre-existing, not this PR's
+> Done elsewhere — retired 2026-09-26 (estate audit): fixed by 4204a7b (#131), which formatted `.icm/CONTEXT.md`.
 
 - lane: chore
 - found-by: `fix-console-today-timezone` bug lane, `Quality (advisory)` on PR #130 · 2026-09-25
