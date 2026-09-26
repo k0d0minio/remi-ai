@@ -16,7 +16,7 @@ Re-cut 2026-09-10 from Morgane's feedback on the first version
 retriaged 2026-09-18 into the pipeline template's stub shape, and **amended 2026-09-23** from the
 11 September call and her 14 September « Ce que les consultants doivent voir » — now precedence
 row 1 — by the Scope run [`runs/september-sources/`](../runs/september-sources/01_scope/output/scope.md)
-(decisions D-16 … D-24 below). The three epics were cut before the Scope front existed, so the
+(decisions D-16 … D-25 below). The three epics were cut before the Scope front existed, so the
 epics themselves have no `scope.md`: the decisions a front would have recorded are the list below,
 and Define proceeds from the stub alone; the 2026-09-23 amendments do have one.
 
@@ -129,6 +129,11 @@ the decisions it rests on under its **Notes for Define**; a spec carries the ids
 24. **D-24 — Where the September documents live:** « REMI V2 Features » (20 Aug) in
     `collaboration/` with a precedence row as a superseded reference; the Startup Boost roadmap in
     `collaboration/` with no row; the five transcripts under `.icm/processed/`, cited from there.
+25. **D-25 — One environment, one database (Jamie, 2026-09-26, estate audit):** preview and
+    production are the two deploy targets, there is no UAT, and both read the one Neon database.
+    Previews never run migrations — `migrate.mjs` fails closed off production and the admin project's
+    `ALLOW_NON_PRODUCTION_MIGRATIONS` opt-out goes. Settles `triage/previews-migrate-the-shared-database`
+    (its duplicate `env-preview-migrations-row-is-stale` was folded in the same day).
 
 ## Milestones
 

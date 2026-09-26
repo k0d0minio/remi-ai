@@ -1,8 +1,9 @@
 # Stub: Preview deploys migrate the shared database
 
 - lane: chore
-- found-by: PR #95's preview deploys, confirmed again by `ciqual-import` (#102) · 2026-09-17
-- size: M
+- found-by: PR #95's preview deploys, confirmed again by `ciqual-import` (#102) · 2026-09-17 — settled by D-25 and re-cut 2026-09-26 (estate audit; `env-preview-migrations-row-is-stale` folded in)
+- priority: P1
+- complexity: medium
 
 ## Problem
 
@@ -57,34 +58,11 @@ PR. It does not stop the next branch doing the same thing.
 
 ## Proposed change
 
-Settle whether previews migrate at all and against what: a Neon branch per preview, or the opt-out off on every project and the trade-off written where a tester reads it; make the guard fail closed.
-
-## Acceptance criteria (rough)
-
-- [ ] It is settled and written down whether previews migrate at all, and against what database.
-- [ ] If previews keep migrating: each gets its own Neon branch, so no preview can write into the
-      database another deploy reads.
-- [ ] If they do not: `ALLOW_NON_PRODUCTION_MIGRATIONS` is off on every project, and the tradeoff —
-      a preview serving against `main`'s schema, so a branch's new columns are absent until merge —
-      is stated where someone testing a preview will read it.
-- [ ] `.icm/docs/ENV.md` records the setting per project and the reason.
-- [ ] `migrate.mjs`'s header stops describing a guard that is not in force.
-
-## Notes
-
-- The failure mode is asymmetric and nasty: the preview that pollutes the database **passes**, and
-  the cost lands on a later build, often on a different branch, as an error that names a column
-  rather than a cause.
-- Two branches with migrations open at once is now normal here — five feature PRs were cut from one
-  `main` on 2026-09-17 — so this is a standing condition, not an edge case.
-- The real fix is a **Neon branch per preview**, which the storage vendor supports natively and
-  which `migrate.mjs`'s own guard text already suggests ("Point previews at their own Neon
-  branch to see them"). Then a preview migrates its own database, the guard can stay on, and a
-  branch's schema is visible in its own preview — which is what the guard currently trades away.
-- Whatever is decided, the `ALLOW_NON_PRODUCTION_MIGRATIONS` setting on each Vercel project should
-  match it, and `.icm/docs/ENV.md` should say which projects carry it and why. Right now the code
-  says one thing and the deployment says another, which is worse than either.
-
-## Prompt
-
-Run `/pipeline chore previews-migrate-the-shared-database` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.
+D-25 (2026-09-26): one database, shared by preview and production, and **previews never run
+migrations** — only `main`'s production build does. So: `scripts/migrate.mjs` fails closed when
+`VERCEL_ENV` is absent or anything but `production` (an absent variable on Vercel is the dangerous
+branch, not the safe one); the `ALLOW_NON_PRODUCTION_MIGRATIONS` opt-out is removed from the admin
+project (#116 declared it `[preview]` — undo that) and from `turbo.json`'s `globalEnv`;
+`.icm/docs/ENV.md:108` says the variable is unset everywhere and why. A preview that needs a schema
+change it cannot see tests against the migration once it is on `main`. Still biting on 2026-09-25
+(#131, `42701`), so P1.
