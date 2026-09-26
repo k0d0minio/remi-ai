@@ -47,7 +47,7 @@ both are the operator's: the business's involvement ends when the scope is settl
 agent **reads** checkboxes, never ticks them, and never self-advances across any gate.
 
 **Scope takes input in any medium** — a pasted message from Morgane, a document under
-`docs/collaboration/`, a call, a prototype, a prompt written after the Friday call — and settles
+icm-board `workspaces/deals/remi-ai/remi-partnership/raw/documents/collaboration/`, a call, a prototype, a prompt written after the Friday call — and settles
 it with the operator in session, in rounds of questions; there is no question sheet and nothing
 is answered out of band. What the operator cannot settle goes into `scope.md` as **Open for
 Define**, never assumed. `run.md`'s `author/source:` records where the input came from.

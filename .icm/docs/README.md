@@ -1,3 +1,5 @@
+> **2026-09-26 (icm-board decision D47):** the client's documents that lived here — the founder's braindump (`braindump/`), the collaboration decks and documents (`collaboration/`), the correspondence, the call summary, the new-development-direction note, the call transcripts under `.icm/processed/` and their originals under `.icm/raw/_processed/` — now live in icm-board at `workspaces/deals/remi-ai/remi-partnership/raw/` (documents/, transcripts/, originals/) and are purged from this repository. What remains here is what sessions wrote: `ENV.md`, `RETENTION.md`, `history/`, the status report. `.icm/raw/` and `.icm/processed/` are ignored working folders.
+
 # `.icm/docs` — the project's source of truth
 
 Everything that decides **what REMI is** lives here. Code rules stay in

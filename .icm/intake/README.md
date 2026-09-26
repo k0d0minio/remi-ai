@@ -12,7 +12,7 @@
 ## The backlog
 
 Re-cut 2026-09-10 from Morgane's feedback on the first version
-([`.icm/docs/collaboration/remi-v2-feedback-on-first-version.docx`](../docs/collaboration/remi-v2-feedback-on-first-version.docx)),
+(``icm-board workspaces/deals/remi-ai/remi-partnership/raw/documents/collaboration/remi-v2-feedback-on-first-version.docx`` (icm-board `workspaces/deals/remi-ai/remi-partnership/raw/documents/collaboration/remi-v2-feedback-on-first-version.docx`)),
 retriaged 2026-09-18 into the pipeline template's stub shape, and **amended 2026-09-23** from the
 11 September call and her 14 September « Ce que les consultants doivent voir » — now precedence
 row 1 — by the Scope run [`runs/september-sources/`](../runs/september-sources/01_scope/output/scope.md)
@@ -128,7 +128,7 @@ the decisions it rests on under its **Notes for Define**; a spec carries the ids
     and « age, not date of birth » as an open point (`birth_date` is stored today).
 24. **D-24 — Where the September documents live:** « REMI V2 Features » (20 Aug) in
     `collaboration/` with a precedence row as a superseded reference; the Startup Boost roadmap in
-    `collaboration/` with no row; the five transcripts under `.icm/processed/`, cited from there.
+    `collaboration/` with no row; the five transcripts under `icm-board workspaces/deals/remi-ai/remi-partnership/raw/transcripts/`, cited from there.
 25. **D-25 — One environment, one database (Jamie, 2026-09-26, estate audit):** preview and
     production are the two deploy targets, there is no UAT, and both read the one Neon database.
     Previews never run migrations — `migrate.mjs` fails closed off production and the admin project's
@@ -180,7 +180,7 @@ its research (R1–R30) is still cited by `practitioner-workflow`.
 
 The numbered REMI-NNN tickets (phases A–F, cut 18 Aug 2026 from the direction report) were purged
 in the 28 Aug clean slate (commit 444ecf5) after
-[`new-development-direction.docx`](../docs/new-development-direction.docx) superseded their
+``new-development-direction.docx`` (icm-board `workspaces/deals/remi-ai/remi-partnership/raw/documents/new-development-direction.docx`) superseded their
 sequencing — terrain-first, patient experience before the practitioner space. They remain
 recoverable in git history.
 

@@ -22,7 +22,7 @@ D23; `/setup` — `.icm/scripts/setup.sh` — says whether the two are complete 
 - **Authors** — where a story or request comes from (`run.md` → `author/source:`): Morgane (the
   founder, and the practitioner whose consultation the product follows — her feedback and her
   documents rank first in `.icm/docs/README.md` § Precedence), Arnaud, the Friday call, a document
-  under `.icm/docs/collaboration/`, a chat thread. Scope settles the source with the operator in
+  under `icm-board workspaces/deals/remi-ai/remi-partnership/raw/documents/collaboration/`, a chat thread. Scope settles the source with the operator in
   session; nothing is answered out of band. Vocabulary: the product speaks French and its terms
   are quoted in « » (`CONVENTIONS.md` § Working languages); everything the pipeline writes is
   English.
