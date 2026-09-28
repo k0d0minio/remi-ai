@@ -259,6 +259,30 @@
   --shadow-color: 0.08 0.02 255;
 }
 
+/*
+ * `.theme-vital` — re-points the primary role at the green ramp for one subtree
+ * (today: the web sign-in screen). Only the primary family and the focus ring
+ * move; every intent, neutral and shadow stays the system's. The light fill is
+ * `--vital-700`, not `-600`: at L 0.63 the lighter step cannot carry white text.
+ */
+.theme-vital {
+  --primary: var(--vital-700);
+  --primary-foreground: var(--grey-50);
+  --primary-subtle: var(--vital-50);
+  --primary-border: var(--vital-200);
+  --primary-hover: var(--vital-800);
+  --ring: var(--vital-600);
+}
+
+.dark .theme-vital {
+  --primary: oklch(0.68 0.15 150);
+  --primary-foreground: oklch(0.17 0.04 150);
+  --primary-subtle: oklch(0.26 0.045 150);
+  --primary-border: oklch(0.38 0.075 150);
+  --primary-hover: var(--vital-400);
+  --ring: oklch(0.68 0.15 150);
+}
+
 /* ── 3. the Tailwind theme ─────────────────────────────────────────────────── */
 
 @theme inline {
