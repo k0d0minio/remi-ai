@@ -46,7 +46,7 @@ const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
   const content = getContent(locale);
 
   return (
-    <div className="grid min-h-dvh lg:grid-cols-2">
+    <div className="theme-vital grid min-h-dvh lg:grid-cols-2">
       <section className="bg-primary-subtle relative hidden flex-col justify-center gap-10 overflow-hidden border-r p-12 lg:flex xl:p-16">
         {/* The brand tint, as light as it goes and still read as colour. */}
         <div
