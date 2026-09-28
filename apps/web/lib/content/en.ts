@@ -30,7 +30,7 @@ export const en: Content = {
   },
   signIn: {
     eyebrow: "Pilot",
-    headline: "Pick up where your last consultation left off.",
+    headline: "Pick up from your last consultation.",
     title: "Sign in",
     lead: "Enter your details to continue.",
     email: "Email",
