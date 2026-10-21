@@ -14,7 +14,7 @@
 
 ## Features
 | Feature | State | Tickets |
-|---|---|---|
+| ------- | ----- | ------- |
 
 — not yet established
 
@@ -22,12 +22,12 @@
 — not yet established
 
 ## Decisions
-| ID | Decision | Date | Supersedes |
-|---|---|---|---|
+| ID  | Decision | Date | Supersedes |
+| --- | -------- | ---- | ---------- |
 
 ## Open questions
 — not yet established
 
 ## Run log
 | Date | Commit | What changed |
-|---|---|---|
+| ---- | ------ | ------------ |
