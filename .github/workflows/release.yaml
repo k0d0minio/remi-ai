@@ -171,13 +171,13 @@ jobs:
           INPUT_SLUG: ${{ inputs.slug }}
           INPUT_SHA: ${{ inputs.sha }}
         run: |
-          # shellcheck disable=SC2012,SC2016
           set -euo pipefail
           if [ -n "${INPUT_SLUG:-}" ]; then
             slug="$INPUT_SLUG"; sha="${INPUT_SHA:-$(git rev-parse HEAD)}"; summary="Release $slug"; url=""
           else
             # The slug line is the spine Spec-table row or the lane `- slug:` bullet (resolve-run.sh
             # matches the same two shapes); the Summary is the first non-empty line under ## Summary.
+            # shellcheck disable=SC2016  # the backticks and the backreference are sed syntax, not shell
             slug="$(printf '%s\n' "$PR_BODY" | sed -nE 's/^- slug:[[:space:]]*//p; s/^\|[[:space:]]*\*\*Slug\*\*[[:space:]]*\|[[:space:]]*`?([^`| ]+)`?[[:space:]]*\|.*/\1/p' | head -1)"
             [ -n "$slug" ] || slug="pr-${PR_NUMBER}"
             summary="$(printf '%s\n' "$PR_BODY" | awk '/^## Summary/{f=1; next} f && NF {print; exit}')"
@@ -187,6 +187,7 @@ jobs:
           # remi-ai: the changelog page's H1 is the announcement and its page the link
           # (.icm/_shared/project-rules.md → Reporting); the PR's Summary line and URL stand in
           # when the run shipped no page (an internal change, a chore).
+          # shellcheck disable=SC2012  # one glob, sorted, the last match wins
           page="$(ls -d apps/docs/app/changelog/*-"$slug"/page.mdx 2>/dev/null | sort | tail -n1 || true)"
           if [ -n "$page" ]; then
             h1="$(sed -nE 's/^# +//p' "$page" | head -n1)"
