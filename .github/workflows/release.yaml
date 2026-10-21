@@ -171,6 +171,7 @@ jobs:
           INPUT_SLUG: ${{ inputs.slug }}
           INPUT_SHA: ${{ inputs.sha }}
         run: |
+          # shellcheck disable=SC2012,SC2016
           set -euo pipefail
           if [ -n "${INPUT_SLUG:-}" ]; then
             slug="$INPUT_SLUG"; sha="${INPUT_SHA:-$(git rev-parse HEAD)}"; summary="Release $slug"; url=""
