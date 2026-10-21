@@ -10,7 +10,7 @@
 ## The backlog
 
 Re-cut 2026-09-10 from Morgane's feedback on the first version
-(``icm-board workspaces/deals/remi-ai/remi-partnership/raw/documents/collaboration/remi-v2-feedback-on-first-version.docx`` (icm-board `workspaces/deals/remi-ai/remi-partnership/raw/documents/collaboration/remi-v2-feedback-on-first-version.docx`)),
+(`icm-board workspaces/deals/remi-ai/remi-partnership/raw/documents/collaboration/remi-v2-feedback-on-first-version.docx` (icm-board `workspaces/deals/remi-ai/remi-partnership/raw/documents/collaboration/remi-v2-feedback-on-first-version.docx`)),
 retriaged 2026-09-18 into the pipeline template's stub shape, and **amended 2026-09-23** from the
 11 September call and her 14 September « Ce que les consultants doivent voir » — now precedence
 row 1 — by the Scope run [`runs/september-sources/`](../runs/september-sources/01_scope/output/scope.md)
@@ -178,7 +178,7 @@ its research (R1–R30) is still cited by `practitioner-workflow`.
 
 The numbered REMI-NNN tickets (phases A–F, cut 18 Aug 2026 from the direction report) were purged
 in the 28 Aug clean slate (commit 444ecf5) after
-``new-development-direction.docx`` (icm-board `workspaces/deals/remi-ai/remi-partnership/raw/documents/new-development-direction.docx`) superseded their
+`new-development-direction.docx` (icm-board `workspaces/deals/remi-ai/remi-partnership/raw/documents/new-development-direction.docx`) superseded their
 sequencing — terrain-first, patient experience before the practitioner space. They remain
 recoverable in git history.
 
