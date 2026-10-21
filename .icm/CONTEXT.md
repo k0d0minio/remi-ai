@@ -1,13 +1,12 @@
 # .icm — the work layer
 
 The map of this folder. The tickets, the two scripts that start and finish them, and the
-documents that say what Remi is. The loop from stub to merge is `intake/CONTEXT.md`, the
+documents that say what Remi is. The decisions of record are in `intake/README.md`. The loop from stub to merge is `intake/CONTEXT.md`, the
 blueprint's contract.
 
 ```
 .icm/
   CONTEXT.md        this map
-  project.md        the register: what Remi is for, its business rules, its decisions
   intake/           the tickets: epics with a breakdown and stubs, triage, _done/
     CONTEXT.md      the contract: formats, writing rules, the loop
     README.md       this backlog: the epics in order, the decisions of record
