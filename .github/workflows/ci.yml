@@ -1,0 +1,20 @@
+# ci: the client checks, defined once in legible-consulting/.github (CI is truth; never run
+# locally). A platform keeps its own release workflow beside this file; CLAUDE.md names it.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    uses: legible-consulting/.github/.github/workflows/check-client.yml@main
+    with:
+      tier: platform
