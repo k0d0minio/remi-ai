@@ -63,7 +63,7 @@ see where everything stands. The map is [`.icm/CONTEXT.md`](.icm/CONTEXT.md).
 | For…                              | Read                                                     |
 | --------------------------------- | -------------------------------------------------------- |
 | Code style, design system, git    | [`CONVENTIONS.md`](CONVENTIONS.md)                       |
-| Repo identity and routing         | [`AGENTS.md`](AGENTS.md)                                 |
+| Repo identity and routing         | [`CLAUDE.md`](CLAUDE.md)                                 |
 | The delivery pipeline             | [`.icm/CONTEXT.md`](.icm/CONTEXT.md)                     |
 | Environment variables and secrets | [`.icm/docs/ENV.md`](.icm/docs/ENV.md)                   |
 | Rules for one app or package      | that subtree's `AGENTS.md`                               |
