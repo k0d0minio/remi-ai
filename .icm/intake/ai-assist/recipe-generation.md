@@ -98,4 +98,4 @@ Morgane's until the log says patients want a button.
 
 ## Prompt
 
-Run `/pipeline new recipe-generation` in the remi-ai repo. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.
+Start it with `.icm/scripts/new-run.sh ai-assist/recipe-generation`. The session reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** as numbered questions with a default, before Spec approved. Scope is the Proposed change and nothing under Out of scope.

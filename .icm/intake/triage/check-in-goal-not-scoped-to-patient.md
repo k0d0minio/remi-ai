@@ -36,4 +36,4 @@ Check the submitted goal id against the patient's own goals in the service — t
 
 ## Prompt
 
-Run `/pipeline bug check-in-goal-not-scoped-to-patient` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.
+Start it with `.icm/scripts/new-run.sh triage/check-in-goal-not-scoped-to-patient`. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

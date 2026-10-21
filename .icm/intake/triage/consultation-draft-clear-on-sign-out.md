@@ -32,4 +32,4 @@ A client hook on the sign-out path removes every `remi:consultation:*` key; a bl
 
 ## Prompt
 
-Run `/pipeline tweak consultation-draft-clear-on-sign-out` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.
+Start it with `.icm/scripts/new-run.sh triage/consultation-draft-clear-on-sign-out`. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

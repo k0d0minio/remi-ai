@@ -1,11 +1,10 @@
 name: Quality
 
-# The ONE quality job this repo runs in CI — the estate's cost floor (icm-board decision D43,
-# `.icm/_shared/ci.md` → What CI is for). The repo is public, so the minutes are free; the shape
-# is the estate's so nothing changes if that ever does:
+# The ONE quality job this repo runs in CI, advisory (CLAUDE.md → Release). The repo is public,
+# so the minutes are free. The shape is the estate's so nothing changes if that ever does:
 #
-#   • ADVISORY, by name. The job is `Quality (advisory)`: `ci-status.sh` reports it and never
-#     reds on it, and the ruleset on `main` requires the deploy statuses, not this. The merge
+#   • ADVISORY, by name. The job is `Quality (advisory)`: the desk and the session read it and never
+#     red on it, and the ruleset on `main` requires the deploy statuses, not this. The merge
 #     waits on the deploy — Vercel already built the head, which is why there is no build step.
 #   • READY HEADS ONLY. A draft owes CI nothing: `format.sh` / `lint.sh` / `security-check.sh`
 #     over the changed files are the session's pre-flip check. The `types:` list REPLACES

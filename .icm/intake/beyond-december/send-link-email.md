@@ -51,4 +51,4 @@ Today Morgane copies the patient's link and pastes it into WhatsApp. The email s
 
 ## Prompt
 
-Run `/pipeline new send-link-email` in the remi-ai repo — **only after the owner has lifted this stub's P2**. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.
+Start it with `.icm/scripts/new-run.sh beyond-december/send-link-email` — **only after the owner has lifted this stub's P2**. The session reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** as numbered questions with a default, before Spec approved. Scope is the Proposed change and nothing under Out of scope.

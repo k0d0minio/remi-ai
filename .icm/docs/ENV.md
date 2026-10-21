@@ -202,38 +202,25 @@ is keyless — Vercel identifies the project from the deployment. There was a
 `NEXT_PUBLIC_ANALYTICS_KEY` row here that nothing ever read; it is gone. Don't reintroduce one
 unless a second analytics vendor arrives with a reader to go with it.
 
-## Pipeline & CI (GitHub Actions)
+## CI and the two scripts (GitHub Actions, `gh`)
 
-| Variable                    | Purpose                                                                                                                                                                                                                                                 | Where set | Public? |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
-| `GITHUB_TOKEN`              | Injected automatically by Actions — do **not** add it                                                                                                                                                                                                   | Actions   | no      |
-| `GH_TOKEN`                  | Local alternative for the pipeline scripts — every GitHub call goes through `.icm/scripts/lib/gh.sh`, which takes either token, else a logged-in `gh`                                                                                                   | local     | no      |
-| `GITHUB_REPO`               | Optional `owner/repo` override for the pipeline scripts. Default: derived from `origin`                                                                                                                                                                 | local     | no      |
-| `GITHUB_API_URL`            | API base for the same scripts — Actions injects it; set it locally only for an override. Default: `https://api.github.com`                                                                                                                              | both      | no      |
-| `TURBO_TOKEN`               | Turborepo remote cache token — shares the cache between CI and Vercel                                                                                                                                                                                   | Actions   | no      |
-| `TURBO_TEAM`                | Turborepo team slug (a repo **variable**, not a secret)                                                                                                                                                                                                 | Actions   | no      |
-| `VERCEL_TOKEN_REMI21`       | Vercel API token for the **remi21** team — `deploy-status.sh`, `env.sh audit` and `rollback.sh` read with it (`deploy.token_env` in `.icm/project.json`; plain `VERCEL_TOKEN` is the fallback a cloud panel sets). Unset: those scripts stop and say so | local     | no      |
-| `SLACK_BOT_TOKEN`           | Bot token (`xoxb-…`, scope `chat:write`, the app invited to both channels) of the REMI Slack workspace — `.icm/scripts/report.sh` posts with it, from `release.yaml`. Unset: the post is printed and `SKIPPED slack`                                    | Actions   | no      |
-| `SLACK_ANNOUNCE_CHANNEL_ID` | Channel id (`C…`) `report.sh announce` posts to after every merge — what shipped, in the changelog's words. An Actions **variable**, not a secret                                                                                                       | Actions   | no      |
-| `SLACK_ALERTS_CHANNEL_ID`   | Channel id (`C…`) `report.sh alert` posts to — an announcement that reached no channel (`release.yaml`), or a production health read that failed after a merge (`health-check.sh`, in session). An Actions **variable**                                 | Actions   | no      |
-| `PIPELINE_REQUIRED_CHECKS`  | Optional **newline-separated** override of `required_checks` in `.icm/project.json` — the checked-in home of the check names `ci-status.sh` waits for. Normally unset                                                                                   | local     | no      |
+| Variable                    | Purpose                                                                                                                                                      | Where set | Public? |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ------- |
+| `GITHUB_TOKEN`              | Injected automatically by Actions. Do **not** add it                                                                                                         | Actions   | no      |
+| `GH_TOKEN`                  | What `gh` reads when no `gh auth login` exists. `.icm/scripts/new-run.sh` and `close-out.sh` call `gh`; a logged-in `gh` needs no variable                  | local     | no      |
+| `TURBO_TOKEN`               | Turborepo remote cache token, shares the cache between CI and Vercel                                                                                         | Actions   | no      |
+| `TURBO_TEAM`                | Turborepo team slug (a repo **variable**, not a secret)                                                                                                      | Actions   | no      |
+| `SLACK_BOT_TOKEN`           | Bot token (`xoxb-…`, scope `chat:write`, the app invited to the channel) of the REMI Slack workspace. `release.yaml` posts with it. Unset: the post is skipped | Actions   | no      |
+| `SLACK_ANNOUNCE_CHANNEL_ID` | Channel id (`C…`) `release.yaml` posts to after every merge: the pull request's title and the Release link. An Actions **variable**, not a secret             | Actions   | no      |
+| `SLACK_ALERTS_CHANNEL_ID`   | Channel id (`C…`) kept for an alert post. Nothing reads it today                                                                                              | Actions   | no      |
+| `VERCEL_TOKEN_REMI21`       | Vercel API token for the **remi21** team. Nothing reads it today                                                                                             | local     | no      |
 
 The Slack app itself is described by [`slack-app-manifest.yaml`](slack-app-manifest.yaml) beside this
 file: import it at api.slack.com/apps (Create New App → From a manifest), install it, and the Bot User
-OAuth Token it shows is the first row. The three Slack rows live in **this repository's Actions secrets and variables** (`gh secret set
-SLACK_BOT_TOKEN`, `gh variable set SLACK_ANNOUNCE_CHANNEL_ID`, `gh variable set
-SLACK_ALERTS_CHANNEL_ID`) because `.github/workflows/release.yaml` is what calls the reporting hook
-(`reporting.announce_from: ci`). Export the same three in the operator's shell only if the
-in-session health probe's alert should reach Slack too. The Vercel token is read from the **process
-environment of the session** — never from a `.env.local`, which no pipeline script loads: the shell
-on the operator's machine, the Claude cloud environment panel in a remote session. `.icm/project.json`
-→ `reporting` and `deploy` carry only the **names**.
-
-The required check names have a checked-in home — `required_checks` in `.icm/project.json` — which
-today holds this repo's one blocking Actions check, `Format, lint, typecheck`, **one name per array
-element** (the name contains commas, so no comma-separated form can carry it). `PIPELINE_REQUIRED_CHECKS`
-only overrides it, one name per line. `Pipeline gates (advisory)` is deliberately not required: it
-projects the PR body's checkboxes, not the factory (`.icm/_shared/project-rules.md` → The factory).
+OAuth Token it shows is the `SLACK_BOT_TOKEN` row. The Slack rows live in **this repository's Actions
+secrets and variables** (`gh secret set SLACK_BOT_TOKEN`, `gh variable set SLACK_ANNOUNCE_CHANNEL_ID`)
+because `.github/workflows/release.yaml` is what posts. No check is required on `main`: the
+`Quality (advisory)` job reports and never blocks, and the merge is Jamie's.
 
 ## Not wired yet
 

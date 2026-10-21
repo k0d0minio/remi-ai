@@ -1,13 +1,11 @@
 # Intake — this repo's backlog
 
-> The formats live next door: [`CONTEXT.md`](CONTEXT.md) (template-owned) owns the breakdown and
-> stub shapes, the triage stub, the archive rules and the triage verbs; the estate contract is
-> `_system/contracts/TICKETS.md` in icm-board and `.claude/skills/ticket-craft/` is its working
-> knowledge. This file is what is true of **this** backlog: the epics, the decisions of record
-> that bind them, and the milestones. Identity is the path — no ticket numbers. Done is a folder
-> move: `new-run.sh --stub` moves a stub to `_done/` when its run opens, `close-out.sh` archives
-> the epic when its last run merges. The admin dashboard's tickets board reads this folder from
-> `main`.
+> The formats, the writing rules and the loop from stub to merge are in
+> [`CONTEXT.md`](CONTEXT.md), the blueprint's contract. `.icm/scripts/new-run.sh` starts a
+> ticket and moves its stub into `_done/`. `.icm/scripts/close-out.sh` moves a finished epic
+> into `_done/`. This file is what is true of **this** backlog: the epics, the decisions of
+> record that bind them, and the milestones. Identity is the path. No ticket numbers. The
+> desk reads this folder on `main`.
 
 ## The backlog
 
@@ -34,8 +32,8 @@ the owner moves it. The target is Morgane's § 9 — « utilisable pour moi » �
 patient page the people she follows now can use in October, and a patient experience FunMedDev's
 team can test on 1 December.
 
-One-off findings sit in [`triage/`](triage/); finished ones in its `_done/`. A lane starts from
-one by name: `/pipeline bug|tweak|chore <stub-name>`.
+One-off findings sit in [`triage/`](triage/); finished ones in its `_done/`. One starts with
+`.icm/scripts/new-run.sh triage/<stub-name>`.
 
 ## Decisions of record
 

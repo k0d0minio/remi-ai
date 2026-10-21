@@ -1,4 +1,4 @@
-# Slack app manifest for the pipeline's reporting hook (.icm/scripts/report.sh → chat.postMessage).
+# Slack app manifest for the release announcement (.github/workflows/release.yaml → chat.postMessage).
 #
 # Import it once, in the REMI workspace: api.slack.com/apps → Create New App → From a manifest →
 # pick the workspace → paste this file → Next → Create. Then OAuth & Permissions → Install to

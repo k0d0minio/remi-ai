@@ -43,7 +43,7 @@ fails to create if any exist.
 
 ## Prompt
 
-Run `/pipeline chore protocol-template-name-unique-index` in the remi-ai repo. The lane pre-seeds
+Start it with `.icm/scripts/new-run.sh triage/protocol-template-name-unique-index`. The lane pre-seeds
 from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change
 and nothing wider. Generate the migration fresh — never renumber or edit an existing one
 (`CONVENTIONS.md` § "Regenerate a migration, never renumber it").

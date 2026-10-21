@@ -42,8 +42,10 @@ shadcn/ui over Radix, Nextra 4, tsup. Each app is one Vercel project in team `re
 `ci.yml` runs the client checks on every push and pull request. `quality.yaml` is this
 repo's own advisory job: lint, typecheck and tests on a ready pull request, never required.
 `release.yaml` runs on the merge of a pull request to `main`: the merge is the production
-release, and the job announces it (a GitHub Release and Slack, named in `.icm/project.json`).
-There is no UAT environment. Jamie merges.
+release. The job cuts a GitHub Release named after the pull request and posts it to Slack
+(the secret `SLACK_BOT_TOKEN` and the variable `SLACK_ANNOUNCE_CHANNEL_ID`). A line
+`- announce: none` in the pull request body skips both. There is no UAT environment. Jamie
+merges.
 
 ## Rules
 

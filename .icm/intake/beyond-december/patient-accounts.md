@@ -66,4 +66,4 @@ recorded from day one.
 
 ## Prompt
 
-Run `/pipeline new patient-accounts` in the remi-ai repo — **only after the owner has moved this stub onto the live path**. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.
+Start it with `.icm/scripts/new-run.sh beyond-december/patient-accounts` — **only after the owner has moved this stub onto the live path**. The session reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** as numbered questions with a default, before Spec approved. Scope is the Proposed change and nothing under Out of scope.
