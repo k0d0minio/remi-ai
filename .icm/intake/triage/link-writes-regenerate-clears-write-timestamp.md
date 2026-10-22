@@ -30,4 +30,4 @@ Ask Morgane which reading she wants after a rotation and make the card say that;
 
 ## Prompt
 
-Run `/pipeline tweak link-writes-regenerate-clears-write-timestamp` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.
+Start it with `.icm/scripts/new-run.sh triage/link-writes-regenerate-clears-write-timestamp`. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

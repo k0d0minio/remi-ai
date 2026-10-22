@@ -153,9 +153,8 @@ Five calls, transcribed by machine and extracted through `.icm/raw/` on 23 Septe
   admin console (25 Aug), Neon confirmed, pseudonymisation, the 18+ rule, the genotype-test rule
   (28 Aug), the pitch rehearsal and the view-only link (1 Sept).
 
-The Scope run that read them all is
-[`.icm/runs/september-sources/`](../runs/september-sources/01_scope/output/scope.md): the story
-records each one, the scope settles what changed (D-16 … D-24).
+The Scope run that read them all, `september-sources`, settled what changed (D-16 … D-24). Its
+folder left the repo with the old pipeline on 2026-10-21. Git history holds it.
 
 ### `remi-status-report.html` — the direction report
 

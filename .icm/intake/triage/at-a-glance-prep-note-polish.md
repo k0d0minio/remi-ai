@@ -30,4 +30,4 @@ Mirror the action's returned `saved` state into the display instead of the serve
 
 ## Prompt
 
-Run `/pipeline tweak at-a-glance-prep-note-polish` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.
+Start it with `.icm/scripts/new-run.sh triage/at-a-glance-prep-note-polish`. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

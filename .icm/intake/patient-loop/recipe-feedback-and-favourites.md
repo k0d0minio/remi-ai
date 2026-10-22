@@ -61,4 +61,4 @@ version had:
 
 ## Prompt
 
-Run `/pipeline new recipe-feedback-and-favourites` in the remi-ai repo — **P2 by D-19: pick it up when `ai-assist/recipe-generation` is next, or when the owner lifts it**. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.
+Start it with `.icm/scripts/new-run.sh patient-loop/recipe-feedback-and-favourites` — **P2 by D-19: pick it up when `ai-assist/recipe-generation` is next, or when the owner lifts it**. The session reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** as numbered questions with a default, before Spec approved. Scope is the Proposed change and nothing under Out of scope.

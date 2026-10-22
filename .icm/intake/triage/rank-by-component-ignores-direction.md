@@ -42,4 +42,4 @@ cannot silently disagree with the vocabulary.
 
 ## Prompt
 
-Run `/pipeline bug rank-by-component-ignores-direction` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.
+Start it with `.icm/scripts/new-run.sh triage/rank-by-component-ignores-direction`. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

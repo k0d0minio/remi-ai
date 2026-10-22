@@ -52,4 +52,4 @@ Her 20 Aug catalogue makes export a P0 trust principle: a practitioner must be a
 
 ## Prompt
 
-Run `/pipeline new patient-record-export` in the remi-ai repo — **only after the owner has lifted this stub's P2**. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.
+Start it with `.icm/scripts/new-run.sh beyond-december/patient-record-export` — **only after the owner has lifted this stub's P2**. The session reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** as numbered questions with a default, before Spec approved. Scope is the Proposed change and nothing under Out of scope.

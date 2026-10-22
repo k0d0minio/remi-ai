@@ -56,4 +56,4 @@ control is text. When the owner picks a vendor:
 
 ## Prompt
 
-Run `/pipeline new meal-photos` in the remi-ai repo — **only after the owner has lifted this stub's P2 and `patient-loop/patient-documents-and-links` has shipped the files seam**. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.
+Start it with `.icm/scripts/new-run.sh beyond-december/meal-photos` — **only after the owner has lifted this stub's P2 and `patient-loop/patient-documents-and-links` has shipped the files seam**. The session reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** as numbered questions with a default, before Spec approved. Scope is the Proposed change and nothing under Out of scope.

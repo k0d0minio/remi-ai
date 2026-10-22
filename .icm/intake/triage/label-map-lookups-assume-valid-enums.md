@@ -42,4 +42,4 @@ Pick one of the two fixes — validate at the read boundary in the services pack
 
 ## Prompt
 
-Run `/pipeline chore label-map-lookups-assume-valid-enums` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.
+Start it with `.icm/scripts/new-run.sh triage/label-map-lookups-assume-valid-enums`. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

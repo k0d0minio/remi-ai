@@ -63,4 +63,4 @@ Retry connection-level failures of the migrate step and its verification query w
 
 ## Prompt
 
-Run `/pipeline chore db-migrate-connection-retry` in the remi-ai repo. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.
+Start it with `.icm/scripts/new-run.sh triage/db-migrate-connection-retry`. The lane pre-seeds from this stub and moves it to `triage/_done/` when it opens the PR. Scope is the Proposed change and nothing wider; a question left open above is raised, not answered in code.

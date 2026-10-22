@@ -62,4 +62,4 @@ structurés." `bulk-entry` built the grid; this stub fills it:
 
 ## Prompt
 
-Run `/pipeline new free-text-to-rows` in the remi-ai repo — **only after the owner has lifted this stub's P2 (D-8 excluded it from the first AI round)**. Define reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** rather than answering them. Scope is the Proposed change and nothing under Out of scope.
+Start it with `.icm/scripts/new-run.sh ai-assist/free-text-to-rows` — **only after the owner has lifted this stub's P2 (D-8 excluded it from the first AI round)**. The session reads this stub, its epic's `breakdown.md` and the decisions of record in `.icm/intake/README.md`, and asks the points under **Open for Define** as numbered questions with a default, before Spec approved. Scope is the Proposed change and nothing under Out of scope.

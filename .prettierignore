@@ -5,27 +5,8 @@ pnpm-lock.yaml
 **/public/
 .turbo/
 
-# Canonical assets seeded from icm-board — kept byte-identical to the template
+# The blueprint's files, byte-identical with legible-consulting/blueprint and reached by
+# copier update, never formatted here.
 .claude/
-
-# Immutable records — pipeline run artifacts are written once and kept verbatim; reformatting
-# them rewrites history for no benefit.
-.icm/runs/
-
-# Template-owned pipeline files — byte-identical with the estate template in icm-board
-# (`_system/template/icm-pipeline/MANIFEST`, estate decision D20) and synced from it by
-# `icm-sync.sh`. A formatter pass here would put them out of step with every other repo and read
-# as drift; they are edited in the template, never in place. `.claude/` above covers the router.
-.icm/stages/
-.icm/lanes/
-.icm/_shared/
-.icm/skills/
-.icm/raw/
 .icm/intake/CONTEXT.md
-.icm/MANIFEST
 .github/pull_request_template.md
-
-# Compiled by the pipeline's own scripts, never by hand — `process-raw.sh` writes `.icm/processed/`,
-# `client-status.sh` writes `.icm/output/`; formatting either only churns a generated file.
-.icm/processed/
-.icm/output/

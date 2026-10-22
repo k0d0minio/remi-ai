@@ -1,7 +1,7 @@
 # Remi AI
 
-A Turborepo monorepo: six Next.js apps over two shared packages, with a gated delivery pipeline
-that work flows through.
+A Turborepo monorepo: six Next.js apps over two shared packages. Work flows through tickets in
+`.icm/intake/` and one pull request per ticket.
 
 ## Layout
 
@@ -16,7 +16,7 @@ apps/
 packages/
   ui/           @remi/ui — the design system; the only home for primitives
   services/     @remi/services — storage, email, AI, env; seams, not integrations
-.icm/           the work layer — intake, docs, and the delivery pipeline
+.icm/           the work layer — the tickets, the two scripts, the docs
 ```
 
 The dependency arrow points **app → package**, only ever. No app imports another app; a package
@@ -63,7 +63,7 @@ see where everything stands. The map is [`.icm/CONTEXT.md`](.icm/CONTEXT.md).
 | For…                              | Read                                                     |
 | --------------------------------- | -------------------------------------------------------- |
 | Code style, design system, git    | [`CONVENTIONS.md`](CONVENTIONS.md)                       |
-| Repo identity and routing         | [`AGENTS.md`](AGENTS.md)                                 |
+| Repo identity and routing         | [`CLAUDE.md`](CLAUDE.md)                                 |
 | The delivery pipeline             | [`.icm/CONTEXT.md`](.icm/CONTEXT.md)                     |
 | Environment variables and secrets | [`.icm/docs/ENV.md`](.icm/docs/ENV.md)                   |
 | Rules for one app or package      | that subtree's `AGENTS.md`                               |
