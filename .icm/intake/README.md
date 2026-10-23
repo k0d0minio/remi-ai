@@ -3,198 +3,190 @@
 > The formats, the writing rules and the loop from stub to merge are in
 > [`CONTEXT.md`](CONTEXT.md), the blueprint's contract. `.icm/scripts/new-run.sh` starts a
 > ticket and moves its stub into `_done/`. `.icm/scripts/close-out.sh` moves a finished epic
-> into `_done/`. This file is what is true of **this** backlog: the epics, the decisions of
-> record that bind them, and the milestones. Identity is the path. No ticket numbers. The
-> desk reads this folder on `main`.
+> into `_done/`. This file is what is true of **this** backlog: the stories, the epics cut from
+> them, the decisions of record that bind them, and the milestones. Identity is the path. No
+> ticket numbers. The desk reads this folder on `main`.
 
 ## The backlog
 
-Re-cut 2026-09-10 from Morgane's feedback on the first version
-(`icm-board workspaces/deals/remi-ai/remi-partnership/raw/documents/collaboration/remi-v2-feedback-on-first-version.docx` (icm-board `workspaces/deals/remi-ai/remi-partnership/raw/documents/collaboration/remi-v2-feedback-on-first-version.docx`)),
-retriaged 2026-09-18 into the pipeline template's stub shape, and **amended 2026-09-23** from the
-11 September call and her 14 September « Ce que les consultants doivent voir » — now precedence
-row 1 — by the Scope run [`runs/september-sources/`](../runs/september-sources/01_scope/output/scope.md)
-(decisions D-16 … D-25 below). The three epics were cut before the Scope front existed, so the
-epics themselves have no `scope.md`: the decisions a front would have recorded are the list below,
-and Define proceeds from the stub alone; the 2026-09-23 amendments do have one.
+Re-cut on 2026-10-23 from Morgane's thirty user stories. She wrote them on 12 and 15 October
+2026, in French, one document per story, numbered 1 to 32 (10 and 27 do not exist). They live in
+the client's Drive folder,
+[`remi-ai/user-stories/`](https://drive.google.com/drive/folders/1Dsa6QvCLwBTn5jnI7ubrccnY0HUn4D-7),
+and never in this repo. Jamie decided on 2026-10-23 that they **replace the open backlog whole**
+and **win over anything the platform contradicts**. One story is one epic. Each epic's
+`breakdown.md` restates the story, lists the questions it leaves open, and maps every one of her
+acceptance criteria to a stub in its `Criteria → stubs` table. Story 30 states rules for the whole
+product. It is not an epic. Its rules are decisions D-30 and D-31 below.
 
-| Epic                                               | What it is                                                                                                                                                                                                                      |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`patient-loop/`](patient-loop/breakdown.md)       | The link the patient writes into — home, meals and writes shipped; next her 14 Sept asks: challenges, documents and links (the files seam), general feedback; then check-ins and progression, profile edit; recipe feedback P2. |
-| [`ai-assist/`](ai-assist/breakdown.md)             | The model arrives — the Vercel AI Gateway behind the seam, meal suggestions to the patient, recipe generation into the library, a summary draft for Morgane; one P2 parked.                                                     |
-| [`beyond-december/`](beyond-december/breakdown.md) | The old version's flows that are right and not for now — accounts, autonomous patient + PDF, practitioner space, photos, groups, genotype, record export, send-link mail. All P2.                                               |
+The order is her « Parcours général » (story 30): sign-up link → preparatory profile →
+consultation → practitioner validation → activation and e-mail → the patient's space.
 
-Order: **`practitioner-workflow` → `patient-loop` → `ai-assist`** (D-4). `practitioner-workflow`
-shipped whole on 2026-09-18 and `nutrition-knowledge` ran alongside it (CIQUAL imported, her rules
-authored) — both archived under [`_done/`](_done/). `patient-loop` is the live epic; `ai-assist`
-starts mid-October (D-14) into the slots it leaves. Nothing in `beyond-december` is "next" until
-the owner moves it. The target is Morgane's § 9 — « utilisable pour moi » — met on the console, a
-patient page the people she follows now can use in October, and a patient experience FunMedDev's
-team can test on 1 December.
+| # | Story (her title) | Epic | Phase |
+|---|---|---|---|
+| 2 | « Inscription et compte patient » | [`patient-signup-account/`](patient-signup-account/breakdown.md) | 1 |
+| 3 | « Consentement et données personnelles » | [`consent-and-data/`](consent-and-data/breakdown.md) | 1 |
+| 1 | « Création du dossier patient » | [`patient-file-creation/`](patient-file-creation/breakdown.md) | 1 |
+| 4 | « Questionnaire préparatoire du patient » | [`preparatory-questionnaire/`](preparatory-questionnaire/breakdown.md) | 1 |
+| 5 | « Liste des patients et statuts du dossier » | [`patient-list-and-status/`](patient-list-and-status/breakdown.md) | 1 |
+| 6 | « Consultation du dossier patient avant le rendez-vous » | [`patient-file-view/`](patient-file-view/breakdown.md) | 1 |
+| 7 | « Calcul de l'IMC » | [`bmi/`](bmi/breakdown.md) | 1 |
+| 8 | « Calcul des besoins protéiques » | [`protein-needs/`](protein-needs/breakdown.md) | 1 |
+| 9 | « Calcul énergétique » | [`energy-needs/`](energy-needs/breakdown.md) | 1 |
+| 13 | « Aliments, nutriments et composés » | [`food-directives/`](food-directives/breakdown.md) | 2 |
+| 14 | « Sécurité des évictions totales » | [`eviction-safety/`](eviction-safety/breakdown.md) | 2 |
+| 15 | « Demande d'ajout d'un élément » | [`knowledge-base-requests/`](knowledge-base-requests/breakdown.md) | 2 |
+| 16 | « Objectifs prioritaires du patient » | [`priority-goals/`](priority-goals/breakdown.md) | 2 |
+| 17 | « Conseils d'hygiène de vie » | [`lifestyle-advice/`](lifestyle-advice/breakdown.md) | 2 |
+| 18 | « Compléments, plantes, huiles essentielles et autres interventions » | [`supplement-interventions/`](supplement-interventions/breakdown.md) | 2 |
+| 11 | « Chrononutrition : organisation des repas » | [`meal-structure/`](meal-structure/breakdown.md) | 2 |
+| 12 | « Jeûne intermittent » | [`intermittent-fasting/`](intermittent-fasting/breakdown.md) | 2 |
+| 19 | « Validation et activation de l'accompagnement » | [`care-activation/`](care-activation/breakdown.md) | 3 |
+| 20 | « Mise à jour du profil et des recommandations, historique » | [`protocol-versions/`](protocol-versions/breakdown.md) | 3 |
+| 21 | « Modifications du patient après validation » | [`patient-change-signals/`](patient-change-signals/breakdown.md) | 3 |
+| 22 | « Accès du patient à son espace activé » | [`patient-access/`](patient-access/breakdown.md) | 3 |
+| 31 | « Accueil et navigation de l'espace patient » | [`patient-home-navigation/`](patient-home-navigation/breakdown.md) | 3 |
+| 23 | « Espace Recommandations » | [`patient-recommendations/`](patient-recommendations/breakdown.md) | 3 |
+| 24 | « Espace Recettes » | [`recipe-space/`](recipe-space/breakdown.md) | 4 |
+| 25 | « Fiche recette, portions et favoris » | [`recipe-card/`](recipe-card/breakdown.md) | 4 |
+| 26 | « Liste de courses » | [`shopping-list/`](shopping-list/breakdown.md) | 4 |
+| 28 | « Suggestion d'amélioration » | [`meal-improvement/`](meal-improvement/breakdown.md) | 4 |
+| 32 | « Consultation des recettes du jour (praticien) » | [`practitioner-daily-recipes/`](practitioner-daily-recipes/breakdown.md) | 4 |
+| 29 | « Je suis au restaurant (bonus MVP) » | [`restaurant-menu/`](restaurant-menu/breakdown.md) | 5 |
+| 30 | « Règles transversales de priorité et de sécurité » | decisions D-30 and D-31 | every phase |
 
-One-off findings sit in [`triage/`](triage/); finished ones in its `_done/`. One starts with
-`.icm/scripts/new-run.sh triage/<stub-name>`.
+The phases are a build order, not a promise of dates. The dates are under Milestones. One-off
+findings sit in [`triage/`](triage/), finished ones in its `_done/`. The triage stubs of
+September describe bugs in code that still runs. They stay until the epic that rebuilds their
+surface drops them.
 
 ## Decisions of record
 
-The decisions that bind every epic above. D-1 … D-12 were taken by Jamie on 2026-09-10, the day
-the feedback arrived; D-13 … D-15 on 2026-09-11, preparing the call with Morgane and Arnaud;
-D-16 … D-24 on 2026-09-23, scoping that call's transcript and her 14 September answer to it
-([`runs/september-sources/01_scope/output/scope.md`](../runs/september-sources/01_scope/output/scope.md)
-carries the full table with its why and its changes). Where
-one supersedes a decision of 2026-09-01
-([`_done/patient-record/breakdown.md`](_done/patient-record/breakdown.md) § Decisions) it says so;
-the rest of that list still stands, as does the brainstorm's § 7 what-not-to-build. A stub names
-the decisions it rests on under its **Notes for Define**; a spec carries the ids forward.
+D-1 to D-25 were taken between 2026-09-10 and 2026-09-26 for the September backlog. The stories
+supersede the ones below. The rest stand. D-26 to D-34 were taken by Jamie on 2026-10-23 from the
+stories, as defaults a breakdown may rest on and a question for Morgane may overturn. D-34 is
+Jamie's own decision, not a default.
 
-1. **D-1 — The practitioner space is the admin console, reorganised.** No second signed-in
-   surface before the open day. Morgane stays an operator. Her § 3's A/B split ("console admin"
-   vs "espace praticien") is _console pages vs the patient page_ inside `apps/admin`, not two
-   apps.
-2. **D-2 — The patient link becomes read + write on the same token.** Supersedes 2026-09-01
-   decision 1 (view-only, WhatsApp carries the loop). The token in the URL is still the whole
-   credential; patient accounts are parked in `beyond-december`.
-3. **D-3 — AI vendor: Mistral, EU-hosted, behind the existing text-provider seam.** Supersedes
-   "AI deliberately unchosen". One adapter file; nothing above the seam names it. **Superseded by
-   D-16.**
-4. **D-4 — Order: `practitioner-workflow` → `patient-loop` → `ai-assist`.** `nutrition-knowledge`
-   runs alongside the first two and is a dependency of recipe generation. Her § 9 order.
-5. **D-5 — Recipes: the library stays.** Generation writes into it and assigns in the same step;
-   a recipe can be created from the patient page and assigned at creation; duplicate-as-variant
-   exists. Extends 2026-09-01 decision 5 rather than replacing it. Patient groups are parked.
-6. **D-6 — Meal suggestions go straight to the patient** — no practitioner gate. Every exchange
-   is visible in the journal in admin and Morgane can correct after the fact. Generated recipes
-   pass an _automated_ check (allergies, intolerances, diet, active recommendations, time and
-   difficulty) and reach the patient without a manual gate; she can archive any of them.
-7. **D-7 — Knowledge layer now: CIQUAL + Morgane's own nutrition rules as text.** Genotype
-   (Fagron / Dr Mouton) parked until the rights question is answered.
-8. **D-8 — First AI round: meal suggestions, recipe generation, consultation notes → summary
-   draft.** "Free text → structured rows" is _explicitly excluded_ from the first round; it sits
-   P2 at the end of `ai-assist` so it is not lost.
-9. **D-9 — Check-ins are in-page, with no outbound channel**; a simple progression view on both
-   sides.
-10. **D-10 — FunMedDev's team tests on 1 December as patients Morgane creates.** Practitioner
-    sign-up, admin approval, Stripe, the 3-months-free rule, patient accounts and PDF import are
-    all parked in `beyond-december`.
-11. **D-11 — Her feedback ranks 1** in [`.icm/docs/README.md § Precedence`](../docs/README.md).
-    **Superseded by D-17** — it ranks 2, under the 11 September call.
-12. **D-12 — The meal journal stays text-only** (2026-09-01 decision 6 stands); photos are parked
-    pending a blob vendor — an owner decision, never made in passing. **The vendor is decided by
-    D-18**; the journal stays text-only and photos stay parked.
-13. **D-13 — A bridge for "tester dès maintenant" that calls no model: `copy-context`.** Her
-    § 9.4 aside — she already generates with ChatGPT from a hand-typed profile — became one
-    button that exports the patient's pseudonymous context as a prompt. Its assembler is the
-    context block every `ai-assist` prompt opens with, built first and reused, so the bridge is
-    not throwaway. Shipped 2026-09-17 (#96).
-14. **D-14 — The AI order stands, with its reason written down.** Grids and slots first so the
-    model has somewhere to fill; `free-text-to-rows` stays P2 for that reason and is re-examined
-    at the 31 October milestone, not before. Mistral starts mid-October, once
-    `patient-loop/link-writes` and `meal-entry` exist for suggestions to land in. Not "AI later" —
-    "AI into slots that exist".
-15. **D-15 — The backlog carries dates.** Five milestones to 1 December are below; a stub's epic
-    tells the milestone it serves. One person runs the agents, in parallel where the epics allow
-    it and serially where they do not; the dates assume one stub a day.
-16. **D-16 — AI vendor: the Vercel AI Gateway first, EU residency later.** Supersedes D-3. One
-    adapter behind the seam targets the gateway; model ids stay behind the three roles; the
-    cheapest capable models first; EU-hosted inference is revisited when patient volume justifies
-    its price. Prompts carry pseudonymised context only. From the 11 Sept call [29:15]–[33:59]:
-    Jamie's recommendation, Morgane's « au début, le moins cher ». `ai-assist/mistral-adapter`
-    became `ai-gateway-adapter`.
-17. **D-17 — The 11 September call and her 14 September answer rank first.** Supersedes D-11. Her
-    feedback on the first version ranks 2 and wins only where the call is silent; the four August
-    calls are a lower row, cited as context.
-18. **D-18 — Files: a files seam with Vercel Blob as its one adapter, EU region.** The fourth
-    seam in the services package, built by `patient-loop/patient-documents-and-links`. Answers the
-    vendor question D-12 left open; `meal-photos` and `autonomous-patient-pdf-import` are parked,
-    no longer blocked.
-19. **D-19 — The patient link gets what she asked for on 14 September, before any model:**
-    `challenges`, `patient-documents-and-links`, `general-feedback` — P1 in `patient-loop`, in that
-    order. `recipe-feedback-and-favourites` drops to P2 (« pas besoin pour l'instant »);
-    `check-in-and-progression` carries her weekly 0–5 score as an open point.
-20. **D-20 — Recipes: the library stays (D-5); a seed base is Define's question.** The proposal put
-    to her in `recipe-generation`: ~20 anti-inflammatory recipes she supplies as a transformation
-    canvas, against CIQUAL-only generation. A culinary-coherence check joins the post-generation
-    control either way.
-21. **D-21 — Recorded, not built:** the practitioner knowledge-sharing forum; speech-to-text for
-    consultations; a supplement reference table; the 20 Aug catalogue's shopping list, follow-up
-    board, period synthesis and pre-consultation questionnaires; the governance asks of the August
-    calls. Out of scope in the Scope run, no stubs.
-22. **D-22 — Parked P2 in `beyond-december`:** `patient-record-export` (her 20 Aug § 30 trust
-    principle) and `send-link-email` (the 28 Aug promise, through Resend).
-23. **D-23 — Two facts from the August calls land in existing stubs:** `genotype-layer` carries
-    the Belgian rule that a doctor must order the test; `patient-profile-edit` carries the 18+ rule
-    and « age, not date of birth » as an open point (`birth_date` is stored today).
-24. **D-24 — Where the September documents live:** « REMI V2 Features » (20 Aug) in
-    `collaboration/` with a precedence row as a superseded reference; the Startup Boost roadmap in
-    `collaboration/` with no row; the five transcripts under `icm-board workspaces/deals/remi-ai/remi-partnership/raw/transcripts/`, cited from there.
-25. **D-25 — One environment, one database (Jamie, 2026-09-26, estate audit):** preview and
-    production are the two deploy targets, there is no UAT, and both read the one Neon database.
-    Previews never run migrations — `migrate.mjs` fails closed off production and the admin project's
-    `ALLOW_NON_PRODUCTION_MIGRATIONS` opt-out goes. Settles `triage/previews-migrate-the-shared-database`
-    (its duplicate `env-preview-migrations-row-is-stale` was folded in the same day).
+### Superseded by the stories (2026-10-23)
+
+- **D-1** as "no practitioner space". The console is the practitioner space (D-27), with roles.
+- **D-2** the token as the whole credential. Patient accounts replace it (D-26).
+- **D-9** in-page check-ins and the progression view. Story 30: « Aucun écran du MVP ne propose
+  de points, de badges ni de questionnaire de feedback périodique. »
+- **D-10** accounts and the practitioner flow parked. They are the first phase.
+- **D-12** text-only meals. Story 28 takes a photo or a description (D-29).
+- **D-13** `copy-context` as a product feature. The context assembler stays as code behind the
+  prompts. The button leaves the console when `meal-improvement` ships.
+- **D-19** the September patient page: challenges, the general feedback box, the weekly 0–5
+  score, « Je vais manger / J'ai mangé ». None is in the stories. They leave `apps/web` when
+  `patient-home-navigation` ships. The tables stay until a migration drops them.
+- **D-20** the seed base of ~20 recipes as an open question. Closed by D-34 on 2026-10-23.
+
+### Standing from September
+
+- **D-6** suggestions reach the patient with no manual gate. Story 28 agrees. The automated check
+  is the compatibility gate of `eviction-safety`.
+- **D-7** CIQUAL and her rules are the knowledge layer. Story 13 widens it (D-33).
+- **D-16** AI through the Vercel AI Gateway, cheapest capable model first, structured JSON output,
+  every generation logged, safety checks in code after generation. EU-hosted inference later.
+- **D-18** files through the files seam, Vercel Blob, EU region.
+- **D-25** one Neon database for preview and production. Previews never migrate.
+
+### New (2026-10-23)
+
+26. **D-26 — Patient accounts.** E-mail and password on `apps/web`. The account is created once,
+    from the practitioner's link or by the practitioner, and is the same account after
+    activation (stories 1, 2, 22). The token link `[locale]/p/[token]` is retired by
+    `patient-home-navigation`.
+27. **D-27 — The practitioner space is `apps/admin`, with two roles.** `admin` is the REMI team
+    (story 15's review list, story 3's logged access). `practitioner` sees only their own
+    patients (stories 1, 3, 5, 6). Morgane holds both roles. One practitioner at the open day
+    unless she says otherwise (question 2).
+28. **D-28 — One auth seam for both apps.** The adapter is Jamie's decision in
+    `patient-signup-account`. Default: Neon Auth. The operator scrypt code of September is
+    replaced, not extended.
+29. **D-29 — Photos.** A meal or menu photo goes through the files seam (D-18) to a
+    vision-capable model behind the gateway (D-16). The photo is stored with the entry and
+    deleted with the patient (`.icm/docs/RETENTION.md`).
+30. **D-30 — Story 30's priority order binds every generation and every suggestion.** In this
+    order: 1 allergies, intolerances, total evictions and contra-indications; 2 the patient's
+    declared diet and the practitioner's validated imperative recommendations; 3 foods to limit
+    and other validated restrictions; 4 validated nutritional parameters (energy, macros,
+    chrononutrition, fasting, foods to favour); 5 the main goal; 6 secondary goals. Missing data
+    is « Non renseigné », never invented. A calculation is an « estimation » until validated.
+    Only validated recommendations reach generation. Allergies, intolerances, evictions and diet
+    declared by the patient apply at once and are signalled. Unknown composition is never
+    presented as safe. No points, no badges, no periodic feedback questionnaire.
+31. **D-31 — Four file statuses, one enum, one home.** « Dossier à compléter » →
+    « Prêt pour consultation » → « Recommandations à valider » → « Accompagnement actif »
+    (stories 5, 30). `patient-list-and-status` owns the enum. Every surface reads it.
+32. **D-32 — Audit events.** A status change, a consent, a validated protocol version and a
+    patient change after validation each write to `audit_events`, with who, when and what
+    (stories 3, 19, 20, 21).
+33. **D-33 — The term base.** CIQUAL covers foods and nutrients. Story 13's compounds and
+    families (polyphenols, I3C, phytoestrogens, oxalates, purines, histamine, crucifers, FODMAP
+    sources) need a terms-and-associations table with a provenance and a confidence level per
+    row, seeded from sources Morgane names and validated by her. An association that is not in
+    the table does not exist (story 13: « REMI ne génère aucune association aliment–composé
+    absente de sa base validée »).
+34. **D-34 — Template recipes, not pure generation.** REMI generates every recipe from a
+    verified template recipe. It never generates a recipe from nothing. The template base holds
+    more than twenty recipes. Only a verified template feeds generation. The generated recipe
+    still passes the compatibility gate (story 24, D-30). Jamie decided this on 2026-10-23 and
+    removed the question from the list for Morgane. It closes D-20 and the September question
+    « une base de ~20 recettes comme canevas, ou génération pure contrôlée ? ». `recipe-space`
+    says where the templates live and who writes them.
 
 ## Milestones
 
-Dated 2026-09-11 (D-15), for the call with Morgane and Arnaud that day; state as of 2026-09-23.
-The two fixed points come from the direction letter: FunMedDev's team tests on **1 December**,
-the open day is **19 December**. Everything else is derived backwards at one stub a day, one
-person, agents in parallel where the epics allow it. A missed date is reported on the Friday
-call, not absorbed silently.
+Two fixed points from the direction letter: **FunMedDev's team tests on 1 December 2026** and
+**the open day is 19 December 2026**. Jamie keeps the horizon at 19 December (2026-10-23). The
+dates below are derived backwards, one person, agents in parallel where the epics allow it. Jamie
+is on site for another client from 2 to 6 November. The September plan assumed one stub a day
+(D-15). Twenty-nine epics are more than one stub a day fits before 1 December, so **what 1
+December must show is question 1 of the call**, and the P0 set follows her answer. A missed date
+is reported on the Friday call, not absorbed.
 
-| By           | Milestone                                                    | Stubs                                                                                                                                                                                                                              |
-| ------------ | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 30 September | **Console usable for Morgane** — her § 9.1 to 9.4            | **Met 2026-09-18.** `practitioner-workflow/*` shipped whole: at-a-glance-page (#93), copy-context (#96), bulk-entry (#97), recipe-in-place (#95), consultation-update (#99), secondary-sections (#100), reuse-and-duplicate (#107) |
-| 15 October   | **The patient writes into the link** — home, meals, her page | shipped: `patient-loop/link-writes` (#98), `patient-home-today` (#106), `meal-entry` (#110) · left: `challenges`, `patient-documents-and-links`, `general-feedback` (her 14 Sept asks, D-19) · `recipe-feedback-and-favourites` P2 |
-| 31 October   | **REMI answers a meal** — the gateway live, her knowledge in | shipped: `nutrition-knowledge/*` (#102, #101) · left: `ai-assist/ai-gateway-adapter`, `meal-suggestions` · `free-text-to-rows` P2 re-examined here                                                                                 |
-| 15 November  | **REMI proposes recipes** — the loop closes                  | `ai-assist/recipe-generation` (seed base or not: D-20), `summary-draft`, `patient-loop/check-in-and-progression`, `patient-profile-edit` · `recipe-feedback-and-favourites` returns from P2 before generation needs it             |
-| 30 November  | **Freeze** — fixes only until the open day                   | triage                                                                                                                                                                                                                             |
-| 1 December   | FunMedDev's team tests                                       | —                                                                                                                                                                                                                                  |
-| 19 December  | Open day                                                     | —                                                                                                                                                                                                                                  |
+| By | Phase | Epics |
+|---|---|---|
+| 14 November | **1 — The file.** A practitioner creates or receives a patient, reads the file, sees the calculations. | `patient-signup-account`, `consent-and-data`, `patient-file-creation`, `preparatory-questionnaire`, `patient-list-and-status`, `patient-file-view`, `bmi`, `protein-needs`, `energy-needs` |
+| 21 November | **2 — The protocol.** The practitioner writes the recommendations REMI will apply. | `food-directives`, `eviction-safety`, `knowledge-base-requests`, `priority-goals`, `lifestyle-advice`, `supplement-interventions`, `meal-structure`, `intermittent-fasting` |
+| 26 November | **3 — Activation and the patient's space.** The patient signs in and reads. | `care-activation`, `protocol-versions`, `patient-change-signals`, `patient-access`, `patient-home-navigation`, `patient-recommendations` |
+| 1 December | **4 — Recipes and the suggestion.** REMI proposes. FunMedDev's team tests. | `recipe-space`, `recipe-card`, `shopping-list`, `meal-improvement`, `practitioner-daily-recipes` |
+| 12 December | **Freeze.** Fixes only until the open day. | triage |
+| 19 December | **5 — Open day.** The bonus if time allows. | `restaurant-menu` |
 
-The gateway starts mid-October by choice, not by capacity (D-14): a suggestion needs a meal entry
-to land in, and a generated recipe needs the library-and-assign path. Until then Morgane tests
-generation through `copy-context` with the model she already uses.
+`recipe-space/ai-gateway-adapter` does not wait for phase 4. It starts beside phase 1, so the
+model has a slot on day one of phase 4 and the prompts are proven on real protocols before then.
 
 ## Open points are deliberate
 
-Every stub carries an **Open for Define** list under its `## Notes for Define`, and every prompt
-tells the session to raise those points rather than answer them. That is on purpose: a number of
-things the source documents do not settle — a vocabulary Morgane has not confirmed, a visibility
-choice only she can make — would be decided by accident if an implementation just picked one.
-Define is the last stage that gathers requirements: it asks the operator in session
-(`stages/02_define/CONTEXT.md` step 2), and what cannot be settled goes under the spec's **Out of
-scope**, never left open for Build to guess.
+Every breakdown carries `### Questions for Morgane` and `### Questions for Jamie`, numbered, each
+with a default. A session that starts a stub asks them in the pull request before Spec approved
+and builds on no guess. The questions of the 23 October call are collected in French in the
+client's Drive folder. Her answers return to the breakdowns in the same pull request that acts on
+them.
 
 ## Where the previous backlogs went
 
-Five epics have shipped and sit in [`_done/`](_done/): `patient-record` and `patient-surface`
-(the manual-first record and the read-only link, cut from the v2 structure brainstorm),
-`nutrition-knowledge` (CIQUAL and her rules, archived by `close-out.sh` on 2026-09-18 once both
-runs had merged), `practitioner-workflow` (the console around her consultation, seven runs, the
-last merged 2026-09-18), and `patient-workspace`, which was **dropped whole** on 2026-09-10 — a re-layout
-of the admin patient page with nothing changed in what it does, superseded by Morgane's feedback
-that the page must be rebuilt around her workflow. Each of its stubs carries a `> Dropped:` line;
-its research (R1–R30) is still cited by `practitioner-workflow`.
-
-The numbered REMI-NNN tickets (phases A–F, cut 18 Aug 2026 from the direction report) were purged
-in the 28 Aug clean slate (commit 444ecf5) after
-`new-development-direction.docx` (icm-board `workspaces/deals/remi-ai/remi-partnership/raw/documents/new-development-direction.docx`) superseded their
-sequencing — terrain-first, patient experience before the practitioner space. They remain
-recoverable in git history.
+- **September 2026, dropped on 2026-10-23:** `ai-assist`, `beyond-december` and the open rest of
+  `patient-loop` sit in [`_done/`](_done/), every stub and breakdown with a `> Dropped:` line.
+  The stories cover their ground differently: the gateway adapter is `recipe-space`'s first stub,
+  meal suggestions are `meal-improvement`, recipe generation is `recipe-space`, accounts are
+  `patient-signup-account`, the practitioner space is D-27, photos are D-29, export and
+  send-link are inside `care-activation` and `patient-access`. Genotype is inside
+  `preparatory-questionnaire` (story 4), with the laboratory mapping as a blocker.
+- **Shipped in September:** `patient-record`, `patient-surface`, `nutrition-knowledge`,
+  `practitioner-workflow`, the shipped part of `patient-loop`, in `_done/`. Their tables and
+  screens are the ground the stories rebuild on. A breakdown says what it keeps.
+- **August 2026:** the numbered REMI-NNN tickets, purged on 28 August. Git history holds them.
 
 ## Four facts that keep getting re-invented
 
-Worth knowing before reading any older document in this repository:
-
-1. **There is no signed pilot.** ~15 practitioners is a beta **recruitment target**. Nobody has
-   signed anything.
-2. **There is no billing date and no revenue.** The "€24.50/practitioner/month from 1 September
-   2026" was demo fixture data that an earlier audit read as a contract.
-3. **The database question is closed — Neon.** The braindump named Supabase; the owner settled on
-   Neon on 27 August 2026, and it is connected.
-4. **V2 is not a port of v1, nor of the old V2.** The 7-day food diary, the psychological
-   questionnaire, the nutrigenomics engine and rigid weekly plan generation are all out of scope;
-   the old V2's flows (`remi-v2-explication-systeme.docx`) are inputs to learn from, at Morgane's
-   own request, never a spec.
-
-The precedence order between documents is in [`.icm/docs/README.md`](../docs/README.md).
+1. **There is no signed pilot.** ~15 practitioners is a beta recruitment target.
+2. **There is no billing date and no revenue.** The « 24,50 € » was fixture data.
+3. **The database is Neon.** Settled 27 August 2026, connected.
+4. **The stories are the spec.** Every older document (the braindump, the feedback of 10
+   September, the 11 September call) is context. Where one disagrees with a story, the story
+   wins. The precedence table in [`.icm/docs/README.md`](../docs/README.md) is updated by the
+   pull request that merges this file.
