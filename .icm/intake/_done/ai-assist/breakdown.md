@@ -1,0 +1,93 @@
+> Dropped: superseded by Morgane's user stories of October 2026 (`.icm/intake/README.md`), 2026-10-23
+
+# Breakdown: ai-assist — the model arrives, into slots the manual product already has
+
+- scope-slug: ai-assist · story: none — cut 2026-09-10 from Morgane's feedback § 5, § 7, § 8 and her covering message (`correspondence/03`)
+- initiative: a patient experience validated on real terrain, in time for the December open day / objective: a usable patient version for the partner clinic to test on 1 December
+- personas: patient, practitioner, operator
+
+## What I understood
+
+Cut 2026-09-10 from Morgane's feedback § 5 (the "ensuite, l'IA" paragraph), § 7 (recipe
+generation), § 8 (meal suggestions) and her covering message: "pour certaines fonctions comme les
+recettes 100 % personnalisées ou « Je vais manger → Suggestions », l'IA fait directement partie
+de la valeur du produit, donc j'aimerais qu'on commence à les tester dès maintenant." Her principle
+and ours agree: the base works without a model; the model then pre-fills, suggests and automates
+into workflows that exist. Every stub here writes into a table and a screen that
+`practitioner-workflow`, `patient-loop` or `nutrition-knowledge` built first.
+
+Decisions of record (2026-09-10,
+[`README.md § Decisions of record`](../README.md)) that
+bind this epic: **D-16** (2026-09-23, supersedes D-3) — the Vercel AI Gateway behind the
+`TextProvider` seam, cheapest capable models first, EU-hosted inference later; **D-6** — meal
+suggestions straight to the patient, generated recipes gated by an automated check, not a manual
+one; **D-7** — CIQUAL and her rules are the knowledge the prompts retrieve; **D-8** — the first round
+is meal suggestions, recipe generation and consultation notes → summary draft; free text →
+structured rows is excluded from the first round and sits last, P2. Brainstorm § 7's "no
+automation without human validation at the start" is honoured where a human reads the output
+before it acts (summary draft, recipe check) and consciously set aside for meal suggestions by D-6
+— they are advice to a patient, visible to Morgane, correctable, and the thing she wants to test.
+
+## The shape every stub shares
+
+- **One adapter**, one registration line, nothing above the seam names the vendor.
+- **Structured output.** Each capability defines a zod schema for what the model returns; the
+  provider is asked for JSON against it; a response that fails the schema is a logged failure, not
+  a rendered answer. The seam grows a `generateJson(prompt, schema)` beside `generateText`.
+- **Prompts are code**: one file per capability under `packages/services/src/ai/prompts/`,
+  versioned with the repo, with the patient context assembled by a function that is unit-tested
+  against fixtures. Her data — profile, active recommendations, goals, instruction, allergies —
+  is the prompt's first block; retrieved rules and foods the second; the request the third.
+- **Safety inputs are hard constraints, not prompt hints.** Allergies, intolerances and diet are
+  checked _after_ generation by code (the recipe check; the suggestion's "add X" against the
+  exclusion list), never trusted to the model.
+- **Every generation is logged**: `ai_generations` — capability, patient, prompt version, model,
+  token counts, latency, outcome (ok / schema-fail / refused / error), the output's id. The
+  braindump's "suivi des coûts par génération", and the record the next iteration learns from.
+- **Every output is labelled** where a person sees it (« proposé par REMI ») and correctable by
+  Morgane.
+
+## When it starts
+
+Mid-October (decision D-14, 2026-09-11): after `patient-loop/link-writes` and `meal-entry`, so the
+first call has a slot to land in. The context block every prompt opens with is built earlier by
+`practitioner-workflow/copy-context` and reused here unchanged. Milestones in
+[`README.md § Milestones`](../README.md): suggestions by 31 October, generation by 15 November.
+
+## Where it sits
+
+The patient loop (meal entry → suggestion) and the recipe library (generation → assignment) on the patient link; the consultation screen in the console; the AI seam in the services package and its generation log.
+
+## Build order
+
+1. `ai-gateway-adapter` — the adapter, `generateJson`, the generation log, the env variable —
+   depends-on: none
+2. `meal-suggestions` — « Je vais manger → Suggestions » and the « J'ai mangé » feedback, instant,
+   to the patient — depends-on: ai-gateway-adapter (cross-epic: `patient-loop/meal-entry`;
+   `nutrition-knowledge/nutrition-rules` soft)
+3. `recipe-generation` — several recipes from profile + recommendations, checked, into the library
+   and assigned — depends-on: ai-gateway-adapter (cross-epic: `practitioner-workflow/recipe-in-place`,
+   `patient-loop/patient-profile-edit`, `patient-loop/recipe-feedback-and-favourites`,
+   `nutrition-knowledge/*`)
+4. `summary-draft` — consultation notes → a proposed living-summary revision and anamnesis
+   fields, for Morgane to edit — depends-on: ai-gateway-adapter (cross-epic:
+   `practitioner-workflow/consultation-update`)
+5. `free-text-to-rows` — P2, excluded from the first round by decision D-8 — depends-on:
+   ai-gateway-adapter (cross-epic: `practitioner-workflow/bulk-entry`)
+
+## Parallelizable
+
+2, 3 and 4 are independent once 1 lands and their cross-epic prerequisites have shipped; each
+touches its own prompt file, schema and surface. 5 waits for an explicit owner decision to lift its
+P2, not just for 1.
+
+## Out of scope (whole epic)
+
+- Photo recognition, multiple variants, "tient compte des repas précédents de la journée" — her
+  § 8 "vision finale"; a second round once the first is measured.
+- Autonomy beyond what D-6 grants: nothing here archives, changes or sends a protocol on its own.
+- Embeddings, agents, tool use — a single structured call per capability is the whole design
+  until the log says otherwise.
+- A direct vendor SDK or a second adapter; EU-hosted inference is an owner decision for later
+  (D-16), reached by changing a model id behind the gateway, not by a new adapter.
+- The recipe seed base is Define's question inside `recipe-generation` (D-20), not a stub here.
