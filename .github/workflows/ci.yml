@@ -17,5 +17,3 @@ concurrency:
 jobs:
   check:
     uses: legible-consulting/.github/.github/workflows/check-client.yml@main
-    with:
-      tier: platform
