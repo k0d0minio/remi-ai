@@ -1,3 +1,5 @@
+> Dropped: #141 removed `release.yaml` before this stub started, 2026-10-27.
+
 # Stub: Retire release.yaml after the blueprint release
 
 - lane: chore
