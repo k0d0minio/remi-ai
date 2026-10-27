@@ -60,6 +60,41 @@ findings sit in [`triage/`](triage/), finished ones in its `_done/`. The triage 
 September describe bugs in code that still runs. They stay until the epic that rebuilds their
 surface drops them.
 
+## Order
+
+Set by Jamie on 2026-10-27. The epics follow the table above. `triage` comes last.
+
+1. patient-signup-account
+2. consent-and-data
+3. patient-file-creation
+4. preparatory-questionnaire
+5. patient-list-and-status
+6. patient-file-view
+7. bmi
+8. protein-needs
+9. energy-needs
+10. food-directives
+11. eviction-safety
+12. knowledge-base-requests
+13. priority-goals
+14. lifestyle-advice
+15. supplement-interventions
+16. meal-structure
+17. intermittent-fasting
+18. care-activation
+19. protocol-versions
+20. patient-change-signals
+21. patient-access
+22. patient-home-navigation
+23. patient-recommendations
+24. recipe-space
+25. recipe-card
+26. shopping-list
+27. meal-improvement
+28. practitioner-daily-recipes
+29. restaurant-menu
+30. triage
+
 ## Decisions of record
 
 D-1 to D-25 were taken between 2026-09-10 and 2026-09-26 for the September backlog. The stories
