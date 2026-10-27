@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: Start a piece of work
-    url: https://github.com/k0d0minio/remi-ai/blob/main/.icm/CONTEXT.md
+    url: https://github.com/k0d0minio/remi-ai/blob/main/.icm/intake/CONTEXT.md
     about: Work does not start from an issue. Write a stub in .icm/intake/ and start it with .icm/scripts/new-run.sh. Findings live in the stub and the pull request, never in an issue.

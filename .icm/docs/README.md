@@ -4,7 +4,7 @@
 
 Everything that decides **what REMI is** lives here. Code rules stay in
 [`CONVENTIONS.md`](../../CONVENTIONS.md); delivery mechanics stay in
-[`.icm/CONTEXT.md`](../CONTEXT.md). This folder is the product knowledge, and the ordered
+[`.icm/intake/CONTEXT.md`](../intake/CONTEXT.md). This folder is the product knowledge, and the ordered
 backlog next to it in [`.icm/intake/`](../intake/README.md) is cut from it.
 
 There is no root `docs/` folder any more — it moved here on 18 August 2026, so that one directory

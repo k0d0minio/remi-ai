@@ -51,9 +51,7 @@ release-please pull request open on `main`, and that pull request is the batch. 
 setup, every merge to `main` deploys UAT and builds a production deployment that stays staged.
 Production moves on a promotion, as `.icm/uat/CONTEXT.md` says. The UAT environment and the UAT
 database do not exist yet. The setup acts in `.icm/uat/CONTEXT.md` and `.icm/database/CONTEXT.md`
-come first. `release.yaml` and `quality.yaml` are this repo's own workflows from before the
-blueprint. `release.yaml` still cuts a GitHub Release on each merge and posts it to Slack. Jamie
-decides if each one stays.
+come first. The triage stub `set-up-uat-environment` holds them.
 
 ## Rules
 
