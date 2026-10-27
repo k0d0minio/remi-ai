@@ -41,18 +41,18 @@ reads them. The `energy` row of `patient_calculations` is the home (cross-epic:
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Le calcul n'est effectué qu'avec les données nécessaires disponibles (sexe, âge, taille, poids actuel, niveau d'activité) » | energy-estimate |
-| 2 | « Le métabolisme de repos et les besoins énergétiques estimés en kcal/jour sont affichés » | calorie-target-validation |
-| 3 | « Les besoins énergétiques estimés restent basés sur le poids actuel, même si le poids de référence pour les protéines est modifié » | energy-estimate |
-| 4 | « Le niveau d'activité est modifiable par le praticien, avec recalcul » | calorie-target-validation |
-| 5 | « L'objectif (maintien / perte de poids / prise de poids / prise de masse musculaire) est renseignable et conservé » | calorie-target-validation |
-| 6 | « Saisir et valider un objectif calorique inférieur, égal ou supérieur …, ou un ajustement exprimé en kcal/jour » | calorie-target-validation |
-| 7 | « REMI n'applique aucune restriction calorique automatiquement ; la cible … enregistrée séparément des besoins estimés » | calorie-target-validation |
-| 8 | « Une cible manuelle validée n'est pas écrasée sans nouvelle confirmation » | calorie-target-validation |
-| 9 | « Exemple de contrôle : femme, 35 ans, 165 cm, 65 kg, activité modérée → 1 345 kcal ; 2 152 kcal/jour » | energy-estimate |
-| 10 | « Besoins estimés à 2 300 kcal/j ; le praticien valide une cible à 2 000 kcal/j. L'estimation reste 2 300 » | calorie-target-validation |
+| #   | Morgane's criterion (short, her French kept)                                                                                         | Stub                      |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------- |
+| 1   | « Le calcul n'est effectué qu'avec les données nécessaires disponibles (sexe, âge, taille, poids actuel, niveau d'activité) »        | energy-estimate           |
+| 2   | « Le métabolisme de repos et les besoins énergétiques estimés en kcal/jour sont affichés »                                           | calorie-target-validation |
+| 3   | « Les besoins énergétiques estimés restent basés sur le poids actuel, même si le poids de référence pour les protéines est modifié » | energy-estimate           |
+| 4   | « Le niveau d'activité est modifiable par le praticien, avec recalcul »                                                              | calorie-target-validation |
+| 5   | « L'objectif (maintien / perte de poids / prise de poids / prise de masse musculaire) est renseignable et conservé »                 | calorie-target-validation |
+| 6   | « Saisir et valider un objectif calorique inférieur, égal ou supérieur …, ou un ajustement exprimé en kcal/jour »                    | calorie-target-validation |
+| 7   | « REMI n'applique aucune restriction calorique automatiquement ; la cible … enregistrée séparément des besoins estimés »             | calorie-target-validation |
+| 8   | « Une cible manuelle validée n'est pas écrasée sans nouvelle confirmation »                                                          | calorie-target-validation |
+| 9   | « Exemple de contrôle : femme, 35 ans, 165 cm, 65 kg, activité modérée → 1 345 kcal ; 2 152 kcal/jour »                              | energy-estimate           |
+| 10  | « Besoins estimés à 2 300 kcal/j ; le praticien valide une cible à 2 000 kcal/j. L'estimation reste 2 300 »                          | calorie-target-validation |
 
 ## Out of scope
 

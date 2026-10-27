@@ -10,3 +10,6 @@ pnpm-lock.yaml
 .claude/
 .icm/intake/CONTEXT.md
 .github/pull_request_template.md
+.icm/database/CONTEXT.md
+.icm/lanes/
+.icm/uat/CONTEXT.md

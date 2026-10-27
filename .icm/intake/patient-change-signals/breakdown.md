@@ -28,16 +28,16 @@ The patient may change their profile at any time, also after the protocol is val
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Chaque modification déclenche un signalement visible dans le dossier et dans la liste des patients » | change-signals-in-console |
-| 2 | « Le signalement indique le champ modifié, l'ancienne valeur, la nouvelle valeur et la date » | patient-change-table |
-| 3 | « Le signalement disparaît quand le praticien l'a pris en compte » | change-signals-in-console |
-| 4 | « Les recommandations déjà validées restent inchangées » | rule: README (D-30) |
-| 5 | « Seules les recommandations validées sont appliquées aux prochaines recettes » | cross-epic: protocol-versions/working-copy-and-validate |
-| 6 | « Un calcul basé sur une donnée modifiée est affiché comme estimation à revalider » | recalculate-flag |
-| 7 | « Le praticien peut prendre en compte la modification, mettre à jour les recommandations et valider une nouvelle version » | change-signals-in-console |
-| 30 | « Les modifications des allergies, intolérances, évictions et du régime alimentaire déclarées par le patient sont appliquées immédiatement et signalées au praticien » | immediate-safety-fields |
+| #   | Morgane's criterion (short, her French kept)                                                                                                                           | Stub                                                    |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| 1   | « Chaque modification déclenche un signalement visible dans le dossier et dans la liste des patients »                                                                 | change-signals-in-console                               |
+| 2   | « Le signalement indique le champ modifié, l'ancienne valeur, la nouvelle valeur et la date »                                                                          | patient-change-table                                    |
+| 3   | « Le signalement disparaît quand le praticien l'a pris en compte »                                                                                                     | change-signals-in-console                               |
+| 4   | « Les recommandations déjà validées restent inchangées »                                                                                                               | rule: README (D-30)                                     |
+| 5   | « Seules les recommandations validées sont appliquées aux prochaines recettes »                                                                                        | cross-epic: protocol-versions/working-copy-and-validate |
+| 6   | « Un calcul basé sur une donnée modifiée est affiché comme estimation à revalider »                                                                                    | recalculate-flag                                        |
+| 7   | « Le praticien peut prendre en compte la modification, mettre à jour les recommandations et valider une nouvelle version »                                             | change-signals-in-console                               |
+| 30  | « Les modifications des allergies, intolérances, évictions et du régime alimentaire déclarées par le patient sont appliquées immédiatement et signalées au praticien » | immediate-safety-fields                                 |
 
 ## Out of scope
 

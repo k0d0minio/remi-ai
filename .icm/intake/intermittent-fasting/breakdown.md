@@ -35,19 +35,19 @@ day's meals. The generator reads it (cross-epic: `recipe-space`).
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Par défaut, aucun jeûne intermittent n'est appliqué » | fasting-option |
-| 2 | « Désactivé par défaut et peut être activé directement par le praticien » | fasting-option |
-| 3 | « Une seule option est active à la fois » | fasting-option |
-| 4 | « Suppression du petit-déjeuner … REMI ne propose aucune recette pour ce repas » | fasting-in-generation |
-| 5 | « Suppression du dîner … REMI ne propose aucune recette pour ce repas » | fasting-in-generation |
-| 6 | « Aucun horaire ni aucune durée de jeûne ne sont demandés ou contrôlés par REMI » | fasting-option |
-| 7 | « Les suggestions respectent les autres recommandations validées, notamment les évictions totales et les contre-indications » | rule: README (D-30) |
-| 8 | « Les besoins nutritionnels journaliers validés restent inchangés ; REMI répartit les apports entre les repas maintenus » | fasting-in-generation |
-| 9 | « REMI ne compense pas automatiquement … par des portions excessives ; … il le signale au praticien » | fasting-in-generation |
-| 10 | « Si leur couverture sur deux repas n'est pas réalisable, REMI le signale au praticien plutôt que de réduire automatiquement les objectifs » | fasting-in-generation |
-| 11 | « Le praticien peut modifier ou désactiver le jeûne intermittent à tout moment » | fasting-option |
+| #   | Morgane's criterion (short, her French kept)                                                                                                 | Stub                  |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1   | « Par défaut, aucun jeûne intermittent n'est appliqué »                                                                                      | fasting-option        |
+| 2   | « Désactivé par défaut et peut être activé directement par le praticien »                                                                    | fasting-option        |
+| 3   | « Une seule option est active à la fois »                                                                                                    | fasting-option        |
+| 4   | « Suppression du petit-déjeuner … REMI ne propose aucune recette pour ce repas »                                                             | fasting-in-generation |
+| 5   | « Suppression du dîner … REMI ne propose aucune recette pour ce repas »                                                                      | fasting-in-generation |
+| 6   | « Aucun horaire ni aucune durée de jeûne ne sont demandés ou contrôlés par REMI »                                                            | fasting-option        |
+| 7   | « Les suggestions respectent les autres recommandations validées, notamment les évictions totales et les contre-indications »                | rule: README (D-30)   |
+| 8   | « Les besoins nutritionnels journaliers validés restent inchangés ; REMI répartit les apports entre les repas maintenus »                    | fasting-in-generation |
+| 9   | « REMI ne compense pas automatiquement … par des portions excessives ; … il le signale au praticien »                                        | fasting-in-generation |
+| 10  | « Si leur couverture sur deux repas n'est pas réalisable, REMI le signale au praticien plutôt que de réduire automatiquement les objectifs » | fasting-in-generation |
+| 11  | « Le praticien peut modifier ou désactiver le jeûne intermittent à tout moment »                                                             | fasting-option        |
 
 ## Out of scope
 

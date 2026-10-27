@@ -25,24 +25,24 @@ shadcn/ui over Radix, Nextra 4, tsup. Each app is one Vercel project in team `re
 
 ## Routing
 
-| You are asked to                              | Go to                                                                                                                                                       |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| build the next ticket, or any ticket          | `.icm/intake/CONTEXT.md` (the loop), then the stub                                                                                                          |
-| fix a bug, make a tweak or do a chore, with or without a stub | `.icm/lanes/<lane>/CONTEXT.md`: `bug`, `tweak` or `chore` |
-| fix a fault that production shows now | `.icm/lanes/hotfix/CONTEXT.md` |
-| do work that has no ticket | `.icm/intake/CONTEXT.md` § A request with no stub |
-| answer a question about the build, or review | read and answer. No stub, no branch, no pull request |
-| open, fill or finish a pull request           | `.github/pull_request_template.md`. The gates sit at its top                                                                                                |
-| merge after the tick, release or promote | `.icm/intake/CONTEXT.md` § The loop, step 7, and § After the tick, then `.icm/uat/CONTEXT.md` |
-| plan new work                                 | `.icm/intake/CONTEXT.md` (an epic with a breakdown), never a loose list. `.icm/intake/README.md` holds the epics in order and the decisions of record       |
-| write code                                    | `CONVENTIONS.md` first: code style, design-system rules, leanness, git. Then the subtree's `AGENTS.md` (`apps/<app>/AGENTS.md`, `packages/<pkg>/AGENTS.md`) |
-| know what Remi is for, and which account wins | `.icm/docs/README.md`: its `braindump/` is Morgane's own material and outranks every other account. `remi-status-report.html` is the plan derived from it   |
-| read product knowledge                        | `apps/docs/app/technical/**` (architecture), `apps/docs/app/business/**` (direction). `.icm/docs/` still wins where they differ                             |
-| add or change an environment variable         | `.icm/docs/ENV.md`, the one catalogue of names. Values never enter git                                                                                      |
-| change what CI checks or how a release is cut | `legible-consulting/.github` (`check-client.yml`, `release.yml`). `ci.yml` here only calls them |
-| change a file the blueprint renders           | the blueprint, then `copier update` here                                                                                                                    |
-| read the UAT batch, record the client's sign-off, roll back | `.icm/uat/CONTEXT.md` (the whole UAT contract), then its scripts |
-| change the database, or read where a preview's database comes from | `.icm/database/CONTEXT.md`, then `preview-db.sh` |
+| You are asked to                                                   | Go to                                                                                                                                                       |
+| ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| build the next ticket, or any ticket                               | `.icm/intake/CONTEXT.md` (the loop), then the stub                                                                                                          |
+| fix a bug, make a tweak or do a chore, with or without a stub      | `.icm/lanes/<lane>/CONTEXT.md`: `bug`, `tweak` or `chore`                                                                                                   |
+| fix a fault that production shows now                              | `.icm/lanes/hotfix/CONTEXT.md`                                                                                                                              |
+| do work that has no ticket                                         | `.icm/intake/CONTEXT.md` § A request with no stub                                                                                                           |
+| answer a question about the build, or review                       | read and answer. No stub, no branch, no pull request                                                                                                        |
+| open, fill or finish a pull request                                | `.github/pull_request_template.md`. The gates sit at its top                                                                                                |
+| merge after the tick, release or promote                           | `.icm/intake/CONTEXT.md` § The loop, step 7, and § After the tick, then `.icm/uat/CONTEXT.md`                                                               |
+| plan new work                                                      | `.icm/intake/CONTEXT.md` (an epic with a breakdown), never a loose list. `.icm/intake/README.md` holds the epics in order and the decisions of record       |
+| write code                                                         | `CONVENTIONS.md` first: code style, design-system rules, leanness, git. Then the subtree's `AGENTS.md` (`apps/<app>/AGENTS.md`, `packages/<pkg>/AGENTS.md`) |
+| know what Remi is for, and which account wins                      | `.icm/docs/README.md`: its `braindump/` is Morgane's own material and outranks every other account. `remi-status-report.html` is the plan derived from it   |
+| read product knowledge                                             | `apps/docs/app/technical/**` (architecture), `apps/docs/app/business/**` (direction). `.icm/docs/` still wins where they differ                             |
+| add or change an environment variable                              | `.icm/docs/ENV.md`, the one catalogue of names. Values never enter git                                                                                      |
+| change what CI checks or how a release is cut                      | `legible-consulting/.github` (`check-client.yml`, `release.yml`). `ci.yml` here only calls them                                                             |
+| change a file the blueprint renders                                | the blueprint, then `copier update` here                                                                                                                    |
+| read the UAT batch, record the client's sign-off, roll back        | `.icm/uat/CONTEXT.md` (the whole UAT contract), then its scripts                                                                                            |
+| change the database, or read where a preview's database comes from | `.icm/database/CONTEXT.md`, then `preview-db.sh`                                                                                                            |
 
 ## Release
 

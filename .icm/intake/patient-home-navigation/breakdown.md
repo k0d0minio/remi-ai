@@ -29,16 +29,16 @@ After activation and sign-in the patient lands on « Accueil »: a discreet logo
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « À chaque connexion d'un patient actif, la page d'accueil est affichée par défaut, avec son prénom » | app-shell-and-nav |
-| 2 | « Le champ repas accepte une description ; l'ajout de photo et le bouton principal conduisent à la fiche 28 … la limite de deux propositions restent gérés dans ce parcours » | home-meal-block |
-| 3 | « Les trois destinations principales sont accessibles depuis toutes les pages principales ; l'onglet actif est identifiable … “Recommandations” est accessible depuis “Profil” sans onglet principal distinct » | app-shell-and-nav |
-| 4 | « Les propositions de recettes sont consultables par jour et par moment de repas prévu ; favoris et liste de courses sont accessibles sans onglets supplémentaires » | cross-epic: recipe-space |
-| 5 | « “Je suis au restaurant” n'apparaît que si le bonus est disponible ; son absence ne bloque pas la navigation MVP » | home-meal-block |
-| 6 | « Les recommandations consultables depuis “Profil” sont uniquement celles validées … Les informations du profil modifiables sont clairement identifiées » | profile-tab |
-| 7 | « Les fonctionnalités de l'espace patient sont bloquées tant que l'accompagnement n'a pas été activé par le praticien » | cross-epic: patient-access/waiting-screen |
-| 8 | « L'interface est utilisable sur petit écran, au clavier et avec des libellés lisibles ; le bouton principal reste clairement identifiable » | app-shell-and-nav |
+| #   | Morgane's criterion (short, her French kept)                                                                                                                                                                    | Stub                                      |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| 1   | « À chaque connexion d'un patient actif, la page d'accueil est affichée par défaut, avec son prénom »                                                                                                           | app-shell-and-nav                         |
+| 2   | « Le champ repas accepte une description ; l'ajout de photo et le bouton principal conduisent à la fiche 28 … la limite de deux propositions restent gérés dans ce parcours »                                   | home-meal-block                           |
+| 3   | « Les trois destinations principales sont accessibles depuis toutes les pages principales ; l'onglet actif est identifiable … “Recommandations” est accessible depuis “Profil” sans onglet principal distinct » | app-shell-and-nav                         |
+| 4   | « Les propositions de recettes sont consultables par jour et par moment de repas prévu ; favoris et liste de courses sont accessibles sans onglets supplémentaires »                                            | cross-epic: recipe-space                  |
+| 5   | « “Je suis au restaurant” n'apparaît que si le bonus est disponible ; son absence ne bloque pas la navigation MVP »                                                                                             | home-meal-block                           |
+| 6   | « Les recommandations consultables depuis “Profil” sont uniquement celles validées … Les informations du profil modifiables sont clairement identifiées »                                                       | profile-tab                               |
+| 7   | « Les fonctionnalités de l'espace patient sont bloquées tant que l'accompagnement n'a pas été activé par le praticien »                                                                                         | cross-epic: patient-access/waiting-screen |
+| 8   | « L'interface est utilisable sur petit écran, au clavier et avec des libellés lisibles ; le bouton principal reste clairement identifiable »                                                                    | app-shell-and-nav                         |
 
 ## Out of scope
 

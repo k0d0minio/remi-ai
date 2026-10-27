@@ -30,15 +30,15 @@ The check is one function in `packages/services`, called by recipe-space, meal-i
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Une éviction totale ne peut pas être enregistrée sans période d'application ou statut d'exclusion durable » | cross-epic food-directives/directive-fields |
-| 2 | « Une recette contenant un ingrédient évincé n'est jamais proposée » | compatibility-gate |
-| 3 | « Étant donné une compatibilité non confirmable, la proposition n'est pas proposée » | compatibility-gate |
-| 4 | « À l'échéance d'une éviction temporaire, le praticien reçoit une demande de réévaluation (prolonger, terminer, passer en durable) » | eviction-expiry-review |
-| 5 | « Sans confirmation du praticien à la date d'échéance, REMI suspend automatiquement toutes les suggestions de recettes… ne reprennent qu'après confirmation » | suggestion-suspension |
-| 6 | « Un aliment potentiellement contre-indiqué n'est jamais réintroduit automatiquement » | compatibility-gate |
-| 7 | « Les évictions totales et contre-indications priment sur toutes les préférences et orientations » | rule: README (D-30), compatibility-gate |
+| #   | Morgane's criterion (short, her French kept)                                                                                                                  | Stub                                        |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| 1   | « Une éviction totale ne peut pas être enregistrée sans période d'application ou statut d'exclusion durable »                                                 | cross-epic food-directives/directive-fields |
+| 2   | « Une recette contenant un ingrédient évincé n'est jamais proposée »                                                                                          | compatibility-gate                          |
+| 3   | « Étant donné une compatibilité non confirmable, la proposition n'est pas proposée »                                                                          | compatibility-gate                          |
+| 4   | « À l'échéance d'une éviction temporaire, le praticien reçoit une demande de réévaluation (prolonger, terminer, passer en durable) »                          | eviction-expiry-review                      |
+| 5   | « Sans confirmation du praticien à la date d'échéance, REMI suspend automatiquement toutes les suggestions de recettes… ne reprennent qu'après confirmation » | suggestion-suspension                       |
+| 6   | « Un aliment potentiellement contre-indiqué n'est jamais réintroduit automatiquement »                                                                        | compatibility-gate                          |
+| 7   | « Les évictions totales et contre-indications priment sur toutes les préférences et orientations »                                                            | rule: README (D-30), compatibility-gate     |
 
 ## Out of scope
 

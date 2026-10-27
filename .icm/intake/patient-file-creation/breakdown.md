@@ -39,17 +39,17 @@ D-28 and D-31.
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Un seul lien permanent par praticien ; il reste utilisable après plusieurs inscriptions et se copie en un clic » | practitioner-signup-link |
-| 2 | « L'inscription via le lien rattache automatiquement le patient au bon praticien ; un lien invalide ne crée aucun dossier » | practitioner-signup-link |
-| 3 | « Le praticien peut créer et compléter intégralement le profil … sans déclencher automatiquement d'invitation » | practitioner-creates-file |
-| 4 | « Le praticien peut consulter, compléter et modifier l'ensemble des réponses au questionnaire préparatoire, y compris lorsqu'elles sont manquantes » | practitioner-creates-file |
-| 5 | « Une adresse e-mail déjà liée au même praticien n'entraîne jamais la création d'un second dossier : REMI propose d'ouvrir le dossier existant ou de s'y connecter » | practitioner-creates-file (console), patient-takes-over-file (patient) |
-| 6 | « Si le profil a été créé par le praticien, le patient reçoit un e-mail d'activation une fois les recommandations validées et peut accéder à son espace REMI avec les informations déjà enregistrées » | patient-takes-over-file |
-| 7 | « Les champs manquants sont signalés ; le dossier peut être enregistré sans questionnaire complet » | practitioner-creates-file |
-| 8 | « Le praticien ne voit que les dossiers qui lui sont rattachés et le patient ne voit que son propre profil » | care-relationship, consent-and-data/data-access-scoping |
-| 9 | « Aucune recette personnalisée n'est accessible avant activation par le praticien » | patient-access (story 22) |
+| #   | Morgane's criterion (short, her French kept)                                                                                                                                                           | Stub                                                                   |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| 1   | « Un seul lien permanent par praticien ; il reste utilisable après plusieurs inscriptions et se copie en un clic »                                                                                     | practitioner-signup-link                                               |
+| 2   | « L'inscription via le lien rattache automatiquement le patient au bon praticien ; un lien invalide ne crée aucun dossier »                                                                            | practitioner-signup-link                                               |
+| 3   | « Le praticien peut créer et compléter intégralement le profil … sans déclencher automatiquement d'invitation »                                                                                        | practitioner-creates-file                                              |
+| 4   | « Le praticien peut consulter, compléter et modifier l'ensemble des réponses au questionnaire préparatoire, y compris lorsqu'elles sont manquantes »                                                   | practitioner-creates-file                                              |
+| 5   | « Une adresse e-mail déjà liée au même praticien n'entraîne jamais la création d'un second dossier : REMI propose d'ouvrir le dossier existant ou de s'y connecter »                                   | practitioner-creates-file (console), patient-takes-over-file (patient) |
+| 6   | « Si le profil a été créé par le praticien, le patient reçoit un e-mail d'activation une fois les recommandations validées et peut accéder à son espace REMI avec les informations déjà enregistrées » | patient-takes-over-file                                                |
+| 7   | « Les champs manquants sont signalés ; le dossier peut être enregistré sans questionnaire complet »                                                                                                    | practitioner-creates-file                                              |
+| 8   | « Le praticien ne voit que les dossiers qui lui sont rattachés et le patient ne voit que son propre profil »                                                                                           | care-relationship, consent-and-data/data-access-scoping                |
+| 9   | « Aucune recette personnalisée n'est accessible avant activation par le praticien »                                                                                                                    | patient-access (story 22)                                              |
 
 ## Out of scope
 

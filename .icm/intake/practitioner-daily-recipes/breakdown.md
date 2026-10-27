@@ -26,12 +26,12 @@ On `main` the console's patient page shows Morgane's hand assignments from `pati
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « accède aux recettes du jour depuis le dossier du patient » | daily-recipes-tab |
-| 2 | « Seules les recettes du jour proposées au patient sélectionné » | daily-recipes-tab |
-| 3 | « dans l'ordre des repas, sans historique des jours précédents » | daily-recipes-tab |
-| 4 | « Aucune modification ni validation », « Aucune recette proposée aujourd'hui » | daily-recipes-tab, daily-recipe-read |
+| #   | Morgane's criterion (short, her French kept)                                   | Stub                                 |
+| --- | ------------------------------------------------------------------------------ | ------------------------------------ |
+| 1   | « accède aux recettes du jour depuis le dossier du patient »                   | daily-recipes-tab                    |
+| 2   | « Seules les recettes du jour proposées au patient sélectionné »               | daily-recipes-tab                    |
+| 3   | « dans l'ordre des repas, sans historique des jours précédents »               | daily-recipes-tab                    |
+| 4   | « Aucune modification ni validation », « Aucune recette proposée aujourd'hui » | daily-recipes-tab, daily-recipe-read |
 
 ## Out of scope
 

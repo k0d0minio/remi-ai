@@ -31,15 +31,15 @@ Nothing on `main` does this. The epic reads the structured ingredients of `recip
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Le patient indique le nombre de personnes avant la génération » | shopping-list-build |
-| 2 | « Les quantités sont proportionnelles au nombre de personnes » | shopping-list-build |
-| 3 | « Un même ingrédient […] apparaît une seule fois, avec la quantité totale agrégée » | shopping-list-build |
-| 4 | « Les unités sont affichées sans conversions trompeuses » | shopping-list-build |
-| 5 | « Le patient peut cocher les articles déjà achetés » | shopping-list-screen |
-| 6 | « un ingrédient exclu n'y est jamais ajouté » | shopping-list-build |
-| 7 | « s'envoyer la liste de courses par e-mail » | shopping-list-email |
+| #   | Morgane's criterion (short, her French kept)                                        | Stub                 |
+| --- | ----------------------------------------------------------------------------------- | -------------------- |
+| 1   | « Le patient indique le nombre de personnes avant la génération »                   | shopping-list-build  |
+| 2   | « Les quantités sont proportionnelles au nombre de personnes »                      | shopping-list-build  |
+| 3   | « Un même ingrédient […] apparaît une seule fois, avec la quantité totale agrégée » | shopping-list-build  |
+| 4   | « Les unités sont affichées sans conversions trompeuses »                           | shopping-list-build  |
+| 5   | « Le patient peut cocher les articles déjà achetés »                                | shopping-list-screen |
+| 6   | « un ingrédient exclu n'y est jamais ajouté »                                       | shopping-list-build  |
+| 7   | « s'envoyer la liste de courses par e-mail »                                        | shopping-list-email  |
 
 ## Out of scope
 

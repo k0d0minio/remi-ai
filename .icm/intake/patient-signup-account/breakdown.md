@@ -37,18 +37,18 @@ pages. It rests on D-26, D-28, D-32. It supersedes D-2 and D-10.
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Nom, prénom, date de naissance, adresse e-mail et telephone sont obligatoires » | signup-page |
-| 2 | « L'adresse e-mail doit être valide » | signup-page |
-| 3 | « Le compte ne peut pas être créé tant que les consentements obligatoires ne sont pas cochés » | consent-and-data/consent-gate-at-signup |
-| 4 | « Le statut du dossier est “Prêt pour consultation” après la création du compte » | patient-list-and-status/file-status-enum (question 1) |
-| 5 | « Le patient n'a accès à aucune recette tant que l'accompagnement n'est pas activé (message d'attente) » | patient-access (story 22) |
-| 6 | « adresse e-mail déjà inscrite chez ce praticien … invité à se connecter au lieu de créer un doublon » | duplicate-email-guard |
-| 7 | « Le praticien peut créer un profil patient et renseigner l'ensemble des informations du questionnaire » | patient-file-creation/practitioner-creates-file |
-| 8 | « Le profil créé par le praticien apparaît directement dans sa liste de patients, sans création de doublon » | patient-list-and-status/list-appearance-rule |
-| 9 | « Le compte créé à l'inscription reste le compte utilisé après activation » | sign-in-and-session |
-| 10 | « Le parcours d'inscription est utilisable sur mobile » | signup-page |
+| #   | Morgane's criterion (short, her French kept)                                                                 | Stub                                                  |
+| --- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| 1   | « Nom, prénom, date de naissance, adresse e-mail et telephone sont obligatoires »                            | signup-page                                           |
+| 2   | « L'adresse e-mail doit être valide »                                                                        | signup-page                                           |
+| 3   | « Le compte ne peut pas être créé tant que les consentements obligatoires ne sont pas cochés »               | consent-and-data/consent-gate-at-signup               |
+| 4   | « Le statut du dossier est “Prêt pour consultation” après la création du compte »                            | patient-list-and-status/file-status-enum (question 1) |
+| 5   | « Le patient n'a accès à aucune recette tant que l'accompagnement n'est pas activé (message d'attente) »     | patient-access (story 22)                             |
+| 6   | « adresse e-mail déjà inscrite chez ce praticien … invité à se connecter au lieu de créer un doublon »       | duplicate-email-guard                                 |
+| 7   | « Le praticien peut créer un profil patient et renseigner l'ensemble des informations du questionnaire »     | patient-file-creation/practitioner-creates-file       |
+| 8   | « Le profil créé par le praticien apparaît directement dans sa liste de patients, sans création de doublon » | patient-list-and-status/list-appearance-rule          |
+| 9   | « Le compte créé à l'inscription reste le compte utilisé après activation »                                  | sign-in-and-session                                   |
+| 10  | « Le parcours d'inscription est utilisable sur mobile »                                                      | signup-page                                           |
 
 ## Out of scope
 

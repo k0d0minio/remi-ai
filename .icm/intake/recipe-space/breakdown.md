@@ -42,25 +42,25 @@ Stubs 1 and 2 both add migrations. They run in this order and never in parallel 
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « accessibles seulement si l'accompagnement est actif » | patient-recipes-today |
-| 2 | « Aucune recette ne contient un aliment en éviction totale, une allergie ou une intolérance » | weekly-plan-generation |
-| 3 | « À favoriser » privilégiés, « À limiter » moins souvent ou en plus petite quantité | weekly-plan-generation |
-| 4 | instructions assez précises « pour une personne débutante » | weekly-plan-generation |
-| 5 | « respecte les recommandations de chrononutrition […] ainsi que le jeûne intermittent » | weekly-plan-generation |
-| 6 | classées par petit-déjeuner, midi, soir, et collation « uniquement si prévue » | patient-recipes-today |
-| 7 | « Chaque jour, une recette différente […] pour chaque moment de repas prévu » | weekly-plan-generation |
-| 8 | propositions de la semaine réutilisées, « évite les répétitions », « de saison », « met à jour les recettes futures » | weekly-plan-generation |
-| 9 | « aucune recette dont la compatibilité […] n'a pas pu être confirmée » | weekly-plan-generation |
-| 10 | « Changer le nombre de portions met à jour toutes les quantités » | recipe-card/portion-scaling |
-| 11 | « ses favoris dans une liste dédiée » | recipe-card/favourites |
-| 12 | « Les données manquantes du profil ne sont jamais inventées » | rule: README (D-30) |
-| 13 | « Une justification courte » | recipe-justification |
-| 14 | « partager une recette depuis sa fiche recette ou ses favoris » | recipe-card/recipe-sharing |
-| 15 | « Le destinataire peut consulter la recette sans créer de compte » | recipe-card/recipe-sharing |
-| 16 | « Aucune donnée personnelle, recommandation ou information de santé […] n'est transmise » | recipe-card/recipe-sharing |
-| 17 | « REMI, la nutrition sur mesure » et le lien « sur chaque recette partagée » | recipe-card/recipe-sharing |
+| #   | Morgane's criterion (short, her French kept)                                                                          | Stub                        |
+| --- | --------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| 1   | « accessibles seulement si l'accompagnement est actif »                                                               | patient-recipes-today       |
+| 2   | « Aucune recette ne contient un aliment en éviction totale, une allergie ou une intolérance »                         | weekly-plan-generation      |
+| 3   | « À favoriser » privilégiés, « À limiter » moins souvent ou en plus petite quantité                                   | weekly-plan-generation      |
+| 4   | instructions assez précises « pour une personne débutante »                                                           | weekly-plan-generation      |
+| 5   | « respecte les recommandations de chrononutrition […] ainsi que le jeûne intermittent »                               | weekly-plan-generation      |
+| 6   | classées par petit-déjeuner, midi, soir, et collation « uniquement si prévue »                                        | patient-recipes-today       |
+| 7   | « Chaque jour, une recette différente […] pour chaque moment de repas prévu »                                         | weekly-plan-generation      |
+| 8   | propositions de la semaine réutilisées, « évite les répétitions », « de saison », « met à jour les recettes futures » | weekly-plan-generation      |
+| 9   | « aucune recette dont la compatibilité […] n'a pas pu être confirmée »                                                | weekly-plan-generation      |
+| 10  | « Changer le nombre de portions met à jour toutes les quantités »                                                     | recipe-card/portion-scaling |
+| 11  | « ses favoris dans une liste dédiée »                                                                                 | recipe-card/favourites      |
+| 12  | « Les données manquantes du profil ne sont jamais inventées »                                                         | rule: README (D-30)         |
+| 13  | « Une justification courte »                                                                                          | recipe-justification        |
+| 14  | « partager une recette depuis sa fiche recette ou ses favoris »                                                       | recipe-card/recipe-sharing  |
+| 15  | « Le destinataire peut consulter la recette sans créer de compte »                                                    | recipe-card/recipe-sharing  |
+| 16  | « Aucune donnée personnelle, recommandation ou information de santé […] n'est transmise »                             | recipe-card/recipe-sharing  |
+| 17  | « REMI, la nutrition sur mesure » et le lien « sur chaque recette partagée »                                          | recipe-card/recipe-sharing  |
 
 ## Out of scope
 

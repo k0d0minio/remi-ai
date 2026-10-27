@@ -31,21 +31,21 @@ On main, `foods` and `food_nutrients` hold CIQUAL: foods and their nutrient valu
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Chaque élément séparé par “;” est traité comme une entrée distincte » | directive-fields |
-| 2 | « Un élément reconnu s'affiche avec sa dénomination officielle ; une correction proposée doit être acceptée par le praticien » | directive-resolution |
-| 3 | « Un élément inconnu est signalé visiblement et n'est jamais considéré comme validé. Un bouton “Demander l'ajout” apparaît… » | directive-resolution, cross-epic knowledge-base-requests/request-record |
-| 4 | « Un terme dont l'association alimentaire est incertaine est signalé comme tel, jamais validé silencieusement » | directive-resolution |
-| 5 | « Le praticien peut ajouter, modifier ou désactiver un élément à tout moment » | directive-fields |
-| 6 | « “À favoriser” influe sur la priorité… ; “À limiter” sur leur quantité ou fréquence ; “Éviction totale” prime sur les deux autres » | directive-application |
-| 7 | « Un même élément présent à la fois dans “À favoriser” et dans “Éviction totale” : REMI bloque l'enregistrement » | directive-fields |
-| 8 | « Une éviction totale ne peut pas être enregistrée sans période d'application ou statut d'exclusion médicale durable » | directive-fields |
-| 9 | « Les recommandations ne sont appliquées aux recettes et suggestions qu'après validation par le praticien » | directive-application |
-| 10 | « Le praticien peut saisir indifféremment un aliment, un nutriment, un micronutriment, un composé bioactif ou une famille alimentaire dans chacun des trois champs » | directive-fields |
-| 11 | « REMI relie la consigne aux sources alimentaires documentées, sans considérer comme équivalentes des traces et des concentrations significatives » | term-base |
-| 12 | « REMI ne génère aucune association aliment–composé absente de sa base validée ; un élément incertain est signalé et peut faire l'objet d'une demande d'ajout » | term-base, directive-resolution |
-| 13 | « Une éviction totale ne peut être présentée comme garantie lorsque les données… sont insuffisantes » | cross-epic eviction-safety/compatibility-gate |
+| #   | Morgane's criterion (short, her French kept)                                                                                                                         | Stub                                                                    |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| 1   | « Chaque élément séparé par “;” est traité comme une entrée distincte »                                                                                              | directive-fields                                                        |
+| 2   | « Un élément reconnu s'affiche avec sa dénomination officielle ; une correction proposée doit être acceptée par le praticien »                                       | directive-resolution                                                    |
+| 3   | « Un élément inconnu est signalé visiblement et n'est jamais considéré comme validé. Un bouton “Demander l'ajout” apparaît… »                                        | directive-resolution, cross-epic knowledge-base-requests/request-record |
+| 4   | « Un terme dont l'association alimentaire est incertaine est signalé comme tel, jamais validé silencieusement »                                                      | directive-resolution                                                    |
+| 5   | « Le praticien peut ajouter, modifier ou désactiver un élément à tout moment »                                                                                       | directive-fields                                                        |
+| 6   | « “À favoriser” influe sur la priorité… ; “À limiter” sur leur quantité ou fréquence ; “Éviction totale” prime sur les deux autres »                                 | directive-application                                                   |
+| 7   | « Un même élément présent à la fois dans “À favoriser” et dans “Éviction totale” : REMI bloque l'enregistrement »                                                    | directive-fields                                                        |
+| 8   | « Une éviction totale ne peut pas être enregistrée sans période d'application ou statut d'exclusion médicale durable »                                               | directive-fields                                                        |
+| 9   | « Les recommandations ne sont appliquées aux recettes et suggestions qu'après validation par le praticien »                                                          | directive-application                                                   |
+| 10  | « Le praticien peut saisir indifféremment un aliment, un nutriment, un micronutriment, un composé bioactif ou une famille alimentaire dans chacun des trois champs » | directive-fields                                                        |
+| 11  | « REMI relie la consigne aux sources alimentaires documentées, sans considérer comme équivalentes des traces et des concentrations significatives »                  | term-base                                                               |
+| 12  | « REMI ne génère aucune association aliment–composé absente de sa base validée ; un élément incertain est signalé et peut faire l'objet d'une demande d'ajout »      | term-base, directive-resolution                                         |
+| 13  | « Une éviction totale ne peut être présentée comme garantie lorsque les données… sont insuffisantes »                                                                | cross-epic eviction-safety/compatibility-gate                           |
 
 ## Out of scope
 

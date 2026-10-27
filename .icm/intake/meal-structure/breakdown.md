@@ -38,16 +38,16 @@ function the generation engine (`recipe-space`) reads. Story 12 extends the same
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Les valeurs par défaut s'affichent à la création de la configuration » | meal-configuration |
-| 2 | « Chaque repas peut être activé ou désactivé et son orientation modifiée » | meal-configuration |
-| 3 | « La collation est désactivée par défaut » | meal-configuration |
-| 4 | « Aucun quota de macronutriments strict n'est imposé repas par repas ; … à l'échelle de la journée » | meal-orientation-rules |
-| 5 | « Régime validé incompatible … REMI adapte l'orientation … sans l'imposer au praticien » | meal-orientation-rules |
-| 6 | « Recommandation du praticien en conflit avec une restriction médicale, REMI signale le conflit et demande confirmation » | meal-orientation-rules |
-| 7 | « Les orientations de repas respectent les restrictions prioritaires (évictions totales et contre-indications) » | meal-orientation-rules |
-| 8 | « Le praticien peut modifier à tout moment la configuration des repas » | meal-configuration |
+| #   | Morgane's criterion (short, her French kept)                                                                              | Stub                   |
+| --- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| 1   | « Les valeurs par défaut s'affichent à la création de la configuration »                                                  | meal-configuration     |
+| 2   | « Chaque repas peut être activé ou désactivé et son orientation modifiée »                                                | meal-configuration     |
+| 3   | « La collation est désactivée par défaut »                                                                                | meal-configuration     |
+| 4   | « Aucun quota de macronutriments strict n'est imposé repas par repas ; … à l'échelle de la journée »                      | meal-orientation-rules |
+| 5   | « Régime validé incompatible … REMI adapte l'orientation … sans l'imposer au praticien »                                  | meal-orientation-rules |
+| 6   | « Recommandation du praticien en conflit avec une restriction médicale, REMI signale le conflit et demande confirmation » | meal-orientation-rules |
+| 7   | « Les orientations de repas respectent les restrictions prioritaires (évictions totales et contre-indications) »          | meal-orientation-rules |
+| 8   | « Le praticien peut modifier à tout moment la configuration des repas »                                                   | meal-configuration     |
 
 ## Out of scope
 

@@ -36,16 +36,16 @@ story 30's (D-30).
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Le calcul est effectué seulement si la taille et le poids actuel sont renseignés et valides » | bmi-indicator |
-| 2 | « Les classes affichées sont : < 18,5 … ≥ 30 obésité » | bmi-indicator |
-| 3 | « Tout IMC < 18,5 ou ≥ 25 déclenche un signalement au praticien, sans ajustement nutritionnel automatique » | bmi-indicator |
-| 4 | « Le poids de référence protéique et l'objectif calorique validé peuvent être modifiés sans changer l'IMC » | calculations-table |
-| 5 | « Le résultat est identifié comme indicateur, et non comme diagnostic » | bmi-indicator |
-| 6 | « Le recalcul est déclenché après correction du poids actuel ou de la taille ; … un autre paramètre … ne déclenche pas » | bmi-indicator |
-| 7 | « Exemple de contrôle : femme, 35 ans, 165 cm, 65 kg … → IMC 23,9 » | calculations-table |
-| 8 | « Si une donnée nécessaire est manquante, REMI n'effectue pas le calcul et indique la donnée manquante » | bmi-indicator |
+| #   | Morgane's criterion (short, her French kept)                                                                             | Stub               |
+| --- | ------------------------------------------------------------------------------------------------------------------------ | ------------------ |
+| 1   | « Le calcul est effectué seulement si la taille et le poids actuel sont renseignés et valides »                          | bmi-indicator      |
+| 2   | « Les classes affichées sont : < 18,5 … ≥ 30 obésité »                                                                   | bmi-indicator      |
+| 3   | « Tout IMC < 18,5 ou ≥ 25 déclenche un signalement au praticien, sans ajustement nutritionnel automatique »              | bmi-indicator      |
+| 4   | « Le poids de référence protéique et l'objectif calorique validé peuvent être modifiés sans changer l'IMC »              | calculations-table |
+| 5   | « Le résultat est identifié comme indicateur, et non comme diagnostic »                                                  | bmi-indicator      |
+| 6   | « Le recalcul est déclenché après correction du poids actuel ou de la taille ; … un autre paramètre … ne déclenche pas » | bmi-indicator      |
+| 7   | « Exemple de contrôle : femme, 35 ans, 165 cm, 65 kg … → IMC 23,9 »                                                      | calculations-table |
+| 8   | « Si une donnée nécessaire est manquante, REMI n'effectue pas le calcul et indique la donnée manquante »                 | bmi-indicator      |
 
 ## Out of scope
 
