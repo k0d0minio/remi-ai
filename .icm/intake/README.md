@@ -22,43 +22,78 @@ product. It is not an epic. Its rules are decisions D-30 and D-31 below.
 The order is her « Parcours général » (story 30): sign-up link → preparatory profile →
 consultation → practitioner validation → activation and e-mail → the patient's space.
 
-| # | Story (her title) | Epic | Phase |
-|---|---|---|---|
-| 2 | « Inscription et compte patient » | [`patient-signup-account/`](patient-signup-account/breakdown.md) | 1 |
-| 3 | « Consentement et données personnelles » | [`consent-and-data/`](consent-and-data/breakdown.md) | 1 |
-| 1 | « Création du dossier patient » | [`patient-file-creation/`](patient-file-creation/breakdown.md) | 1 |
-| 4 | « Questionnaire préparatoire du patient » | [`preparatory-questionnaire/`](preparatory-questionnaire/breakdown.md) | 1 |
-| 5 | « Liste des patients et statuts du dossier » | [`patient-list-and-status/`](patient-list-and-status/breakdown.md) | 1 |
-| 6 | « Consultation du dossier patient avant le rendez-vous » | [`patient-file-view/`](patient-file-view/breakdown.md) | 1 |
-| 7 | « Calcul de l'IMC » | [`bmi/`](bmi/breakdown.md) | 1 |
-| 8 | « Calcul des besoins protéiques » | [`protein-needs/`](protein-needs/breakdown.md) | 1 |
-| 9 | « Calcul énergétique » | [`energy-needs/`](energy-needs/breakdown.md) | 1 |
-| 13 | « Aliments, nutriments et composés » | [`food-directives/`](food-directives/breakdown.md) | 2 |
-| 14 | « Sécurité des évictions totales » | [`eviction-safety/`](eviction-safety/breakdown.md) | 2 |
-| 15 | « Demande d'ajout d'un élément » | [`knowledge-base-requests/`](knowledge-base-requests/breakdown.md) | 2 |
-| 16 | « Objectifs prioritaires du patient » | [`priority-goals/`](priority-goals/breakdown.md) | 2 |
-| 17 | « Conseils d'hygiène de vie » | [`lifestyle-advice/`](lifestyle-advice/breakdown.md) | 2 |
-| 18 | « Compléments, plantes, huiles essentielles et autres interventions » | [`supplement-interventions/`](supplement-interventions/breakdown.md) | 2 |
-| 11 | « Chrononutrition : organisation des repas » | [`meal-structure/`](meal-structure/breakdown.md) | 2 |
-| 12 | « Jeûne intermittent » | [`intermittent-fasting/`](intermittent-fasting/breakdown.md) | 2 |
-| 19 | « Validation et activation de l'accompagnement » | [`care-activation/`](care-activation/breakdown.md) | 3 |
-| 20 | « Mise à jour du profil et des recommandations, historique » | [`protocol-versions/`](protocol-versions/breakdown.md) | 3 |
-| 21 | « Modifications du patient après validation » | [`patient-change-signals/`](patient-change-signals/breakdown.md) | 3 |
-| 22 | « Accès du patient à son espace activé » | [`patient-access/`](patient-access/breakdown.md) | 3 |
-| 31 | « Accueil et navigation de l'espace patient » | [`patient-home-navigation/`](patient-home-navigation/breakdown.md) | 3 |
-| 23 | « Espace Recommandations » | [`patient-recommendations/`](patient-recommendations/breakdown.md) | 3 |
-| 24 | « Espace Recettes » | [`recipe-space/`](recipe-space/breakdown.md) | 4 |
-| 25 | « Fiche recette, portions et favoris » | [`recipe-card/`](recipe-card/breakdown.md) | 4 |
-| 26 | « Liste de courses » | [`shopping-list/`](shopping-list/breakdown.md) | 4 |
-| 28 | « Suggestion d'amélioration » | [`meal-improvement/`](meal-improvement/breakdown.md) | 4 |
-| 32 | « Consultation des recettes du jour (praticien) » | [`practitioner-daily-recipes/`](practitioner-daily-recipes/breakdown.md) | 4 |
-| 29 | « Je suis au restaurant (bonus MVP) » | [`restaurant-menu/`](restaurant-menu/breakdown.md) | 5 |
-| 30 | « Règles transversales de priorité et de sécurité » | decisions D-30 and D-31 | every phase |
+| #   | Story (her title)                                                     | Epic                                                                     | Phase       |
+| --- | --------------------------------------------------------------------- | ------------------------------------------------------------------------ | ----------- |
+| 2   | « Inscription et compte patient »                                     | [`patient-signup-account/`](patient-signup-account/breakdown.md)         | 1           |
+| 3   | « Consentement et données personnelles »                              | [`consent-and-data/`](consent-and-data/breakdown.md)                     | 1           |
+| 1   | « Création du dossier patient »                                       | [`patient-file-creation/`](patient-file-creation/breakdown.md)           | 1           |
+| 4   | « Questionnaire préparatoire du patient »                             | [`preparatory-questionnaire/`](preparatory-questionnaire/breakdown.md)   | 1           |
+| 5   | « Liste des patients et statuts du dossier »                          | [`patient-list-and-status/`](patient-list-and-status/breakdown.md)       | 1           |
+| 6   | « Consultation du dossier patient avant le rendez-vous »              | [`patient-file-view/`](patient-file-view/breakdown.md)                   | 1           |
+| 7   | « Calcul de l'IMC »                                                   | [`bmi/`](bmi/breakdown.md)                                               | 1           |
+| 8   | « Calcul des besoins protéiques »                                     | [`protein-needs/`](protein-needs/breakdown.md)                           | 1           |
+| 9   | « Calcul énergétique »                                                | [`energy-needs/`](energy-needs/breakdown.md)                             | 1           |
+| 13  | « Aliments, nutriments et composés »                                  | [`food-directives/`](food-directives/breakdown.md)                       | 2           |
+| 14  | « Sécurité des évictions totales »                                    | [`eviction-safety/`](eviction-safety/breakdown.md)                       | 2           |
+| 15  | « Demande d'ajout d'un élément »                                      | [`knowledge-base-requests/`](knowledge-base-requests/breakdown.md)       | 2           |
+| 16  | « Objectifs prioritaires du patient »                                 | [`priority-goals/`](priority-goals/breakdown.md)                         | 2           |
+| 17  | « Conseils d'hygiène de vie »                                         | [`lifestyle-advice/`](lifestyle-advice/breakdown.md)                     | 2           |
+| 18  | « Compléments, plantes, huiles essentielles et autres interventions » | [`supplement-interventions/`](supplement-interventions/breakdown.md)     | 2           |
+| 11  | « Chrononutrition : organisation des repas »                          | [`meal-structure/`](meal-structure/breakdown.md)                         | 2           |
+| 12  | « Jeûne intermittent »                                                | [`intermittent-fasting/`](intermittent-fasting/breakdown.md)             | 2           |
+| 19  | « Validation et activation de l'accompagnement »                      | [`care-activation/`](care-activation/breakdown.md)                       | 3           |
+| 20  | « Mise à jour du profil et des recommandations, historique »          | [`protocol-versions/`](protocol-versions/breakdown.md)                   | 3           |
+| 21  | « Modifications du patient après validation »                         | [`patient-change-signals/`](patient-change-signals/breakdown.md)         | 3           |
+| 22  | « Accès du patient à son espace activé »                              | [`patient-access/`](patient-access/breakdown.md)                         | 3           |
+| 31  | « Accueil et navigation de l'espace patient »                         | [`patient-home-navigation/`](patient-home-navigation/breakdown.md)       | 3           |
+| 23  | « Espace Recommandations »                                            | [`patient-recommendations/`](patient-recommendations/breakdown.md)       | 3           |
+| 24  | « Espace Recettes »                                                   | [`recipe-space/`](recipe-space/breakdown.md)                             | 4           |
+| 25  | « Fiche recette, portions et favoris »                                | [`recipe-card/`](recipe-card/breakdown.md)                               | 4           |
+| 26  | « Liste de courses »                                                  | [`shopping-list/`](shopping-list/breakdown.md)                           | 4           |
+| 28  | « Suggestion d'amélioration »                                         | [`meal-improvement/`](meal-improvement/breakdown.md)                     | 4           |
+| 32  | « Consultation des recettes du jour (praticien) »                     | [`practitioner-daily-recipes/`](practitioner-daily-recipes/breakdown.md) | 4           |
+| 29  | « Je suis au restaurant (bonus MVP) »                                 | [`restaurant-menu/`](restaurant-menu/breakdown.md)                       | 5           |
+| 30  | « Règles transversales de priorité et de sécurité »                   | decisions D-30 and D-31                                                  | every phase |
 
 The phases are a build order, not a promise of dates. The dates are under Milestones. One-off
 findings sit in [`triage/`](triage/), finished ones in its `_done/`. The triage stubs of
 September describe bugs in code that still runs. They stay until the epic that rebuilds their
 surface drops them.
+
+## Order
+
+Set by Jamie on 2026-10-27. The epics follow the table above. `triage` comes last.
+
+1. patient-signup-account
+2. consent-and-data
+3. patient-file-creation
+4. preparatory-questionnaire
+5. patient-list-and-status
+6. patient-file-view
+7. bmi
+8. protein-needs
+9. energy-needs
+10. food-directives
+11. eviction-safety
+12. knowledge-base-requests
+13. priority-goals
+14. lifestyle-advice
+15. supplement-interventions
+16. meal-structure
+17. intermittent-fasting
+18. care-activation
+19. protocol-versions
+20. patient-change-signals
+21. patient-access
+22. patient-home-navigation
+23. patient-recommendations
+24. recipe-space
+25. recipe-card
+26. shopping-list
+27. meal-improvement
+28. practitioner-daily-recipes
+29. restaurant-menu
+30. triage
 
 ## Decisions of record
 
@@ -147,14 +182,14 @@ is on site for another client from 2 to 6 November. The September plan assumed o
 December must show is question 1 of the call**, and the P0 set follows her answer. A missed date
 is reported on the Friday call, not absorbed.
 
-| By | Phase | Epics |
-|---|---|---|
+| By          | Phase                                                                                                  | Epics                                                                                                                                                                                      |
+| ----------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 14 November | **1 — The file.** A practitioner creates or receives a patient, reads the file, sees the calculations. | `patient-signup-account`, `consent-and-data`, `patient-file-creation`, `preparatory-questionnaire`, `patient-list-and-status`, `patient-file-view`, `bmi`, `protein-needs`, `energy-needs` |
-| 21 November | **2 — The protocol.** The practitioner writes the recommendations REMI will apply. | `food-directives`, `eviction-safety`, `knowledge-base-requests`, `priority-goals`, `lifestyle-advice`, `supplement-interventions`, `meal-structure`, `intermittent-fasting` |
-| 26 November | **3 — Activation and the patient's space.** The patient signs in and reads. | `care-activation`, `protocol-versions`, `patient-change-signals`, `patient-access`, `patient-home-navigation`, `patient-recommendations` |
-| 1 December | **4 — Recipes and the suggestion.** REMI proposes. FunMedDev's team tests. | `recipe-space`, `recipe-card`, `shopping-list`, `meal-improvement`, `practitioner-daily-recipes` |
-| 12 December | **Freeze.** Fixes only until the open day. | triage |
-| 19 December | **5 — Open day.** The bonus if time allows. | `restaurant-menu` |
+| 21 November | **2 — The protocol.** The practitioner writes the recommendations REMI will apply.                     | `food-directives`, `eviction-safety`, `knowledge-base-requests`, `priority-goals`, `lifestyle-advice`, `supplement-interventions`, `meal-structure`, `intermittent-fasting`                |
+| 26 November | **3 — Activation and the patient's space.** The patient signs in and reads.                            | `care-activation`, `protocol-versions`, `patient-change-signals`, `patient-access`, `patient-home-navigation`, `patient-recommendations`                                                   |
+| 1 December  | **4 — Recipes and the suggestion.** REMI proposes. FunMedDev's team tests.                             | `recipe-space`, `recipe-card`, `shopping-list`, `meal-improvement`, `practitioner-daily-recipes`                                                                                           |
+| 12 December | **Freeze.** Fixes only until the open day.                                                             | triage                                                                                                                                                                                     |
+| 19 December | **5 — Open day.** The bonus if time allows.                                                            | `restaurant-menu`                                                                                                                                                                          |
 
 `recipe-space/ai-gateway-adapter` does not wait for phase 4. It starts beside phase 1, so the
 model has a slot on day one of phase 4 and the prompts are proven on real protocols before then.

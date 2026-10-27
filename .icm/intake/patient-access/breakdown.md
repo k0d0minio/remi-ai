@@ -26,13 +26,13 @@ Before activation a signed-in patient sees one message, « Votre praticien prép
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Avant activation, aucune fonctionnalité n'est accessible au patient » | waiting-screen |
-| 2 | « L'e-mail d'activation explique comment ajouter REMI à l'écran d'accueil du smartphone … sans téléchargement depuis l'App Store ou Google Play » | activation-email-content |
-| 3 | « Le même compte (mêmes identifiants) donne accès à l'espace activé » | active-space-entry |
-| 4 | « Un patient qui n'a pas reçu l'e-mail peut se connecter et voir son accompagnement actif » | active-space-entry |
-| 5 | « Le patient ne voit jamais les recommandations non validées » | rule: README (D-30) |
+| #   | Morgane's criterion (short, her French kept)                                                                                                      | Stub                     |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| 1   | « Avant activation, aucune fonctionnalité n'est accessible au patient »                                                                           | waiting-screen           |
+| 2   | « L'e-mail d'activation explique comment ajouter REMI à l'écran d'accueil du smartphone … sans téléchargement depuis l'App Store ou Google Play » | activation-email-content |
+| 3   | « Le même compte (mêmes identifiants) donne accès à l'espace activé »                                                                             | active-space-entry       |
+| 4   | « Un patient qui n'a pas reçu l'e-mail peut se connecter et voir son accompagnement actif »                                                       | active-space-entry       |
+| 5   | « Le patient ne voit jamais les recommandations non validées »                                                                                    | rule: README (D-30)      |
 
 ## Out of scope
 

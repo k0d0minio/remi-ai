@@ -26,15 +26,15 @@ Nothing on `main` does this. It reuses the photo path of `meal-improvement/meal-
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « les plats identifiés et les suggestions retenues » | menu-suggestions |
-| 2 | « une justification courte » par suggestion | menu-suggestions |
-| 3 | plat avec « éviction totale, une allergie ou une intolérance » jamais suggéré | menu-suggestions |
-| 4 | « composition inconnue ou des allergènes non confirmés » → précisé, pas présenté comme sûr | menu-suggestions |
-| 5 | « menu illisible » → « une nouvelle photo » | menu-photo-reading |
-| 6 | « Les recommandations validées et les évictions sont respectées » | menu-suggestions |
-| 7 | message : vérifier « auprès du serveur » | menu-suggestions |
+| #   | Morgane's criterion (short, her French kept)                                               | Stub               |
+| --- | ------------------------------------------------------------------------------------------ | ------------------ |
+| 1   | « les plats identifiés et les suggestions retenues »                                       | menu-suggestions   |
+| 2   | « une justification courte » par suggestion                                                | menu-suggestions   |
+| 3   | plat avec « éviction totale, une allergie ou une intolérance » jamais suggéré              | menu-suggestions   |
+| 4   | « composition inconnue ou des allergènes non confirmés » → précisé, pas présenté comme sûr | menu-suggestions   |
+| 5   | « menu illisible » → « une nouvelle photo »                                                | menu-photo-reading |
+| 6   | « Les recommandations validées et les évictions sont respectées »                          | menu-suggestions   |
+| 7   | message : vérifier « auprès du serveur »                                                   | menu-suggestions   |
 
 ## Out of scope
 

@@ -45,18 +45,18 @@ and 6 carry them. The policy text promises them from its pilot version.
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Les consentements requis sont enregistrés avec date et version du texte » | consent-texts-and-records |
-| 2 | « Le compte ne peut pas être créé tant que les consentements obligatoires ne sont pas cochés » | consent-gate-at-signup |
-| 3 | « Le patient peut relire les informations sur le traitement de ses données avant de consentir » | consent-gate-at-signup |
-| 4 | « Aucune donnée facultative n'est collectée sans consentement applicable » | genetic-consent-and-optional-data |
-| 5 | « Un refus est enregistré et ne déclenche aucune activation automatique » | genetic-consent-and-optional-data |
-| 6 | « L'accès aux données est limité au praticien autorisé ; le praticien ne voit que ses propres patients » | data-access-scoping |
-| 7 | « Tout accès de l'équipe REMI aux données personnelles des patients doit être sécurisé, limité et traçable » | data-access-scoping |
-| 8 | « Le génotype n'est collecté et affiché que si le consentement correspondant a été donné » | genetic-consent-and-optional-data |
-| 9 | politique de confidentialité § 4 : « option de retrait dans votre espace personnel » | consent-withdrawal-in-app |
-| 10 | politique de confidentialité § 7 : « supprimer les données d'un compte inactif après 12 mois, précédée d'une notification » | inactive-account-deletion |
+| #   | Morgane's criterion (short, her French kept)                                                                                | Stub                              |
+| --- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| 1   | « Les consentements requis sont enregistrés avec date et version du texte »                                                 | consent-texts-and-records         |
+| 2   | « Le compte ne peut pas être créé tant que les consentements obligatoires ne sont pas cochés »                              | consent-gate-at-signup            |
+| 3   | « Le patient peut relire les informations sur le traitement de ses données avant de consentir »                             | consent-gate-at-signup            |
+| 4   | « Aucune donnée facultative n'est collectée sans consentement applicable »                                                  | genetic-consent-and-optional-data |
+| 5   | « Un refus est enregistré et ne déclenche aucune activation automatique »                                                   | genetic-consent-and-optional-data |
+| 6   | « L'accès aux données est limité au praticien autorisé ; le praticien ne voit que ses propres patients »                    | data-access-scoping               |
+| 7   | « Tout accès de l'équipe REMI aux données personnelles des patients doit être sécurisé, limité et traçable »                | data-access-scoping               |
+| 8   | « Le génotype n'est collecté et affiché que si le consentement correspondant a été donné »                                  | genetic-consent-and-optional-data |
+| 9   | politique de confidentialité § 4 : « option de retrait dans votre espace personnel »                                        | consent-withdrawal-in-app         |
+| 10  | politique de confidentialité § 7 : « supprimer les données d'un compte inactif après 12 mois, précédée d'une notification » | inactive-account-deletion         |
 
 ## Out of scope
 

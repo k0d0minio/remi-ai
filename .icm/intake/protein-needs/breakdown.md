@@ -38,19 +38,19 @@ situation stored there. The nutrition rules of September stay as they are.
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « La valeur de référence (0,83), le poids de référence, le coefficient et la valeur finale sont consultables » | protein-target-validation |
-| 2 | « Modifier le poids de référence protéique sans affecter le poids réel, l'IMC ou les besoins énergétiques » | protein-target-validation |
-| 3 | « Saisir directement un objectif protéique en g/jour, qui prévaut après validation » | protein-target-validation |
-| 4 | « Alerte si l'IMC est hors de la plage 18,5 à < 25 » | protein-estimate |
-| 5 | « 65 ans ou plus, REMI propose le coefficient 1 à 1,2 ; le praticien confirme » | protein-estimate |
-| 6 | « Grossesse : +1 g/j, +9 g/j, +28 g/j. Allaitement : +19 g/j puis +13 g/j » | protein-estimate |
-| 7 | « Pathologie, dénutrition ou situation particulière : validation du praticien obligatoire » | protein-target-validation |
-| 8 | « Si une donnée nécessaire est manquante, REMI n'effectue pas le calcul » | protein-estimate |
-| 9 | « Toutes les valeurs restent des estimations tant que le praticien ne les a pas validées » | protein-target-validation |
-| 10 | « Les modifications du praticien …, leur validation et les paramètres utilisés sont enregistrés » | protein-target-validation |
-| 11 | « Exemple : patient à 100 kg, poids de référence 75 kg, 1,2 g/kg/j → 90 g/j ; l'IMC continue à utiliser les 100 kg » | protein-estimate |
+| #   | Morgane's criterion (short, her French kept)                                                                         | Stub                      |
+| --- | -------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| 1   | « La valeur de référence (0,83), le poids de référence, le coefficient et la valeur finale sont consultables »       | protein-target-validation |
+| 2   | « Modifier le poids de référence protéique sans affecter le poids réel, l'IMC ou les besoins énergétiques »          | protein-target-validation |
+| 3   | « Saisir directement un objectif protéique en g/jour, qui prévaut après validation »                                 | protein-target-validation |
+| 4   | « Alerte si l'IMC est hors de la plage 18,5 à < 25 »                                                                 | protein-estimate          |
+| 5   | « 65 ans ou plus, REMI propose le coefficient 1 à 1,2 ; le praticien confirme »                                      | protein-estimate          |
+| 6   | « Grossesse : +1 g/j, +9 g/j, +28 g/j. Allaitement : +19 g/j puis +13 g/j »                                          | protein-estimate          |
+| 7   | « Pathologie, dénutrition ou situation particulière : validation du praticien obligatoire »                          | protein-target-validation |
+| 8   | « Si une donnée nécessaire est manquante, REMI n'effectue pas le calcul »                                            | protein-estimate          |
+| 9   | « Toutes les valeurs restent des estimations tant que le praticien ne les a pas validées »                           | protein-target-validation |
+| 10  | « Les modifications du praticien …, leur validation et les paramètres utilisés sont enregistrés »                    | protein-target-validation |
+| 11  | « Exemple : patient à 100 kg, poids de référence 75 kg, 1,2 g/kg/j → 90 g/j ; l'IMC continue à utiliser les 100 kg » | protein-estimate          |
 
 ## Out of scope
 

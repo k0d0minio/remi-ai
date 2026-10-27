@@ -33,17 +33,17 @@ On `main`, `patient_meal_entries` holds the September loop: « Je vais manger / 
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « une photo ou une description textuelle » | meal-capture |
-| 2 | « les points positifs et, uniquement si nécessaire, une amélioration prioritaire » | meal-suggestion |
-| 3 | amélioration « simple à appliquer (ajout, remplacement ou retrait) », explication liée à « une recommandation ou un objectif validé » | meal-suggestion |
-| 4 | éviction totale « signalé en priorité », aucune suggestion incompatible | meal-suggestion |
-| 5 | photo ou description « trop vague » → « demande une précision » | meal-suggestion |
-| 6 | « Ça me convient » et « Pas pour moi » sur chaque suggestion | suggestion-feedback |
-| 7 | après « Pas pour moi », « une deuxième suggestion différente » | suggestion-feedback |
-| 8 | « 2 suggestions au total par repas » | suggestion-feedback |
-| 9 | « aucun historique détaillé des choix du patient » | suggestion-feedback |
+| #   | Morgane's criterion (short, her French kept)                                                                                          | Stub                |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| 1   | « une photo ou une description textuelle »                                                                                            | meal-capture        |
+| 2   | « les points positifs et, uniquement si nécessaire, une amélioration prioritaire »                                                    | meal-suggestion     |
+| 3   | amélioration « simple à appliquer (ajout, remplacement ou retrait) », explication liée à « une recommandation ou un objectif validé » | meal-suggestion     |
+| 4   | éviction totale « signalé en priorité », aucune suggestion incompatible                                                               | meal-suggestion     |
+| 5   | photo ou description « trop vague » → « demande une précision »                                                                       | meal-suggestion     |
+| 6   | « Ça me convient » et « Pas pour moi » sur chaque suggestion                                                                          | suggestion-feedback |
+| 7   | après « Pas pour moi », « une deuxième suggestion différente »                                                                        | suggestion-feedback |
+| 8   | « 2 suggestions au total par repas »                                                                                                  | suggestion-feedback |
+| 9   | « aucun historique détaillé des choix du patient »                                                                                    | suggestion-feedback |
 
 ## Out of scope
 

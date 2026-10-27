@@ -26,17 +26,17 @@ A read-only space « Mes recommandations », reachable only when the accompanime
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « L'espace est accessible uniquement lorsque l'accompagnement est actif » | recommendations-page |
-| 2 | « Seules les recommandations validées par le praticien sont affichées » | recommendations-page |
-| 3 | « Les recommandations sont présentées par catégories clairement identifiables » | recommendations-page |
-| 4 | « Les évictions totales et leur durée éventuelle sont clairement visibles » | evictions-and-food-directives-view |
-| 5 | « Les compléments, plantes et huiles essentielles affichent les informations de prise renseignées par le praticien » | recommendations-page |
-| 6 | « Une information non renseignée n'est jamais inventée » | rule: README (D-30) |
-| 7 | « Le patient ne peut ni ajouter, ni modifier, ni supprimer les recommandations » | recommendations-page |
-| 8 | « Toute mise à jour validée par le praticien apparaît automatiquement dans cet espace » | recommendations-page |
-| 9 | « Les modifications non validées ne sont jamais affichées au patient » | recommendations-page |
+| #   | Morgane's criterion (short, her French kept)                                                                         | Stub                               |
+| --- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| 1   | « L'espace est accessible uniquement lorsque l'accompagnement est actif »                                            | recommendations-page               |
+| 2   | « Seules les recommandations validées par le praticien sont affichées »                                              | recommendations-page               |
+| 3   | « Les recommandations sont présentées par catégories clairement identifiables »                                      | recommendations-page               |
+| 4   | « Les évictions totales et leur durée éventuelle sont clairement visibles »                                          | evictions-and-food-directives-view |
+| 5   | « Les compléments, plantes et huiles essentielles affichent les informations de prise renseignées par le praticien » | recommendations-page               |
+| 6   | « Une information non renseignée n'est jamais inventée »                                                             | rule: README (D-30)                |
+| 7   | « Le patient ne peut ni ajouter, ni modifier, ni supprimer les recommandations »                                     | recommendations-page               |
+| 8   | « Toute mise à jour validée par le praticien apparaît automatiquement dans cet espace »                              | recommendations-page               |
+| 9   | « Les modifications non validées ne sont jamais affichées au patient »                                               | recommendations-page               |
 
 ## Out of scope
 

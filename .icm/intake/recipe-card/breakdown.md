@@ -34,17 +34,17 @@ Stubs 2 and 4 each add a table. They run in this order and never in parallel (D-
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Les quantités sont recalculées selon le nombre de portions choisi » | portion-scaling |
-| 2 | « Les consignes de sécurité […] restent inchangées lors du recalcul » | portion-scaling |
-| 3 | « Les favoris sont persistants dans le compte du patient » | favourites |
-| 4 | « Une recette enregistrée en favori reste compatible avec les évictions validées » | favourites |
-| 5 | « Le patient peut retirer une recette de ses favoris » | favourites |
-| 6 | « étapes de préparation […] claires, précises, cohérentes et réalisables » | recipe-space/weekly-plan-generation |
-| 7 | partager « depuis sa fiche ou ses favoris », « sans compte REMI » | recipe-sharing |
-| 8 | « ne révèle aucune donnée personnelle, information de santé ou recommandation » | recipe-sharing |
-| 9 | « Le logo REMI, la mention […] et le lien vers la plateforme » | recipe-sharing |
+| #   | Morgane's criterion (short, her French kept)                                       | Stub                                |
+| --- | ---------------------------------------------------------------------------------- | ----------------------------------- |
+| 1   | « Les quantités sont recalculées selon le nombre de portions choisi »              | portion-scaling                     |
+| 2   | « Les consignes de sécurité […] restent inchangées lors du recalcul »              | portion-scaling                     |
+| 3   | « Les favoris sont persistants dans le compte du patient »                         | favourites                          |
+| 4   | « Une recette enregistrée en favori reste compatible avec les évictions validées » | favourites                          |
+| 5   | « Le patient peut retirer une recette de ses favoris »                             | favourites                          |
+| 6   | « étapes de préparation […] claires, précises, cohérentes et réalisables »         | recipe-space/weekly-plan-generation |
+| 7   | partager « depuis sa fiche ou ses favoris », « sans compte REMI »                  | recipe-sharing                      |
+| 8   | « ne révèle aucune donnée personnelle, information de santé ou recommandation »    | recipe-sharing                      |
+| 9   | « Le logo REMI, la mention […] et le lien vers la plateforme »                     | recipe-sharing                      |
 
 ## Out of scope
 

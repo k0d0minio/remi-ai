@@ -27,16 +27,16 @@ Nothing on main holds this. The admin list is a page in `apps/admin` for the adm
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Le bouton “Demander l'ajout” apparaît pour les éléments inconnus et pour les éléments reconnus dont les associations… ne sont pas suffisamment fiables » | request-record (the service), cross-epic food-directives/directive-resolution (the button) |
-| 2 | « Une demande déjà en attente pour un même élément et un même motif n'est pas dupliquée ; son statut “En attente” est affiché » | request-record |
-| 3 | « Chaque demande est reliée au terme concerné, à son motif, au praticien et au dossier source ; le commentaire est facultatif » | request-record |
-| 4 | « L'administrateur REMI dispose d'une liste des demandes et peut consulter leur détail et leur statut » | admin-review |
-| 5 | « L'administrateur peut valider le terme et ses associations alimentaires, compléter les associations d'un terme existant ou refuser la demande » | admin-review |
-| 6 | « Le praticien peut consulter le résultat dans l'interface (“En attente”, “Validé”, “Refusé”) ; aucun système de notification supplémentaire » | request-record |
-| 7 | « Un élément inconnu ou dont les associations sont incertaines n'est jamais traité comme validé et n'influence pas les suggestions de recettes » | rule: README (D-30), food-directives/directive-application |
-| 8 | « L'élément devient exploitable uniquement après validation des données et associations alimentaires nécessaires dans la base REMI » | admin-review |
+| #   | Morgane's criterion (short, her French kept)                                                                                                               | Stub                                                                                       |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| 1   | « Le bouton “Demander l'ajout” apparaît pour les éléments inconnus et pour les éléments reconnus dont les associations… ne sont pas suffisamment fiables » | request-record (the service), cross-epic food-directives/directive-resolution (the button) |
+| 2   | « Une demande déjà en attente pour un même élément et un même motif n'est pas dupliquée ; son statut “En attente” est affiché »                            | request-record                                                                             |
+| 3   | « Chaque demande est reliée au terme concerné, à son motif, au praticien et au dossier source ; le commentaire est facultatif »                            | request-record                                                                             |
+| 4   | « L'administrateur REMI dispose d'une liste des demandes et peut consulter leur détail et leur statut »                                                    | admin-review                                                                               |
+| 5   | « L'administrateur peut valider le terme et ses associations alimentaires, compléter les associations d'un terme existant ou refuser la demande »          | admin-review                                                                               |
+| 6   | « Le praticien peut consulter le résultat dans l'interface (“En attente”, “Validé”, “Refusé”) ; aucun système de notification supplémentaire »             | request-record                                                                             |
+| 7   | « Un élément inconnu ou dont les associations sont incertaines n'est jamais traité comme validé et n'influence pas les suggestions de recettes »           | rule: README (D-30), food-directives/directive-application                                 |
+| 8   | « L'élément devient exploitable uniquement après validation des données et associations alimentaires nécessaires dans la base REMI »                       | admin-review                                                                               |
 
 ## Out of scope
 

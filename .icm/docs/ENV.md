@@ -204,16 +204,16 @@ unless a second analytics vendor arrives with a reader to go with it.
 
 ## CI and the two scripts (GitHub Actions, `gh`)
 
-| Variable                    | Purpose                                                                                                                                                        | Where set | Public? |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
-| `GITHUB_TOKEN`              | Injected automatically by Actions. Do **not** add it                                                                                                           | Actions   | no      |
-| `GH_TOKEN`                  | What `gh` reads when no `gh auth login` exists. `.icm/scripts/new-run.sh` and `close-out.sh` call `gh`; a logged-in `gh` needs no variable                     | local     | no      |
-| `TURBO_TOKEN`               | Turborepo remote cache token, shares the cache between CI and Vercel                                                                                           | Actions   | no      |
-| `TURBO_TEAM`                | Turborepo team slug (a repo **variable**, not a secret)                                                                                                        | Actions   | no      |
-| `SLACK_BOT_TOKEN`           | Bot token (`xoxb-…`, scope `chat:write`, the app invited to the channel) of the REMI Slack workspace. Nothing reads it today                                    | Actions   | no      |
-| `SLACK_ANNOUNCE_CHANNEL_ID` | Channel id (`C…`) of the release post. Nothing reads it today. An Actions **variable**, not a secret                                                         | Actions   | no      |
-| `SLACK_ALERTS_CHANNEL_ID`   | Channel id (`C…`) kept for an alert post. Nothing reads it today                                                                                               | Actions   | no      |
-| `VERCEL_TOKEN_REMI21`       | Vercel API token for the **remi21** team. Nothing reads it today                                                                                               | local     | no      |
+| Variable                    | Purpose                                                                                                                                    | Where set | Public? |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ------- |
+| `GITHUB_TOKEN`              | Injected automatically by Actions. Do **not** add it                                                                                       | Actions   | no      |
+| `GH_TOKEN`                  | What `gh` reads when no `gh auth login` exists. `.icm/scripts/new-run.sh` and `close-out.sh` call `gh`; a logged-in `gh` needs no variable | local     | no      |
+| `TURBO_TOKEN`               | Turborepo remote cache token, shares the cache between CI and Vercel                                                                       | Actions   | no      |
+| `TURBO_TEAM`                | Turborepo team slug (a repo **variable**, not a secret)                                                                                    | Actions   | no      |
+| `SLACK_BOT_TOKEN`           | Bot token (`xoxb-…`, scope `chat:write`, the app invited to the channel) of the REMI Slack workspace. Nothing reads it today               | Actions   | no      |
+| `SLACK_ANNOUNCE_CHANNEL_ID` | Channel id (`C…`) of the release post. Nothing reads it today. An Actions **variable**, not a secret                                       | Actions   | no      |
+| `SLACK_ALERTS_CHANNEL_ID`   | Channel id (`C…`) kept for an alert post. Nothing reads it today                                                                           | Actions   | no      |
+| `VERCEL_TOKEN_REMI21`       | Vercel API token for the **remi21** team. Nothing reads it today                                                                           | local     | no      |
 
 The Slack app itself is described by [`slack-app-manifest.yaml`](slack-app-manifest.yaml) beside this
 file: import it at api.slack.com/apps (Create New App → From a manifest), install it, and the Bot User

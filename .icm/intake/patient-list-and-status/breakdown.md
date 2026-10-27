@@ -37,19 +37,19 @@ D-27, D-30, D-31, D-32.
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Le praticien ne voit que ses propres patients » | patient-list (scope: patient-file-creation/care-relationship) |
-| 2 | « Le tri par date de rendez-vous place les patients sans date en fin de liste » | patient-list |
-| 3 | « Le tri par ordre alphabétique se fait sur le nom, puis le prénom » | patient-list |
-| 4 | « Le patient s'inscrit via le lien du praticien et complète directement son questionnaire préparatoire » | patient-signup-account/signup-page |
-| 5 | « Le dossier apparaît automatiquement dans la liste … uniquement lorsque tous les champs obligatoires … sont remplis, avec le statut « Prêt pour consultation » » | list-appearance-rule |
-| 6 | « Le statut passe à « Recommandations à valider » dès que le praticien enregistre une première recommandation alimentaire » | file-status-enum (trigger: food-directives, story 13) |
-| 7 | « Le statut passe à « Accompagnement actif » uniquement après validation des recommandations et activation » | file-status-enum (trigger: care-activation, story 19) |
-| 8 | « Si le patient quitte le questionnaire … ses réponses sont automatiquement enregistrées … son dossier n'apparaît pas encore dans la liste » | list-appearance-rule |
-| 9 | « Si le praticien crée lui-même un dossier patient, celui-ci apparaît immédiatement … « Dossier à compléter » » | list-appearance-rule |
-| 10 | « Les dossiers comportant une modification patient non prise en compte affichent un indicateur visible dans la liste » | list-indicators (signal: patient-change-signals, story 21) |
-| 11 | « Les informations manquantes signalées sur la fiche restent accessibles depuis la liste » | list-indicators |
+| #   | Morgane's criterion (short, her French kept)                                                                                                                      | Stub                                                          |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| 1   | « Le praticien ne voit que ses propres patients »                                                                                                                 | patient-list (scope: patient-file-creation/care-relationship) |
+| 2   | « Le tri par date de rendez-vous place les patients sans date en fin de liste »                                                                                   | patient-list                                                  |
+| 3   | « Le tri par ordre alphabétique se fait sur le nom, puis le prénom »                                                                                              | patient-list                                                  |
+| 4   | « Le patient s'inscrit via le lien du praticien et complète directement son questionnaire préparatoire »                                                          | patient-signup-account/signup-page                            |
+| 5   | « Le dossier apparaît automatiquement dans la liste … uniquement lorsque tous les champs obligatoires … sont remplis, avec le statut « Prêt pour consultation » » | list-appearance-rule                                          |
+| 6   | « Le statut passe à « Recommandations à valider » dès que le praticien enregistre une première recommandation alimentaire »                                       | file-status-enum (trigger: food-directives, story 13)         |
+| 7   | « Le statut passe à « Accompagnement actif » uniquement après validation des recommandations et activation »                                                      | file-status-enum (trigger: care-activation, story 19)         |
+| 8   | « Si le patient quitte le questionnaire … ses réponses sont automatiquement enregistrées … son dossier n'apparaît pas encore dans la liste »                      | list-appearance-rule                                          |
+| 9   | « Si le praticien crée lui-même un dossier patient, celui-ci apparaît immédiatement … « Dossier à compléter » »                                                   | list-appearance-rule                                          |
+| 10  | « Les dossiers comportant une modification patient non prise en compte affichent un indicateur visible dans la liste »                                            | list-indicators (signal: patient-change-signals, story 21)    |
+| 11  | « Les informations manquantes signalées sur la fiche restent accessibles depuis la liste »                                                                        | list-indicators                                               |
 
 ## Out of scope
 

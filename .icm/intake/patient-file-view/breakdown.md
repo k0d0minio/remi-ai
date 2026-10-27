@@ -37,17 +37,17 @@ questionnaire. It rests on D-27, D-30, D-31, D-32.
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « La fiche est accessible dès l'inscription, même si le questionnaire est incomplet » | file-page-frame |
-| 2 | « Chaque champ vide est affiché « Non renseigné », jamais complété par REMI » | file-page-frame |
-| 3 | « La liste des informations manquantes distingue les champs obligatoires des champs facultatifs » | file-page-frame |
-| 4 | « Le statut du dossier est visible sur la fiche » | file-page-frame |
-| 5 | « Le praticien ne peut voir et accèder que les fiches de ses propres patients » | file-page-frame (scope: patient-file-creation/care-relationship) |
-| 6 | « Le praticien peut compléter ou corriger lui-même une donnée du patient » | provenance-markers |
-| 7 | « Toutes les réponses enregistrées sont visibles » | file-page-frame |
-| 8 | « Les modifications du patient après validation sont signalées sur la fiche » | post-validation-change-markers |
-| 9 | « Aucune valeur absente n'est supposée ni extrapolée » | rule: README (D-30) |
+| #   | Morgane's criterion (short, her French kept)                                                      | Stub                                                             |
+| --- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| 1   | « La fiche est accessible dès l'inscription, même si le questionnaire est incomplet »             | file-page-frame                                                  |
+| 2   | « Chaque champ vide est affiché « Non renseigné », jamais complété par REMI »                     | file-page-frame                                                  |
+| 3   | « La liste des informations manquantes distingue les champs obligatoires des champs facultatifs » | file-page-frame                                                  |
+| 4   | « Le statut du dossier est visible sur la fiche »                                                 | file-page-frame                                                  |
+| 5   | « Le praticien ne peut voir et accèder que les fiches de ses propres patients »                   | file-page-frame (scope: patient-file-creation/care-relationship) |
+| 6   | « Le praticien peut compléter ou corriger lui-même une donnée du patient »                        | provenance-markers                                               |
+| 7   | « Toutes les réponses enregistrées sont visibles »                                                | file-page-frame                                                  |
+| 8   | « Les modifications du patient après validation sont signalées sur la fiche »                     | post-validation-change-markers                                   |
+| 9   | « Aucune valeur absente n'est supposée ni extrapolée »                                            | rule: README (D-30)                                              |
 
 ## Out of scope
 

@@ -26,15 +26,15 @@ The practitioner may change the patient's profile and every recommendation at an
 
 ## Criteria → stubs
 
-| # | Morgane's criterion (short, her French kept) | Stub |
-|---|---|---|
-| 1 | « Les changements non validés sont signalés (“Modifications non validées”) et ne sont pas appliqués » | working-copy-and-validate |
-| 2 | « Après validation, les prochaines recettes et suggestions utilisent les nouvelles recommandations » | working-copy-and-validate |
-| 3 | « Les recettes déjà générées ne sont pas supprimées » | working-copy-and-validate |
-| 4 | « Chaque validation crée une nouvelle entrée datée dans l'historique ; la version précédente reste consultable avec sa date » | protocol-version-table |
-| 5 | « L'historique est consultable en lecture seule par le praticien » | protocol-history-view |
-| 6 | « Un élément désactivé reste dans l'historique » | protocol-version-table |
-| 7 | « Les changements effectués par le patient sur son profil sont signalés au praticien » | cross-epic: patient-change-signals/change-signals-in-console |
+| #   | Morgane's criterion (short, her French kept)                                                                                  | Stub                                                         |
+| --- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| 1   | « Les changements non validés sont signalés (“Modifications non validées”) et ne sont pas appliqués »                         | working-copy-and-validate                                    |
+| 2   | « Après validation, les prochaines recettes et suggestions utilisent les nouvelles recommandations »                          | working-copy-and-validate                                    |
+| 3   | « Les recettes déjà générées ne sont pas supprimées »                                                                         | working-copy-and-validate                                    |
+| 4   | « Chaque validation crée une nouvelle entrée datée dans l'historique ; la version précédente reste consultable avec sa date » | protocol-version-table                                       |
+| 5   | « L'historique est consultable en lecture seule par le praticien »                                                            | protocol-history-view                                        |
+| 6   | « Un élément désactivé reste dans l'historique »                                                                              | protocol-version-table                                       |
+| 7   | « Les changements effectués par le patient sur son profil sont signalés au praticien »                                        | cross-epic: patient-change-signals/change-signals-in-console |
 
 ## Out of scope
 
