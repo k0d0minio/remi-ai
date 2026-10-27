@@ -210,17 +210,16 @@ unless a second analytics vendor arrives with a reader to go with it.
 | `GH_TOKEN`                  | What `gh` reads when no `gh auth login` exists. `.icm/scripts/new-run.sh` and `close-out.sh` call `gh`; a logged-in `gh` needs no variable                     | local     | no      |
 | `TURBO_TOKEN`               | Turborepo remote cache token, shares the cache between CI and Vercel                                                                                           | Actions   | no      |
 | `TURBO_TEAM`                | Turborepo team slug (a repo **variable**, not a secret)                                                                                                        | Actions   | no      |
-| `SLACK_BOT_TOKEN`           | Bot token (`xoxb-…`, scope `chat:write`, the app invited to the channel) of the REMI Slack workspace. `release.yaml` posts with it. Unset: the post is skipped | Actions   | no      |
-| `SLACK_ANNOUNCE_CHANNEL_ID` | Channel id (`C…`) `release.yaml` posts to after every merge: the pull request's title and the Release link. An Actions **variable**, not a secret              | Actions   | no      |
+| `SLACK_BOT_TOKEN`           | Bot token (`xoxb-…`, scope `chat:write`, the app invited to the channel) of the REMI Slack workspace. Nothing reads it today                                    | Actions   | no      |
+| `SLACK_ANNOUNCE_CHANNEL_ID` | Channel id (`C…`) of the release post. Nothing reads it today. An Actions **variable**, not a secret                                                         | Actions   | no      |
 | `SLACK_ALERTS_CHANNEL_ID`   | Channel id (`C…`) kept for an alert post. Nothing reads it today                                                                                               | Actions   | no      |
 | `VERCEL_TOKEN_REMI21`       | Vercel API token for the **remi21** team. Nothing reads it today                                                                                               | local     | no      |
 
 The Slack app itself is described by [`slack-app-manifest.yaml`](slack-app-manifest.yaml) beside this
 file: import it at api.slack.com/apps (Create New App → From a manifest), install it, and the Bot User
 OAuth Token it shows is the `SLACK_BOT_TOKEN` row. The Slack rows live in **this repository's Actions
-secrets and variables** (`gh secret set SLACK_BOT_TOKEN`, `gh variable set SLACK_ANNOUNCE_CHANNEL_ID`)
-because `.github/workflows/release.yaml` is what posts. No check is required on `main`: the
-`Quality (advisory)` job reports and never blocks, and the merge is Jamie's.
+secrets and variables**. Since 2026-10-27 no workflow posts to Slack: `release.yaml` was removed.
+No check is required on `main`, and the merge is Jamie's.
 
 ## Not wired yet
 

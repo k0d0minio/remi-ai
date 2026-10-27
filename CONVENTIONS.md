@@ -175,7 +175,7 @@ discovering twenty thousand lines of drift in an audit two years from now.
   composition is exempt; behaviour is not.
 - **Coverage floors on the database layer.** `packages/services/src/db/` carries a hard floor of
   75% line coverage and aims for 90%. A PR that drops it below the floor is red.
-- The harness (runner + coverage gate in `.github/workflows/quality.yaml`) arrives with the first
+- The harness (runner + coverage gate in CI) arrives with the first
   db adapter PR; until then this section is the standing instruction. Tests run in the factory,
   not locally — the same rule as every other check.
 
@@ -199,9 +199,9 @@ preview, not to a session's context window:
 
 | Check           | Runs where                                                    |
 | --------------- | ------------------------------------------------------------- |
-| Format          | Husky pre-commit (lint-staged) + CI                           |
-| Lint, typecheck | CI — `.github/workflows/quality.yaml`, on **every** PR        |
-| Migration order | CI — `quality.yaml`, on every PR (see below)                  |
+| Format          | Husky pre-commit (lint-staged)                                |
+| Lint, typecheck | CI — `ci.yml` (`check-client.yml`), on **every** PR           |
+| Migration order | No CI job since 2026-10-27 (see below)                        |
 | Build           | The Vercel preview deploy                                     |
 | Pipeline gates  | CI — `.github/workflows/gates.yaml` reads the PR's checkboxes |
 
@@ -212,8 +212,8 @@ code querying columns that do not exist. When two branches number their migratio
 visible failure is a git conflict in `_journal.json`; the dangerous way out is renumbering the
 entry by hand and keeping its original `when`. So after bringing `main` into a migration-bearing
 branch: delete the branch's migration and its journal entry, then `pnpm db:generate` again. The
-`Migration order` step (`packages/services/scripts/check-migration-order.mjs`) is what fails a PR
-that did it the other way.
+`Migration order` script (`packages/services/scripts/check-migration-order.mjs`) finds a PR that
+did it the other way. Since 2026-10-27 no CI job runs it: `quality.yaml` was removed.
 
 `.claude/hooks/block-local-checks.sh` enforces this for agent sessions. Push, then read the result
 back from the PR's check runs. The one exception: if you already know an edit introduced a type
