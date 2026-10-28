@@ -101,10 +101,10 @@ Set by Jamie on 2026-10-27. The epics follow the table above. `triage` comes las
 27. meal-improvement
 28. practitioner-daily-recipes
 29. restaurant-menu
-30. triage
+30. genotype-macro-split
+31. triage
 
-`genotype-macro-split` (story 10) waits for its place. The pull request that cut it asks the question.
-Default: after `energy-needs`, as the fourth calculation.
+`genotype-macro-split` (story 10) comes after the recipe and analysis epics (Jamie, 2026-10-28).
 
 ## Decisions of record
 
