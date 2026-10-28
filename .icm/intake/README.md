@@ -212,7 +212,7 @@ where one differs.
 | « Résumé du Livre du Docteur Mouton.docx »                | `genotype-macro-split` (the biology behind the table, never a rule)                       |
 | « Prompt.docx », `01-weekly-planner.md`, `02-single-meal.md` | `recipe-space`, `meal-improvement` (the v1 prompts, reference for tone and structure)      |
 | « Questions pour Morgane — user stories REMI — 23 octobre 2026 » | every breakdown. Her answers return to the breakdowns in the pull request that acts on them |
-| The e-mail thread « REMI & Fagron \| contact », 3 to 24 September 2026 (Gmail, label `projects/remi-ai`) | `preparatory-questionnaire`, `genotype-macro-split`. The laboratory is Fagron NutriGen. Its sample reports are the reference for the A/H/M mapping. The Fagron platform is the « API du laboratoire », outside the MVP |
+| The e-mail thread « REMI & Fagron \| contact », 3 to 24 September 2026 (Gmail, label `projects/remi-ai`) | `preparatory-questionnaire`, `genotype-macro-split`. Fagron NutriGen is a candidate laboratory, not decided. Its sample reports show what a laboratory report looks like. The laboratory choice is `genotype-macro-split` question 6 |
 
 ## Milestones
 
