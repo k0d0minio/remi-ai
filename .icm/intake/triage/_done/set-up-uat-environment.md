@@ -35,9 +35,9 @@ a decision that replaces D-25.
 
 - [ ] The Vercel projects `admin` and `app` have the custom environment `uat`, tracking `main`, at `uat.<its production domain>`.
 - [ ] On `admin` and `app`, "Auto-assign Custom Production Domains" is off. A merge to `main` builds a production deployment that stays staged.
-- [ ] Neon has a UAT project apart from production's. `NEON_PROJECT_ID` names the UAT project.
+- [ ] Neon has a UAT project apart from production's.
 - [ ] `DATABASE_URL` and `DATABASE_URL_UNPOOLED` are on `uat`. `MIGRATE_AT_BUILD` is on no environment by hand: only `preview-db.sh` sets it, on a preview branch.
-- [ ] The Actions secrets `VERCEL_TOKEN`, `NEON_API_KEY` and `DATABASE_URL`, and the variables `VERCEL_TEAM`, `VERCEL_PROJECT` (`admin`) and `NEON_PROJECT_ID`, exist.
+- [ ] The Actions secrets `VERCEL_TOKEN`, `NEON_API_KEY` and `DATABASE_URL`, and the variable `VERCEL_TEAM`, exist. No Actions variable names a Vercel project or a Neon project.
 - [ ] The admin app's `package.json` has `"build": "bash ../../.icm/scripts/vercel-build.sh next build"`. Vercel's Build Command does not change.
 - [ ] `db:migrate` and `db:verify` are separate scripts. The admin app's `package.json` names both. `migrate.mjs` migrates on Vercel only when `VERCEL_TARGET_ENV=uat` or `MIGRATE_AT_BUILD=1`.
 - [ ] `turbo.json` `globalEnv` names `VERCEL_TARGET_ENV`, `MIGRATE_AT_BUILD` and `DATABASE_URL_UNPOOLED`.
