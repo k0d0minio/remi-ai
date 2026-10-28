@@ -202,9 +202,12 @@ Jamie's own decision, not a default.
     production only. The UAT project's default branch serves `uat` and is the base of previews.
     A preview migrates only on its own Neon branch. The admin `uat` build migrates the base.
     Production migrates in `promote.yml` only. `admin` and `app` have the custom environment
-    `uat`. `marketing` and `documentation` follow `main`. Until the blueprint promotes several
-    projects, `promote.sh run` promotes `admin`, and Jamie then promotes `app` by hand. Jamie
-    decided this on 2026-10-28 (`triage/set-up-uat-environment`). It replaces D-25.
+    `uat`. `marketing` and `documentation` follow `main`. The UAT Neon project is `uat-remi-ai`.
+    No Actions variable names a Vercel project or a Neon project: the blueprint finds them
+    (house `blueprint-uat-several-projects`). Until it does, `promote.yml` migrates production
+    and its promote step fails, Jamie then promotes `admin` and `app` by hand, and a pull request
+    with a migration gets no migrated preview. Jamie decided this on 2026-10-28
+    (`triage/set-up-uat-environment`). It replaces D-25.
 
 ## Material beside the stories
 

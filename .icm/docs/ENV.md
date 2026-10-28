@@ -119,6 +119,9 @@ with "no database adapter registered" — a deploy without a database never quie
    (`preview/<git branch>`, cut by `preview-db.yml`).
 3. `promote.yml` migrates production, on `promote.sh run`, before the promotion.
 
+Step 2 does not run yet: `preview-db.yml` needs a Vercel project and a Neon project that no
+Actions variable names here. The blueprint will find both (D-36).
+
 Every other build only builds. `.icm/scripts/vercel-build.sh` decides it, and
 `packages/services/scripts/migrate.mjs` refuses again on Vercel when the build owns no database. A
 plain preview reads and writes the UAT base's rows, with the schema the base already has.
@@ -218,9 +221,7 @@ unless a second analytics vendor arrives with a reader to go with it.
 | `VERCEL_TOKEN_REMI21`       | Vercel API token for the **remi21** team. Nothing reads it today                                                                           | local     | no      |
 | `VERCEL_TOKEN`              | Vercel token for the **remi21** team. `promote.yml`, `preview-db.yml`, `neon-cleanup.yml` and `promote.sh` read it                         | both      | no      |
 | `VERCEL_TEAM`               | The Vercel team's slug, `remi21`. An Actions **variable**, not a secret                                                                    | both      | no      |
-| `VERCEL_PROJECT`            | The Vercel project that `promote.yml` promotes and `preview-db.sh` writes to: `admin`. An Actions **variable**                             | both      | no      |
 | `NEON_API_KEY`              | Neon API key of the organisation. `preview-db.yml` and `neon-cleanup.yml` read it                                                          | both      | no      |
-| `NEON_PROJECT_ID`           | The id of the UAT Neon project, the one that holds the base. An Actions **variable**                                                       | both      | no      |
 | `DATABASE_URL`              | Production's **direct** connection string. Read by the migration in `promote.yml` only                                                     | Actions   | no      |
 
 The Slack app itself is described by [`slack-app-manifest.yaml`](slack-app-manifest.yaml) beside this

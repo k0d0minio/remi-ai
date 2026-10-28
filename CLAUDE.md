@@ -50,9 +50,10 @@ shadcn/ui over Radix, Nextra 4, tsup. Each app is one Vercel project in team `re
 release-please pull request open on `main`, and that pull request is the batch. After the UAT
 setup, every merge to `main` deploys UAT and builds a production deployment that stays staged.
 Production moves on a promotion, as `.icm/uat/CONTEXT.md` says. `admin` and `app` have `uat`.
-`marketing` and `documentation` follow `main`. The promotion has two steps until the blueprint
-promotes several projects: `promote.sh run` migrates production and promotes `admin`, then Jamie
-promotes `app` by hand in Vercel, never before. D-36 in `.icm/intake/README.md` holds the decision.
+`marketing` and `documentation` follow `main`. Until the blueprint finds the Vercel projects
+itself, the promotion has two steps: `promote.sh run` migrates production and its promote step
+fails, then Jamie promotes `admin` and `app` by hand in Vercel, never before. D-36 in
+`.icm/intake/README.md` holds the decision.
 
 ## Rules
 
