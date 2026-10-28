@@ -162,52 +162,6 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  apps/demo:
-    dependencies:
-      '@remi/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      '@vercel/analytics':
-        specifier: 'catalog:'
-        version: 1.6.1(next@16.3.6(@babel/core@7.29.7)(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
-      lucide-react:
-        specifier: 'catalog:'
-        version: 0.545.0(react@19.2.8)
-      next:
-        specifier: 'catalog:'
-        version: 16.3.6(@babel/core@7.29.7)(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      react:
-        specifier: 'catalog:'
-        version: 19.2.8
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.2.8(react@19.2.8)
-    devDependencies:
-      '@tailwindcss/postcss':
-        specifier: ^4.1.14
-        version: 4.3.3
-      '@types/node':
-        specifier: 'catalog:'
-        version: 22.20.1
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.18
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 19.2.4(@types/react@19.2.18)
-      eslint:
-        specifier: ^9.39.1
-        version: 9.39.5(jiti@2.7.0)
-      postcss:
-        specifier: ^8.5.28
-        version: 8.5.28
-      tailwindcss:
-        specifier: 'catalog:'
-        version: 4.3.3
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
-
   apps/docs:
     dependencies:
       '@remi/services':
@@ -252,55 +206,6 @@ importers:
         version: 5.9.3
 
   apps/marketing:
-    dependencies:
-      '@remi/services':
-        specifier: workspace:*
-        version: link:../../packages/services
-      '@remi/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      '@vercel/analytics':
-        specifier: 'catalog:'
-        version: 1.6.1(next@16.3.6(@babel/core@7.29.7)(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
-      lucide-react:
-        specifier: 'catalog:'
-        version: 0.545.0(react@19.2.8)
-      next:
-        specifier: 'catalog:'
-        version: 16.3.6(@babel/core@7.29.7)(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      react:
-        specifier: 'catalog:'
-        version: 19.2.8
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.2.8(react@19.2.8)
-    devDependencies:
-      '@tailwindcss/postcss':
-        specifier: ^4.1.14
-        version: 4.3.3
-      '@types/node':
-        specifier: 'catalog:'
-        version: 22.20.1
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.18
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 19.2.4(@types/react@19.2.18)
-      eslint:
-        specifier: ^9.39.1
-        version: 9.39.5(jiti@2.7.0)
-      postcss:
-        specifier: ^8.5.28
-        version: 8.5.28
-      tailwindcss:
-        specifier: 'catalog:'
-        version: 4.3.3
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
-
-  apps/support:
     dependencies:
       '@remi/services':
         specifier: workspace:*

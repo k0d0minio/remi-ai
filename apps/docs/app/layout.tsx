@@ -15,7 +15,7 @@ import "nextra-theme-docs/style.css";
  *
  * The origins below are the opposite case, and that is why `@remi/services` is
  * the one workspace dependency this app does take: an origin spelled out here
- * would be a second copy of a fact that changes for all six apps on the same
+ * would be a second copy of a fact that changes for all four apps on the same
  * day — the day the domain moves — and the copy nobody remembers to edit.
  */
 const brandName = "REMI";
@@ -123,9 +123,6 @@ const OutboundLinks = () => (
     </a>
     <a href={appHref("marketing")} style={navLinkStyle}>
       Site
-    </a>
-    <a href={appHref("support")} style={navLinkStyle}>
-      Support
     </a>
   </>
 );

@@ -24,7 +24,6 @@ export const en: Content = {
     appearance: "Appearance",
     themes: { system: "Match system", light: "Light", dark: "Dark" },
     help: "Help",
-    supportCentre: "Support centre",
     documentation: "Documentation",
     signOut: "Sign out",
   },
@@ -41,7 +40,6 @@ export const en: Content = {
     submit: "Continue",
     pilotNote: "Pilot access only — contact your practitioner.",
     aboutLink: "About REMI",
-    helpLink: "Get help",
   },
   practitionerNav: [
     { href: "/practice", icon: "practice", label: "Practice" },

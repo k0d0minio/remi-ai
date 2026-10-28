@@ -72,9 +72,8 @@ export type Content = {
     /** The theme section's heading, and a label for each of the three states. */
     appearance: string;
     themes: Record<Theme, string>;
-    /** Heading over the two links that leave for another app. */
+    /** Heading over the link that leaves for the docs app. */
     help: string;
-    supportCentre: string;
     documentation: string;
     signOut: string;
   };
@@ -93,9 +92,8 @@ export type Content = {
     roleHint: string;
     submit: string;
     pilotNote: string;
-    /** The two ways out for someone who cannot get in — both separate apps. */
+    /** The way out for someone who cannot get in — a separate app. */
     aboutLink: string;
-    helpLink: string;
   };
   practitionerNav: NavItem[];
   patientNav: NavItem[];

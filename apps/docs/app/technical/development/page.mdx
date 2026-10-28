@@ -5,7 +5,7 @@
 ```bash
 pnpm install
 pnpm packages:build   # @remi/ui and @remi/services must exist before an app can compile
-pnpm web:dev          # or admin:dev / marketing:dev / docs:dev / support:dev / demo:dev
+pnpm web:dev          # or admin:dev / marketing:dev / docs:dev
 ```
 
 `turbo run dev` declares `dependsOn: ["^build"]`, so a bare `pnpm dev` builds the packages first.

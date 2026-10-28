@@ -1,6 +1,6 @@
 # Remi AI
 
-A Turborepo monorepo: six Next.js apps over two shared packages. Work flows through tickets in
+A Turborepo monorepo: four Next.js apps over two shared packages. Work flows through tickets in
 `.icm/intake/` and one pull request per ticket.
 
 ## Layout
@@ -11,8 +11,6 @@ apps/
   marketing/    the public site — unauthenticated, indexable (:3001)
   admin/        internal operations — operator-only, separate deployment (:3002)
   docs/         the reference site — Nextra (:3003)
-  support/      the public help centre — unauthenticated, indexable (:3004)
-  demo/         the prototype sandbox — mock data only, no backend (:3005)
 packages/
   ui/           @remi/ui — the design system; the only home for primitives
   services/     @remi/services — storage, email, AI, env; seams, not integrations
@@ -27,7 +25,7 @@ importing an app is a lint error.
 ```bash
 pnpm install
 pnpm packages:build   # @remi/ui and @remi/services must exist before an app can compile
-pnpm web:dev          # or admin:dev / marketing:dev / docs:dev / support:dev / demo:dev
+pnpm web:dev          # or admin:dev / marketing:dev / docs:dev
 ```
 
 `turbo run dev` declares `dependsOn: ["^build"]`, so a bare `pnpm dev` builds the packages first.

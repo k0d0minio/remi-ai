@@ -12,8 +12,8 @@ type Props = {
 /**
  * EN | FR, preserving the current path. A client component only because it
  * needs `usePathname` to know where the visitor is — the switcher itself is a
- * server-safe primitive in @remi/ui, shared with the help centre, so this file
- * is the whole of the client cost.
+ * server-safe primitive in @remi/ui, so this file is the whole of the client
+ * cost.
  */
 export const LocaleSwitcher = ({ locale }: Props) => {
   const pathname = usePathname();

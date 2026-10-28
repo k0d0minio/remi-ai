@@ -82,7 +82,7 @@ Braces on every `if` / `else` / loop body. No `if (x) return y;` without `{ }` �
 
 ### Links that leave the app
 
-Six apps are six deployments on six origins, so a link between them is a plain `<a>` — `next/link`
+Four apps are four deployments on four origins, so a link between them is a plain `<a>` — `next/link`
 resolves against the origin it rendered on and 404s. **Never write an origin.** Build it with
 `appHref()` / `appOrigin()` from `@remi/services/shared`, which is the single catalogue of where
 each app answers (`packages/services/src/shared/links.ts`) and the only file that knows the domain.

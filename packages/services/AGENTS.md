@@ -79,14 +79,14 @@ is the three-edit rule in [`/CONVENTIONS.md`](../../CONVENTIONS.md) § "Environm
 
 `shared/links.ts` is the one carve-out, and it is not a loophole: a `NEXT_PUBLIC_*` variable is
 inlined into the browser bundle only for a literal `process.env.NAME`, so routing it through
-`env()` would leave the browser reading `undefined`. Its **seven** reads are literal and spelled out
-one per line: the six `NEXT_PUBLIC_*_URL` overrides — the file answers from its own table when they
+`env()` would leave the browser reading `undefined`. Its **five** reads are literal and spelled out
+one per line: the four `NEXT_PUBLIC_*_URL` overrides — the file answers from its own table when they
 are unset — plus `NODE_ENV`, which selects the dev ports and which Next.js inlines on the same
 terms.
 
 ## Where the apps live
 
-`shared/links.ts` is the single catalogue of the six origins: one root domain, one subdomain per
+`shared/links.ts` is the single catalogue of the four origins: one root domain, one subdomain per
 app, the dev ports, and which apps carry a locale prefix. Every cross-app link, `metadataBase` and
 sitemap in the repo is built from it, so moving the ecosystem to a new domain is one edit. Never
 write an origin anywhere else — a second copy is a link that silently keeps pointing at the old
