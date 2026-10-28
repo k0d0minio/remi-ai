@@ -20,8 +20,10 @@ Three facts of this repo make the setup larger than the blueprint's single proje
    previews never migrate. `.icm/database/CONTEXT.md` with UAT says: one Neon project for
    production, one for UAT, and the UAT project's default branch is the base for previews.
 3. `packages/services/scripts/migrate.mjs` refuses to migrate from a deployment that is not
-   production. With UAT, the `uat` environment migrates at build (`MIGRATE_AT_BUILD=1`), and
-   `promote.yml` migrates production.
+   production. With UAT, the `uat` environment migrates at build (`VERCEL_TARGET_ENV=uat`), and
+   `promote.yml` migrates production. Today the admin app's production build is the only
+   migration of production, so the switch to `.icm/scripts/vercel-build.sh` waits for this
+   setup (blueprint v1.0.3 conformance, 2026-10-28).
 
 ## Proposed change
 
@@ -34,8 +36,9 @@ a decision that replaces D-25.
 - [ ] Each Vercel project that the client tests has the custom environment `uat`, tracking `main`, at `uat.<its production domain>`.
 - [ ] On those projects, "Auto-assign Custom Production Domains" is off. A merge to `main` builds a production deployment that stays staged.
 - [ ] Neon has a UAT project apart from production's. `NEON_PROJECT_ID` names the UAT project.
-- [ ] `DATABASE_URL`, `DATABASE_URL_UNPOOLED` and `MIGRATE_AT_BUILD=1` are on `uat`. `MIGRATE_AT_BUILD` is not on Production.
+- [ ] `DATABASE_URL` and `DATABASE_URL_UNPOOLED` are on `uat`. `MIGRATE_AT_BUILD` is on no environment by hand: only `preview-db.sh` sets it, on a preview branch.
 - [ ] The Actions secrets `VERCEL_TOKEN`, `NEON_API_KEY` and `DATABASE_URL`, and the variables `VERCEL_TEAM`, `VERCEL_PROJECT` and `NEON_PROJECT_ID`, exist.
-- [ ] `db:migrate`, `db:verify` and `vercel-build` follow `.icm/database/CONTEXT.md` § The migration rule. `migrate.mjs` migrates on `uat`.
+- [ ] `db:migrate`, `db:verify` and `vercel-build` follow `.icm/database/CONTEXT.md` § The migration rule. The admin app's `package.json` has `"vercel-build": "bash ../../.icm/scripts/vercel-build.sh next build"`, and its `build` no longer migrates. `db:migrate` and `db:verify` are separate scripts, and `migrate.mjs` no longer refuses `uat`.
+- [ ] The root `package.json` names `db:migrate` and `db:verify` (through `pnpm --filter @remi/services`), so that `promote.yml` migrates and verifies production.
 - [ ] `.icm/intake/README.md` records the decision that replaces D-25.
 - [ ] `.icm/scripts/promote.sh status` marks every setup act that it can read as done.
