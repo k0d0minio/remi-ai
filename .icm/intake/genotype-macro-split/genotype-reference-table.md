@@ -11,8 +11,8 @@
 ## Problem
 
 `macroProfile()` (story 4) returns DEFAULT for every trio because no table exists. Story 10
-supplies the table: 26 genotype rows and the DEFAULT row, each with an orientation, three
-ranges and a « Validation médicale » value.
+supplies the table. The procedure of 24 October completes it: 28 genotype rows and the DEFAULT
+row, each with an orientation, three ranges and a « Validation médicale » value.
 
 ## Proposed change
 
@@ -27,7 +27,7 @@ the laboratory-mapping flag is off (Morgane's question 3). The proposal is writt
 
 ## Acceptance criteria
 
-- [ ] The data file holds every row of the story's table, the DEFAULT row included, with a test per row
+- [ ] The data file holds the 28 genotype rows of the 24 October table and the DEFAULT row, with a test per row
 - [ ] A patient with no genotype gets DEFAULT 45 / 30 / 25 and the orientation « Méditerranéen équilibré »
 - [ ] A trio that matches a row returns that row's three ranges, its orientation and its validation mode
 - [ ] A trio absent from the table returns DEFAULT with `reason: 'absent'`. Nothing is derived from a nearby row
@@ -43,4 +43,4 @@ the laboratory-mapping flag is off (Morgane's question 3). The proposal is writt
 
 - D-30 (nothing invented), D-35. Shared files first: this stub adds the `macro` kind to the enum of `bmi/calculations-table`. Files: `shared/genotype-macro-table.ts` and its tests, `shared/calculations.ts`, the calculations service.
 - cross-epic: `preparatory-questionnaire/genotype-section` (the three values and `macroProfile()`), `bmi/calculations-table` (the table).
-- Source rows: the story's table. « Genotyp Last version .xlsx » is informative (Morgane's question 1).
+- Source rows: the table of « Recommandations alimentaires.docx », 24 October 2026 (Morgane's question 1). « Genotyp Last version .xlsx » is informative.

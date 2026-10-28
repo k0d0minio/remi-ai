@@ -191,8 +191,9 @@ Jamie's own decision, not a default.
     removed the question from the list for Morgane. It closes D-20 and the September question
     « une base de ~20 recettes comme canevas, ou génération pure contrôlée ? ». `recipe-space`
     says where the templates live and who writes them.
-35. **D-35 — The genotype table.** Story 10's reference table (26 genotype rows and DEFAULT, with
-    an orientation, three ranges and a « Validation médicale » mode each) is the one lookup behind
+35. **D-35 — The genotype table.** The reference table of « Recommandations alimentaires.docx »
+    (24 October 2026: 28 genotype rows and DEFAULT, with an orientation, three ranges and a
+    « Validation médicale » mode each) is the one lookup behind
     `macroProfile()`. `genotype-macro-split/genotype-reference-table` holds it as data with a test
     per row. Until Morgane validates the laboratory mapping (story 4, question 3) the lookup
     returns DEFAULT for every trio. No row is derived from a nearby one.
@@ -206,7 +207,7 @@ where one differs.
 | File                                                      | Read by                                                                                   |
 | --------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | « Genotyp Tabs.xlsx », « Genotyp Last version .xlsx »     | `genotype-macro-split` (the table, informative beside the story's own)                    |
-| « Recommandation alimentaire.docx », « Recommandations alimentaires.docx » | `bmi`, `protein-needs`, `energy-needs`, `genotype-macro-split` (the calculation procedure) |
+| « Recommandation alimentaire.docx », « Recommandations alimentaires.docx » | `bmi`, `protein-needs`, `energy-needs`, `genotype-macro-split`. The 24 October version carries the complete 28-row genotype table and the definition of « Validation médicale » |
 | « Calendrier fruits et légumes de saison.xlsx »           | `recipe-space` (the season table, question 2)                                             |
 | « Résumé du Livre du Docteur Mouton.docx »                | `genotype-macro-split` (the biology behind the table, never a rule)                       |
 | « Prompt.docx », `01-weekly-planner.md`, `02-single-meal.md` | `recipe-space`, `meal-improvement` (the v1 prompts, reference for tone and structure)      |

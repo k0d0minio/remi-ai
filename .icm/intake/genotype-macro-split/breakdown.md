@@ -2,7 +2,7 @@
 
 - epic-slug: genotype-macro-split
 - story: 10
-- source: story 10 « Répartition des macronutriments selon le génotype », Morgane Paquet, 23 October 2026, https://drive.google.com/file/d/1gs7fTU8mTl5G0_Am5_n-dr1fMdDFVOv8/view (Drive `remi-ai/` root, filed after the first cut), with « Genotyp Last version .xlsx » (24 October 2026) and « Résumé du Livre du Docteur Mouton.docx » (24 October 2026) as reference
+- source: story 10 « Répartition des macronutriments selon le génotype », Morgane Paquet, 23 October 2026, https://drive.google.com/file/d/1gs7fTU8mTl5G0_Am5_n-dr1fMdDFVOv8/view (Drive `remi-ai/` root, filed after the first cut), with « Recommandations alimentaires.docx » (24 October 2026, the procedure with the complete 28-row table and the definition of « Validation médicale »), « Genotyp Last version .xlsx » (24 October 2026) and « Résumé du Livre du Docteur Mouton.docx » (24 October 2026) as reference
 
 ## What I understood
 
@@ -29,12 +29,22 @@ and the read in generation (`recipe-space/weekly-plan-generation`). Story 4's ru
 partial genetic calculation. The Mouton summary explains the biology. The table is the whole
 rule. This epic rests on D-30, D-32 and D-35.
 
+The procedure of 24 October adds four rules the story of 23 October does not carry. The table
+has 28 genotype rows: it adds E2/E3 · H · M and E3/E4 · A · M, the two rows the book omits and
+the summary resolves by analogy. The proportions are landmarks and need not total 100 %. REMI
+normalises nothing. « Oui » means a risk profile: REMI shows the proposal and requires the
+practitioner's confirmation, recorded with its date, before it applies. The genotype comes from
+the patient, or later from the laboratory's API, outside the MVP. The summary adds one more: when
+the validated protein target in g/day and the protein percentage of the split disagree, REMI
+shows the conflict to the practitioner and settles nothing alone.
+
 ### Questions for Morgane
 
-1. The story's table and « Genotyp Last version .xlsx » differ: the spreadsheet carries index ranges with arrows and adds E2/E3 · H · M « copie de H/H, par analogie ». Which one is the reference? Default: the story's table. The spreadsheet's index is informative. E2/E3 · H · M is absent, so it gets DEFAULT and the flag.
+1. The story's table of 23 October has 26 genotype rows. The procedure « Recommandations alimentaires.docx » of 24 October has 28: it adds E2/E3 · H · M (as H/H) and E3/E4 · A · M (as A/H). Is the 24 October table the reference? Default: yes, 28 rows. The spreadsheet's index ranges are informative.
 2. « Profils extrêmes » for the nutrigenetics reminder: which rows? Default: every row with « Validation médicale = Oui ».
 3. Story 4's question 3 (the A/H/M mapping against the laboratories' reports) still stands. Until you validate it, does REMI apply the table? Default: no. The table is loaded and tested. The lookup returns DEFAULT until you confirm the mapping.
 4. The summary shows « Besoins énergétiques 1 850 kcal/j » and « Protéines 90 g/j » beside the three percentages. Are those the validated targets of stories 8 and 9, or the estimates? Default: the validated targets when they exist, else the estimates labelled « Estimation ».
+5. The Mouton summary uses LCT/MCM6 for lactose vigilance (its CAS D). Story 4 collects APOE, DIO2 and AMY1A only. Collect LCT/MCM6 in the MVP? Default: no. Lactose stays an allergy, an intolerance or an eviction the practitioner writes.
 
 ### Questions for Jamie
 
@@ -72,4 +82,5 @@ rule. This epic rests on D-30, D-32 and D-35.
 - The genotype inputs and the gate (`preparatory-questionnaire/genotype-section`).
 - The genetic consent (`consent-and-data/genetic-consent-and-optional-data`).
 - The energy and protein values themselves (`energy-needs`, `protein-needs`). This epic shows them in the same summary.
-- The LCT/MCM6 profile and any orientation the Mouton summary describes beyond the table.
+- The LCT/MCM6 profile (question 5) and any orientation the Mouton summary describes beyond the table.
+- The laboratory API that would fetch the genotype. The procedure of 24 October puts it outside the MVP.

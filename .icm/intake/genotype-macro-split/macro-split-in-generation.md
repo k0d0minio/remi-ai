@@ -28,6 +28,8 @@ rank 4 of D-30.
 - [ ] The context block carries the validated split and the orientation, or nothing when none is validated
 - [ ] A `required` or `practitioner` row that is undecided reaches no generation
 - [ ] The target applies per day. No single meal is forced to the day's percentages
+- [ ] The three percentages need not total 100. REMI normalises nothing and passes the ranges as they are
+- [ ] The orientation reaches the prompt as a soft preference. No eviction and no food limit is derived from a genotype
 - [ ] Protéines reach the block in g/day and in %
 - [ ] The day's deviation from the ranges is logged with the generation id
 - [ ] Unit tests cover a validated split, an unvalidated one and DEFAULT

@@ -33,6 +33,8 @@ validation.
 
 - [ ] The row shows the five values and « Modifier » on each. The lookup detail is hidden until « Voir le détail »
 - [ ] A `required` row applies nothing until « Confirmer ». The nutrigenetics text is visible
+- [ ] « Confirmer » records who confirmed and the date, as an audit event
+- [ ] When the validated protein target in g/day disagrees with the protein percentage of the split, the row shows the conflict. REMI settles nothing alone
 - [ ] A `practitioner` row applies nothing until « Appliquer » or « Ne pas appliquer » is chosen
 - [ ] A `none` row is the working value at once
 - [ ] E2/E4 shows empty glucides and lipides fields. The practitioner's values save. Protéines show 20 to 25 %
