@@ -24,7 +24,7 @@ D-26, D-30, D-31 and feeds the calculations (stories 7 to 9) and recipes (story 
 
 1. Today's patients' free-text allergies and intolerances: do you redo them in the checkbox lists, or do they stay as « Autre » text until you correct them? Default: « Autre » text, you correct in the console.
 2. Pathologies: a free-text field with a « Maladie cœliaque » checkbox, or a list? Default: free text plus the checkbox.
-3. Who validates the A/H/M categories of DIO2 and AMY1A against the laboratories' reports, and by when? Default: you, before the recipe epic starts. Until then the genotype is stored and not used.
+3. Who validates the A/H/M categories of DIO2 and AMY1A against the Fagron NutriGen report (the sample « NutriGen - Rapport Professional FR.pdf » of 24 September 2026), and by when? Default: you, before `genotype-macro-split` starts. Until then the genotype is stored and not used.
 4. The practitioner's free question: one per practitioner, or several? Default: one.
 5. « Date de consultation » here and « date de rendez-vous » on the file: the same date? Default: yes, one field.
 

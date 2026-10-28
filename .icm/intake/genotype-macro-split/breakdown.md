@@ -38,11 +38,20 @@ the patient, or later from the laboratory's API, outside the MVP. The summary ad
 the validated protein target in g/day and the protein percentage of the split disagree, REMI
 shows the conflict to the practitioner and settles nothing alone.
 
+The laboratory is Fagron Genomics and the test is Fagron NutriGen (the e-mail thread « REMI &
+Fagron | contact », 3 to 24 September 2026, Jolien De Neve with Arnaud, Morgane and Jamie). Its
+24 September message carries the sample reports « NutriGen - Rapport Professional FR.pdf » and
+« NutriGen - Rapport Voedingsmiddelen FR.pdf » and the NutriGen questionnaire. The A/H/M mapping
+of story 4 is validated against those reports. The Fagron platform holds the consent, the
+questionnaire and the test code per patient. A DNA test is done once in a lifetime, so a
+genotype is stored once. The « API du laboratoire » of the 24 October procedure is that platform,
+outside the MVP.
+
 ### Questions for Morgane
 
 1. The story's table of 23 October has 26 genotype rows. The procedure « Recommandations alimentaires.docx » of 24 October has 28: it adds E2/E3 · H · M (as H/H) and E3/E4 · A · M (as A/H). Is the 24 October table the reference? Default: yes, 28 rows. The spreadsheet's index ranges are informative.
 2. « Profils extrêmes » for the nutrigenetics reminder: which rows? Default: every row with « Validation médicale = Oui ».
-3. Story 4's question 3 (the A/H/M mapping against the laboratories' reports) still stands. Until you validate it, does REMI apply the table? Default: no. The table is loaded and tested. The lookup returns DEFAULT until you confirm the mapping.
+3. Story 4's question 3 (the A/H/M mapping against the Fagron NutriGen report) still stands. Until you validate it, does REMI apply the table? Default: no. The table is loaded and tested. The lookup returns DEFAULT until you confirm the mapping against the sample report of 24 September.
 4. The summary shows « Besoins énergétiques 1 850 kcal/j » and « Protéines 90 g/j » beside the three percentages. Are those the validated targets of stories 8 and 9, or the estimates? Default: the validated targets when they exist, else the estimates labelled « Estimation ».
 5. The Mouton summary uses LCT/MCM6 for lactose vigilance (its CAS D). Story 4 collects APOE, DIO2 and AMY1A only. Collect LCT/MCM6 in the MVP? Default: no. Lactose stays an allergy, an intolerance or an eviction the practitioner writes.
 
