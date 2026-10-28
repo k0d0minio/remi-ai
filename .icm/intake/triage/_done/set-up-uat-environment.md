@@ -38,8 +38,9 @@ a decision that replaces D-25.
 - [ ] Neon has a UAT project apart from production's. `NEON_PROJECT_ID` names the UAT project.
 - [ ] `DATABASE_URL` and `DATABASE_URL_UNPOOLED` are on `uat`. `MIGRATE_AT_BUILD` is on no environment by hand: only `preview-db.sh` sets it, on a preview branch.
 - [ ] The Actions secrets `VERCEL_TOKEN`, `NEON_API_KEY` and `DATABASE_URL`, and the variables `VERCEL_TEAM`, `VERCEL_PROJECT` (`admin`) and `NEON_PROJECT_ID`, exist.
-- [ ] `apps/admin/vercel.json` sets `buildCommand` to `pnpm run vercel-build`. The admin app's `package.json` has `"vercel-build": "bash ../../.icm/scripts/vercel-build.sh turbo run build --filter=@remi/admin"`, and its `build` no longer migrates.
+- [ ] The admin app's `package.json` has `"build": "bash ../../.icm/scripts/vercel-build.sh next build"`. Vercel's Build Command does not change.
 - [ ] `db:migrate` and `db:verify` are separate scripts. The admin app's `package.json` names both. `migrate.mjs` migrates on Vercel only when `VERCEL_TARGET_ENV=uat` or `MIGRATE_AT_BUILD=1`.
+- [ ] `turbo.json` `globalEnv` names `VERCEL_TARGET_ENV`, `MIGRATE_AT_BUILD` and `DATABASE_URL_UNPOOLED`.
 - [ ] The root `package.json` names `db:migrate` and `db:verify` (through `pnpm --filter @remi/services`), so that `promote.yml` migrates and verifies production.
 - [ ] `ALLOW_NON_PRODUCTION_MIGRATIONS` is in no file outside `.icm/docs/history/` and `_done/`.
 - [ ] `.icm/intake/README.md` records D-36, which replaces D-25.
