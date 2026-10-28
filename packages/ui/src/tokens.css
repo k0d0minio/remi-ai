@@ -169,7 +169,7 @@
    * and exposes them as `--font-inter` / `--font-display` on <html>.
    *
    * The fallback inside `var()` is what keeps the apps that declare nothing
-   * (web, admin, demo) rendering exactly as they do today.
+   * (web, admin) rendering exactly as they do today.
    *
    * These names deliberately differ from the `--font-*` theme keys below; a
    * theme key that referenced its own name would be a self-reference cycle.

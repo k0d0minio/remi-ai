@@ -14,13 +14,7 @@ import globals from "globals";
 // (see .github/workflows/quality.yaml) so the count can only go down.
 
 /** Every app that consumes the shared packages rather than owning primitives. */
-const CONSUMER_APPS = [
-  "apps/web",
-  "apps/admin",
-  "apps/marketing",
-  "apps/support",
-  "apps/demo",
-];
+const CONSUMER_APPS = ["apps/web", "apps/admin", "apps/marketing"];
 const glob = (dirs: string[], ext = "{ts,tsx}") =>
   dirs.map((d) => `${d}/**/*.${ext}`);
 
@@ -160,7 +154,7 @@ export default defineConfig(
   {
     // Server-capable apps must name the services entrypoint they mean. The root
     // barrel is types-only; /server carries the Node-only surface.
-    files: glob(["apps/web", "apps/admin", "apps/marketing", "apps/support"]),
+    files: glob(["apps/web", "apps/admin", "apps/marketing"]),
     rules: {
       "no-restricted-imports": [
         "error",
@@ -187,33 +181,6 @@ export default defineConfig(
     },
   },
   {
-    // apps/demo is the prototype sandbox: mock data only, no services, no auth.
-    // The lint rule is what keeps it a sandbox instead of a second product.
-    files: ["apps/demo/**/*.{ts,tsx}"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            {
-              group: ["@remi/services", "@remi/services/*"],
-              message:
-                "apps/demo is mock-data only — it never reaches a backend. See apps/demo/AGENTS.md.",
-            },
-            {
-              group: ["@radix-ui/*", "@headlessui/*"],
-              message: "Import primitives from @remi/ui.",
-            },
-            {
-              group: ["@/components/ui", "@/components/ui/*"],
-              message: "There is no local ui barrel. Import from @remi/ui.",
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
     // The shared packages never depend on an app.
     files: ["packages/**/*.{ts,tsx}"],
     rules: {
@@ -226,8 +193,6 @@ export default defineConfig(
                 "@remi/web",
                 "@remi/admin",
                 "@remi/marketing",
-                "@remi/support",
-                "@remi/demo",
                 "@remi/docs",
               ],
               message:
@@ -281,8 +246,6 @@ export default defineConfig(
                 "@remi/web",
                 "@remi/admin",
                 "@remi/marketing",
-                "@remi/support",
-                "@remi/demo",
                 "@remi/docs",
               ],
               message:
@@ -315,8 +278,6 @@ export default defineConfig(
                 "@remi/web",
                 "@remi/admin",
                 "@remi/marketing",
-                "@remi/support",
-                "@remi/demo",
                 "@remi/docs",
               ],
               message:

@@ -11,8 +11,8 @@ product design system is deliberate: it is reference material, not product surfa
 
 ## Its one workspace dependency
 
-`@remi/services`, for `appHref()` alone — the navbar links back to the app, the public site and the
-help centre, and where those answer is catalogued once in `packages/services/src/shared/links.ts`.
+`@remi/services`, for `appHref()` alone — the navbar links back to the app and the public site, and
+where those answer is catalogued once in `packages/services/src/shared/links.ts`.
 An origin typed into this layout would be the copy nobody edits the day the domain moves. That is
 the whole reason for the dependency, and the bar for a second one: `@remi/ui` stays out, because
 importing the design system is what "off the design system" means.

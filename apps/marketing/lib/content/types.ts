@@ -101,8 +101,6 @@ export type Content = {
     tagline: string;
     disclaimer: string;
     navLabel: string;
-    /** Label for the support centre link — a separate app, hence an origin. */
-    support: string;
     /** The same destination as the header's, repeated where a reader ends up. */
     signIn: string;
   };

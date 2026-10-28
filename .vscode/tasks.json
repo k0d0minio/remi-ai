@@ -31,20 +31,6 @@
       "problemMatcher": []
     },
     {
-      "label": "▶ Dev: support",
-      "detail": "The public help centre on :3004.",
-      "type": "shell",
-      "command": "pnpm support:dev",
-      "problemMatcher": []
-    },
-    {
-      "label": "▶ Dev: demo",
-      "detail": "The Design-stage prototype sandbox on :3005 (mock data only).",
-      "type": "shell",
-      "command": "pnpm demo:dev",
-      "problemMatcher": []
-    },
-    {
       "label": "◆ Watch: packages",
       "detail": "Rebuild @remi/ui and @remi/services on change — run alongside an app.",
       "type": "shell",

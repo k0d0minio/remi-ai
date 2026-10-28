@@ -53,18 +53,11 @@ export const SiteFooter = ({ locale }: Props) => {
             >
               {content.header.contact}
             </Link>
-            {/* Plain anchors, not NextLink: both are separate deployments, so a
-                client-side navigation cannot cross into them. The locale goes
-                with the reader — the help centre publishes the same two
-                languages under the same prefixes, so someone reading the French
-                site stays in French when they leave it. */}
-            <Link
-              href={appHref("support", "/", locale)}
-              variant="muted"
-              className="text-sm"
-            >
-              {content.footer.support}
-            </Link>
+            {/* A plain anchor, not NextLink: the app is a separate deployment,
+                so a client-side navigation cannot cross into it. The locale
+                goes with the reader — the app publishes the same two languages
+                under the same prefixes, so someone reading the French site
+                stays in French when they leave it. */}
             <Link
               href={appHref("web", "/", locale)}
               variant="muted"

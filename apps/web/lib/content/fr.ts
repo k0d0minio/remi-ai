@@ -24,7 +24,6 @@ export const fr: Content = {
     appearance: "Apparence",
     themes: { system: "Selon le système", light: "Clair", dark: "Sombre" },
     help: "Aide",
-    supportCentre: "Centre d'aide",
     documentation: "Documentation",
     signOut: "Se déconnecter",
   },
@@ -41,7 +40,6 @@ export const fr: Content = {
     submit: "Continuer",
     pilotNote: "Accès réservé au pilote — contactez votre praticien.",
     aboutLink: "À propos de REMI",
-    helpLink: "Obtenir de l'aide",
   },
   practitionerNav: [
     { href: "/practice", icon: "practice", label: "Ma pratique" },

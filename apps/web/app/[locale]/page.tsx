@@ -97,24 +97,15 @@ const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
                 {content.signIn.pilotNote}
               </Typography>
               {/* The note above tells someone without an account that they
-                  cannot sign in; without these two, that is where they stop.
-                  Plain anchors — both are separate deployments. */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                <Link
-                  href={appHref("marketing", "/", locale)}
-                  variant="muted"
-                  className="text-xs"
-                >
-                  {content.signIn.aboutLink}
-                </Link>
-                <Link
-                  href={appHref("support", "/", locale)}
-                  variant="muted"
-                  className="text-xs"
-                >
-                  {content.signIn.helpLink}
-                </Link>
-              </div>
+                  cannot sign in; without this link, that is where they stop.
+                  A plain anchor — the public site is a separate deployment. */}
+              <Link
+                href={appHref("marketing", "/", locale)}
+                variant="muted"
+                className="text-xs"
+              >
+                {content.signIn.aboutLink}
+              </Link>
             </CardFooter>
           </Card>
         </div>

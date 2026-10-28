@@ -49,7 +49,6 @@ export const en: Content = {
     disclaimer:
       "REMI helps people apply their practitioner's recommendations. It does not diagnose, treat, or replace professional care — anything clinical belongs with your practitioner.",
     navLabel: "Footer",
-    support: "Support centre",
     signIn: "Sign in",
   },
 

@@ -2,7 +2,7 @@
 
 Remi AI's product, built by Legible Consulting with Jamie as the company's CTO, and tracked
 against `legible-consulting/blueprint` through `.copier-answers.yml`. A
-Turborepo monorepo: six Next.js apps over two shared packages. The services package defines
+Turborepo monorepo: four Next.js apps over two shared packages. The services package defines
 seams, not integrations: storage, email and AI each have an interface and one adapter. This
 file is identity and routing only. The rules live once, in the files it points at.
 
@@ -14,8 +14,6 @@ file is identity and routing only. The rules live once, in the files it points a
 | `apps/marketing/`    | the public site, indexable (:3001)                                                          | Vercel `marketing`     |
 | `apps/admin/`        | internal operations, operator only (:3002)                                                  | Vercel `admin`         |
 | `apps/docs/`         | the reference site, Nextra (:3003)                                                          | Vercel `documentation` |
-| `apps/support/`      | the public help centre (:3004)                                                              | Vercel `support`       |
-| `apps/demo/`         | the prototype sandbox, mock data only (:3005)                                               | Vercel `demo`          |
 | `packages/ui/`       | `@remi/ui`, the design system, the only home for primitives                                 | —                      |
 | `packages/services/` | `@remi/services`: storage (Neon Postgres, Drizzle), email (Resend), AI (no vendor yet), env | —                      |
 
@@ -66,7 +64,6 @@ fails, then Jamie promotes `admin` and `app` by hand in Vercel, never before. D-
 - Secrets never in git: names only, in `.icm/docs/ENV.md` and each app's `.env.example`.
   Values in GitHub or Vercel settings. Flag any plaintext credential found.
 - One ticket is one branch and one pull request. The pull request moves the stub to `_done/`.
-- `apps/demo` is mock data only. Prototyping belongs there.
 - `main` changes by pull request. Gates are human checkboxes: read them, never tick them.
   Jamie ticks Ready to merge, and the session merges with `.icm/scripts/merge.sh`.
   The release is Jamie's word `release` in the session: the session runs `.icm/scripts/release.sh`.

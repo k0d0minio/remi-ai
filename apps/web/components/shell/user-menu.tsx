@@ -4,7 +4,6 @@ import {
   BookOpen,
   Check,
   ChevronDown,
-  LifeBuoy,
   LogOut,
   Repeat,
   User,
@@ -102,21 +101,11 @@ export const UserMenu = ({ name, initials, role, locale, content }: Props) => {
         <DropdownMenuSeparator />
         <DropdownMenuLabel>{content.userMenu.help}</DropdownMenuLabel>
         {/*
-         * Both are separate deployments, so these are plain anchors inside the
-         * item rather than router links — and they open in a new tab, because
-         * leaving the app to read an answer and losing the screen you were
-         * asking about is the whole reason people stop opening the help.
+         * The docs are a separate deployment, so this is a plain anchor inside
+         * the item rather than a router link — and it opens in a new tab,
+         * because leaving the app to read an answer and losing the screen you
+         * were asking about is the whole reason people stop opening the help.
          */}
-        <DropdownMenuItem asChild>
-          <a
-            href={appHref("support", "/", locale)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <LifeBuoy aria-hidden="true" />
-            {content.userMenu.supportCentre}
-          </a>
-        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <a href={appHref("docs")} target="_blank" rel="noreferrer">
             <BookOpen aria-hidden="true" />

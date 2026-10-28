@@ -3,11 +3,11 @@ import { defaultLocale, localePath, type Locale } from "./i18n";
 /**
  * Where every app in this monorepo answers, in one place.
  *
- * Six apps are six Vercel projects on six origins, so a link that crosses
+ * Four apps are four Vercel projects on four origins, so a link that crosses
  * between them has to be built rather than routed — a `next/link` to "/contact"
  * resolves against the origin it was rendered on and 404s. That much was always
  * true; what makes this a single file is that the answer changes all at once.
- * The day the real domain is bought, six subdomains move together, and an origin
+ * The day the real domain is bought, four subdomains move together, and an origin
  * typed into one footer somewhere is the one that gets missed.
  *
  * Read straight from `process.env` rather than through `@remi/services/server`'s
@@ -17,9 +17,8 @@ import { defaultLocale, localePath, type Locale } from "./i18n";
  * instead of looked up by key.
  */
 
-/** The six deployments, named as `apps/` names them. */
-export type AppKey =
-  "web" | "marketing" | "admin" | "docs" | "support" | "demo";
+/** The four deployments, named as `apps/` names them. */
+export type AppKey = "web" | "marketing" | "admin" | "docs";
 
 /**
  * The domain everything hangs off, and the label each app answers on. This is
@@ -37,8 +36,6 @@ const subdomains: Record<AppKey, string> = {
   marketing: "remi",
   admin: "remi-admin",
   docs: "remi-docs",
-  support: "remi-support",
-  demo: "remi-demo",
 };
 
 /** The port each app's dev server binds to — the same numbers as its `package.json`. */
@@ -47,8 +44,6 @@ const devPorts: Record<AppKey, number> = {
   marketing: 3001,
   admin: 3002,
   docs: 3003,
-  support: 3004,
-  demo: 3005,
 };
 
 /**
@@ -60,7 +55,7 @@ const devPorts: Record<AppKey, number> = {
  *
  * Unset is still legitimate in two places: local development, where the dev
  * ports below answer, and a preview deployment happy to be described by the
- * table. All six are registered in turbo.json's `globalEnv`, and
+ * table. All four are registered in turbo.json's `globalEnv`, and
  * .icm/docs/ENV.md carries the per-project matrix of which app needs which.
  */
 const overrides: Record<AppKey, string | undefined> = {
@@ -68,28 +63,24 @@ const overrides: Record<AppKey, string | undefined> = {
   marketing: process.env.NEXT_PUBLIC_MARKETING_URL,
   admin: process.env.NEXT_PUBLIC_ADMIN_URL,
   docs: process.env.NEXT_PUBLIC_DOCS_URL,
-  support: process.env.NEXT_PUBLIC_SUPPORT_URL,
-  demo: process.env.NEXT_PUBLIC_DEMO_URL,
 };
 
 /**
  * Which apps publish every route under a locale prefix. Holding the answer here
  * is what lets a caller hand its own locale to every link it builds and still
- * get a working URL for the three apps that have no prefix — the alternative is
+ * get a working URL for the two apps that have no prefix — the alternative is
  * each caller remembering which is which, which is how a `/fr` lands in front of
  * an English-only console.
  */
 const localised: Record<AppKey, boolean> = {
   web: true,
   marketing: true,
-  support: true,
   admin: false,
   docs: false,
-  demo: false,
 };
 
 /**
- * `pnpm dev` runs all six on localhost, so a development build points at ports
+ * `pnpm dev` runs all four on localhost, so a development build points at ports
  * rather than at the live domain. Without this, following a footer link while
  * working locally would leave the machine entirely.
  */

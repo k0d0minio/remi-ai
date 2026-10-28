@@ -34,15 +34,13 @@ that app's project.
 | `NEXT_PUBLIC_MARKETING_URL` | Where `apps/marketing` answers                 | Vercel    | yes     |
 | `NEXT_PUBLIC_ADMIN_URL`     | Where `apps/admin` answers                     | Vercel    | yes     |
 | `NEXT_PUBLIC_DOCS_URL`      | Where `apps/docs` answers                      | Vercel    | yes     |
-| `NEXT_PUBLIC_SUPPORT_URL`   | Where `apps/support` answers                   | Vercel    | yes     |
-| `NEXT_PUBLIC_DEMO_URL`      | Where `apps/demo` answers                      | Vercel    | yes     |
 
 `NODE_ENV` is the one row nobody sets: Next.js, Turborepo and the test runner set it themselves, and
 it is listed here because it is in the zod schema and in `turbo.json` like every other variable, and
 because `packages/services/src/shared/links.ts` reads it literally to decide between the dev ports
 and the live domain. Never set it by hand.
 
-### The six origin variables
+### The four origin variables
 
 `packages/services/src/shared/links.ts` is the one file that knows where each app answers, and every
 cross-app link, canonical URL, sitemap entry, operator invitation and patient share link is built
@@ -67,17 +65,15 @@ Two things to know before setting them:
 ### Which project needs which
 
 The minimum each Vercel project needs, from the `appHref` / `appOrigin` calls in its own source.
-Setting all six in all six projects is also fine and is the safer habit — these are public URLs,
+Setting all four in all four projects is also fine and is the safer habit — these are public URLs,
 there is nothing to leak, and it survives someone adding a cross-app link later.
 
-| Vercel project | Needs                          | Why                                                |
-| -------------- | ------------------------------ | -------------------------------------------------- |
-| `web`          | `MARKETING`, `DOCS`, `SUPPORT` | the product links out to all three                 |
-| `marketing`    | `MARKETING`, `APP`, `SUPPORT`  | own `metadataBase` — canonicals, hreflang, sitemap |
-| `admin`        | `ADMIN`, `APP`                 | operator invitation links; patient share links     |
-| `docs`         | `APP`, `MARKETING`, `SUPPORT`  | the nav leaves for all three                       |
-| `support`      | `SUPPORT`, `MARKETING`, `APP`  | own `metadataBase`; the help centre is a leaf      |
-| `demo`         | none                           | mock data only, no cross-app links                 |
+| Vercel project | Needs               | Why                                                |
+| -------------- | ------------------- | -------------------------------------------------- |
+| `web`          | `MARKETING`, `DOCS` | the product links out to both                      |
+| `marketing`    | `MARKETING`, `APP`  | own `metadataBase` — canonicals, hreflang, sitemap |
+| `admin`        | `ADMIN`, `APP`      | operator invitation links; patient share links     |
+| `docs`         | `APP`, `MARKETING`  | the nav leaves for both                            |
 
 Local development needs none of them: `NODE_ENV=development` makes the catalogue answer with the dev
 ports, so every app runs from a clean checkout. Each app's `.env.example` lists the ones it uses.
@@ -202,8 +198,8 @@ config change in five places.
 
 ## Analytics
 
-**No variable.** `@vercel/analytics` is mounted in `web`, `admin`, `marketing` and `support`, and it
-is keyless — Vercel identifies the project from the deployment. There was a
+**No variable.** `@vercel/analytics` is mounted in `web`, `admin` and `marketing`, and it is
+keyless — Vercel identifies the project from the deployment. There was a
 `NEXT_PUBLIC_ANALYTICS_KEY` row here that nothing ever read; it is gone. Don't reintroduce one
 unless a second analytics vendor arrives with a reader to go with it.
 
