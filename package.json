@@ -11,6 +11,8 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "check:migrations": "node packages/services/scripts/check-migration-order.mjs",
+    "db:migrate": "pnpm --filter @remi/services db:migrate",
+    "db:verify": "pnpm --filter @remi/services db:verify",
     "clean": "turbo run clean",
     "env:pull": "turbo run env:pull",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

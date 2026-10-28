@@ -126,6 +126,8 @@ Jamie's own decision, not a default.
   score, « Je vais manger / J'ai mangé ». None is in the stories. They leave `apps/web` when
   `patient-home-navigation` ships. The tables stay until a migration drops them.
 - **D-20** the seed base of ~20 recipes as an open question. Closed by D-34 on 2026-10-23.
+- **D-25** one Neon database for preview and production, and previews never migrate. D-36
+  replaces it (2026-10-28).
 
 ### Standing from September
 
@@ -136,7 +138,6 @@ Jamie's own decision, not a default.
 - **D-16** AI through the Vercel AI Gateway, cheapest capable model first, structured JSON output,
   every generation logged, safety checks in code after generation. EU-hosted inference later.
 - **D-18** files through the files seam, Vercel Blob, EU region.
-- **D-25** one Neon database for preview and production. Previews never migrate.
 
 ### New (2026-10-23)
 
@@ -197,6 +198,13 @@ Jamie's own decision, not a default.
     `macroProfile()`. `genotype-macro-split/genotype-reference-table` holds it as data with a test
     per row. Until Morgane validates the laboratory mapping (story 4, question 3) the lookup
     returns DEFAULT for every trio. No row is derived from a nearby one.
+36. **D-36 — Two Neon projects, and UAT on `admin` and `app`.** Production's project serves
+    production only. The UAT project's default branch serves `uat` and is the base of previews.
+    A preview migrates only on its own Neon branch. The admin `uat` build migrates the base.
+    Production migrates in `promote.yml` only. `admin` and `app` have the custom environment
+    `uat`. `marketing` and `documentation` follow `main`. Until the blueprint promotes several
+    projects, `promote.sh run` promotes `admin`, and Jamie then promotes `app` by hand. Jamie
+    decided this on 2026-10-28 (`triage/set-up-uat-environment`). It replaces D-25.
 
 ## Material beside the stories
 
