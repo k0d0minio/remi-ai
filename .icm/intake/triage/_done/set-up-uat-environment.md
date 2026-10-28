@@ -33,12 +33,15 @@ a decision that replaces D-25.
 
 ## Acceptance criteria
 
-- [ ] Each Vercel project that the client tests has the custom environment `uat`, tracking `main`, at `uat.<its production domain>`.
-- [ ] On those projects, "Auto-assign Custom Production Domains" is off. A merge to `main` builds a production deployment that stays staged.
+- [ ] The Vercel projects `admin` and `app` have the custom environment `uat`, tracking `main`, at `uat.<its production domain>`.
+- [ ] On `admin` and `app`, "Auto-assign Custom Production Domains" is off. A merge to `main` builds a production deployment that stays staged.
 - [ ] Neon has a UAT project apart from production's. `NEON_PROJECT_ID` names the UAT project.
 - [ ] `DATABASE_URL` and `DATABASE_URL_UNPOOLED` are on `uat`. `MIGRATE_AT_BUILD` is on no environment by hand: only `preview-db.sh` sets it, on a preview branch.
-- [ ] The Actions secrets `VERCEL_TOKEN`, `NEON_API_KEY` and `DATABASE_URL`, and the variables `VERCEL_TEAM`, `VERCEL_PROJECT` and `NEON_PROJECT_ID`, exist.
-- [ ] `db:migrate`, `db:verify` and `vercel-build` follow `.icm/database/CONTEXT.md` § The migration rule. The admin app's `package.json` has `"vercel-build": "bash ../../.icm/scripts/vercel-build.sh next build"`, and its `build` no longer migrates. `db:migrate` and `db:verify` are separate scripts, and `migrate.mjs` no longer refuses `uat`.
+- [ ] The Actions secrets `VERCEL_TOKEN`, `NEON_API_KEY` and `DATABASE_URL`, and the variables `VERCEL_TEAM`, `VERCEL_PROJECT` (`admin`) and `NEON_PROJECT_ID`, exist.
+- [ ] `apps/admin/vercel.json` sets `buildCommand` to `pnpm run vercel-build`. The admin app's `package.json` has `"vercel-build": "bash ../../.icm/scripts/vercel-build.sh turbo run build --filter=@remi/admin"`, and its `build` no longer migrates.
+- [ ] `db:migrate` and `db:verify` are separate scripts. The admin app's `package.json` names both. `migrate.mjs` migrates on Vercel only when `VERCEL_TARGET_ENV=uat` or `MIGRATE_AT_BUILD=1`.
 - [ ] The root `package.json` names `db:migrate` and `db:verify` (through `pnpm --filter @remi/services`), so that `promote.yml` migrates and verifies production.
-- [ ] `.icm/intake/README.md` records the decision that replaces D-25.
+- [ ] `ALLOW_NON_PRODUCTION_MIGRATIONS` is in no file outside `.icm/docs/history/` and `_done/`.
+- [ ] `.icm/intake/README.md` records D-36, which replaces D-25.
+- [ ] The stub `triage/previews-migrate-the-shared-database` is in `triage/_done/` with a `> Dropped:` line.
 - [ ] `.icm/scripts/promote.sh status` marks every setup act that it can read as done.
