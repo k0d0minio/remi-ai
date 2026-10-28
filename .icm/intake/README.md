@@ -10,7 +10,7 @@
 ## The backlog
 
 Re-cut on 2026-10-23 from Morgane's thirty user stories. She wrote them on 12 and 15 October
-2026, in French, one document per story, numbered 1 to 32 (10 and 27 do not exist). They live in
+2026, in French, one document per story, numbered 1 to 32 (27 does not exist). They live in
 the client's Drive folder,
 [`remi-ai/user-stories/`](https://drive.google.com/drive/folders/1Dsa6QvCLwBTn5jnI7ubrccnY0HUn4D-7),
 and never in this repo. Jamie decided on 2026-10-23 that they **replace the open backlog whole**
@@ -18,6 +18,12 @@ and **win over anything the platform contradicts**. One story is one epic. Each 
 `breakdown.md` restates the story, lists the questions it leaves open, and maps every one of her
 acceptance criteria to a stub in its `Criteria → stubs` table. Story 30 states rules for the whole
 product. It is not an epic. Its rules are decisions D-30 and D-31 below.
+
+Two stories arrived after that cut. Story 10 « Répartition des macronutriments selon le génotype »
+reached the Drive `remi-ai/` root on 23 October 2026, with the genotype table it rests on. It is the
+epic `genotype-macro-split`. Story 33 « Suppression de la photo » arrived on 27 October 2026 as an
+attachment on the e-mail thread « Update: REMI AI ». It re-cuts `meal-improvement`: the patient types
+the meal, no photo. Jamie files both in `user-stories/`.
 
 The order is her « Parcours général » (story 30): sign-up link → preparatory profile →
 consultation → practitioner validation → activation and e-mail → the patient's space.
@@ -33,6 +39,7 @@ consultation → practitioner validation → activation and e-mail → the patie
 | 7   | « Calcul de l'IMC »                                                   | [`bmi/`](bmi/breakdown.md)                                               | 1           |
 | 8   | « Calcul des besoins protéiques »                                     | [`protein-needs/`](protein-needs/breakdown.md)                           | 1           |
 | 9   | « Calcul énergétique »                                                | [`energy-needs/`](energy-needs/breakdown.md)                             | 1           |
+| 10  | « Répartition des macronutriments selon le génotype »                 | [`genotype-macro-split/`](genotype-macro-split/breakdown.md)             | 1           |
 | 13  | « Aliments, nutriments et composés »                                  | [`food-directives/`](food-directives/breakdown.md)                       | 2           |
 | 14  | « Sécurité des évictions totales »                                    | [`eviction-safety/`](eviction-safety/breakdown.md)                       | 2           |
 | 15  | « Demande d'ajout d'un élément »                                      | [`knowledge-base-requests/`](knowledge-base-requests/breakdown.md)       | 2           |
@@ -51,6 +58,7 @@ consultation → practitioner validation → activation and e-mail → the patie
 | 25  | « Fiche recette, portions et favoris »                                | [`recipe-card/`](recipe-card/breakdown.md)                               | 4           |
 | 26  | « Liste de courses »                                                  | [`shopping-list/`](shopping-list/breakdown.md)                           | 4           |
 | 28  | « Suggestion d'amélioration »                                         | [`meal-improvement/`](meal-improvement/breakdown.md)                     | 4           |
+| 33  | « Suppression de la photo »                                           | re-cuts [`meal-improvement/`](meal-improvement/breakdown.md)             | 4           |
 | 32  | « Consultation des recettes du jour (praticien) »                     | [`practitioner-daily-recipes/`](practitioner-daily-recipes/breakdown.md) | 4           |
 | 29  | « Je suis au restaurant (bonus MVP) »                                 | [`restaurant-menu/`](restaurant-menu/breakdown.md)                       | 5           |
 | 30  | « Règles transversales de priorité et de sécurité »                   | decisions D-30 and D-31                                                  | every phase |
@@ -95,6 +103,9 @@ Set by Jamie on 2026-10-27. The epics follow the table above. `triage` comes las
 29. restaurant-menu
 30. triage
 
+`genotype-macro-split` (story 10) waits for its place. The pull request that cut it asks the question.
+Default: after `energy-needs`, as the fourth calculation.
+
 ## Decisions of record
 
 D-1 to D-25 were taken between 2026-09-10 and 2026-09-26 for the September backlog. The stories
@@ -109,7 +120,6 @@ Jamie's own decision, not a default.
 - **D-9** in-page check-ins and the progression view. Story 30: « Aucun écran du MVP ne propose
   de points, de badges ni de questionnaire de feedback périodique. »
 - **D-10** accounts and the practitioner flow parked. They are the first phase.
-- **D-12** text-only meals. Story 28 takes a photo or a description (D-29).
 - **D-13** `copy-context` as a product feature. The context assembler stays as code behind the
   prompts. The button leaves the console when `meal-improvement` ships.
 - **D-19** the September patient page: challenges, the general feedback box, the weekly 0–5
@@ -122,6 +132,7 @@ Jamie's own decision, not a default.
 - **D-6** suggestions reach the patient with no manual gate. Story 28 agrees. The automated check
   is the compatibility gate of `eviction-safety`.
 - **D-7** CIQUAL and her rules are the knowledge layer. Story 13 widens it (D-33).
+- **D-12** text-only meals. Story 33 confirms it for story 28 (2026-10-27).
 - **D-16** AI through the Vercel AI Gateway, cheapest capable model first, structured JSON output,
   every generation logged, safety checks in code after generation. EU-hosted inference later.
 - **D-18** files through the files seam, Vercel Blob, EU region.
@@ -140,9 +151,10 @@ Jamie's own decision, not a default.
 28. **D-28 — One auth seam for both apps.** The adapter is Jamie's decision in
     `patient-signup-account`. Default: Neon Auth. The operator scrypt code of September is
     replaced, not extended.
-29. **D-29 — Photos.** A meal or menu photo goes through the files seam (D-18) to a
+29. **D-29 — Photos.** The menu photo of story 29 goes through the files seam (D-18) to a
     vision-capable model behind the gateway (D-16). The photo is stored with the entry and
-    deleted with the patient (`.icm/docs/RETENTION.md`).
+    deleted with the patient (`.icm/docs/RETENTION.md`). Story 28 takes text only (story 33,
+    D-12).
 30. **D-30 — Story 30's priority order binds every generation and every suggestion.** In this
     order: 1 allergies, intolerances, total evictions and contra-indications; 2 the patient's
     declared diet and the practitioner's validated imperative recommendations; 3 foods to limit
@@ -151,10 +163,18 @@ Jamie's own decision, not a default.
     is « Non renseigné », never invented. A calculation is an « estimation » until validated.
     Only validated recommendations reach generation. Allergies, intolerances, evictions and diet
     declared by the patient apply at once and are signalled. Unknown composition is never
-    presented as safe. No points, no badges, no periodic feedback questionnaire.
+    presented as safe. No points, no badges, no periodic feedback questionnaire. Compatible
+    validated recommendations apply together. The order decides only on a conflict. A conflict
+    that involves a practitioner's recommendation is signalled to the practitioner. An unconfirmed
+    allergen or a cross-contamination risk is never presented as safe, and the patient is invited
+    to check the ingredients. Missing data is « Non renseigné » or asked for. A recipe or a
+    suggestion whose composition is uncertain is not shown (`eviction-safety/compatibility-gate`).
+    A menu dish of story 29 is listed as « Composition inconnue » and never suggested.
 31. **D-31 — Four file statuses, one enum, one home.** « Dossier à compléter » →
     « Prêt pour consultation » → « Recommandations à valider » → « Accompagnement actif »
     (stories 5, 30). `patient-list-and-status` owns the enum. Every surface reads it.
+    « Dossier à compléter » is story 5's label and the default of `patient-list-and-status`
+    question 1. Story 30 says « inscription à compléter ».
 32. **D-32 — Audit events.** A status change, a consent, a validated protocol version and a
     patient change after validation each write to `audit_events`, with who, when and what
     (stories 3, 19, 20, 21).
@@ -171,6 +191,26 @@ Jamie's own decision, not a default.
     removed the question from the list for Morgane. It closes D-20 and the September question
     « une base de ~20 recettes comme canevas, ou génération pure contrôlée ? ». `recipe-space`
     says where the templates live and who writes them.
+35. **D-35 — The genotype table.** Story 10's reference table (26 genotype rows and DEFAULT, with
+    an orientation, three ranges and a « Validation médicale » mode each) is the one lookup behind
+    `macroProfile()`. `genotype-macro-split/genotype-reference-table` holds it as data with a test
+    per row. Until Morgane validates the laboratory mapping (story 4, question 3) the lookup
+    returns DEFAULT for every trio. No row is derived from a nearby one.
+
+## Material beside the stories
+
+Morgane filed these in the Drive `remi-ai/` root between 23 and 25 October 2026. None is a story.
+Each one answers a question a breakdown asks, or is reference for a build. The story and D-30 win
+where one differs.
+
+| File                                                      | Read by                                                                                   |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| « Genotyp Tabs.xlsx », « Genotyp Last version .xlsx »     | `genotype-macro-split` (the table, informative beside the story's own)                    |
+| « Recommandation alimentaire.docx », « Recommandations alimentaires.docx » | `bmi`, `protein-needs`, `energy-needs`, `genotype-macro-split` (the calculation procedure) |
+| « Calendrier fruits et légumes de saison.xlsx »           | `recipe-space` (the season table, question 2)                                             |
+| « Résumé du Livre du Docteur Mouton.docx »                | `genotype-macro-split` (the biology behind the table, never a rule)                       |
+| « Prompt.docx », `01-weekly-planner.md`, `02-single-meal.md` | `recipe-space`, `meal-improvement` (the v1 prompts, reference for tone and structure)      |
+| « Questions pour Morgane — user stories REMI — 23 octobre 2026 » | every breakdown. Her answers return to the breakdowns in the pull request that acts on them |
 
 ## Milestones
 
@@ -184,7 +224,7 @@ is reported on the Friday call, not absorbed.
 
 | By          | Phase                                                                                                  | Epics                                                                                                                                                                                      |
 | ----------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 14 November | **1 — The file.** A practitioner creates or receives a patient, reads the file, sees the calculations. | `patient-signup-account`, `consent-and-data`, `patient-file-creation`, `preparatory-questionnaire`, `patient-list-and-status`, `patient-file-view`, `bmi`, `protein-needs`, `energy-needs` |
+| 14 November | **1 — The file.** A practitioner creates or receives a patient, reads the file, sees the calculations. | `patient-signup-account`, `consent-and-data`, `patient-file-creation`, `preparatory-questionnaire`, `patient-list-and-status`, `patient-file-view`, `bmi`, `protein-needs`, `energy-needs`, `genotype-macro-split` (its place is the pull request's question 1) |
 | 21 November | **2 — The protocol.** The practitioner writes the recommendations REMI will apply.                     | `food-directives`, `eviction-safety`, `knowledge-base-requests`, `priority-goals`, `lifestyle-advice`, `supplement-interventions`, `meal-structure`, `intermittent-fasting`                |
 | 26 November | **3 — Activation and the patient's space.** The patient signs in and reads.                            | `care-activation`, `protocol-versions`, `patient-change-signals`, `patient-access`, `patient-home-navigation`, `patient-recommendations`                                                   |
 | 1 December  | **4 — Recipes and the suggestion.** REMI proposes. FunMedDev's team tests.                             | `recipe-space`, `recipe-card`, `shopping-list`, `meal-improvement`, `practitioner-daily-recipes`                                                                                           |
@@ -208,7 +248,7 @@ them.
   `patient-loop` sit in [`_done/`](_done/), every stub and breakdown with a `> Dropped:` line.
   The stories cover their ground differently: the gateway adapter is `recipe-space`'s first stub,
   meal suggestions are `meal-improvement`, recipe generation is `recipe-space`, accounts are
-  `patient-signup-account`, the practitioner space is D-27, photos are D-29, export and
+  `patient-signup-account`, the practitioner space is D-27, the menu photo is D-29, export and
   send-link are inside `care-activation` and `patient-access`. Genotype is inside
   `preparatory-questionnaire` (story 4), with the laboratory mapping as a blocker.
 - **Shipped in September:** `patient-record`, `patient-surface`, `nutrition-knowledge`,

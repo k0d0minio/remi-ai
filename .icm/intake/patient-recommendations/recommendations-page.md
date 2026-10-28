@@ -22,6 +22,7 @@ A page « Mes recommandations » in `apps/web`, under Profil (cross-epic: `patie
 - [ ] The page shows the latest validated version and nothing from the working copy.
 - [ ] Categories 1, 2, 4 and 5 appear with their headings, in Morgane's order.
 - [ ] An intervention shows nom, posologie, fréquence, moment and durée exactly as entered.
+- [ ] Only validated and active interventions appear. A suspended or ended intervention is hidden.
 - [ ] An empty value shows « Non renseigné » or is omitted, and is never invented.
 - [ ] The page has no add, edit or delete control.
 - [ ] A new validation shows on the next request, with its « Mis à jour le » date.

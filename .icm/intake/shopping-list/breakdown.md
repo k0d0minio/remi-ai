@@ -16,10 +16,11 @@ Nothing on `main` does this. The epic reads the structured ingredients of `recip
 2. Pantry staples such as salt, oil and pepper: on the list or skipped? Default: on the list, grouped at the end under « Déjà à la maison ? ».
 3. Group the list by shop section (fruits et légumes, frais, épicerie)? Default: no, one alphabetical list for the MVP.
 4. The e-mail: needed for 1 December or for the open day? Default: the open day.
+5. The same ingredient in two unit families (« 2 oignons » and « 100 g d'oignon ») : one line with both quantities, or two lines? Default: one line, both quantities.
 
 ### Questions for Jamie
 
-1. Aggregation key: the CIQUAL food code when the generation matched one, else the normalised ingredient name plus the unit family. Default: as stated.
+1. Aggregation key: the CIQUAL food code when the generation matched one, else the normalised ingredient name. The unit family groups quantities inside the line (Morgane's question 5). Default: as stated.
 2. One current list per patient, or a history? Default: a history. The newest list is « en cours ».
 3. The e-mail sender for the product: `EMAIL_FROM` on the `web` project. Default: the same address as the console, on the verified domain.
 

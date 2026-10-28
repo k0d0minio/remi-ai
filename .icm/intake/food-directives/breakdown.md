@@ -10,12 +10,15 @@ The practitioner writes three free-text lines on the patient file: « À favoris
 
 On main, `foods` and `food_nutrients` hold CIQUAL: foods and their nutrient values. CIQUAL has no polyphenols, I3C, phytoestrogens, oxalates, purines, histamine or food families. A new terms-and-associations base, with provenance and a confidence level per association, is this epic's first stub. The `nutrition` category of `patient_recommendations` carried this kind of directive as prose. The three fields replace it for new entries. This epic rests on D-27, D-30 and D-32. It supersedes the `nutrition` recommendation category as the home of food directives.
 
+At launch the base holds CIQUAL only. Seven of the nine example consignes in the story (polyphénols, composés soufrés, phytoœstrogènes, I3C, oxalates, purines, fibres solubles) resolve « non reconnu » until Morgane's sources are loaded and validated through `knowledge-base-requests` (question 1 and question 5). A directive whose term carries a preparation note (the I3C example) passes the note to generation (`directive-application`). « Validé » has two meanings here. A term is validated in the base (`term-base`). A directive reaches recipes when the practitioner validates the protocol version (story 20, `directive-application`). The practitioner validates no single directive.
+
 ### Questions for Morgane
 
 1. Who supplies the first associations for the terms CIQUAL does not cover (polyphénols, I3C, phytoœstrogènes, oxalates, purines, histamine, familles alimentaires)? Default: you name the sources, Jamie loads them as draft, you validate them in the admin.
 2. « À limiter » applies « conformément au niveau de limitation défini ». The story names no levels. Which levels? Default: two, « réduire » and « rare ».
 3. Do your existing « nutrition » recommendations move into the three fields, or stay as text under « Autres recommandations » (story 23, category 5)? Default: they stay as text. The three fields start empty.
 4. Can a directive be saved as a reusable template, as the protocol templates are today? Default: no, per patient only in the MVP.
+5. By when do you name and validate the sources for the compounds, so that your example consignes work on 1 December? Default: before phase 2 starts on 14 November.
 
 ### Questions for Jamie
 
@@ -35,7 +38,7 @@ On main, `foods` and `food_nutrients` hold CIQUAL: foods and their nutrient valu
 | --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | 1   | « Chaque élément séparé par “;” est traité comme une entrée distincte »                                                                                              | directive-fields                                                        |
 | 2   | « Un élément reconnu s'affiche avec sa dénomination officielle ; une correction proposée doit être acceptée par le praticien »                                       | directive-resolution                                                    |
-| 3   | « Un élément inconnu est signalé visiblement et n'est jamais considéré comme validé. Un bouton “Demander l'ajout” apparaît… »                                        | directive-resolution, cross-epic knowledge-base-requests/request-record |
+| 3   | « Un élément inconnu est signalé visiblement et n'est jamais considéré comme validé. Un bouton “Demander l'ajout” apparaît… »                                        | directive-resolution, knowledge-base-requests/request-record            |
 | 4   | « Un terme dont l'association alimentaire est incertaine est signalé comme tel, jamais validé silencieusement »                                                      | directive-resolution                                                    |
 | 5   | « Le praticien peut ajouter, modifier ou désactiver un élément à tout moment »                                                                                       | directive-fields                                                        |
 | 6   | « “À favoriser” influe sur la priorité… ; “À limiter” sur leur quantité ou fréquence ; “Éviction totale” prime sur les deux autres »                                 | directive-application                                                   |
@@ -45,7 +48,7 @@ On main, `foods` and `food_nutrients` hold CIQUAL: foods and their nutrient valu
 | 10  | « Le praticien peut saisir indifféremment un aliment, un nutriment, un micronutriment, un composé bioactif ou une famille alimentaire dans chacun des trois champs » | directive-fields                                                        |
 | 11  | « REMI relie la consigne aux sources alimentaires documentées, sans considérer comme équivalentes des traces et des concentrations significatives »                  | term-base                                                               |
 | 12  | « REMI ne génère aucune association aliment–composé absente de sa base validée ; un élément incertain est signalé et peut faire l'objet d'une demande d'ajout »      | term-base, directive-resolution                                         |
-| 13  | « Une éviction totale ne peut être présentée comme garantie lorsque les données… sont insuffisantes »                                                                | cross-epic eviction-safety/compatibility-gate                           |
+| 13  | « Une éviction totale ne peut être présentée comme garantie lorsque les données… sont insuffisantes »                                                                | eviction-safety/compatibility-gate                                      |
 
 ## Out of scope
 

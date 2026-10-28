@@ -20,11 +20,12 @@ with `estimated_value`, `estimate_parameters` (jsonb), `estimated_at`, `validate
 `validation_parameters` (jsonb), `validated_at`, `validated_by`, `needs_revalidation`
 (boolean). Add to `patient_profiles` the practitioner-entered `special_situation`
 (`none`, `pregnancy_1`, `pregnancy_2`, `pregnancy_3`, `lactation_first_6_months`,
-`lactation_after_6_months`, `pathology`, `malnutrition`) and `special_situation_note`.
+`lactation_after_6_months`, `pathology`, `malnutrition`, `other`) and
+`special_situation_note`. `other` is story 8's « situation particulière » with its note.
 Add the pure function `bmi(weightKg, heightCm)` and the WHO class function in
 `packages/services/src/shared/calculations.ts`, with unit tests. Record every write of a
-validated value as an audit event. Add the « Calculs » slot to the patient file, empty
-until stub 2 fills it.
+validated value as an audit event. The « Calculs » slot belongs to
+`patient-file-view/calculations-summary-slot`. This stub renders nothing into it.
 
 ## Acceptance criteria
 
@@ -33,7 +34,7 @@ until stub 2 fills it.
 - [ ] The four WHO classes are a table in code, with their French labels.
 - [ ] An estimated value and a validated value are separate columns. Writing one never changes the other.
 - [ ] A write of `validated_value` creates an audit event with the parameters used.
-- [ ] The patient file shows a « Calculs » slot under the patient's data. It says « Aucun calcul » for now.
+- [ ] The « Calculs » slot of `patient-file-view/calculations-summary-slot` is the one slot. This stub adds no second one. The IMC row still reads « Non calculé » until stub 2.
 
 ## Out of scope
 
@@ -46,5 +47,5 @@ until stub 2 fills it.
   (« estimation » until validated), D-32 (validation is an audit event).
 - Files: `packages/services/src/db/schema.ts`, a new migration, `shared/calculations.ts`,
   the patient file page under `apps/admin/app/(admin)/patients/[id]/`.
-- cross-epic: `patient-file-view` owns the file layout. This stub adds the slot only.
+- cross-epic: `patient-file-view/calculations-summary-slot` owns the slot and ships before this epic (order 6 before 7).
 - Shared files first: this stub carries the schema change for the three calculation epics.

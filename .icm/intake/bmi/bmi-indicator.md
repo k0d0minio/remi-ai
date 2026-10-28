@@ -24,7 +24,9 @@ Offer no input for the BMI.
 ## Acceptance criteria
 
 - [ ] With height 165 cm and weight 65 kg the file shows « IMC 23,9 · Corpulence normale ».
+- [ ] The class follows the WHO thresholds: under 18,5 « Insuffisance pondérale », 18,5 to under 25 « Corpulence normale », 25 to under 30 « Surpoids », 30 and above « Obésité ». A test covers 18,4, 18,5, 24,9, 25,0, 29,9 and 30,0.
 - [ ] With the height missing the file shows « Non renseigné : taille » and no BMI.
+- [ ] A height outside 100 to 250 cm or a weight outside 25 to 300 kg (the bounds of `preparatory-questionnaire/questionnaire-flow`) blocks the calculation and names the field.
 - [ ] A BMI of 17.9 or 25.0 shows the alert marker. A BMI of 22.0 shows none.
 - [ ] The alert changes no protocol value. No automatic adjustment exists.
 - [ ] The text « Indicateur, pas un diagnostic » is next to the value.

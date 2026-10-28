@@ -12,7 +12,7 @@ On main, `patient_recommendations` carries `habit` and `activity` categories as 
 
 ### Questions for Morgane
 
-1. « Supprimer » removes an advice from history and « désactiver » keeps it. Do you want both? Default: delete only before the protocol's first validation, deactivate after.
+1. « Supprimer » removes an advice from history and « désactiver » keeps it. Do you want both? Default: yes, « Supprimer » works at any time. The protocol history keeps the deleted row.
 2. Do your existing « habit » and « activity » recommendations move into the six categories? Default: yes, into « Comportements alimentaires » and « Activité physique », and you review them once.
 3. Frequency, moment and duration: free text, or lists? Default: free text.
 
@@ -27,15 +27,15 @@ On main, `patient_recommendations` carries `habit` and `activity` categories as 
 
 ## Criteria → stubs
 
-| #   | Morgane's criterion (short, her French kept)                                                                    | Stub                                                                           |
-| --- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| 1   | « Aucune catégorie n'est obligatoire »                                                                          | advice-section                                                                 |
-| 2   | « Un conseil sans texte ne peut pas être enregistré »                                                           | advice-table                                                                   |
-| 3   | « Plusieurs conseils peuvent coexister dans une même catégorie »                                                | advice-table                                                                   |
-| 4   | « Le praticien peut ajouter, modifier, désactiver ou supprimer un conseil »                                     | advice-section                                                                 |
-| 5   | « Un conseil désactivé n'est plus visible du patient mais reste dans l'historique »                             | advice-table                                                                   |
-| 6   | « Les conseils sont restitués tels que validés, sans être transformés en prescription inventée »                | rule: README (D-30)                                                            |
-| 7   | « Seuls les conseils validés sont visibles du patient, après activation de l'accompagnement, en lecture seule » | advice-table (read model), cross-epic patient-recommendations, care-activation |
+| #   | Morgane's criterion (short, her French kept)                                                                    | Stub                                                                                          |
+| --- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| 1   | « Aucune catégorie n'est obligatoire »                                                                          | advice-section                                                                                |
+| 2   | « Un conseil sans texte ne peut pas être enregistré »                                                           | advice-table                                                                                  |
+| 3   | « Plusieurs conseils peuvent coexister dans une même catégorie »                                                | advice-table                                                                                  |
+| 4   | « Le praticien peut ajouter, modifier, désactiver ou supprimer un conseil »                                     | advice-section                                                                                |
+| 5   | « Un conseil désactivé n'est plus visible du patient mais reste dans l'historique »                             | advice-table                                                                                  |
+| 6   | « Les conseils sont restitués tels que validés, sans être transformés en prescription inventée »                | rule: README (D-30)                                                                           |
+| 7   | « Seuls les conseils validés sont visibles du patient, après activation de l'accompagnement, en lecture seule » | advice-table, patient-recommendations/recommendations-page, care-activation/activation-action |
 
 ## Out of scope
 

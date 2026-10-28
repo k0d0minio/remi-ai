@@ -15,18 +15,24 @@ button. Story 4 needs sections, autosave, resume, mandatory marks and the status
 
 ## Proposed change
 
-Add `apps/web/app/[locale]/questionnaire/` behind the patient session. Sections: Profil,
+Add `apps/web/app/[locale]/questionnaire/` behind the patient session. Sections: Identité
+(nom, prénom, date de naissance, e-mail, téléphone, filled from sign-up, editable), Profil,
 Consultation, Alimentation, Santé, Génétique (gate only here, detail in `genotype-section`),
 Question du praticien. Each change saves at once through a server action. Reopening lands on
-the first incomplete section. Mandatory fields carry a mark and a list at the top. Taille and
-poids accept plausible numbers only. Diet is a radio group. Motif and date de consultation are
-asked. When every mandatory field, including the explicit allergy and intolerance answers, is
-saved, the flow calls `setFileStatus(ready)`.
+the first incomplete section. A completed questionnaire reopens on any section. Mandatory
+fields carry a mark and a list at the top, beside the file's status. Taille and poids accept
+plausible numbers only. Diet is a radio group. Motif and date de consultation are asked. When
+every mandatory field, including the explicit allergy and intolerance answers, is saved, the
+flow calls `setFileStatus(ready)`.
 
 ## Acceptance criteria
 
 - [ ] Each field saves on change. There is no « Enregistrer » button
+- [ ] Identité shows the five sign-up fields. The patient edits nom, prénom, date de naissance and téléphone there. An e-mail change follows `patient-signup-account/sign-in-and-session`
 - [ ] Leaving and returning lands on the first incomplete section with every answer kept
+- [ ] A completed questionnaire reopens on any section, and the patient changes any answer
+- [ ] The top of the questionnaire shows the file's status and the missing mandatory fields
+- [ ] Médicaments and compléments are marked optional
 - [ ] Sexe, taille, poids actuel, niveau d'activité and motif de consultation are marked mandatory. The top list names the missing ones
 - [ ] Taille accepts 100 to 250 cm and poids 25 to 300 kg. Other values are refused with a message
 - [ ] The four activity levels show their French description from the shared module

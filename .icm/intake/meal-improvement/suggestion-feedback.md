@@ -20,7 +20,7 @@ Under each suggestion, two buttons: « Ça me convient » and « Pas pour moi »
 
 - [ ] Both buttons appear under every suggestion.
 - [ ] A response is stored once per attempt and cannot be changed after.
-- [ ] After « Pas pour moi » on the first attempt, one second attempt is offered and returns a different improvement.
+- [ ] After « Pas pour moi » on the first attempt, one second attempt is offered and returns a different improvement for the same meal and the same validated protocol version.
 - [ ] No third attempt is possible for the same meal.
 - [ ] The response is used for the interaction only. No screen lists past choices.
 

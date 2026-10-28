@@ -29,7 +29,8 @@ writes an audit event. The migration sets today's patients per Morgane's questio
 - [ ] Each applied transition writes an audit event with the previous and next status and the reason
 - [ ] The migration adds the column, not null, and sets every existing row to the status Morgane chose
 - [ ] The retention `status` column is untouched and still drives `ended`
-- [ ] The allowed transitions: `to_complete → ready`, `ready → to_validate`, `to_validate → active`, and `active → to_validate` on a new unvalidated change
+- [ ] The allowed transitions: `to_complete → ready`, `ready → to_validate`, `to_validate → active`. No transition leaves `active` (Morgane's question 4)
+- [ ] A patient change after activation raises a signal (`patient-change-signals`) and changes no status
 
 ## Out of scope
 

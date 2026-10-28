@@ -14,13 +14,14 @@ After the patient changes weight, height or activity, the validated calculations
 
 ## Proposed change
 
-Each calculation (BMI, protein needs, energy needs) exposes a stale flag: true when an unacknowledged change touches one of its inputs. The console shows « estimation à revalider » on a stale value. The recap of `care-activation` and the validation of `protocol-versions` treat a stale validated value as a blocker until the practitioner recalculates and validates.
+Each calculation (BMI, protein needs, energy needs) exposes a stale flag. The flag is set when a patient change touches an input of a validated calculation. Only a recalculation followed by a validation clears it. « Pris en compte » on the signal leaves the flag set. The console shows « estimation à revalider » on a stale value. The recap of `care-activation` and the validation of `protocol-versions` treat a stale validated value as a blocker until the practitioner recalculates and validates.
 
 ## Acceptance criteria
 
 - [ ] A change to weight or height marks BMI, protein needs and energy needs « estimation à revalider ».
 - [ ] A change to the activity level marks energy needs « estimation à revalider ».
 - [ ] The flag clears when the practitioner recalculates and validates.
+- [ ] « Pris en compte » on the signal does not clear « estimation à revalider ». Only a recalculation followed by a validation clears it.
 - [ ] The flag does not change the stored validated value.
 
 ## Out of scope

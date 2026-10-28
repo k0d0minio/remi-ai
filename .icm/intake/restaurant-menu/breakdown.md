@@ -8,7 +8,7 @@
 
 At the restaurant, the patient photographs the menu. REMI lists the dishes it can read and marks the ones that fit the validated recommendations, each with a short justification. A dish with an evicted food, an allergen or an intolerance is never suggested. A dish whose composition is unknown is said to be unknown and never shown as safe. An unreadable menu asks for a new photo. Every answer reminds the patient to ask the waiter about evicted ingredients. Morgane marks the whole story « bonus MVP »: its absence does not block the release. Story 31 shows the entry only when this ships.
 
-Nothing on `main` does this. It reuses the photo path of `meal-improvement/meal-capture`, the gateway adapter and the compatibility gate. Every stub is P2. Rests on D-16, D-18, D-29, D-30.
+Nothing on `main` does this. Story 33 (2026-10-27) removed the meal photo from story 28. The menu photo of story 29 stays. This epic owns the photo path. The photo goes through the files seam (D-18), image types only, with a 5 MB cap. It is resized in the browser and stored privately under the patient's prefix. It is deleted after the retention period of `.icm/docs/RETENTION.md`. The epic reuses the gateway adapter and the compatibility gate. Every stub is P2. Rests on D-16, D-18, D-29, D-30.
 
 ### Questions for Morgane
 

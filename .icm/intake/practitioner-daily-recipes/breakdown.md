@@ -18,6 +18,7 @@ On `main` the console's patient page shows Morgane's hand assignments from `pati
 ### Questions for Jamie
 
 1. Reuse the patient's card component in the console for the read-only view? Default: yes, from `packages/ui`.
+2. Keep `daily-recipe-read`? It goes beyond the story. Default: yes, as P1.
 
 ## Build order
 

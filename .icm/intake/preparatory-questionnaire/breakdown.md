@@ -65,7 +65,7 @@ D-26, D-30, D-31 and feeds the calculations (stories 7 to 9) and recipes (story 
 | 18  | « Chaque liste (APOE, DIO2, AMY1A) permet une seule sélection ; la personnalisation génétique exige trois résultats complets et une correspondance valide »                                   | genotype-section                                                                        |
 | 19  | « Si la réponse est « Non / Je ne sais pas », si un résultat manque ou si aucune correspondance n'est valide, REMI conserve le profil DEFAULT (45 % glucides, 30 % lipides, 25 % protéines) » | genotype-section                                                                        |
 | 20  | « Aucun calcul génétique partiel ; le patient peut terminer le questionnaire sans génotypes et les résultats non renseignés restent vides »                                                   | genotype-section                                                                        |
-| 21  | « Les génotypes peuvent être modifiés et les propositions de macronutriments recalculées ; leur application reste soumise aux validations requises et à l'ajustement du praticien »           | genotype-section (the recalculation: recipe-space, story 24)                            |
+| 21  | « Les génotypes peuvent être modifiés et les propositions de macronutriments recalculées ; leur application reste soumise aux validations requises et à l'ajustement du praticien »           | genotype-section, genotype-macro-split/macro-split-proposal (story 10)                  |
 | 22  | « Le patient doit répondre aux rubriques Allergies et Intolérances, y compris via « Aucune connue », avant le passage au statut « Prêt pour consultation » »                                  | allergy-intolerance-lists                                                               |
 | 23  | « La sélection « Tous » bloque les sous-choix individuels ; la déclaration d'une allergie au blé est disponible séparément »                                                                  | allergy-intolerance-lists                                                               |
 | 24  | « Le passage de « Oui » à « Non / Je ne sais pas » … réactive immédiatement DEFAULT et désactive l'usage des anciennes données »                                                              | genotype-section                                                                        |
@@ -74,6 +74,6 @@ D-26, D-30, D-31 and feeds the calculations (stories 7 to 9) and recipes (story 
 ## Out of scope
 
 - The calculations that read these fields (`bmi`, `protein-needs`, `energy-needs`).
-- The genotype → macronutrient table and its use (`recipe-space`, after Morgane's question 3).
+- The genotype → macronutrient table and its use (`genotype-macro-split`, story 10, after Morgane's question 3).
 - The consent texts (`consent-and-data`). This epic calls the genetic consent at the gate.
 - The console's edit of the same fields (`patient-file-creation/practitioner-creates-file`, `patient-file-view/provenance-markers`).

@@ -28,6 +28,7 @@ table and its rows as they are.
 - [ ] A goal saves with its text alone. An empty text does not save.
 - [ ] Five goals coexist on one patient. No cap blocks the sixth.
 - [ ] « Monter » and « Descendre » change the order. The order survives a reload.
+- [ ] The practitioner edits a goal in place. The edit keeps the goal's rank and its history.
 - [ ] « Désactiver » moves the goal under « Objectifs désactivés » with its date. The row is not deleted.
 - [ ] The section shows no « point de départ » field and no score.
 - [ ] Each add, edit, reorder and deactivation creates an audit event.

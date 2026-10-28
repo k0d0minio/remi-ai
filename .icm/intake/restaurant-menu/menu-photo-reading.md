@@ -14,7 +14,7 @@ At the restaurant the patient has a menu and no way to ask REMI about it.
 
 ## Proposed change
 
-A « Je suis au restaurant » entry under the home block (story 31), shown only when this epic ships. The patient takes a photo. It goes through the files seam like a meal photo. One vision call returns the dishes it can read: name, description when printed, a confidence. A menu with no readable dish returns « Je n'arrive pas à lire la carte. Peux-tu reprendre une photo ? ». The photo follows the same retention as meal photos.
+A « Je suis au restaurant » entry under the home block (story 31), shown only when this epic ships. The patient takes a photo. It is resized in the browser and uploaded through the files seam (D-18) under the patient's prefix, image types only, 5 MB cap. This epic owns that path. One vision call returns the dishes it can read: name, description when printed, a confidence. A menu with no readable dish returns « Je n'arrive pas à lire la carte. Peux-tu reprendre une photo ? ». The photo is stored privately and deleted after the retention period of `.icm/docs/RETENTION.md`.
 
 ## Acceptance criteria
 
@@ -22,7 +22,9 @@ A « Je suis au restaurant » entry under the home block (story 31), shown only 
 - [ ] A readable menu returns the list of dishes with their printed description.
 - [ ] An unreadable menu returns the new-photo message and no dish.
 - [ ] The call is one row in `ai_generations`.
-- [ ] The photo is private and deleted with the meal photos.
+- [ ] The photo is stored privately under the patient's prefix and read only through a short signed URL.
+- [ ] A file that is not an image or exceeds 5 MB is refused with a message.
+- [ ] A photo older than the retention period of `.icm/docs/RETENTION.md` is deleted by a scheduled job.
 
 ## Out of scope
 
@@ -30,4 +32,4 @@ A « Je suis au restaurant » entry under the home block (story 31), shown only 
 
 ## Notes
 
-D-18, D-29. Files: `apps/web/app/[locale]/(patient)/restaurant/page.tsx`, `prompts/menu-read.ts`. Cross-epic: `recipe-space/ai-gateway-adapter`, `meal-improvement/meal-capture` (the upload path), `patient-home-navigation` (the conditional entry).
+D-18, D-29. This stub owns the photo path. Story 33 removed the meal photo of story 28. Files: `apps/web/app/[locale]/(patient)/restaurant/page.tsx`, `prompts/menu-read.ts`, `packages/services/src/server/restaurant/*`, `.icm/docs/RETENTION.md`. Cross-epic: `recipe-space/ai-gateway-adapter`, `patient-home-navigation` (the conditional entry).

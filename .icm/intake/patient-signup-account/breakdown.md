@@ -42,7 +42,7 @@ pages. It rests on D-26, D-28, D-32. It supersedes D-2 and D-10.
 | 1   | « Nom, prénom, date de naissance, adresse e-mail et telephone sont obligatoires »                            | signup-page                                           |
 | 2   | « L'adresse e-mail doit être valide »                                                                        | signup-page                                           |
 | 3   | « Le compte ne peut pas être créé tant que les consentements obligatoires ne sont pas cochés »               | consent-and-data/consent-gate-at-signup               |
-| 4   | « Le statut du dossier est “Prêt pour consultation” après la création du compte »                            | patient-list-and-status/file-status-enum (question 1) |
+| 4   | « Le statut du dossier est “Prêt pour consultation” après la création du compte »                            | question 1 for Morgane. Default: preparatory-questionnaire/questionnaire-flow flips it after the mandatory fields |
 | 5   | « Le patient n'a accès à aucune recette tant que l'accompagnement n'est pas activé (message d'attente) »     | patient-access (story 22)                             |
 | 6   | « adresse e-mail déjà inscrite chez ce praticien … invité à se connecter au lieu de créer un doublon »       | duplicate-email-guard                                 |
 | 7   | « Le praticien peut créer un profil patient et renseigner l'ensemble des informations du questionnaire »     | patient-file-creation/practitioner-creates-file       |

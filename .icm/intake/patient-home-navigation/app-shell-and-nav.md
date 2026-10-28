@@ -23,6 +23,10 @@ A layout for `apps/web/app/[locale]/(app)/`, behind sign-in (cross-epic: `patien
 - [ ] The bottom bar stays fixed on a 375 px wide screen and does not cover content.
 - [ ] Every tab is reachable with the keyboard, and each has a visible label.
 - [ ] Only one primary button appears per screen.
+- [ ] From any screen, one tap on « Accueil » returns the patient to the home.
+- [ ] Every essential action is visible on its screen. No essential action sits in a hidden menu.
+- [ ] Text and controls meet the WCAG AA contrast ratio.
+- [ ] No screen asks the patient for anything the flow does not need.
 
 ## Out of scope
 
