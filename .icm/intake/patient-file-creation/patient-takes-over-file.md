@@ -20,11 +20,13 @@ Two paths into the same file. First: the activation e-mail (`care-activation`) c
 one-time link that lets the patient set a password on the existing file. Second: the patient
 follows the practitioner's sign-up link with the e-mail already on a practitioner-created
 file. REMI offers « Un dossier existe déjà pour cette adresse » and a one-time e-mail to claim
-it. In both paths the account is attached to the existing `patient_profiles` row and the data
-entered by the practitioner stays.
+it. In both paths the patient reads the data-processing information and gives the mandatory
+consents of story 3 before the password is set. Then the account is attached to the existing
+`patient_profiles` row and the data entered by the practitioner stays.
 
 ## Acceptance criteria
 
+- [ ] Both paths show the consent step of `consent-and-data/consent-gate-at-signup` before the password is set. No account exists without the mandatory consents
 - [ ] An activation link on a practitioner-created file sets a password and signs the patient into that file
 - [ ] A sign-up with an e-mail of a practitioner-created file (no account yet) creates no new row and offers the claim e-mail
 - [ ] The claim link expires and works once

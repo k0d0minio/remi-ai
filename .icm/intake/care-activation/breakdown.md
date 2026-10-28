@@ -28,17 +28,17 @@ After the first consultation the practitioner validates the recommendations and 
 
 ## Criteria → stubs
 
-| #   | Morgane's criterion (short, her French kept)                                                                                                      | Stub                                                    |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| 1   | « L'activation est déclenchée uniquement par le praticien, après confirmation du récapitulatif »                                                  | activation-action                                       |
-| 2   | « Les incohérences et les évictions non résolues bloquent la validation ; une éviction sans période ni statut durable bloque l'activation »       | activation-recap                                        |
-| 3   | « Les éléments non reconnus ne bloquent pas l'activation, mais sont listés dans le récapitulatif et restent non appliqués »                       | activation-recap                                        |
-| 4   | « Le statut du dossier devient “Accompagnement actif” après activation »                                                                          | activation-action                                       |
-| 5   | « L'e-mail est envoyé une seule fois, au moment de l'activation réussie »                                                                         | activation-email                                        |
-| 6   | « Si l'envoi de l'e-mail échoue, le praticien est averti et peut renvoyer l'e-mail »                                                              | activation-email                                        |
-| 7   | « Avant activation, aucune fonctionnalité de l'espace patient n'est accessible, à l'exception de l'inscription et du questionnaire préparatoire » | cross-epic: patient-access/waiting-screen               |
-| 8   | « Seules les recommandations validées sont utilisées pour générer les recettes et les suggestions d'amélioration »                                | cross-epic: protocol-versions/working-copy-and-validate |
-| 9   | « Le patient retrouve son compte initial »                                                                                                        | cross-epic: patient-access/active-space-entry           |
+| #   | Morgane's criterion (short, her French kept)                                                                                                      | Stub                                        |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| 1   | « L'activation est déclenchée uniquement par le praticien, après confirmation du récapitulatif »                                                  | activation-action                           |
+| 2   | « Les incohérences et les évictions non résolues bloquent la validation ; une éviction sans période ni statut durable bloque l'activation »       | activation-recap                            |
+| 3   | « Les éléments non reconnus ne bloquent pas l'activation, mais sont listés dans le récapitulatif et restent non appliqués »                       | activation-recap                            |
+| 4   | « Le statut du dossier devient “Accompagnement actif” après activation »                                                                          | activation-action                           |
+| 5   | « L'e-mail est envoyé une seule fois, au moment de l'activation réussie »                                                                         | activation-email                            |
+| 6   | « Si l'envoi de l'e-mail échoue, le praticien est averti et peut renvoyer l'e-mail »                                                              | activation-email                            |
+| 7   | « Avant activation, aucune fonctionnalité de l'espace patient n'est accessible, à l'exception de l'inscription et du questionnaire préparatoire » | patient-access/waiting-screen               |
+| 8   | « Seules les recommandations validées sont utilisées pour générer les recettes et les suggestions d'amélioration »                                | protocol-versions/working-copy-and-validate |
+| 9   | « Le patient retrouve son compte initial »                                                                                                        | patient-access/active-space-entry           |
 
 ## Out of scope
 

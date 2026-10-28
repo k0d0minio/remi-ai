@@ -32,7 +32,7 @@ until validated.
 - [ ] A change of the reference weight changes no real weight, no BMI and no energy estimate.
 - [ ] A direct g/day value prevails after « Valider ».
 - [ ] After a validated direct value, a change of the coefficient shows a proposal and changes nothing until « Valider ».
-- [ ] A `pathology` or `malnutrition` estimate cannot reach the suggestions before « Valider ».
+- [ ] A `pathology`, `malnutrition` or `other` estimate cannot reach the suggestions before « Valider ».
 - [ ] The label « Estimation » shows until validation, then « Validé le <date> ».
 - [ ] Each « Valider » creates an audit event with the reference weight, the coefficient and the final value.
 

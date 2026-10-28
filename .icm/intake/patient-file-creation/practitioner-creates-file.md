@@ -30,6 +30,8 @@ file's status is « Dossier à compléter » until every mandatory field is fill
 - [ ] An e-mail already on one of this practitioner's files opens that file with « Ce dossier existe déjà »
 - [ ] The file is created with `practitioner_id` set to the creator
 - [ ] The status is « Dossier à compléter » until the mandatory fields are filled, then « Prêt pour consultation »
+- [ ] The practitioner opens any file of theirs and edits any questionnaire field at any time, a missing one included
+- [ ] The three genotype fields stay locked in the console until the patient's genetic consent is `given` (Morgane's question 5)
 - [ ] Creation and each save write an audit event
 
 ## Out of scope

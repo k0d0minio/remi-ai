@@ -6,7 +6,7 @@
 
 ## What I understood
 
-Before activation a signed-in patient sees one message, « Votre praticien prépare votre accompagnement », and every feature stays locked except the questionnaire. After activation the patient receives « Votre espace REMI est prêt » with a sign-in link and simple instructions to add REMI to the phone's home screen, on iPhone and on Android. The patient signs in with the account created at sign-up. A patient who never received the e-mail signs in all the same and finds the active space. Unvalidated recommendations are never shown. On `main` the patient opens a token link with no account and no waiting state. Rests on D-26 (accounts, owned by `patient-signup-account`), D-31 (status), and `care-activation` (the status flip and the send).
+Before activation a signed-in patient sees one message, « Votre praticien prépare votre accompagnement », and every feature stays locked except the questionnaire. `waiting-screen` keeps the questionnaire reachable before activation. That is the default of question 1, not the story's words. After activation the patient receives « Votre espace REMI est prêt » with a sign-in link and simple instructions to add REMI to the phone's home screen, on iPhone and on Android. The patient signs in with the account created at sign-up. A patient who never received the e-mail signs in all the same and finds the active space. Unvalidated recommendations are never shown. On `main` the patient opens a token link with no account and no waiting state. Rests on D-26 (accounts, owned by `patient-signup-account`), D-31 (status), and `care-activation` (the status flip and the send).
 
 ### Questions for Morgane
 
@@ -32,7 +32,7 @@ Before activation a signed-in patient sees one message, « Votre praticien prép
 | 2   | « L'e-mail d'activation explique comment ajouter REMI à l'écran d'accueil du smartphone … sans téléchargement depuis l'App Store ou Google Play » | activation-email-content |
 | 3   | « Le même compte (mêmes identifiants) donne accès à l'espace activé »                                                                             | active-space-entry       |
 | 4   | « Un patient qui n'a pas reçu l'e-mail peut se connecter et voir son accompagnement actif »                                                       | active-space-entry       |
-| 5   | « Le patient ne voit jamais les recommandations non validées »                                                                                    | rule: README (D-30)      |
+| 5   | « Le patient ne voit jamais les recommandations non validées »                                                                                    | active-space-entry       |
 
 ## Out of scope
 

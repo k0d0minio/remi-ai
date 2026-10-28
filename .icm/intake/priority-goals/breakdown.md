@@ -39,14 +39,14 @@ state of a goal is the protocol validation of story 19 and 20 (cross-epic:
 
 ## Criteria → stubs
 
-| #   | Morgane's criterion (short, her French kept)                                                  | Stub                 |
-| --- | --------------------------------------------------------------------------------------------- | -------------------- |
-| 1   | « Un objectif est un texte libre »                                                            | goals-section        |
-| 2   | « Plusieurs objectifs sont possibles pour un même patient »                                   | goals-section        |
-| 3   | « Les objectifs peuvent être ordonnés par priorité ; l'ordre de priorité est conservé »       | goals-section        |
-| 4   | « Seuls les objectifs validés sont utilisés par REMI pour les suggestions »                   | goals-for-generation |
-| 5   | « Un objectif désactivé n'est plus utilisé mais reste dans l'historique »                     | goals-section        |
-| 6   | « Les objectifs ne contredisent jamais les évictions ni les contre-indications, qui priment » | rule: README (D-30)  |
+| #   | Morgane's criterion (short, her French kept)                                                  | Stub                                |
+| --- | --------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 1   | « Un objectif est un texte libre »                                                            | goals-section                       |
+| 2   | « Plusieurs objectifs sont possibles pour un même patient »                                   | goals-section                       |
+| 3   | « Les objectifs peuvent être ordonnés par priorité ; l'ordre de priorité est conservé »       | goals-section                       |
+| 4   | « Seuls les objectifs validés sont utilisés par REMI pour les suggestions »                   | goals-for-generation                |
+| 5   | « Un objectif désactivé n'est plus utilisé mais reste dans l'historique »                     | goals-section, goals-for-generation |
+| 6   | « Les objectifs ne contredisent jamais les évictions ni les contre-indications, qui priment » | rule: README (D-30)                 |
 
 ## Out of scope
 

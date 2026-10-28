@@ -14,7 +14,7 @@ A request has no reader. Until someone validates the term and its food associati
 
 ## Proposed change
 
-In `apps/admin`, for the admin role only: a page « Demandes d'ajout » listing requests by status and date, and a detail page per request. On the detail: the term, the reason, the practitioner, the source file, the comment. Three actions. « Valider » creates the term in `food_terms` as validated, or completes an existing term, with its associations entered as rows (food, level, provenance, confidence). « Compléter » adds associations to a known term. « Refuser » closes the request with an optional line. Each action writes an audit event and updates the request's status. Until this stub ships, Jamie loads validated terms by hand on Morgane's word.
+In `apps/admin`, for the admin role only: a page « Demandes d'ajout » listing requests by status and date, and a detail page per request. On the detail: the term, the reason, the practitioner, the source file, the comment. Three actions. « Valider » creates the term in `food_terms` as validated, or completes an existing term, with its associations entered as rows (food, level, provenance, confidence). « Compléter » adds associations to a known term. « Refuser » closes the request with an optional line. Each action writes an audit event and updates the request's status. A pending request blocks only its own directive. The other validated directives of the same protocol stay usable. Until this stub ships, Jamie loads validated terms by hand on Morgane's word.
 
 ## Acceptance criteria
 
@@ -24,6 +24,7 @@ In `apps/admin`, for the admin role only: a page « Demandes d'ajout » listing 
 - [ ] « Compléter » adds associations to an existing term.
 - [ ] « Refuser » sets the status « Refusé » and keeps the optional line.
 - [ ] A term is usable in a directive only after « Valider ». Before that, the directive stays unvalidated.
+- [ ] Other validated directives of the same protocol stay usable while a request is pending. The request blocks only its own directive.
 - [ ] Every action writes an audit event (D-32).
 
 ## Out of scope

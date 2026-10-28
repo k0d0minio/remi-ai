@@ -33,6 +33,7 @@ contra-indications are applied before any orientation (D-30).
 - [ ] With a validated ketogenic diet and a « Plutôt glucidique » snack, the output is a low-carb snack with `adapted: true`. The stored choice is unchanged.
 - [ ] The console shows « Adapté au régime » on the adapted meal and does not change the select.
 - [ ] A conflict with a medical restriction shows « Conflit avec … » and « Confirmer ? ». Until confirmed, the output marks the meal `unconfirmed`.
+- [ ] An orientation that conflicts with a contra-indication is refused the same way as one that conflicts with a total eviction.
 - [ ] A total eviction removes the food from every meal whatever the orientation. The test proves it.
 - [ ] The tests cover the five orientations and the four meals.
 
@@ -40,10 +41,11 @@ contra-indications are applied before any orientation (D-30).
 
 - The generation prompt and the recipes (`recipe-space`).
 - The source of the medical restrictions (`food-directives`, `eviction-safety`).
+- Day-scale proportions. `recipe-space/weekly-plan-generation` evaluates proportions over the day.
 
 ## Notes
 
-- Decisions kept: D-30 (priority order: restrictions first, then the validated diet, then the nutritional parameters).
+- Decisions kept: D-30. Its priority order: 1 allergies, intolerances, total evictions and contra-indications. 2 the patient's declared diet and the practitioner's validated imperative recommendations. 3 foods to limit. 4 the validated nutritional parameters.
 - Files: `shared/meals.ts` and tests, the patient file page.
 - cross-epic: `recipe-space` reads this function. `food-directives` and `eviction-safety`
   provide the restrictions it checks. `intermittent-fasting/fasting-in-generation` removes

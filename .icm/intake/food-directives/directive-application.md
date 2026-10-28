@@ -22,6 +22,7 @@ A service `activeDirectives(patientId)` returns the validated, non-archived dire
 - [ ] The context block carries « À favoriser », « À limiter » with level, and « Éviction totale » with period or durable status.
 - [ ] A term in both favour and limit resolves in favour of limit. Exclude wins over both.
 - [ ] A change to a directive reaches the next generation only after the protocol is validated (story 20).
+- [ ] A term that carries a preparation note in `food_term_associations` passes the note with the term in the context block.
 - [ ] Unit tests cover the three lists and the precedence.
 
 ## Out of scope

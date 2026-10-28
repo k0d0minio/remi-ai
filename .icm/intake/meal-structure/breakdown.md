@@ -15,7 +15,9 @@ adapts an orientation to the validated diet (a « plutôt glucidique » snack be
 under a validated ketogenic diet) and shows the adaptation without imposing it. A
 practitioner recommendation that contradicts a medical restriction is flagged and needs a
 confirmation. Total evictions and contra-indications prevail over every orientation (D-30).
-The practitioner may change the configuration at any time.
+« Les recommandations particulières du praticien restent prioritaires » is rank 2 of
+D-30, and `meal-orientation-rules` applies it. The practitioner may change the
+configuration at any time.
 
 On `main` nothing holds a meal structure. The recipe library and the meal journal of
 September do not read one. This epic adds `patient_meal_slots` and a pure resolution

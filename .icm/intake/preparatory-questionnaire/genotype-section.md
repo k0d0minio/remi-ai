@@ -31,14 +31,14 @@ values and restores DEFAULT.
 - [ ] `macroProfile()` returns DEFAULT 45/30/25 when any of the three is empty or the trio has no table entry
 - [ ] Switching to « Non / Je ne sais pas » makes `macroProfile()` return DEFAULT at once and keeps the stored values out of every calculation
 - [ ] The patient can finish the questionnaire with the section empty
-- [ ] The internal table is one data file with a test per entry. Until Morgane validates it (question 3), it holds only DEFAULT and the function returns DEFAULT for every trio
+- [ ] The lookup table is `genotype-macro-split/genotype-reference-table` (story 10). Until Morgane validates the laboratory mapping (question 3), `macroProfile()` returns DEFAULT for every trio
 - [ ] Changing a genotype writes an audit event
 
 ## Out of scope
 
-- The macronutrient proposal in recipes (`recipe-space`). The laboratory mapping's validation (Morgane).
+- The reference table, the macronutrient proposal and its use in recipes (`genotype-macro-split`, story 10). The laboratory mapping's validation (Morgane).
 
 ## Notes
 
-- D-30. cross-epic: `consent-and-data/genetic-consent-and-optional-data`, `recipe-space` reads `macroProfile()`.
+- D-30. cross-epic: `consent-and-data/genetic-consent-and-optional-data`, `genotype-macro-split/genotype-reference-table` (the table `macroProfile()` reads).
 - The 28 Aug rule stands: a doctor orders the test. REMI never suggests one.

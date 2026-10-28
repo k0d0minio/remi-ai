@@ -8,7 +8,7 @@
 
 The patient opens a recipe and finds everything needed to cook it: name, description, times, ingredients with quantities, numbered steps, portions. The patient changes the number of people and every quantity follows. The patient keeps a recipe as a favourite, finds it in « Mes favoris », and removes it. The patient shares a recipe from the card or from the favourites through the phone's share sheet. The shared page carries the recipe, the REMI logo, « REMI, la nutrition sur mesure » and a link to the platform, and nothing about the patient.
 
-On `main` the token link renders Morgane's prose recipes with no quantities to scale and no favourites (the four-button feedback stub was parked). This epic reads the structured recipe of `recipe-space/recipe-structure`. It rests on D-26 (the screen lives behind the patient account) and D-30. Story 24 repeats criteria 10, 11 and 14 to 17 of this story. They are built once, here.
+On `main` the token link renders Morgane's prose recipes with no quantities to scale and no favourites (the four-button feedback stub was parked). This epic reads the structured recipe of `recipe-space/recipe-structure`. It rests on D-26 (the screen lives behind the patient account) and D-30. Story 24 repeats criteria 10, 11 and 14 to 17 of this story. They are built once, here. Criteria 7 to 9 are unconditional in the story. `recipe-sharing` is P1 only until question 1 is answered.
 
 ### Questions for Morgane
 

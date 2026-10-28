@@ -14,7 +14,7 @@ The patient reads quantities on each card and adds them by hand. The story wants
 
 ## Proposed change
 
-A « Liste de courses » action on a card and on a multi-select of today's recipes and favourites. Before building, REMI asks the number of people, pre-filled with the household size. A new table `patient_shopping_lists` stores the recipe ids, the people count and the items as rows: name, quantity, unit, food code when known, checked flag. Identical ingredients are merged by food code, else by normalised name and unit family. Quantities are scaled with the rounding table of `portion-scaling`. The same ingredient in two unit families stays two lines. The list only ever contains ingredients of gated recipes.
+A « Liste de courses » action on a card and on a multi-select of today's recipes and favourites. Before building, REMI asks the number of people, pre-filled with the household size. A new table `patient_shopping_lists` stores the recipe ids, the people count and the items as rows: name, quantity, unit, food code when known, checked flag. Identical ingredients are merged by food code, else by normalised name. Quantities are scaled with the rounding table of `portion-scaling`. Quantities are summed per unit family and never converted across families. The same ingredient in two unit families is one line with both quantities, « 2 oignons et 100 g » (Morgane's question 5). The list only ever contains ingredients of gated recipes.
 
 ## Acceptance criteria
 
@@ -22,6 +22,7 @@ A « Liste de courses » action on a card and on a multi-select of today's recip
 - [ ] Every quantity is proportional to the number of people.
 - [ ] An ingredient present in several recipes appears once with the summed quantity.
 - [ ] No unit is converted across families. Grams stay grams. Pieces stay pieces.
+- [ ] The same ingredient in two unit families is one line that shows both quantities.
 - [ ] A test proves a list never contains an ingredient the recipes do not contain.
 - [ ] Deleting a patient removes their lists.
 

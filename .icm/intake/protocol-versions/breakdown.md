@@ -6,7 +6,7 @@
 
 ## What I understood
 
-The practitioner may change the patient's profile and every recommendation at any time. A change is not applied until the practitioner validates. Until then the file says « Modifications non validées ». Each validation creates a dated, immutable version: version, date, content. The previous version stays readable. Only the validated version reaches recipe generation and meal suggestions. Recipes already generated are kept. On `main` the protocol tables (`patient_recommendations`, `patient_supplements`, `patient_goals`, `patient_instructions`) write live, and archiving is the only history. This epic adds the version layer under them and is the read source for `care-activation`, `patient-recommendations`, `recipe-space` and `meal-improvement`. Rests on D-30, D-32. The patient's own changes are `patient-change-signals`.
+The practitioner may change the patient's profile and every recommendation at any time. A change is not applied until the practitioner validates. Until then the file says « Modifications non validées ». Each validation creates a dated, immutable version: version, date, content. The previous version stays readable. Only the validated version reaches recipe generation and meal suggestions. Recipes already generated are kept. On `main` the protocol tables (`patient_recommendations`, `patient_supplements`, `patient_goals`, `patient_instructions`) write live, and archiving is the only history. This epic adds the version layer under them and is the read source for `care-activation`, `patient-recommendations`, `recipe-space` and `meal-improvement`. Rests on D-30, D-32. The patient's own changes are `patient-change-signals`. « modifier à tout moment le profil du patient » is `patient-file-view/provenance-markers`. The add, modify and deactivate controls live in `food-directives`, `priority-goals`, `supplement-interventions` and `lifestyle-advice`. `working-copy-and-validate` turns their live tables into the working copy.
 
 ### Questions for Morgane
 
@@ -26,18 +26,20 @@ The practitioner may change the patient's profile and every recommendation at an
 
 ## Criteria → stubs
 
-| #   | Morgane's criterion (short, her French kept)                                                                                  | Stub                                                         |
-| --- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| 1   | « Les changements non validés sont signalés (“Modifications non validées”) et ne sont pas appliqués »                         | working-copy-and-validate                                    |
-| 2   | « Après validation, les prochaines recettes et suggestions utilisent les nouvelles recommandations »                          | working-copy-and-validate                                    |
-| 3   | « Les recettes déjà générées ne sont pas supprimées »                                                                         | working-copy-and-validate                                    |
-| 4   | « Chaque validation crée une nouvelle entrée datée dans l'historique ; la version précédente reste consultable avec sa date » | protocol-version-table                                       |
-| 5   | « L'historique est consultable en lecture seule par le praticien »                                                            | protocol-history-view                                        |
-| 6   | « Un élément désactivé reste dans l'historique »                                                                              | protocol-version-table                                       |
-| 7   | « Les changements effectués par le patient sur son profil sont signalés au praticien »                                        | cross-epic: patient-change-signals/change-signals-in-console |
+| #   | Morgane's criterion (short, her French kept)                                                                                  | Stub                                             |
+| --- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| 1   | « Les changements non validés sont signalés (“Modifications non validées”) et ne sont pas appliqués »                         | working-copy-and-validate                        |
+| 2   | « Après validation, les prochaines recettes et suggestions utilisent les nouvelles recommandations »                          | working-copy-and-validate                        |
+| 3   | « Les recettes déjà générées ne sont pas supprimées »                                                                         | working-copy-and-validate                        |
+| 4   | « Chaque validation crée une nouvelle entrée datée dans l'historique ; la version précédente reste consultable avec sa date » | protocol-version-table                           |
+| 5   | « L'historique est consultable en lecture seule par le praticien »                                                            | protocol-history-view                            |
+| 6   | « Un élément désactivé reste dans l'historique »                                                                              | protocol-version-table                           |
+| 7   | « Les changements effectués par le patient sur son profil sont signalés au praticien »                                        | patient-change-signals/change-signals-in-console |
 
 ## Out of scope
 
 - The patient's changes and their signals: `patient-change-signals`.
+- « Modifier à tout moment le profil du patient »: `patient-file-view/provenance-markers`.
+- The add, modify and deactivate controls for each category: `food-directives`, `priority-goals`, `supplement-interventions`, `lifestyle-advice`.
 - The first validation's button and e-mail: `care-activation`.
 - A diff between versions (question 3).

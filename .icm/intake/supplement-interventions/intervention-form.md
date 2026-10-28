@@ -14,11 +14,13 @@ The console's supplement rows take four fields. The story's form takes ten, four
 
 ## Proposed change
 
-On the console patient page, the supplements section becomes « Compléments et interventions » with « + Ajouter une recommandation ». The form shows type, route, moment and frequency as lists with a free option, and name, dose, duration or dates, reason and precautions under a fold. A save with a mandatory field empty is refused and names the field. Each row has « Modifier », « Suspendre », « Terminer ». A suspended or ended row stays in the list under its status. Beside the form, a read-only panel « Déclaré par le patient » shows the medications and supplements the patient declared. REMI adds no dose and no interaction note.
+On the console patient page, the supplements section becomes « Compléments et interventions » with « + Ajouter une recommandation ». The form shows type, route, moment and frequency as lists with a free option, and name, dose, duration or dates, reason and precautions under a fold. « Durée » takes free text, such as « 3 semaines », with or without an end date. A save with a mandatory field empty is refused and names the field. A migrated row carries `incomplete` and shows « À compléter ». Its next edit requires route, moment and frequency before it saves. Each row has « Modifier », « Suspendre », « Terminer ». A suspended or ended row stays in the list under its status. Beside the form, a read-only panel « Déclaré par le patient » shows the medications and supplements the patient declared. REMI adds no dose and no interaction note.
 
 ## Acceptance criteria
 
 - [ ] Type, route, moment and frequency are mandatory. Name, dose, reason, duration and precautions are optional.
+- [ ] A row saves with a free-text « Durée » and no end date.
+- [ ] A migrated row shows « À compléter ». Its next edit does not save until route, moment and frequency are filled.
 - [ ] « Modifier », « Suspendre » and « Terminer » keep the row in history with its status.
 - [ ] The declared medications and supplements show beside the form, read-only.
 - [ ] REMI pre-fills no dose and shows no interaction it did not receive from the practitioner.

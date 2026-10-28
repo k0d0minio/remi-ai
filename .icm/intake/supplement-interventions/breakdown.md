@@ -27,16 +27,16 @@ On main, `patient_supplements` holds name, dose, timing, reason, position and `a
 
 ## Criteria → stubs
 
-| #   | Morgane's criterion (short, her French kept)                                                                                | Stub                                                                                  |
-| --- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| 1   | « Plusieurs interventions peuvent coexister pour un même patient »                                                          | intervention-fields                                                                   |
-| 2   | « Type, voie, moment de prise et fréquence sont obligatoires ; nom, dose, objectif, durée et précautions sont facultatifs » | intervention-form                                                                     |
-| 3   | « Le moment de prise propose : matin, midi, soir, avant / pendant / après repas, au coucher, horaire libre »                | intervention-fields                                                                   |
-| 4   | « La fréquence propose : chaque jour, certains jours, ponctuellement, personnalisée »                                       | intervention-fields                                                                   |
-| 5   | « Le statut par défaut est “Actif” »                                                                                        | intervention-fields                                                                   |
-| 6   | « Le praticien peut modifier, suspendre ou terminer une intervention sans la perdre de l'historique »                       | intervention-form                                                                     |
-| 7   | « Aucune dose ni interaction n'est inventée par REMI »                                                                      | rule: README (D-30)                                                                   |
-| 8   | « Le patient ne voit que les interventions validées et actives »                                                            | intervention-fields (read model), cross-epic patient-recommendations, care-activation |
+| #   | Morgane's criterion (short, her French kept)                                                                                | Stub                                                                                                 |
+| --- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| 1   | « Plusieurs interventions peuvent coexister pour un même patient »                                                          | intervention-fields                                                                                  |
+| 2   | « Type, voie, moment de prise et fréquence sont obligatoires ; nom, dose, objectif, durée et précautions sont facultatifs » | intervention-form                                                                                    |
+| 3   | « Le moment de prise propose : matin, midi, soir, avant / pendant / après repas, au coucher, horaire libre »                | intervention-fields                                                                                  |
+| 4   | « La fréquence propose : chaque jour, certains jours, ponctuellement, personnalisée »                                       | intervention-fields                                                                                  |
+| 5   | « Le statut par défaut est “Actif” »                                                                                        | intervention-fields                                                                                  |
+| 6   | « Le praticien peut modifier, suspendre ou terminer une intervention sans la perdre de l'historique »                       | intervention-form                                                                                    |
+| 7   | « Aucune dose ni interaction n'est inventée par REMI »                                                                      | rule: README (D-30)                                                                                  |
+| 8   | « Le patient ne voit que les interventions validées et actives »                                                            | intervention-fields, patient-recommendations/recommendations-page, care-activation/activation-action |
 
 ## Out of scope
 

@@ -36,6 +36,7 @@ event. A new estimate after a validated target shows a proposal and waits for a 
 - [ ] A weight-loss goal with no typed target leaves the target empty. REMI writes no target alone.
 - [ ] After a validated target, a recomputed estimate changes the target only after a new « Valider ».
 - [ ] « Voir le détail du calcul » shows the formula and the values used. The slot hides it by default.
+- [ ] The estimate and the target show the label « Estimation » until validation, then « Validé le <date> ».
 - [ ] Each « Valider » creates an audit event with the goal, the situation, the estimate and the target.
 
 ## Out of scope

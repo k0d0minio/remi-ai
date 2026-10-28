@@ -18,7 +18,11 @@ epic rests on D-26, D-30 and D-32. The audit trail (`audit_events`) already exis
 every write here. The privacy policy promises two things no story asks for: an option to
 withdraw a consent from the patient's space (section 4) and the deletion of an account inactive
 for twelve months, after a notice (section 7). Jamie decided on 2026-10-23 to build both. Stubs 5
-and 6 carry them. The policy text promises them from its pilot version.
+and 6 carry them. The policy text promises them from its pilot version. The consent gate
+binds every path that creates an account: the sign-up page and the two takeover paths of
+`patient-file-creation/patient-takes-over-file`. Story 1 lets the practitioner enter the
+génotype. Question 5 of `patient-file-creation` settles whether that waits for the patient's
+genetic consent. Default: it waits.
 
 ### Questions for Morgane
 
@@ -48,7 +52,7 @@ and 6 carry them. The policy text promises them from its pilot version.
 | #   | Morgane's criterion (short, her French kept)                                                                                | Stub                              |
 | --- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
 | 1   | « Les consentements requis sont enregistrés avec date et version du texte »                                                 | consent-texts-and-records         |
-| 2   | « Le compte ne peut pas être créé tant que les consentements obligatoires ne sont pas cochés »                              | consent-gate-at-signup            |
+| 2   | « Le compte ne peut pas être créé tant que les consentements obligatoires ne sont pas cochés »                              | consent-gate-at-signup, patient-file-creation/patient-takes-over-file |
 | 3   | « Le patient peut relire les informations sur le traitement de ses données avant de consentir »                             | consent-gate-at-signup            |
 | 4   | « Aucune donnée facultative n'est collectée sans consentement applicable »                                                  | genetic-consent-and-optional-data |
 | 5   | « Un refus est enregistré et ne déclenche aucune activation automatique »                                                   | genetic-consent-and-optional-data |

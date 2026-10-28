@@ -14,11 +14,11 @@ Evictions are the recommendations a patient must never miss. They must stand out
 
 ## Proposed change
 
-Category 3 « Recommandations alimentaires » on the page: three lists from the validated version, « À favoriser », « À limiter », « Évictions totales ». Each eviction shows its period (« jusqu'au <date> ») or « exclusion durable ». Evictions render first and with a distinct style. The same block is reused as the summary on the Profil tab (cross-epic: `patient-home-navigation/profile-tab`).
+Category 3 « Recommandations alimentaires » on the page: three lists from the validated version, in this order: « Évictions totales », « À favoriser », « À limiter ». Each eviction shows its period (« jusqu'au <date> ») or « exclusion durable ». Evictions render first and with a distinct style. The same block is reused as the summary on the Profil tab (cross-epic: `patient-home-navigation/profile-tab`).
 
 ## Acceptance criteria
 
-- [ ] « À favoriser », « À limiter » and « Évictions totales » appear as three lists in that order, evictions first in prominence.
+- [ ] « Évictions totales », « À favoriser » and « À limiter » appear as three lists, in that order.
 - [ ] Each eviction shows its end date or « exclusion durable ».
 - [ ] An ended eviction is not shown (breakdown question 2).
 - [ ] The block reads the validated version only.

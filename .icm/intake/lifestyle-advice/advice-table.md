@@ -20,6 +20,7 @@ A table `patient_lifestyle_advices`: patient, category (one of six keys), text (
 
 - [ ] The migration adds `patient_lifestyle_advices` and moves the `habit` and `activity` rows into it.
 - [ ] A save with an empty text is refused.
+- [ ] « Fréquence », « Moment de la journée » and « Durée » are optional. Each one saves empty.
 - [ ] Several advices can exist in one category for one patient.
 - [ ] A deactivated advice is absent from `validatedAdvices` and present in the history read.
 - [ ] `validatedAdvices` returns nothing for a patient whose protocol is not validated.

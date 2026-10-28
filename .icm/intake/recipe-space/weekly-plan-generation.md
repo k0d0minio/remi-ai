@@ -14,7 +14,7 @@ The patient expects recipes adapted to the protocol without checking the constra
 
 ## Proposed change
 
-For a patient whose file is « Accompagnement actif », REMI keeps seven days of plan ahead. One structured call per recipe starts from a verified template recipe for the meal slot and the season (D-34) and reads the validated protocol: energy and protein targets, the macronutrient split (DEFAULT or genotype), the priority goals, the meal structure and its per-meal orientation, intermittent fasting, the directives « À favoriser », « À limiter », « Éviction totale », the declared diet, allergies and intolerances, the season, and the recipes of the previous two weeks. Every generated recipe goes through `eviction-safety/compatibility-gate`. A `confirmed` recipe is stored. An `uncertain` or `excluded` recipe is discarded and regenerated once. Generation runs at activation and once a day. When a new protocol version is validated, the days after today are regenerated. Past and present days stay.
+For a patient whose file is « Accompagnement actif », REMI keeps seven days of plan ahead. One structured call per recipe starts from a verified template recipe for the meal slot and the season (D-34) and reads the validated protocol: energy and protein targets, the macronutrient split (DEFAULT or genotype), the validated micronutrient directives, the priority goals, the meal structure and its per-meal orientation, intermittent fasting, the directives « À favoriser », « À limiter », « Éviction totale », the declared diet, allergies and intolerances, the season, and the recipes of the previous two weeks. Every generated recipe goes through `eviction-safety/compatibility-gate`. A `confirmed` recipe is stored. An `uncertain` or `excluded` recipe is discarded and regenerated once. Generation runs at activation and once a day. When a new protocol version is validated, the days after today are regenerated. Past and present days stay.
 
 ## Acceptance criteria
 
@@ -22,13 +22,17 @@ For a patient whose file is « Accompagnement actif », REMI keeps seven days of
 - [ ] No stored recipe contains an ingredient in total eviction, a declared allergen or a declared intolerance.
 - [ ] A recipe the gate cannot confirm is never stored as shown.
 - [ ] « À favoriser » sources appear more often. « À limiter » sources appear less often or in smaller quantity. The log shows the counts per week.
+- [ ] The generation input carries the validated micronutrient directives of `food-directives`.
+- [ ] Each meal follows the orientation that `meal-structure/meal-orientation-rules` gives its slot.
 - [ ] A disabled meal and a fasted meal receive no recipe. The collation receives one only when enabled.
 - [ ] No recipe name repeats within the week or against the previous two weeks for the same patient.
 - [ ] Ingredients out of season in Belgium for the month are not the main ingredient.
 - [ ] A new validated protocol version regenerates the days after today within the hour. Already shown days do not change.
 - [ ] Every stored recipe names the verified template it started from.
 - [ ] Every call is one row in `ai_generations`.
-- [ ] Steps are numbered and name temperature and duration where cooking needs them.
+- [ ] Every ingredient of the list appears in at least one step, with its quantity.
+- [ ] No step names an ingredient that is absent from the list.
+- [ ] Steps are numbered, name temperature and duration where cooking needs them, and a beginner can follow them without another source.
 
 ## Out of scope
 

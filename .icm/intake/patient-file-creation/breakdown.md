@@ -23,6 +23,7 @@ D-28 and D-31.
 2. When you create a file with an e-mail, REMI sends nothing until activation. Correct? Default: yes.
 3. Where does your link appear: the account page, the patient list, or both? Default: both.
 4. The appointment date: one date per file, overwritten at each consultation, or a history? Default: one date.
+5. Story 1 lets you enter the génotype on a file you create. Story 3 writes a génotype only under the patient's genetic consent. May you enter it before the patient consents? Default: no. The genotype fields stay locked until the patient gives the genetic consent at takeover.
 
 ### Questions for Jamie
 

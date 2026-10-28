@@ -22,6 +22,7 @@ D-27, D-30, D-31, D-32.
 1. Story 5 names « Dossier à compléter ». Story 30 names « inscription à compléter ». Which label? Default: « Dossier à compléter ».
 2. Today's patients, after the migration: which status? Default: « Accompagnement actif ».
 3. The sort is remembered. What is the first default? Default: by appointment date.
+4. After activation, does a patient change move the file back to « Recommandations à valider », or does it stay « Accompagnement actif » with an indicator? Default: it stays active with the indicator (story 5 criterion 10, story 21).
 
 ### Questions for Jamie
 
