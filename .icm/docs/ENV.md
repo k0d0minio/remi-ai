@@ -92,9 +92,9 @@ Supabase leaning (REMI-007/013 ticket texts predate it). The adapter is
 `packages/services/src/db/adapters/neon.ts`, Drizzle over the serverless **WebSocket** driver
 (`@neondatabase/serverless`'s `Pool` with `drizzle-orm/neon-serverless`), so the storage seam's
 `transaction()` is a real `BEGIN` / `COMMIT` / `ROLLBACK`; checked-in migrations live in
-`packages/services/src/db/migrations/` and are applied by
-`pnpm --filter @remi/services db:migrate`, which runs at the front of the **admin** app's build so
-a deploy migrates before it serves.
+`packages/services/src/db/migrations/`. `db:migrate` applies them and `db:verify` checks the
+result. Where they run is `.icm/database/CONTEXT.md` § The migration rule, and D-36 in
+`.icm/intake/README.md`.
 
 **The pooled driver needs no variable of its own.** Pool size and idle timeout are constants in
 the adapter, sized for one pool per Next.js route bundle rather than one per process. The socket
@@ -102,24 +102,29 @@ needs no wiring either: `@neondatabase/serverless` v1 pulls in no `ws` package a
 `WebSocket` Node 22 provides, so there is no `neonConfig` to set and nothing to carry per
 environment. `DATABASE_URL` remains the whole of the storage configuration.
 
-| Variable                          | Purpose                                                                      | Where set | Public? |
-| --------------------------------- | ---------------------------------------------------------------------------- | --------- | ------- |
-| `DATABASE_URL`                    | Neon connection string — the **admin** and **web** projects                  | Vercel    | no      |
-| `ALLOW_NON_PRODUCTION_MIGRATIONS` | `true` lets a preview deploy migrate. Unset everywhere; an escape hatch only | Vercel    | no      |
+| Variable                | Purpose                                                                                                                                           | Where set | Public? |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
+| `DATABASE_URL`          | Neon connection string (pooled) — the **admin** and **web** projects. Production: production's project. Preview and `uat`: the UAT project's base | Vercel    | no      |
+| `DATABASE_URL_UNPOOLED` | Direct connection string of the same database. `vercel-build.sh` gives it to `db:migrate` and `db:verify`. The app does not read it               | Vercel    | no      |
+| `MIGRATE_AT_BUILD`      | `1` on a preview that owns its own Neon branch. Set by `preview-db.sh` only, scoped to the git branch. Never by hand                              | Vercel    | no      |
+| `VERCEL_TARGET_ENV`     | The deployment's environment: `production`, `uat` or `preview`. Set by Vercel. The `uat` build migrates                                           | Vercel    | no      |
 
-With it unset nothing is registered and any screen that needs the database fails loudly with "no
-database adapter registered" — a deploy without a database never quietly renders nothing.
+With `DATABASE_URL` unset nothing is registered and any screen that needs the database fails loudly
+with "no database adapter registered" — a deploy without a database never quietly renders nothing.
 
-**Preview caveat:** the admin build migrates whatever `DATABASE_URL` it is given, so previews and
-production at the same value means a branch's schema lands in the live database before it merges.
-`scripts/migrate.mjs` now refuses to migrate when `VERCEL_ENV` is anything but `production`, which
-makes that failure impossible by default rather than by discipline — but it is a guard, not the
-answer. The answer is still one of: scope `DATABASE_URL` to production (previews then show the loud
-unregistered error), or point preview environments at a Neon branch of the database.
+**Who migrates.** Only three runs write the schema, and each one owns its database:
 
-The guard's cost is that a preview renders against the schema the database already has, so a table
-a branch adds is absent from its own preview until it merges. `ALLOW_NON_PRODUCTION_MIGRATIONS=true`
-overrides it for one project; reach for a Neon branch first.
+1. The admin `uat` build migrates the UAT base, at every merge to `main`.
+2. A preview whose pull request adds a migration migrates its own Neon branch
+   (`preview/<git branch>`, cut by `preview-db.yml`).
+3. `promote.yml` migrates production, on `promote.sh run`, before the promotion.
+
+Step 2 does not run yet: `preview-db.yml` needs a Vercel project and a Neon project that no
+Actions variable names here. The blueprint will find both (D-36).
+
+Every other build only builds. `.icm/scripts/vercel-build.sh` decides it, and
+`packages/services/scripts/migrate.mjs` refuses again on Vercel when the build owns no database. A
+plain preview reads and writes the UAT base's rows, with the schema the base already has.
 
 Why the guard is not optional: drizzle decides what to apply by comparing each migration's journal
 `when` against the newest `created_at` already recorded — never by hash. A migration applied out of
@@ -214,6 +219,10 @@ unless a second analytics vendor arrives with a reader to go with it.
 | `SLACK_ANNOUNCE_CHANNEL_ID` | Channel id (`C…`) of the release post. Nothing reads it today. An Actions **variable**, not a secret                                       | Actions   | no      |
 | `SLACK_ALERTS_CHANNEL_ID`   | Channel id (`C…`) kept for an alert post. Nothing reads it today                                                                           | Actions   | no      |
 | `VERCEL_TOKEN_REMI21`       | Vercel API token for the **remi21** team. Nothing reads it today                                                                           | local     | no      |
+| `VERCEL_TOKEN`              | Vercel token for the **remi21** team. `promote.yml`, `preview-db.yml`, `neon-cleanup.yml` and `promote.sh` read it                         | both      | no      |
+| `VERCEL_TEAM`               | The Vercel team's slug, `remi21`. An Actions **variable**, not a secret                                                                    | both      | no      |
+| `NEON_API_KEY`              | Neon API key of the organisation. `preview-db.yml` and `neon-cleanup.yml` read it                                                          | both      | no      |
+| `DATABASE_URL`              | Production's **direct** connection string. Read by the migration in `promote.yml` only                                                     | Actions   | no      |
 
 The Slack app itself is described by [`slack-app-manifest.yaml`](slack-app-manifest.yaml) beside this
 file: import it at api.slack.com/apps (Create New App → From a manifest), install it, and the Bot User

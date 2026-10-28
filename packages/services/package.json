@@ -47,6 +47,7 @@
     "ciqual:fixture": "node scripts/ciqual-fixture.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node scripts/migrate.mjs",
+    "db:verify": "node scripts/verify.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"

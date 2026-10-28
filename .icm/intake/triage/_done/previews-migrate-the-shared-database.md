@@ -1,3 +1,5 @@
+> Dropped: superseded by D-36. `triage/set-up-uat-environment` does its work: the fail-closed guard in `migrate.mjs` and the removal of `ALLOW_NON_PRODUCTION_MIGRATIONS`, 2026-10-28
+
 # Stub: Preview deploys migrate the shared database
 
 - lane: chore
