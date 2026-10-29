@@ -1,4 +1,6 @@
 // Test of the shared Neon preview branch. Close this pull request without a merge.
+// Prints the database host only, never the full URL.
+console.log("preview-test db host:", process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL).hostname : "none");
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
