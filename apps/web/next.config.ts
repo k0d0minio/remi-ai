@@ -1,6 +1,7 @@
 // Test of the shared Neon preview branch. Close this pull request without a merge.
-// Prints the database host only, never the full URL.
-console.log("preview-test db host:", process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL).hostname : "none");
+// Prints which Neon endpoint the database host names, as true or false only.
+const previewTestHost = process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL).hostname : "";
+console.log("preview-test endpoint:", JSON.stringify({ previewBranch: previewTestHost.startsWith("ep-aged-water-b9z1kq6n"), main: previewTestHost.startsWith("ep-lively-sunset-b93pzbxy"), hasUrl: previewTestHost !== "" }));
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
