@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   check:
-    uses: legible-consulting/.github/.github/workflows/check-client.yml@main
+    uses: legible-consulting/.github/.github/workflows/check-client.yml@chore/check-client-no-migrations-path
 
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
