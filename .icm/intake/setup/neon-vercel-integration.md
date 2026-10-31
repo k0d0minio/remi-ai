@@ -20,8 +20,10 @@ Do these steps on each Vercel project of the build that reads the database:
 4. Connect the Neon project `remi-ai` to the project, for the environment Production
    only. Or set `DATABASE_URL` and `DATABASE_URL_UNPOOLED` of `remi-ai` on Production by
    hand.
-5. Open Settings → Environment Variables. Make sure that Preview has no `DATABASE_URL` and no
-   `DATABASE_URL_UNPOOLED` for all branches.
+5. Open Settings → Environment Variables. Make sure that Preview's `DATABASE_URL` and
+   `DATABASE_URL_UNPOOLED` come from the store `uat-remi-ai`, and that no person set one by hand.
+   The Vercel-managed integration writes them for all branches, and gives each preview
+   deployment the values of its own branch at build.
 6. Make sure that "Automatically expose System Environment Variables" is on.
 
 ## Done when
@@ -30,5 +32,6 @@ Do these steps on each Vercel project of the build that reads the database:
       before its first build.
 - [ ] Its preview build log shows `[vercel-build] VERCEL_TARGET_ENV=preview: migrate, verify,
       then build`.
-- [ ] Preview has no `DATABASE_URL` for all branches.
+- [ ] Preview's `DATABASE_URL` comes from the store `uat-remi-ai`, and the store's connection to the
+      project makes a database branch for each preview deployment.
 - [ ] Production reads `remi-ai`.
