@@ -3,7 +3,7 @@
 - lane: chore
 - found-by: the setup verification of 2026-10-31 · 2026-10-31
 - complexity: low
-- priority: P2
+- priority: P1
 
 ## Problem
 
@@ -13,6 +13,12 @@ On 2026-10-31 the branches of the merged pull requests #151 and #153 and of the 
 were still in `uat-remi-ai`. Jamie deleted them by the Neon API. The second Done line of the
 setup stub `github-delete-head-branches` (« Its Neon branch is gone from the Neon project »)
 cannot pass as written.
+
+On 2026-11-01 the project reached its limit of 10 branches. Five branches of merged pull requests
+remained: #155, #156, #157, #158 and #160. The integration could not cut a branch for #163, and
+the `admin` and `app` previews failed before the build. Jamie approved the delete of the five, and
+a session deleted them by the Neon API. At three or four pull requests a day, the limit comes back
+in days. Thus the priority is P1.
 
 ## Proposed change
 

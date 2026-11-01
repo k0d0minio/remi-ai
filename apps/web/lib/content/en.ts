@@ -464,4 +464,10 @@ export const en: Content = {
     betaNote:
       "REMI is in beta — feedback is welcome, tell us what is missing or in the way.",
   },
+  signupLink: {
+    metaTitle: "Sign up",
+    title: "Sign up with {name}",
+    opensSoon:
+      "Sign-up opens soon. Keep this link: it will let you create your REMI account, attached to your practitioner.",
+  },
 };

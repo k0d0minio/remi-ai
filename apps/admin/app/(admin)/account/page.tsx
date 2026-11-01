@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { formatDate } from "@remi/services/shared";
+import { appHref, formatDate } from "@remi/services/shared";
 import {
   Badge,
   Card,
@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@remi/ui/server";
 import { NameForm, PasswordForm } from "@/components/operators/account-forms";
+import { SignupLink } from "@/components/operators/signup-link";
 import {
   roleDescriptions,
   roleIntents,
@@ -50,6 +51,24 @@ const Account = async () => {
           {roleDescriptions[operator.role]}
         </Typography>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Mon lien d&apos;inscription</CardTitle>
+          <CardDescription>
+            Un patient qui s&apos;inscrit par ce lien vous est rattaché.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SignupLink
+            url={appHref(
+              "web",
+              `/inscription/${operator.signupLinkToken}`,
+              "fr",
+            )}
+          />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

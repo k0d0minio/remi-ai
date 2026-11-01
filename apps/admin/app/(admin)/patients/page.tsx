@@ -10,12 +10,14 @@ import {
 } from "@remi/services/server";
 import {
   ageInYears,
+  appHref,
   formatDate,
   patientStatuses,
   type PatientStatus,
 } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Badge, EmptyState, Typography, type Intent } from "@remi/ui/server";
+import { SignupLink } from "@/components/operators/signup-link";
 import { RosterFilters } from "@/components/patients/roster-filters";
 import {
   messagesAwaitingLabel,
@@ -112,6 +114,18 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
           </NextLink>
         </Button>
       </div>
+
+      <section
+        aria-labelledby="signup-link-title"
+        className="border-border flex flex-col gap-2 rounded-lg border p-4"
+      >
+        <Typography id="signup-link-title" as="h2" size="sm" weight="semibold">
+          Mon lien d&apos;inscription
+        </Typography>
+        <SignupLink
+          url={appHref("web", `/inscription/${operator.signupLinkToken}`, "fr")}
+        />
+      </section>
 
       <RosterFilters search={search} status={status} sort={sort} />
 

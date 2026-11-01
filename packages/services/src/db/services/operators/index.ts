@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { operatorRoles } from "../../../shared/operator";
 import { err, ok, type Result } from "../../../shared/result";
@@ -21,6 +22,14 @@ import type { Operator, OperatorRole } from "../../models/operator";
 const operators = () => getDatabase().collection<Operator>("operators");
 
 const normaliseEmail = (email: string) => email.trim().toLowerCase();
+
+/**
+ * 24 random bytes as 32 base64url characters. The column default in
+ * `schema.ts` writes the same shape for the rows that predate the column.
+ */
+const newSignupLinkToken = () => randomBytes(24).toString("base64url");
+
+const signupLinkTokenShape = /^[A-Za-z0-9_-]{32}$/;
 
 export const hasOperator = async (): Promise<boolean> => {
   const page = await operators().findMany({}, { limit: 1 });
@@ -93,8 +102,33 @@ export const createOperator = async (
     name: parsed.data.name,
     passwordHash: await hashPassword(parsed.data.password),
     role: parsed.data.role ?? "operator",
+    signupLinkToken: newSignupLinkToken(),
   });
   return ok(operator);
+};
+
+/** What the sign-up page may know about a practitioner: no email, no hash. */
+export type SignupLinkPractitioner = { id: Id; name: string };
+
+/**
+ * Resolves a permanent sign-up link to its practitioner (story 1). It only
+ * reads: an unknown link writes nothing. A value that is not 32 base64url
+ * characters is refused before any query.
+ */
+export const getPractitionerBySignupToken = async (
+  token: string,
+): Promise<Result<SignupLinkPractitioner>> => {
+  if (!signupLinkTokenShape.test(token)) {
+    return err("not_found", "no such sign-up link");
+  }
+  const page = await operators().findMany(
+    { signupLinkToken: token },
+    { limit: 1 },
+  );
+  const operator = page.items[0];
+  return operator
+    ? ok({ id: operator.id, name: operator.name })
+    : err("not_found", "no such sign-up link");
 };
 
 /**

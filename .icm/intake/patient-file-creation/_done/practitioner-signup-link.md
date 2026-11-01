@@ -23,7 +23,7 @@ unknown token shows « Ce lien n'est pas valide » and writes nothing.
 
 ## Acceptance criteria
 
-- [ ] Each practitioner has one token. Two sign-ups through it attach two patients to the same practitioner
+- [ ] Each practitioner has one token. The token resolves to that practitioner on every visit. `patient-signup-account/signup-page` proves that two sign-ups attach two patients to the same practitioner
 - [ ] « Copier le lien » puts the full URL on the clipboard and confirms in place
 - [ ] An unknown or malformed token renders the invalid-link page. No row is written
 - [ ] The token is not shown to another practitioner
