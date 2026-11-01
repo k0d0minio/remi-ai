@@ -12,7 +12,7 @@ import {
   intolerances,
 } from "../../../shared/questionnaire";
 import { registerDatabase } from "../../client";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { createPatient, getPatient } from "../patients";
 import {
   getPatientQuestionnaire,
@@ -24,7 +24,11 @@ let patientId: string;
 
 beforeAll(async () => {
   registerDatabase(createMemoryDatabase());
-  const created = await createPatient({ pseudonym: "Claire", sex: "other" });
+  const created = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym: "Claire",
+    sex: "other",
+  });
   if (!created.ok) {
     throw new Error("test patient not created");
   }

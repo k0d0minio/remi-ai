@@ -169,15 +169,22 @@ const sorters: Record<
 };
 
 /**
+ * One practitioner's files (D-27). The console lists patients through this
+ * and nothing else, so no screen can show another practitioner's file.
+ *
  * Search, filter and sort happen here rather than in the driver: the storage
  * seam speaks in exact-match filters only, and a roster that fits in one page
  * of rows does not earn a query language. If this ever stops fitting in 200
  * rows, the fix is a richer seam, not a filter in the page.
  */
-export const listPatients = async (
+export const patientsOf = async (
+  practitionerId: Id,
   query: PatientQuery = {},
 ): Promise<readonly PatientProfile[]> => {
-  const page = await patients().findMany({}, { limit: 200 });
+  if (!isValidId(practitionerId)) {
+    return [];
+  }
+  const page = await patients().findMany({ practitionerId }, { limit: 200 });
   const status = query.status && query.status !== "all" ? query.status : null;
   return page.items
     .filter((patient) => (status ? patient.status === status : true))
@@ -196,6 +203,76 @@ export const getPatient = async (
   return patient ? ok(patient) : err("not_found", "no such patient");
 };
 
+/**
+ * One file, only when this practitioner holds it. A file of another
+ * practitioner answers `not_found`, like a missing one: « forbidden » would
+ * confirm that the id exists.
+ */
+export const patientOf = async (
+  practitionerId: Id,
+  id: Id,
+  db?: DatabaseClient,
+): Promise<Result<PatientProfile>> => {
+  const found = await getPatient(id, db);
+  return found.ok && found.data.practitionerId === practitionerId
+    ? found
+    : err("not_found", "no such patient");
+};
+
+/**
+ * The collections whose rows sit in one patient file, each by its
+ * `patientId`. A console action that names a row, not a file, finds the file
+ * through this map before it writes.
+ */
+const patientRecordCollections = {
+  recommendation: "patient_recommendations",
+  supplement: "patient_supplements",
+  pantryEssential: "patient_pantry_essentials",
+  mealEntry: "patient_meal_entries",
+  observation: "patient_observations",
+  goal: "patient_goals",
+  challenge: "patient_challenges",
+  message: "patient_messages",
+  recipeAssignment: "patient_recipe_assignments",
+  note: "patient_notes",
+  document: "patient_documents",
+} as const;
+
+/** A check-in hangs from a goal, not from the file: one step more. */
+export type PatientRecordKind =
+  keyof typeof patientRecordCollections | "goalCheckIn";
+
+type FileRow = { id: Id; patientId: Id };
+
+const patientIdOfRecord = async (
+  kind: PatientRecordKind,
+  id: Id,
+): Promise<Id | null> => {
+  const db = getDatabase();
+  if (kind === "goalCheckIn") {
+    const checkIn = await db
+      .collection<{ id: Id; goalId: Id }>("patient_goal_check_ins")
+      .findById(id);
+    return checkIn ? patientIdOfRecord("goal", checkIn.goalId) : null;
+  }
+  const row = await db
+    .collection<FileRow>(patientRecordCollections[kind])
+    .findById(id);
+  return row?.patientId ?? null;
+};
+
+/** The file a row sits in, only when this practitioner holds it. */
+export const patientOfRecord = async (
+  practitionerId: Id,
+  kind: PatientRecordKind,
+  id: Id,
+): Promise<Result<PatientProfile>> => {
+  const patientId = isValidId(id) ? await patientIdOfRecord(kind, id) : null;
+  return patientId
+    ? patientOf(practitionerId, patientId)
+    : err("not_found", "no such patient");
+};
+
 export const getPatientByShareToken = async (
   token: string,
 ): Promise<Result<PatientProfile>> => {
@@ -208,18 +285,27 @@ export const getPatientByShareToken = async (
   return patient ? ok(patient) : err("not_found", "no such patient link");
 };
 
+/**
+ * A new file names its practitioner, or the service refuses it. The id is not
+ * in `patientFields`: an update never moves a file to another practitioner.
+ */
+const newPatientFields = patientFields
+  .partial()
+  .required({ pseudonym: true })
+  .extend({ practitionerId: z.uuid("a practitioner is required") });
+
+export type NewPatientInput = z.input<typeof newPatientFields>;
+
 export const createPatient = async (
-  input: PatientInput,
+  input: NewPatientInput,
 ): Promise<Result<PatientProfile>> => {
-  const parsed = patientFields
-    .partial()
-    .required({ pseudonym: true })
-    .safeParse(input);
+  const parsed = newPatientFields.safeParse(input);
   if (!parsed.success) {
     return invalid(parsed.error.issues[0]);
   }
   const data = parsed.data;
   const patient = await patients().insert({
+    practitionerId: data.practitionerId,
     pseudonym: data.pseudonym,
     fullName: data.fullName ? data.fullName : null,
     email: data.email ? data.email : null,

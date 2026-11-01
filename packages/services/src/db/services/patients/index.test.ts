@@ -1,12 +1,16 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { registerDatabase } from "../../client";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
+import { addGoalCheckIn, addPatientGoal } from "../patient-goals";
+import { addPatientRecommendation } from "../patient-recommendations";
 import {
   createPatient,
   deletePatient,
   getPatient,
   getPatientByShareToken,
-  listPatients,
+  patientOf,
+  patientOfRecord,
+  patientsOf,
   recordPatientLinkOpened,
   regenerateShareToken,
   setPatientNextConsultationPrep,
@@ -36,7 +40,12 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 5));
 
 describe("patient profiles", () => {
   it("creates with defaults and an unguessable share token", async () => {
-    const patient = unwrapOk(await createPatient({ pseudonym: "Claire" }));
+    const patient = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Claire",
+      }),
+    );
     expect(patient.pseudonym).toBe("Claire");
     expect(patient.fullName).toBeNull();
     expect(patient.email).toBeNull();
@@ -53,7 +62,10 @@ describe("patient profiles", () => {
   });
 
   it("requires a pseudonym", async () => {
-    const result = await createPatient({ pseudonym: "   " });
+    const result = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "   ",
+    });
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error).toBe("invalid_input");
@@ -62,6 +74,7 @@ describe("patient profiles", () => {
 
   it("rejects an invalid email", async () => {
     const result = await createPatient({
+      practitionerId: testPractitionerId,
       pseudonym: "Claire",
       email: "not-an-email",
     });
@@ -71,6 +84,7 @@ describe("patient profiles", () => {
   it("updates partially without blanking the rest", async () => {
     const created = unwrapOk(
       await createPatient({
+        practitionerId: testPractitionerId,
         pseudonym: "Marc",
         objective: "sleep better",
         constraints: "no gluten",
@@ -88,6 +102,7 @@ describe("patient profiles", () => {
   it("maps an emptied full name and email back to null", async () => {
     const created = unwrapOk(
       await createPatient({
+        practitionerId: testPractitionerId,
         pseudonym: "Iris",
         fullName: "Iris Dupont",
         email: "iris@example.com",
@@ -101,7 +116,12 @@ describe("patient profiles", () => {
   });
 
   it("resolves the share token exactly, and not at all after regeneration", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "Nora" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Nora",
+      }),
+    );
     const byToken = unwrapOk(await getPatientByShareToken(created.shareToken));
     expect(byToken.id).toBe(created.id);
 
@@ -121,10 +141,15 @@ describe("patient profiles", () => {
   });
 
   it("deletes, and the list reflects it", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "Temp" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Temp",
+      }),
+    );
     expect(unwrapOk(await deletePatient(created.id))).toBe(true);
     expect((await getPatient(created.id)).ok).toBe(false);
-    const remaining = await listPatients();
+    const remaining = await patientsOf(testPractitionerId);
     expect(remaining.some((patient) => patient.id === created.id)).toBe(false);
   });
 });
@@ -133,6 +158,7 @@ describe("clinical fields", () => {
   it("records a birth date, sex and measurements", async () => {
     const created = unwrapOk(
       await createPatient({
+        practitionerId: testPractitionerId,
         pseudonym: "Alix",
         birthDate: "1984-03-11",
         sex: "female",
@@ -153,22 +179,47 @@ describe("clinical fields", () => {
 
   it("rejects a malformed birth date and an out-of-range measurement", async () => {
     expect(
-      (await createPatient({ pseudonym: "Bad", birthDate: "11/03/1984" })).ok,
+      (
+        await createPatient({
+          practitionerId: testPractitionerId,
+          pseudonym: "Bad",
+          birthDate: "11/03/1984",
+        })
+      ).ok,
     ).toBe(false);
     expect(
-      (await createPatient({ pseudonym: "Bad", birthDate: "1984-13-45" })).ok,
+      (
+        await createPatient({
+          practitionerId: testPractitionerId,
+          pseudonym: "Bad",
+          birthDate: "1984-13-45",
+        })
+      ).ok,
     ).toBe(false);
-    expect((await createPatient({ pseudonym: "Bad", heightCm: "0" })).ok).toBe(
-      false,
-    );
     expect(
-      (await createPatient({ pseudonym: "Bad", weightKg: "heavy" })).ok,
+      (
+        await createPatient({
+          practitionerId: testPractitionerId,
+          pseudonym: "Bad",
+          heightCm: "0",
+        })
+      ).ok,
+    ).toBe(false);
+    expect(
+      (
+        await createPatient({
+          practitionerId: testPractitionerId,
+          pseudonym: "Bad",
+          weightKg: "heavy",
+        })
+      ).ok,
     ).toBe(false);
   });
 
   it("clears an optional number and date with an empty string", async () => {
     const created = unwrapOk(
       await createPatient({
+        practitionerId: testPractitionerId,
         pseudonym: "Clear",
         birthDate: "1990-01-01",
         heightCm: "170",
@@ -192,6 +243,7 @@ describe("consent", () => {
   it("records a date and a channel", async () => {
     const created = unwrapOk(
       await createPatient({
+        practitionerId: testPractitionerId,
         pseudonym: "Consented",
         consentDate: "2026-08-14",
         consentChannel: "whatsapp",
@@ -203,7 +255,11 @@ describe("consent", () => {
 
   it("records it after the fact, without touching the rest of the profile", async () => {
     const created = unwrapOk(
-      await createPatient({ pseudonym: "Later", objective: "sleep better" }),
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Later",
+        objective: "sleep better",
+      }),
     );
     expect(created.consentDate).toBeNull();
 
@@ -222,6 +278,7 @@ describe("consent", () => {
     expect(
       (
         await createPatient({
+          practitionerId: testPractitionerId,
           pseudonym: "Bad",
           // The whole point of the enum: "par courrier" is not a channel.
           consentChannel: "post" as never,
@@ -229,13 +286,20 @@ describe("consent", () => {
       ).ok,
     ).toBe(false);
     expect(
-      (await createPatient({ pseudonym: "Bad", consentDate: "14/08/2026" })).ok,
+      (
+        await createPatient({
+          practitionerId: testPractitionerId,
+          pseudonym: "Bad",
+          consentDate: "14/08/2026",
+        })
+      ).ok,
     ).toBe(false);
   });
 
   it("clears both with an empty string", async () => {
     const created = unwrapOk(
       await createPatient({
+        practitionerId: testPractitionerId,
         pseudonym: "Withdrawn",
         consentDate: "2026-08-14",
         consentChannel: "email",
@@ -249,7 +313,12 @@ describe("consent", () => {
   });
 
   it("blocks nothing: a profile with no consent still saves and still shares", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "No consent" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "No consent",
+      }),
+    );
     const updated = unwrapOk(
       await updatePatient(created.id, { objective: "more energy" }),
     );
@@ -265,6 +334,7 @@ describe("the food profile", () => {
   it("records the regime, the two exclusion lists, the budget and the affinity", async () => {
     const created = unwrapOk(
       await createPatient({
+        practitionerId: testPractitionerId,
         pseudonym: "Sana",
         dietaryRegime: "végétarien, sans gluten",
         allergies: "arachides",
@@ -286,7 +356,12 @@ describe("the food profile", () => {
   });
 
   it("leaves them empty, and the affinity not recorded, when nothing is given", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "Blank" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Blank",
+      }),
+    );
     expect(created.dietaryRegime).toBe("");
     expect(created.allergies).toBe("");
     expect(created.intolerances).toBe("");
@@ -300,13 +375,18 @@ describe("the food profile", () => {
   it("takes each value of the affinity, and refuses one outside the set", async () => {
     for (const affinity of ["yes", "somewhat", "no"] as const) {
       const created = unwrapOk(
-        await createPatient({ pseudonym: "Cook", likesCooking: affinity }),
+        await createPatient({
+          practitionerId: testPractitionerId,
+          pseudonym: "Cook",
+          likesCooking: affinity,
+        }),
       );
       expect(created.likesCooking).toBe(affinity);
     }
     expect(
       (
         await createPatient({
+          practitionerId: testPractitionerId,
           pseudonym: "Bad",
           likesCooking: "sometimes" as never,
         })
@@ -317,19 +397,28 @@ describe("the food profile", () => {
   it("takes each level of time and budget, and refuses free text", async () => {
     for (const cookingTime of ["low", "medium", "high"] as const) {
       const created = unwrapOk(
-        await createPatient({ pseudonym: "Time", cookingTime }),
+        await createPatient({
+          practitionerId: testPractitionerId,
+          pseudonym: "Time",
+          cookingTime,
+        }),
       );
       expect(created.cookingTime).toBe(cookingTime);
     }
     for (const foodBudget of ["economical", "standard", "comfort"] as const) {
       const created = unwrapOk(
-        await createPatient({ pseudonym: "Budget", foodBudget }),
+        await createPatient({
+          practitionerId: testPractitionerId,
+          pseudonym: "Budget",
+          foodBudget,
+        }),
       );
       expect(created.foodBudget).toBe(foodBudget);
     }
     expect(
       (
         await createPatient({
+          practitionerId: testPractitionerId,
           pseudonym: "Bad",
           foodBudget: "serré, courses au marché" as never,
         })
@@ -338,6 +427,7 @@ describe("the food profile", () => {
     expect(
       (
         await createPatient({
+          practitionerId: testPractitionerId,
           pseudonym: "Bad",
           cookingTime: "30 min" as never,
         })
@@ -348,6 +438,7 @@ describe("the food profile", () => {
   it("clears a text field and the affinity with an empty string", async () => {
     const created = unwrapOk(
       await createPatient({
+        practitionerId: testPractitionerId,
         pseudonym: "Revised",
         allergies: "fruits à coque",
         likesCooking: "yes",
@@ -363,6 +454,7 @@ describe("the food profile", () => {
   it("updates one without blanking the others", async () => {
     const created = unwrapOk(
       await createPatient({
+        practitionerId: testPractitionerId,
         pseudonym: "Partial",
         dietaryRegime: "sans gluten",
         allergies: "arachides",
@@ -398,7 +490,11 @@ const profileEdit = (
 describe("the patient editing their own food profile", () => {
   it("saves the seven fields and dates each one it changed", async () => {
     const created = unwrapOk(
-      await createPatient({ pseudonym: "Lina", allergies: "arachides" }),
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Lina",
+        allergies: "arachides",
+      }),
     );
     const edited = unwrapOk(
       await updatePatientProfileByPatient(
@@ -434,7 +530,11 @@ describe("the patient editing their own food profile", () => {
 
   it("lets the patient remove an allergy, and dates it", async () => {
     const created = unwrapOk(
-      await createPatient({ pseudonym: "Maé", allergies: "arachides" }),
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Maé",
+        allergies: "arachides",
+      }),
     );
     const edited = unwrapOk(
       await updatePatientProfileByPatient(created.id, profileEdit()),
@@ -448,6 +548,7 @@ describe("the patient editing their own food profile", () => {
   it("changes nothing, and dates nothing, when the form is posted as it was", async () => {
     const created = unwrapOk(
       await createPatient({
+        practitionerId: testPractitionerId,
         pseudonym: "Same",
         allergies: "lactose",
         likesCooking: "yes",
@@ -464,7 +565,12 @@ describe("the patient editing their own food profile", () => {
   });
 
   it("never moves the roster timestamp — that one is Morgane's", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "Roster" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Roster",
+      }),
+    );
     await tick();
     unwrapOk(
       await updatePatientProfileByPatient(
@@ -478,7 +584,12 @@ describe("the patient editing their own food profile", () => {
   });
 
   it("refuses a level outside the set and an unknown patient", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "Strict" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Strict",
+      }),
+    );
     expect(
       (
         await updatePatientProfileByPatient(
@@ -496,7 +607,11 @@ describe("the patient editing their own food profile", () => {
 
   it("drops the patient's date from a field only when Morgane changes that field", async () => {
     const created = unwrapOk(
-      await createPatient({ pseudonym: "Handover", allergies: "arachides" }),
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Handover",
+        allergies: "arachides",
+      }),
     );
     unwrapOk(
       await updatePatientProfileByPatient(
@@ -530,61 +645,79 @@ describe("the patient editing their own food profile", () => {
 describe("the roster query", () => {
   it("searches the pseudonym, the full name and the email", async () => {
     await createPatient({
+      practitionerId: testPractitionerId,
       pseudonym: "Zephyr",
       fullName: "Camille Rousseau",
       email: "camille@example.com",
     });
     expect(
-      (await listPatients({ search: "zeph" })).some(
+      (await patientsOf(testPractitionerId, { search: "zeph" })).some(
         (patient) => patient.pseudonym === "Zephyr",
       ),
     ).toBe(true);
     expect(
-      (await listPatients({ search: "ROUSSEAU" })).some(
+      (await patientsOf(testPractitionerId, { search: "ROUSSEAU" })).some(
         (patient) => patient.pseudonym === "Zephyr",
       ),
     ).toBe(true);
     expect(
-      (await listPatients({ search: "camille@" })).some(
+      (await patientsOf(testPractitionerId, { search: "camille@" })).some(
         (patient) => patient.pseudonym === "Zephyr",
       ),
     ).toBe(true);
-    expect(await listPatients({ search: "no such patient" })).toEqual([]);
+    expect(
+      await patientsOf(testPractitionerId, { search: "no such patient" }),
+    ).toEqual([]);
   });
 
   it("filters by status, and 'all' is not a filter", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "Paused one" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Paused one",
+      }),
+    );
     await updatePatient(created.id, { status: "paused" });
 
-    const paused = await listPatients({ status: "paused" });
+    const paused = await patientsOf(testPractitionerId, { status: "paused" });
     expect(paused.every((patient) => patient.status === "paused")).toBe(true);
     expect(paused.some((patient) => patient.id === created.id)).toBe(true);
 
-    const active = await listPatients({ status: "active" });
+    const active = await patientsOf(testPractitionerId, { status: "active" });
     expect(active.some((patient) => patient.id === created.id)).toBe(false);
 
-    const all = await listPatients({ status: "all" });
+    const all = await patientsOf(testPractitionerId, { status: "all" });
     expect(all.length).toBeGreaterThan(paused.length);
   });
 
   it("sorts by name, and by the last operator edit", async () => {
-    const byName = await listPatients({ sort: "name" });
+    const byName = await patientsOf(testPractitionerId, { sort: "name" });
     const pseudonyms = byName.map((patient) => patient.pseudonym);
     expect(pseudonyms).toEqual(
       [...pseudonyms].sort((a, b) => a.localeCompare(b, "fr")),
     );
 
-    const target = unwrapOk(await createPatient({ pseudonym: "Most recent" }));
+    const target = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Most recent",
+      }),
+    );
     await tick();
     await updatePatient(target.id, { objective: "touched last" });
-    const byRecent = await listPatients({ sort: "recent" });
+    const byRecent = await patientsOf(testPractitionerId, { sort: "recent" });
     expect(byRecent[0]?.id).toBe(target.id);
   });
 });
 
 describe("the share link's last-opened stamp", () => {
   it("records the first open and leaves the operator's edit stamp alone", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "Opened" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Opened",
+      }),
+    );
     await tick();
     await recordPatientLinkOpened(created.id);
 
@@ -596,7 +729,12 @@ describe("the share link's last-opened stamp", () => {
   });
 
   it("does not rewrite the stamp on a second open inside the interval", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "Hammered" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Hammered",
+      }),
+    );
     await recordPatientLinkOpened(created.id);
     const first = unwrapOk(await getPatient(created.id)).linkLastOpenedAt;
 
@@ -608,7 +746,12 @@ describe("the share link's last-opened stamp", () => {
   });
 
   it("forgets the stamp when the link is regenerated", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "Rotated" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Rotated",
+      }),
+    );
     await recordPatientLinkOpened(created.id);
     const regenerated = unwrapOk(await regenerateShareToken(created.id));
     expect(regenerated.linkLastOpenedAt).toBeNull();
@@ -623,12 +766,22 @@ describe("the share link's last-opened stamp", () => {
 
 describe("the next-consultation prep note", () => {
   it("defaults to null on create", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "Prep" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Prep",
+      }),
+    );
     expect(created.nextConsultationPrep).toBeNull();
   });
 
   it("sets the note and moves the operator edit stamp", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "Prep set" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Prep set",
+      }),
+    );
     const before = created.lastEditedAt.getTime();
     await tick();
 
@@ -643,7 +796,12 @@ describe("the next-consultation prep note", () => {
   });
 
   it("clears with an empty string back to null", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "Prep clear" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Prep clear",
+      }),
+    );
     await setPatientNextConsultationPrep(created.id, "quelque chose");
     const cleared = unwrapOk(
       await setPatientNextConsultationPrep(created.id, ""),
@@ -653,7 +811,11 @@ describe("the next-consultation prep note", () => {
 
   it("writes only the prep field and no sibling fields", async () => {
     const created = unwrapOk(
-      await createPatient({ pseudonym: "Prep narrow", objective: "keep me" }),
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Prep narrow",
+        objective: "keep me",
+      }),
     );
     const updated = unwrapOk(
       await setPatientNextConsultationPrep(created.id, "noter la pesée"),
@@ -663,7 +825,12 @@ describe("the next-consultation prep note", () => {
   });
 
   it("rejects an over-long note", async () => {
-    const created = unwrapOk(await createPatient({ pseudonym: "Prep long" }));
+    const created = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Prep long",
+      }),
+    );
     const result = await setPatientNextConsultationPrep(
       created.id,
       "x".repeat(10_001),
@@ -680,5 +847,137 @@ describe("the next-consultation prep note", () => {
     if (!result.ok) {
       expect(result.error).toBe("not_found");
     }
+  });
+});
+
+/**
+ * D-27: two practitioners, one file each. Every console read goes through
+ * these helpers, so each practitioner sees only their own file.
+ */
+describe("the care relationship", () => {
+  const morgane = testPractitionerId;
+  const other = "00000000-0000-4000-8000-000000000002";
+
+  const twoFiles = async () => ({
+    mine: unwrapOk(
+      await createPatient({ practitionerId: morgane, pseudonym: "Mine" }),
+    ),
+    theirs: unwrapOk(
+      await createPatient({ practitionerId: other, pseudonym: "Theirs" }),
+    ),
+  });
+
+  it("refuses a new file without a practitioner", async () => {
+    const missing = await createPatient({
+      pseudonym: "Orphan",
+    } as Parameters<typeof createPatient>[0]);
+    expect(missing.ok).toBe(false);
+    if (!missing.ok) {
+      expect(missing.error).toBe("invalid_input");
+    }
+    const malformed = await createPatient({
+      practitionerId: "not-a-uuid",
+      pseudonym: "Orphan",
+    });
+    expect(malformed.ok).toBe(false);
+  });
+
+  it("stores the practitioner on the new file", async () => {
+    const { mine, theirs } = await twoFiles();
+    expect(mine.practitionerId).toBe(morgane);
+    expect(theirs.practitionerId).toBe(other);
+  });
+
+  it("lists only the practitioner's own files", async () => {
+    const { mine, theirs } = await twoFiles();
+    const morganes = await patientsOf(morgane);
+    expect(morganes.some((patient) => patient.id === mine.id)).toBe(true);
+    expect(morganes.some((patient) => patient.id === theirs.id)).toBe(false);
+    expect(
+      morganes.every((patient) => patient.practitionerId === morgane),
+    ).toBe(true);
+    const others = await patientsOf(other);
+    expect(others.some((patient) => patient.id === theirs.id)).toBe(true);
+    expect(others.every((patient) => patient.practitionerId === other)).toBe(
+      true,
+    );
+  });
+
+  it("lists nothing for a malformed practitioner id", async () => {
+    await twoFiles();
+    expect(await patientsOf("not-a-uuid")).toEqual([]);
+  });
+
+  it("opens a file only for its practitioner", async () => {
+    const { mine, theirs } = await twoFiles();
+    expect(unwrapOk(await patientOf(morgane, mine.id)).id).toBe(mine.id);
+    const refused = await patientOf(morgane, theirs.id);
+    expect(refused.ok).toBe(false);
+    if (!refused.ok) {
+      expect(refused.error).toBe("not_found");
+    }
+  });
+
+  it("never moves a file to another practitioner on update", async () => {
+    const { mine } = await twoFiles();
+    const updated = unwrapOk(
+      await updatePatient(mine.id, {
+        practitionerId: other,
+        objective: "unchanged holder",
+      } as Parameters<typeof updatePatient>[1]),
+    );
+    expect(updated.practitionerId).toBe(morgane);
+  });
+
+  it("finds the file of a row, and refuses another practitioner's", async () => {
+    const { mine, theirs } = await twoFiles();
+    const recommendation = unwrapOk(
+      await addPatientRecommendation(theirs.id, {
+        category: "nutrition",
+        title: "Hydratation",
+      }),
+    );
+    const refused = await patientOfRecord(
+      morgane,
+      "recommendation",
+      recommendation.id,
+    );
+    expect(refused.ok).toBe(false);
+    expect(
+      unwrapOk(
+        await patientOfRecord(other, "recommendation", recommendation.id),
+      ).id,
+    ).toBe(theirs.id);
+
+    const goal = unwrapOk(
+      await addPatientGoal(mine.id, { title: "Sommeil", baseline: "4/10" }),
+    );
+    const checkIn = unwrapOk(
+      await addGoalCheckIn(goal.id, {
+        checkedOn: "2026-11-01",
+        direction: "better",
+      }),
+    );
+    expect(
+      unwrapOk(await patientOfRecord(morgane, "goalCheckIn", checkIn.id)).id,
+    ).toBe(mine.id);
+    expect((await patientOfRecord(other, "goalCheckIn", checkIn.id)).ok).toBe(
+      false,
+    );
+  });
+
+  it("answers not found for a missing or malformed row", async () => {
+    expect((await patientOfRecord(morgane, "note", "not-a-uuid")).ok).toBe(
+      false,
+    );
+    expect(
+      (
+        await patientOfRecord(
+          morgane,
+          "note",
+          "00000000-0000-4000-8000-0000000000ff",
+        )
+      ).ok,
+    ).toBe(false);
   });
 });

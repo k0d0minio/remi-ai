@@ -2,7 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import NextLink from "next/link";
 import { notFound } from "next/navigation";
 import {
-  getPatient,
+  patientOf,
   getPatientInstruction,
   getPatientSummary,
   listGoalCheckIns,
@@ -14,6 +14,7 @@ import {
   ConsultationForm,
   type ConsultationGoal,
 } from "@/components/patients/consultation-form";
+import { requireOperator } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 
 /** Reads the database on every hit — never prerendered. */
@@ -52,7 +53,8 @@ const protocolLinks = (id: string) =>
 const NewConsultation = async ({ params }: PageProps) => {
   ensureDatabase();
   const { id } = await params;
-  const result = await getPatient(id);
+  const operator = await requireOperator();
+  const result = await patientOf(operator.id, id);
   if (!result.ok) {
     notFound();
   }

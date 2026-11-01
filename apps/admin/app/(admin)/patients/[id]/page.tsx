@@ -7,7 +7,7 @@ import {
   countGoalCheckInsAwaitingAttention,
   countMealEntriesAwaitingFeedback,
   getCurrentChallenge,
-  getPatient,
+  patientOf,
   getPatientInstruction,
   getPatientSummary,
   listArchivedMealEntries,
@@ -111,6 +111,7 @@ import {
   type PatientSegment,
 } from "@/components/patients/vocabulary";
 import { patientContextInput } from "@/lib/patients/context";
+import { requireOperator } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 import { fileStoreReady } from "@/lib/files";
 
@@ -152,7 +153,9 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     : segmentParam;
   const initialSegment: PatientSegment =
     segmentValue && isPatientSegment(segmentValue) ? segmentValue : "suivi";
-  const result = await getPatient(id);
+  // Another practitioner's file answers 404, like a missing one (D-27).
+  const operator = await requireOperator();
+  const result = await patientOf(operator.id, id);
   if (!result.ok) {
     notFound();
   }

@@ -4,7 +4,7 @@ import NextLink from "next/link";
 import {
   getCiqualImport,
   listPatientRecommendations,
-  listPatients,
+  patientsOf,
 } from "@remi/services/server";
 import {
   formatDate,
@@ -25,6 +25,7 @@ import {
   patientStatusIntents,
   patientStatusLabels,
 } from "@/components/patients/vocabulary";
+import { requireOperator } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 
 export const metadata: Metadata = {
@@ -47,8 +48,9 @@ const PREVIEW = 5;
  */
 const Accueil = async () => {
   ensureDatabase();
+  const operator = await requireOperator();
   const [patients, ciqual] = await Promise.all([
-    listPatients({ sort: "recent" }),
+    patientsOf(operator.id, { sort: "recent" }),
     getCiqualImport(),
   ]);
 

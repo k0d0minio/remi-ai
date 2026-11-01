@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { registerDatabase } from "../../client";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { addPatientGoal, listGoalCheckIns } from "../patient-goals";
 import { getPatientInstruction } from "../patient-instructions";
 import { listPatientNotes } from "../patient-notes";
@@ -30,7 +30,12 @@ beforeAll(() => {
 });
 
 beforeEach(async () => {
-  patientId = unwrapOk(await createPatient({ pseudonym: "Claire" })).id;
+  patientId = unwrapOk(
+    await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Claire",
+    }),
+  ).id;
   goalId = unwrapOk(
     await addPatientGoal(patientId, { title: "Dormir sans réveil" }),
   ).id;
@@ -156,7 +161,12 @@ describe("recording a consultation", () => {
   });
 
   it("refuses a check-in on a goal that is not this patient's, and writes nothing", async () => {
-    const otherPatient = unwrapOk(await createPatient({ pseudonym: "Alix" }));
+    const otherPatient = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Alix",
+      }),
+    );
     const otherGoal = unwrapOk(
       await addPatientGoal(otherPatient.id, { title: "Bouger plus" }),
     );

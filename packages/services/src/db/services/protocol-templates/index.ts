@@ -62,7 +62,7 @@ const view = (
  * Every template of one kind this operator may insert: her own, plus the ones
  * another operator has shared.
  *
- * The filter is applied in memory for the same reason `listPatients` does it —
+ * The filter is applied in memory for the same reason `patientsOf` does it —
  * the seam speaks in exact-match filters only, and "mine or shared" is not one.
  * A console with two operators and a handful of named sets each does not earn a
  * query language.
