@@ -16,14 +16,16 @@ creates once and keeps.
 
 ## Proposed change
 
-Add an auth seam to `packages/services`: sign up, sign in, sign out, current session, password
-reset. One adapter behind it (Jamie's question 1, default Neon Auth). Add the
+Add an auth seam to `packages/services`: sign up, sign in, magic link, sign out, current
+session, password reset. A patient signs up and signs in with a password or with a magic link
+(Jamie, 2026-11-01). One adapter behind it (Jamie's question 1, default Neon Auth). Add the
 `patient_accounts` table: one row per `patient_profiles` row, e-mail, the adapter's subject id,
 created and activated timestamps. Nothing above the seam names the vendor.
 
 ## Acceptance criteria
 
-- [ ] `packages/services/src/auth/` exports one interface for sign up, sign in, sign out, session read and password reset
+- [ ] `packages/services/src/auth/` exports one interface for password sign up, password sign in, magic-link request, sign out, session read and password reset
+- [ ] A magic-link request sends one e-mail. The link signs the patient in, and creates the account when none exists
 - [ ] One adapter is registered at process start by `apps/web`. No app imports the vendor directly
 - [ ] The migration adds `patient_accounts` with a unique `patient_profile_id` and a unique e-mail per practitioner
 - [ ] A session read returns the principal kind (`patient` or `operator`) and its id
