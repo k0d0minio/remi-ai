@@ -284,6 +284,18 @@ export {
 } from "../db/services/patient-anamnesis";
 
 export {
+  getPatientQuestionnaire,
+  savePatientQuestionnaire,
+  setPatientAllergens,
+} from "../db/services/patient-questionnaire";
+export type {
+  AllergenAnswer,
+  AllergenSelection,
+  PatientQuestionnaireView,
+  QuestionnaireInput,
+} from "../db/services/patient-questionnaire";
+
+export {
   describeConsultation,
   recordConsultation,
 } from "../db/services/consultations";

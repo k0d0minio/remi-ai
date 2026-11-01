@@ -22,6 +22,12 @@ One row in `patient_profiles`, plus what hangs off it:
 | When the patient last changed each of those fields                 | `patient_profiles`        | no                                                 |
 | Referral, anamnesis                                                | `patient_profiles`        | no — practitioner's working record                 |
 | Consent date and channel                                           | `patient_profiles`        | no                                                 |
+| Questionnaire: sex for the calculation, activity, desired weight   | `patient_profiles`        | no — no page shows them yet                        |
+| Questionnaire: consultation reason and date, diet, pathologies     | `patient_profiles`        | no — no page shows them yet                        |
+| Questionnaire: celiac disease, the free question's answer          | `patient_profiles`        | no — no page shows them yet                        |
+| The genetic test answer, the APOE, DIO2 and AMY1A results          | `patient_profiles`        | no — stored, never interpreted (D-35)              |
+| Allergies and intolerances as checked boxes                        | `patient_allergens`       | no — no page shows them yet                        |
+| Whether the patient declared « no known » allergy or intolerance   | `patient_profiles`        | no — no page shows them yet                        |
 | The share token, when the link was last opened, last written       | `patient_profiles`        | the token is the link                              |
 | The protocol, entry by entry                                       | `patient_recommendations` | yes, unless archived                               |
 | Consultation notes                                                 | `patient_notes`           | no                                                 |
@@ -116,6 +122,7 @@ Deleting a patient from the console removes, permanently and in one operation:
 - the profile row — every field in the table above, the real name and the email included;
 - every recommendation encoded for them, archived ones too;
 - every consultation note about them;
+- their questionnaire's allergy and intolerance boxes;
 - every challenge she gave them, running or closed, with the patient's answers on each;
 - the whole general thread — every message the patient sent and every reply to it;
 - everything the patient themselves wrote through the link — their meal entries and their

@@ -167,8 +167,95 @@ export const patientProfiles = pgTable("patient_profiles", {
     .$type<Record<string, string>>()
     .notNull()
     .default({}),
+  /*
+   * The preparatory questionnaire — story 4, `preparatory-questionnaire`. Every
+   * column is nullable and has no default: null is « Non renseigné », and REMI
+   * invents no answer (D-30). The keys are the constants of
+   * `shared/questionnaire.ts`. Allergies and intolerances live in
+   * `patient_allergens`. The free-text `allergies` and `intolerances` above
+   * stay until every reader moves.
+   */
+  /** `female` or `male`. Never `sex`, which is an identity field. */
+  sexForCalculation: text("sex_for_calculation"),
+  /** One of the four NAP levels. */
+  activityLevel: text("activity_level"),
+  /** « Poids souhaité », optional. */
+  desiredWeightKg: doublePrecision("desired_weight_kg"),
+  /** « Motif de consultation », in the patient's words. */
+  consultationReason: text("consultation_reason"),
+  /**
+   * « Date de consultation ». One date: the file shows this same one as the
+   * appointment (story 4, question 5). A calendar day, like `birth_date`.
+   */
+  consultationDate: date("consultation_date", { mode: "string" }),
+  /** One key of `diets`. */
+  diet: text("diet"),
+  /** The note behind the `other` diet. */
+  dietNote: text("diet_note"),
+  /** « Pathologies », free text (story 4, question 2). */
+  pathologies: text("pathologies"),
+  /**
+   * « Maladie cœliaque », declared in the pathologies and never as an allergy.
+   * `true` excludes gluten strictly, cross-contamination included.
+   */
+  celiacDisease: boolean("celiac_disease"),
+  /** The gate answer: `yes` or `no_or_unknown`. Null: not answered. */
+  geneticTest: text("genetic_test"),
+  /**
+   * The three results, in the laboratory's notation. Stored, never
+   * interpreted, until Morgane validates the laboratory mapping (D-35).
+   */
+  apoe: text("apoe"),
+  dio2: text("dio2"),
+  amy1a: text("amy1a"),
+  /** The answer to the practitioner's own free question. */
+  practitionerQuestionAnswer: text("practitioner_question_answer"),
+  /**
+   * « Aucune allergie connue » / « Aucune intolérance connue ». `true` is the
+   * declared absence, `false` means the patient declared rows, and null is no
+   * answer. The story keeps the declared absence distinct from no answer.
+   */
+  noKnownAllergies: boolean("no_known_allergies"),
+  noKnownIntolerances: boolean("no_known_intolerances"),
   ...timestamps,
 });
+
+/**
+ * The patient's allergies and intolerances as story 4's checkbox lists — one row
+ * per checked box, replacing the free text on the profile.
+ *
+ * `key` is one of `allergens` or `intolerances` (`shared/questionnaire.ts`),
+ * by `kind`. `sub_key` is one of the category's sub-list, or `all` for
+ * « Tous ». A null `sub_key` on a category with a sub-list excludes the whole
+ * category by precaution, the same as `all`. `other_text` holds the « Autre »
+ * text and is null on every other row.
+ *
+ * The unique constraint treats nulls as equal, so one category cannot hold two
+ * « whole category » rows.
+ */
+export const patientAllergens = pgTable(
+  "patient_allergens",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(),
+    key: text("key").notNull(),
+    subKey: text("sub_key"),
+    otherText: text("other_text"),
+    ...timestamps,
+  },
+  (table) => [
+    unique()
+      .on(table.patientId, table.kind, table.key, table.subKey)
+      .nullsNotDistinct(),
+    check(
+      "patient_allergens_kind",
+      sql`${table.kind} in ('allergy', 'intolerance')`,
+    ),
+  ],
+);
 
 export const patientRecommendations = pgTable("patient_recommendations", {
   id: uuid("id").primaryKey().defaultRandom(),
