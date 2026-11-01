@@ -26,6 +26,12 @@ export {
 } from "./i18n";
 export type { Locale } from "./i18n";
 export { auditActions } from "./audit";
+export { minPasswordLength, signupFields } from "./signup";
+export type {
+  SignupField,
+  SignupFieldError,
+  SignupFieldErrors,
+} from "./signup";
 export type { AuditActionName } from "./audit";
 export {
   consentDecisions,

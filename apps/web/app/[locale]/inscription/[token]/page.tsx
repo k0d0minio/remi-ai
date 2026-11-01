@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getPractitionerBySignupToken } from "@remi/services/server";
 import { isLocale } from "@remi/services/shared";
 import { Typography, Wordmark } from "@remi/ui/server";
+import { SignupForm } from "@/components/signup/signup-form";
 import { getContent } from "@/lib/content";
 import { fill } from "@/lib/content/fill";
 import { ensureDatabase } from "@/lib/database";
@@ -24,13 +25,13 @@ export const generateMetadata = async ({
 };
 
 /**
- * Where a practitioner's permanent sign-up link lands (story 1). The token
- * only names a practitioner. It opens no data and no session.
+ * Where a practitioner's permanent sign-up link lands (stories 1 and 2). The
+ * token only names a practitioner. It opens no data and no session.
  *
- * The page only reads. An unknown or malformed token is `notFound()`, which
- * renders this route's `not-found.tsx` with a 404, and nothing is written.
- * `patient-signup-account/signup-page` replaces the holding line with the
- * sign-up form, and that form attaches the new patient to `practitioner.id`.
+ * An unknown or malformed token is `notFound()`, which renders this route's
+ * `not-found.tsx` with a 404, and nothing is written. A known one shows the
+ * sign-up form. Its action resolves the token again and attaches the new
+ * patient to that practitioner.
  */
 const SignupLinkPage = async ({ params }: { params: Promise<Params> }) => {
   const { locale, token } = await params;
@@ -51,8 +52,9 @@ const SignupLinkPage = async ({ params }: { params: Promise<Params> }) => {
         {fill(content.title, { name: found.data.name })}
       </Typography>
       <Typography size="sm" tone="muted">
-        {content.opensSoon}
+        {content.intro}
       </Typography>
+      <SignupForm token={token} locale={locale} content={content} />
     </main>
   );
 };

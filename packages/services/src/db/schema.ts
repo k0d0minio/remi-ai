@@ -56,6 +56,15 @@ export const patientProfiles = pgTable("patient_profiles", {
   pseudonym: text("pseudonym").notNull(),
   /** Real identity. Optional, and never sent to an AI provider. */
   fullName: text("full_name"),
+  /**
+   * « Prénom » and « Nom » as the patient typed them at sign-up (story 2).
+   * `full_name` holds the two joined, so every reader of it keeps working.
+   * Null on a file the console created: the practitioner types one full name.
+   */
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  /** « Téléphone », digits and one leading `+`, spaces removed. Null until asked. */
+  phone: text("phone"),
   email: text("email"),
   locale: text("locale").notNull().default("fr"),
   status: text("status").notNull().default("active"),

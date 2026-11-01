@@ -290,22 +290,32 @@ export const getPatientByShareToken = async (
 const newPatientFields = patientFields
   .partial()
   .required({ pseudonym: true })
-  .extend({ practitionerId: z.uuid("a practitioner is required") });
+  .extend({
+    practitionerId: z.uuid("a practitioner is required"),
+    /** Only the sign-up page sends these three. The console sends `fullName`. */
+    firstName: z.string().trim().max(100).optional(),
+    lastName: z.string().trim().max(100).optional(),
+    phone: z.string().trim().max(30).optional(),
+  });
 
 export type NewPatientInput = z.input<typeof newPatientFields>;
 
 export const createPatient = async (
   input: NewPatientInput,
+  db?: DatabaseClient,
 ): Promise<Result<PatientProfile>> => {
   const parsed = newPatientFields.safeParse(input);
   if (!parsed.success) {
     return invalid(parsed.error.issues[0]);
   }
   const data = parsed.data;
-  const patient = await patients().insert({
+  const patient = await patients(db).insert({
     practitionerId: data.practitionerId,
     pseudonym: data.pseudonym,
     fullName: data.fullName ? data.fullName : null,
+    firstName: data.firstName ? data.firstName : null,
+    lastName: data.lastName ? data.lastName : null,
+    phone: data.phone ? data.phone : null,
     email: data.email ? data.email : null,
     locale: data.locale ?? "fr",
     status: data.status ?? "active",
