@@ -500,4 +500,18 @@ export type Content = {
     /** The beta framing consultants read before giving UX feedback. */
     betaNote: string;
   };
+  /**
+   * The page a practitioner's permanent sign-up link opens, at
+   * `/inscription/[token]` (story 1). The sign-up form arrives with
+   * `patient-signup-account/signup-page`. Until then the page names the
+   * practitioner and says the sign-up opens soon. The invalid-link copy lives
+   * in the route's `not-found.tsx`: a not-found boundary receives no locale.
+   */
+  signupLink: {
+    /** The page title in the browser tab. */
+    metaTitle: string;
+    /** Holds `{name}`: the practitioner's name. */
+    title: string;
+    opensSoon: string;
+  };
 };

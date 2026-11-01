@@ -828,6 +828,26 @@ export const operators = pgTable("operators", {
    * migration instead.
    */
   role: text("role").notNull().default("operator"),
+  /**
+   * The practitioner's permanent sign-up link (story 1). A patient who signs
+   * up through `/inscription/<token>` is attached to this practitioner.
+   *
+   * Stored in plaintext, unlike an invitation token: the console shows the
+   * link again on every visit, and a hash cannot. The token grants no access.
+   * It only names a practitioner. Nothing rewrites it: a password change or a
+   * sign-out leaves it as it is.
+   *
+   * The default is the migration's backfill, and it also covers an insert by
+   * a deployment that predates the column. It draws 24 random bytes from two
+   * `gen_random_uuid()` calls (no extension needed) and writes them as 32
+   * base64url characters, the shape `createOperator` generates.
+   */
+  signupLinkToken: text("signup_link_token")
+    .notNull()
+    .unique()
+    .default(
+      sql`translate(encode(decode(substr(replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', ''), 1, 48), 'hex'), 'base64'), '+/', '-_')`,
+    ),
   ...timestamps,
 });
 
