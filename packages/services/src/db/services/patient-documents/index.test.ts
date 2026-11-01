@@ -9,7 +9,7 @@ import { todayAtPractice } from "../../../shared/format";
 import type { Id } from "../../../types";
 import { getDatabase, registerDatabase } from "../../client";
 import type { PatientProfile } from "../../models/patient-profile";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { createPatient, deletePatient } from "../patients";
 import {
   addPatientDocumentFile,
@@ -69,7 +69,10 @@ beforeEach(() => {
 });
 
 const newPatient = async (pseudonym: string): Promise<PatientProfile> => {
-  const created = await createPatient({ pseudonym });
+  const created = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym,
+  });
   if (!created.ok) {
     throw new Error(created.message);
   }

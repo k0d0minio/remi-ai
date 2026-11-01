@@ -5,7 +5,7 @@ import {
   type Collection,
   type DatabaseClient,
 } from "../../client";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { createPatient } from "../patients";
 import { createRecipe, listRecipes } from "../recipes";
 import {
@@ -71,8 +71,14 @@ const recipeNamed = async (title: string) => {
 
 beforeAll(async () => {
   registerDatabase(withInjectedFailure(createMemoryDatabase()));
-  const claire = await createPatient({ pseudonym: "Claire" });
-  const luc = await createPatient({ pseudonym: "Luc" });
+  const claire = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym: "Claire",
+  });
+  const luc = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym: "Luc",
+  });
   if (!claire.ok || !luc.ok) {
     throw new Error("test patients not created");
   }
@@ -242,7 +248,10 @@ describe("recipes assigned to a patient", () => {
 
 describe("giving several recipes at once", () => {
   it("writes one row per recipe from a single note and date", async () => {
-    const claire = await createPatient({ pseudonym: "Inès" });
+    const claire = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Inès",
+    });
     if (!claire.ok) {
       throw new Error("patient not created");
     }
@@ -267,7 +276,10 @@ describe("giving several recipes at once", () => {
   });
 
   it("counts a recipe chosen twice in one selection once", async () => {
-    const patient = await createPatient({ pseudonym: "Théo" });
+    const patient = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Théo",
+    });
     const soup = await recipeNamed("Velouté de panais");
     if (!patient.ok) {
       throw new Error("patient not created");
@@ -282,7 +294,10 @@ describe("giving several recipes at once", () => {
   });
 
   it("refuses the whole batch when one is already held, and names it", async () => {
-    const patient = await createPatient({ pseudonym: "Nora" });
+    const patient = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Nora",
+    });
     const kept = await recipeNamed("Galette de sarrasin");
     const fresh = await recipeNamed("Compote sans sucre");
     if (!patient.ok) {
@@ -305,7 +320,10 @@ describe("giving several recipes at once", () => {
   });
 
   it("refuses an empty selection and an unknown recipe without writing", async () => {
-    const patient = await createPatient({ pseudonym: "Yann" });
+    const patient = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Yann",
+    });
     if (!patient.ok) {
       throw new Error("patient not created");
     }
@@ -326,7 +344,10 @@ describe("giving several recipes at once", () => {
 
 describe("writing a recipe and giving it in one save", () => {
   it("creates the library row and the assignment together", async () => {
-    const patient = await createPatient({ pseudonym: "Sam" });
+    const patient = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Sam",
+    });
     if (!patient.ok) {
       throw new Error("patient not created");
     }
@@ -350,7 +371,10 @@ describe("writing a recipe and giving it in one save", () => {
   });
 
   it("writes neither half when the recipe is invalid", async () => {
-    const patient = await createPatient({ pseudonym: "Ava" });
+    const patient = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Ava",
+    });
     if (!patient.ok) {
       throw new Error("patient not created");
     }
@@ -366,7 +390,10 @@ describe("writing a recipe and giving it in one save", () => {
   });
 
   it("writes neither half when the date is invalid", async () => {
-    const patient = await createPatient({ pseudonym: "Iris" });
+    const patient = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Iris",
+    });
     if (!patient.ok) {
       throw new Error("patient not created");
     }
@@ -383,7 +410,10 @@ describe("writing a recipe and giving it in one save", () => {
   });
 
   it("leaves no library row when the assignment fails after it", async () => {
-    const patient = await createPatient({ pseudonym: "Théo" });
+    const patient = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Théo",
+    });
     if (!patient.ok) {
       throw new Error("patient not created");
     }
@@ -408,8 +438,14 @@ describe("writing a recipe and giving it in one save", () => {
 
 describe("adapting a recipe for one person", () => {
   it("gives the variant and retires the original's giving, for that person only", async () => {
-    const mine = await createPatient({ pseudonym: "Lou" });
-    const theirs = await createPatient({ pseudonym: "Max" });
+    const mine = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Lou",
+    });
+    const theirs = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Max",
+    });
     if (!mine.ok || !theirs.ok) {
       throw new Error("patients not created");
     }
@@ -446,7 +482,10 @@ describe("adapting a recipe for one person", () => {
   });
 
   it("carries the origin's tags and reports the origin on the card", async () => {
-    const patient = await createPatient({ pseudonym: "Zoé" });
+    const patient = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Zoé",
+    });
     const tagged = await createRecipe({
       title: "Gratin d'hiver",
       body: "Des légumes racines.",
@@ -473,7 +512,10 @@ describe("adapting a recipe for one person", () => {
   });
 
   it("works when the patient does not already hold the original", async () => {
-    const patient = await createPatient({ pseudonym: "Élie" });
+    const patient = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Élie",
+    });
     const never = await recipeNamed("Houmous maison");
     if (!patient.ok) {
       throw new Error("patient not created");
@@ -491,7 +533,10 @@ describe("adapting a recipe for one person", () => {
 
   it("reports an unknown patient or recipe rather than throwing", async () => {
     const missing = "00000000-0000-4000-8000-000000000000";
-    const patient = await createPatient({ pseudonym: "Bo" });
+    const patient = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Bo",
+    });
     const recipe = await recipeNamed("Salade de lentilles");
     if (!patient.ok) {
       throw new Error("patient not created");

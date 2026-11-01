@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { registerDatabase } from "../../client";
+import { getDatabase, registerDatabase } from "../../client";
 import { createMemoryDatabase } from "../../test-helpers";
 import {
   changeOperatorPassword,
@@ -151,6 +151,25 @@ describe("the last-owner invariant", () => {
     );
     expect(unwrapOk(await deleteOperator(morgane.id))).toBe(true);
     expect(await findOperatorByEmail("morgane@example.com")).toBeNull();
+  });
+
+  it("refuses to delete an account that still holds a patient file", async () => {
+    const holder = unwrapOk(
+      await createOperator({
+        email: "holder@example.com",
+        name: "Holder",
+        password: "a long enough password",
+      }),
+    );
+    await getDatabase()
+      .collection<{ id: string; practitionerId: string }>("patient_profiles")
+      .insert({ practitionerId: holder.id });
+    const result = await deleteOperator(holder.id);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toBe("not_permitted");
+    }
+    expect(await getOperator(holder.id)).not.toBeNull();
   });
 
   it("setting the role an account already holds is a no-op, not a refusal", async () => {

@@ -1,4 +1,8 @@
-import { getPatientDocument, signedFileUrl } from "@remi/services/server";
+import {
+  getPatientDocument,
+  patientOf,
+  signedFileUrl,
+} from "@remi/services/server";
 import { getOperatorSession } from "@/lib/auth/session";
 import { fileStoreReady } from "@/lib/files";
 
@@ -20,6 +24,10 @@ export const GET = async (
   const { documentId } = await params;
   const document = await getPatientDocument(documentId);
   if (!document || document.kind !== "file" || !document.blobKey) {
+    return new Response("Not found", { status: 404 });
+  }
+  // A file of another practitioner's patient answers 404 too (D-27).
+  if (!(await patientOf(operator.id, document.patientId)).ok) {
     return new Response("Not found", { status: 404 });
   }
   if (!fileStoreReady()) {

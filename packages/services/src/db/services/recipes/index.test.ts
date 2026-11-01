@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { registerDatabase } from "../../client";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { createPatient } from "../patients";
 import { assignRecipes } from "../recipe-assignments";
 import {
@@ -129,8 +129,14 @@ describe("the recipe library", () => {
 
   it("counts the patients currently holding a recipe", async () => {
     const recipe = await created("Dahl de lentilles");
-    const claire = await createPatient({ pseudonym: "Claire" });
-    const luc = await createPatient({ pseudonym: "Luc" });
+    const claire = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Claire",
+    });
+    const luc = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Luc",
+    });
     if (!claire.ok || !luc.ok) {
       throw new Error("test patients not created");
     }
@@ -200,7 +206,10 @@ describe("duplicating a recipe as a variant", () => {
   });
 
   it("leaves the origin's holder count alone", async () => {
-    const claire = await createPatient({ pseudonym: "Manon" });
+    const claire = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Manon",
+    });
     if (!claire.ok) {
       throw new Error("patient not created");
     }

@@ -44,6 +44,14 @@ const timestamps = {
 
 export const patientProfiles = pgTable("patient_profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
+  /**
+   * The practitioner who holds the file (D-27). One per patient: the console
+   * shows a practitioner their own files only. No cascade: an operator who
+   * still holds files cannot be deleted, so no file is lost with an account.
+   */
+  practitionerId: uuid("practitioner_id")
+    .notNull()
+    .references(() => operators.id),
   /** The working name — the one an AI provider may later be allowed to see. */
   pseudonym: text("pseudonym").notNull(),
   /** Real identity. Optional, and never sent to an AI provider. */

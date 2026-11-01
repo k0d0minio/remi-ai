@@ -197,6 +197,17 @@ export const deleteOperator = async (id: Id): Promise<Result<true>> => {
       "this is the last owner — the console would have nobody who can manage it",
     );
   }
+  // The foreign key refuses it too. This answer says why, before the driver
+  // throws: the files of an account must find a new practitioner first (D-27).
+  const held = await getDatabase()
+    .collection<{ id: Id; practitionerId: Id }>("patient_profiles")
+    .findMany({ practitionerId: id }, { limit: 1 });
+  if (held.items.length > 0) {
+    return err(
+      "not_permitted",
+      "this account still holds patient files — they need another practitioner first",
+    );
+  }
   const removed = await operators().remove(id);
   return removed ? ok(true) : err("not_found", "no such operator");
 };

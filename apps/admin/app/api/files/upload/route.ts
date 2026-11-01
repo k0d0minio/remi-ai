@@ -1,4 +1,4 @@
-import { answerUploadRequest, getPatient } from "@remi/services/server";
+import { answerUploadRequest, patientOf } from "@remi/services/server";
 import { isPatientFileKey } from "@remi/services/shared";
 import { getOperatorSession } from "@/lib/auth/session";
 import { fileStoreReady } from "@/lib/files";
@@ -17,8 +17,8 @@ import { fileStoreReady } from "@/lib/files";
 
 /**
  * The patient the widget names, or `null`. Only the shape is read here —
- * `getPatient` validates the id itself and answers `not_found` for anything
- * that is not one of hers.
+ * `patientOf` validates the id itself and answers `not_found` for anything
+ * that is not a file this practitioner holds.
  */
 const patientIdOf = (clientPayload: string | null): string | null => {
   try {
@@ -50,7 +50,7 @@ export const POST = async (request: Request): Promise<Response> => {
     if (!patientId) {
       return false;
     }
-    const patient = await getPatient(patientId);
+    const patient = await patientOf(operator.id, patientId);
     return patient.ok && isPatientFileKey(key, patientId);
   });
 };

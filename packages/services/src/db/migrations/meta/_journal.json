@@ -183,6 +183,13 @@
       "when": 1793525597396,
       "tag": "0025_patient_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1793526771182,
+      "tag": "0026_care_relationship",
+      "breakpoints": true
     }
   ]
 }

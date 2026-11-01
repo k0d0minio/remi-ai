@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { registerDatabase } from "../../client";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { addMealEntry, archiveMealEntry } from "../meal-entries";
 import { createPatient } from "../patients";
 import {
@@ -21,7 +21,10 @@ beforeAll(() => {
 
 /** A fresh patient per test — the same isolation the service itself gives. */
 beforeEach(async () => {
-  const created = await createPatient({ pseudonym: "Claire" });
+  const created = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym: "Claire",
+  });
   if (!created.ok) {
     throw new Error("test patient not created");
   }
