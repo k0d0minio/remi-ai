@@ -27,6 +27,6 @@ touches `apps/web` and `apps/admin`, so it builds both projects.
 ## Acceptance criteria
 
 - [ ] Each name that `uat` sets ends in `[production,preview,uat]` in both `.env.example` files.
-- [ ] The admin preview build log shows `[vercel-build] VERCEL_TARGET_ENV=preview: migrate, verify, then build`, then `[db:migrate] host=` with the host of the branch `preview/triage/declare-uat-and-migrate-previews`, not the host of `uat-remi-ai` main.
+- [ ] The admin preview build log shows `[vercel-build] VERCEL_TARGET_ENV=preview: migrate, verify, then build`, then `[db:migrate] VERCEL_TARGET_ENV=preview host=`. Vercel redacts the host in the log. The proof that the build reached its own branch is in Neon: the compute of `preview/triage/declare-uat-and-migrate-previews` runs at the build's time, and the compute of `uat-remi-ai` main does not start.
 - [ ] After the merge, the admin `uat` build log shows `[vercel-build] VERCEL_TARGET_ENV=uat: migrate, verify, then build`, and `https://uat-admin.remi-ai.tech` answers.
 - [ ] `.icm/docs/ENV.md` § Who migrates names the Neon integration, not `preview-db.yml`.
