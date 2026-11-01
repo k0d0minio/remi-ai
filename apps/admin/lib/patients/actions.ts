@@ -294,6 +294,7 @@ export const savePatientAction = async (
     // The new file belongs to the practitioner who creates it (D-27).
     const created = await createPatient({
       ...input,
+      pseudonym: input.pseudonym ?? "",
       practitionerId: operator.id,
     });
     if (!created.ok) {
