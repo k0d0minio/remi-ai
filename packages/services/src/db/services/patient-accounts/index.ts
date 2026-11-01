@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { err, ok, type Result } from "../../../shared/result";
-import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientAccount } from "../../models/patient-account";
 import { getPatient } from "../patients";
