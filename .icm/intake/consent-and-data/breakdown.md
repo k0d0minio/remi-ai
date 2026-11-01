@@ -33,6 +33,8 @@ genetic consent. Default: it waits.
 5. What happens when a patient withdraws the mandatory `care` consent? Default: generation and suggestions stop at once, your file shows « Consentement retiré », the space stays readable, and deletion stays a request by e-mail.
 6. Which legal retention rules may block the deletion of an inactive account? Default: none during the pilot. An admin can set a hold on one file.
 
+Morgane answered on the call of 2026-10-23 (recorded by Jamie, 2026-11-01): 1. Yes, version 1. 2. Yes: the care consent is mandatory, the genetic consent optional. 3. Yes, a separate short text. 5. Yes. 6. None during the pilot. An admin can set a hold on one file. At the end of the pilot the account continues if the patient wants it, else it is deleted one month after the end, after an e-mail of notice.
+
 ### Questions for Jamie
 
 1. Consent text bodies: rows in the database, or versioned markdown files in the repo with the hash stored on the consent row? Default: markdown in the repo.

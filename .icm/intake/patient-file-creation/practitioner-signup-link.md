@@ -36,4 +36,4 @@ unknown token shows « Ce lien n'est pas valide » and writes nothing.
 ## Notes
 
 - cross-epic: `patient-signup-account/signup-page` consumes the token. Merge this stub first.
-- Morgane's question 1: one practitioner on 1 December. The structure still issues one token per operator.
+- Morgane's question 1, answered on the call of 2026-10-23: about a dozen practitioners before 19 December. The structure still issues one token per operator.

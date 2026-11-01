@@ -24,6 +24,8 @@ Nothing on `main` does this. The epic reads the structured ingredients of `recip
 2. One current list per patient, or a history? Default: a history. The newest list is « en cours ».
 3. The e-mail sender for the product: `EMAIL_FROM` on the `web` project. Default: the same address as the console, on the verified domain.
 
+Jamie answered on 2026-11-01: the same sender as the console, « REMI » from no-reply@mail.jamienisbet.com until remiai.be is verified in Resend.
+
 ## Build order
 
 1. shopping-list-build — the selection, the people count, the aggregation and the table — depends-on: none

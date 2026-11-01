@@ -20,6 +20,8 @@ At launch the base holds CIQUAL only. Seven of the nine example consignes in the
 4. Can a directive be saved as a reusable template, as the protocol templates are today? Default: no, per patient only in the MVP.
 5. By when do you name and validate the sources for the compounds, so that your example consignes work on 1 December? Default: before phase 2 starts on 14 November.
 
+Morgane answered on the call of 2026-10-23 (recorded by Jamie, 2026-11-01): 1. Yes: she names the sources, Jamie loads them as draft, she validates them in the admin. 5. Before 14 November.
+
 ### Questions for Jamie
 
 1. Term matching: normalised exact match with a synonym table, or an embedding search? Default: normalised exact match and synonyms, no model.

@@ -17,6 +17,8 @@ The check is one function in `packages/services`, called by recipe-space, meal-i
 3. Do allergies and intolerances the patient declares count as durable evictions for the check, with no period? Default: yes, at once (story 30).
 4. Does a suspension also hide the recipes already shown for the week, or only stop new ones? Default: it hides them too.
 
+Morgane answered on the call of 2026-10-23 (recorded by Jamie, 2026-11-01): 4. Yes. The expiry of a temporary eviction with no decision suspends every suggestion and hides the recipes already shown for the week.
+
 ### Questions for Jamie
 
 1. How does a generated recipe name its ingredients for the check? Default: the model picks from CIQUAL food codes we pass in the prompt. A free-text ingredient is uncertain, so the recipe is excluded.

@@ -147,8 +147,8 @@ Jamie's own decision, not a default.
     `patient-home-navigation`.
 27. **D-27 — The practitioner space is `apps/admin`, with two roles.** `admin` is the REMI team
     (story 15's review list, story 3's logged access). `practitioner` sees only their own
-    patients (stories 1, 3, 5, 6). Morgane holds both roles. One practitioner at the open day
-    unless she says otherwise (question 2).
+    patients (stories 1, 3, 5, 6). Morgane holds both roles. About a dozen practitioners before the
+    open day (Morgane, call of 2026-10-23).
 28. **D-28 — One auth seam for both apps.** The adapter is Jamie's decision in
     `patient-signup-account`. Default: Neon Auth. The operator scrypt code of September is
     replaced, not extended.
@@ -176,6 +176,9 @@ Jamie's own decision, not a default.
     (stories 5, 30). `patient-list-and-status` owns the enum. Every surface reads it.
     « Dossier à compléter » is story 5's label and the default of `patient-list-and-status`
     question 1. Story 30 says « inscription à compléter ».
+    The status « Recommandations à valider » triggers on the first saved recommendation of any
+    kind, food, goal, supplement or lifestyle advice, food recommendations foremost (Morgane, call
+    of 2026-10-23).
 32. **D-32 — Audit events.** A status change, a consent, a validated protocol version and a
     patient change after validation each write to `audit_events`, with who, when and what
     (stories 3, 19, 20, 21).
@@ -231,8 +234,10 @@ Two fixed points from the direction letter: **FunMedDev's team tests on 1 Decemb
 **the open day is 19 December 2026**. Jamie keeps the horizon at 19 December (2026-10-23). The
 dates below are derived backwards, one person, agents in parallel where the epics allow it. Jamie
 is on site for another client from 2 to 6 November. The September plan assumed one stub a day
-(D-15). Twenty-nine epics are more than one stub a day fits before 1 December, so **what 1
-December must show is question 1 of the call**, and the P0 set follows her answer. A missed date
+(D-15). Twenty-nine epics are more than one stub a day fits before 1 December, so Jamie asked
+Morgane what 1 December must show. She answered on the call of 2026-10-23 (recorded by Jamie,
+2026-11-01): **as much as possible, and at the least working accounts and the protocol in its
+simplest form**, phases 1 and 2. The P0 set follows that answer. A missed date
 is reported on the Friday call, not absorbed.
 
 | By          | Phase                                                                                                  | Epics                                                                                                                                                                                      |
@@ -254,6 +259,20 @@ with a default. A session that starts a stub asks them in the pull request befor
 and builds on no guess. The questions of the 23 October call are collected in French in the
 client's Drive folder. Her answers return to the breakdowns in the same pull request that acts on
 them.
+
+Jamie and Morgane went through that agenda on the call of 2026-10-23. The call's Gemini notes
+hold no usable transcript, so Jamie recorded her answers on 2026-11-01, under « Questions for
+Morgane » of each breakdown they touch. The answers that bind every epic:
+
+- 1 December shows as much as possible, and at the least working accounts and the protocol in
+  its simplest form.
+- About a dozen practitioners before 19 December.
+- The patient space is in French only.
+- REMI's e-mails show « REMI » as the sender, from no-reply@mail.jamienisbet.com until
+  remiai.be is verified in Resend.
+- « Recommandations à valider » triggers on the first saved recommendation of any kind.
+
+A question the call did not touch keeps its default.
 
 ## Where the previous backlogs went
 

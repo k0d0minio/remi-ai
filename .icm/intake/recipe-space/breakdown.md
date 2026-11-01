@@ -22,6 +22,8 @@ This epic rests on D-16 (gateway, structured output, log, safety in code), D-26 
 6. For how many people does REMI generate a recipe before the patient scales it? Default: one portion.
 7. The story asks for a justification « si facile à mettre en place sinon pas pour le MVP ». It costs one field in the generation schema. Build it now? Default: yes.
 
+Morgane answered on the call of 2026-10-23 (recorded by Jamie, 2026-11-01): 1. Yes: her library, grown past twenty, each recipe verified by her before 1 December. 2. Yes. 7. Yes, build it now.
+
 ### Questions for Jamie
 
 1. Which role generates a recipe? Default: `balanced` for the recipe, `fast` for the checks. Gateway model ids replace the Anthropic ids in `ai/index.ts`.

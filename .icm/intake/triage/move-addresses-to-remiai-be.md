@@ -31,6 +31,8 @@ Jamie does the act when the registrar access exists, then a chore run edits `.ic
 4. In `.icm/environments.md`, write the `remiai.be` address in each Address cell, and keep the
    `remi-ai.tech` address beside it until it is removed from Vercel.
 5. Update the auth trusted domains of Neon Auth on both Neon projects to the new addresses.
+ 6. Verify remiai.be in Resend, then set `EMAIL_FROM` to `REMI <no-reply@remiai.be>` on every target
+   of `admin` and, when `shopping-list` ships, of `app`.
 
 Overlap: `triage/neon-api-key-and-dead-domain.md` proposes to remove `app.remiai.be` from `app`
 or add its records. This stub adds the records. Jamie prunes one of the two.

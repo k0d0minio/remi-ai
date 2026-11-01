@@ -28,6 +28,8 @@ D-26, D-30, D-31 and feeds the calculations (stories 7 to 9) and recipes (story 
 4. The practitioner's free question: one per practitioner, or several? Default: one.
 5. « Date de consultation » here and « date de rendez-vous » on the file: the same date? Default: yes, one field.
 
+Morgane answered on the call of 2026-10-23 (recorded by Jamie, 2026-11-01): 3. The default stands: she validates the A/H/M mapping once the laboratory is chosen. The genotype is stored and not used until then.
+
 ### Questions for Jamie
 
 1. Structured allergies and intolerances: rows in a `patient_allergens` table with the enum in code, or one JSONB column? Default: a table.

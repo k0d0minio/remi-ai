@@ -160,9 +160,9 @@ never reuses production's. `OPERATOR_EMAIL` on uat may take its own test address
 | `EMAIL_FROM`     | Default from-address for outbound email                   | Vercel    | no      |
 | `RESEND_API_KEY` | Resend API key — read by the Resend adapter on every send | Vercel    | no      |
 
-Value per target: production takes the live key and the client's sender. uat and preview take a key
-of a separate Resend account or sandbox and a test sender on a domain verified in Resend, never the
-live key. Unset: the console mailer logs and sends nothing.
+Value per target: production takes the live key. uat and preview take a key of a separate Resend
+account or sandbox, never the live key. `EMAIL_FROM` is `REMI <no-reply@mail.jamienisbet.com>` on
+every target until remiai.be is verified in Resend. Unset: the console mailer logs and sends nothing.
 
 Resend is the registered mail vendor: `packages/services/src/email/adapters/resend.ts` implements
 the `Mailer` seam. Two apps register it: `apps/marketing` for the public contact form, and

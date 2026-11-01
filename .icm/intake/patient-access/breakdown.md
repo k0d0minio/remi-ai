@@ -14,6 +14,8 @@ Before activation a signed-in patient sees one message, « Votre praticien prép
 2. Does the waiting screen show anything else, such as your name or the appointment date? Default: your name, and the appointment date when it is known.
 3. Should the e-mail come from « REMI » or from your name? Default: « REMI ».
 
+Morgane answered on the call of 2026-10-23 (recorded by Jamie, 2026-11-01): 3. « REMI ». The address is no-reply@mail.jamienisbet.com until remiai.be is in hand.
+
 ### Questions for Jamie
 
 1. Add a web app manifest and icons to `apps/web` so the home-screen shortcut opens full screen? Default: yes.
