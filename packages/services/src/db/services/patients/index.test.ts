@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { registerDatabase } from "../../client";
+import { getDatabase, registerDatabase } from "../../client";
+import type { PatientProfile } from "../../models/patient-profile";
 import { createMemoryDatabase } from "../../test-helpers";
 import {
   createPatient,
@@ -12,6 +13,7 @@ import {
   setPatientNextConsultationPrep,
   updatePatient,
   updatePatientProfileByPatient,
+  type PatientInput,
   type PatientProfileEdit,
 } from "./index";
 
@@ -189,63 +191,39 @@ describe("clinical fields", () => {
 });
 
 describe("consent", () => {
-  it("records a date and a channel", async () => {
+  // Since `consent-texts-and-records` a consent is a row of `patient_consents`.
+  // The two columns keep what Morgane recorded by hand, and nothing writes them.
+  const handRecorded = {
+    consentDate: "2026-08-14",
+    consentChannel: "email",
+  } as const;
+
+  it("ignores the two old columns on a create", async () => {
     const created = unwrapOk(
-      await createPatient({
-        pseudonym: "Consented",
-        consentDate: "2026-08-14",
-        consentChannel: "whatsapp",
-      }),
+      await createPatient({ pseudonym: "Consented", ...handRecorded }),
     );
-    expect(created.consentDate).toBe("2026-08-14");
-    expect(created.consentChannel).toBe("whatsapp");
+    expect(created.consentDate).toBeNull();
+    expect(created.consentChannel).toBeNull();
   });
 
-  it("records it after the fact, without touching the rest of the profile", async () => {
+  it("keeps the hand-recorded values through an update that sends others", async () => {
     const created = unwrapOk(
       await createPatient({ pseudonym: "Later", objective: "sleep better" }),
     );
-    expect(created.consentDate).toBeNull();
-
+    // The values a profile holds from before: written under the service.
+    await getDatabase()
+      .collection<PatientProfile>("patient_profiles")
+      .update(created.id, handRecorded);
     const updated = unwrapOk(
       await updatePatient(created.id, {
-        consentDate: "2026-09-01",
-        consentChannel: "consultation",
-      }),
+        objective: "more energy",
+        consentDate: "",
+        consentChannel: "",
+      } as PatientInput),
     );
-    expect(updated.consentDate).toBe("2026-09-01");
-    expect(updated.consentChannel).toBe("consultation");
-    expect(updated.objective).toBe("sleep better");
-  });
-
-  it("rejects a channel outside the closed set and a malformed date", async () => {
-    expect(
-      (
-        await createPatient({
-          pseudonym: "Bad",
-          // The whole point of the enum: "par courrier" is not a channel.
-          consentChannel: "post" as never,
-        })
-      ).ok,
-    ).toBe(false);
-    expect(
-      (await createPatient({ pseudonym: "Bad", consentDate: "14/08/2026" })).ok,
-    ).toBe(false);
-  });
-
-  it("clears both with an empty string", async () => {
-    const created = unwrapOk(
-      await createPatient({
-        pseudonym: "Withdrawn",
-        consentDate: "2026-08-14",
-        consentChannel: "email",
-      }),
-    );
-    const cleared = unwrapOk(
-      await updatePatient(created.id, { consentDate: "", consentChannel: "" }),
-    );
-    expect(cleared.consentDate).toBeNull();
-    expect(cleared.consentChannel).toBeNull();
+    expect(updated.objective).toBe("more energy");
+    expect(updated.consentDate).toBe("2026-08-14");
+    expect(updated.consentChannel).toBe("email");
   });
 
   it("blocks nothing: a profile with no consent still saves and still shares", async () => {

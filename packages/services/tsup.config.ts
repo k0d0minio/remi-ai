@@ -17,6 +17,8 @@ export default defineConfig({
     "src/files/client.ts",
   ],
   format: ["esm"],
+  // The consent texts are markdown files inlined as strings (`src/consent/`).
+  loader: { ".md": "text" },
   dts: { resolve: false, respectExternal: true },
   clean: true,
   sourcemap: true,

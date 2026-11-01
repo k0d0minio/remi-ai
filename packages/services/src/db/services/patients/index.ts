@@ -4,7 +4,6 @@ import { getFileStore, isFileStoreConfigured } from "../../../files";
 import { patientFilesPrefix } from "../../../shared/files";
 import { locales } from "../../../shared/i18n";
 import {
-  consentChannels,
   cookingAffinities,
   cookingTimes,
   foodBudgets,
@@ -109,9 +108,8 @@ const patientFields = z.object({
   supplements: text,
   referral: text,
   anamnesis: text,
-  consentDate: calendarDate,
-  /** `""` clears a recorded channel; the enum is what makes it countable. */
-  consentChannel: z.union([z.literal(""), z.enum(consentChannels)]),
+  // No `consentDate` or `consentChannel`: the two columns are read-only since
+  // `consent-texts-and-records`. A consent is a row of `patient_consents`.
 });
 
 export type PatientInput = Partial<z.input<typeof patientFields>>;
@@ -243,8 +241,8 @@ export const createPatient = async (
     referral: data.referral ?? "",
     anamnesis: data.anamnesis ?? "",
     nextConsultationPrep: null,
-    consentDate: data.consentDate ? data.consentDate : null,
-    consentChannel: data.consentChannel ? data.consentChannel : null,
+    consentDate: null,
+    consentChannel: null,
     lastEditedAt: new Date(),
     shareToken: newShareToken(),
     linkLastOpenedAt: null,
@@ -297,8 +295,6 @@ export const updatePatient = async (
     birthDate,
     heightCm,
     weightKg,
-    consentDate,
-    consentChannel,
     likesCooking,
     cookingTime,
     foodBudget,
@@ -310,8 +306,6 @@ export const updatePatient = async (
   assign(patch, "birthDate", nullableText(birthDate));
   assign(patch, "heightCm", nullableNumber(heightCm));
   assign(patch, "weightKg", nullableNumber(weightKg));
-  assign(patch, "consentDate", nullableText(consentDate));
-  assign(patch, "consentChannel", nullableEnum(consentChannel));
   assign(patch, "likesCooking", nullableEnum(likesCooking));
   assign(patch, "cookingTime", nullableEnum(cookingTime));
   assign(patch, "foodBudget", nullableEnum(foodBudget));

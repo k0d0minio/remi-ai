@@ -129,6 +129,14 @@ export const auditActions = [
   "summary.updated",
   "summary.cleared",
   "next_consultation_prep.updated",
+  /**
+   * A consent decision (`consent-texts-and-records`, D-32). One action per
+   * decision so the journal filters a withdrawal without opening the row. The
+   * detail names the key, the text version and the language shown.
+   */
+  "consent.given",
+  "consent.refused",
+  "consent.withdrawn",
   "share_link.regenerated",
   "share_link.emailed",
   /**

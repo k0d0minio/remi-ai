@@ -78,7 +78,6 @@ import {
 import {
   appHref,
   challengeOutcomes,
-  consentChannels,
   contextBlocks,
   cookingAffinities,
   cookingTimes,
@@ -90,7 +89,6 @@ import {
   patientSexes,
   patientStatuses,
   recommendationCategories,
-  type ConsentChannel,
   type ChallengeOutcome,
   type CookingAffinity,
   type CookingTime,
@@ -166,12 +164,6 @@ const asSex = (value: string): PatientSex =>
   (patientSexes as readonly string[]).includes(value)
     ? (value as PatientSex)
     : "unspecified";
-
-/** `""` is a real answer here — it is how Morgane clears a recorded channel. */
-const asConsentChannel = (value: string): ConsentChannel | "" =>
-  (consentChannels as readonly string[]).includes(value)
-    ? (value as ConsentChannel)
-    : "";
 
 /** `""` is a real answer: § D lets a check-in carry a measure and no direction. */
 const asGoalDirection = (value: string): GoalDirection | "" =>
@@ -249,8 +241,6 @@ const patientInputFrom = (formData: FormData): PatientInput => {
     supplements: field(formData, "supplements"),
     referral: field(formData, "referral"),
     anamnesis: field(formData, "anamnesis"),
-    consentDate: field(formData, "consentDate"),
-    consentChannel: asConsentChannel(field(formData, "consentChannel")),
   };
 };
 
