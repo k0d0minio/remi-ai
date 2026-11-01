@@ -55,6 +55,8 @@ The « API du laboratoire » of the 24 October procedure is outside the MVP what
 5. The Mouton summary uses LCT/MCM6 for lactose vigilance (its CAS D). Story 4 collects APOE, DIO2 and AMY1A only. Collect LCT/MCM6 in the MVP? Default: no. Lactose stays an allergy, an intolerance or an eviction the practitioner writes.
 6. Which laboratory reports the genotypes? Fagron NutriGen is under discussion, not decided. Default: open. The mapping validation waits for the choice. The patient types the three results from any report in the meantime.
 
+Morgane answered on the call of 2026-10-23 (recorded by Jamie, 2026-11-01): 1. Yes, the 28-row table of 24 October. 3. Yes: the table is loaded and tested, and the lookup returns DEFAULT until she validates the mapping. 6. Open: no laboratory is chosen.
+
 ### Questions for Jamie
 
 1. Where does the split live? Default: a `macro` kind in `patient_calculations` (`bmi/calculations-table`), the ranges and the orientation in `estimate_parameters`, the practitioner's values in `validated_value` and `validation_parameters`.

@@ -25,6 +25,8 @@ D-28 and D-31.
 4. The appointment date: one date per file, overwritten at each consultation, or a history? Default: one date.
 5. Story 1 lets you enter the génotype on a file you create. Story 3 writes a génotype only under the patient's genetic consent. May you enter it before the patient consents? Default: no. The genotype fields stay locked until the patient gives the genetic consent at takeover.
 
+Morgane answered on the call of 2026-10-23 (recorded by Jamie, 2026-11-01): 1. About a dozen practitioners before 19 December. The structure holds several from the start.
+
 ### Questions for Jamie
 
 1. The care relationship: a `practitioner_id` column on `patient_profiles` referencing `operators`, or a join table? Default: a column.

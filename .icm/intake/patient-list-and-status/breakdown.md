@@ -9,8 +9,8 @@
 The practitioner's list shows all their patients, sorted by appointment date or by name, the
 choice remembered. Each file carries one of four statuses: « Dossier à compléter » (the
 practitioner created it, mandatory fields missing), « Prêt pour consultation » (the
-questionnaire's mandatory fields are filled), « Recommandations à valider » (a first food
-recommendation is saved), « Accompagnement actif » (validated and activated). A patient who
+questionnaire's mandatory fields are filled), « Recommandations à valider » (a first
+recommendation of any kind is saved), « Accompagnement actif » (validated and activated). A patient who
 signs up appears in the list only once every mandatory field is filled. The list flags missing
 information and patient changes after validation. On `main` the roster at `(admin)/patients`
 sorts on `last_edited_at` and `status` holds the retention lifecycle (`active`, `ended`), a
@@ -23,6 +23,8 @@ D-27, D-30, D-31, D-32.
 2. Today's patients, after the migration: which status? Default: « Accompagnement actif ».
 3. The sort is remembered. What is the first default? Default: by appointment date.
 4. After activation, does a patient change move the file back to « Recommandations à valider », or does it stay « Accompagnement actif » with an indicator? Default: it stays active with the indicator (story 5 criterion 10, story 21).
+
+Morgane answered on the call of 2026-10-23 (recorded by Jamie, 2026-11-01): criterion 6: « Recommandations à valider » triggers on the first saved recommendation of any kind, food, goal, supplement or lifestyle advice, food recommendations foremost.
 
 ### Questions for Jamie
 

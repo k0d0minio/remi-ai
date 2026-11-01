@@ -18,6 +18,8 @@ After the first consultation the practitioner validates the recommendations and 
 ### Questions for Jamie
 
 1. Which sender address for the activation e-mail? Default: the address `patientLinkEmail` uses today, on the verified Resend domain.
+
+Jamie answered on 2026-11-01: the sender shows « REMI », from no-reply@mail.jamienisbet.com until remiai.be is verified in Resend.
 2. Is the first validation the same action as the activation? Default: yes, « Activer l'accompagnement » validates version 1 and activates in one step.
 
 ## Build order
