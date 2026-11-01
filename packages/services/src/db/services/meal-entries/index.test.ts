@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { registerDatabase } from "../../client";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import type { MealEntry } from "../../models/meal-entry";
 import { createPatient } from "../patients";
 import {
@@ -31,7 +31,10 @@ beforeAll(() => {
  * way the service does.
  */
 beforeEach(async () => {
-  const created = await createPatient({ pseudonym: "Claire" });
+  const created = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym: "Claire",
+  });
   if (!created.ok) {
     throw new Error("test patient not created");
   }

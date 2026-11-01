@@ -7,7 +7,7 @@ import {
   type DatabaseClient,
 } from "../../client";
 import type { PatientProfile } from "../../models/patient-profile";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { createPatient } from "../patients";
 import { writeThroughPatientLink } from "../patient-link-writes";
 import {
@@ -57,7 +57,10 @@ beforeAll(() => {
 
 /** A fresh patient per test, so no test inherits another's running challenge. */
 const newPatient = async (pseudonym: string): Promise<PatientProfile> => {
-  const created = await createPatient({ pseudonym });
+  const created = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym,
+  });
   if (!created.ok) {
     throw new Error(created.message);
   }

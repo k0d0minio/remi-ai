@@ -2,13 +2,13 @@
 
 import {
   deleteProtocolTemplate,
-  getPatient,
   listPatientNotes,
   listPantryEssentials,
   listPatientRecipes,
   listPatientRecommendations,
   listPatientSupplements,
-  listPatients,
+  patientOf,
+  patientsOf,
   listProtocolTemplates,
   renameProtocolTemplate,
   saveProtocolTemplate,
@@ -86,15 +86,15 @@ const asTemplateKind = (value: string): ProtocolTemplateKindName | null =>
  *
  * The notes are read in one page and reduced per patient rather than queried
  * per row: the seam speaks in exact-match filters only, and a roster that fits
- * in one page does not earn a query language (`listPatients` settles the same
+ * in one page does not earn a query language (`patientsOf` settles the same
  * question the same way). `occurredAt` is the consultation's own date, which is
  * what she recognises a patient by — not when the note was typed up.
  */
 export const listCopySourcesAction = async (
   excludePatientId: string,
 ): Promise<readonly CopySource[]> => {
-  await requireOperator();
-  const patients = await listPatients();
+  const operator = await requireOperator();
+  const patients = await patientsOf(operator.id);
   const others = patients.filter((patient) => patient.id !== excludePatientId);
 
   const sources = await Promise.all(
@@ -140,12 +140,13 @@ export const readCopyRowsAction = async (
   sourcePatientId: string,
   kind: string,
 ): Promise<CopyRowsResult> => {
-  await requireOperator();
+  const operator = await requireOperator();
   const copyKind = asCopyKind(kind);
   if (!copyKind) {
     return { error: "Type de lignes inconnu.", rows: [] };
   }
-  const source = await getPatient(sourcePatientId);
+  // Another practitioner's patient reads as gone (D-27).
+  const source = await patientOf(operator.id, sourcePatientId);
   if (!source.ok) {
     return { error: "Ce patient n'existe plus.", rows: [] };
   }
@@ -225,8 +226,11 @@ export const takeCopyRowsAction = async (
     return { error: "Aucune ligne sélectionnée.", ...empty };
   }
 
-  const source = await getPatient(sourcePatientId);
+  const source = await patientOf(operator.id, sourcePatientId);
   if (!source.ok) {
+    return { error: "Ce patient n'existe plus.", ...empty };
+  }
+  if (!(await patientOf(operator.id, targetPatientId)).ok) {
     return { error: "Ce patient n'existe plus.", ...empty };
   }
 
@@ -321,7 +325,7 @@ const recordedCopy = async (
   targetPatientId: string,
   count: number,
 ) => {
-  const target = await getPatient(targetPatientId);
+  const target = await patientOf(operator.id, targetPatientId);
   await audit(operator, "protocol.copied_from_patient", {
     type: "patient",
     id: targetPatientId,

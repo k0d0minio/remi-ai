@@ -45,6 +45,8 @@ import {
   movePatientRecommendation,
   movePatientSupplement,
   patientLinkEmail,
+  patientOf,
+  patientOfRecord,
   recordConsultation,
   regenerateShareToken,
   removePatientDocument,
@@ -72,7 +74,9 @@ import {
   updatePatientSupplement,
   updateRecipeAssignment,
   type ConsultationCheckInInput,
+  type Operator,
   type PatientInput,
+  type PatientRecordKind,
   type SectionSaveCounts,
 } from "@remi/services/server";
 import {
@@ -142,6 +146,24 @@ export type DeletePatientState = { error: string | null };
 
 const field = (formData: FormData, name: string) =>
   String(formData.get(name) ?? "");
+
+/** What an action answers for a file the signed-in practitioner does not hold. */
+const NO_SUCH_FILE = "ce dossier patient est introuvable";
+
+/**
+ * D-27: an action writes only into a file the signed-in practitioner holds.
+ * The form posts the ids, so each action checks them again: the page that
+ * rendered the form is no guard. Another practitioner's file reads as missing.
+ */
+const holdsPatient = async (operator: Operator, patientId: string) =>
+  (await patientOf(operator.id, patientId)).ok;
+
+/** The same check for an action that names a row of the file, not the file. */
+const holdsRecord = async (
+  operator: Operator,
+  kind: PatientRecordKind,
+  id: string,
+) => (await patientOfRecord(operator.id, kind, id)).ok;
 
 /**
  * `undefined` when the form did not carry the field at all, which is a
@@ -269,7 +291,12 @@ export const savePatientAction = async (
   const input = patientInputFrom(formData);
 
   if (!id) {
-    const created = await createPatient(input);
+    // The new file belongs to the practitioner who creates it (D-27).
+    const created = await createPatient({
+      ...input,
+      pseudonym: input.pseudonym ?? "",
+      practitionerId: operator.id,
+    });
     if (!created.ok) {
       return { error: created.message, saved: false };
     }
@@ -283,6 +310,9 @@ export const savePatientAction = async (
     redirect(`/patients/${created.data.id}`);
   }
 
+  if (!(await holdsPatient(operator, id))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const updated = await updatePatient(id, {
     ...input,
     status: asStatus(field(formData, "status")),
@@ -310,6 +340,9 @@ export const deletePatientAction = async (
   formData: FormData,
 ): Promise<DeletePatientState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "id")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const id = field(formData, "id");
   fileStoreReady();
   const existing = await getPatient(id);
@@ -331,6 +364,9 @@ export const deletePatientAction = async (
 
 export const regenerateShareTokenAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const result = await regenerateShareToken(id);
   if (result.ok) {
@@ -355,9 +391,9 @@ export const emailShareLinkAction = async (
 ): Promise<ShareFormState> => {
   const operator = await requireOperator();
   const id = field(formData, "id");
-  const found = await getPatient(id);
+  const found = await patientOf(operator.id, id);
   if (!found.ok) {
-    return { error: found.message, sent: false };
+    return { error: NO_SUCH_FILE, sent: false };
   }
   const patient = found.data;
   if (!patient.email) {
@@ -410,6 +446,9 @@ export const addRecommendationAction = async (
   formData: FormData,
 ): Promise<RecommendationFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const patientId = field(formData, "patientId");
   const result = await addPatientRecommendation(patientId, {
     category: asCategory(field(formData, "category")),
@@ -434,6 +473,9 @@ export const updateRecommendationAction = async (
   formData: FormData,
 ): Promise<RecommendationFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "recommendation", field(formData, "id")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const id = field(formData, "id");
   const result = await updatePatientRecommendation(id, {
     category: asCategory(field(formData, "category")),
@@ -453,7 +495,10 @@ export const updateRecommendationAction = async (
 };
 
 export const moveRecommendationAction = async (formData: FormData) => {
-  await requireOperator();
+  const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "recommendation", field(formData, "id")))) {
+    return;
+  }
   const direction = field(formData, "direction") === "up" ? "up" : "down";
   await movePatientRecommendation(field(formData, "id"), direction);
   // Not audited: reordering changes how a protocol reads, never what it says,
@@ -463,6 +508,9 @@ export const moveRecommendationAction = async (formData: FormData) => {
 
 export const archiveRecommendationAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "recommendation", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
   const result = await archivePatientRecommendation(id, archived);
@@ -478,6 +526,9 @@ export const archiveRecommendationAction = async (formData: FormData) => {
 
 export const deleteRecommendationAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "recommendation", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const removed = await deletePatientRecommendation(id);
   if (removed.ok) {
@@ -502,6 +553,9 @@ export const addSupplementAction = async (
   formData: FormData,
 ): Promise<SupplementFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const patientId = field(formData, "patientId");
   const result = await addPatientSupplement(patientId, {
     name: field(formData, "name"),
@@ -526,6 +580,9 @@ export const updateSupplementAction = async (
   formData: FormData,
 ): Promise<SupplementFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "supplement", field(formData, "id")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const id = field(formData, "id");
   const result = await updatePatientSupplement(id, {
     name: field(formData, "name"),
@@ -546,7 +603,10 @@ export const updateSupplementAction = async (
 };
 
 export const moveSupplementAction = async (formData: FormData) => {
-  await requireOperator();
+  const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "supplement", field(formData, "id")))) {
+    return;
+  }
   const direction = field(formData, "direction") === "up" ? "up" : "down";
   await movePatientSupplement(field(formData, "id"), direction);
   // Not audited, like the recommendations: reordering changes how a protocol
@@ -556,6 +616,9 @@ export const moveSupplementAction = async (formData: FormData) => {
 
 export const archiveSupplementAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "supplement", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
   const result = await archivePatientSupplement(id, archived);
@@ -571,6 +634,9 @@ export const archiveSupplementAction = async (formData: FormData) => {
 
 export const deleteSupplementAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "supplement", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const removed = await deletePatientSupplement(id);
   if (removed.ok) {
@@ -597,6 +663,9 @@ export const addPantryEssentialAction = async (
   formData: FormData,
 ): Promise<PantryFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const patientId = field(formData, "patientId");
   const result = await addPantryEssential(patientId, {
     item: field(formData, "item"),
@@ -619,6 +688,11 @@ export const updatePantryEssentialAction = async (
   formData: FormData,
 ): Promise<PantryFormState> => {
   const operator = await requireOperator();
+  if (
+    !(await holdsRecord(operator, "pantryEssential", field(formData, "id")))
+  ) {
+    return { error: NO_SUCH_FILE };
+  }
   const id = field(formData, "id");
   const result = await updatePantryEssential(id, {
     item: field(formData, "item"),
@@ -638,6 +712,11 @@ export const updatePantryEssentialAction = async (
 
 export const movePantryEssentialAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (
+    !(await holdsRecord(operator, "pantryEssential", field(formData, "id")))
+  ) {
+    return;
+  }
   const id = field(formData, "id");
   const direction = field(formData, "direction") === "up" ? "up" : "down";
   const result = await movePantryEssential(id, direction);
@@ -653,6 +732,11 @@ export const movePantryEssentialAction = async (formData: FormData) => {
 
 export const archivePantryEssentialAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (
+    !(await holdsRecord(operator, "pantryEssential", field(formData, "id")))
+  ) {
+    return;
+  }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
   const result = await archivePantryEssential(id, archived);
@@ -668,6 +752,11 @@ export const archivePantryEssentialAction = async (formData: FormData) => {
 
 export const deletePantryEssentialAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (
+    !(await holdsRecord(operator, "pantryEssential", field(formData, "id")))
+  ) {
+    return;
+  }
   const id = field(formData, "id");
   const removed = await deletePantryEssential(id);
   if (removed.ok) {
@@ -701,6 +790,9 @@ export const addMealEntryAction = async (
   formData: FormData,
 ): Promise<MealFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const patientId = field(formData, "patientId");
   const result = await addMealEntry(patientId, {
     eatenOn: field(formData, "eatenOn"),
@@ -729,6 +821,9 @@ export const updateMealEntryAction = async (
   formData: FormData,
 ): Promise<MealFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "mealEntry", field(formData, "id")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const id = field(formData, "id");
   const result = await updateMealEntry(id, {
     eatenOn: field(formData, "eatenOn"),
@@ -754,6 +849,9 @@ export const writeMealFeedbackAction = async (
   formData: FormData,
 ): Promise<MealFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "mealEntry", field(formData, "id")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const id = field(formData, "id");
   const feedback = field(formData, "feedback");
   const result = await updateMealEntry(id, {
@@ -778,6 +876,9 @@ export const writeMealFeedbackAction = async (
 
 export const archiveMealEntryAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "mealEntry", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
   const result = await archiveMealEntry(id, archived);
@@ -793,6 +894,9 @@ export const archiveMealEntryAction = async (formData: FormData) => {
 
 export const deleteMealEntryAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "mealEntry", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const removed = await deleteMealEntry(id);
   if (removed.ok) {
@@ -818,6 +922,9 @@ export const addObservationAction = async (
   formData: FormData,
 ): Promise<ObservationFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const patientId = field(formData, "patientId");
   const result = await addPatientObservation(patientId, {
     body: field(formData, "body"),
@@ -840,6 +947,9 @@ export const updateObservationAction = async (
   formData: FormData,
 ): Promise<ObservationFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "observation", field(formData, "id")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const id = field(formData, "id");
   const result = await updatePatientObservation(id, {
     body: field(formData, "body"),
@@ -859,6 +969,9 @@ export const updateObservationAction = async (
 
 export const archiveObservationAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "observation", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
   const result = await archivePatientObservation(id, archived);
@@ -878,6 +991,9 @@ export const archiveObservationAction = async (formData: FormData) => {
 
 export const deleteObservationAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "observation", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const removed = await deletePatientObservation(id);
   if (removed.ok) {
@@ -902,6 +1018,9 @@ export const addGoalAction = async (
   formData: FormData,
 ): Promise<GoalFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const patientId = field(formData, "patientId");
   const result = await addPatientGoal(patientId, {
     title: field(formData, "title"),
@@ -924,6 +1043,9 @@ export const updateGoalAction = async (
   formData: FormData,
 ): Promise<GoalFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "goal", field(formData, "id")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const id = field(formData, "id");
   const result = await updatePatientGoal(id, {
     title: field(formData, "title"),
@@ -943,6 +1065,9 @@ export const updateGoalAction = async (
 
 export const moveGoalAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "goal", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const direction = field(formData, "direction") === "up" ? "up" : "down";
   const result = await movePatientGoal(id, direction);
@@ -964,6 +1089,9 @@ export const moveGoalAction = async (formData: FormData) => {
  */
 export const archiveGoalAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "goal", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
   const result = await archivePatientGoal(id, archived);
@@ -979,6 +1107,9 @@ export const archiveGoalAction = async (formData: FormData) => {
 
 export const deleteGoalAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "goal", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const removed = await deletePatientGoal(id);
   if (removed.ok) {
@@ -996,6 +1127,9 @@ export const addCheckInAction = async (
   formData: FormData,
 ): Promise<CheckInFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "goal", field(formData, "goalId")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const goalId = field(formData, "goalId");
   const direction = asGoalDirection(field(formData, "direction"));
   const result = await addGoalCheckIn(goalId, {
@@ -1022,6 +1156,9 @@ export const updateCheckInAction = async (
   formData: FormData,
 ): Promise<CheckInFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "goalCheckIn", field(formData, "id")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const id = field(formData, "id");
   const direction = asGoalDirection(field(formData, "direction"));
   const result = await updateGoalCheckIn(id, {
@@ -1045,6 +1182,9 @@ export const updateCheckInAction = async (
 
 export const deleteCheckInAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "goalCheckIn", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const removed = await deleteGoalCheckIn(id);
   if (removed.ok) {
@@ -1065,6 +1205,9 @@ export const deleteCheckInAction = async (formData: FormData) => {
  */
 export const markCheckInSeenAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "goalCheckIn", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const seen = await markGoalCheckInSeen(id);
   if (seen.ok) {
@@ -1091,6 +1234,9 @@ export const setInstructionAction = async (
   formData: FormData,
 ): Promise<InstructionFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const patientId = field(formData, "patientId");
   const body = field(formData, "body");
   const patientBody = field(formData, "patientBody");
@@ -1130,6 +1276,9 @@ export const startChallengeAction = async (
   formData: FormData,
 ): Promise<ChallengeFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const patientId = field(formData, "patientId");
   const posted = optionalField(formData, "closeCurrentWith");
   const closeCurrentWith =
@@ -1175,6 +1324,9 @@ export const updateChallengeAction = async (
   formData: FormData,
 ): Promise<ChallengeFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "challenge", field(formData, "id")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const id = field(formData, "id");
   const result = await updateChallenge(id, {
     text: field(formData, "text"),
@@ -1198,6 +1350,9 @@ export const closeChallengeAction = async (
   formData: FormData,
 ): Promise<ChallengeFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "challenge", field(formData, "id")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const id = field(formData, "id");
   const outcome = asChallengeOutcome(field(formData, "outcome"));
   if (outcome === null) {
@@ -1230,6 +1385,9 @@ export const replyToPatientAction = async (
   formData: FormData,
 ): Promise<MessageFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const patientId = field(formData, "patientId");
   const result = await replyToPatient(
     patientId,
@@ -1264,6 +1422,9 @@ export const markMessageReadAction = async (
   formData: FormData,
 ): Promise<MessageFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "message", field(formData, "id")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const id = field(formData, "id");
   const result = await markPatientMessageRead(id);
   if (!result.ok) {
@@ -1289,6 +1450,9 @@ export const setSummaryAction = async (
   formData: FormData,
 ): Promise<SummaryFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const patientId = field(formData, "patientId");
   const body = field(formData, "body");
   const before = await getPatientSummary(patientId);
@@ -1325,6 +1489,9 @@ export const updateNextConsultationPrepAction = async (
   formData: FormData,
 ): Promise<PrepFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const patientId = field(formData, "patientId");
   const before = await getPatient(patientId);
   const result = await setPatientNextConsultationPrep(
@@ -1373,6 +1540,9 @@ export const assignRecipesAction = async (
   formData: FormData,
 ): Promise<AssignmentFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const patientId = field(formData, "patientId");
   // One checkbox per recipe, so the selection arrives as repeats of one name.
   const recipeIds = formData.getAll("recipeId").map(String).filter(Boolean);
@@ -1399,6 +1569,9 @@ export const createAndAssignRecipeAction = async (
   formData: FormData,
 ): Promise<AssignmentFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const patientId = field(formData, "patientId");
   const result = await createAndAssignRecipe(
     patientId,
@@ -1431,6 +1604,9 @@ export const duplicateAndAssignRecipeAction = async (
   formData: FormData,
 ): Promise<AssignmentFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const patientId = field(formData, "patientId");
   const result = await duplicateAndAssignRecipe(
     patientId,
@@ -1460,6 +1636,11 @@ export const updateRecipeAssignmentAction = async (
   formData: FormData,
 ): Promise<AssignmentFormState> => {
   const operator = await requireOperator();
+  if (
+    !(await holdsRecord(operator, "recipeAssignment", field(formData, "id")))
+  ) {
+    return { error: NO_SUCH_FILE };
+  }
   const id = field(formData, "id");
   const result = await updateRecipeAssignment(id, {
     note: field(formData, "note"),
@@ -1479,6 +1660,11 @@ export const updateRecipeAssignmentAction = async (
 
 export const archiveRecipeAssignmentAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (
+    !(await holdsRecord(operator, "recipeAssignment", field(formData, "id")))
+  ) {
+    return;
+  }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
   const result = await archiveRecipeAssignment(id, archived);
@@ -1502,6 +1688,11 @@ export const archiveRecipeAssignmentAction = async (formData: FormData) => {
  */
 export const removeRecipeAssignmentAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (
+    !(await holdsRecord(operator, "recipeAssignment", field(formData, "id")))
+  ) {
+    return;
+  }
   const id = field(formData, "id");
   const removed = await removeRecipeAssignment(id);
   if (removed.ok) {
@@ -1519,6 +1710,9 @@ export const addNoteAction = async (
   formData: FormData,
 ): Promise<NoteFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const patientId = field(formData, "patientId");
   const result = await addPatientNote(patientId, {
     occurredAt: field(formData, "occurredAt"),
@@ -1554,6 +1748,9 @@ export const recordConsultationAction = async (
   formData: FormData,
 ): Promise<ConsultationFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const patientId = field(formData, "patientId");
 
   // One hidden id per rendered goal, with its three fields named after it: a
@@ -1604,6 +1801,9 @@ export const updateNoteAction = async (
   formData: FormData,
 ): Promise<NoteFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "note", field(formData, "id")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const id = field(formData, "id");
   const result = await updatePatientNote(id, {
     occurredAt: field(formData, "occurredAt"),
@@ -1624,6 +1824,9 @@ export const updateNoteAction = async (
 
 export const deleteNoteAction = async (formData: FormData) => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "note", field(formData, "id")))) {
+    return;
+  }
   const id = field(formData, "id");
   const removed = await deletePatientNote(id);
   if (removed.ok) {
@@ -1647,6 +1850,9 @@ export const saveAnamnesisAction = async (
   formData: FormData,
 ): Promise<AnamnesisFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE };
+  }
   const patientId = field(formData, "patientId");
   const category = field(formData, "category");
   const result = await setPatientAnamnesis(
@@ -1690,6 +1896,9 @@ export const recordContextExportAction = async (
   blocks: readonly string[],
 ) => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, patientId))) {
+    return;
+  }
   const found = await getPatient(patientId);
   await audit(operator, "context.exported", {
     type: "patient",
@@ -1777,6 +1986,9 @@ export const saveRecommendationSectionAction = async (
   formData: FormData,
 ): Promise<SectionSaveState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const patientId = field(formData, "patientId");
   const rows = sectionRows(formData, ["id", "category", "title", "detail"]);
 
@@ -1812,6 +2024,9 @@ export const saveSupplementSectionAction = async (
   formData: FormData,
 ): Promise<SectionSaveState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const patientId = field(formData, "patientId");
   const rows = sectionRows(formData, [
     "id",
@@ -1854,6 +2069,9 @@ export const savePantrySectionAction = async (
   formData: FormData,
 ): Promise<SectionSaveState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const patientId = field(formData, "patientId");
   const rows = sectionRows(formData, ["id", "item", "why"]);
 
@@ -1894,6 +2112,9 @@ export const addDocumentLinkAction = async (
   formData: FormData,
 ): Promise<DocumentFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const patientId = field(formData, "patientId");
   const result = await addPatientDocumentLink(
     patientId,
@@ -1923,6 +2144,9 @@ export const addDocumentFileAction = async (
   formData: FormData,
 ): Promise<DocumentFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   if (!fileStoreReady()) {
     return {
       error: "Aucun stockage de fichiers n’est configuré sur ce déploiement.",
@@ -1958,6 +2182,9 @@ export const updateDocumentAction = async (
   formData: FormData,
 ): Promise<DocumentFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "document", field(formData, "id")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   const id = field(formData, "id");
   const result = await updatePatientDocument(id, {
     title: field(formData, "title"),
@@ -1982,6 +2209,9 @@ export const removeDocumentAction = async (
   formData: FormData,
 ): Promise<DocumentFormState> => {
   const operator = await requireOperator();
+  if (!(await holdsRecord(operator, "document", field(formData, "id")))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
   fileStoreReady();
   const id = field(formData, "id");
   const result = await removePatientDocument(id);

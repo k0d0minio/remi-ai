@@ -3,7 +3,7 @@ import { Plus, Users } from "lucide-react";
 import NextLink from "next/link";
 import {
   listChallengeSignals,
-  listPatients,
+  patientsOf,
   listUnreadMessageCounts,
   type ChallengeSignal,
   type PatientSort,
@@ -22,6 +22,7 @@ import {
   patientStatusIntents,
   patientStatusLabels,
 } from "@/components/patients/vocabulary";
+import { requireOperator } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 
 export const metadata: Metadata = {
@@ -83,9 +84,10 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
   const search = first(params.q) ?? "";
   const status = asStatus(first(params.status));
   const sort = asSort(first(params.sort));
+  const operator = await requireOperator();
 
   const [patients, challengeSignals, unreadMessages] = await Promise.all([
-    listPatients({ search, status, sort }),
+    patientsOf(operator.id, { search, status, sort }),
     listChallengeSignals(),
     listUnreadMessageCounts(),
   ]);

@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { registerDatabase } from "../db/client";
 import { createPatientAccount } from "../db/services/patient-accounts";
 import { createPatient } from "../db/services/patients";
-import { createMemoryDatabase } from "../db/test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../db/test-helpers";
 import { ok } from "../shared/result";
 import { registerAuthProvider, type AuthIdentity } from "./provider";
 import { readSession } from "./session";
@@ -35,7 +35,10 @@ beforeAll(async () => {
     },
   });
 
-  const patient = await createPatient({ pseudonym: "Claire" });
+  const patient = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym: "Claire",
+  });
   if (!patient.ok) {
     throw new Error("test patient not created");
   }

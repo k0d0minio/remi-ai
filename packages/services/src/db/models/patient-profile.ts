@@ -1,4 +1,4 @@
-import type { Entity } from "../../types";
+import type { Entity, Id } from "../../types";
 import type { Locale } from "../../shared/i18n";
 import type {
   consentChannels,
@@ -31,6 +31,8 @@ export type PatientEditableProfileField =
  * and patient surfaces.
  */
 export type PatientProfile = Entity & {
+  /** The operator who holds the file (D-27). */
+  practitionerId: Id;
   pseudonym: string;
   fullName: string | null;
   email: string | null;
