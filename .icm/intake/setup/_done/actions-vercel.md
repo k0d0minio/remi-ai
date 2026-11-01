@@ -1,3 +1,5 @@
+> Done: Jamie, 2026-11-01
+
 # Setup: the Vercel token and team in GitHub Actions
 
 - setup-slug: actions-vercel

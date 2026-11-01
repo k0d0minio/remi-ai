@@ -28,6 +28,9 @@ pages. It rests on D-26, D-28, D-32. It supersedes D-2 and D-10.
 2. One identity store for operators and patients, or two? Default: one seam, two principal kinds, operators migrated later.
 3. Sign-up route on `apps/web`: `[locale]/inscription/[token]`? Default: yes.
 
+Jamie answered on 2026-11-01: 1. Neon Auth. 2. The default: one seam, two principal kinds,
+operators migrated later. 3. Yes.
+
 ## Build order
 
 1. auth-seam — the auth seam, its adapter and the `patient_accounts` table — depends-on: none

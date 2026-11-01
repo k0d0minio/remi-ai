@@ -1,3 +1,5 @@
+> Done: Jamie, 2026-11-01
+
 # Setup: the UAT environment on each Vercel project that the client tests
 
 - setup-slug: vercel-uat-environment

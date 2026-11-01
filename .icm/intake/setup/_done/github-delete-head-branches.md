@@ -1,3 +1,5 @@
+> Done: Jamie, 2026-11-01
+
 # Setup: GitHub deletes the head branch after a merge
 
 - setup-slug: github-delete-head-branches

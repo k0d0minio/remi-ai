@@ -1,3 +1,5 @@
+> Done: Jamie, 2026-11-01
+
 # Setup: the UAT database on the UAT environment
 
 - setup-slug: uat-database
