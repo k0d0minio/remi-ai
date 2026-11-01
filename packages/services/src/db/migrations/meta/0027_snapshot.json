@@ -1,5 +1,5 @@
 {
-  "id": "d22d9a8b-a36a-4e30-b60d-794f1b25d393",
+  "id": "40089805-41ce-4958-ab98-43b36fc79bd1",
   "prevId": "67612a00-b7fa-41ed-8f80-af491739741f",
   "version": "7",
   "dialect": "postgresql",
@@ -585,13 +585,6 @@
           "notNull": true,
           "default": "'operator'"
         },
-        "signup_link_token": {
-          "name": "signup_link_token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "translate(encode(decode(substr(replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', ''), 1, 48), 'hex'), 'base64'), '+/', '-_')"
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -616,13 +609,6 @@
           "nullsNotDistinct": false,
           "columns": [
             "email"
-          ]
-        },
-        "operators_signup_link_token_unique": {
-          "name": "operators_signup_link_token_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "signup_link_token"
           ]
         }
       },
@@ -722,6 +708,100 @@
       },
       "policies": {},
       "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.patient_allergens": {
+      "name": "patient_allergens",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "patient_id": {
+          "name": "patient_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sub_key": {
+          "name": "sub_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "other_text": {
+          "name": "other_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "patient_allergens_patient_id_patient_profiles_id_fk": {
+          "name": "patient_allergens_patient_id_patient_profiles_id_fk",
+          "tableFrom": "patient_allergens",
+          "tableTo": "patient_profiles",
+          "columnsFrom": [
+            "patient_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "patient_allergens_patient_id_kind_key_sub_key_unique": {
+          "name": "patient_allergens_patient_id_kind_key_sub_key_unique",
+          "nullsNotDistinct": true,
+          "columns": [
+            "patient_id",
+            "kind",
+            "key",
+            "sub_key"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "patient_allergens_kind": {
+          "name": "patient_allergens_kind",
+          "value": "\"patient_allergens\".\"kind\" in ('allergy', 'intolerance')"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.patient_anamnesis": {
@@ -2074,6 +2154,102 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'{}'::jsonb"
+        },
+        "sex_for_calculation": {
+          "name": "sex_for_calculation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activity_level": {
+          "name": "activity_level",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "desired_weight_kg": {
+          "name": "desired_weight_kg",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "consultation_reason": {
+          "name": "consultation_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "consultation_date": {
+          "name": "consultation_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "diet": {
+          "name": "diet",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "diet_note": {
+          "name": "diet_note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pathologies": {
+          "name": "pathologies",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "celiac_disease": {
+          "name": "celiac_disease",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "genetic_test": {
+          "name": "genetic_test",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "apoe": {
+          "name": "apoe",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dio2": {
+          "name": "dio2",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amy1a": {
+          "name": "amy1a",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "practitioner_question_answer": {
+          "name": "practitioner_question_answer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "no_known_allergies": {
+          "name": "no_known_allergies",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "no_known_intolerances": {
+          "name": "no_known_intolerances",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",

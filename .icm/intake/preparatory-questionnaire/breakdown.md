@@ -35,6 +35,8 @@ Morgane answered on the call of 2026-10-23 (recorded by Jamie, 2026-11-01): 3. T
 1. Structured allergies and intolerances: rows in a `patient_allergens` table with the enum in code, or one JSONB column? Default: a table.
 2. The three genotypes: three columns on `patient_profiles`? Default: yes.
 
+Jamie answered on 2026-11-01 (`questionnaire-fields` pull request): 1 and 2. The defaults stand.
+
 ## Build order
 
 1. questionnaire-fields — the schema for every new field, migrated without loss — depends-on: none
