@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { registerDatabase } from "../../client";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { createPatient } from "../patients";
 import {
   createPatientAccount,
@@ -13,8 +13,14 @@ let marcId: string;
 
 beforeAll(async () => {
   registerDatabase(createMemoryDatabase());
-  const claire = await createPatient({ pseudonym: "Claire" });
-  const marc = await createPatient({ pseudonym: "Marc" });
+  const claire = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym: "Claire",
+  });
+  const marc = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym: "Marc",
+  });
   if (!claire.ok || !marc.ok) {
     throw new Error("test patients not created");
   }

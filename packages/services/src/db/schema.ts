@@ -44,6 +44,14 @@ const timestamps = {
 
 export const patientProfiles = pgTable("patient_profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
+  /**
+   * The practitioner who holds the file (D-27). One per patient: the console
+   * shows a practitioner their own files only. No cascade: an operator who
+   * still holds files cannot be deleted, so no file is lost with an account.
+   */
+  practitionerId: uuid("practitioner_id")
+    .notNull()
+    .references(() => operators.id),
   /** The working name — the one an AI provider may later be allowed to see. */
   pseudonym: text("pseudonym").notNull(),
   /** Real identity. Optional, and never sent to an AI provider. */
@@ -125,7 +133,7 @@ export const patientProfiles = pgTable("patient_profiles", {
    * When the patient agreed to their record being held and to the share link
    * existing, and through which channel, as Morgane recorded it by hand. Both
    * nullable. Read-only since `consent-texts-and-records`: a consent is a row
-   * of `patient_consents`, and migration 0026 copied each dated pair into one
+   * of `patient_consents`, and migration 0027 copied each dated pair into one
    * `legacy` row. A later migration drops the two columns.
    *
    * The date is a plain calendar date for the same reason as `birth_date`:
@@ -548,7 +556,7 @@ export const patientAccounts = pgTable("patient_accounts", {
  * SHA-256 of the file the patient read (`src/consent/texts/`). The hash proves
  * the wording even if a file were ever edited by mistake.
  *
- * Migration 0026 wrote one `legacy` row per profile with a `consent_date`,
+ * Migration 0027 wrote one `legacy` row per profile with a `consent_date`,
  * from the two hand-filled columns of `patient_profiles`. Those rows have no
  * locale and no hash. `channel` keeps the channel Morgane recorded.
  *

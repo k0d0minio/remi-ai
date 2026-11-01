@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { anamnesisCategories } from "../../../shared/patient";
 import { registerDatabase } from "../../client";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { createPatient, getPatient, getPatientByShareToken } from "../patients";
 import { listPatientAnamnesis, setPatientAnamnesis } from "./index";
 
@@ -10,7 +10,10 @@ let shareToken: string;
 
 beforeAll(async () => {
   registerDatabase(createMemoryDatabase());
-  const created = await createPatient({ pseudonym: "Claire" });
+  const created = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym: "Claire",
+  });
   if (!created.ok) {
     throw new Error("test patient not created");
   }

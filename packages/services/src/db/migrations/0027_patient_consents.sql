@@ -15,7 +15,8 @@ CREATE TABLE "patient_consents" (
 );
 --> statement-breakpoint
 ALTER TABLE "patient_consents" ADD CONSTRAINT "patient_consents_patient_profile_id_patient_profiles_id_fk" FOREIGN KEY ("patient_profile_id") REFERENCES "public"."patient_profiles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "patient_consents_patient_key_idx" ON "patient_consents" USING btree ("patient_profile_id","consent_key","decided_at");--> statement-breakpoint
+CREATE INDEX "patient_consents_patient_key_idx" ON "patient_consents" USING btree ("patient_profile_id","consent_key","decided_at");
+--> statement-breakpoint
 -- Hand-added: each profile with a `consent_date` gets one `care` row of version
 -- `legacy` (consent-texts-and-records). The date becomes 00:00 Europe/Brussels
 -- on that day. `consent_channel` moves to `channel` as it is, NULL included.

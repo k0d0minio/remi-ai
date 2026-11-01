@@ -24,7 +24,9 @@ export {
   deletePatient,
   getPatient,
   getPatientByShareToken,
-  listPatients,
+  patientOf,
+  patientOfRecord,
+  patientsOf,
   recordPatientLinkOpened,
   regenerateShareToken,
   setPatientNextConsultationPrep,
@@ -34,6 +36,7 @@ export {
 export type {
   PatientInput,
   PatientQuery,
+  PatientRecordKind,
   PatientSort,
 } from "../db/services/patients";
 

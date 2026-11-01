@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { consentText } from "../../../consent";
 import { registerDatabase } from "../../client";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { listAuditEvents, type AuditActor } from "../audit";
 import { createPatient } from "../patients";
 import { consentsOf, recordConsent } from "./index";
@@ -20,7 +20,10 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 5));
 
 beforeAll(async () => {
   registerDatabase(createMemoryDatabase());
-  const created = await createPatient({ pseudonym: "Claire" });
+  const created = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym: "Claire",
+  });
   if (!created.ok) {
     throw new Error("test patient not created");
   }
@@ -88,7 +91,10 @@ describe("patient consents", () => {
     expect(latest.care?.decision).toBe("given");
     expect(latest.genetic?.decision).toBe("given");
 
-    const marc = await createPatient({ pseudonym: "Marc" });
+    const marc = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Marc",
+    });
     if (!marc.ok) {
       throw new Error("test patient not created");
     }

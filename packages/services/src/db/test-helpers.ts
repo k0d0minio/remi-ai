@@ -3,6 +3,12 @@ import type { Id } from "../types";
 import type { Collection, DatabaseClient } from "./client";
 
 /**
+ * The practitioner who holds the fixtures' patient files (D-27). The memory
+ * client checks no foreign key, so a fixed id stands in for an operator row.
+ */
+export const testPractitionerId = "00000000-0000-4000-8000-000000000001";
+
+/**
  * An in-memory `DatabaseClient` for the service tests — the seam is the whole
  * point of it: the services are exercised against the same interface the Neon
  * adapter satisfies, with no driver and no network. Imported by `*.test.ts`

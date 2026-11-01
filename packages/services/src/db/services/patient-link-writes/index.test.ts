@@ -2,7 +2,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { err, ok, type Result } from "../../../shared/result";
 import { registerDatabase } from "../../client";
 import type { PatientProfile } from "../../models/patient-profile";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { listAuditEvents } from "../audit";
 import { addMealEntry } from "../meal-entries";
 import { createPatient, getPatient, regenerateShareToken } from "../patients";
@@ -24,7 +24,10 @@ afterEach(() => {
 
 /** A fresh patient per test, so one test's ledger never counts in another's. */
 const newPatient = async (pseudonym: string): Promise<PatientProfile> => {
-  const created = await createPatient({ pseudonym });
+  const created = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym,
+  });
   if (!created.ok) {
     throw new Error(created.message);
   }

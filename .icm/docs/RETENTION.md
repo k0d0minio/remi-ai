@@ -186,7 +186,7 @@ The table is append-only. A change of mind is a new row, and the latest row per 
 patient's answer. The rows are deleted with the patient, like everything else on the profile.
 
 Before this table, Morgane recorded consent by hand as two facts on the profile: the date and the
-channel (in consultation, WhatsApp, or email). Migration `0026` copied each profile with a date into
+channel (in consultation, WhatsApp, or email). Migration `0027` copied each profile with a date into
 one `care` row of version `legacy`, with the channel kept. The two columns stay on the profile and
 the console shows them, but nothing writes them any more. A later migration drops them.
 

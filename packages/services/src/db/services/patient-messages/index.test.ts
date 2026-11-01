@@ -2,7 +2,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { registerDatabase } from "../../client";
 import type { Operator } from "../../models/operator";
 import type { PatientProfile } from "../../models/patient-profile";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { createOperator } from "../operators";
 import { writeThroughPatientLink } from "../patient-link-writes";
 import { createPatient } from "../patients";
@@ -36,7 +36,10 @@ afterEach(() => {
 
 /** A fresh patient per test, so no test inherits another's thread. */
 const newPatient = async (pseudonym: string): Promise<PatientProfile> => {
-  const created = await createPatient({ pseudonym });
+  const created = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym,
+  });
   if (!created.ok) {
     throw new Error(created.message);
   }

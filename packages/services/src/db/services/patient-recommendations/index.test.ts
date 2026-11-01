@@ -5,7 +5,7 @@ import {
   type DatabaseClient,
 } from "../../client";
 import type { Id } from "../../../types";
-import { createMemoryDatabase } from "../../test-helpers";
+import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import type { PatientRecommendation } from "../../models/patient-recommendation";
 import { createPatient } from "../patients";
 import {
@@ -58,7 +58,10 @@ const withInjectedFailure = (base: DatabaseClient): DatabaseClient => ({
 
 beforeAll(async () => {
   registerDatabase(withInjectedFailure(createMemoryDatabase()));
-  const created = await createPatient({ pseudonym: "Claire" });
+  const created = await createPatient({
+    practitionerId: testPractitionerId,
+    pseudonym: "Claire",
+  });
   if (!created.ok) {
     throw new Error("test patient not created");
   }
@@ -224,7 +227,10 @@ describe("saving the whole protocol at once", () => {
   let sectionPatientId: string;
 
   beforeAll(async () => {
-    const created = await createPatient({ pseudonym: "Margaux" });
+    const created = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Margaux",
+    });
     if (!created.ok) {
       throw new Error("test patient not created");
     }
@@ -330,7 +336,10 @@ describe("saving the whole protocol at once", () => {
   });
 
   it("keeps a row stored under the retired supplement category submittable", async () => {
-    const created = await createPatient({ pseudonym: "Inès" });
+    const created = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Inès",
+    });
     if (!created.ok) {
       throw new Error("test patient not created");
     }
@@ -359,7 +368,10 @@ describe("saving the whole protocol at once", () => {
   });
 
   it("empties the protocol when nothing is submitted", async () => {
-    const created = await createPatient({ pseudonym: "Yaelle" });
+    const created = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Yaelle",
+    });
     if (!created.ok) {
       throw new Error("test patient not created");
     }
@@ -381,7 +393,10 @@ describe("saving the whole protocol at once", () => {
   });
 
   it("leaves the section untouched when a write fails part-way", async () => {
-    const created = await createPatient({ pseudonym: "Solène" });
+    const created = await createPatient({
+      practitionerId: testPractitionerId,
+      pseudonym: "Solène",
+    });
     if (!created.ok) {
       throw new Error("test patient not created");
     }
