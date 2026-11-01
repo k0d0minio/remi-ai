@@ -26,8 +26,8 @@ created and activated timestamps. Nothing above the seam names the vendor.
 
 - [ ] `packages/services/src/auth/` exports one interface for password sign up, password sign in, magic-link request, sign out, session read and password reset
 - [ ] A magic-link request sends one e-mail. The link signs the patient in, and creates the account when none exists
-- [ ] One adapter is registered at process start by `apps/web`. No app imports the vendor directly
-- [ ] The migration adds `patient_accounts` with a unique `patient_profile_id` and a unique e-mail per practitioner
+- [ ] `apps/web` registers one adapter at first use, with `ensureAuthProvider()`. No app imports the vendor directly
+- [ ] The migration adds `patient_accounts` with a unique `patient_profile_id` and an e-mail unique across the table
 - [ ] A session read returns the principal kind (`patient` or `operator`) and its id
 - [ ] The operator console keeps working unchanged on this branch
 - [ ] `.icm/docs/ENV.md` and the three env lists name every new variable. No value enters git

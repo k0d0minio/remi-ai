@@ -175,6 +175,11 @@ export default defineConfig(
               group: ["@/components/ui", "@/components/ui/*"],
               message: "There is no local ui barrel. Import from @remi/ui.",
             },
+            {
+              group: ["@neon/auth", "@neon/auth/*"],
+              message:
+                "Reach auth through the seam in @remi/services/server. Only the adapter names the vendor (D-28).",
+            },
           ],
         },
       ],

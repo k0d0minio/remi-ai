@@ -103,12 +103,12 @@ needs no wiring either: `@neondatabase/serverless` v1 pulls in no `ws` package a
 `WebSocket` Node 22 provides, so there is no `neonConfig` to set and nothing to carry per
 environment. `DATABASE_URL` remains the whole of the storage configuration.
 
-| Variable                | Purpose                                                                                                                                           | Where set | Public? |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
-| `DATABASE_URL`          | Neon connection string (pooled) — the **admin** and **web** projects. Production: production's project. Preview and `uat`: the UAT project's base | Vercel    | no      |
-| `DATABASE_URL_UNPOOLED` | Direct connection string of the same database. `vercel-build.sh` gives it to `db:migrate` and `db:verify`. The app does not read it               | Vercel    | no      |
+| Variable                | Purpose                                                                                                                                                        | Where set | Public? |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
+| `DATABASE_URL`          | Neon connection string (pooled) — the **admin** and **web** projects. Production: production's project. Preview and `uat`: the UAT project's base              | Vercel    | no      |
+| `DATABASE_URL_UNPOOLED` | Direct connection string of the same database. `vercel-build.sh` gives it to `db:migrate` and `db:verify`. The app does not read it                            | Vercel    | no      |
 | `MIGRATE_AT_BUILD`      | `1` forces a migration on a Vercel target other than `uat` and `preview`. Nothing sets it since the Neon integration makes the preview branches. Never by hand | Vercel    | no      |
-| `VERCEL_TARGET_ENV`     | The deployment's environment: `production`, `uat` or `preview`. Set by Vercel. The `uat` build migrates                                           | Vercel    | no      |
+| `VERCEL_TARGET_ENV`     | The deployment's environment: `production`, `uat` or `preview`. Set by Vercel. The `uat` build migrates                                                        | Vercel    | no      |
 
 With `DATABASE_URL` unset nothing is registered and any screen that needs the database fails loudly
 with "no database adapter registered" — a deploy without a database never quietly renders nothing.
@@ -136,9 +136,9 @@ never ran. Nothing reported it.
 ## Auth
 
 Operator auth for `apps/admin` is vendor-free: an scrypt password hash in the `operators` table
-and an HMAC-signed session cookie, both in `packages/services/src/auth/`. Phase-1 patients hold no
-accounts — the patient link's unguessable token is the whole credential (REMI-035); the fuller
-auth question stays with REMI-013.
+and an HMAC-signed session cookie, both in `packages/services/src/auth/`. Patients get accounts
+through the auth seam below (D-26). The patient link's token stays until the patient space
+replaces it.
 
 The console now has more than one account. `OPERATOR_EMAIL` creates the **first** one and stops
 working the moment it exists; every account after that arrives by invitation from an owner, through
@@ -152,6 +152,26 @@ variable behind that — the invitation is data, not configuration.
 
 Value per target: `AUTH_SECRET` is one value per target, made with `openssl rand -base64 32`; uat
 never reuses production's. `OPERATOR_EMAIL` on uat may take its own test address.
+
+### Patient auth (`apps/web`)
+
+Patients sign in through the auth seam in `packages/services/src/auth/` (D-28). Its one adapter
+is Neon Auth, managed Better Auth, at `packages/services/src/auth/adapters/neon-auth.ts`. The users
+live in the `neon_auth` schema of the same Neon branch, so each preview branch has its own users.
+`apps/web` registers the adapter at first use (`apps/web/lib/auth/provider.ts`) and mounts the
+auth API at `/api/auth/[...path]`. Neon Auth's own settings (sign-in methods, the magic link, the
+SMTP sender, the trusted origins) live in the Neon console, per project, not in a variable.
+
+| Variable                  | Purpose                                                                                                                          | Where set | Public? |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
+| `NEON_AUTH_BASE_URL`      | The Neon Auth server of the deployment's branch (**app** project). Set by the Neon integration, never by hand                    | Vercel    | no      |
+| `NEON_AUTH_COOKIE_SECRET` | Signs the patient session-data cookie (**app** project). At least 32 characters. Rotating it makes every patient read the server | Vercel    | no      |
+
+Value per target: `NEON_AUTH_BASE_URL` comes from the integration: production from `remi-ai`, uat
+from the main branch of `uat-remi-ai`, preview from the branch `preview/<git branch>` of
+`uat-remi-ai`. `NEON_AUTH_COOKIE_SECRET` is one value per target, made with
+`openssl rand -base64 32`. uat never reuses production's. With either unset, `/api/auth` answers
+503 and the log names the variable.
 
 ## Email
 
@@ -222,20 +242,20 @@ unless a second analytics vendor arrives with a reader to go with it.
 
 ## CI and the two scripts (GitHub Actions, `gh`)
 
-| Variable                    | Purpose                                                                                                                                    | Where set | Public? |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ------- |
-| `GITHUB_TOKEN`              | Injected automatically by Actions. Do **not** add it                                                                                       | Actions   | no      |
-| `GH_TOKEN`                  | What `gh` reads when no `gh auth login` exists. `.icm/scripts/new-run.sh` and `close-out.sh` call `gh`; a logged-in `gh` needs no variable | local     | no      |
-| `TURBO_TOKEN`               | Turborepo remote cache token, shares the cache between CI and Vercel                                                                       | Actions   | no      |
-| `TURBO_TEAM`                | Turborepo team slug (a repo **variable**, not a secret)                                                                                    | Actions   | no      |
-| `SLACK_BOT_TOKEN`           | Bot token (`xoxb-…`, scope `chat:write`, the app invited to the channel) of the REMI Slack workspace. Nothing reads it today               | Actions   | no      |
-| `SLACK_ANNOUNCE_CHANNEL_ID` | Channel id (`C…`) of the release post. Nothing reads it today. An Actions **variable**, not a secret                                       | Actions   | no      |
-| `SLACK_ALERTS_CHANNEL_ID`   | Channel id (`C…`) kept for an alert post. Nothing reads it today                                                                           | Actions   | no      |
-| `VERCEL_TOKEN_REMI21`       | Vercel API token for the **remi21** team. Nothing reads it today                                                                           | local     | no      |
-| `VERCEL_TOKEN`              | Vercel token for the **remi21** team. `promote.yml` and `promote.sh` read it. No other workflow exists                     | both      | no      |
-| `VERCEL_TEAM`               | The Vercel team's slug, `remi21`. An Actions **variable**, not a secret                                                                    | both      | no      |
-| `NEON_API_KEY`              | Neon API key of the organisation. No workflow reads it: the Neon integration makes the preview branches. Open item: delete it (triage `neon-api-key-and-dead-domain`)                                       | both      | no      |
-| `DATABASE_URL`              | Production's **direct** connection string. Read by the migration in `promote.yml` only                                                     | Actions   | no      |
+| Variable                    | Purpose                                                                                                                                                               | Where set | Public? |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
+| `GITHUB_TOKEN`              | Injected automatically by Actions. Do **not** add it                                                                                                                  | Actions   | no      |
+| `GH_TOKEN`                  | What `gh` reads when no `gh auth login` exists. `.icm/scripts/new-run.sh` and `close-out.sh` call `gh`; a logged-in `gh` needs no variable                            | local     | no      |
+| `TURBO_TOKEN`               | Turborepo remote cache token, shares the cache between CI and Vercel                                                                                                  | Actions   | no      |
+| `TURBO_TEAM`                | Turborepo team slug (a repo **variable**, not a secret)                                                                                                               | Actions   | no      |
+| `SLACK_BOT_TOKEN`           | Bot token (`xoxb-…`, scope `chat:write`, the app invited to the channel) of the REMI Slack workspace. Nothing reads it today                                          | Actions   | no      |
+| `SLACK_ANNOUNCE_CHANNEL_ID` | Channel id (`C…`) of the release post. Nothing reads it today. An Actions **variable**, not a secret                                                                  | Actions   | no      |
+| `SLACK_ALERTS_CHANNEL_ID`   | Channel id (`C…`) kept for an alert post. Nothing reads it today                                                                                                      | Actions   | no      |
+| `VERCEL_TOKEN_REMI21`       | Vercel API token for the **remi21** team. Nothing reads it today                                                                                                      | local     | no      |
+| `VERCEL_TOKEN`              | Vercel token for the **remi21** team. `promote.yml` and `promote.sh` read it. No other workflow exists                                                                | both      | no      |
+| `VERCEL_TEAM`               | The Vercel team's slug, `remi21`. An Actions **variable**, not a secret                                                                                               | both      | no      |
+| `NEON_API_KEY`              | Neon API key of the organisation. No workflow reads it: the Neon integration makes the preview branches. Open item: delete it (triage `neon-api-key-and-dead-domain`) | both      | no      |
+| `DATABASE_URL`              | Production's **direct** connection string. Read by the migration in `promote.yml` only                                                                                | Actions   | no      |
 
 The Slack app itself is described by [`slack-app-manifest.yaml`](slack-app-manifest.yaml) beside this
 file: import it at api.slack.com/apps (Create New App → From a manifest), install it, and the Bot User
