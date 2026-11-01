@@ -35,6 +35,11 @@ that app's project.
 | `NEXT_PUBLIC_ADMIN_URL`     | Where `apps/admin` answers                     | Vercel    | yes     |
 | `NEXT_PUBLIC_DOCS_URL`      | Where `apps/docs` answers                      | Vercel    | yes     |
 
+Value per target: production takes the production address of each app, uat the uat address
+(`https://uat-app.remi-ai.tech`, `https://uat-admin.remi-ai.tech`; marketing and docs have no uat,
+so uat takes their production address), preview is unset today. The addresses live in
+`.icm/environments.md`.
+
 `NODE_ENV` is the one row nobody sets: Next.js, Turborepo and the test runner set it themselves, and
 it is listed here because it is in the zod schema and in `turbo.json` like every other variable, and
 because `packages/services/src/shared/links.ts` reads it literally to decide between the dev ports
@@ -145,12 +150,19 @@ variable behind that — the invitation is data, not configuration.
 | `AUTH_SECRET`    | Signs the admin session cookie (**admin** project). Rotating it signs every operator out        | Vercel    | no      |
 | `OPERATOR_EMAIL` | The one email allowed to create the first operator account (**admin** project) — see `/sign-in` | Vercel    | no      |
 
+Value per target: `AUTH_SECRET` is one value per target, made with `openssl rand -base64 32`; uat
+never reuses production's. `OPERATOR_EMAIL` on uat may take its own test address.
+
 ## Email
 
 | Variable         | Purpose                                                   | Where set | Public? |
 | ---------------- | --------------------------------------------------------- | --------- | ------- |
 | `EMAIL_FROM`     | Default from-address for outbound email                   | Vercel    | no      |
 | `RESEND_API_KEY` | Resend API key — read by the Resend adapter on every send | Vercel    | no      |
+
+Value per target: production takes the live key and the client's sender. uat and preview take a key
+of a separate Resend account or sandbox and a test sender on a domain verified in Resend, never the
+live key. Unset: the console mailer logs and sends nothing.
 
 Resend is the registered mail vendor: `packages/services/src/email/adapters/resend.ts` implements
 the `Mailer` seam. Two apps register it: `apps/marketing` for the public contact form, and
@@ -173,6 +185,10 @@ screen that no email will go out, and refuses to claim it emailed a patient thei
 | ----------------------- | ---------------------------------------------------------------------------------------------------------- | --------- | ------- |
 | `BLOB_READ_WRITE_TOKEN` | Read-write token of the private Vercel Blob store — read by the Blob adapter on every upload, read, delete | Vercel    | no      |
 
+Value per target: production takes the token of the store `document-storage`; preview and uat take
+the token of the store `uat-document-storage`, added by hand, since the store connection exposes
+only `BLOB_STORE_ID` and `BLOB_WEBHOOK_PUBLIC_KEY`. Unset: no file store is registered.
+
 Vercel Blob is the registered file vendor (decision D-18): `packages/services/src/files/adapters/vercel-blob.ts`
 implements the `FileStore` seam. **The store must be created private and in an EU region** — both are
 fixed at creation and cannot be changed afterwards; a public or non-EU store means a new store. Two
@@ -190,6 +206,8 @@ file cannot be opened. Nothing is ever reported as stored when it was not.
 | -------------------- | ----------------------------------------------------- | --------- | ------- |
 | `ANTHROPIC_API_KEY`  | Direct Anthropic API access                           | both      | no      |
 | `AI_GATEWAY_API_KEY` | Vercel AI Gateway key, if routing through the gateway | Vercel    | no      |
+
+Value per target: AI has no vendor adapter yet. Set neither key on any target until an adapter reads it.
 
 Model ids are **not** environment variables — they live in `packages/services/src/ai/index.ts`
 behind three role names (`fast` / `balanced` / `deep`), so an upgrade is one edit rather than a

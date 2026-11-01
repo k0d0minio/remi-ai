@@ -1,3 +1,5 @@
+> Done: Jamie, 2026-11-01
+
 # Setup: the Neon integration on each Vercel project
 
 - setup-slug: neon-vercel-integration

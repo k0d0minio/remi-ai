@@ -1,3 +1,5 @@
+> Done: Jamie, 2026-11-01
+
 # Setup: production's connection string for the migration in promote.yml
 
 - setup-slug: actions-production-database
