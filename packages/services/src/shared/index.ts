@@ -27,6 +27,20 @@ export {
 export type { Locale } from "./i18n";
 export { auditActions } from "./audit";
 export type { AuditActionName } from "./audit";
+export {
+  consentDecisions,
+  consentKeys,
+  consentRecordChannels,
+  consentTextLocales,
+  legacyConsentVersion,
+  mandatoryConsentKeys,
+} from "./consent";
+export type {
+  ConsentDecision,
+  ConsentKey,
+  ConsentRecordChannel,
+  ConsentTextLocale,
+} from "./consent";
 export { appHref, appOrigin } from "./links";
 export {
   documentFileTypes,

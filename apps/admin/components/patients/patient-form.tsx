@@ -3,7 +3,6 @@
 import { useActionState, useEffect } from "react";
 import type { PatientProfile } from "@remi/services/shared";
 import {
-  consentChannels,
   cookingAffinities,
   cookingTimes,
   foodBudgets,
@@ -196,49 +195,10 @@ export const PatientForm = ({ patient, onSaved }: Props) => {
         </div>
 
         <Typography size="sm" tone="muted">
-          Quand et comment la personne a accepté que REMI conserve son dossier
-          et que le lien patient existe. C&apos;est un fait consigné : rien
-          n&apos;est bloqué tant qu&apos;il manque.
+          Le consentement consigné à la main avant l&apos;inscription en ligne.
+          Il se lit ici et ne se modifie plus : le patient donnera ses
+          consentements lui-même à l&apos;inscription.
         </Typography>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field
-            id="consentDate"
-            label="Date du consentement"
-            optional
-            hint="Le jour où la personne a accepté."
-          >
-            <Input
-              id="consentDate"
-              name="consentDate"
-              type="date"
-              defaultValue={patient?.consentDate ?? ""}
-            />
-          </Field>
-
-          <Field
-            id="consentChannel"
-            label="Canal"
-            optional
-            hint="Par quel biais l'accord a été donné."
-          >
-            <Select
-              name="consentChannel"
-              defaultValue={patient?.consentChannel ?? ""}
-            >
-              <SelectTrigger id="consentChannel">
-                <SelectValue placeholder="Non renseigné" />
-              </SelectTrigger>
-              <SelectContent>
-                {consentChannels.map((channel) => (
-                  <SelectItem key={channel} value={channel}>
-                    {consentChannelLabels[channel]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-        </div>
       </div>
 
       <Separator tone="subtle" />

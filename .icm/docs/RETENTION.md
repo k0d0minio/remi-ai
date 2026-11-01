@@ -21,7 +21,8 @@ One row in `patient_profiles`, plus what hangs off it:
 | Diet, allergies, intolerances, likes cooking, time to cook, budget | `patient_profiles`        | yes — the patient edits them on « Mon profil »     |
 | When the patient last changed each of those fields                 | `patient_profiles`        | no                                                 |
 | Referral, anamnesis                                                | `patient_profiles`        | no — practitioner's working record                 |
-| Consent date and channel                                           | `patient_profiles`        | no                                                 |
+| Consent date and channel, recorded by hand before the consent rows | `patient_profiles`        | no                                                 |
+| Each consent decision, with the version and the hash of its text   | `patient_consents`        | no                                                 |
 | Questionnaire: sex for the calculation, activity, desired weight   | `patient_profiles`        | no — no page shows them yet                        |
 | Questionnaire: consultation reason and date, diet, pathologies     | `patient_profiles`        | no — no page shows them yet                        |
 | Questionnaire: celiac disease, the free question's answer          | `patient_profiles`        | no — no page shows them yet                        |
@@ -181,14 +182,23 @@ says what she chose, and any automation lands with it.
 
 ## Consent
 
-Consent is recorded on the profile as two facts: the date the patient agreed, and the channel they
-agreed through (in consultation, WhatsApp, or email). Morgane records and edits them on the patient
-page; a profile with neither shows "pas encore enregistré" rather than an empty line.
+Each consent decision is one row of `patient_consents`: the key (`care` or `genetic`), the
+decision (`given`, `refused` or `withdrawn`), the moment, the channel and who took it. The row
+names the text the patient read three ways: its version, the language shown, and the SHA-256 of
+the text file. The texts live in `packages/services/src/consent/texts/`, one file per key, version
+and language. A published file never changes: a new wording is a new version, and a test pins the
+hash of every file. Recording a decision also writes an audit event (D-32).
 
-It is a **recorded fact, not a gate**. Nothing in REMI refuses to save, render or share a profile
-because consent is missing — the value of writing it down is that it can be answered, not that it
-blocks anything. No consent wording or version is stored; if that is wanted later, it is one more
-nullable column, not a reshape.
+The table is append-only. A change of mind is a new row, and the latest row per key is the
+patient's answer. The rows are deleted with the patient, like everything else on the profile.
+
+Before this table, Morgane recorded consent by hand as two facts on the profile: the date and the
+channel (in consultation, WhatsApp, or email). Migration `0028` copied each profile with a date into
+one `care` row of version `legacy`, with the channel kept. The two columns stay on the profile and
+the console shows them, but nothing writes them any more. A later migration drops them.
+
+Consent does not gate anything yet. The sign-up screen (`consent-and-data/consent-gate-at-signup`)
+is the first place that refuses to go on without the mandatory `care` consent.
 
 ## Where this is enforced
 
