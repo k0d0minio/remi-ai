@@ -1,3 +1,5 @@
+> Dropped: duplicate of `triage/regenerated-migration-breaks-preview-branch`, 2026-11-01
+
 # Stub: A preview branch that migrated first does not skip a migration main merges later
 
 - lane: bug

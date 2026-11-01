@@ -8,7 +8,7 @@
 
 ## Problem
 
-`patient_profiles.consent_date` and `consent_channel` are read-only since `consent-texts-and-records`. Migration `0027` copied each dated pair into one `care` row of version `legacy` in `patient_consents`. The admin form and the patient page still read the two columns for the « Recueilli le … » badge (`apps/admin/components/patients/patient-form.tsx`, `apps/admin/app/(admin)/patients/[id]/page.tsx`).
+`patient_profiles.consent_date` and `consent_channel` are read-only since `consent-texts-and-records`. Migration `0028` copied each dated pair into one `care` row of version `legacy` in `patient_consents`. The admin form and the patient page still read the two columns for the « Recueilli le … » badge (`apps/admin/components/patients/patient-form.tsx`, `apps/admin/app/(admin)/patients/[id]/page.tsx`).
 
 ## Proposed change
 

@@ -80,6 +80,12 @@ export {
 } from "./services/patient-anamnesis";
 
 export {
+  getPatientQuestionnaire,
+  savePatientQuestionnaire,
+  setPatientAllergens,
+} from "./services/patient-questionnaire";
+
+export {
   describeConsultation,
   recordConsultation,
 } from "./services/consultations";

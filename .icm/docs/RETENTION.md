@@ -23,6 +23,12 @@ One row in `patient_profiles`, plus what hangs off it:
 | Referral, anamnesis                                                | `patient_profiles`        | no — practitioner's working record                 |
 | Consent date and channel, recorded by hand before the consent rows | `patient_profiles`        | no                                                 |
 | Each consent decision, with the version and the hash of its text   | `patient_consents`        | no                                                 |
+| Questionnaire: sex for the calculation, activity, desired weight   | `patient_profiles`        | no — no page shows them yet                        |
+| Questionnaire: consultation reason and date, diet, pathologies     | `patient_profiles`        | no — no page shows them yet                        |
+| Questionnaire: celiac disease, the free question's answer          | `patient_profiles`        | no — no page shows them yet                        |
+| The genetic test answer, the APOE, DIO2 and AMY1A results          | `patient_profiles`        | no — stored, never interpreted (D-35)              |
+| Allergies and intolerances as checked boxes                        | `patient_allergens`       | no — no page shows them yet                        |
+| Whether the patient declared « no known » allergy or intolerance   | `patient_profiles`        | no — no page shows them yet                        |
 | The share token, when the link was last opened, last written       | `patient_profiles`        | the token is the link                              |
 | The protocol, entry by entry                                       | `patient_recommendations` | yes, unless archived                               |
 | Consultation notes                                                 | `patient_notes`           | no                                                 |
@@ -117,6 +123,7 @@ Deleting a patient from the console removes, permanently and in one operation:
 - the profile row — every field in the table above, the real name and the email included;
 - every recommendation encoded for them, archived ones too;
 - every consultation note about them;
+- their questionnaire's allergy and intolerance boxes;
 - every challenge she gave them, running or closed, with the patient's answers on each;
 - the whole general thread — every message the patient sent and every reply to it;
 - everything the patient themselves wrote through the link — their meal entries and their
@@ -186,7 +193,7 @@ The table is append-only. A change of mind is a new row, and the latest row per 
 patient's answer. The rows are deleted with the patient, like everything else on the profile.
 
 Before this table, Morgane recorded consent by hand as two facts on the profile: the date and the
-channel (in consultation, WhatsApp, or email). Migration `0027` copied each profile with a date into
+channel (in consultation, WhatsApp, or email). Migration `0028` copied each profile with a date into
 one `care` row of version `legacy`, with the channel kept. The two columns stay on the profile and
 the console shows them, but nothing writes them any more. A later migration drops them.
 

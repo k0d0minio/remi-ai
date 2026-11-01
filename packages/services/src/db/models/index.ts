@@ -56,6 +56,20 @@ export type {
 } from "./patient-profile";
 export type { PatientAccount } from "./patient-account";
 export type { PatientConsent } from "./patient-consent";
+export type {
+  ActivityLevel,
+  AllergenKey,
+  AllergenKind,
+  Amy1aCategory,
+  ApoeGenotype,
+  Diet,
+  Dio2Category,
+  GeneticTestAnswer,
+  IntoleranceKey,
+  PatientAllergen,
+  PatientQuestionnaire,
+  SexForCalculation,
+} from "./patient-questionnaire";
 export type { PatientRecommendation } from "./patient-recommendation";
 export type { PatientSummary } from "./patient-summary";
 export type { PatientSupplement } from "./patient-supplement";
