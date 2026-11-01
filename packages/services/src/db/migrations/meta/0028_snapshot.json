@@ -1,5 +1,5 @@
 {
-  "id": "cd641140-6c8b-4893-9f25-7e0bcc246d85",
+  "id": "42c44d33-c8c0-489f-8f49-c8883f6713a0",
   "prevId": "40089805-41ce-4958-ab98-43b36fc79bd1",
   "version": "7",
   "dialect": "postgresql",
@@ -585,13 +585,6 @@
           "notNull": true,
           "default": "'operator'"
         },
-        "signup_link_token": {
-          "name": "signup_link_token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "translate(encode(decode(substr(replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', ''), 1, 48), 'hex'), 'base64'), '+/', '-_')"
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -616,13 +609,6 @@
           "nullsNotDistinct": false,
           "columns": [
             "email"
-          ]
-        },
-        "operators_signup_link_token_unique": {
-          "name": "operators_signup_link_token_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "signup_link_token"
           ]
         }
       },
@@ -1006,6 +992,141 @@
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.patient_consents": {
+      "name": "patient_consents",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "patient_profile_id": {
+          "name": "patient_profile_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "consent_key": {
+          "name": "consent_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text_version": {
+          "name": "text_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text_locale": {
+          "name": "text_locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "text_hash": {
+          "name": "text_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "decision": {
+          "name": "decision",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "channel": {
+          "name": "channel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "decided_at": {
+          "name": "decided_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_kind": {
+          "name": "actor_kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "patient_consents_patient_key_idx": {
+          "name": "patient_consents_patient_key_idx",
+          "columns": [
+            {
+              "expression": "patient_profile_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "consent_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "decided_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "patient_consents_patient_profile_id_patient_profiles_id_fk": {
+          "name": "patient_consents_patient_profile_id_patient_profiles_id_fk",
+          "tableFrom": "patient_consents",
+          "tableTo": "patient_profiles",
+          "columnsFrom": [
+            "patient_profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "patient_consents_decision_check": {
+          "name": "patient_consents_decision_check",
+          "value": "\"patient_consents\".\"decision\" in ('given', 'refused', 'withdrawn')"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.patient_documents": {

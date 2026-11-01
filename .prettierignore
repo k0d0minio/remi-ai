@@ -13,3 +13,7 @@ pnpm-lock.yaml
 .icm/database/CONTEXT.md
 .icm/lanes/
 .icm/uat/CONTEXT.md
+
+# The consent texts are records: a hash of each file's bytes sits on every consent row, so a
+# reformat would break the link between a row and the text it accepted.
+packages/services/src/consent/texts/

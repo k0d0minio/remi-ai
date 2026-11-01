@@ -97,6 +97,9 @@ export const actionLabels: Record<AuditActionName, string> = {
   "summary.updated": "résumé modifié",
   "summary.cleared": "résumé retiré",
   "next_consultation_prep.updated": "note de préparation modifiée",
+  "consent.given": "consentement donné",
+  "consent.refused": "consentement refusé",
+  "consent.withdrawn": "consentement retiré",
   "share_link.regenerated": "lien patient régénéré",
   "share_link.emailed": "lien patient envoyé",
   "context.exported": "contexte copié",
@@ -212,6 +215,10 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "summary.updated": "neutral",
   "summary.cleared": "neutral",
   "next_consultation_prep.updated": "neutral",
+  "consent.given": "neutral",
+  "consent.refused": "info",
+  // A withdrawal stops processing: Morgane must see it.
+  "consent.withdrawn": "warning",
   "share_link.regenerated": "warning",
   "share_link.emailed": "info",
   // Health data left the console, pseudonymous but real — worth the eye, not an

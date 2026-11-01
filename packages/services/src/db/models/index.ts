@@ -55,6 +55,7 @@ export type {
   PatientStatus,
 } from "./patient-profile";
 export type { PatientAccount } from "./patient-account";
+export type { PatientConsent } from "./patient-consent";
 export type {
   ActivityLevel,
   AllergenKey,

@@ -131,10 +131,10 @@ export const patientProfiles = pgTable("patient_profiles", {
     .defaultNow(),
   /**
    * When the patient agreed to their record being held and to the share link
-   * existing, and through which channel. Both nullable: consent is a recorded
-   * fact, not a gate, and a profile without it renders and saves exactly as
-   * one with it. A stored wording or version, if it is ever wanted, is one
-   * more nullable column here — not a reshape of this table.
+   * existing, and through which channel, as Morgane recorded it by hand. Both
+   * nullable. Read-only since `consent-texts-and-records`: a consent is a row
+   * of `patient_consents`, and migration 0028 copied each dated pair into one
+   * `legacy` row. A later migration drops the two columns.
    *
    * The date is a plain calendar date for the same reason as `birth_date`:
    * the day someone agreed has no timezone.
@@ -634,6 +634,57 @@ export const patientAccounts = pgTable("patient_accounts", {
   activatedAt: timestamp("activated_at", { withTimezone: true, mode: "date" }),
   ...timestamps,
 });
+
+/**
+ * Each consent decision of a patient — story 3, D-32. Append-only: no service
+ * updates or deletes a row, and the latest row per key is the answer.
+ *
+ * The text is named three ways: its version, the language shown, and the
+ * SHA-256 of the file the patient read (`src/consent/texts/`). The hash proves
+ * the wording even if a file were ever edited by mistake.
+ *
+ * Migration 0028 wrote one `legacy` row per profile with a `consent_date`,
+ * from the two hand-filled columns of `patient_profiles`. Those rows have no
+ * locale and no hash. `channel` keeps the channel Morgane recorded.
+ *
+ * The rows go with the patient (`on delete cascade`), as `RETENTION.md` says.
+ */
+export const patientConsents = pgTable(
+  "patient_consents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientProfileId: uuid("patient_profile_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    /** A key of `consentKeys`. */
+    consentKey: text("consent_key").notNull(),
+    /** `1`, `2`, … or `legacy`. */
+    textVersion: text("text_version").notNull(),
+    textLocale: text("text_locale"),
+    textHash: text("text_hash"),
+    decision: text("decision").notNull(),
+    /** `app`, or the hand-recorded channel of a `legacy` row. */
+    channel: text("channel"),
+    decidedAt: timestamp("decided_at", {
+      withTimezone: true,
+      mode: "date",
+    }).notNull(),
+    /** A key of `auditActorKinds`: who took the decision. */
+    actorKind: text("actor_kind").notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    index("patient_consents_patient_key_idx").on(
+      table.patientProfileId,
+      table.consentKey,
+      table.decidedAt,
+    ),
+    check(
+      "patient_consents_decision_check",
+      sql`${table.decision} in ('given', 'refused', 'withdrawn')`,
+    ),
+  ],
+);
 
 /**
  * The short list of foods worth keeping in the placard and the frigo, chosen
