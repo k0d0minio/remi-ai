@@ -20,6 +20,7 @@ file plus one registration line — never a rewrite of the callers.
 | Email   | `Mailer`         | `registerMailer()`       | Resend (`createResendMailer()`)             | `consoleMailer` — logs, never sends                               |
 | Files   | `FileStore`      | `registerFileStore()`    | Vercel Blob (`createVercelBlobFileStore()`) | stores nothing — uploads refused, `isFileStoreConfigured()` false |
 | AI      | `TextProvider`   | `registerTextProvider()` | none yet                                    | throws                                                            |
+| Auth    | `AuthProvider`   | `registerAuthProvider()` | Neon Auth (`createNeonAuthProvider()`)      | throws — `apps/web`'s `ensureAuthProvider()` answers 503 instead  |
 
 Storage's vendor is **Neon Postgres** (owner decision, 27 Aug 2026 — supersedes the earlier
 Supabase leaning), queried with Drizzle against `src/db/schema.ts`. The schema is the single
@@ -35,6 +36,8 @@ An adapter goes in this package under `src/<seam>/adapters/<vendor>.ts`, the sea
 the only thing that re-exports it, and `.icm/docs/ENV.md` gains its variables in the same PR. A vendor
 SDK, if one is needed, becomes a dependency of **this** package only. The Resend adapter needs none:
 it is one POST to one endpoint, so it uses `fetch` and the package stays at a single dependency.
+The Neon Auth SDK reads cookies through `next/headers`, so `next` is a peer dependency of this
+package. Apps are lint-blocked from `@neon/auth`.
 
 ## Entrypoints — pick the one that matches where the code runs
 
@@ -105,7 +108,8 @@ src/
   types/       the storage-agnostic vocabulary everything else is written against
   shared/      isomorphic — no fs, no driver, no secret
   server/      the Node barrel + env
-  auth/        password hashing + session tokens — vendor-free, `node:crypto` only
+  auth/        the auth seam (provider.ts, session.ts) · adapters/ · the operator console's
+               password hashing + session tokens, vendor-free, `node:crypto` only
   db/          client.ts (the seam) · schema.ts (Drizzle) · adapters/ · models/ · services/ · migrations/
   email/       the mailer seam + templates
   files/       the files seam · adapters/ (the server adapter and its browser half) · client.ts

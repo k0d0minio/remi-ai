@@ -31,6 +31,9 @@ pages. It rests on D-26, D-28, D-32. It supersedes D-2 and D-10.
 Jamie answered on 2026-11-01: 1. Neon Auth. 2. The default: one seam, two principal kinds,
 operators migrated later. 3. Yes.
 
+Jamie decided on 2026-11-01: a patient signs up and signs in with a password or with a magic
+link. Story 2 asks for a password. The magic link is added to it. Morgane is not asked.
+
 ## Build order
 
 1. auth-seam — the auth seam, its adapter and the `patient_accounts` table — depends-on: none

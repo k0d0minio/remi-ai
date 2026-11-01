@@ -329,6 +329,33 @@ export type { AuditAction, AuditEvent } from "../db/models/audit-event";
 
 export { hashPassword, verifyPassword } from "../auth/password";
 export {
+  getAuthProvider,
+  isAuthProviderRegistered,
+  registerAuthProvider,
+} from "../auth/provider";
+export type {
+  AuthIdentity,
+  AuthProvider,
+  AuthResult,
+  AuthRouteHandlers,
+  MagicLinkInput,
+  PasswordResetInput,
+  PasswordResetRequestInput,
+  PasswordSignInInput,
+  PasswordSignUpInput,
+} from "../auth/provider";
+export { readSession } from "../auth/session";
+export type { AuthSession, Principal, PrincipalKind } from "../auth/session";
+export { createNeonAuthProvider } from "../auth/adapters/neon-auth";
+
+export {
+  createPatientAccount,
+  getPatientAccountByEmail,
+  getPatientAccountBySubject,
+} from "../db/services/patient-accounts";
+export type { PatientAccountInput } from "../db/services/patient-accounts";
+export type { PatientAccount } from "../db/models/patient-account";
+export {
   SESSION_TTL_SECONDS,
   createSessionToken,
   verifySessionToken,

@@ -518,6 +518,29 @@ export const patientSummaries = pgTable("patient_summaries", {
 });
 
 /**
+ * The account a patient signs in with — story 2, D-26, D-28. One row per
+ * patient file: the account is made once and kept after activation, which only
+ * sets `activated_at` (story 19).
+ *
+ * `auth_subject` is the auth adapter's user id, kept as text and not as a
+ * foreign key: the identity store is the adapter's, and nothing here names it.
+ * `email` is unique across the whole table, not per practitioner, because the
+ * identity store holds one user per address (Jamie, 2026-11-01). The service
+ * lower-cases it before every write and read.
+ */
+export const patientAccounts = pgTable("patient_accounts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientProfileId: uuid("patient_profile_id")
+    .notNull()
+    .unique()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  email: text("email").notNull().unique(),
+  authSubject: text("auth_subject").notNull().unique(),
+  activatedAt: timestamp("activated_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
+
+/**
  * The short list of foods worth keeping in the placard and the frigo, chosen
  * for this patient — brainstorm § H. An item is a name and a why, and that is
  * the whole design: § H warns explicitly against per-item quantity, season or

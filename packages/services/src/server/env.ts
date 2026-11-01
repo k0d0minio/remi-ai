@@ -15,6 +15,9 @@ const schema = z.object({
   APP_URL: z.string().url().optional(),
   DATABASE_URL: z.string().optional(),
   AUTH_SECRET: z.string().optional(),
+  NEON_AUTH_BASE_URL: z.string().url().optional(),
+  /** The SDK refuses a shorter secret: fail at boot, naming the variable. */
+  NEON_AUTH_COOKIE_SECRET: z.string().min(32).optional(),
   OPERATOR_EMAIL: z.string().optional(),
   EMAIL_FROM: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
