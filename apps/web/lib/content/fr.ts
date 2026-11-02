@@ -471,4 +471,50 @@ export const fr: Content = {
     betaNote:
       "REMI est en bêta — vos retours sont les bienvenus, dites-nous ce qui manque ou ce qui gêne.",
   },
+  signupLink: {
+    metaTitle: "Inscription",
+    title: "Inscription chez {name}",
+    intro:
+      "Créez votre compte REMI. Il est rattaché à la personne qui vous suit, et vous ouvre le questionnaire à remplir avant la consultation.",
+    labels: {
+      lastName: "Nom",
+      firstName: "Prénom",
+      birthDate: "Date de naissance",
+      email: "Adresse e-mail",
+      phone: "Téléphone",
+      password: "Mot de passe",
+    },
+    hints: {
+      phone: "Des chiffres, avec un + au début si besoin.",
+      password: "Au moins 8 caractères.",
+    },
+    summary: "À corriger : {fields}.",
+    required: "{field} : ce champ est obligatoire.",
+    invalid: {
+      lastName: "Ce nom est trop long.",
+      firstName: "Ce prénom est trop long.",
+      birthDate: "Cette date n'est pas valide.",
+      email: "Cette adresse e-mail n'est pas valide.",
+      phone: "Ce numéro n'est pas valide. Utilisez 8 à 15 chiffres, avec un + au début si besoin.",
+      password: "Ce mot de passe est trop long.",
+    },
+    tooShort: "Le mot de passe compte au moins 8 caractères.",
+    form: {
+      invalid_link:
+        "Ce lien n'est pas valide. Demandez-en un nouveau à la personne qui vous suit.",
+      already_registered:
+        "Cette adresse a déjà un compte. Aucun nouveau compte n'a été créé.",
+      rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
+      unavailable:
+        "L'inscription n'a pas abouti. Réessayez dans un instant : vos réponses sont gardées.",
+    },
+    submit: "Créer mon compte",
+    submitting: "Création du compte…",
+  },
+  questionnaire: {
+    metaTitle: "Questionnaire",
+    title: "Votre compte est créé",
+    comingSoon:
+      "Votre questionnaire arrive bientôt. Vous le remplirez ici avant votre consultation.",
+  },
 };
