@@ -78,9 +78,9 @@ const readAnswers = (row: QuestionnaireRow): PatientQuestionnaire => {
 
 /** `""` or null clears the field. */
 const clearable = <T extends z.ZodType>(schema: T) =>
-  z.union([z.literal(""), z.null(), schema]).transform((value) =>
-    value === "" ? null : (value as z.output<T>),
-  );
+  z
+    .union([z.literal(""), z.null(), schema])
+    .transform((value) => (value === "" ? null : (value as z.output<T>)));
 
 const freeText = (max: number) =>
   z

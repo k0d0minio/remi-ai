@@ -14,4 +14,6 @@ export type Operator = Entity & {
   name: string;
   passwordHash: string;
   role: OperatorRole;
+  /** The permanent sign-up link's token. Shown only to its own practitioner. */
+  signupLinkToken: string;
 };

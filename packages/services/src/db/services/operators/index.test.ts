@@ -7,6 +7,7 @@ import {
   deleteOperator,
   findOperatorByEmail,
   getOperator,
+  getPractitionerBySignupToken,
   hasOperator,
   listOperators,
   setOperatorRole,
@@ -241,5 +242,67 @@ describe("an operator's own account", () => {
       (await changeOperatorPassword("not-a-uuid", "a", "a long password here"))
         .ok,
     ).toBe(false);
+  });
+});
+
+describe("the permanent sign-up link", () => {
+  const create = async (email: string) =>
+    unwrapOk(
+      await createOperator({
+        email,
+        name: email.split("@")[0],
+        password: "a long enough password",
+      }),
+    );
+
+  it("gives each new account one token of 32 base64url characters", async () => {
+    const first = await create("link-one@example.com");
+    const second = await create("link-two@example.com");
+    expect(first.signupLinkToken).toMatch(/^[A-Za-z0-9_-]{32}$/);
+    expect(second.signupLinkToken).toMatch(/^[A-Za-z0-9_-]{32}$/);
+    expect(first.signupLinkToken).not.toBe(second.signupLinkToken);
+  });
+
+  it("resolves a token to its practitioner, every time, with no email and no hash", async () => {
+    const practitioner = await create("link-resolve@example.com");
+    // Two resolutions of one link name the same practitioner: the link is reusable.
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const resolved = unwrapOk(
+        await getPractitionerBySignupToken(practitioner.signupLinkToken),
+      );
+      expect(resolved).toEqual({
+        id: practitioner.id,
+        name: practitioner.name,
+      });
+    }
+  });
+
+  it("refuses an unknown token and a malformed one", async () => {
+    const unknown = await getPractitionerBySignupToken("A".repeat(32));
+    const tooShort = await getPractitionerBySignupToken("abc");
+    const badCharacter = await getPractitionerBySignupToken(
+      `${"A".repeat(31)}/`,
+    );
+    for (const result of [unknown, tooShort, badCharacter]) {
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error).toBe("not_found");
+      }
+    }
+  });
+
+  it("keeps the token through a password change and a rename", async () => {
+    const practitioner = await create("link-keep@example.com");
+    unwrapOk(
+      await changeOperatorPassword(
+        practitioner.id,
+        "a long enough password",
+        "a different long password",
+      ),
+    );
+    unwrapOk(await updateOperatorName(practitioner.id, "Renamed"));
+    expect((await getOperator(practitioner.id))?.signupLinkToken).toBe(
+      practitioner.signupLinkToken,
+    );
   });
 });

@@ -471,4 +471,10 @@ export const fr: Content = {
     betaNote:
       "REMI est en bêta — vos retours sont les bienvenus, dites-nous ce qui manque ou ce qui gêne.",
   },
+  signupLink: {
+    metaTitle: "Inscription",
+    title: "Inscription chez {name}",
+    opensSoon:
+      "L'inscription ouvre bientôt. Gardez ce lien : il vous permettra de créer votre compte REMI, rattaché à la personne qui vous suit.",
+  },
 };
