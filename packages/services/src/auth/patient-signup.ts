@@ -1,15 +1,18 @@
 import { randomInt } from "node:crypto";
 import { z } from "zod";
+import { checkSignupConsents } from "../consent";
 import { getDatabase } from "../db/client";
 import type { PatientProfile } from "../db/models/patient-profile";
-import { recordAuditEvent } from "../db/services/audit";
+import { recordAuditEvent, type AuditRecord } from "../db/services/audit";
 import { getPractitionerBySignupToken } from "../db/services/operators";
 import {
   createPatientAccount,
   getPatientAccountByEmail,
   getPatientAccountBySubject,
 } from "../db/services/patient-accounts";
+import { insertConsent } from "../db/services/patient-consents";
 import { createPatient } from "../db/services/patients";
+import type { ShownConsent } from "../shared/consent";
 import type { Locale } from "../shared/i18n";
 import { err, ok, type Result } from "../shared/result";
 import {
@@ -28,9 +31,10 @@ import { getAuthProvider, type AuthIdentity, type AuthResult } from "./provider"
  *
  * The order is fixed by who owns what. The identity store creates the user
  * first, because the account row needs its subject. Then one transaction
- * writes the patient file and the account. A failure there leaves a user with
- * no file. The next submit with the same e-mail and password signs that user
- * in and writes the missing rows, so the patient never meets a dead end.
+ * writes the patient file, the account and the consent rows. A failure there
+ * leaves a user with no file. The next submit with the same e-mail and
+ * password signs that user in and writes the missing rows, so the patient
+ * never meets a dead end.
  */
 
 /** A message is a `SignupFieldError` code, read back by `validateSignup`. */
@@ -189,12 +193,21 @@ export type PatientSignupInput = {
   data: SignupData;
   /** Where the e-mail verification link returns to, as a path of this app. */
   callbackPath: string;
+  /**
+   * The consent texts the patient ticked, as the page showed them (story 3).
+   * Every mandatory key must be there, at its current version.
+   */
+  consents: readonly ShownConsent[];
 };
 
 /**
  * Creates the patient's file and account under the link's practitioner, signs
- * the patient in, and writes one `patient.signed_up` event.
+ * the patient in, and writes one `patient.signed_up` event. Then one
+ * `patient_consents` row and one `consent.given` event per mandatory consent.
  *
+ * - `invalid_input`: a mandatory consent is missing, or names a text that is
+ *   not current. The page checks this first. Nothing is written, not even the
+ *   identity store's user.
  * - `not_found`: the token names no practitioner. Nothing is written.
  * - `conflict`: the e-mail already has an account. Nothing is written.
  * - `rate_limited`, `upstream_failed`: the identity store refused. Nothing is written.
@@ -204,7 +217,16 @@ export const signUpPatient = async ({
   locale,
   data,
   callbackPath,
+  consents,
 }: PatientSignupInput): Promise<Result<{ patientId: Id }>> => {
+  // No account without the mandatory consents (story 3, criterion 2).
+  const consentCheck = checkSignupConsents(consents);
+  if (!consentCheck.ok) {
+    return err(
+      "invalid_input",
+      "the mandatory consents are missing or not current",
+    );
+  }
   const practitioner = await getPractitionerBySignupToken(token);
   if (!practitioner.ok) {
     return practitioner;
@@ -218,6 +240,7 @@ export const signUpPatient = async ({
   }
 
   let patient: PatientProfile;
+  const consentAudits: AuditRecord[] = [];
   try {
     patient = await getDatabase().transaction(async (tx) => {
       const created = orRollback(
@@ -246,6 +269,24 @@ export const signUpPatient = async ({
           tx,
         ),
       );
+      for (const shown of consentCheck.consents) {
+        const written = orRollback(
+          await insertConsent(
+            {
+              patientId: created.id,
+              ...shown,
+              decision: "given",
+              actor: {
+                kind: "patient",
+                id: created.id,
+                name: created.pseudonym,
+              },
+            },
+            tx,
+          ),
+        );
+        consentAudits.push(written.audit);
+      }
       return created;
     });
   } catch (cause) {
@@ -262,5 +303,9 @@ export const signUpPatient = async ({
     targetId: patient.id,
     targetLabel: patient.pseudonym,
   });
+  // After the commit: an event never names a row that rolled back.
+  for (const audit of consentAudits) {
+    await recordAuditEvent(audit);
+  }
   return ok({ patientId: patient.id });
 };

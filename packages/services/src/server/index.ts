@@ -381,10 +381,22 @@ export {
 export type { PatientAccountInput } from "../db/services/patient-accounts";
 export type { PatientAccount } from "../db/models/patient-account";
 
-export { consentText, consentTexts, currentConsentText } from "../consent";
-export type { ConsentText } from "../consent";
-export { consentsOf, recordConsent } from "../db/services/patient-consents";
-export type { ConsentInput } from "../db/services/patient-consents";
+export {
+  checkSignupConsents,
+  consentText,
+  consentTexts,
+  currentConsentText,
+} from "../consent";
+export type { ConsentText, SignupConsentCheck } from "../consent";
+export {
+  consentsOf,
+  insertConsent,
+  recordConsent,
+} from "../db/services/patient-consents";
+export type {
+  ConsentInput,
+  ConsentWrite,
+} from "../db/services/patient-consents";
 export type { PatientConsent } from "../db/models/patient-consent";
 
 export {

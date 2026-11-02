@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { consentText } from "../../../consent";
-import { registerDatabase } from "../../client";
+import { getDatabase, registerDatabase } from "../../client";
 import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { listAuditEvents, type AuditActor } from "../audit";
 import { createPatient } from "../patients";
-import { consentsOf, recordConsent } from "./index";
+import { consentsOf, insertConsent, recordConsent } from "./index";
 
 let claireId: string;
 let claire: AuditActor;
@@ -183,5 +183,33 @@ describe("patient consents", () => {
     if (!recorded.ok) {
       expect(recorded.error).toBe("not_found");
     }
+  });
+
+  it("inserts on the client it is given and leaves the audit event to the caller", async () => {
+    const before = (await listAuditEvents({ targetId: claireId })).length;
+    const written = await getDatabase().transaction((tx) =>
+      insertConsent(
+        {
+          patientId: claireId,
+          key: "care",
+          version: "1",
+          locale: "fr-BE",
+          decision: "given",
+          actor: claire,
+        },
+        tx,
+      ),
+    );
+    if (!written.ok) {
+      throw new Error(written.message);
+    }
+    expect(written.data.row.consentKey).toBe("care");
+    expect(written.data.audit).toMatchObject({
+      action: "consent.given",
+      targetId: claireId,
+      targetLabel: "Claire",
+      detail: "care v1 fr-BE",
+    });
+    expect(await listAuditEvents({ targetId: claireId })).toHaveLength(before);
   });
 });

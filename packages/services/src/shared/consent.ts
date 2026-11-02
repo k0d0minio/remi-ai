@@ -1,3 +1,4 @@
+import type { Locale } from "./i18n";
 import { consentChannels } from "./patient";
 
 /**
@@ -43,3 +44,45 @@ export const legacyConsentVersion = "legacy";
 export const consentRecordChannels = ["app", ...consentChannels] as const;
 
 export type ConsentRecordChannel = (typeof consentRecordChannels)[number];
+
+/**
+ * One consent text as a screen showed it: the key, the version and the
+ * language. The sign-up form posts one per ticked box, and the service checks
+ * each against the current text before it writes a row.
+ */
+export type ShownConsent = {
+  key: ConsentKey;
+  version: string;
+  locale: ConsentTextLocale;
+};
+
+/** The text language a page shows for a locale of the app. */
+export const consentTextLocaleFor = (locale: Locale): ConsentTextLocale =>
+  locale === "fr" ? "fr-BE" : "en";
+
+/** How a form posts one shown consent: `key:version:locale`. */
+export const shownConsentValue = (shown: ShownConsent) =>
+  `${shown.key}:${shown.version}:${shown.locale}`;
+
+const isConsentKey = (value: string): value is ConsentKey =>
+  (consentKeys as readonly string[]).includes(value);
+
+const isConsentTextLocale = (value: string): value is ConsentTextLocale =>
+  (consentTextLocales as readonly string[]).includes(value);
+
+/** Reads one posted value back. A malformed value is null: no consent. */
+export const parseShownConsent = (value: unknown): ShownConsent | null => {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const [key = "", version = "", locale = "", ...rest] = value.split(":");
+  if (
+    rest.length > 0 ||
+    !isConsentKey(key) ||
+    !version ||
+    !isConsentTextLocale(locale)
+  ) {
+    return null;
+  }
+  return { key, version, locale };
+};

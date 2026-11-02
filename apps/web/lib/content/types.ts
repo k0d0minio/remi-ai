@@ -14,6 +14,7 @@
 
 import type {
   ChallengeOutcome,
+  ConsentKey,
   CookingAffinity,
   CookingTime,
   FoodBudget,
@@ -525,6 +526,22 @@ export type Content = {
     form: Record<SignupFormError, string>;
     submit: string;
     submitting: string;
+    /** The consent step, before the form (story 3). */
+    consent: {
+      title: string;
+      intro: string;
+      /** The name of each consent, as the patient reads it. */
+      names: Record<ConsentKey, string>;
+      /** Holds `{version}` and `{date}`: the text's version and its date. */
+      version: string;
+      /** Holds `{name}`: the consent's name. */
+      accept: string;
+      reread: string;
+      /** Holds `{consents}`: the names of the unticked consents, joined. */
+      missing: string;
+      continue: string;
+      back: string;
+    };
   };
   /**
    * Where a new patient lands after sign-up. A holding page until

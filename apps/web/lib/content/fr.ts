@@ -507,9 +507,28 @@ export const fr: Content = {
       rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
       unavailable:
         "L'inscription n'a pas abouti. Réessayez dans un instant : vos réponses sont gardées.",
+      consent_missing:
+        "Cochez chaque consentement obligatoire. Aucun compte n'a été créé.",
+      consent_stale:
+        "Le texte a changé depuis l'ouverture de la page. Rechargez la page pour lire la version en vigueur. Aucun compte n'a été créé.",
     },
     submit: "Créer mon compte",
     submitting: "Création du compte…",
+    consent: {
+      title: "Vos données personnelles",
+      intro:
+        "Avant de créer votre compte, lisez comment REMI traite vos données. Votre compte ne peut pas être créé sans votre accord.",
+      names: {
+        care: "Traitement de vos données pour votre suivi",
+        genetic: "Traitement de vos données génétiques",
+      },
+      version: "Version {version} du {date}",
+      accept: "J'ai lu et j'accepte : {name}.",
+      reread: "Relire",
+      missing: "Cochez pour continuer : {consents}.",
+      continue: "Continuer",
+      back: "Revoir mes consentements",
+    },
   },
   questionnaire: {
     metaTitle: "Questionnaire",
