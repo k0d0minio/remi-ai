@@ -197,8 +197,11 @@ channel (in consultation, WhatsApp, or email). Migration `0028` copied each prof
 one `care` row of version `legacy`, with the channel kept. The two columns stay on the profile and
 the console shows them, but nothing writes them any more. A later migration drops them.
 
-Consent does not gate anything yet. The sign-up screen (`consent-and-data/consent-gate-at-signup`)
-is the first place that refuses to go on without the mandatory `care` consent.
+The sign-up screen (`/inscription/<token>`) is the first gate. It shows the mandatory `care` text
+before any field, and refuses to create an account without the tick. The patient file, the account
+and the `care` row commit in one transaction, so no account exists without its consent row. The
+audit events are written after the commit. The two takeover paths of
+`patient-file-creation/patient-takes-over-file` are not gated yet.
 
 ## Where this is enforced
 

@@ -8,9 +8,13 @@ import {
 } from "../../../shared/consent";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
-import { getDatabase } from "../../client";
+import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientConsent } from "../../models/patient-consent";
-import { recordAuditEvent, type AuditActor } from "../audit";
+import {
+  recordAuditEvent,
+  type AuditActor,
+  type AuditRecord,
+} from "../audit";
 import { getPatient } from "../patients";
 
 /**
@@ -23,8 +27,9 @@ import { getPatient } from "../patients";
  * pair that no file carries.
  */
 
-const consents = () =>
-  getDatabase().collection<PatientConsent>("patient_consents");
+/** On the pooled client by default, or on a transaction the caller opened. */
+const consents = (db: DatabaseClient = getDatabase()) =>
+  db.collection<PatientConsent>("patient_consents");
 
 /** Above any history a patient can build: one row per decision, two keys. */
 const HISTORY_LIMIT = 500;
@@ -46,8 +51,11 @@ const newestFirst = (a: PatientConsent, b: PatientConsent) =>
   b.decidedAt.getTime() - a.decidedAt.getTime() ||
   b.createdAt.getTime() - a.createdAt.getTime();
 
-const historyOf = async (patientId: Id): Promise<PatientConsent[]> => {
-  const page = await consents().findMany(
+const historyOf = async (
+  patientId: Id,
+  db?: DatabaseClient,
+): Promise<PatientConsent[]> => {
+  const page = await consents(db).findMany(
     { patientProfileId: patientId },
     { limit: HISTORY_LIMIT },
   );
@@ -68,9 +76,24 @@ export const consentsOf = async (
   return latest;
 };
 
-export const recordConsent = async (
+/** A consent row, and the audit event that records it. */
+export type ConsentWrite = {
+  row: PatientConsent;
+  audit: AuditRecord;
+};
+
+/**
+ * Writes one decision on `db` and writes no audit event. The caller writes
+ * `audit` after its transaction commits: an event written inside a transaction
+ * that rolls back would name a consent that no row holds.
+ *
+ * The sign-up uses it: the patient file, the account and the consent rows
+ * commit together, or none of them does.
+ */
+export const insertConsent = async (
   input: ConsentInput,
-): Promise<Result<PatientConsent>> => {
+  db: DatabaseClient,
+): Promise<Result<ConsentWrite>> => {
   const parsed = consentInput.safeParse(input);
   if (!parsed.success) {
     return err(
@@ -84,12 +107,12 @@ export const recordConsent = async (
     const name = `${key} v${version} ${locale}`;
     return err("invalid_input", `no consent text ${name}`);
   }
-  const patient = await getPatient(patientId);
+  const patient = await getPatient(patientId, db);
   if (!patient.ok) {
     return err("not_found", "no such patient");
   }
 
-  const current = (await historyOf(patientId)).find(
+  const current = (await historyOf(patientId, db)).find(
     (row) => row.consentKey === key,
   );
   // A withdrawal takes back a consent in force. With none, the row would claim
@@ -99,7 +122,7 @@ export const recordConsent = async (
   }
 
   const actor = input.actor;
-  const created = await consents().insert({
+  const row = await consents(db).insert({
     patientProfileId: patientId,
     consentKey: key,
     textVersion: text.version,
@@ -110,13 +133,27 @@ export const recordConsent = async (
     decidedAt: new Date(),
     actorKind: "kind" in actor ? actor.kind : "operator",
   });
-  await recordAuditEvent({
-    actor,
-    action: `consent.${decision}` as const,
-    targetType: "patient",
-    targetId: patientId,
-    targetLabel: patient.data.pseudonym,
-    detail: `${key} v${text.version} ${text.locale}`,
+  return ok({
+    row,
+    audit: {
+      actor,
+      action: `consent.${decision}` as const,
+      targetType: "patient",
+      targetId: patientId,
+      targetLabel: patient.data.pseudonym,
+      detail: `${key} v${text.version} ${text.locale}`,
+    },
   });
-  return ok(created);
+};
+
+/** Writes one decision and its audit event (D-32). */
+export const recordConsent = async (
+  input: ConsentInput,
+): Promise<Result<PatientConsent>> => {
+  const written = await insertConsent(input, getDatabase());
+  if (!written.ok) {
+    return written;
+  }
+  await recordAuditEvent(written.data.audit);
+  return ok(written.data.row);
 };

@@ -1,5 +1,10 @@
 import { createHash } from "node:crypto";
-import type { ConsentKey, ConsentTextLocale } from "../shared/consent";
+import {
+  mandatoryConsentKeys,
+  type ConsentKey,
+  type ConsentTextLocale,
+  type ShownConsent,
+} from "../shared/consent";
 import care1FrBe from "./texts/care/1.fr-BE.md";
 import genetic1FrBe from "./texts/genetic/1.fr-BE.md";
 
@@ -90,4 +95,55 @@ export const currentConsentText = (
     throw new Error(`no consent text for the key "${key}"`);
   }
   return current;
+};
+
+export type SignupConsentCheck =
+  | { ok: true; consents: ShownConsent[] }
+  | { ok: false; missing: ConsentKey[]; stale: ConsentKey[] };
+
+/**
+ * Checks the consents a sign-up posted (story 3), before anything is written.
+ *
+ * - `missing`: a mandatory key with no entry. The patient did not tick it.
+ * - `stale`: an entry that does not name the text a page shows now in that
+ *   language, a key named twice, or a key the sign-up does not ask. A new
+ *   version shipped since the render, or the form was forged.
+ *
+ * The sign-up asks only the mandatory keys. The genetic consent comes later,
+ * when a génotype is entered (`genetic-consent-and-optional-data`).
+ */
+export const checkSignupConsents = (
+  shown: readonly ShownConsent[],
+): SignupConsentCheck => {
+  const missing: ConsentKey[] = [];
+  const stale: ConsentKey[] = [];
+  const accepted: ShownConsent[] = [];
+  for (const key of mandatoryConsentKeys) {
+    const entries = shown.filter((entry) => entry.key === key);
+    const [entry] = entries;
+    if (!entry) {
+      missing.push(key);
+      continue;
+    }
+    const current = currentConsentText(key, entry.locale);
+    if (
+      entries.length > 1 ||
+      entry.version !== current.version ||
+      entry.locale !== current.locale
+    ) {
+      stale.push(key);
+      continue;
+    }
+    accepted.push(entry);
+  }
+  for (const entry of shown) {
+    const asked = mandatoryConsentKeys.includes(entry.key);
+    if (!asked && !stale.includes(entry.key)) {
+      stale.push(entry.key);
+    }
+  }
+  if (missing.length > 0 || stale.length > 0) {
+    return { ok: false, missing, stale };
+  }
+  return { ok: true, consents: accepted };
 };

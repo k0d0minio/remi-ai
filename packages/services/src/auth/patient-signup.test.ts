@@ -1,14 +1,33 @@
-import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { currentConsentText } from "../consent";
 import { getDatabase, registerDatabase } from "../db/client";
 import type { PatientProfile } from "../db/models/patient-profile";
 import { listAuditEvents } from "../db/services/audit";
 import { createOperator } from "../db/services/operators";
 import { getPatientAccountByEmail } from "../db/services/patient-accounts";
+import { consentsOf } from "../db/services/patient-consents";
+import type * as ConsentService from "../db/services/patient-consents";
 import { getPatient } from "../db/services/patients";
 import { createMemoryDatabase } from "../db/test-helpers";
+import type { ShownConsent } from "../shared/consent";
 import { err, ok } from "../shared/result";
 import { signUpPatient, validateSignup, type SignupData } from "./patient-signup";
 import { registerAuthProvider, type AuthIdentity } from "./provider";
+
+/** Set to make the next consent write fail inside the sign-up transaction. */
+const consentWrite = vi.hoisted(() => ({ fails: false }));
+
+vi.mock("../db/services/patient-consents", async (importOriginal) => {
+  const actual = await importOriginal<typeof ConsentService>();
+  const { err: failure } = await import("../shared/result");
+  return {
+    ...actual,
+    insertConsent: (...args: Parameters<typeof actual.insertConsent>) =>
+      consentWrite.fails
+        ? Promise.resolve(failure("upstream_failed", "the consent write failed"))
+        : actual.insertConsent(...args),
+  };
+});
 
 /** The identity store of the fake adapter: e-mail → password and user. */
 const users = new Map<string, { password: string; identity: AuthIdentity }>();
@@ -82,14 +101,26 @@ beforeAll(async () => {
 
 beforeEach(() => {
   users.clear();
+  consentWrite.fails = false;
 });
 
-const signUp = (overrides: Partial<typeof valid> = {}, link = token) =>
+/** The care text a French page shows now, as the form posts it. */
+const care = (): ShownConsent => {
+  const text = currentConsentText("care", "fr-BE");
+  return { key: "care", version: text.version, locale: text.locale };
+};
+
+const signUp = (
+  overrides: Partial<typeof valid> = {},
+  link = token,
+  consents: readonly ShownConsent[] = [care()],
+) =>
   signUpPatient({
     token: link,
     locale: "fr",
     data: data(overrides),
     callbackPath: "/fr/questionnaire",
+    consents,
   });
 
 const profiles = async () =>
@@ -233,5 +264,65 @@ describe("the sign-up", () => {
     const result = await signUp({ email: "noa@example.be" });
     expect(result).toMatchObject({ ok: false, error: "conflict" });
     expect(await profiles()).toHaveLength(before);
+  });
+
+  it("writes nothing without the mandatory consent, not even the identity", async () => {
+    const before = (await profiles()).length;
+    const result = await signUp({ email: "ines@example.be" }, token, []);
+    expect(result).toMatchObject({ ok: false, error: "invalid_input" });
+    expect(await profiles()).toHaveLength(before);
+    expect(users.size).toBe(0);
+  });
+
+  it("writes nothing for a consent version that is not current", async () => {
+    const before = (await profiles()).length;
+    const result = await signUp({ email: "ines@example.be" }, token, [
+      { ...care(), version: "0" },
+    ]);
+    expect(result).toMatchObject({ ok: false, error: "invalid_input" });
+    expect(await profiles()).toHaveLength(before);
+    expect(users.size).toBe(0);
+  });
+
+  it("writes one care row with the version shown, and its event", async () => {
+    const result = await signUp({ email: "jade@example.be" });
+    if (!result.ok) {
+      throw new Error(result.message);
+    }
+    const consents = await consentsOf(result.data.patientId);
+    expect(Object.keys(consents)).toEqual(["care"]);
+    expect(consents.care).toMatchObject({
+      decision: "given",
+      textVersion: care().version,
+      textLocale: care().locale,
+      textHash: currentConsentText("care", "fr-BE").hash,
+      channel: "app",
+      actorKind: "patient",
+    });
+
+    const events = await listAuditEvents({
+      action: "consent.given",
+      targetId: result.data.patientId,
+    });
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      actorKind: "patient",
+      actorId: result.data.patientId,
+      detail: `care v${care().version} fr-BE`,
+    });
+  });
+
+  it("rolls back the file and the account when the consent write fails", async () => {
+    consentWrite.fails = true;
+    const before = (await profiles()).length;
+    const signedUp = (await listAuditEvents({ action: "patient.signed_up" }))
+      .length;
+    const result = await signUp({ email: "remi@example.be" });
+    expect(result).toMatchObject({ ok: false, error: "upstream_failed" });
+    expect(await profiles()).toHaveLength(before);
+    expect(await getPatientAccountByEmail("remi@example.be")).toBeNull();
+    expect(
+      await listAuditEvents({ action: "patient.signed_up" }),
+    ).toHaveLength(signedUp);
   });
 });

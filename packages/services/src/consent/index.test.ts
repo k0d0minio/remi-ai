@@ -1,7 +1,16 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { consentKeys } from "../shared/consent";
-import { consentText, consentTexts, currentConsentText } from "./index";
+import {
+  consentKeys,
+  parseShownConsent,
+  shownConsentValue,
+} from "../shared/consent";
+import {
+  checkSignupConsents,
+  consentText,
+  consentTexts,
+  currentConsentText,
+} from "./index";
 
 /**
  * The hash of every published text file. A failure here means a published
@@ -57,5 +66,76 @@ describe("consent texts", () => {
     const text = currentConsentText("genetic", "en");
     expect(text.locale).toBe("fr-BE");
     expect(text.version).toBe("1");
+  });
+});
+
+describe("the sign-up consent check", () => {
+  const care = currentConsentText("care", "fr-BE");
+  const shown = {
+    key: "care",
+    version: care.version,
+    locale: care.locale,
+  } as const;
+
+  it("accepts the current care text", () => {
+    expect(checkSignupConsents([shown])).toEqual({
+      ok: true,
+      consents: [shown],
+    });
+  });
+
+  it("names a mandatory key with no tick as missing", () => {
+    expect(checkSignupConsents([])).toEqual({
+      ok: false,
+      missing: ["care"],
+      stale: [],
+    });
+  });
+
+  it("names an old version, a text in another language and a duplicate as stale", () => {
+    for (const consents of [
+      [{ ...shown, version: "0" }],
+      [{ ...shown, locale: "en" as const }],
+      [shown, shown],
+    ]) {
+      expect(checkSignupConsents(consents)).toEqual({
+        ok: false,
+        missing: [],
+        stale: ["care"],
+      });
+    }
+  });
+
+  it("refuses a key the sign-up does not ask", () => {
+    const genetic = currentConsentText("genetic", "fr-BE");
+    expect(
+      checkSignupConsents([
+        shown,
+        { key: "genetic", version: genetic.version, locale: genetic.locale },
+      ]),
+    ).toEqual({ ok: false, missing: [], stale: ["genetic"] });
+  });
+});
+
+describe("a posted consent", () => {
+  it("reads back the value a form posts", () => {
+    const shown = { key: "care", version: "1", locale: "fr-BE" } as const;
+    expect(parseShownConsent(shownConsentValue(shown))).toEqual(shown);
+  });
+
+  it("reads a malformed value as no consent", () => {
+    const malformed = [
+      null,
+      "",
+      "care",
+      "care:1",
+      "care::fr-BE",
+      "x:1:fr-BE",
+      "care:1:de",
+      "care:1:fr-BE:x",
+    ];
+    for (const value of malformed) {
+      expect(parseShownConsent(value)).toBeNull();
+    }
   });
 });

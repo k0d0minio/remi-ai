@@ -1,11 +1,17 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { signUpPatient, validateSignup } from "@remi/services/server";
+import {
+  checkSignupConsents,
+  signUpPatient,
+  validateSignup,
+} from "@remi/services/server";
 import {
   isLocale,
   localePath,
+  parseShownConsent,
   signupFields,
+  type ShownConsent,
   type SignupFieldErrors,
 } from "@remi/services/shared";
 import { ensureAuthProvider } from "@/lib/auth/provider";
@@ -17,6 +23,10 @@ import { QUESTIONNAIRE_PATH, type SignupState } from "./state";
  * caller input, the token and the locale included. The token arrives in a
  * hidden field because a server action has no route params. The service
  * resolves it again, so a forged token writes nothing.
+ *
+ * The consents come first (story 3): with a mandatory one unticked, or a text
+ * that changed since the render, nothing is checked further and nothing is
+ * written. `signUpPatient` checks them again before it writes.
  */
 export const signUpAction = async (
   _previous: SignupState,
@@ -29,6 +39,20 @@ export const signUpAction = async (
   }
   if (typeof token !== "string") {
     return { fields: {}, form: "invalid_link" };
+  }
+
+  const consents = formData
+    .getAll("consent")
+    .map(parseShownConsent)
+    .filter((shown): shown is ShownConsent => shown !== null);
+  const consentCheck = checkSignupConsents(consents);
+  if (!consentCheck.ok) {
+    const missingOnly =
+      consentCheck.missing.length > 0 && consentCheck.stale.length === 0;
+    return {
+      fields: {},
+      form: missingOnly ? "consent_missing" : "consent_stale",
+    };
   }
 
   const checked = validateSignup(
@@ -49,6 +73,7 @@ export const signUpAction = async (
     locale: rawLocale,
     data: checked.data,
     callbackPath: landing,
+    consents: consentCheck.consents,
   });
   if (!result.ok) {
     const fields: SignupFieldErrors = {};

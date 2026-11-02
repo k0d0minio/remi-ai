@@ -37,15 +37,19 @@ export {
   consentDecisions,
   consentKeys,
   consentRecordChannels,
+  consentTextLocaleFor,
   consentTextLocales,
   legacyConsentVersion,
   mandatoryConsentKeys,
+  parseShownConsent,
+  shownConsentValue,
 } from "./consent";
 export type {
   ConsentDecision,
   ConsentKey,
   ConsentRecordChannel,
   ConsentTextLocale,
+  ShownConsent,
 } from "./consent";
 export { appHref, appOrigin } from "./links";
 export {

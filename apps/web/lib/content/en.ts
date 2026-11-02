@@ -500,9 +500,28 @@ export const en: Content = {
       rate_limited: "Too many attempts. Try again in a few minutes.",
       unavailable:
         "The sign-up did not go through. Try again in a moment: your answers are kept.",
+      consent_missing:
+        "Tick each mandatory consent. No account was created.",
+      consent_stale:
+        "The text changed after the page opened. Reload the page to read the current version. No account was created.",
     },
     submit: "Create my account",
     submitting: "Creating your account…",
+    consent: {
+      title: "Your personal data",
+      intro:
+        "Before you create your account, read how REMI processes your data. Your account cannot be created without your agreement.",
+      names: {
+        care: "Processing of your data for your care",
+        genetic: "Processing of your genetic data",
+      },
+      version: "Version {version} of {date}",
+      accept: "I have read and I accept: {name}.",
+      reread: "Read again",
+      missing: "Tick to continue: {consents}.",
+      continue: "Continue",
+      back: "Review my consents",
+    },
   },
   questionnaire: {
     metaTitle: "Questionnaire",
