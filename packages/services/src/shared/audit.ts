@@ -21,6 +21,8 @@ export type AuditActorKindName = (typeof auditActorKinds)[number];
 
 export const auditActions = [
   "patient.created",
+  /** A patient created their own account from a practitioner's sign-up link. */
+  "patient.signed_up",
   "patient.updated",
   "patient.deleted",
   "recommendation.added",

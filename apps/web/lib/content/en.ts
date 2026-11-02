@@ -467,7 +467,47 @@ export const en: Content = {
   signupLink: {
     metaTitle: "Sign up",
     title: "Sign up with {name}",
-    opensSoon:
-      "Sign-up opens soon. Keep this link: it will let you create your REMI account, attached to your practitioner.",
+    intro:
+      "Create your REMI account. It is attached to your practitioner, and it opens the questionnaire to fill in before your consultation.",
+    labels: {
+      lastName: "Last name",
+      firstName: "First name",
+      birthDate: "Date of birth",
+      email: "E-mail address",
+      phone: "Phone",
+      password: "Password",
+    },
+    hints: {
+      phone: "Digits, with a + at the start if needed.",
+      password: "At least 8 characters.",
+    },
+    summary: "To correct: {fields}.",
+    required: "{field}: this field is required.",
+    invalid: {
+      lastName: "This last name is too long.",
+      firstName: "This first name is too long.",
+      birthDate: "This date is not valid.",
+      email: "This e-mail address is not valid.",
+      phone: "This number is not valid. Use 8 to 15 digits, with a + at the start if needed.",
+      password: "This password is too long.",
+    },
+    tooShort: "The password needs at least 8 characters.",
+    form: {
+      invalid_link:
+        "This link is not valid. Ask your practitioner for a new one.",
+      already_registered:
+        "This address already has an account. No new account was created.",
+      rate_limited: "Too many attempts. Try again in a few minutes.",
+      unavailable:
+        "The sign-up did not go through. Try again in a moment: your answers are kept.",
+    },
+    submit: "Create my account",
+    submitting: "Creating your account…",
+  },
+  questionnaire: {
+    metaTitle: "Questionnaire",
+    title: "Your account is ready",
+    comingSoon:
+      "Your questionnaire is coming soon. You will fill it in here before your consultation.",
   },
 };

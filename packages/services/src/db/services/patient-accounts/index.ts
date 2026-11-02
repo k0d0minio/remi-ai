@@ -55,8 +55,13 @@ export const getPatientAccountByEmail = async (
   return findOne({ email: address }, db);
 };
 
+/**
+ * With `db`, the write joins a transaction the caller opened: the sign-up
+ * writes the profile and the account as one unit. Without it, it opens its own.
+ */
 export const createPatientAccount = async (
   input: PatientAccountInput,
+  db?: DatabaseClient,
 ): Promise<Result<PatientAccount>> => {
   const parsed = accountInput.safeParse(input);
   if (!parsed.success) {
@@ -67,7 +72,7 @@ export const createPatientAccount = async (
   }
   const { patientProfileId, email, authSubject } = parsed.data;
 
-  return getDatabase().transaction(async (db) => {
+  const write = async (db: DatabaseClient): Promise<Result<PatientAccount>> => {
     const patient = await getPatient(patientProfileId, db);
     if (!patient.ok) {
       return err("not_found", "no such patient");
@@ -88,5 +93,6 @@ export const createPatientAccount = async (
       activatedAt: null,
     });
     return ok(created);
-  });
+  };
+  return db ? write(db) : getDatabase().transaction(write);
 };

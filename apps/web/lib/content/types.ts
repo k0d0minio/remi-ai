@@ -22,10 +22,12 @@ import type {
   PersonalisationDimension,
   RecommendationCategory,
   SignalKind,
+  SignupField,
   StepStatus,
 } from "@remi/services/shared";
 import type { Theme } from "@remi/ui/server";
 import type { PatientWriteError } from "@/lib/patient-link/actions";
+import type { SignupFormError } from "@/lib/signup/state";
 
 export type NavItem = {
   /** Path without the locale prefix — the shell adds it. */
@@ -502,16 +504,35 @@ export type Content = {
   };
   /**
    * The page a practitioner's permanent sign-up link opens, at
-   * `/inscription/[token]` (story 1). The sign-up form arrives with
-   * `patient-signup-account/signup-page`. Until then the page names the
-   * practitioner and says the sign-up opens soon. The invalid-link copy lives
-   * in the route's `not-found.tsx`: a not-found boundary receives no locale.
+   * `/inscription/[token]` (stories 1 and 2): the sign-up form. The
+   * invalid-link copy lives in the route's `not-found.tsx`: a not-found
+   * boundary receives no locale.
    */
   signupLink: {
     /** The page title in the browser tab. */
     metaTitle: string;
     /** Holds `{name}`: the practitioner's name. */
     title: string;
-    opensSoon: string;
+    intro: string;
+    labels: Record<SignupField, string>;
+    hints: { phone: string; password: string };
+    /** Holds `{fields}`: the refused fields' labels, joined. */
+    summary: string;
+    /** Holds `{field}`: the field's label. */
+    required: string;
+    invalid: Record<SignupField, string>;
+    tooShort: string;
+    form: Record<SignupFormError, string>;
+    submit: string;
+    submitting: string;
+  };
+  /**
+   * Where a new patient lands after sign-up. A holding page until
+   * `preparatory-questionnaire/questionnaire-flow` builds the questionnaire.
+   */
+  questionnaire: {
+    metaTitle: string;
+    title: string;
+    comingSoon: string;
   };
 };

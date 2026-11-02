@@ -35,6 +35,11 @@ export type PatientProfile = Entity & {
   practitionerId: Id;
   pseudonym: string;
   fullName: string | null;
+  /** Set by the sign-up page. `fullName` holds the two joined. */
+  firstName: string | null;
+  lastName: string | null;
+  /** Digits and one leading `+`. */
+  phone: string | null;
   email: string | null;
   locale: Locale;
   status: PatientStatus;

@@ -11,6 +11,7 @@ import type { Intent } from "@remi/ui/server";
 
 export const actionLabels: Record<AuditActionName, string> = {
   "patient.created": "profil créé",
+  "patient.signed_up": "inscription par le lien",
   "patient.updated": "profil modifié",
   "patient.deleted": "profil supprimé",
   "recommendation.added": "recommandation ajoutée",
@@ -125,6 +126,7 @@ export const actionLabels: Record<AuditActionName, string> = {
  */
 export const actionIntents: Record<AuditActionName, Intent> = {
   "patient.created": "neutral",
+  "patient.signed_up": "neutral",
   "patient.updated": "neutral",
   "patient.deleted": "error",
   "recommendation.added": "neutral",

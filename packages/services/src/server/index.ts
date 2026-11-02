@@ -364,6 +364,12 @@ export type {
   PasswordSignUpInput,
 } from "../auth/provider";
 export { readSession } from "../auth/session";
+export { signUpPatient, validateSignup } from "../auth/patient-signup";
+export type {
+  PatientSignupInput,
+  SignupData,
+  SignupValidation,
+} from "../auth/patient-signup";
 export type { AuthSession, Principal, PrincipalKind } from "../auth/session";
 export { createNeonAuthProvider } from "../auth/adapters/neon-auth";
 
