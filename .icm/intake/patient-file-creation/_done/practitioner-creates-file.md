@@ -43,3 +43,10 @@ file's status is « Dossier à compléter » until every mandatory field is fill
 
 - cross-epic: `preparatory-questionnaire/questionnaire-fields` (the schema), `patient-list-and-status/file-status-enum` (the status).
 - Reuses the console's existing bulk-entry form components where they fit.
+- Jamie accepted the defaults of the pull request's questions on 2026-11-03:
+  1. `file-status-enum` shipped first (k0d0minio/remi-ai#170). This build calls `markReadyWhenComplete`, which calls `setFileStatus(ready)`.
+  2. Mandatory: sexe pour le calcul, taille, poids, activité, motif, and an explicit answer on allergies and on intolerances.
+  3. The free-text objectif, régime, allergies and intolérances leave the form. The form shows them read-only when set.
+  4. One « Enregistrer » button, no save per change.
+  5. The same e-mail on another practitioner's file creates a new file.
+  6. The audit event of a save names the changed fields and holds no value.

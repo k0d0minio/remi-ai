@@ -3,10 +3,24 @@
 import { Pencil } from "lucide-react";
 import { useCallback, useState } from "react";
 import type {
+  PatientAllergen,
   PatientEditableProfileField,
   PatientProfile,
+  PatientQuestionnaire,
 } from "@remi/services/shared";
-import { ageInYears } from "@remi/services/shared";
+import {
+  activityLevelDetails,
+  ageInYears,
+  ALL_SUB_KEY,
+  allergenLabels,
+  allergenSubLabels,
+  allSubKeyLabel,
+  dietLabels,
+  geneticTestAnswerLabels,
+  intoleranceLabels,
+  noneKnownLabels,
+  sexForCalculationLabels,
+} from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Badge, Separator, Typography } from "@remi/ui/server";
 import { PatientForm } from "@/components/patients/patient-form";
@@ -35,6 +49,15 @@ type Props = {
    * formatted on the server for the same reason as the two dates above.
    */
   patientEditedOn: Partial<Record<PatientEditableProfileField, string>>;
+  /** The questionnaire's answers and boxes, read and handed to the form. */
+  questionnaire: {
+    answers: PatientQuestionnaire;
+    allergens: readonly PatientAllergen[];
+  };
+  /** `consultationDate`, formatted on the server like the dates above. */
+  consultationDate: string | null;
+  /** The patient gave the genetic consent. The form unlocks the genotype. */
+  genotypeOpen: boolean;
 };
 
 /** One line of the read summary. `null` reads as an em dash. */
@@ -65,6 +88,9 @@ export const ProfileSummary = ({
   lastEditedAt,
   consent,
   patientEditedOn,
+  questionnaire,
+  consultationDate,
+  genotypeOpen,
 }: Props) => {
   const [editing, setEditing] = useState(false);
 
@@ -73,7 +99,14 @@ export const ProfileSummary = ({
   const close = useCallback(() => setEditing(false), []);
 
   if (editing) {
-    return <PatientForm patient={patient} onSaved={close} />;
+    return (
+      <PatientForm
+        patient={patient}
+        questionnaire={questionnaire}
+        genotypeOpen={genotypeOpen}
+        onSaved={close}
+      />
+    );
   }
 
   const age = ageInYears(patient.birthDate);
@@ -82,6 +115,7 @@ export const ProfileSummary = ({
     { label: "Pseudonyme", value: patient.pseudonym },
     { label: "Nom complet", value: patient.fullName },
     { label: "Adresse email", value: patient.email },
+    { label: "Téléphone", value: patient.phone },
     { label: "Langue", value: localeLabels[patient.locale] },
     { label: "Statut", value: patientStatusLabels[patient.status] },
   ];
@@ -100,6 +134,71 @@ export const ProfileSummary = ({
     {
       label: "Poids",
       value: patient.weightKg === null ? null : `${patient.weightKg} kg`,
+    },
+  ];
+
+  const answers = questionnaire.answers;
+  const questionnaireRows: Row[] = [
+    {
+      label: "Sexe utilisé pour le calcul",
+      value: answers.sexForCalculation
+        ? sexForCalculationLabels[answers.sexForCalculation].fr
+        : null,
+    },
+    {
+      label: "Niveau d'activité physique",
+      value: answers.activityLevel
+        ? activityLevelDetails[answers.activityLevel].label.fr
+        : null,
+    },
+    {
+      label: "Poids souhaité",
+      value:
+        answers.desiredWeightKg === null
+          ? null
+          : `${answers.desiredWeightKg} kg`,
+    },
+    { label: "Motif de consultation", value: answers.consultationReason },
+    { label: "Date de consultation", value: consultationDate },
+    {
+      label: "Régime",
+      value: answers.diet
+        ? [dietLabels[answers.diet].fr, answers.dietNote]
+            .filter(Boolean)
+            .join(" — ")
+        : null,
+    },
+    {
+      label: "Allergies déclarées",
+      value: listAnswer("allergy", answers.noKnownAllergies, questionnaire),
+    },
+    {
+      label: "Intolérances déclarées",
+      value: listAnswer(
+        "intolerance",
+        answers.noKnownIntolerances,
+        questionnaire,
+      ),
+    },
+    { label: "Pathologies", value: answers.pathologies },
+    {
+      label: "Maladie cœliaque",
+      value:
+        answers.celiacDisease === null
+          ? null
+          : answers.celiacDisease
+            ? "Oui"
+            : "Non",
+    },
+    {
+      label: "Test génétique",
+      value: answers.geneticTest
+        ? geneticTestAnswerLabels[answers.geneticTest].fr
+        : null,
+    },
+    {
+      label: "Réponse à la question du praticien",
+      value: answers.practitionerQuestionAnswer,
     },
   ];
 
@@ -173,6 +272,8 @@ export const ProfileSummary = ({
       <Separator tone="subtle" />
       <SummaryGroup title="Mesures" rows={measures} />
       <Separator tone="subtle" />
+      <SummaryGroup title="Questionnaire" rows={questionnaireRows} />
+      <Separator tone="subtle" />
       <SummaryGroup title="Alimentation" rows={food} />
       <Separator tone="subtle" />
 
@@ -194,6 +295,39 @@ export const ProfileSummary = ({
       </div>
     </div>
   );
+};
+
+/** One box as it reads: « Poissons : Saumon », « Autre : kiwi ». */
+const boxLabel = (row: PatientAllergen) => {
+  const labels: Record<string, { fr: string }> =
+    row.kind === "allergy" ? allergenLabels : intoleranceLabels;
+  const name = labels[row.key]?.fr ?? row.key;
+  if (row.subKey === null) {
+    return row.otherText ? `${name} : ${row.otherText}` : name;
+  }
+  const subLabels = allergenSubLabels[
+    row.key as keyof typeof allergenSubLabels
+  ] as Record<string, { fr: string }> | undefined;
+  const sub =
+    row.subKey === ALL_SUB_KEY
+      ? allSubKeyLabel.fr
+      : (subLabels?.[row.subKey]?.fr ?? row.subKey);
+  return row.otherText
+    ? `${name} : ${sub} (${row.otherText})`
+    : `${name} : ${sub}`;
+};
+
+/** A list's answer as one line, or null when the list has no answer. */
+const listAnswer = (
+  kind: "allergy" | "intolerance",
+  noneKnown: boolean | null,
+  questionnaire: Props["questionnaire"],
+) => {
+  if (noneKnown === true) {
+    return noneKnownLabels[kind].fr;
+  }
+  const boxes = questionnaire.allergens.filter((row) => row.kind === kind);
+  return boxes.length > 0 ? boxes.map(boxLabel).join(", ") : null;
 };
 
 type GroupProps = {

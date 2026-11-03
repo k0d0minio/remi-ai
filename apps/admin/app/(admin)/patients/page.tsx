@@ -110,7 +110,7 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
         <Button asChild>
           <NextLink href="/patients/new">
             <Plus aria-hidden="true" />
-            Nouveau profil
+            Nouveau patient
           </NextLink>
         </Button>
       </div>
@@ -147,7 +147,7 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
               <Button asChild>
                 <NextLink href="/patients/new">
                   <Plus aria-hidden="true" />
-                  Nouveau profil
+                  Nouveau patient
                 </NextLink>
               </Button>
             )

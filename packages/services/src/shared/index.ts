@@ -128,11 +128,18 @@ export {
   geneticTestAnswers,
   intoleranceLabels,
   intolerances,
+  mandatoryQuestionnaireFieldLabels,
+  mandatoryQuestionnaireFields,
+  missingMandatoryFields,
   noneKnownLabels,
   sexesForCalculation,
   sexForCalculationLabels,
 } from "./questionnaire";
-export type { QuestionnaireLabel } from "./questionnaire";
+export type {
+  MandatoryQuestionnaireField,
+  QuestionnaireCompleteness,
+  QuestionnaireLabel,
+} from "./questionnaire";
 export {
   componentsForRecommendation,
   normaliseNutritionText,

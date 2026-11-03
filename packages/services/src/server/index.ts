@@ -22,6 +22,7 @@ export { createNeonDatabase } from "../db/adapters/neon";
 export {
   createPatient,
   deletePatient,
+  findPatientByEmail,
   getPatient,
   getPatientByShareToken,
   patientOf,
@@ -288,7 +289,11 @@ export {
 } from "../db/services/patient-anamnesis";
 
 export {
+  checkAllergenAnswer,
+  checkQuestionnaireInput,
   getPatientQuestionnaire,
+  markReadyWhenComplete,
+  missingQuestionnaireFields,
   savePatientQuestionnaire,
   setPatientAllergens,
 } from "../db/services/patient-questionnaire";

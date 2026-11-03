@@ -11,16 +11,21 @@ import {
   dio2Categories,
   geneticTestAnswers,
   intolerances,
+  missingMandatoryFields,
   sexesForCalculation,
+  type MandatoryQuestionnaireField,
 } from "../../../shared/questionnaire";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
+import type { PatientProfile } from "../../models/patient-profile";
 import type {
   AllergenKind,
   PatientAllergen,
   PatientQuestionnaire,
 } from "../../models/patient-questionnaire";
+import type { AuditActor } from "../audit";
+import { setFileStatus } from "../patients";
 
 /**
  * The preparatory questionnaire's storage — story 4, `questionnaire-fields`.
@@ -273,6 +278,44 @@ const cleanSelections = (
   );
 };
 
+/** Formats the first issue as the service's other answers do: `field: message`. */
+const answerError = (error: z.ZodError) => {
+  const issue = error.issues[0];
+  const field = issue.path.join(".");
+  return err(
+    "invalid_input",
+    field ? `${field}: ${issue.message}` : issue.message,
+  );
+};
+
+/**
+ * Checks a save without writing it. The console creates the profile and the
+ * answers in one submit: it checks the answers first, so a refused answer never
+ * leaves a half-created file behind.
+ */
+export const checkQuestionnaireInput = (
+  input: QuestionnaireInput,
+): Result<null> => {
+  const parsed = answerSchema.safeParse(input);
+  return parsed.success ? ok(null) : answerError(parsed.error);
+};
+
+/** Checks one list's answer without writing it, for the same reason. */
+export const checkAllergenAnswer = (
+  kind: string,
+  answer: AllergenAnswer,
+): Result<null> => {
+  const parsedKind = kindSchema.safeParse(kind);
+  if (!parsedKind.success) {
+    return err("invalid_input", "that list does not exist");
+  }
+  if (answer.state !== "declared") {
+    return ok(null);
+  }
+  const cleaned = cleanSelections(parsedKind.data, answer.items);
+  return cleaned.ok ? ok(null) : cleaned;
+};
+
 /** The questionnaire's answers and the patient's checked boxes. */
 export const getPatientQuestionnaire = async (
   patientId: Id,
@@ -304,12 +347,7 @@ export const savePatientQuestionnaire = async (
   }
   const parsed = answerSchema.safeParse(input);
   if (!parsed.success) {
-    const issue = parsed.error.issues[0];
-    const field = issue.path.join(".");
-    return err(
-      "invalid_input",
-      field ? `${field}: ${issue.message}` : issue.message,
-    );
+    return answerError(parsed.error);
   }
   const patch: Partial<PatientQuestionnaire> = {};
   for (const [field, value] of Object.entries(parsed.data)) {
@@ -391,4 +429,74 @@ export const setPatientAllergens = async (
     return inserted;
   });
   return ok(written.sort(byRank));
+};
+
+type CompletenessRow = PatientProfile & PatientQuestionnaire;
+
+/**
+ * The mandatory fields this file still misses, in the list's order (story 4,
+ * `shared/questionnaire.ts`). Taille and poids live on the profile, the rest
+ * on the questionnaire's columns and rows.
+ */
+export const missingQuestionnaireFields = async (
+  patientId: Id,
+): Promise<Result<MandatoryQuestionnaireField[]>> => {
+  if (!isValidId(patientId)) {
+    return err("not_found", "no such patient");
+  }
+  const row = await getDatabase()
+    .collection<CompletenessRow>("patient_profiles")
+    .findById(patientId);
+  if (!row) {
+    return err("not_found", "no such patient");
+  }
+  const page = await allergenRows().findMany({ patientId }, { limit: 500 });
+  const countOf = (kind: AllergenKind) =>
+    page.items.filter((item) => item.kind === kind).length;
+  return ok(
+    missingMandatoryFields({
+      sexForCalculation: row.sexForCalculation ?? null,
+      heightCm: row.heightCm ?? null,
+      weightKg: row.weightKg ?? null,
+      activityLevel: row.activityLevel ?? null,
+      consultationReason: row.consultationReason ?? null,
+      noKnownAllergies: row.noKnownAllergies ?? null,
+      noKnownIntolerances: row.noKnownIntolerances ?? null,
+      allergyCount: countOf("allergy"),
+      intoleranceCount: countOf("intolerance"),
+    }),
+  );
+};
+
+/**
+ * Moves a file from « Dossier à compléter » to « Prêt pour consultation » once
+ * its last mandatory field is saved (story 4 criterion 8, story 5). It does
+ * nothing while a field is missing, and nothing for a file past
+ * `to_complete`: a field cleared later never moves a file back (D-31).
+ * Answers the file's status after the call.
+ */
+export const markReadyWhenComplete = async (
+  patientId: Id,
+  actor: AuditActor | null,
+): Promise<Result<PatientProfile["fileStatus"]>> => {
+  const missing = await missingQuestionnaireFields(patientId);
+  if (!missing.ok) {
+    return missing;
+  }
+  const row = await getDatabase()
+    .collection<PatientProfile>("patient_profiles")
+    .findById(patientId);
+  if (!row) {
+    return err("not_found", "no such patient");
+  }
+  if (row.fileStatus !== "to_complete" || missing.data.length > 0) {
+    return ok(row.fileStatus);
+  }
+  const moved = await setFileStatus(
+    patientId,
+    "ready",
+    actor,
+    "every mandatory field is filled",
+  );
+  return moved.ok ? ok(moved.data.fileStatus) : moved;
 };

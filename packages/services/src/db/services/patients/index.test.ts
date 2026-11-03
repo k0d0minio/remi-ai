@@ -8,6 +8,7 @@ import { addPatientRecommendation } from "../patient-recommendations";
 import {
   createPatient,
   deletePatient,
+  findPatientByEmail,
   getPatient,
   getPatientByShareToken,
   patientOf,
@@ -1103,5 +1104,72 @@ describe("the file status", () => {
     const ended = unwrapOk(await updatePatient(file.id, { status: "ended" }));
     expect(ended.status).toBe("ended");
     expect(ended.fileStatus).toBe("ready");
+  });
+});
+
+describe("the console's identity fields and the e-mail lookup", () => {
+  const other = "00000000-0000-4000-8000-000000000003";
+
+  it("finds this practitioner's file by e-mail, ignoring case and spaces", async () => {
+    const file = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Mail",
+        email: "Lea.Martin@example.com",
+      }),
+    );
+    const found = await findPatientByEmail(
+      testPractitionerId,
+      " lea.martin@EXAMPLE.com ",
+    );
+    expect(found?.id).toBe(file.id);
+  });
+
+  it("never finds another practitioner's file", async () => {
+    await createPatient({
+      practitionerId: other,
+      pseudonym: "Elsewhere",
+      email: "elsewhere@example.com",
+    });
+    expect(
+      await findPatientByEmail(testPractitionerId, "elsewhere@example.com"),
+    ).toBeNull();
+    expect(await findPatientByEmail(testPractitionerId, "")).toBeNull();
+    expect(await findPatientByEmail("not-a-uuid", "a@b.be")).toBeNull();
+  });
+
+  it("stores the first name, the last name and the phone without its spaces", async () => {
+    const file = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Names",
+      }),
+    );
+    const updated = unwrapOk(
+      await updatePatient(file.id, {
+        firstName: "Léa",
+        lastName: "Martin",
+        fullName: "Léa Martin",
+        phone: "+32 470 12 34 56",
+      }),
+    );
+    expect(updated.firstName).toBe("Léa");
+    expect(updated.lastName).toBe("Martin");
+    expect(updated.phone).toBe("+32470123456");
+    const cleared = unwrapOk(await updatePatient(file.id, { phone: "" }));
+    expect(cleared.phone).toBeNull();
+  });
+
+  it("refuses a phone that is not a number", async () => {
+    const file = unwrapOk(
+      await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Phone",
+      }),
+    );
+    const refused = await updatePatient(file.id, { phone: "call me" });
+    expect(refused.ok).toBe(false);
+    const tooShort = await updatePatient(file.id, { phone: "123" });
+    expect(tooShort.ok).toBe(false);
   });
 });

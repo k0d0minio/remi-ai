@@ -60,6 +60,7 @@ export type {
 export {
   createPatient,
   deletePatient,
+  findPatientByEmail,
   getPatient,
   getPatientByShareToken,
   patientOf,
@@ -81,7 +82,11 @@ export {
 } from "./services/patient-anamnesis";
 
 export {
+  checkAllergenAnswer,
+  checkQuestionnaireInput,
   getPatientQuestionnaire,
+  markReadyWhenComplete,
+  missingQuestionnaireFields,
   savePatientQuestionnaire,
   setPatientAllergens,
 } from "./services/patient-questionnaire";

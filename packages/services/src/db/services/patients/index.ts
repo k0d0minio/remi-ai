@@ -87,6 +87,24 @@ const calendarDate = z.union([
 ]);
 
 /**
+ * « Téléphone »: digits and spaces, one leading `+`, 8 to 15 digits, stored
+ * without the spaces. The sign-up page's rule, so a number reads the same
+ * whoever typed it. `""` clears it.
+ */
+const phone = z.union([
+  z.literal(""),
+  z
+    .string()
+    .trim()
+    .regex(/^\+?[\d ]+$/, "that phone number is not valid")
+    .transform((value) => value.replace(/ /g, ""))
+    .refine((value) => {
+      const digits = value.replace("+", "").length;
+      return digits >= 8 && digits <= 15;
+    }, "that phone number is not valid"),
+]);
+
+/**
  * No `.default()`s here: the same shape validates creates and partial updates,
  * and a default applied during an update would silently blank the fields the
  * form did not send.
@@ -94,6 +112,10 @@ const calendarDate = z.union([
 const patientFields = z.object({
   pseudonym: z.string().trim().min(1, "a pseudonym is required").max(120),
   fullName: z.string().trim().max(200),
+  /** « Prénom » and « Nom ». `fullName` holds the two joined. */
+  firstName: z.string().trim().max(100),
+  lastName: z.string().trim().max(100),
+  phone,
   email: z.union([z.literal(""), z.email("that email address is not valid")]),
   locale: z.enum(locales),
   status: z.enum(patientStatuses),
@@ -208,6 +230,30 @@ export const getPatient = async (
   return patient ? ok(patient) : err("not_found", "no such patient");
 };
 
+/** The comparison form of an e-mail address: trimmed, lower case. */
+const emailKey = (email: string) => email.trim().toLowerCase();
+
+/**
+ * The file of this practitioner that carries this e-mail, or null. The match
+ * ignores case and the spaces around the address. Another practitioner's file
+ * never matches (D-27): « Ce dossier existe déjà » would confirm it exists.
+ */
+export const findPatientByEmail = async (
+  practitionerId: Id,
+  email: string,
+): Promise<PatientProfile | null> => {
+  const key = emailKey(email);
+  if (!key || !isValidId(practitionerId)) {
+    return null;
+  }
+  const page = await patients().findMany({ practitionerId }, { limit: 500 });
+  return (
+    page.items.find(
+      (patient) => patient.email !== null && emailKey(patient.email) === key,
+    ) ?? null
+  );
+};
+
 /**
  * One file, only when this practitioner holds it. A file of another
  * practitioner answers `not_found`, like a missing one: « forbidden » would
@@ -299,10 +345,6 @@ const newPatientFields = patientFields
   .required({ pseudonym: true })
   .extend({
     practitionerId: z.uuid("a practitioner is required"),
-    /** Only the sign-up page sends these three. The console sends `fullName`. */
-    firstName: z.string().trim().max(100).optional(),
-    lastName: z.string().trim().max(100).optional(),
-    phone: z.string().trim().max(30).optional(),
   });
 
 export type NewPatientInput = z.input<typeof newPatientFields>;
@@ -395,6 +437,9 @@ export const updatePatient = async (
   }
   const {
     fullName,
+    firstName,
+    lastName,
+    phone: phoneNumber,
     email,
     birthDate,
     heightCm,
@@ -406,6 +451,9 @@ export const updatePatient = async (
   } = parsed.data;
   const patch: Partial<PatientProfile> = { ...rest, lastEditedAt: new Date() };
   assign(patch, "fullName", nullableText(fullName));
+  assign(patch, "firstName", nullableText(firstName));
+  assign(patch, "lastName", nullableText(lastName));
+  assign(patch, "phone", nullableText(phoneNumber));
   assign(patch, "email", nullableText(email));
   assign(patch, "birthDate", nullableText(birthDate));
   assign(patch, "heightCm", nullableNumber(heightCm));
