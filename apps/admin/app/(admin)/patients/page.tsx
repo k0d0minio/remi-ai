@@ -3,27 +3,26 @@ import { Plus, Users } from "lucide-react";
 import NextLink from "next/link";
 import {
   listChallengeSignals,
-  patientsOf,
   listUnreadMessageCounts,
+  patientListNames,
+  patientListOf,
   type ChallengeSignal,
-  type PatientSort,
 } from "@remi/services/server";
 import {
-  ageInYears,
   appHref,
+  defaultPatientListSort,
+  fileStatusLabels,
   formatDate,
+  isPatientListSort,
   patientStatuses,
+  type FileStatus,
   type PatientStatus,
 } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Badge, EmptyState, Typography, type Intent } from "@remi/ui/server";
 import { SignupLink } from "@/components/operators/signup-link";
 import { RosterFilters } from "@/components/patients/roster-filters";
-import {
-  messagesAwaitingLabel,
-  patientStatusIntents,
-  patientStatusLabels,
-} from "@/components/patients/vocabulary";
+import { messagesAwaitingLabel } from "@/components/patients/vocabulary";
 import { requireOperator } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 
@@ -34,17 +33,10 @@ export const metadata: Metadata = {
 /** Reads the database on every hit — never prerendered. */
 export const dynamic = "force-dynamic";
 
-const sorts: readonly PatientSort[] = ["recent", "name", "created"];
-
 const asStatus = (value: string | undefined): PatientStatus | "all" =>
   (patientStatuses as readonly string[]).includes(value ?? "")
     ? (value as PatientStatus)
     : "all";
-
-const asSort = (value: string | undefined): PatientSort =>
-  (sorts as readonly string[]).includes(value ?? "")
-    ? (value as PatientSort)
-    : "recent";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -70,6 +62,18 @@ const challengeSignalBadges: Record<
 };
 
 /**
+ * The tone of each file status on the row. The words come from the one map,
+ * `fileStatusLabels` (D-31). The two statuses that wait on the practitioner
+ * read as `info`.
+ */
+const fileStatusIntents: Record<FileStatus, Intent> = {
+  to_complete: "warning",
+  ready: "info",
+  to_validate: "info",
+  active: "success",
+};
+
+/**
  * The patient roster — real rows from the database. Rows rather than a table:
  * they survive a phone screen, which is where Morgane opens this between
  * consultations.
@@ -85,11 +89,14 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
   const params = await searchParams;
   const search = first(params.q) ?? "";
   const status = asStatus(first(params.status));
-  const sort = asSort(first(params.sort));
   const operator = await requireOperator();
+  // The practitioner's remembered order (story 5), not a URL parameter.
+  const sort = isPatientListSort(operator.patientListSort)
+    ? operator.patientListSort
+    : defaultPatientListSort;
 
   const [patients, challengeSignals, unreadMessages] = await Promise.all([
-    patientsOf(operator.id, { search, status, sort }),
+    patientListOf(operator.id, { search, status, sort }),
     listChallengeSignals(),
     listUnreadMessageCounts(),
   ]);
@@ -162,7 +169,7 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
 
           <ul className="flex flex-col gap-2">
             {patients.map((patient) => {
-              const age = ageInYears(patient.birthDate);
+              const { nom, prenom } = patientListNames(patient);
               const signal = challengeSignals.get(patient.id);
               const challengeBadge = signal
                 ? challengeSignalBadges[signal]
@@ -176,16 +183,16 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
                     className="border-border bg-card hover:bg-accent focus-visible:ring-ring/40 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border px-4 py-3 transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
                   >
                     <Typography as="span" size="sm" weight="medium">
-                      {patient.pseudonym}
+                      {nom}
                     </Typography>
-                    {patient.fullName ? (
-                      <Typography as="span" size="sm" tone="muted">
-                        {patient.fullName}
+                    {prenom ? (
+                      <Typography as="span" size="sm">
+                        {prenom}
                       </Typography>
                     ) : null}
-                    {age !== null ? (
+                    {patient.pseudonym !== nom ? (
                       <Typography as="span" size="xs" tone="muted">
-                        {age} ans
+                        {patient.pseudonym}
                       </Typography>
                     ) : null}
                     <span className="ml-auto flex items-center gap-3">
@@ -206,14 +213,16 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
                         </Badge>
                       ) : null}
                       <Typography as="span" size="xs" tone="muted">
-                        modifié le {formatDate(patient.lastEditedAt)}
+                        {patient.consultationDate
+                          ? `RDV le ${formatDate(patient.consultationDate)}`
+                          : "Pas de rendez-vous"}
                       </Typography>
                       <Badge
-                        variant={patientStatusIntents[patient.status]}
+                        variant={fileStatusIntents[patient.fileStatus]}
                         tone="subtle"
                         size="sm"
                       >
-                        {patientStatusLabels[patient.status]}
+                        {fileStatusLabels[patient.fileStatus].fr}
                       </Badge>
                     </span>
                   </NextLink>

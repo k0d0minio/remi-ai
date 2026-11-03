@@ -33,3 +33,4 @@ practitioner edits it on the file. The patient enters it in the questionnaire
 ## Notes
 
 - cross-epic: `patient-list-and-status/patient-list` sorts on this column. `preparatory-questionnaire/questionnaire-flow` writes it.
+- decision (Jamie, 2026-11-03): no `appointment_at` column. The build uses `patient_profiles.consultation_date` (migration 0027). Its schema comment names it the appointment date (story 4, question 5). The ticket adds no migration.

@@ -24,7 +24,7 @@ import type {
   PatientAllergen,
   PatientQuestionnaire,
 } from "../../models/patient-questionnaire";
-import type { AuditActor } from "../audit";
+import { recordAuditEvent, type AuditActor } from "../audit";
 import { consentInForce } from "../patient-consents/in-force";
 import { setFileStatus } from "../patients";
 
@@ -356,10 +356,16 @@ export const getPatientQuestionnaire = async (
 /**
  * Save any subset of the answers. A field the input does not name is left as
  * it is, which is what makes a save per change safe.
+ *
+ * A save that changes `consultationDate` writes one
+ * `patient.consultation_date_changed` event with the old and the new value
+ * (`appointment-date`). Every writer of the column passes here, so the console
+ * and the patient's questionnaire get the same trail.
  */
 export const savePatientQuestionnaire = async (
   patientId: Id,
   input: QuestionnaireInput,
+  actor: AuditActor | null = null,
 ): Promise<Result<PatientQuestionnaire>> => {
   if (!isValidId(patientId)) {
     return err("not_found", "no such patient");
@@ -374,7 +380,8 @@ export const savePatientQuestionnaire = async (
       (patch as Record<string, unknown>)[field] = value;
     }
   }
-  if (!(await profiles().findById(patientId))) {
+  const current = await profiles().findById(patientId);
+  if (!current) {
     return err("not_found", "no such patient");
   }
   const writesGenotype = genotypeFields.some(
@@ -389,9 +396,117 @@ export const savePatientQuestionnaire = async (
     return err("not_permitted", "the desired weight needs the care consent");
   }
   const written = await profiles().update(patientId, patch);
-  return written
-    ? ok(await visibleAnswers(written))
-    : err("not_found", "no such patient");
+  if (!written) {
+    return err("not_found", "no such patient");
+  }
+  await recordConsultationDateChange(current, patch, actor);
+  return ok(await visibleAnswers(written));
+};
+
+/** One event when a save changes `consultationDate`. No event otherwise. */
+const recordConsultationDateChange = async (
+  // The pseudonym is on the same row. It labels the event, so the event
+  // survives the file's deletion.
+  before: QuestionnaireRow & Partial<Pick<PatientProfile, "pseudonym">>,
+  patch: Partial<PatientQuestionnaire>,
+  actor: AuditActor | null,
+) => {
+  if (patch.consultationDate === undefined) {
+    return;
+  }
+  const previous = before.consultationDate ?? null;
+  const next = patch.consultationDate;
+  if (previous === next) {
+    return;
+  }
+  await recordAuditEvent({
+    actor,
+    action: "patient.consultation_date_changed",
+    targetType: "patient",
+    targetId: before.id,
+    targetLabel: before.pseudonym ?? "",
+    detail: `${previous ?? "∅"} → ${next ?? "∅"}`,
+  });
+};
+
+/**
+ * The profile columns the questionnaire also asks: identity from sign-up,
+ * taille, poids, médicaments and compléments. A floor only, like `weightKg`
+ * above: `questionnaire-flow` owns the rules the patient sees (the sign-up's
+ * identity rules, the plausible ranges).
+ */
+const profileAnswerSchema = z
+  .object({
+    // Identity came from sign-up, where each is required: never cleared here.
+    firstName: z.string().trim().min(1, "required").max(100),
+    lastName: z.string().trim().min(1, "required").max(100),
+    birthDate: calendarDate,
+    phone: z
+      .string()
+      .transform((value) => value.replace(/\s/g, ""))
+      .pipe(z.string().regex(/^\+?\d{8,15}$/, "that phone number is not valid")),
+    // The column is an integer.
+    heightCm: z.union([z.null(), z.number().int().positive().max(300)]),
+    weightKg: z.union([z.null(), weightKg]),
+    // Not-null text columns: "" is « Non renseigné » there.
+    medications: z.string().trim().max(5_000),
+    supplements: z.string().trim().max(5_000),
+  })
+  .partial()
+  .strict();
+
+/** What `savePatientProfileAnswers` accepts: any subset of its fields. */
+export type ProfileAnswerInput = z.input<typeof profileAnswerSchema>;
+
+const careGatedProfileFields = ["medications", "supplements"] as const;
+
+/**
+ * The patient's own save of the profile columns the questionnaire asks.
+ * A field the input does not name is left as it is.
+ *
+ * It keeps `fullName` equal to « prénom nom », and applies `updatePatient`'s
+ * care-consent rule to médicaments and compléments. Unlike `updatePatient`, it
+ * never moves `lastEditedAt`: that column means the practitioner worked on
+ * the file, and sorts her roster.
+ */
+export const savePatientProfileAnswers = async (
+  patientId: Id,
+  input: ProfileAnswerInput,
+): Promise<Result<PatientProfile>> => {
+  if (!isValidId(patientId)) {
+    return err("not_found", "no such patient");
+  }
+  const parsed = profileAnswerSchema.safeParse(input);
+  if (!parsed.success) {
+    return answerError(parsed.error);
+  }
+  const rows = getDatabase().collection<PatientProfile>("patient_profiles");
+  const current = await rows.findById(patientId);
+  if (!current) {
+    return err("not_found", "no such patient");
+  }
+  const patch: Partial<PatientProfile> = {};
+  for (const [field, value] of Object.entries(parsed.data)) {
+    if (value !== undefined) {
+      (patch as Record<string, unknown>)[field] = value;
+    }
+  }
+  const writesCareData = careGatedProfileFields.some(
+    (field) => patch[field] && patch[field] !== current[field],
+  );
+  if (writesCareData && !(await consentInForce(patientId, "care"))) {
+    return err(
+      "not_permitted",
+      "the medications and the supplements need the care consent",
+    );
+  }
+  if (patch.firstName !== undefined || patch.lastName !== undefined) {
+    const first = patch.firstName ?? current.firstName ?? "";
+    const last = patch.lastName ?? current.lastName ?? "";
+    patch.fullName = `${first} ${last}`.trim();
+  }
+  const written = await rows.update(patientId, patch);
+  return written ? ok(written) : err("not_found", "no such patient");
 };
 
 /**

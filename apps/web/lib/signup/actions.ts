@@ -81,6 +81,9 @@ export const signUpAction = async (
     switch (result.error) {
       case "not_found":
         return { fields, form: "invalid_link" };
+      // The e-mail holds an account, with this practitioner or another: one
+      // patient has one practitioner (Jamie, 2026-11-03). The form shows the
+      // sign-in link and names no data of the existing file.
       case "conflict":
         return { fields, form: "already_registered" };
       case "rate_limited":

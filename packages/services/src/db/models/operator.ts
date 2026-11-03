@@ -1,5 +1,5 @@
 import type { Entity } from "../../types";
-import type { operatorRoles } from "../../shared/operator";
+import type { operatorRoles, PatientListSort } from "../../shared/operator";
 
 export type OperatorRole = (typeof operatorRoles)[number];
 
@@ -16,4 +16,6 @@ export type Operator = Entity & {
   role: OperatorRole;
   /** The permanent sign-up link's token. Shown only to its own practitioner. */
   signupLinkToken: string;
+  /** The order of the patient list, remembered per practitioner (story 5). */
+  patientListSort: PatientListSort;
 };

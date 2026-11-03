@@ -371,13 +371,18 @@ const changedFieldNames = (
  * the form rendered. Every part was checked before the first write.
  */
 const writeQuestionnaire = async (
+  operator: Operator,
   patientId: string,
   answers: QuestionnaireInput,
   lists: { allergy?: AllergenAnswer; intolerance?: AllergenAnswer },
 ): Promise<string | null> => {
   // An empty patch is no write: the database refuses an update with no value.
   if (Object.keys(answers).length > 0) {
-    const saved = await savePatientQuestionnaire(patientId, answers);
+    const saved = await savePatientQuestionnaire(
+      patientId,
+      answers,
+      actorOf(operator),
+    );
     if (!saved.ok) {
       return saved.message;
     }
@@ -461,7 +466,12 @@ export const savePatientAction = async (
     if (!created.ok) {
       return { error: created.message, saved: false };
     }
-    const failed = await writeQuestionnaire(created.data.id, answers, lists);
+    const failed = await writeQuestionnaire(
+      operator,
+      created.data.id,
+      answers,
+      lists,
+    );
     await audit(operator, "patient.created", {
       type: "patient",
       id: created.data.id,
@@ -491,7 +501,7 @@ export const savePatientAction = async (
   if (!updated.ok) {
     return { error: updated.message, saved: false };
   }
-  const failed = await writeQuestionnaire(id, answers, lists);
+  const failed = await writeQuestionnaire(operator, id, answers, lists);
   if (failed) {
     return { error: failed, saved: false };
   }
@@ -1708,6 +1718,40 @@ export const updateNextConsultationPrepAction = async (
       id: patientId,
       label: field(formData, "pseudonym"),
     });
+  }
+  revalidatePatient(patientId);
+  return { error: null, saved: true };
+};
+
+export type ConsultationDateFormState = { error: string | null; saved: boolean };
+
+/**
+ * Sets, changes or clears the file's consultation date from the working view
+ * (`appointment-date`). An empty `consultationDate` clears it. The service
+ * writes the `patient.consultation_date_changed` event with both values.
+ */
+export const setConsultationDateAction = async (
+  _previous: ConsultationDateFormState,
+  formData: FormData,
+): Promise<ConsultationDateFormState> => {
+  const operator = await requireOperator();
+  const patientId = field(formData, "patientId");
+  if (!(await holdsPatient(operator, patientId))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
+  const saved = await savePatientQuestionnaire(
+    patientId,
+    { consultationDate: field(formData, "consultationDate") },
+    actorOf(operator),
+  );
+  if (!saved.ok) {
+    return {
+      error:
+        saved.error === "invalid_input"
+          ? "Cette date n'est pas valide."
+          : NO_SUCH_FILE,
+      saved: false,
+    };
   }
   revalidatePatient(patientId);
   return { error: null, saved: true };

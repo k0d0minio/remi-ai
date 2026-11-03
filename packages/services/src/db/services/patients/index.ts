@@ -10,6 +10,10 @@ import {
 import { patientFilesPrefix } from "../../../shared/files";
 import { locales } from "../../../shared/i18n";
 import {
+  defaultPatientListSort,
+  type PatientListSort,
+} from "../../../shared/operator";
+import {
   cookingAffinities,
   cookingTimes,
   foodBudgets,
@@ -21,6 +25,7 @@ import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientDocument } from "../../models/patient-document";
+import type { PatientQuestionnaire } from "../../models/patient-questionnaire";
 import { recordAuditEvent, type AuditActor } from "../audit";
 import type {
   PatientEditableProfileField,
@@ -218,6 +223,109 @@ export const patientsOf = async (
     .filter((patient) => (status ? patient.status === status : true))
     .filter((patient) => matchesSearch(patient, query.search ?? ""))
     .sort(sorters[query.sort ?? "recent"]);
+};
+
+/**
+ * One row of the practitioner's patient list (story 5). The appointment date
+ * is the questionnaire's `consultation_date`: one date, the same one the file
+ * shows (story 4, question 5).
+ */
+export type PatientListRow = PatientProfile &
+  Pick<PatientQuestionnaire, "consultationDate">;
+
+export type PatientListQuery = Omit<PatientQuery, "sort"> & {
+  sort?: PatientListSort;
+};
+
+/** Case and accent insensitive: « Élodie » and « elodie » compare equal. */
+const listCollator = new Intl.Collator("fr", { sensitivity: "base" });
+
+/**
+ * Nom and prénom as the list shows and sorts them. A file older than the
+ * split identity fields has no `lastName`: its full name, then its pseudonym,
+ * stands in for the nom, and the prénom is empty.
+ */
+export const patientListNames = (
+  patient: Pick<
+    PatientProfile,
+    "lastName" | "firstName" | "fullName" | "pseudonym"
+  >,
+): { nom: string; prenom: string } => {
+  const lastName = patient.lastName?.trim();
+  if (lastName) {
+    return { nom: lastName, prenom: patient.firstName?.trim() ?? "" };
+  }
+  return { nom: patient.fullName?.trim() || patient.pseudonym, prenom: "" };
+};
+
+/** Nom, then prénom, then the pseudonym as the last tie-break. */
+export const comparePatientsByName = (
+  a: PatientListRow,
+  b: PatientListRow,
+): number => {
+  const left = patientListNames(a);
+  const right = patientListNames(b);
+  return (
+    listCollator.compare(left.nom, right.nom) ||
+    listCollator.compare(left.prenom, right.prenom) ||
+    listCollator.compare(a.pseudonym, b.pseudonym)
+  );
+};
+
+/**
+ * The oldest appointment first. A file with no date goes to the end. A tie
+ * sorts by name. `YYYY-MM-DD` strings order as the dates do.
+ */
+export const comparePatientsByAppointment = (
+  a: PatientListRow,
+  b: PatientListRow,
+): number => {
+  const left = a.consultationDate;
+  const right = b.consultationDate;
+  if (left !== right) {
+    if (left === null) {
+      return 1;
+    }
+    if (right === null) {
+      return -1;
+    }
+    return left < right ? -1 : 1;
+  }
+  return comparePatientsByName(a, b);
+};
+
+const listSorters: Record<
+  PatientListSort,
+  (a: PatientListRow, b: PatientListRow) => number
+> = {
+  appointment: comparePatientsByAppointment,
+  name: comparePatientsByName,
+};
+
+/**
+ * The practitioner's patient list (story 5). The same scope, search and filter
+ * as `patientsOf` (D-27), with the two sorts of the list and the appointment
+ * date on each row.
+ */
+export const patientListOf = async (
+  practitionerId: Id,
+  query: PatientListQuery = {},
+): Promise<readonly PatientListRow[]> => {
+  if (!isValidId(practitionerId)) {
+    return [];
+  }
+  const page = await getDatabase()
+    .collection<PatientListRow>("patient_profiles")
+    .findMany({ practitionerId }, { limit: 200 });
+  const status = query.status && query.status !== "all" ? query.status : null;
+  return page.items
+    .map((patient) => ({
+      ...patient,
+      consultationDate: patient.consultationDate ?? null,
+    }))
+    .filter((patient) => (status ? patient.status === status : true))
+    .filter((patient) => matchesSearch(patient, query.search ?? ""))
+    .sort(listSorters[query.sort ?? defaultPatientListSort]);
 };
 
 export const getPatient = async (

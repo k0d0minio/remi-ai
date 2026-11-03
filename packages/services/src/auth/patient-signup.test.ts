@@ -233,6 +233,28 @@ describe("the sign-up", () => {
     expect(await profiles()).toHaveLength(before);
   });
 
+  // One patient has one practitioner (Jamie, 2026-11-03): another
+  // practitioner's link opens no second file for a known e-mail.
+  it("refuses a known e-mail on another practitioner's link and writes nothing", async () => {
+    const other = await createOperator({
+      email: "arnaud@example.be",
+      name: "Arnaud",
+      password: "long enough password",
+      role: "owner",
+    });
+    if (!other.ok) {
+      throw new Error("second practitioner not created");
+    }
+    expect((await signUp({ email: "zoe@example.be" })).ok).toBe(true);
+    const before = (await profiles()).length;
+    const again = await signUp(
+      { email: " Zoe@Example.BE " },
+      other.data.signupLinkToken,
+    );
+    expect(again).toMatchObject({ ok: false, error: "conflict" });
+    expect(await profiles()).toHaveLength(before);
+  });
+
   it("finishes a sign-up whose identity exists without a file", async () => {
     // A failed write left the identity store's user and no REMI rows.
     users.set("sam@example.be", {

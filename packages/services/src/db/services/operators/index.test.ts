@@ -10,6 +10,7 @@ import {
   getPractitionerBySignupToken,
   hasOperator,
   listOperators,
+  setOperatorPatientListSort,
   setOperatorRole,
   updateOperatorName,
   verifyOperator,
@@ -304,5 +305,44 @@ describe("the permanent sign-up link", () => {
     expect((await getOperator(practitioner.id))?.signupLinkToken).toBe(
       practitioner.signupLinkToken,
     );
+  });
+});
+
+describe("the remembered patient list sort", () => {
+  it("starts at the appointment date and stores a valid choice", async () => {
+    const operator = unwrapOk(
+      await createOperator({
+        email: "sort@example.com",
+        name: "Sort",
+        password: "long enough password",
+      }),
+    );
+    expect(operator.patientListSort).toBe("appointment");
+
+    const updated = unwrapOk(
+      await setOperatorPatientListSort(operator.id, "name"),
+    );
+    expect(updated.patientListSort).toBe("name");
+    expect((await getOperator(operator.id))?.patientListSort).toBe("name");
+  });
+
+  it("refuses an unknown sort and keeps the stored one", async () => {
+    const operator = unwrapOk(
+      await createOperator({
+        email: "sort-refused@example.com",
+        name: "Sort refused",
+        password: "long enough password",
+      }),
+    );
+    const refused = await setOperatorPatientListSort(operator.id, "recent");
+    expect(refused.ok).toBe(false);
+    expect((await getOperator(operator.id))?.patientListSort).toBe(
+      "appointment",
+    );
+  });
+
+  it("answers not_found for a malformed id", async () => {
+    const result = await setOperatorPatientListSort("not-a-uuid", "name");
+    expect(result.ok).toBe(false);
   });
 });

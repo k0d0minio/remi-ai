@@ -18,12 +18,14 @@ invité à se connecter au lieu de créer un doublon. »
 On sign-up, look the e-mail up among this practitioner's patients. An existing account gets
 « Vous avez déjà un compte. Connectez-vous. » with a link to sign-in. A file the practitioner
 created without an account continues as the takeover path
-(`patient-file-creation/patient-takes-over-file`).
+(`patient-file-creation/patient-takes-over-file`). The same e-mail on another
+practitioner's link gets the same answer: one patient has one practitioner (Jamie,
+2026-11-03).
 
 ## Acceptance criteria
 
 - [ ] A second sign-up with an e-mail already holding an account with this practitioner creates no row and shows the sign-in link
-- [ ] The same e-mail with another practitioner's link creates a separate file (one file per care relationship)
+- [ ] The same e-mail with another practitioner's link creates no row and shows the sign-in link (one patient has one practitioner, Jamie, 2026-11-03)
 - [ ] The message does not reveal any data of the existing file
 - [ ] The check is case-insensitive on the e-mail
 

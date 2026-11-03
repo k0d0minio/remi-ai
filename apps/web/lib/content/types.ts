@@ -28,6 +28,8 @@ import type {
 } from "@remi/services/shared";
 import type { Theme } from "@remi/ui/server";
 import type { PatientWriteError } from "@/lib/patient-link/actions";
+import type { QuestionnaireSection } from "@/lib/questionnaire/sections";
+import type { SaveError } from "@/lib/questionnaire/state";
 import type { SignInNotice } from "@/lib/patient-auth/paths";
 import type {
   LinkRequestState,
@@ -533,6 +535,11 @@ export type Content = {
     invalid: Record<SignupField, string>;
     tooShort: string;
     form: Record<SignupFormError, string>;
+    /**
+     * The link after `form.already_registered`, to the sign-in page. The two
+     * read as one message. Neither names any data of the existing file.
+     */
+    signIn: string;
     submit: string;
     submitting: string;
     /** The consent step, before the form (story 3). */
@@ -553,13 +560,59 @@ export type Content = {
     };
   };
   /**
-   * Where a new patient lands after sign-up. A holding page until
-   * `preparatory-questionnaire/questionnaire-flow` builds the questionnaire.
+   * The preparatory questionnaire (story 4), where a new patient lands after
+   * sign-up. The labels of the shared lists (diets, activity levels, the
+   * mandatory fields…) come from `@remi/services/shared`, not from here.
    */
   questionnaire: {
     metaTitle: string;
     title: string;
-    comingSoon: string;
+    intro: string;
+    statusLabel: string;
+    missingTitle: string;
+    complete: string;
+    /** Under the header: what the mandatory mark means. */
+    mandatoryLegend: string;
+    /** Read by a screen reader in place of the mark. */
+    mandatory: string;
+    optional: string;
+    sectionsLabel: string;
+    sections: Record<QuestionnaireSection, string>;
+    previous: string;
+    next: string;
+    saving: string;
+    saved: string;
+    errors: Record<SaveError, string>;
+    labels: {
+      firstName: string;
+      lastName: string;
+      birthDate: string;
+      email: string;
+      phone: string;
+      desiredWeight: string;
+      consultationDate: string;
+      diet: string;
+      dietNote: string;
+      pathologies: string;
+      medications: string;
+      supplements: string;
+      geneticTest: string;
+      otherText: string;
+    };
+    hints: {
+      email: string;
+      height: string;
+      weight: string;
+      desiredWeight: string;
+      /** While the diet has no saved answer: the default is shown, not saved. */
+      dietDefault: string;
+      allergies: string;
+      intolerances: string;
+      otherText: string;
+      medications: string;
+      supplements: string;
+      geneticComingSoon: string;
+    };
   };
   /**
    * The patient's sign-in at `/connexion` (story 2): the password form, the

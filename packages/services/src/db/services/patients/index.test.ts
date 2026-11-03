@@ -12,6 +12,8 @@ import {
   findPatientByEmail,
   getPatient,
   getPatientByShareToken,
+  patientListNames,
+  patientListOf,
   patientOf,
   patientOfRecord,
   patientsOf,
@@ -1258,5 +1260,146 @@ describe("the console's identity fields and the e-mail lookup", () => {
     expect(refused.ok).toBe(false);
     const tooShort = await updatePatient(file.id, { phone: "123" });
     expect(tooShort.ok).toBe(false);
+  });
+});
+
+describe("the practitioner's patient list", () => {
+  // A practitioner of its own, so no file of another describe block lands here.
+  const practitioner = "00000000-0000-4000-8000-000000000051";
+  const stranger = "00000000-0000-4000-8000-000000000052";
+
+  const file = async (
+    input: {
+      pseudonym: string;
+      lastName?: string;
+      firstName?: string;
+      fullName?: string;
+      consultationDate?: string;
+    },
+    practitionerId = practitioner,
+  ) => {
+    const { consultationDate, ...fields } = input;
+    const created = unwrapOk(
+      await createPatient({ practitionerId, ...fields }),
+    );
+    if (consultationDate) {
+      // The questionnaire writes this column. The list only reads it.
+      await getDatabase()
+        .collection<PatientProfile & { consultationDate: string | null }>(
+          "patient_profiles",
+        )
+        .update(created.id, { consultationDate });
+    }
+    return created;
+  };
+
+  let seeded = false;
+  const seed = async () => {
+    if (seeded) {
+      return;
+    }
+    seeded = true;
+    await file({
+      pseudonym: "P-late",
+      lastName: "Zola",
+      firstName: "Émile",
+      consultationDate: "2026-12-01",
+    });
+    await file({ pseudonym: "P-none", lastName: "Arnaud", firstName: "Léa" });
+    await file({
+      pseudonym: "P-early",
+      lastName: "Martin",
+      firstName: "Paul",
+      consultationDate: "2026-11-10",
+    });
+    await file({
+      pseudonym: "P-accent",
+      lastName: "élodie",
+      firstName: "Anne",
+      consultationDate: "2026-11-20",
+    });
+    await file({ pseudonym: "P-legacy", fullName: "Dupont Jean" });
+    await file(
+      {
+        pseudonym: "P-theirs",
+        lastName: "Aaron",
+        consultationDate: "2026-01-01",
+      },
+      stranger,
+    );
+  };
+
+  it("lists only the practitioner's own files", async () => {
+    await seed();
+    const rows = await patientListOf(practitioner);
+    expect(rows).toHaveLength(5);
+    expect(rows.every((row) => row.practitionerId === practitioner)).toBe(
+      true,
+    );
+    expect(await patientListOf("not-a-uuid")).toEqual([]);
+  });
+
+  it("sorts by appointment date, oldest first, files without a date last", async () => {
+    await seed();
+    const rows = await patientListOf(practitioner, { sort: "appointment" });
+    expect(rows.map((row) => row.pseudonym)).toEqual([
+      "P-early",
+      "P-accent",
+      "P-late",
+      // No date: by name among themselves.
+      "P-none",
+      "P-legacy",
+    ]);
+    expect(rows[0]?.consultationDate).toBe("2026-11-10");
+    expect(rows[4]?.consultationDate).toBeNull();
+  });
+
+  it("sorts by appointment date when no sort is given", async () => {
+    await seed();
+    const rows = await patientListOf(practitioner);
+    expect(rows[0]?.pseudonym).toBe("P-early");
+  });
+
+  it("sorts by nom, then prénom, case and accent insensitive", async () => {
+    await seed();
+    await file({
+      pseudonym: "P-martin-anna",
+      lastName: "MARTIN",
+      firstName: "anna",
+    });
+    const rows = await patientListOf(practitioner, { sort: "name" });
+    expect(rows.map((row) => row.pseudonym)).toEqual([
+      "P-none", // Arnaud
+      "P-legacy", // Dupont Jean, from the full name
+      "P-accent", // élodie sorts as « elodie »
+      "P-martin-anna", // MARTIN anna before Martin Paul
+      "P-early",
+      "P-late", // Zola
+    ]);
+  });
+
+  it("keeps the search and the status filter of the roster", async () => {
+    await seed();
+    const found = await patientListOf(practitioner, { search: "dupont" });
+    expect(found.map((row) => row.pseudonym)).toEqual(["P-legacy"]);
+    const paused = await patientListOf(practitioner, { status: "paused" });
+    expect(paused).toEqual([]);
+  });
+
+  it("falls back to the full name, then the pseudonym, for the nom", () => {
+    const names = (
+      lastName: string | null,
+      firstName: string | null,
+      fullName: string | null,
+    ) => patientListNames({ lastName, firstName, fullName, pseudonym: "P-1" });
+    expect(names(" Martin ", "Paul", null)).toEqual({
+      nom: "Martin",
+      prenom: "Paul",
+    });
+    expect(names(null, null, "Dupont Jean")).toEqual({
+      nom: "Dupont Jean",
+      prenom: "",
+    });
+    expect(names("", "Léa", "")).toEqual({ nom: "P-1", prenom: "" });
   });
 });

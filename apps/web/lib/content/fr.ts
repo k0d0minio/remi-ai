@@ -502,8 +502,7 @@ export const fr: Content = {
     form: {
       invalid_link:
         "Ce lien n'est pas valide. Demandez-en un nouveau à la personne qui vous suit.",
-      already_registered:
-        "Cette adresse a déjà un compte. Aucun nouveau compte n'a été créé.",
+      already_registered: "Vous avez déjà un compte.",
       rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
       unavailable:
         "L'inscription n'a pas abouti. Réessayez dans un instant : vos réponses sont gardées.",
@@ -512,6 +511,7 @@ export const fr: Content = {
       consent_stale:
         "Le texte a changé depuis l'ouverture de la page. Rechargez la page pour lire la version en vigueur. Aucun compte n'a été créé.",
     },
+    signIn: "Connectez-vous.",
     submit: "Créer mon compte",
     submitting: "Création du compte…",
     consent: {
@@ -532,9 +532,73 @@ export const fr: Content = {
   },
   questionnaire: {
     metaTitle: "Questionnaire",
-    title: "Votre compte est créé",
-    comingSoon:
-      "Votre questionnaire arrive bientôt. Vous le remplirez ici avant votre consultation.",
+    title: "Questionnaire préparatoire",
+    intro:
+      "Remplissez-le avant votre consultation. Chaque réponse est enregistrée dès que vous la modifiez. Vous pouvez partir et revenir quand vous voulez.",
+    statusLabel: "Statut du dossier :",
+    missingTitle: "Champs obligatoires à remplir :",
+    complete: "Tous les champs obligatoires sont remplis.",
+    mandatoryLegend: "* Champ obligatoire",
+    mandatory: "obligatoire",
+    optional: "(facultatif)",
+    sectionsLabel: "Sections du questionnaire",
+    sections: {
+      identite: "Identité",
+      profil: "Profil",
+      consultation: "Consultation",
+      alimentation: "Alimentation",
+      sante: "Santé",
+      genetique: "Génétique",
+    },
+    previous: "Précédent",
+    next: "Suivant",
+    saving: "Enregistrement…",
+    saved: "Enregistré",
+    errors: {
+      required: "Ce champ ne peut pas rester vide.",
+      invalid: "Cette valeur n'est pas valide.",
+      height_range: "Indiquez une taille entre 100 et 250 cm, sans décimale.",
+      weight_range:
+        "Indiquez un poids entre 25 et 300 kg, avec une décimale au plus.",
+      consent:
+        "Cette information demande votre consentement aux soins. Parlez-en à votre praticien.",
+      signed_out: "Votre session a expiré. Reconnectez-vous pour continuer.",
+      unavailable:
+        "L'enregistrement a échoué. Vérifiez votre connexion et réessayez.",
+    },
+    labels: {
+      firstName: "Prénom",
+      lastName: "Nom",
+      birthDate: "Date de naissance",
+      email: "Adresse e-mail",
+      phone: "Téléphone",
+      desiredWeight: "Poids souhaité",
+      consultationDate: "Date de consultation",
+      diet: "Régime / type d'alimentation",
+      dietNote: "Précisez votre régime",
+      pathologies: "Pathologies",
+      medications: "Médicaments",
+      supplements: "Compléments alimentaires",
+      geneticTest:
+        "Avez-vous réalisé un test génétique permettant de connaître vos génotypes APOE, DIO2 et AMY1A ?",
+      otherText: "Précisez",
+    },
+    hints: {
+      email: "Pour modifier votre e-mail, contactez votre praticien.",
+      height: "En cm, de 100 à 250.",
+      weight: "En kg, de 25 à 300.",
+      desiredWeight: "En kg, de 25 à 300. Laissez vide si vous n'en avez pas.",
+      dietDefault:
+        "« Aucun régime particulier » est proposé par défaut. Touchez votre réponse pour l'enregistrer.",
+      allergies:
+        "Cochez « Aucune allergie connue » ou chaque allergie. Une catégorie cochée est exclue en entier.",
+      intolerances:
+        "Cochez « Aucune intolérance connue » ou chaque intolérance.",
+      otherText: "Précisez « Autre » pour l'enregistrer.",
+      medications: "Ceux que vous prenez aujourd'hui, avec leur dose si vous la connaissez.",
+      supplements: "Vitamines, minéraux, plantes…",
+      geneticComingSoon: "La suite de cette section arrive bientôt.",
+    },
   },
   patientSignIn: {
     metaTitle: "Connexion",

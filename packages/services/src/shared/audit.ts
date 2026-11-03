@@ -35,6 +35,11 @@ export const auditActions = [
   "patient.updated",
   /** The file moved to its next status (D-31). The detail names both and why. */
   "patient.file_status_changed",
+  /**
+   * The file's consultation date (`consultation_date`) changed: set, changed or
+   * cleared. The detail names the old and the new value (`appointment-date`).
+   */
+  "patient.consultation_date_changed",
   "patient.deleted",
   /**
    * The inactivity sweep sent the notice of deletion (`inactive-account-

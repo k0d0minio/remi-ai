@@ -26,6 +26,8 @@ export {
   getPatient,
   getPatientByShareToken,
   patientOf,
+  patientListNames,
+  patientListOf,
   patientOfRecord,
   patientsOf,
   recordPatientLinkOpened,
@@ -37,6 +39,8 @@ export {
 } from "../db/services/patients";
 export type {
   PatientInput,
+  PatientListQuery,
+  PatientListRow,
   PatientQuery,
   PatientRecordKind,
   PatientSort,
@@ -294,6 +298,7 @@ export {
   getPatientQuestionnaire,
   markReadyWhenComplete,
   missingQuestionnaireFields,
+  savePatientProfileAnswers,
   savePatientQuestionnaire,
   setPatientAllergens,
 } from "../db/services/patient-questionnaire";
@@ -301,6 +306,7 @@ export type {
   AllergenAnswer,
   AllergenSelection,
   PatientQuestionnaireView,
+  ProfileAnswerInput,
   QuestionnaireInput,
 } from "../db/services/patient-questionnaire";
 
@@ -323,6 +329,7 @@ export {
   getPractitionerBySignupToken,
   hasOperator,
   listOperators,
+  setOperatorPatientListSort,
   setOperatorRole,
   updateOperatorName,
   verifyOperator,

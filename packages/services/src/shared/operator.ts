@@ -23,3 +23,17 @@ export const isAtLeast = (role: OperatorRoleName, required: OperatorRoleName) =>
 /** The single answer to "may this account touch other accounts". */
 export const canManageOperators = (role: OperatorRoleName) =>
   isAtLeast(role, "owner");
+
+/**
+ * The two orders of the practitioner's patient list (story 5). The list keeps
+ * one per practitioner, in `operators.patient_list_sort`.
+ */
+export const patientListSorts = ["appointment", "name"] as const;
+
+export type PatientListSort = (typeof patientListSorts)[number];
+
+/** Morgane's default for the first sort (story 5, question 3). */
+export const defaultPatientListSort: PatientListSort = "appointment";
+
+export const isPatientListSort = (value: unknown): value is PatientListSort =>
+  (patientListSorts as readonly unknown[]).includes(value);

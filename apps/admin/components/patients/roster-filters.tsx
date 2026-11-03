@@ -2,8 +2,13 @@
 
 import { Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { patientStatuses, type PatientStatus } from "@remi/services/shared";
+import { useEffect, useState, useTransition } from "react";
+import {
+  patientListSorts,
+  patientStatuses,
+  type PatientListSort,
+  type PatientStatus,
+} from "@remi/services/shared";
 import {
   Button,
   Select,
@@ -14,8 +19,7 @@ import {
 } from "@remi/ui";
 import { Input, VisuallyHidden } from "@remi/ui/server";
 import { patientStatusLabels } from "@/components/patients/vocabulary";
-
-type Sort = "recent" | "name" | "created";
+import { setPatientListSortAction } from "@/lib/patients/list-actions";
 
 /** What has been typed into the search box, and the URL it was typed against. */
 type Typed = { value: string; from: string };
@@ -23,37 +27,36 @@ type Typed = { value: string; from: string };
 type Props = {
   search: string;
   status: PatientStatus | "all";
-  sort: Sort;
+  /** The practitioner's remembered order, read from their operator row. */
+  sort: PatientListSort;
 };
 
-const sortLabels: Record<Sort, string> = {
-  recent: "modifiés récemment",
-  name: "par pseudonyme",
-  created: "les plus récents",
+/** Morgane's words for the two orders of story 5. */
+const sortLabels: Record<PatientListSort, string> = {
+  appointment: "Date de rendez-vous",
+  name: "Nom",
 };
 
 /** Long enough not to navigate on every keystroke, short enough not to feel laggy. */
 const DEBOUNCE_MS = 250;
 
 /**
- * The roster's URL, built from the three filters. A module-level function
+ * The roster's URL, built from the two filters. A module-level function
  * rather than a closure, so the debounce effect can list every value it
  * depends on and the dependency array stays honest.
  *
  * A filter at its default is left out of the query string: `/patients` and
- * `/patients?status=all&sort=recent` are the same roster, and only one of them
- * should be the address it has.
+ * `/patients?status=all` are the same roster, and only one of them should be
+ * the address it has. The sort is not in the URL: the practitioner's operator
+ * row remembers it (story 5).
  */
-const rosterHref = (q: string, status: string, sort: string) => {
+const rosterHref = (q: string, status: string) => {
   const params = new URLSearchParams();
   if (q.trim()) {
     params.set("q", q.trim());
   }
   if (status !== "all") {
     params.set("status", status);
-  }
-  if (sort !== "recent") {
-    params.set("sort", sort);
   }
   const queryString = params.toString();
   return queryString ? `/patients?${queryString}` : "/patients";
@@ -66,11 +69,13 @@ const rosterHref = (q: string, status: string, sort: string) => {
  *
  * The search box is debounced and pushed into the URL, so a filtered roster is
  * a shareable link and the back button steps through the filters the way it
- * does through pages. The selects navigate straight away: a dropdown has no
- * intermediate states worth waiting through.
+ * does through pages. The status select navigates straight away: a dropdown
+ * has no intermediate states worth waiting through. The sort select writes the
+ * practitioner's remembered order, and the action refreshes the list.
  */
 export const RosterFilters = ({ search, status, sort }: Props) => {
   const router = useRouter();
+  const [sorting, startSorting] = useTransition();
 
   // The URL is the source of truth: a back navigation has to move the input,
   // not be overwritten by it. So what has been typed is not mirrored into
@@ -90,11 +95,11 @@ export const RosterFilters = ({ search, status, sort }: Props) => {
       return;
     }
     const timer = setTimeout(
-      () => router.push(rosterHref(query, status, sort)),
+      () => router.push(rosterHref(query, status)),
       DEBOUNCE_MS,
     );
     return () => clearTimeout(timer);
-  }, [query, search, status, sort, router]);
+  }, [query, search, status, router]);
 
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -118,7 +123,7 @@ export const RosterFilters = ({ search, status, sort }: Props) => {
 
       <Select
         value={status}
-        onValueChange={(value) => router.push(rosterHref(query, value, sort))}
+        onValueChange={(value) => router.push(rosterHref(query, value))}
       >
         <SelectTrigger aria-label="Filtrer par statut" className="w-44">
           <SelectValue />
@@ -135,13 +140,16 @@ export const RosterFilters = ({ search, status, sort }: Props) => {
 
       <Select
         value={sort}
-        onValueChange={(value) => router.push(rosterHref(query, status, value))}
+        disabled={sorting}
+        onValueChange={(value) =>
+          startSorting(() => setPatientListSortAction(value))
+        }
       >
         <SelectTrigger aria-label="Trier" className="w-52">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {(Object.keys(sortLabels) as Sort[]).map((value) => (
+          {patientListSorts.map((value) => (
             <SelectItem key={value} value={value}>
               {sortLabels[value]}
             </SelectItem>
@@ -149,7 +157,7 @@ export const RosterFilters = ({ search, status, sort }: Props) => {
         </SelectContent>
       </Select>
 
-      {search || status !== "all" || sort !== "recent" ? (
+      {search || status !== "all" ? (
         <Button
           type="button"
           variant="ghost"
