@@ -54,6 +54,7 @@ const seed = async (email = "claire@example.be") => {
       passwordHash: "x",
       role: "owner",
       signupLinkToken: "t".repeat(32),
+      patientListSort: "appointment",
     });
   const patient = unwrapOk(
     await createPatient({

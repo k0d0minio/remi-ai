@@ -239,6 +239,13 @@
       "when": 1793699839898,
       "tag": "0033_patient_list_sort",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1793701691582,
+      "tag": "0034_inactivity_retention",
+      "breakpoints": true
     }
   ]
 }
