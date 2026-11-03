@@ -259,8 +259,9 @@ export const patientProfiles = pgTable("patient_profiles", {
  *
  * `key` is one of `allergens` or `intolerances` (`shared/questionnaire.ts`),
  * by `kind`. `sub_key` is one of the category's sub-list, or `all` for
- * « Tous ». A null `sub_key` on a category with a sub-list excludes the whole
- * category by precaution, the same as `all`. `other_text` holds the « Autre »
+ * « Tous ». A category ticked with no sub-choice is written as `all`: no
+ * precision excludes the whole category. A null `sub_key` written before that
+ * rule reads the same as `all`. `other_text` holds the « Autre »
  * text and is null on every other row.
  *
  * The unique constraint treats nulls as equal, so one category cannot hold two

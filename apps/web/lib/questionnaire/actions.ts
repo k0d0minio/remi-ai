@@ -116,6 +116,17 @@ const writeAnswer = async (
       } as ProfileAnswerInput),
     );
   }
+  // « Maladie cœliaque » is a tick or an untick. An untouched box sends nothing.
+  if (field === "celiacDisease") {
+    if (value !== "true" && value !== "false") {
+      return failed("invalid");
+    }
+    return fromService(
+      await savePatientQuestionnaire(patientId, {
+        celiacDisease: value === "true",
+      }),
+    );
+  }
   // A diet other than « Autre » drops the note that described « Autre ».
   const input: QuestionnaireInput =
     field === "diet" && value !== "other"
