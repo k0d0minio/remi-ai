@@ -229,6 +229,9 @@ type CleanSelection = {
  * - « Tous » and individual boxes of the same category: « Tous » stays alone.
  * - A category sent bare and with sub-boxes: the sub-boxes are its precision,
  *   so the bare row goes.
+ * - A category with a sub-list sent bare and alone: no precision excludes the
+ *   whole category (story 4, criterion 14), so it is stored as « Tous ». One
+ *   value for the whole category is what `eviction-safety` reads.
  * - « Autre » needs its text. No other box takes a text.
  */
 const cleanSelections = (
@@ -288,12 +291,18 @@ const cleanSelections = (
     cleaned.filter((s) => s.subKey !== null).map((s) => s.key),
   );
   return ok(
-    cleaned.filter((s) => {
-      if (hasAll.has(s.key)) {
-        return s.subKey === ALL_SUB_KEY;
-      }
-      return !(s.subKey === null && hasSubs.has(s.key));
-    }),
+    cleaned
+      .filter((s) => {
+        if (hasAll.has(s.key)) {
+          return s.subKey === ALL_SUB_KEY;
+        }
+        return !(s.subKey === null && hasSubs.has(s.key));
+      })
+      .map((s) =>
+        s.subKey === null && kind === "allergy" && subListOf(s.key)
+          ? { ...s, subKey: ALL_SUB_KEY }
+          : s,
+      ),
   );
 };
 

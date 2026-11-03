@@ -577,6 +577,7 @@ export const fr: Content = {
       diet: "Régime / type d'alimentation",
       dietNote: "Précisez votre régime",
       pathologies: "Pathologies",
+      celiacDisease: "Maladie cœliaque",
       medications: "Médicaments",
       supplements: "Compléments alimentaires",
       geneticTest:
@@ -591,10 +592,12 @@ export const fr: Content = {
       dietDefault:
         "« Aucun régime particulier » est proposé par défaut. Touchez votre réponse pour l'enregistrer.",
       allergies:
-        "Cochez « Aucune allergie connue » ou chaque allergie. Une catégorie cochée est exclue en entier.",
+        "Cochez « Aucune allergie connue » ou chaque allergie. Une catégorie cochée sans précision est exclue en entier.",
       intolerances:
         "Cochez « Aucune intolérance connue » ou chaque intolérance.",
       otherText: "Précisez « Autre » pour l'enregistrer.",
+      celiacDisease:
+        "Cochez si un médecin l'a diagnostiquée. Le gluten est alors exclu strictement, contaminations croisées comprises.",
       medications: "Ceux que vous prenez aujourd'hui, avec leur dose si vous la connaissez.",
       supplements: "Vitamines, minéraux, plantes…",
       geneticComingSoon: "La suite de cette section arrive bientôt.",

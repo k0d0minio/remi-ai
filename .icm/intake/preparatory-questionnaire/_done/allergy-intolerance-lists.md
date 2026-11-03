@@ -36,7 +36,7 @@ flag that includes cross-contamination.
 - [ ] The file cannot become « Prêt pour consultation » until both lists carry an explicit answer
 - [ ] « Autre » stores its text as an `other` row
 - [ ] « Maladie cœliaque » ticked stores `celiac_disease` and the strict gluten exclusion flag
-- [ ] Blé is a separate allergy box from gluten
+- [ ] Blé is its own box in the gluten sub-list
 
 ## Out of scope
 
@@ -45,3 +45,11 @@ flag that includes cross-contamination.
 ## Notes
 
 - D-30. The enums come from `questionnaire-fields`. The strict gluten flag is read by `eviction-safety` (story 14).
+- Jamie accepted the defaults of the pull request's questions on 2026-11-03:
+  1. Blé stays the `wheat` key of the gluten sub-list (`questionnaire-fields`, answer 6). Criterion 9 reads « Blé is its own box in the gluten sub-list ».
+  2. The gluten sub-list shows like the four others.
+  3. A category ticked with no sub-choice is stored as `all`. An older null `sub_key` reads as `all`.
+  4. `celiac_disease = true` is the strict gluten exclusion flag. No second column.
+  5. « Maladie cœliaque »: a tick stores `true`, an untick stores `false`, an untouched box stays null.
+  6. A sub-list « Autre » stores its text on the `<family>/other` row.
+  7. The intolerance list has no sub-list.
