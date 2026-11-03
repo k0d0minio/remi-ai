@@ -24,7 +24,7 @@ import type {
   PatientAllergen,
   PatientQuestionnaire,
 } from "../../models/patient-questionnaire";
-import type { AuditActor } from "../audit";
+import { recordAuditEvent, type AuditActor } from "../audit";
 import { consentInForce } from "../patient-consents/in-force";
 import { setFileStatus } from "../patients";
 
@@ -356,10 +356,16 @@ export const getPatientQuestionnaire = async (
 /**
  * Save any subset of the answers. A field the input does not name is left as
  * it is, which is what makes a save per change safe.
+ *
+ * A save that changes `consultationDate` writes one
+ * `patient.consultation_date_changed` event with the old and the new value
+ * (`appointment-date`). Every writer of the column passes here, so the console
+ * and the patient's questionnaire get the same trail.
  */
 export const savePatientQuestionnaire = async (
   patientId: Id,
   input: QuestionnaireInput,
+  actor: AuditActor | null = null,
 ): Promise<Result<PatientQuestionnaire>> => {
   if (!isValidId(patientId)) {
     return err("not_found", "no such patient");
@@ -374,7 +380,8 @@ export const savePatientQuestionnaire = async (
       (patch as Record<string, unknown>)[field] = value;
     }
   }
-  if (!(await profiles().findById(patientId))) {
+  const current = await profiles().findById(patientId);
+  if (!current) {
     return err("not_found", "no such patient");
   }
   const writesGenotype = genotypeFields.some(
@@ -389,9 +396,37 @@ export const savePatientQuestionnaire = async (
     return err("not_permitted", "the desired weight needs the care consent");
   }
   const written = await profiles().update(patientId, patch);
-  return written
-    ? ok(await visibleAnswers(written))
-    : err("not_found", "no such patient");
+  if (!written) {
+    return err("not_found", "no such patient");
+  }
+  await recordConsultationDateChange(current, patch, actor);
+  return ok(await visibleAnswers(written));
+};
+
+/** One event when a save changes `consultationDate`. No event otherwise. */
+const recordConsultationDateChange = async (
+  // The pseudonym is on the same row. It labels the event, so the event
+  // survives the file's deletion.
+  before: QuestionnaireRow & Partial<Pick<PatientProfile, "pseudonym">>,
+  patch: Partial<PatientQuestionnaire>,
+  actor: AuditActor | null,
+) => {
+  if (patch.consultationDate === undefined) {
+    return;
+  }
+  const previous = before.consultationDate ?? null;
+  const next = patch.consultationDate;
+  if (previous === next) {
+    return;
+  }
+  await recordAuditEvent({
+    actor,
+    action: "patient.consultation_date_changed",
+    targetType: "patient",
+    targetId: before.id,
+    targetLabel: before.pseudonym ?? "",
+    detail: `${previous ?? "∅"} → ${next ?? "∅"}`,
+  });
 };
 
 /**

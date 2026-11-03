@@ -59,6 +59,7 @@ import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
 import { ChallengeHistory } from "@/components/patients/challenge-history";
 import { ChallengeSection } from "@/components/patients/challenge-section";
+import { ConsultationDate } from "@/components/patients/consultation-date";
 import { CopyContextCard } from "@/components/patients/copy-context-card";
 import { DeletePatient } from "@/components/patients/delete-patient";
 import {
@@ -243,6 +244,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     notFound();
   }
   const missingFields = missing.ok ? missing.data : [];
+  const consultationDate = questionnaire.data.answers.consultationDate;
   const genotypeOpen = consents.genetic?.decision === "given";
 
   // Derived from the thread already in hand rather than a second read.
@@ -592,6 +594,25 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
             </CardHeader>
             <CardContent>
               <WorkingRecommendations recommendations={recommendations} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Date de consultation</CardTitle>
+              <CardDescription>
+                Le rendez-vous de la personne. Le questionnaire écrit la même
+                date.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ConsultationDate
+                patientId={patient.id}
+                value={consultationDate}
+                formatted={
+                  consultationDate ? formatDate(consultationDate) : null
+                }
+              />
             </CardContent>
           </Card>
 
@@ -1125,9 +1146,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 )}
                 questionnaire={questionnaire.data}
                 consultationDate={
-                  questionnaire.data.answers.consultationDate
-                    ? formatDate(questionnaire.data.answers.consultationDate)
-                    : null
+                  consultationDate ? formatDate(consultationDate) : null
                 }
                 genotypeOpen={genotypeOpen}
               />
