@@ -28,6 +28,7 @@ export type { Locale } from "./i18n";
 export { auditActions } from "./audit";
 export { minPasswordLength, signupFields } from "./signup";
 export type {
+  PatientLanding,
   SignupField,
   SignupFieldError,
   SignupFieldErrors,

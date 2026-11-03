@@ -1,4 +1,5 @@
 import type { DatabaseClient } from "../db/client";
+import type { PatientAccount } from "../db/models/patient-account";
 import { getPatientAccountBySubject } from "../db/services/patient-accounts";
 import type { Id } from "../types";
 import { getAuthProvider, type AuthIdentity } from "./provider";
@@ -34,4 +35,20 @@ export const readSession = async (
     identity,
     principal: account ? { kind: "patient", id: account.id } : null,
   };
+};
+
+/**
+ * The signed-in patient's account, or `null` for a visitor, for an identity
+ * with no patient file, and for an operator. A patient page reads the
+ * patient's id from here and never from its URL, so a patient only ever
+ * reaches their own data.
+ */
+export const readPatientAccount = async (
+  db?: DatabaseClient,
+): Promise<PatientAccount | null> => {
+  const identity = await getAuthProvider().readIdentity();
+  if (!identity) {
+    return null;
+  }
+  return getPatientAccountBySubject(identity.subject, db);
 };

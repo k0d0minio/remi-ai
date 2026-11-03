@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
-import { readSession } from "@remi/services/server";
-import { isLocale, localePath } from "@remi/services/shared";
+import { notFound } from "next/navigation";
+import { isLocale } from "@remi/services/shared";
 import { Typography, Wordmark } from "@remi/ui/server";
-import { ensureAuthProvider } from "@/lib/auth/provider";
+import { SignOutButton } from "@/components/patient-auth/sign-out-button";
 import { getContent } from "@/lib/content";
-import { ensureDatabase } from "@/lib/database";
+import { requirePatient } from "@/lib/patient-auth/session";
 
 /** Reads the session on every hit — never prerendered. */
 export const dynamic = "force-dynamic";
@@ -26,8 +25,8 @@ export const generateMetadata = async ({
 /**
  * Where a new patient lands after sign-up (story 2). A holding page behind the
  * patient session: `preparatory-questionnaire/questionnaire-flow` replaces it
- * with the questionnaire. Without a patient account, the visitor goes back to
- * the entry screen.
+ * with the questionnaire. Without a patient account, the visitor goes to the
+ * sign-in page.
  */
 const QuestionnairePage = async ({
   params,
@@ -38,22 +37,19 @@ const QuestionnairePage = async ({
   if (!isLocale(locale)) {
     notFound();
   }
-  ensureDatabase();
-  const session = ensureAuthProvider() ? await readSession() : null;
-  if (session?.principal?.kind !== "patient") {
-    redirect(localePath(locale, "/"));
-  }
-  const content = getContent(locale).questionnaire;
+  await requirePatient(locale);
+  const content = getContent(locale);
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-10">
       <Wordmark />
       <Typography as="h1" size="2xl" weight="semibold">
-        {content.title}
+        {content.questionnaire.title}
       </Typography>
       <Typography size="sm" tone="muted">
-        {content.comingSoon}
+        {content.questionnaire.comingSoon}
       </Typography>
+      <SignOutButton locale={locale} label={content.signOut} />
     </main>
   );
 };
