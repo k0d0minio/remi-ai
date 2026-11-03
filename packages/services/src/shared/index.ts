@@ -79,6 +79,15 @@ export type {
   ProtocolTemplateKindName,
 } from "./protocol-reuse";
 export type { AppKey } from "./links";
+export {
+  canMoveFileStatus,
+  fileStatuses,
+  fileStatusLabels,
+  fileStatusTransitions,
+  initialFileStatus,
+  isFileStatus,
+} from "./file-status";
+export type { FileStatus } from "./file-status";
 export { canManageOperators, isAtLeast, operatorRoles } from "./operator";
 export type { OperatorRoleName } from "./operator";
 export {
