@@ -22,6 +22,7 @@ import {
   getPatientQuestionnaire,
   markReadyWhenComplete,
   missingQuestionnaireFields,
+  savePatientProfileAnswers,
   savePatientQuestionnaire,
   setPatientAllergens,
 } from "./index";
@@ -701,5 +702,107 @@ describe("optional data under its consent", () => {
       await savePatientQuestionnaire(patient.id, { desiredWeightKg: 60 }),
     );
     expect(answers.desiredWeightKg).toBe(60);
+  });
+});
+
+describe("the profile columns the questionnaire asks", () => {
+  it("saves the identity and keeps the full name joined", async () => {
+    const patient = await newPatient("Identité");
+    const saved = unwrapOk(
+      await savePatientProfileAnswers(patient.id, {
+        firstName: "  Claire ",
+        lastName: "Dubois",
+        birthDate: "1984-05-12",
+        phone: "+32 470 12 34 56",
+      }),
+    );
+    expect(saved.firstName).toBe("Claire");
+    expect(saved.fullName).toBe("Claire Dubois");
+    expect(saved.birthDate).toBe("1984-05-12");
+    expect(saved.phone).toBe("+32470123456");
+
+    const renamed = unwrapOk(
+      await savePatientProfileAnswers(patient.id, { lastName: "Martin" }),
+    );
+    expect(renamed.fullName).toBe("Claire Martin");
+  });
+
+  it("never moves the practitioner's last edit", async () => {
+    const patient = await newPatient("Sans retouche");
+    await tick();
+    const saved = unwrapOk(
+      await savePatientProfileAnswers(patient.id, { heightCm: 172 }),
+    );
+    expect(saved.lastEditedAt).toEqual(patient.lastEditedAt);
+  });
+
+  it("saves and clears taille and poids", async () => {
+    const patient = await newPatient("Mesures");
+    const saved = unwrapOk(
+      await savePatientProfileAnswers(patient.id, {
+        heightCm: 168,
+        weightKg: 64.5,
+      }),
+    );
+    expect(saved.heightCm).toBe(168);
+    expect(saved.weightKg).toBe(64.5);
+    const cleared = unwrapOk(
+      await savePatientProfileAnswers(patient.id, { weightKg: null }),
+    );
+    expect(cleared.weightKg).toBe(null);
+    expect(cleared.heightCm).toBe(168);
+  });
+
+  it("refuses a cleared identity field, a broken value and an unknown field", async () => {
+    const patient = await newPatient("Refus");
+    expect(
+      errorOf(await savePatientProfileAnswers(patient.id, { firstName: " " })),
+    ).toBe("invalid_input");
+    expect(
+      errorOf(await savePatientProfileAnswers(patient.id, { phone: "12" })),
+    ).toBe("invalid_input");
+    expect(
+      errorOf(await savePatientProfileAnswers(patient.id, { heightCm: 172.5 })),
+    ).toBe("invalid_input");
+    expect(
+      errorOf(
+        await savePatientProfileAnswers(patient.id, {
+          pseudonym: "x",
+        } as never),
+      ),
+    ).toBe("invalid_input");
+  });
+
+  it("needs the care consent for médicaments and compléments, never to clear them", async () => {
+    const patient = await newPatient("Traitement");
+    expect(
+      errorOf(
+        await savePatientProfileAnswers(patient.id, {
+          medications: "Levothyrox",
+        }),
+      ),
+    ).toBe("not_permitted");
+    unwrapOk(await savePatientProfileAnswers(patient.id, { supplements: "" }));
+    await decide(patient, "care", "given");
+    const saved = unwrapOk(
+      await savePatientProfileAnswers(patient.id, {
+        medications: "Levothyrox",
+      }),
+    );
+    expect(saved.medications).toBe("Levothyrox");
+  });
+
+  it("answers not_found for an unknown patient", async () => {
+    expect(
+      errorOf(await savePatientProfileAnswers("nope", { heightCm: 170 })),
+    ).toBe("not_found");
+    expect(
+      errorOf(
+        await savePatientProfileAnswers(
+          "00000000-0000-4000-8000-000000000000",
+          { heightCm: 170 },
+        ),
+      ),
+    ).toBe("not_found");
   });
 });

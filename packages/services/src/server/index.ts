@@ -298,6 +298,7 @@ export {
   getPatientQuestionnaire,
   markReadyWhenComplete,
   missingQuestionnaireFields,
+  savePatientProfileAnswers,
   savePatientQuestionnaire,
   setPatientAllergens,
 } from "../db/services/patient-questionnaire";
@@ -305,6 +306,7 @@ export type {
   AllergenAnswer,
   AllergenSelection,
   PatientQuestionnaireView,
+  ProfileAnswerInput,
   QuestionnaireInput,
 } from "../db/services/patient-questionnaire";
 
