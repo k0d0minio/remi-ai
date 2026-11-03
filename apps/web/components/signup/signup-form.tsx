@@ -1,7 +1,9 @@
 "use client";
 
+import NextLink from "next/link";
 import { useActionState, useState } from "react";
 import {
+  localePath,
   shownConsentValue,
   signupFields,
   type ConsentKey,
@@ -9,9 +11,10 @@ import {
   type SignupField,
 } from "@remi/services/shared";
 import { Button } from "@remi/ui";
-import { Field, Input, Typography } from "@remi/ui/server";
+import { Field, Input, Link, Typography } from "@remi/ui/server";
 import type { Content } from "@/lib/content/types";
 import { fill } from "@/lib/content/fill";
+import { SIGN_IN_PATH } from "@/lib/patient-auth/paths";
 import { signUpAction } from "@/lib/signup/actions";
 import {
   initialSignupState,
@@ -150,6 +153,20 @@ export const SignupForm = ({ token, locale, content, consents }: Props) => {
               : fill(content.summary, {
                   fields: refused.map((name) => content.labels[name]).join(", "),
                 })}
+            {/* A known e-mail goes to sign-in, never to a second file. The
+                message names no data of that file. */}
+            {formError === "already_registered" ? (
+              <>
+                {" "}
+                <Link
+                  as={NextLink}
+                  href={localePath(locale, SIGN_IN_PATH)}
+                  variant="primary"
+                >
+                  {content.signIn}
+                </Link>
+              </>
+            ) : null}
           </Typography>
         ) : null}
 
