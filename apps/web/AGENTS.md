@@ -17,11 +17,19 @@ app/[locale]/       every page ships in en and fr; `[locale]/layout.tsx` IS the
   (app)/            signed-in routes — the route group carries the auth boundary
     (practitioner)/ the console: clients, practice, therapeutic frame
     (patient)/      the daily surface: today, meals, steps, plan
+  inscription/      the patient's sign-up from the practitioner's link
+  connexion/        the patient's sign-in, the reset pages, the magic link's landing
+  questionnaire/    behind the patient session: the page before activation
+  accueil/          behind the patient session: the page after activation
 app/api/            route handlers (webhooks, cron, uploads) — outside the locale
                     segment, because a machine surface has no language
 components/         composition only, grouped by feature — never primitives
 hooks/              client hooks specific to this app
-lib/auth/           the session seam + the development stand-in
+lib/auth/           the session seam + the development stand-in, and the auth
+                    seam's registration (`provider.ts`)
+lib/patient-auth/   the patient's routes, session guard and sign-in actions.
+                    A patient page calls `requirePatient()` and reads the
+                    patient's id from the account it returns, never from the URL
 lib/content/        one dictionary per locale, typed by `types.ts` so a missing
                     translation is a type error
 lib/fixtures/       stand-in data — deleted by the PR that registers a real

@@ -29,6 +29,7 @@ export {
   patientsOf,
   recordPatientLinkOpened,
   regenerateShareToken,
+  setFileStatus,
   setPatientNextConsultationPrep,
   updatePatient,
   updatePatientProfileByPatient,
@@ -363,7 +364,15 @@ export type {
   PasswordSignInInput,
   PasswordSignUpInput,
 } from "../auth/provider";
-export { readSession } from "../auth/session";
+export { readPatientAccount, readSession } from "../auth/session";
+export {
+  completePatientSignIn,
+  patientLandingFor,
+  requestPatientMagicLink,
+  requestPatientPasswordReset,
+  resetPatientPassword,
+  signInPatient,
+} from "../auth/patient-sign-in";
 export { signUpPatient, validateSignup } from "../auth/patient-signup";
 export type {
   PatientSignupInput,

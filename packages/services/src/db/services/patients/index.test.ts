@@ -4,6 +4,7 @@ import type { PatientProfile } from "../../models/patient-profile";
 import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { recordConsent } from "../patient-consents";
 import { addGoalCheckIn, addPatientGoal } from "../patient-goals";
+import { listAuditEvents, type AuditActor } from "../audit";
 import { addPatientRecommendation } from "../patient-recommendations";
 import {
   createPatient,
@@ -15,6 +16,7 @@ import {
   patientsOf,
   recordPatientLinkOpened,
   regenerateShareToken,
+  setFileStatus,
   setPatientNextConsultationPrep,
   updatePatient,
   updatePatientProfileByPatient,
@@ -54,6 +56,7 @@ describe("patient profiles", () => {
     expect(patient.email).toBeNull();
     expect(patient.locale).toBe("fr");
     expect(patient.status).toBe("active");
+    expect(patient.fileStatus).toBe("to_complete");
     expect(patient.sex).toBe("unspecified");
     expect(patient.birthDate).toBeNull();
     expect(patient.heightCm).toBeNull();
@@ -1039,5 +1042,153 @@ describe("médicaments and compléments under the care consent", () => {
       await updatePatient(patient.id, { supplements: "" }),
     );
     expect(cleared.supplements).toBe("");
+  });
+});
+
+describe("the file status", () => {
+  const morgane: AuditActor = {
+    id: testPractitionerId,
+    email: "morgane@example.com",
+    name: "Morgane",
+  };
+
+  const newFile = async (pseudonym: string) =>
+    unwrapOk(
+      await createPatient({ practitionerId: testPractitionerId, pseudonym }),
+    );
+
+  it("moves a file through the four statuses, one step at a time", async () => {
+    const file = await newFile("Steps");
+    expect(file.fileStatus).toBe("to_complete");
+    const ready = unwrapOk(
+      await setFileStatus(file.id, "ready", morgane, "mandatory fields filled"),
+    );
+    expect(ready.fileStatus).toBe("ready");
+    const toValidate = unwrapOk(
+      await setFileStatus(
+        file.id,
+        "to_validate",
+        morgane,
+        "first recommendation",
+      ),
+    );
+    expect(toValidate.fileStatus).toBe("to_validate");
+    const active = unwrapOk(
+      await setFileStatus(file.id, "active", morgane, "activated"),
+    );
+    expect(active.fileStatus).toBe("active");
+    expect(unwrapOk(await getPatient(file.id)).fileStatus).toBe("active");
+  });
+
+  it("refuses a skipped step with a conflict and writes nothing", async () => {
+    const file = await newFile("Skip");
+    const skipped = await setFileStatus(
+      file.id,
+      "to_validate",
+      morgane,
+      "early",
+    );
+    expect(skipped.ok).toBe(false);
+    if (!skipped.ok) {
+      expect(skipped.error).toBe("conflict");
+    }
+    expect(unwrapOk(await getPatient(file.id)).fileStatus).toBe("to_complete");
+    expect(await listAuditEvents({ targetId: file.id })).toHaveLength(0);
+  });
+
+  it("refuses every move out of active", async () => {
+    const file = await newFile("Active");
+    await setFileStatus(file.id, "ready", morgane, "filled");
+    await setFileStatus(file.id, "to_validate", morgane, "recommended");
+    await setFileStatus(file.id, "active", morgane, "activated");
+    for (const next of ["to_complete", "ready", "to_validate"] as const) {
+      const moved = await setFileStatus(file.id, next, morgane, "a change");
+      expect(moved.ok).toBe(false);
+      if (!moved.ok) {
+        expect(moved.error).toBe("conflict");
+      }
+    }
+    expect(unwrapOk(await getPatient(file.id)).fileStatus).toBe("active");
+  });
+
+  it("writes one audit event per applied move, with both statuses and the reason", async () => {
+    const file = await newFile("Trail");
+    await setFileStatus(file.id, "ready", morgane, "mandatory fields filled");
+    const events = await listAuditEvents({
+      action: "patient.file_status_changed",
+      targetId: file.id,
+    });
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      actorKind: "operator",
+      actorId: testPractitionerId,
+      targetType: "patient",
+      targetLabel: "Trail",
+      detail: "to_complete → ready: mandatory fields filled",
+    });
+  });
+
+  it("records the patient as the actor when the patient's write moves the file", async () => {
+    const file = await newFile("Self");
+    await setFileStatus(
+      file.id,
+      "ready",
+      { kind: "patient", id: file.id, name: file.pseudonym },
+      "questionnaire complete",
+    );
+    const [event] = await listAuditEvents({
+      action: "patient.file_status_changed",
+      targetId: file.id,
+    });
+    expect(event?.actorKind).toBe("patient");
+  });
+
+  it("answers ok for the same status and writes nothing", async () => {
+    const file = await newFile("Same");
+    const same = unwrapOk(
+      await setFileStatus(file.id, "to_complete", morgane, "no change"),
+    );
+    expect(same.fileStatus).toBe("to_complete");
+    expect(await listAuditEvents({ targetId: file.id })).toHaveLength(0);
+  });
+
+  it("refuses an unknown status, a missing reason and a missing file", async () => {
+    const file = await newFile("Bad");
+    const unknown = await setFileStatus(
+      file.id,
+      "ended" as Parameters<typeof setFileStatus>[1],
+      morgane,
+      "wrong value",
+    );
+    expect(unknown.ok).toBe(false);
+    if (!unknown.ok) {
+      expect(unknown.error).toBe("invalid_input");
+    }
+    const noReason = await setFileStatus(file.id, "ready", morgane, "  ");
+    expect(noReason.ok).toBe(false);
+    if (!noReason.ok) {
+      expect(noReason.error).toBe("invalid_input");
+    }
+    const missing = await setFileStatus(
+      "00000000-0000-4000-8000-0000000000ee",
+      "ready",
+      morgane,
+      "no file",
+    );
+    expect(missing.ok).toBe(false);
+    if (!missing.ok) {
+      expect(missing.error).toBe("not_found");
+    }
+    expect((await setFileStatus("not-a-uuid", "ready", morgane, "x")).ok).toBe(
+      false,
+    );
+  });
+
+  it("leaves the retention status alone, and updatePatient never moves the file status", async () => {
+    const file = await newFile("Retention");
+    await setFileStatus(file.id, "ready", morgane, "filled");
+    const ended = unwrapOk(await updatePatient(file.id, { status: "ended" }));
+    expect(ended.status).toBe("ended");
+    expect(ended.fileStatus).toBe("ready");
   });
 });

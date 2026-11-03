@@ -40,3 +40,10 @@ writes an audit event. The migration sets today's patients per Morgane's questio
 
 - D-31, D-32. Touches `schema.ts` and the migrations journal, so it goes first across every epic that reads it.
 - Label per Morgane's question 1. Default « Dossier à compléter ».
+- Jamie accepted the defaults of the pull request's questions on 2026-11-03:
+  1. Today's patients get `active` after the migration.
+  2. The first label is « Dossier à compléter ».
+  3. No transition leaves `active`.
+  4. `file_status` is text with the enum in code, and no database CHECK.
+  5. The table refuses `to_complete → to_validate`.
+- A refused transition returns the `conflict` code of `ServiceErrorCode`. The spec named `invalid_transition`. That code does not exist in `Result`.
