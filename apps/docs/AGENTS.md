@@ -21,7 +21,7 @@ importing the design system is what "off the design system" means.
 
 | Under            | Holds                                          | Read by             |
 | ---------------- | ---------------------------------------------- | ------------------- |
-| `app/business/`  | direction, initiatives, the V2 scope, roles    | Scope, Define, Ship |
+| `app/business/`  | business model and OKR, product roadmap, genotype knowledge base, landing brief, roles | Scope, Define, Ship |
 | `app/technical/` | architecture, applications, packages, workflow | Build, Ship         |
 
 `.icm/_shared/knowledge-map.md` routes each stage to a **named page**, not to "the docs" — that
@@ -36,7 +36,9 @@ files. Documenting a rule in both places guarantees the two disagree eventually.
 ## Writing
 
 - Sentence case headings. Present tense. Say what is true today, not what is planned — a roadmap
-  item goes under business/initiatives, clearly marked.
+  item goes under business/scope, the product roadmap, clearly marked.
+- The site is in French. Morgane's documents under `app/business/` are reproduced as she wrote
+  them; a page that quotes them does not rewrite them.
 - Tables for anything referenceable; prose for reasoning.
 - Every page states what it is for in its first two lines, so a stage loading it knows immediately
   whether it has the right page.

@@ -1,153 +1,151 @@
-# Decisions
+# Décisions
 
-The technical decision log. A decision recorded here is **set**: a spec cites it instead of
-reopening it, and the Build stage treats it as ground truth. Reopening one is a real event — it
-happens on this page, in a PR, never silently inside a spec. Each entry carries the date it was
-taken and, where it matters, the condition that would reopen it.
+Le journal des décisions techniques. Une décision consignée ici est **arrêtée** : une spécification la cite au lieu de
+la rouvrir, et l’étape Build la tient pour acquise. La rouvrir est un événement réel — cela se passe sur cette page, dans une PR,
+jamais en silence à l’intérieur d’une spécification. Chaque entrée porte la date à laquelle elle a été prise et, quand cela compte, la
+condition qui la rouvrirait.
 
-Business decisions are not here — open ones live on the operator console's « Décisions attendues »
-page until Morgane and Arnaud answer them.
+Les décisions d’affaires ne sont pas ici — celles qui sont ouvertes vivent sur la page « Décisions attendues » de la console opérateur
+jusqu’à ce que Morgane et Arnaud répondent.
 
-## Data layer — 2026-08-06
+## Couche de données — 2026-08-06
 
-- **Database: Neon** — serverless Postgres, EU region. Supabase remains the likely eventual home;
-  it is the same Postgres underneath, so the storage seam keeps that move an adapter swap, not a
-  migration project. Revisit when approaching the scaling threshold, or when a Supabase-only
-  capability (RLS-as-auth, storage buckets) is genuinely needed.
-- **Auth: magic links, kept simple.** One lightweight auth for both roles — no passwords — with
-  the session carrying `practitioner` or `patient`. Practitioners additionally get **2FA that must
-  stay low-friction**; ease of enrolment is a requirement, not a nice-to-have.
-- **Tenancy: the care relationship is the access primitive.** A practitioner↔patient relationship
-  row with a start and an end; every query in the services layer scopes through it, and the end
-  date ends access. This maps one-to-one onto RLS policies if Supabase arrives later.
+- **Base de données : Neon** — Postgres serverless, région UE. Supabase reste la destination finale probable ;
+  c’est le même Postgres en dessous, donc le point de jonction du stockage fait de ce changement un échange d’adaptateur, et non
+  un projet de migration. À revoir à l’approche du seuil de montée en charge, ou quand une capacité propre à Supabase (RLS comme authentification,
+  buckets de stockage) devient réellement nécessaire.
+- **Authentification : liens magiques, en restant simple.** Une authentification légère pour les deux rôles — sans mot de passe — avec
+  la session portant `practitioner` ou `patient`. Les praticiens ont en plus une **2FA qui doit
+  rester peu contraignante** ; la facilité d’inscription est une exigence, pas un bonus.
+- **Multi-locataire : la relation de soin est la primitive d’accès.** Une ligne de relation praticien↔patient avec un début et une fin ;
+  chaque requête de la couche de services passe par elle, et la date de fin met fin à l’accès. Cela correspond un pour un aux
+  politiques RLS si Supabase arrive plus tard.
 
-## AI layer — 2026-08-06
+## Couche IA — 2026-08-06
 
-- **Provider access goes through the Vercel AI Gateway** (`AI_GATEWAY_API_KEY`), not a direct
-  vendor SDK. Model ids stay behind the `fast` / `balanced` / `deep` roles in
+- **L’accès aux fournisseurs passe par le Vercel AI Gateway** (`AI_GATEWAY_API_KEY`), et non par un SDK
+  de fournisseur direct. Les identifiants de modèle restent derrière les rôles `fast` / `balanced` / `deep` dans
   `packages/services/src/ai/`.
-- **Guardrails are architectural, from the first adapter.** Model output is validated against the
-  therapeutic frame *before* it renders, and every AI output is persisted with its context — an
-  audit trail, not a hope. The `TextProvider` seam grows this surface before any vendor lands
-  behind it.
-- **Pseudonymization is an open business question** — « Décisions attendues », question 8. Jamie
-  leans pseudonymize (the model never sees a name; names re-enter at render); the personal-tone
-  tradeoff belongs to Morgane and Arnaud. No AI feature spec assumes either answer until it lands.
+- **Les garde-fous sont architecturaux, dès le premier adaptateur.** La sortie du modèle est validée par rapport au
+  cadre thérapeutique *avant* son affichage, et chaque sortie d’IA est conservée avec son contexte — une piste
+  d’audit, pas un espoir. Le point de jonction `TextProvider` acquiert cette surface avant qu’un fournisseur ne s’y branche.
+- **La pseudonymisation est une question d’affaires ouverte** — « Décisions attendues », question 8. Jamie
+  penche pour la pseudonymisation (le modèle ne voit jamais un nom ; les noms reviennent à l’affichage) ; le compromis sur le
+  ton personnel revient à Morgane et Arnaud. Aucune spécification de fonctionnalité d’IA ne suppose l’une ou l’autre réponse tant qu’elle n’est pas arrivée.
 
-## Platform — 2026-08-06
+## Plateforme — 2026-08-06
 
-- **Vercel function regions pinned to the EU**, all six apps — compute sits beside the data, and
-  the residency story holds end to end.
-- **Email: Resend.** The seam's reserved variables (`RESEND_API_KEY`, `EMAIL_FROM`) become real
-  when the mailer adapter lands; sending happens from a transactional subdomain.
-- **Observability: Vercel's built-in suite first** — runtime logs, alerting, analytics on the Pro
-  plan — before paying for a dedicated error tracker. Sentry's reserved rows in `.icm/docs/ENV.md` stay
-  unwired unless exception grouping proves insufficient in practice.
-- **Admin console access — superseded on 2026-08-13.** See _Access control_ below.
+- **Régions des fonctions Vercel fixées sur l’UE**, pour les six applications — le calcul se tient à côté des données, et
+  le discours sur la résidence tient de bout en bout.
+- **E-mail : Resend.** Les variables réservées du point de jonction (`RESEND_API_KEY`, `EMAIL_FROM`) deviennent réelles
+  quand l’adaptateur d’envoi arrive ; l’envoi se fait depuis un sous-domaine transactionnel.
+- **Observabilité : d’abord la suite intégrée de Vercel** — journaux d’exécution, alertes, analytique sur le plan
+  Pro — avant de payer un outil dédié de suivi des erreurs. Les lignes réservées à Sentry dans `.icm/docs/ENV.md` restent
+  débranchées sauf si le regroupement des exceptions s’avère insuffisant en pratique.
+- **Accès à la console d’administration — remplacé le 2026-08-13.** Voir _Contrôle d’accès_ ci-dessous.
 
-## Engineering practice — 2026-08-06
+## Pratique d’ingénierie — 2026-08-06
 
-- **Test-driven development wherever possible**, with a hard 75% coverage floor on the database
-  layer aiming for 90%. Canonical rule and mechanics: `/CONVENTIONS.md` → Testing.
-- **Mobile: responsive web for the first version; a real app-store presence is a stated goal.** The hedge
-  is architectural, not a framework bet today: the patient-facing core loop is built API-first —
-  route handlers / server actions over the same services — so a future native client consumes the
-  seam the web app already uses. The wrapper-vs-React-Native choice (Capacitor keeping one
-  codebase vs Expo with a second, truly native UI) is deliberately deferred until app-store work
-  is scheduled; native health integrations (HealthKit / Health Connect for steps) are the likely
-  deciding argument.
-- **Bilingual v1.** The product ships French and English, matching the marketing site. `apps/web`
-  already routes through `[locale]`; the work is finishing dictionaries, not building a system.
+- **Développement piloté par les tests partout où c’est possible**, avec un plancher strict de 75 % de couverture sur la couche
+  de base de données, avec 90 % pour objectif. Règle canonique et mécanique : `/CONVENTIONS.md` → Testing.
+- **Mobile : web adaptatif pour la première version ; une vraie présence sur les app stores est un objectif affirmé.** La parade
+  est architecturale, pas un pari sur un framework aujourd’hui : le cœur de boucle côté patient est construit API d’abord —
+  gestionnaires de routes / actions serveur au-dessus des mêmes services — de sorte qu’un futur client natif consomme
+  le point de jonction que l’application web utilise déjà. Le choix entre enveloppe et React Native (Capacitor, qui garde une seule
+  base de code, contre Expo avec une seconde interface réellement native) est volontairement différé jusqu’à ce que le travail pour les app stores
+  soit planifié ; les intégrations de santé natives (HealthKit / Health Connect pour les pas) seront probablement
+  l’argument décisif.
+- **V1 bilingue.** Le produit sort en français et en anglais, comme le site marketing. `apps/web`
+  route déjà par `[locale]` ; le travail consiste à terminer les dictionnaires, pas à construire un système.
 
-## Nutrition knowledge — 2026-09-17
+## Connaissances nutritionnelles — 2026-09-17
 
-- **The food-composition source is CIQUAL, and the edition is pinned.** ANSES's
-  *Table de composition nutritionnelle des aliments Ciqual 2025* — 3 484 foods, 74 constituents,
-  257 816 composition values — imported into `foods` / `food_nutrients` behind the storage seam.
-  Published 19 November 2025 (data files dated 3 November 2025); DOI
-  [10.57745/RDMHWY](https://doi.org/10.57745/RDMHWY) on Recherche Data Gouv. It is the newest
-  edition: there is no 2026 table. The importer refuses an export whose component vocabulary does
-  not match the one the recommendation map was written against, so moving to a later edition is a
-  deliberate act rather than a silent one.
-- **Licence: Licence Ouverte 2.0 (Etalab)**, SPDX `etalab-2.0`. It grants reuse, adaptation and
-  redistribution — including commercially — on one condition: the source is named. So it is named
-  on every surface that shows one of its numbers, and the committed test subset carries its own
-  `LICENCE.md` with the citation of record. The full 75 MB export is not committed; the importer
-  takes it from wherever it was downloaded.
-- **The publisher's uncertainty is stored, not flattened.** CIQUAL writes `-` for a constituent it
-  never determined (83 246 cells), `traces` (2 514), and `< x` for a value below the limit of
-  quantification (20 075). Each value carries a marker beside it and the publisher's own string,
-  and ranking reads measured values only unless a caller opts in — `< 20 µg` is an upper bound, and
-  ranking it as 20 would put an unmeasured food above one measured at 5.
-- **The recommendation-to-component map is hand-written and stays that way.**
-  `packages/services/src/shared/nutrition.ts` maps French phrasing to CIQUAL component codes; no
-  model call is involved in deciding that « augmenter les protéines » means component 25000. Which
-  components Morgane's practice needs beyond the twelve it ships with is open, and the answer lands
-  in that file.
+- **La source de composition des aliments est CIQUAL, et l’édition est figée.** La
+  *Table de composition nutritionnelle des aliments Ciqual 2025* de l’ANSES — 3 484 aliments, 74 constituants,
+  257 816 valeurs de composition — importée dans `foods` / `food_nutrients` derrière le point de jonction du stockage.
+  Publiée le 19 novembre 2025 (fichiers de données datés du 3 novembre 2025) ; DOI
+  [10.57745/RDMHWY](https://doi.org/10.57745/RDMHWY) sur Recherche Data Gouv. C’est l’édition la plus récente :
+  il n’existe pas de table 2026. L’importeur refuse un export dont le vocabulaire de composants ne
+  correspond pas à celui sur lequel la correspondance des recommandations a été écrite ; passer à une édition ultérieure est donc
+  un acte délibéré plutôt que silencieux.
+- **Licence : Licence Ouverte 2.0 (Etalab)**, SPDX `etalab-2.0`. Elle accorde la réutilisation, l’adaptation et
+  la redistribution — y compris commerciale — à une seule condition : la source est nommée. Elle est donc nommée sur
+  chaque surface qui montre un de ses chiffres, et le sous-ensemble de test versionné porte son propre
+  `LICENCE.md` avec la citation de référence. L’export complet de 75 Mo n’est pas versionné ; l’importeur
+  le prend là où il a été téléchargé.
+- **L’incertitude de l’éditeur est stockée, non aplatie.** CIQUAL écrit `-` pour un constituant jamais
+  déterminé (83 246 cellules), `traces` (2 514), et `< x` pour une valeur sous la limite de
+  quantification (20 075). Chaque valeur porte à côté un marqueur et la chaîne exacte de l’éditeur, et
+  le classement ne lit que les valeurs mesurées sauf si l’appelant choisit autrement — `< 20 µg` est une borne supérieure, et
+  le classer comme 20 placerait un aliment non mesuré au-dessus d’un aliment mesuré à 5.
+- **La correspondance recommandation-composant est écrite à la main et le reste.**
+  `packages/services/src/shared/nutrition.ts` met en correspondance des formulations françaises et des codes de composants CIQUAL ; aucun
+  appel de modèle n’intervient pour décider que « augmenter les protéines » signifie le composant 25000. Les composants
+  dont la pratique de Morgane a besoin au-delà des douze livrés restent à définir, et la réponse arrivera dans
+  ce fichier.
 
-## Access control — 2026-08-13
+## Contrôle d’accès — 2026-08-13
 
-- **Operator access is a role, not a URL.** An `operator` role lands in the database and the backend
-  alongside `practitioner` and `patient`, and the admin console sits behind it. This supersedes the
-  platform decision of 2026-08-06, which leaned on Vercel deployment protection as the interim:
-  that tier covers preview deployments but, by design, not a production domain, and extending it to
-  production sits behind a paid add-on. The role is the thing that was wanted anyway — the interim
-  was only ever buying time until it existed.
-- **Confidential material does not live in a deployed app.** Commercial terms, the offer and
-  internal deliberations belong in the operator console and nowhere else. Nothing that would matter
-  if read goes into a site that is merely unlisted. This is a standing rule rather than a phase, and
-  it does not wait on the role above.
-- **The docs site is uncrawlable but publicly viewable.** `app/robots.ts` disallows everything and
-  the root layout sends `noindex`, so it stays out of search results. That is a publishing choice,
-  not an access control, and this site's content is written on that basis — figures live in the
-  console and this site carries the shape of a decision rather than its numbers.
+- **L’accès opérateur est un rôle, pas une URL.** Un rôle `operator` arrive dans la base de données et le backend
+  aux côtés de `practitioner` et `patient`, et la console d’administration se place derrière lui. Cela remplace la décision de plateforme
+  du 2026-08-06, qui s’appuyait sur la protection de déploiement Vercel comme solution provisoire :
+  ce niveau couvre les déploiements de préversion mais, par conception, pas un domaine de production, et l’étendre à la
+  production passe par un module complémentaire payant. Le rôle est ce qui était voulu de toute façon — la solution provisoire
+  ne servait qu’à gagner du temps jusqu’à son existence.
+- **Le matériel confidentiel ne vit pas dans une application déployée.** Les conditions commerciales, l’offre et
+  les délibérations internes appartiennent à la console opérateur et nulle part ailleurs. Rien de ce qui compterait
+  si c’était lu ne va dans un site simplement non listé. C’est une règle permanente et non une phase, et
+  elle n’attend pas le rôle ci-dessus.
+- **Le site de docs n’est pas explorable mais reste visible publiquement.** `app/robots.ts` interdit tout
+  et le layout racine envoie `noindex`, ce qui le tient hors des résultats de recherche. C’est un choix de publication,
+  pas un contrôle d’accès, et le contenu de ce site est écrit sur cette base — les chiffres vivent dans la
+  console et ce site porte la forme d’une décision plutôt que ses nombres.
 
-## Storage driver — 2026-09-17
+## Pilote de stockage — 2026-09-17
 
-- **Neon over the WebSocket driver, not the HTTP one.** The adapter
-  (`packages/services/src/db/adapters/neon.ts`) uses `@neondatabase/serverless`'s `Pool` with
-  `drizzle-orm/neon-serverless`, so the storage seam's `transaction()` issues a real
-  `BEGIN` / `COMMIT` / `ROLLBACK`. The HTTP driver has no interactive transactions: its
-  `transaction()` could only run the callback on the same client, which is a promise the seam's
-  own type makes and could not keep. The first service to write across tables in one unit —
-  recording a consultation, which writes a note, its check-ins, the instruction, the summary and
-  the preparation note or none of them — is what made that gap real rather than theoretical.
-- **A service takes the transaction's client as an argument.** `transaction(fn)` hands `fn` a
-  `DatabaseClient` bound to the open transaction; a service reaching `getDatabase()` instead would
-  silently write outside it. The five writes a consultation composes take that client as a trailing
-  optional argument, defaulting to the pooled one, so every other call site is unchanged. Adding a
-  service to a transaction means giving it that argument, not copying its logic into the caller.
-- **The pool is per module graph, and bounded for it.** Next.js gives every route bundle its own
-  copy of this package, so `registerDatabase()` runs once per graph and each one builds its own
-  pool. They are sized on that basis — small, with an idle timeout, and with an `error` listener,
-  because an idle connection dropped by Neon emits on the pool and an unhandled `error` event ends
-  the process.
+- **Neon par le pilote WebSocket, pas par le pilote HTTP.** L’adaptateur
+  (`packages/services/src/db/adapters/neon.ts`) utilise le `Pool` de `@neondatabase/serverless` avec
+  `drizzle-orm/neon-serverless`, de sorte que le `transaction()` du point de jonction du stockage émet de vrais
+  `BEGIN` / `COMMIT` / `ROLLBACK`. Le pilote HTTP n’a pas de transactions interactives : son
+  `transaction()` ne pouvait qu’exécuter le callback sur le même client, ce qui est une promesse que le type
+  du point de jonction fait et qu’il ne pouvait pas tenir. Le premier service à écrire dans plusieurs tables en une seule unité —
+  l’enregistrement d’une consultation, qui écrit une note, ses points de suivi, la consigne, le résumé et
+  la note de préparation, ou rien de tout cela — est ce qui a rendu cette lacune réelle plutôt que théorique.
+- **Un service reçoit en argument le client de la transaction.** `transaction(fn)` remet à `fn` un
+  `DatabaseClient` lié à la transaction ouverte ; un service qui appellerait `getDatabase()` à la place
+  écrirait silencieusement en dehors d’elle. Les cinq écritures que compose une consultation prennent ce client comme dernier
+  argument optionnel, par défaut le client poolé, de sorte que tous les autres sites d’appel sont inchangés. Ajouter un
+  service à une transaction signifie lui donner cet argument, pas copier sa logique chez l’appelant.
+- **Le pool est par graphe de modules, et borné en conséquence.** Next.js donne à chaque bundle de route sa propre
+  copie de ce package, si bien que `registerDatabase()` s’exécute une fois par graphe et que chacun construit son propre
+  pool. Ils sont dimensionnés sur cette base — petits, avec un délai d’inactivité, et avec un écouteur `error`,
+  car une connexion inactive coupée par Neon émet sur le pool et un événement `error` non géré met fin au
+  processus.
 
-## Files — 2026-09-24
+## Fichiers — 2026-09-24
 
-- **Vercel Blob behind a files seam** (decision D-18). `FileStore` in
-  `packages/services/src/files/` is the fourth seam, beside storage, email and AI; the one adapter
-  (`files/adapters/vercel-blob.ts`) is the only server file naming the vendor, and its browser
-  half is the only client code that does — the apps import `@remi/services/files/client` and
-  never name it. Registered lazily, through `@remi/services/server`, in both the console and the
-  patient link.
-- **A private store in an EU region.** Both are settings of the store, fixed when it is created
-  and not changeable afterwards; every call passes `access: "private"`, so nothing in it has a
-  public address. Each environment has its own store and its own `BLOB_READ_WRITE_TOKEN`
-  (`.icm/docs/ENV.md` § Files). Residency is the store's region; retention is the document's
-  life — a file is deleted when its document is removed, and every file of a patient is swept
-  from the store before the patient is deleted (`.icm/docs/RETENTION.md`).
-- **The rules are the seam's.** PDF, JPEG, PNG and WebP only, 10 MB each — carried on every
-  upload grant to the store, and checked again on the object that actually landed before any row
-  points at it; an object that fails is removed on the spot. Reads are signed URLs that live five
-  minutes, issued only after the caller proved the file is theirs: the operator's session in the
-  console, the patient's token on the link.
-- **Uploads go from the browser to the store.** A 10 MB body cannot pass through a server action
-  or a function on Vercel, so the server only answers the uploader's grant request — for a key
-  under that patient's prefix, `patients/<id>/` — and records the row afterwards. The store's
-  upload-completed callback is deliberately unused: it needs a public URL that preview protection
-  refuses, and the second check on the stored object does its job.
-- **A removal leaves the store first.** A document's file is deleted before its row, and a patient's
-  prefix before the patient; when the store refuses, nothing is deleted and the console says so.
-  Reopen this entry if patient volume or a residency requirement outgrows Blob's EU region.
-
+- **Vercel Blob derrière un point de jonction de fichiers** (décision D-18). `FileStore` dans
+  `packages/services/src/files/` est le quatrième point de jonction, aux côtés du stockage, de l’e-mail et de l’IA ; l’unique adaptateur
+  (`files/adapters/vercel-blob.ts`) est le seul fichier serveur qui nomme le fournisseur, et sa moitié navigateur
+  est le seul code client à le faire — les applications importent `@remi/services/files/client` et
+  ne le nomment jamais. Enregistré paresseusement, via `@remi/services/server`, dans la console comme dans le
+  lien patient.
+- **Un store privé dans une région UE.** Les deux sont des réglages du store, fixés à sa création
+  et non modifiables ensuite ; chaque appel passe `access: "private"`, de sorte que rien dedans n’a
+  d’adresse publique. Chaque environnement a son propre store et son propre `BLOB_READ_WRITE_TOKEN`
+  (`.icm/docs/ENV.md` § Files). La résidence est la région du store ; la conservation est la durée de vie
+  du document — un fichier est supprimé quand son document est retiré, et chaque fichier d’un patient est purgé
+  du store avant la suppression du patient (`.icm/docs/RETENTION.md`).
+- **Les règles sont celles du point de jonction.** PDF, JPEG, PNG et WebP uniquement, 10 Mo chacun — portées par chaque
+  autorisation d’envoi vers le store, et revérifiées sur l’objet effectivement arrivé avant qu’aucune ligne
+  ne le référence ; un objet qui échoue est retiré sur-le-champ. Les lectures passent par des URL signées qui durent cinq
+  minutes, émises seulement après que l’appelant a prouvé que le fichier est le sien : la session de l’opérateur dans la
+  console, le jeton du patient sur le lien.
+- **Les envois vont du navigateur au store.** Un corps de 10 Mo ne peut pas passer par une action serveur
+  ni par une fonction sur Vercel, si bien que le serveur ne fait que répondre à la demande d’autorisation de l’envoyeur — pour une clé
+  sous le préfixe de ce patient, `patients/<id>/` — et enregistre la ligne ensuite. Le callback de fin d’envoi
+  du store est volontairement inutilisé : il exige une URL publique que la protection des préversions
+  refuse, et la seconde vérification sur l’objet stocké fait son travail.
+- **Une suppression quitte d’abord le store.** Le fichier d’un document est supprimé avant sa ligne, et le préfixe d’un patient
+  avant le patient ; quand le store refuse, rien n’est supprimé et la console le dit.
+  Rouvrir cette entrée si le volume de patients ou une exigence de résidence dépasse la région UE de Blob.

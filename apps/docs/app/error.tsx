@@ -59,15 +59,15 @@ type Props = {
 
 const ErrorBoundary = ({ error, reset }: Props) => (
   <div style={wrapStyle}>
-    <span style={eyebrowStyle}>Error</span>
-    <h1 style={headingStyle}>This page did not load</h1>
+    <span style={eyebrowStyle}>Erreur</span>
+    <h1 style={headingStyle}>Cette page ne s’est pas chargée</h1>
     <p style={bodyStyle}>
-      The reference is still there — something on our side failed on the way to
-      it. Try again, and quote the reference below if it keeps happening.
+      La référence est toujours là — quelque chose a échoué de notre côté en
+      chemin. Réessayez, et citez la référence ci-dessous si cela se reproduit.
     </p>
     {error.digest ? <span style={eyebrowStyle}>{error.digest}</span> : null}
     <button type="button" onClick={reset} style={buttonStyle}>
-      Try again
+      Réessayer
     </button>
   </div>
 );

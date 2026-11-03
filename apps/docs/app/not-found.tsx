@@ -11,7 +11,7 @@ import type { CSSProperties } from "react";
  */
 
 export const metadata = {
-  title: "Page not found",
+  title: "Page introuvable",
 };
 
 const wrapStyle: CSSProperties = {
@@ -48,13 +48,13 @@ const bodyStyle: CSSProperties = {
 const NotFound = () => (
   <div style={wrapStyle}>
     <span style={eyebrowStyle}>404</span>
-    <h1 style={headingStyle}>This page does not exist</h1>
+    <h1 style={headingStyle}>Cette page n’existe pas</h1>
     <p style={bodyStyle}>
-      The reference moves as the product does, so a page here can be renamed or
-      folded into another. Start from the overview, or use search — every page
-      is indexed.
+      La référence évolue avec le produit : une page peut donc être renommée ou
+      fusionnée dans une autre. Partez de la vue d’ensemble, ou utilisez la
+      recherche — chaque page est indexée.
     </p>
-    <a href="/">Back to the overview</a>
+    <a href="/">Retour à la vue d’ensemble</a>
   </div>
 );
 

@@ -1,29 +1,31 @@
 # REMI
 
-The canonical reference for what REMI is, who it serves, and how it is built. Two halves, and
-the split matters — the pipeline routes each stage to one or the other, never to "the docs".
+La référence canonique de ce qu’est REMI, de qui il sert et de la façon dont il est construit. Deux moitiés, et
+la séparation compte : le pipeline route chaque étape vers l’une ou l’autre, jamais vers « les docs ».
 
-## Business
+## Direction
 
-Direction and product truth. What we are building and why now. The Scope and Define stages read
-here for vocabulary and the why-now; Ship updates it when user-facing behaviour changes.
+L’orientation et la vérité produit. Ce que nous construisons et pourquoi maintenant. Les étapes Scope et Define lisent
+ici le vocabulaire et le pourquoi-maintenant ; Ship le met à jour quand le comportement visible par l’utilisateur change.
 
-- **Initiatives** — the strategy the current work ladders up to
-- **V2 scope** — the frozen feature list, and what is explicitly out of it
-- **Roles** — who the product serves and what each of them can see and do
+- **Business model et OKR** — la vision, le lean canvas, les milestones 2026–2027 et les OKR de novembre 2026 à février 2027
+- **Roadmap produit** — les trois phases, du MVP patient au pilote praticiens et aux versions futures
+- **Base de connaissances génotypes** — ce que le moteur de recettes doit comprendre des profils APOE, DIO2, AMY1A et LCT
+- **Brief de la landing page** — le brief qui définit le site public, ses deux offres pilotes et ses parcours d’inscription
+- **Rôles** — qui le produit sert et ce que chacun peut voir et faire
 
-## Technical
+## Technique
 
-How the repository is put together. The Build stage reads here to find where code lives and which
-entrypoint to import; Ship updates it when the architecture changes.
+Comment le dépôt est organisé. L’étape Build lit ici pour trouver où vit le code et quel
+point d’entrée importer ; Ship le met à jour quand l’architecture change.
 
-- **Architecture** — repository structure, technology stack, how a request flows
-- **Applications** — the four apps and what each is for
-- **Packages** — `@remi/ui` and `@remi/services`, and their entrypoints
-- **Development** — workflow, build system, CI/CD
+- **Architecture** — structure du dépôt, pile technologique, trajet d’une requête
+- **Applications** — les quatre applications et l’usage de chacune
+- **Packages** — `@remi/ui` et `@remi/services`, et leurs points d’entrée
+- **Développement** — flux de travail, système de build, CI/CD
 
-## What is *not* here
+## Ce qui n’est *pas* ici
 
-Code conventions. They are canonical in [`CONVENTIONS.md`](https://github.com/k0d0minio/remi-ai/blob/main/CONVENTIONS.md)
-at the repo root, plus the per-subtree `AGENTS.md` files — one home, so a rule can never disagree
-with itself. This site covers product direction and architecture only.
+Les conventions de code. Elles font foi dans [`CONVENTIONS.md`](https://github.com/k0d0minio/remi-ai/blob/main/CONVENTIONS.md)
+à la racine du dépôt, plus les fichiers `AGENTS.md` de chaque sous-arbre — un seul foyer, pour qu’une règle ne puisse jamais
+se contredire. Ce site couvre uniquement l’orientation du produit et l’architecture.

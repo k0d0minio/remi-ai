@@ -1,63 +1,63 @@
 # Packages
 
-Two packages, and the dependency arrow only ever points **app → package**.
+Deux packages, et la flèche de dépendance ne pointe jamais que **application → package**.
 
-Each package's full rules live beside its code, and that is the copy to trust: `packages/ui/AGENTS.md`
-and `packages/services/AGENTS.md` change in the same commit as the thing they describe. This page is
-the orientation — what each package is for, and the one fact about each that is easy to get wrong.
+Les règles complètes de chaque package vivent à côté de son code, et c’est cette copie qui fait foi : `packages/ui/AGENTS.md`
+et `packages/services/AGENTS.md` changent dans le même commit que ce qu’ils décrivent. Cette page est
+l’orientation — à quoi sert chaque package, et le seul fait à son sujet sur lequel on se trompe facilement.
 
 ## `@remi/ui`
 
-Every primitive shared across apps. shadcn/ui New York over Radix, Tailwind 4.
+Toutes les primitives partagées entre applications. shadcn/ui New York sur Radix, Tailwind 4.
 
-`tsup.config.ts` emits **four** build units, and every split is load-bearing:
+`tsup.config.ts` produit **quatre** unités de build, et chaque découpage est porteur :
 
-| Import path       | Banner         | Callable from         |
-| ----------------- | -------------- | --------------------- |
-| `@remi/ui`        | `"use client"` | client components     |
-| `@remi/ui/server` | none           | server **and** client |
-| `@remi/ui/utils`  | none           | server **and** client |
-| `@remi/ui/motion` | `"use client"` | client components     |
+| Chemin d’import   | Bannière       | Appelable depuis       |
+| ----------------- | -------------- | ---------------------- |
+| `@remi/ui`        | `"use client"` | composants client      |
+| `@remi/ui/server` | aucune         | serveur **et** client  |
+| `@remi/ui/utils`  | aucune         | serveur **et** client  |
+| `@remi/ui/motion` | `"use client"` | composants client      |
 
-`cn()` lives on `/utils`. Merging that entry into the barrel breaks `cn()` in every server component
-in the repo; merging `/server` into it gives up RSC on the marketing site. tsup **bundles** each
-entry, so what an entry can reach it inlines — the two import directions that silently break the
-split are documented in `packages/ui/AGENTS.md` and enforced by `no-restricted-imports` zones in
+`cn()` vit sur `/utils`. Fusionner cette entrée dans le barrel casse `cn()` dans chaque composant serveur
+du dépôt ; fusionner `/server` dedans fait renoncer aux RSC sur le site marketing. tsup **embarque** chaque
+entrée, si bien que tout ce qu’une entrée peut atteindre y est intégré — les deux sens d’import qui cassent
+silencieusement le découpage sont documentés dans `packages/ui/AGENTS.md` et appliqués par des zones `no-restricted-imports` dans
 `eslint.config.ts`.
 
-Tokens ship as two stylesheets: `@remi/ui/tokens.css` (raw, no Tailwind — what every app in this
-repo imports) and `@remi/ui/globals.css` (a standalone Tailwind + tokens build, for a consumer that
-runs no Tailwind pass of its own). Apps never redefine a token.
+Les tokens sont livrés en deux feuilles de style : `@remi/ui/tokens.css` (brute, sans Tailwind — celle que chaque application de ce
+dépôt importe) et `@remi/ui/globals.css` (un build Tailwind + tokens autonome, pour un consommateur qui
+n’exécute aucune passe Tailwind de son côté). Les applications ne redéfinissent jamais un token.
 
 ## `@remi/services`
 
-Storage, email, AI, and the environment reader. Each is a **seam**, not an integration: an interface
-plus a `register*()` call, with the concrete adapter registered once at process start by the app that
-owns the process. Only email has picked a vendor so far (Resend), so choosing a database or an AI
-provider later is a new file plus one registration line — never a rewrite of the callers. The seam
-table — interface, registration call, and what happens when nothing is registered — is in
+Le stockage, l’e-mail, l’IA et le lecteur d’environnement. Chacun est un **point de jonction**, pas une intégration : une interface
+plus un appel `register*()`, l’adaptateur concret étant enregistré une seule fois au démarrage du processus par l’application qui
+possède le processus. Seul l’e-mail a retenu un fournisseur jusqu’ici (Resend) ; choisir plus tard une base de données ou un fournisseur
+d’IA revient donc à un nouveau fichier plus une ligne d’enregistrement — jamais à une réécriture des appelants. Le tableau
+des points de jonction — interface, appel d’enregistrement, et ce qui se passe quand rien n’est enregistré — se trouve dans
 `packages/services/AGENTS.md`.
 
-Pick the entrypoint that matches where the code runs:
+Choisissez le point d’entrée qui correspond à l’endroit où le code s’exécute :
 
-| Import                  | Runs on          |
-| ----------------------- | ---------------- |
-| `@remi/services/shared` | browser + server |
-| `@remi/services/server` | server only      |
-| `@remi/services/db`     | server only      |
-| `@remi/services/ai`     | server only      |
-| `@remi/services/email`  | server only      |
+| Import                  | S’exécute sur         |
+| ----------------------- | --------------------- |
+| `@remi/services/shared` | navigateur + serveur  |
+| `@remi/services/server` | serveur uniquement    |
+| `@remi/services/db`     | serveur uniquement    |
+| `@remi/services/ai`     | serveur uniquement    |
+| `@remi/services/email`  | serveur uniquement    |
 
-The root `@remi/services` barrel is types-only and apps are lint-blocked from importing it, so the
-choice is always explicit at the call site. What each entrypoint carries, and why a seam's registry
-belongs to the entrypoint you reached it through, are in `packages/services/AGENTS.md`.
+Le barrel racine `@remi/services` ne contient que des types, et le lint interdit aux applications de l’importer ; le
+choix est donc toujours explicite à l’endroit de l’appel. Ce que porte chaque point d’entrée, et pourquoi le registre d’un point de jonction
+appartient au point d’entrée par lequel on l’a atteint, se trouve dans `packages/services/AGENTS.md`.
 
-`patientContextText()` is the one export that sits on two of them. It assembles a patient's
-pseudonymous context — profile, goals, the current instruction, active recommendations, supplements
-and essentials — into the plain French text an AI prompt opens with, and it is a pure function: no
-I/O, no clock, no provider. It lives under `src/ai/` because that is what it is for, and it is
-re-exported from `/shared` as well as `/ai` and `/server` because it is genuinely isomorphic — the
-console re-assembles the text in the browser as the operator edits it, and reaching it through
-`/ai` from a client component would pull the provider seam into that bundle. Its input type has no
-field for a real name, an email or a share token, so pseudonymity is a property of the signature
-rather than of the caller's memory.
+`patientContextText()` est le seul export qui se trouve sur deux d’entre eux. Il assemble le contexte
+pseudonymisé d’un patient — profil, objectifs, consigne courante, recommandations actives, suppléments
+et essentiels — en texte français simple, par lequel s’ouvre un prompt d’IA, et c’est une fonction pure : pas
+d’E/S, pas d’horloge, pas de fournisseur. Il vit sous `src/ai/` parce que c’est son usage, et il est
+réexporté depuis `/shared` ainsi que depuis `/ai` et `/server` parce qu’il est réellement isomorphe — la
+console réassemble le texte dans le navigateur pendant que l’opérateur le modifie, et l’atteindre par
+`/ai` depuis un composant client ferait entrer le point de jonction du fournisseur dans ce bundle. Son type d’entrée n’a
+aucun champ pour un vrai nom, un e-mail ou un jeton de partage : la pseudonymisation est donc une propriété de la signature
+plutôt que de la mémoire de l’appelant.

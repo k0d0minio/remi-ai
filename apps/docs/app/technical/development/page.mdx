@@ -1,37 +1,37 @@
-# Development
+# Développement
 
-## Getting started
+## Démarrage
 
 ```bash
 pnpm install
-pnpm packages:build   # @remi/ui and @remi/services must exist before an app can compile
-pnpm web:dev          # or admin:dev / marketing:dev / docs:dev
+pnpm packages:build   # @remi/ui et @remi/services doivent exister avant qu'une application compile
+pnpm web:dev          # ou admin:dev / marketing:dev / docs:dev
 ```
 
-`turbo run dev` declares `dependsOn: ["^build"]`, so a bare `pnpm dev` builds the packages first.
-Run `pnpm packages:dev` in a second terminal to rebuild them on change.
+`turbo run dev` déclare `dependsOn: ["^build"]` : un simple `pnpm dev` construit donc d’abord les packages.
+Lancez `pnpm packages:dev` dans un second terminal pour les reconstruire à chaque modification.
 
-## The factory owns the checks
+## L’usine possède les contrôles
 
-Format, lint, typecheck and build are deterministic, non-AI work. They belong to Husky, CI and the
-Vercel preview — not to a session's context window. An agent working in this repo is blocked from
-running them locally by `.claude/hooks/block-local-checks.sh`: push, then read the result back from
-the PR's check runs.
+Le formatage, le lint, le typecheck et le build sont un travail déterministe, sans IA. Ils appartiennent à Husky, à la CI et à
+la préversion Vercel — pas à la fenêtre de contexte d’une session. Un agent qui travaille dans ce dépôt ne peut pas
+les lancer en local : `.claude/hooks/block-local-checks.sh` le bloque. On pousse, puis on relit le résultat dans les
+check runs de la PR.
 
-Which check runs where is one table, and it lives in `/CONVENTIONS.md` § "The factory owns the
-checks — you do not". It is not copied here, because a second copy is how the two start
-disagreeing.
+Quel contrôle tourne où tient dans un seul tableau, qui vit dans `/CONVENTIONS.md` § « The factory owns the
+checks — you do not ». Il n’est pas recopié ici, car une seconde copie est la façon dont les deux se mettent à
+diverger.
 
 ## CI/CD
 
-Every app deploys from its own Vercel project, gated by `turbo-ignore` so a change to `apps/docs`
-does not rebuild `apps/web`. The Turborepo remote cache is shared between CI and Vercel, so the
-package builds CI needs for `typecheck` are usually restored rather than recompiled.
+Chaque application se déploie depuis son propre projet Vercel, filtré par `turbo-ignore` pour qu’une modification de `apps/docs`
+ne reconstruise pas `apps/web`. Le cache distant Turborepo est partagé entre la CI et Vercel : les
+builds de packages dont la CI a besoin pour `typecheck` sont donc le plus souvent restaurés plutôt que recompilés.
 
-## Delivery
+## Livraison
 
-Work reaches `main` through the pipeline. `/pipeline scope` settles a request with the operator into
-`scope.md` and cuts the intake batch; then, per stub, `new` → `build` → `release` — one feature PR,
-two human gates (Spec approved, Ready to merge), and a squash-merge that carries the run's record and
-its archive. A `bug` / `tweak` / `chore` fast lane skips the front and ends in a PR the operator
-merges; `knowledge` changes one of these pages outside a Release. See `.icm/CONTEXT.md`.
+Le travail atteint `main` par le pipeline. `/pipeline scope` règle une demande avec l’opérateur dans
+`scope.md` et découpe le lot d’intake ; ensuite, par ébauche, `new` → `build` → `release` — une PR de fonctionnalité,
+deux portes humaines (Spec approved, Ready to merge), et un squash-merge qui emporte le dossier du run et
+son archive. Une voie rapide `bug` / `tweak` / `chore` saute le début et se termine par une PR que l’opérateur
+fusionne ; `knowledge` modifie une de ces pages en dehors d’une Release. Voir `.icm/CONTEXT.md`.

@@ -14,7 +14,7 @@ const CHANGELOG_ROUTE = "/changelog";
  * and a descending sort on it is chronological — newest first whatever order
  * `_meta.ts` happens to be in, and correct for an entry nobody registered there.
  */
-const dateFormat = new Intl.DateTimeFormat("en-GB", {
+const dateFormat = new Intl.DateTimeFormat("fr-BE", {
   day: "numeric",
   month: "long",
   year: "numeric",

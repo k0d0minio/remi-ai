@@ -1,0 +1,135 @@
+# Base de connaissances génotypes
+
+Ce que le moteur de recettes doit comprendre des profils APOE, DIO2, AMY1A et LCT avant de proposer
+une recette, et la frontière entre le savoir du livre et le paramétrage REMI. Écrit par Morgane
+Paquet et repris ici tel quel. Build lit cette page quand il touche au moteur de recettes ou aux
+recommandations.
+
+Base de connaissances destinée au moteur de recettes et à Jamie Nisbet · Dr Georges Mouton & Julie Lioré, _Je mange selon mes génotypes_, Exuvie, 2024 · Références : pages imprimées du livre.
+
+Principe de traçabilité : les explications biologiques et orientations attribuées au Dr Mouton proviennent exclusivement du livre. Les pourcentages, validations, formules et comportements applicatifs proviennent des deux fichiers REMI joints et ne sont pas attribués au livre. Ce document ne certifie pas ces recommandations comme médicalement démontrées.
+
+## 1. Ce que REMI doit comprendre avant toute recette
+
+La proposition de l’auteur est de moduler prioritairement l’équilibre entre graisses et glucides selon trois profils : APOE, DIO2 et AMY1A. Les protéines ne constituent pas, dans le schéma 2A, le curseur principal d’ajustement. Le quatrième profil, LCT (ou MCM6 selon le compte rendu de laboratoire), concerne la digestion du lactose et la sélection d’ingrédients, pas l’indice gluco-lipidique. Livre p. 124-129.
+
+L’indice gluco-lipidique du schéma 3B est un classement des orientations allant de 1 (plus riche en graisses) à 98 (moins riche en graisses), les positions 99-100 correspondant au profil APOE E2/E4 exclu de l’arbitrage. Ce n’est pas une proportion énergétique ni un nombre de grammes. Le Dr Mouton précise que son arbitrage comprend son expérience professionnelle et une part arbitraire. Livre p. 132-139.
+
+Pour REMI, les fourchettes en % sont les cibles indicatives du classeur utilisateur et non des chiffres formulés dans le livre. Elles servent à orienter les recettes proposées, sans imposer une recette parfaite. Les apports protéiques, calories, chrononutrition, jeûne et restrictions continuent à relever des recommandations validées du praticien. Source : Recommandations alimentaires, p. 1-5.
+
+## 2. Rôles séparés des quatre systèmes
+
+### 2.1 APOE : le point de départ de l’orientation graisses/glucides
+
+Le gène APOE code l’apolipoprotéine E, protéine participant au transport des lipides et au métabolisme des lipoprotéines. Trois allèles majeurs E2, E3 et E4 donnent six combinaisons. Le Dr Mouton classe E2/E3 du côté E2 et E3/E4 du côté E4 ; E2/E4 est un cas particulier pour lequel il recommande de se fier aux marqueurs métaboliques plutôt qu’au schéma. Livre p. 35-38.
+
+APOE E4 : le livre privilégie une proportion plus élevée de végétaux et de glucides que chez les E2/E3, avec vigilance sur les graisses saturées et trans et les produits laitiers gras ; il mentionne les produits de la mer, œufs et volailles comme options favorables, et décrit une orientation flexitarienne individualisée au regard du profil lipidique. Il ne préconise pas de supprimer toutes les graisses. Livre p. 38-42.
+
+APOE E3 : l’auteur décrit une alimentation high-fat/low-carb, proche d’une diète méditerranéenne enrichie en graisses, avec légumes, lipides mono- et polyinsaturés et glucides issus notamment de légumineuses et tubercules sans excès. Il ne présente pas le cétogène prolongé comme nécessaire à tous. Livre p. 42-43.
+
+APOE E2 : l’auteur propose une orientation very high-fat/very low-carb dite « proto-cétogène », à adapter progressivement et individuellement, sans cétogenèse systématique. Livre p. 43-45. Important : l’auteur reconnaît explicitement qu’à sa connaissance la recommandation de manger très gras chez E2 n’a pas fait l’objet de publications scientifiques directes. Livre p. 142-143.
+
+Traduction REMI : sélectionner l’orientation du profil complet figurant dans le tableau utilisateur, sans déduire seul une limite chiffrée de graisses saturées ni diagnostiquer un risque. Appliquer les exclusions et les orientations du praticien en priorité.
+
+### 2.2 DIO2 : une hypothèse de tolérance glucidique via la conversion thyroïdienne
+
+DIO2 est le gène codant la déiodinase de type 2, enzyme impliquée dans la conversion de T4 en hormone thyroïdienne active T3 dans différents tissus. Le livre répartit les profils en A (ancestral, conversion décrite comme moins favorable), H (intermédiaire) et M (moderne, conversion décrite comme plus favorable). Livre p. 49-55.
+
+Selon le Dr Mouton, un profil ancestral justifie d’envisager moins de glucides et davantage de graisses, notamment si HbA1c ou insuline sont élevées ; un profil moderne offre davantage de latitude glucidique. Il insiste sur les dosages thyroïdiens et les cofacteurs, et sur la nécessité d’une évaluation clinique ; la présence du génotype ne démontre pas une intolérance alimentaire. Livre p. 52-55.
+
+Traduction REMI : DIO2 module uniquement la position à l’intérieur du classement conjoint APOE-DIO2-AMY1A déjà consigné dans le tableau. Ne jamais calculer automatiquement une dose hormonale, prescrire un nutriment, diagnostiquer une hypothyroïdie ou imposer une restriction spécifique sur la seule base du résultat.
+
+### 2.3 AMY1A : quantité d’amylase salivaire et place des amidons
+
+L’amylase salivaire (alpha-amylase) initie, dans la bouche, la dégradation des amidons ; AMY1A est l’appellation employée dans le livre pour la partie salivaire, à distinguer de l’amylase pancréatique AMY2. L’auteur met l’accent sur les variations du nombre de copies (CNV), plutôt que sur un seul SNP, et sur la mastication. Livre p. 65-69.
+
+Selon le livre, un faible nombre de copies (profil A) s’associe à une moindre capacité de prédigestion des amidons, H à un profil intermédiaire, M à davantage de copies et à une plus grande adaptation aux aliments amylacés. Les céréales, légumineuses, tubercules et racines farineuses sont les exemples d’aliments concernés. L’auteur envisage de limiter fortement les amidons pour les profils peu dotés en copies ; il souligne toutefois que ce génotype reste en cours d’exploration. Livre p. 65-72.
+
+Traduction REMI : lorsque le profil génétique complet appelle moins de glucides, réduire en priorité la proportion des sources d’amidon dans les recettes, tout en préservant les ingrédients autorisés et les besoins du patient. Ne pas convertir un A/H/M en nombre exact de copies et ne pas supposer qu’un nombre de copies seul définit la part calorique de glucides.
+
+### 2.4 LCT / MCM6 : tolérance au lactose, indépendamment des ratios
+
+La lactase est une enzyme intestinale qui coupe le lactose du lait en glucose et galactose. Le livre présente LCT A/A comme une absence de persistance de lactase à l’âge adulte ; A/M et M/M comme des profils généralement capables de digérer le lactose, avec possibles différences de tolérance individuelle. Il précise que le résultat peut être libellé « MCM6 », région régulatrice influençant l’expression du gène LCT. Livre p. 57-59 et 126-127.
+
+Les aliments laitiers ont des teneurs en lactose différentes : les fromages à pâte dure affinés sont présentés comme pauvres en lactose, tandis que lait, yaourts, fromages frais et lactosérum nécessitent davantage d’attention. Livre p. 58-60. L’auteur distingue aussi le lactose des protéines du lait (caséines, protéines du lactosérum), auxquelles on peut réagir séparément. Livre p. 60-63.
+
+Traduction REMI : LCT ne déplace jamais l’indice gluco-lipidique. Il informe une vigilance ou une préférence sur les ingrédients contenant du lactose. Une allergie aux protéines du lait ou une éviction imposée par le praticien prime sur toute tolérance génétique ; un lait « sans lactose » n’est pas sans protéines du lait. Ne jamais annoncer qu’un ingrédient est sûr sur la seule base du génotype.
+
+## 3. Comment utiliser les résultats génétiques ensemble
+
+Le Dr Mouton attribue la prépondérance à APOE, puis affine avec DIO2 et AMY1A, selon les combinaisons du schéma 3B. Il exclut APOE E2/E4 et recommande de regarder les marqueurs métaboliques. Il mentionne deux combinaisons omises du schéma et préconise de se reporter aux profils H correspondants : E2/E2 + DIO2 H + AMY1A M vers AMY1A H, et E3/E4 + DIO2 A + AMY1A M vers AMY1A H. Livre p. 132-139.
+
+Si une composante du trio n’est pas fournie, le livre ne donne pas de méthode de reconstitution d’un indice complet. Ne pas inférer les autres génotypes, appliquer une moyenne ou recalculer un indice. Dans le MVP, le classeur et le document de recommandations définissent un profil méditerranéen par défaut quand les génotypes sont absents ; il s’agit d’une règle REMI, pas du livre.
+
+## 4. Informations opérationnelles utiles à la génération de recettes
+
+| Information | Ce que REMI en fait | Source / statut |
+| --- | --- | --- |
+| APOE, DIO2, AMY1A complets | Rechercher une ligne exacte du classeur et récupérer orientation et fourchettes indicatives. | Schéma 3B du livre pour indice ; Excel REMI pour %. |
+| Indice | Afficher ou conserver un rang d’orientation ; jamais le lire comme un %. | Livre p. 132-139. |
+| LCT/MCM6 | Informer sélection d’ingrédients avec lactose ; aucune modification directe des macros. | Livre p. 57-63, 126-127. |
+| Protéines g/j et énergie | Utiliser les cibles validées par le praticien, non déduites des génotypes. | Recommandations alimentaires p. 1-4. |
+| Moment du repas | Respecter chrononutrition souple et éventuelle suppression d’un repas si décidée. | Recommandations alimentaires p. 4-5. |
+| Favoriser / limiter / éviction | Appliquer les listes validées ; l’éviction totale est prioritaire. | Recommandations alimentaires p. 5-6. |
+| Génotype absent / ambigu | Ne pas reconstituer de profil ni faire passer une hypothèse pour une certitude. | Livre p. 20-23, 132-139 ; procédure REMI p. 4. |
+
+## 5. Exemples de consignes compréhensibles par le moteur
+
+CAS A. Si la ligne génétique indique une orientation plutôt riche en graisses, alors privilégier, parmi les aliments autorisés, des recettes où la part des glucides est relativement plus faible. Pourquoi : c’est le sens du curseur gluco-lipidique de l’auteur. Ne pas en déduire un % exact du livre. Livre p. 124-125, 132-139.
+
+CAS B. Si APOE E3/E4 ou E4/E4 est présent, alors tenir compte de la prudence exprimée dans le livre à propos des graisses saturées et des produits laitiers gras, sans créer une éviction automatique non prescrite. Livre p. 38-42.
+
+CAS C. Si AMY1A A et orientation pauvre en glucides, alors veiller particulièrement aux portions de féculents (céréales, tubercules, racines et légumineuses riches en amidon) dans les recettes proposées. Justification : interprétation de l’auteur sur amylase salivaire et amidons. Livre p. 65-71.
+
+CAS D. Si résultat LCT A/A confirmé, alors signaler les sources significatives de lactose et privilégier, selon validation du praticien, les possibilités pauvres en lactose. Cela ne résout pas une allergie aux protéines laitières. Livre p. 57-63 et 126-127.
+
+CAS E. Si APOE E2/E4, alors ne pas assigner automatiquement une proportion lipidique/glucidique fondée sur l’indice 99-100 ; le livre classe ce profil à part et renvoie aux marqueurs métaboliques. Livre p. 36, 132-139.
+
+## 6. Frontière entre savoir du livre et paramétrage REMI
+
+| Connaissance du Dr Mouton | Décision prise dans les documents REMI |
+| --- | --- |
+| Le curseur classe les profils de plus gras à plus glucidique, sans % chiffré. | Le classeur ajoute des plages de glucides, lipides et protéines. |
+| Les protéines ne sont pas la variable principale de l’indice. | La procédure REMI calcule d’abord des besoins protéiques en g/jour et autorise correction praticien. |
+| Les génotypes doivent être rapprochés de la clinique et des bilans. | REMI prévoit « validation médicale » Oui / Selon praticien / Non. |
+| Le livre ne propose pas de score de conformité des recettes ni de tolérance numérique. | REMI souhaite une tendance globale, non un ratio exact à chaque repas. |
+| LCT a trait à la digestion du lactose, pas à l’indice principal. | REMI applique les évictions et allergies selon la procédure de recommandations. |
+
+Point d’attention de calcul : si les fourchettes de macros ne totalisent pas exactement 100 % pour des valeurs prises indépendamment, aucune méthode de normalisation ne doit être attribuée au Dr Mouton. Les protéines en grammes validées par le praticien et les pourcentages proposés dans le classeur peuvent parfois entrer en conflit ; le logiciel doit remonter ce conflit au praticien plutôt que trancher en invoquant le livre.
+
+## Tableau fonctionnel joint : transcription des 28 profils
+
+Les 28 lignes qui suivent reproduisent les champs et valeurs du fichier Excel fourni. Ces proportions sont des paramètres REMI indicatifs, et non des pourcentages publiés dans le livre. A/H/M = ancestral / hétérozygote / moderne. Les deux lignes indiquées « analogie » doivent demeurer identifiées comme telles.
+
+| APOE | DIO2 | AMY1A | Indice (Excel) | Orientation (Excel) | G % | L % | P % |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| E2/E2 | A/H/M | A/H/M | 1 | Cétogène | 5–10 | 65–75 | 20–25 |
+| E2/E3 | A | A/H/M | 2 | Cétogène | 5–12 | 63–75 | 20–25 |
+| E2/E3 | H | A | 3→3,5←4 | Cétogène | 6–12 | 63–74 | 20–25 |
+| E2/E3 | H | H | 5→5,5←6 | Très gras | 8–15 | 60–72 | 20–25 |
+| E2/E3 | H | M | 5→5,5←6 (copie de H/H, par analogie) | Très gras | 8–15 | 60–72 | 20–25 |
+| E2/E3 | M | A | 7→7,5←8 | Très gras | 10–18 | 57–70 | 20–25 |
+| E2/E3 | M | H | 9 | Très gras | 12–20 | 55–68 | 20–25 |
+| E2/E3 | M | M | 10 | Fort Gras | 15–22 | 53–65 | 20–25 |
+| E3/E3 | A | A | 11→13←15 | Fort Gras | 10–20 | 55–70 | 20–25 |
+| E3/E3 | A | H | 16→17←18 | Gras | 12–22 | 53–66 | 20–25 |
+| E3/E3 | H | A | 19→27,5←36 | Gras | 15–25 | 50–60 | 20–25 |
+| E3/E3 | A | M | 37 | Assez gras | 20–28 | 47–55 | 20–25 |
+| E3/E3 | H | H | 38→43←48 | Modéré côté graisse | 22–32 | 43–58 | 20–25 |
+| E3/E3 | M | A | 49→55,5←62 | Modéré (milieu de flèche) | 25–35 | 40–55 | 20–25 |
+| E3/E3 | M | H | 63→67←71 | Modéré | 28–38 | 37–52 | 20–25 |
+| E3/E4 | A | A | 72→72,5←73 | Plus glucides / moins graisses | 30–40 | 35–45 | 20–25 |
+| E3/E3 | H | M | 74→74,5←75 | Plutôt glucides (reste modéré) | 32–42 | 33–45 | 20–25 |
+| E3/E3 | M | M | 76→76,5←77 | Plus Glucidique | 34–44 | 31–46 | 20–25 |
+| E3/E4 | A | H | 78 | Glucidique | 35–45 | 30–45 | 20–25 |
+| E3/E4 | A | M | 78 (règle du livre p. 139 : voir A/H) | Glucidique | 35–45 | 30–45 | 20–25 |
+| E3/E4 | H | A | 79→81,5←84 | Glucidique | 36–48 | 27–44 | 20–25 |
+| E3/E4 | H | H | 85→86←87 | Glucidique marqué | 38–50 | 25–42 | 20–25 |
+| E3/E4 | M | A | 88→90←92 | Riche en glucides | 40–55 | 20–40 | 20–25 |
+| E3/E4 | H | M | 93 | Riche en glucides | 45–55 | 20–35 | 20–25 |
+| E3/E4 | M | H | 94→94,5←95 | Fort glucidique | 48–58 | 17–32 | 20–25 |
+| E3/E4 | M | M | 96 | Flexitarien, pas de graisse saturée | 50–60 | 15–30 | 20–25 |
+| E4/E4 | A/H/M | A/H/M | 97→97,5←98 | Flexitarien, pas de graisse saturée | 50–60 | 15–30 | 20–25 |
+| E2/E4 | A/H/M | A/H/M | 99–100 (cas exclu des schémas ; très rare) | Inclassable → se fier aux marqueurs | non spécifié | non spécifié | 20–25 |
+
+Source de tous les mécanismes attribués à l’auteur : Dr Georges Mouton et Julie Lioré, _Je mange selon mes génotypes_, Exuvie (2024). Toute règle applicative ou valeur provenant du fichier « Recommandations alimentaires » ou du classeur Excel doit être conservée dans une couche distincte de la base de connaissances.

@@ -1,66 +1,66 @@
 # Applications
 
-Four apps, one Vercel project each, one port each. Every app that renders product UI consumes
-`@remi/ui` and owns no primitives of its own.
+Quatre applications, un projet Vercel chacune, un port chacune. Toute application qui affiche une interface produit consomme
+`@remi/ui` et ne possède aucune primitive en propre.
 
-| App         | Package           | Port | Auth | Data                    | Purpose                                  |
-| ----------- | ----------------- | ---- | ---- | ----------------------- | ---------------------------------------- |
-| `web`       | `@remi/web`       | 3000 | yes  | `@remi/services/server` | The product. Signed-in surface.          |
-| `marketing` | `@remi/marketing` | 3001 | no   | mostly static           | The public site. Indexable, content-led. |
-| `admin`     | `@remi/admin`     | 3002 | yes  | `@remi/services/server` | Internal operations. Operator-only.      |
-| `docs`      | `@remi/docs`      | 3003 | no   | none                    | This site. Nextra, MDX.                  |
+| Application | Package           | Port | Auth | Données                 | Rôle                                         |
+| ----------- | ----------------- | ---- | ---- | ----------------------- | -------------------------------------------- |
+| `web`       | `@remi/web`       | 3000 | oui  | `@remi/services/server` | Le produit. Surface connectée.               |
+| `marketing` | `@remi/marketing` | 3001 | non  | surtout statique        | Le site public. Indexable, porté par le contenu. |
+| `admin`     | `@remi/admin`     | 3002 | oui  | `@remi/services/server` | Opérations internes. Opérateur uniquement.   |
+| `docs`      | `@remi/docs`      | 3003 | non  | aucune                  | Ce site. Nextra, MDX.                        |
 
-## Why admin is its own app, not a route group in web
+## Pourquoi admin est une application à part, et non un groupe de routes dans web
 
-A separate deployment gives a separate URL, separate environment variables, and separate access
-control. A `/admin` route group inside the product app makes every operator-only capability one
-routing mistake away from a customer.
+Un déploiement séparé donne une URL séparée, des variables d’environnement séparées et un contrôle d’accès
+séparé. Un groupe de routes `/admin` dans l’application produit place chaque capacité réservée aux opérateurs à une
+erreur de routage d’un client.
 
-## The operator's patient page
+## La page patient de l’opérateur
 
-A patient's page opens on a working view — what an operator reaches before anything else: the
-status line, the active goals, the standing instruction, the head of the living summary, the most
-recent meals, the main recommendations, a preparation note for the next consultation, and four
-quick actions. Everything else sits behind navigation: a section index in the right rail on
-desktop, a segmented control (Suivi · Journal · Dossier · Profil) on phone, and a horizontal row
-of anchors in between. One DOM order, three views.
+La page d’un patient s’ouvre sur une vue de travail — ce qu’un opérateur consulte avant tout : la
+ligne de statut, les objectifs actifs, la consigne permanente, le début du résumé vivant, les repas les plus
+récents, les recommandations principales, une note de préparation pour la prochaine consultation, et quatre
+actions rapides. Tout le reste est derrière la navigation : un index des sections dans le rail de droite sur
+ordinateur, un contrôle segmenté (Suivi · Journal · Dossier · Profil) sur téléphone, et une rangée horizontale
+d’ancres entre les deux. Un seul ordre du DOM, trois vues.
 
-The secondary sections are shaped for the way an operator reads them rather than for the way the
-rows are stored. The anamnesis lists the areas that have been filled in, with the rest offered as
-a short row of prompts to complete. The profile is a read summary — identity, measures, food,
-consent — with the full form one click behind it. **Anything no longer live is a closed fold
-carrying its count** at the foot of the section it belongs to: archived recommendations, archived
-essentials, previous recipes, archived meals, stopped supplements, archived observations, archived
-goals, and the delete flow at the end of the profile. There is no standalone "archived" section
-and no separate danger card, so the section list is identical for every patient.
+Les sections secondaires sont façonnées pour la manière dont un opérateur les lit, plutôt que pour la manière dont les
+lignes sont stockées. L’anamnèse liste les domaines déjà renseignés, le reste étant proposé sous la forme d’une
+courte rangée d’invites à compléter. Le profil est un résumé en lecture — identité, mesures, alimentation,
+consentement — avec le formulaire complet à un clic derrière. **Tout ce qui n’est plus actif est un pli fermé
+qui porte son compte** au pied de la section dont il relève : recommandations archivées, essentiels
+archivés, recettes précédentes, repas archivés, suppléments arrêtés, observations archivées, objectifs
+archivés, et le flux de suppression à la fin du profil. Il n’y a ni section « archivé » autonome
+ni carte de danger séparée, de sorte que la liste des sections est identique pour chaque patient.
 
-### Writing up a consultation
+### Rédiger une consultation
 
-The first quick action leaves the page: `/patients/[id]/consultation` is the post-consultation
-write-up, laid out in the order the work happens — the note, a check-in per active goal, the
-standing instruction and the living summary prefilled with what is in force, links into the
-recommendation, supplement and essentials sections, and the preparation note for next time. One
-save writes all of it in a single transaction and records a single audit event naming what changed;
-the per-card actions on the patient page remain the between-consultation edit path.
+La première action rapide quitte la page : `/patients/[id]/consultation` est le compte rendu
+post-consultation, disposé dans l’ordre où le travail se fait — la note, un point par objectif actif, la
+consigne permanente et le résumé vivant préremplis avec ce qui est en vigueur, des liens vers les
+sections recommandations, suppléments et essentiels, et la note de préparation pour la fois suivante. Un seul
+enregistrement écrit le tout dans une seule transaction et consigne un seul événement d’audit nommant ce qui a changé ;
+les actions par carte de la page patient restent la voie de modification entre deux consultations.
 
-The form is kept in the browser's local storage while it is typed and restored when the screen
-reopens — the links into the protocol sections leave the page and come back, and a draft that
-survives only the note would lose the rest. It is cleared once a save succeeds, and nothing about it
-reaches the server or another device.
+Le formulaire est conservé dans le stockage local du navigateur pendant la saisie et restauré à la
+réouverture de l’écran — les liens vers les sections du protocole quittent la page puis y reviennent, et un brouillon qui
+ne survivrait que pour la note perdrait le reste. Il est effacé dès qu’un enregistrement réussit, et rien de ce brouillon
+n’atteint le serveur ni un autre appareil.
 
-## The food table in the console
+## La table des aliments dans la console
 
-`/aliments` is the one surface in admin that is not about a particular person. It reads the ANSES
-Ciqual 2025 composition table — 3 484 foods, 74 constituents — imported into `foods` and
-`food_nutrients` by `pnpm ciqual:import`, a maintenance script pointed at the export downloaded
-from ANSES. The raw export is not in the repository; a derived subset of it is, as the service
-tests' fixture.
+`/aliments` est la seule surface de l’administration qui ne concerne pas une personne en particulier. Elle lit la
+table de composition ANSES Ciqual 2025 — 3 484 aliments, 74 constituants — importée dans `foods` et
+`food_nutrients` par `pnpm ciqual:import`, un script de maintenance pointé sur l’export téléchargé
+depuis l’ANSES. L’export brut n’est pas dans le dépôt ; un sous-ensemble dérivé l’est, comme jeu de test
+des tests de service.
 
-The page is read-only, so it has no server action to guard twice and writes nothing to the audit
-trail. It still lives inside the `(admin)` group, which is what makes it operator-only. Values are
-shown in the publisher's own notation — `traces`, `< 0,01`, and « — » where a constituent was never
-determined — because a page that rounds those into numbers states something the table does not.
+La page est en lecture seule : elle n’a donc aucune action serveur à garder deux fois et n’écrit rien dans la piste
+d’audit. Elle vit tout de même dans le groupe `(admin)`, ce qui la réserve aux opérateurs. Les valeurs sont
+affichées dans la notation propre de l’éditeur — `traces`, `< 0,01`, et « — » là où un constituant n’a jamais été
+déterminé — car une page qui arrondit cela en nombres affirme quelque chose que la table ne dit pas.
 
-The licence (Licence Ouverte 2.0, Etalab) requires the source to be named wherever its data is
-shown, so the console home line and both `/aliments` pages carry it. The edition, the DOI and the
-terms are in [decisions](/technical/decisions).
+La licence (Licence Ouverte 2.0, Etalab) exige que la source soit nommée partout où ses données sont
+affichées ; la ligne d’accueil de la console et les deux pages `/aliments` la portent donc. L’édition, le DOI et les
+conditions figurent dans [décisions](/technical/decisions).
