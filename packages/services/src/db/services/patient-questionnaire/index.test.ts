@@ -15,9 +15,13 @@ import { getDatabase, registerDatabase } from "../../client";
 import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { listAuditEvents } from "../audit";
 import { recordConsent } from "../patient-consents";
-import { createPatient, getPatient } from "../patients";
+import { createPatient, getPatient, updatePatient } from "../patients";
 import {
+  checkAllergenAnswer,
+  checkQuestionnaireInput,
   getPatientQuestionnaire,
+  markReadyWhenComplete,
+  missingQuestionnaireFields,
   savePatientQuestionnaire,
   setPatientAllergens,
 } from "./index";
@@ -453,6 +457,141 @@ describe("the allergy and intolerance lists", () => {
           "00000000-0000-4000-8000-000000000000",
           "allergy",
           { state: "none_known" },
+        ),
+      ),
+    ).toBe("not_found");
+  });
+});
+
+describe("checking a submit before any write", () => {
+  it("accepts valid answers and refuses an unknown value with its field", () => {
+    expect(checkQuestionnaireInput({ activityLevel: "high" }).ok).toBe(true);
+    const refused = checkQuestionnaireInput({
+      activityLevel: "extreme" as "high",
+    });
+    expect(refused.ok).toBe(false);
+    if (!refused.ok) {
+      expect(refused.message).toMatch(/^activityLevel:/);
+    }
+  });
+
+  it("checks one list's answer like the write would", () => {
+    expect(checkAllergenAnswer("allergy", { state: "none_known" }).ok).toBe(
+      true,
+    );
+    expect(
+      checkAllergenAnswer("allergy", {
+        state: "declared",
+        items: [{ key: "fish", subKey: "salmon" }],
+      }).ok,
+    ).toBe(true);
+    expect(
+      errorOf(checkAllergenAnswer("allergy", { state: "declared", items: [] })),
+    ).toBe("invalid_input");
+    expect(
+      errorOf(
+        checkAllergenAnswer("allergy", {
+          state: "declared",
+          items: [{ key: "other" }],
+        }),
+      ),
+    ).toBe("invalid_input");
+    expect(errorOf(checkAllergenAnswer("food", { state: "none_known" }))).toBe(
+      "invalid_input",
+    );
+  });
+});
+
+describe("the missing fields and the move to « Prêt pour consultation »", () => {
+  const newFile = async (pseudonym: string) =>
+    unwrapOk(
+      await createPatient({ practitionerId: testPractitionerId, pseudonym }),
+    );
+
+  it("lists every mandatory field on an empty file, in the list's order", async () => {
+    const file = await newFile("Empty");
+    expect(unwrapOk(await missingQuestionnaireFields(file.id))).toEqual([
+      "sexForCalculation",
+      "heightCm",
+      "weightKg",
+      "activityLevel",
+      "consultationReason",
+      "allergies",
+      "intolerances",
+    ]);
+  });
+
+  it("keeps the file « Dossier à compléter » while a field is missing", async () => {
+    const file = await newFile("Partial");
+    await savePatientQuestionnaire(file.id, {
+      sexForCalculation: "female",
+      activityLevel: "moderate",
+    });
+    expect(unwrapOk(await markReadyWhenComplete(file.id, null))).toBe(
+      "to_complete",
+    );
+    expect(unwrapOk(await missingQuestionnaireFields(file.id))).toEqual([
+      "heightCm",
+      "weightKg",
+      "consultationReason",
+      "allergies",
+      "intolerances",
+    ]);
+  });
+
+  it("moves the file to ready once the last mandatory field is saved, and audits it", async () => {
+    const file = await newFile("Complete");
+    await updatePatient(file.id, { heightCm: 168, weightKg: 61 });
+    await savePatientQuestionnaire(file.id, {
+      sexForCalculation: "female",
+      activityLevel: "moderate",
+      consultationReason: "Fatigue",
+    });
+    await setPatientAllergens(file.id, "allergy", { state: "none_known" });
+    expect(unwrapOk(await markReadyWhenComplete(file.id, null))).toBe(
+      "to_complete",
+    );
+    await setPatientAllergens(file.id, "intolerance", {
+      state: "declared",
+      items: [{ key: "lactose" }],
+    });
+    expect(unwrapOk(await missingQuestionnaireFields(file.id))).toEqual([]);
+    expect(unwrapOk(await markReadyWhenComplete(file.id, null))).toBe("ready");
+    expect(unwrapOk(await getPatient(file.id)).fileStatus).toBe("ready");
+    const events = await listAuditEvents({
+      action: "patient.file_status_changed",
+      targetId: file.id,
+    });
+    expect(events).toHaveLength(1);
+  });
+
+  it("never moves a file back when a field is cleared later", async () => {
+    const file = await newFile("Cleared");
+    await updatePatient(file.id, { heightCm: 170, weightKg: 70 });
+    await savePatientQuestionnaire(file.id, {
+      sexForCalculation: "male",
+      activityLevel: "low",
+      consultationReason: "Sommeil",
+    });
+    await setPatientAllergens(file.id, "allergy", { state: "none_known" });
+    await setPatientAllergens(file.id, "intolerance", { state: "none_known" });
+    expect(unwrapOk(await markReadyWhenComplete(file.id, null))).toBe("ready");
+    await savePatientQuestionnaire(file.id, { consultationReason: "" });
+    expect(unwrapOk(await markReadyWhenComplete(file.id, null))).toBe("ready");
+    expect(unwrapOk(await missingQuestionnaireFields(file.id))).toEqual([
+      "consultationReason",
+    ]);
+  });
+
+  it("answers not found for a missing file", async () => {
+    expect(errorOf(await missingQuestionnaireFields("not-a-uuid"))).toBe(
+      "not_found",
+    );
+    expect(
+      errorOf(
+        await markReadyWhenComplete(
+          "00000000-0000-4000-8000-0000000000ab",
+          null,
         ),
       ),
     ).toBe("not_found");

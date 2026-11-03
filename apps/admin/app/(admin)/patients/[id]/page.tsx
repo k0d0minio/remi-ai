@@ -10,6 +10,7 @@ import {
   getCurrentChallenge,
   patientOf,
   getPatientInstruction,
+  getPatientQuestionnaire,
   getPatientSummary,
   listArchivedMealEntries,
   listArchivedPantryEssentials,
@@ -34,11 +35,14 @@ import {
   listArchivedPatientSupplements,
   listPatientSupplements,
   listRecipes,
+  missingQuestionnaireFields,
 } from "@remi/services/server";
 import {
   ageInYears,
   appHref,
+  fileStatusLabels,
   formatDate,
+  mandatoryQuestionnaireFieldLabels,
   patientLinkPreviewParam,
   todayAtPractice,
 } from "@remi/services/shared";
@@ -123,7 +127,12 @@ type Params = { id: string };
 
 type PageProps = {
   params: Promise<Params>;
-  searchParams: Promise<{ segment?: string | string[]; from?: string }>;
+  searchParams: Promise<{
+    segment?: string | string[];
+    from?: string;
+    /** Set when « Nouveau patient » met an e-mail already on this file. */
+    exists?: string;
+  }>;
 };
 
 const isPatientSegment = (value: string): value is PatientSegment =>
@@ -149,6 +158,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   // add a recommendation is a round trip, so the way back is on the page she
   // lands on rather than in her browser history.
   const fromConsultation = query.from === "consultation";
+  const alreadyExists = query.exists === "1";
   const segmentValue = Array.isArray(segmentParam)
     ? segmentParam[0]
     : segmentParam;
@@ -223,6 +233,18 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     listPatientMessages(patient.id),
     consentsOf(patient.id),
   ]);
+  // The questionnaire half of the file (story 1): its answers for the form,
+  // what is still missing, and whether the genotype may be entered.
+  const [questionnaire, missing] = await Promise.all([
+    getPatientQuestionnaire(patient.id),
+    missingQuestionnaireFields(patient.id),
+  ]);
+  if (!questionnaire.ok) {
+    notFound();
+  }
+  const missingFields = missing.ok ? missing.data : [];
+  const genotypeOpen = consents.genetic?.decision === "given";
+
   // Derived from the thread already in hand rather than a second read.
   const unreadMessages = messages.filter(
     (message) => message.author === "patient" && message.readAt === null,
@@ -395,7 +417,32 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
             >
               {patientStatusLabels[patient.status]}
             </Badge>
+            <Badge
+              variant={
+                patient.fileStatus === "to_complete" ? "warning" : "info"
+              }
+              tone="subtle"
+              size="sm"
+            >
+              {fileStatusLabels[patient.fileStatus].fr}
+            </Badge>
           </div>
+          {alreadyExists ? (
+            <Typography size="sm" role="status" className="text-info-text">
+              Ce dossier existe déjà : l&apos;adresse email saisie est la
+              sienne. Aucun second dossier n&apos;a été créé.
+            </Typography>
+          ) : null}
+          {missingFields.length > 0 ? (
+            <Typography size="sm" tone="muted">
+              {`Champs manquants : ${missingFields
+                .map((name) => mandatoryQuestionnaireFieldLabels[name].fr)
+                .join(", ")}.`}{" "}
+              <a href="#profile" className="underline underline-offset-2">
+                Compléter
+              </a>
+            </Typography>
+          ) : null}
           <Typography size="sm" tone="muted">
             {[
               patient.fullName,
@@ -1076,6 +1123,13 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                     ([field, at]) => (at ? [[field, formatDate(at)]] : []),
                   ),
                 )}
+                questionnaire={questionnaire.data}
+                consultationDate={
+                  questionnaire.data.answers.consultationDate
+                    ? formatDate(questionnaire.data.answers.consultationDate)
+                    : null
+                }
+                genotypeOpen={genotypeOpen}
               />
 
               <SectionFold id="danger-zone" label="Zone sensible" tone="error">

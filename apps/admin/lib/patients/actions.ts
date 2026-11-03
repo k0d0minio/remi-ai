@@ -21,7 +21,10 @@ import {
   archivePatientSupplement,
   archiveRecipeAssignment,
   assignRecipes,
+  checkAllergenAnswer,
+  checkQuestionnaireInput,
   closeChallenge,
+  consentsOf,
   createAndAssignRecipe,
   createPatient,
   deleteGoalCheckIn,
@@ -35,10 +38,13 @@ import {
   deletePatientSupplement,
   describeConsultation,
   duplicateAndAssignRecipe,
+  findPatientByEmail,
   getPatient,
   getPatientInstruction,
+  getPatientQuestionnaire,
   getPatientSummary,
   markGoalCheckInSeen,
+  markReadyWhenComplete,
   markPatientMessageRead,
   movePantryEssential,
   movePatientGoal,
@@ -53,9 +59,11 @@ import {
   replyToPatient,
   removeRecipeAssignment,
   savePantryEssentials,
+  savePatientQuestionnaire,
   savePatientRecommendations,
   savePatientSupplements,
   sendEmail,
+  setPatientAllergens,
   setPatientAnamnesis,
   setPatientInstruction,
   setPatientNextConsultationPrep,
@@ -76,6 +84,8 @@ import {
   type ConsultationCheckInInput,
   type Operator,
   type PatientInput,
+  type PatientQuestionnaireView,
+  type QuestionnaireInput,
   type PatientRecordKind,
   type SectionSaveCounts,
 } from "@remi/services/server";
@@ -108,6 +118,12 @@ import { audit } from "@/lib/audit";
 import { requireOperator } from "@/lib/auth/session";
 import { fileStoreReady } from "@/lib/files";
 import { mailerReady } from "@/lib/mailer";
+import {
+  allergenAnswerFrom,
+  postsGenotype,
+  questionnaireInputFrom,
+  type AllergenAnswer,
+} from "@/lib/patients/questionnaire-form";
 
 /**
  * Every action re-asserts the operator session before touching anything: the
@@ -121,7 +137,15 @@ import { mailerReady } from "@/lib/mailer";
  * write is not an action to record.
  */
 
-export type PatientFormState = { error: string | null; saved: boolean };
+export type PatientFormState = {
+  error: string | null;
+  saved: boolean;
+  /**
+   * The file of this practitioner that already carries the e-mail the save
+   * tried to set. The form links to it next to the error.
+   */
+  existingId?: string | null;
+};
 export type RecommendationFormState = { error: string | null };
 export type SupplementFormState = { error: string | null };
 export type PantryFormState = { error: string | null };
@@ -246,21 +270,32 @@ const asCategory = (value: string): RecommendationCategory =>
 const postedField = (formData: FormData, name: string) =>
   formData.has(name) ? field(formData, name) : undefined;
 
+/**
+ * The profile half of the patient form. `objective`, `dietaryRegime`,
+ * `allergies` and `intolerances` are absent on purpose: the questionnaire's
+ * fields replaced them in the form (Jamie, 2026-11-03), so a save leaves the
+ * old texts as they are. The file shows them read-only.
+ *
+ * « Prénom » and « Nom » fill `fullName`, as the sign-up does. Both empty
+ * leaves `fullName` as it is: a file created before the split keeps its name.
+ */
 const patientInputFrom = (formData: FormData): PatientInput => {
   const locale = field(formData, "locale");
+  const firstName = field(formData, "firstName").trim();
+  const lastName = field(formData, "lastName").trim();
+  const fullName = [firstName, lastName].filter(Boolean).join(" ");
   return {
     pseudonym: field(formData, "pseudonym"),
-    fullName: field(formData, "fullName"),
+    firstName,
+    lastName,
+    ...(fullName ? { fullName } : {}),
+    phone: field(formData, "phone"),
     email: field(formData, "email"),
     locale: isLocale(locale) ? locale : "fr",
     birthDate: field(formData, "birthDate"),
     sex: asSex(field(formData, "sex")),
     heightCm: field(formData, "heightCm"),
     weightKg: field(formData, "weightKg"),
-    objective: field(formData, "objective"),
-    dietaryRegime: field(formData, "dietaryRegime"),
-    allergies: field(formData, "allergies"),
-    intolerances: field(formData, "intolerances"),
     constraints: field(formData, "constraints"),
     preferences: field(formData, "preferences"),
     likesCooking: asCookingAffinity(field(formData, "likesCooking")),
@@ -280,6 +315,95 @@ const revalidatePatient = (id: string) => {
   revalidatePath("/");
 };
 
+/** The audit actor of the signed-in practitioner. */
+const actorOf = (operator: Operator) => ({
+  id: operator.id,
+  email: operator.email,
+  name: operator.name,
+});
+
+/** Morgane's question 5: the genotype waits on the patient's genetic consent. */
+const geneticConsentGiven = async (patientId: string) =>
+  (await consentsOf(patientId)).genetic?.decision === "given";
+
+const GENOTYPE_LOCKED =
+  "Le génotype reste verrouillé tant que le patient n'a pas donné son consentement génétique.";
+
+const EMAIL_TAKEN =
+  "Ce dossier existe déjà : cette adresse est sur un autre de vos dossiers.";
+
+/** One list's rows and flag, as a string, to tell whether a save changed it. */
+const allergenSignature = (
+  view: PatientQuestionnaireView | null,
+  kind: "allergy" | "intolerance",
+) => {
+  if (!view) {
+    return "";
+  }
+  const flag =
+    kind === "allergy"
+      ? view.answers.noKnownAllergies
+      : view.answers.noKnownIntolerances;
+  const rows = view.allergens
+    .filter((row) => row.kind === kind)
+    .map((row) => `${row.key}/${row.subKey ?? ""}/${row.otherText ?? ""}`);
+  return JSON.stringify([flag, rows]);
+};
+
+/** `null`, `undefined` and `""` all read as « not filled ». */
+const comparable = (value: unknown) =>
+  value === null || value === undefined ? "" : String(value);
+
+/**
+ * The names of the fields a save changed, for the audit detail. Names only:
+ * the trail holds no health value (Jamie, 2026-11-03).
+ */
+const changedFieldNames = (
+  before: Record<string, unknown>,
+  input: Record<string, unknown>,
+) =>
+  Object.entries(input)
+    .filter(([name, value]) => comparable(before[name]) !== comparable(value))
+    .map(([name]) => name);
+
+/**
+ * Writes the questionnaire half of one submit: the answers, then each list
+ * the form rendered. Every part was checked before the first write.
+ */
+const writeQuestionnaire = async (
+  patientId: string,
+  answers: QuestionnaireInput,
+  lists: { allergy?: AllergenAnswer; intolerance?: AllergenAnswer },
+): Promise<string | null> => {
+  // An empty patch is no write: the database refuses an update with no value.
+  if (Object.keys(answers).length > 0) {
+    const saved = await savePatientQuestionnaire(patientId, answers);
+    if (!saved.ok) {
+      return saved.message;
+    }
+  }
+  for (const kind of ["allergy", "intolerance"] as const) {
+    const answer = lists[kind];
+    if (answer) {
+      const written = await setPatientAllergens(patientId, kind, answer);
+      if (!written.ok) {
+        return written.message;
+      }
+    }
+  }
+  return null;
+};
+
+/**
+ * One submit of the patient form, on « Nouveau patient » and on « Modifier »
+ * (story 1). It writes the profile, the questionnaire's answers and the two
+ * allergen lists, then moves the file to « Prêt pour consultation » when the
+ * last mandatory field is filled. Missing fields never block a save.
+ *
+ * It sends nothing: no invitation and no activation e-mail goes out on a
+ * create or a save. The patient's activation e-mail belongs to
+ * `care-activation`.
+ */
 export const savePatientAction = async (
   _previous: PatientFormState,
   formData: FormData,
@@ -287,8 +411,47 @@ export const savePatientAction = async (
   const operator = await requireOperator();
   const id = field(formData, "id");
   const input = patientInputFrom(formData);
+  const lists = {
+    allergy: allergenAnswerFrom(formData, "allergy"),
+    intolerance: allergenAnswerFrom(formData, "intolerance"),
+  };
+
+  if (id && !(await holdsPatient(operator, id))) {
+    return { error: NO_SUCH_FILE, saved: false };
+  }
+  // A new file has no consent yet, so its genotype is always locked.
+  const genotypeOpen = id ? await geneticConsentGiven(id) : false;
+  if (postsGenotype(formData) && !genotypeOpen) {
+    return { error: GENOTYPE_LOCKED, saved: false };
+  }
+  const answers = questionnaireInputFrom(
+    formData,
+    genotypeOpen,
+  ) as QuestionnaireInput;
+
+  // Every part is checked before the first write, so a refused answer never
+  // leaves a half-created file.
+  const checks = [
+    checkQuestionnaireInput(answers),
+    ...(["allergy", "intolerance"] as const).flatMap((kind) => {
+      const answer = lists[kind];
+      return answer ? [checkAllergenAnswer(kind, answer)] : [];
+    }),
+  ];
+  const refused = checks.find((check) => !check.ok);
+  if (refused && !refused.ok) {
+    return { error: refused.message, saved: false };
+  }
+
+  const sameEmail = input.email
+    ? await findPatientByEmail(operator.id, input.email)
+    : null;
 
   if (!id) {
+    // A known e-mail opens that file. No second file is created.
+    if (sameEmail) {
+      redirect(`/patients/${sameEmail.id}?exists=1`);
+    }
     // The new file belongs to the practitioner who creates it (D-27).
     const created = await createPatient({
       ...input,
@@ -298,32 +461,69 @@ export const savePatientAction = async (
     if (!created.ok) {
       return { error: created.message, saved: false };
     }
+    const failed = await writeQuestionnaire(created.data.id, answers, lists);
     await audit(operator, "patient.created", {
       type: "patient",
       id: created.data.id,
       label: created.data.pseudonym,
     });
+    if (failed) {
+      // The file exists: the practitioner finishes it from its page.
+      redirect(`/patients/${created.data.id}`);
+    }
+    await markReadyWhenComplete(created.data.id, actorOf(operator));
     revalidatePath("/patients");
     revalidatePath("/");
     redirect(`/patients/${created.data.id}`);
   }
 
-  if (!(await holdsPatient(operator, id))) {
-    return { error: NO_SUCH_FILE, saved: false };
+  if (sameEmail && sameEmail.id !== id) {
+    return { error: EMAIL_TAKEN, saved: false, existingId: sameEmail.id };
   }
-  const updated = await updatePatient(id, {
-    ...input,
-    status: asStatus(field(formData, "status")),
-  });
+
+  const [before, beforeAnswers] = await Promise.all([
+    getPatient(id),
+    getPatientQuestionnaire(id),
+  ]);
+  const beforeView = beforeAnswers.ok ? beforeAnswers.data : null;
+  const status = asStatus(field(formData, "status"));
+  const updated = await updatePatient(id, { ...input, status });
   if (!updated.ok) {
     return { error: updated.message, saved: false };
   }
+  const failed = await writeQuestionnaire(id, answers, lists);
+  if (failed) {
+    return { error: failed, saved: false };
+  }
+  const afterAnswers = await getPatientQuestionnaire(id);
+  const afterView = afterAnswers.ok ? afterAnswers.data : null;
+
+  const changed = [
+    ...changedFieldNames(
+      before.ok ? { ...before.data } : {},
+      { ...input, status },
+    ),
+    ...changedFieldNames(
+      { ...(beforeView?.answers ?? {}) },
+      answers as Record<string, unknown>,
+    ),
+    ...(["allergy", "intolerance"] as const).filter(
+      (kind) =>
+        allergenSignature(beforeView, kind) !==
+        allergenSignature(afterView, kind),
+    ),
+  ];
   await audit(operator, "patient.updated", {
     type: "patient",
     id,
     label: updated.data.pseudonym,
+    detail: changed.length > 0 ? `champs : ${changed.join(", ")}` : "",
   });
+  const fileStatus = await markReadyWhenComplete(id, actorOf(operator));
   revalidatePatient(id);
+  if (fileStatus.ok && fileStatus.data !== updated.data.fileStatus) {
+    revalidatePath("/patients");
+  }
   return { error: null, saved: true };
 };
 

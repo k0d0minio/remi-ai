@@ -5,7 +5,7 @@ import { Typography } from "@remi/ui/server";
 import { PatientForm } from "@/components/patients/patient-form";
 
 export const metadata: Metadata = {
-  title: "Nouveau profil",
+  title: "Nouveau patient",
 };
 
 const NewPatient = () => (
@@ -19,11 +19,12 @@ const NewPatient = () => (
         Patients
       </NextLink>
       <Typography as="h1" size="2xl" weight="semibold">
-        Nouveau profil
+        Nouveau patient
       </Typography>
       <Typography size="sm" tone="muted">
-        Seul le pseudonyme est obligatoire — tout le reste se complète au fil
-        des consultations.
+        Le dossier complet, comme si le patient s&apos;était inscrit lui-même.
+        Seul le pseudonyme est requis pour enregistrer : les champs manquants
+        restent listés sur le dossier. Aucun email ne part.
       </Typography>
     </div>
 

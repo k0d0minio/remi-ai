@@ -140,22 +140,6 @@ export const mealSlotLabels: Record<MealSlot, string> = {
 };
 
 /**
- * Typing aids, not a closed set: the regime field takes anything Morgane
- * writes, and these are only the ones she reaches for often enough to be worth
- * one keystroke. Adding one here changes nothing about what can be stored.
- */
-export const dietaryRegimeSuggestions = [
-  "végétarien",
-  "végétalien",
-  "sans gluten",
-  "sans lactose",
-  "pescétarien",
-  "flexitarien",
-  "halal",
-  "casher",
-] as const;
-
-/**
  * § B's twelve areas of enquiry, worded as Morgane's brainstorm words them.
  * The keys are what the database stores, so retitling one — or dropping one
  * from `anamnesisCategories` — is an edit here and in that constant, never a

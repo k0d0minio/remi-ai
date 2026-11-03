@@ -316,3 +316,89 @@ export const apoeGenotypes = [
 export const dio2Categories = ["A", "H", "M"] as const;
 
 export const amy1aCategories = ["A", "H", "M"] as const;
+
+/**
+ * The mandatory fields of the questionnaire, in the order the list names them
+ * (story 4, criterion 1): « Sexe, taille, poids actuel, niveau d'activité
+ * physique et motif de consultation sont obligatoires », plus an explicit
+ * answer on allergies and on intolerances. Jamie accepted the list on
+ * 2026-11-03.
+ *
+ * One list for both sides: the console's « Champs manquants » and the
+ * patient's questionnaire read it, so the two never disagree on what makes a
+ * file « Prêt pour consultation ».
+ */
+export const mandatoryQuestionnaireFields = [
+  "sexForCalculation",
+  "heightCm",
+  "weightKg",
+  "activityLevel",
+  "consultationReason",
+  "allergies",
+  "intolerances",
+] as const;
+
+export type MandatoryQuestionnaireField =
+  (typeof mandatoryQuestionnaireFields)[number];
+
+export const mandatoryQuestionnaireFieldLabels = {
+  sexForCalculation: {
+    fr: "Sexe utilisé pour le calcul",
+    en: "Sex used for the calculation",
+  },
+  heightCm: { fr: "Taille", en: "Height" },
+  weightKg: { fr: "Poids actuel", en: "Current weight" },
+  activityLevel: {
+    fr: "Niveau d'activité physique",
+    en: "Physical activity level",
+  },
+  consultationReason: {
+    fr: "Motif de consultation",
+    en: "Reason for consultation",
+  },
+  allergies: { fr: "Allergies", en: "Allergies" },
+  intolerances: { fr: "Intolérances", en: "Intolerances" },
+} as const satisfies Record<MandatoryQuestionnaireField, QuestionnaireLabel>;
+
+/** What the completeness check reads. Null is « Non renseigné » (D-30). */
+export type QuestionnaireCompleteness = {
+  sexForCalculation: string | null;
+  heightCm: number | null;
+  weightKg: number | null;
+  activityLevel: string | null;
+  consultationReason: string | null;
+  /** True for « Aucune allergie connue », false for declared rows, null unanswered. */
+  noKnownAllergies: boolean | null;
+  noKnownIntolerances: boolean | null;
+  /** How many rows of each kind `patient_allergens` holds. */
+  allergyCount: number;
+  intoleranceCount: number;
+};
+
+/**
+ * An allergy list is answered by « Aucune allergie connue » or by at least one
+ * checked box. A `false` flag with no row is no answer: nothing is declared.
+ */
+const listAnswered = (noneKnown: boolean | null, count: number) =>
+  noneKnown === true || count > 0;
+
+/** The mandatory fields still missing, in the list's order. Empty when complete. */
+export const missingMandatoryFields = (
+  input: QuestionnaireCompleteness,
+): MandatoryQuestionnaireField[] => {
+  const filled: Record<MandatoryQuestionnaireField, boolean> = {
+    sexForCalculation: input.sexForCalculation !== null,
+    heightCm: input.heightCm !== null,
+    weightKg: input.weightKg !== null,
+    activityLevel: input.activityLevel !== null,
+    consultationReason:
+      input.consultationReason !== null &&
+      input.consultationReason.trim() !== "",
+    allergies: listAnswered(input.noKnownAllergies, input.allergyCount),
+    intolerances: listAnswered(
+      input.noKnownIntolerances,
+      input.intoleranceCount,
+    ),
+  };
+  return mandatoryQuestionnaireFields.filter((field) => !filled[field]);
+};

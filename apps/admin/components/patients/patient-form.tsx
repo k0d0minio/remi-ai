@@ -1,7 +1,12 @@
 "use client";
 
+import NextLink from "next/link";
 import { useActionState, useEffect } from "react";
-import type { PatientProfile } from "@remi/services/shared";
+import type {
+  PatientAllergen,
+  PatientProfile,
+  PatientQuestionnaire,
+} from "@remi/services/shared";
 import {
   cookingAffinities,
   cookingTimes,
@@ -31,11 +36,12 @@ import {
   savePatientAction,
   type PatientFormState,
 } from "@/lib/patients/actions";
+import { UNSET, UNSET_LABEL } from "@/lib/patients/questionnaire-form";
+import { QuestionnaireFields } from "@/components/patients/questionnaire-fields";
 import {
   consentChannelLabels,
   cookingAffinityLabels,
   cookingTimeLabels,
-  dietaryRegimeSuggestions,
   foodBudgetLabels,
   localeLabels,
   patientSexLabels,
@@ -43,14 +49,6 @@ import {
 } from "@/components/patients/vocabulary";
 
 const initial: PatientFormState = { error: null, saved: false };
-
-/**
- * The « non renseigné » choice of the three-level selects. A select item
- * cannot carry `""`, so it posts this word, which no vocabulary contains — the
- * action narrows anything outside a set to `""`, and `""` clears the column.
- */
-const UNSET = "unset";
-const UNSET_LABEL = "Non renseigné";
 
 /**
  * A disabled field posts nothing, so the action leaves the stored value as it
@@ -62,6 +60,16 @@ const CARE_CONSENT_REQUIRED =
 type Props = {
   /** Present when editing; absent on `/patients/new`. */
   patient?: PatientProfile;
+  /** The questionnaire's stored answers and boxes. Absent on a new file. */
+  questionnaire?: {
+    answers: PatientQuestionnaire;
+    allergens: readonly PatientAllergen[];
+  };
+  /**
+   * The patient gave the genetic consent (Morgane's question 5). False on a
+   * new file: nobody has consented to anything yet.
+   */
+  genotypeOpen?: boolean;
   /**
    * The patient's latest `care` decision is `given`. Without it, médicaments
    * and compléments are locked (story 3): a new file holds no consent yet.
@@ -75,17 +83,29 @@ type Props = {
   onSaved?: () => void;
 };
 
+/** The texts the questionnaire replaced in the form, shown when one is set. */
+const legacyTexts = (patient: PatientProfile) =>
+  [
+    { label: "Objectif", value: patient.objective },
+    { label: "Régime alimentaire (texte libre)", value: patient.dietaryRegime },
+    { label: "Allergies (texte libre)", value: patient.allergies },
+    { label: "Intolérances (texte libre)", value: patient.intolerances },
+  ].filter((row) => row.value.trim() !== "");
+
 /**
  * One form for creating and editing — the hidden `id` decides which, so the
- * two paths cannot drift apart field by field. Status appears only once the
- * profile exists: a patient is created active or not at all.
+ * two paths cannot drift apart field by field (story 1: the practitioner
+ * creates and completes the whole file, exactly as the patient would).
  *
- * The clinical fields sit in their own block rather than mixed into identity.
- * They are the ones a protocol is actually written against, and separating
- * them is what lets Morgane scan for a medication without reading a paragraph.
+ * The order: identity, then every questionnaire field in the questionnaire's
+ * order, then the console's own fields. Only the pseudonym is needed to save.
+ * A missing field never blocks a save: the file page lists what is missing.
+ * Status appears only once the profile exists: a patient is created active.
  */
 export const PatientForm = ({
   patient,
+  questionnaire,
+  genotypeOpen = false,
   careConsentGiven = false,
   onSaved,
 }: Props) => {
@@ -107,17 +127,22 @@ export const PatientForm = ({
     patient?.consentDate && patient.consentChannel
       ? { date: patient.consentDate, channel: patient.consentChannel }
       : null;
+  const legacy = patient ? legacyTexts(patient) : [];
 
   return (
     <form action={action} className="flex flex-col gap-6">
       {patient ? <input type="hidden" name="id" value={patient.id} /> : null}
 
       <div className="flex flex-col gap-4">
+        <Typography as="h3" variant="eyebrow" tone="muted">
+          Identité
+        </Typography>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
             id="pseudonym"
             label="Pseudonyme"
-            hint="Le nom de travail — le seul que l'IA de REMI pourra un jour voir."
+            hint="Le nom de travail — le seul que l'IA de REMI pourra un jour voir. Le seul champ requis pour enregistrer."
           >
             <Input
               id="pseudonym"
@@ -128,29 +153,65 @@ export const PatientForm = ({
           </Field>
 
           <Field
-            id="fullName"
-            label="Nom complet"
-            optional
-            hint="Identité réelle — ne quitte jamais cette console et le lien patient."
-          >
-            <Input
-              id="fullName"
-              name="fullName"
-              defaultValue={patient?.fullName ?? ""}
-            />
-          </Field>
-
-          <Field
             id="email"
             label="Adresse email"
             optional
-            hint="Nécessaire pour envoyer le lien patient par email."
+            hint="Aucun email ne part à la création. Une adresse déjà sur un de vos dossiers ouvre ce dossier."
           >
             <Input
               id="email"
               name="email"
               type="email"
               defaultValue={patient?.email ?? ""}
+            />
+          </Field>
+
+          <Field
+            id="firstName"
+            label="Prénom"
+            optional
+            hint={
+              patient?.fullName && !patient.firstName && !patient.lastName
+                ? `Nom actuel : ${patient.fullName}. Vide, il reste tel quel.`
+                : "Identité réelle — ne quitte jamais cette console et le lien patient."
+            }
+          >
+            <Input
+              id="firstName"
+              name="firstName"
+              defaultValue={patient?.firstName ?? ""}
+            />
+          </Field>
+
+          <Field id="lastName" label="Nom" optional>
+            <Input
+              id="lastName"
+              name="lastName"
+              defaultValue={patient?.lastName ?? ""}
+            />
+          </Field>
+
+          <Field id="phone" label="Téléphone" optional>
+            <Input
+              id="phone"
+              name="phone"
+              type="tel"
+              inputMode="tel"
+              defaultValue={patient?.phone ?? ""}
+            />
+          </Field>
+
+          <Field
+            id="birthDate"
+            label="Date de naissance"
+            optional
+            hint="L'âge en est déduit ; il n'est jamais stocké."
+          >
+            <Input
+              id="birthDate"
+              name="birthDate"
+              type="date"
+              defaultValue={patient?.birthDate ?? ""}
             />
           </Field>
 
@@ -167,6 +228,21 @@ export const PatientForm = ({
                 {locales.map((locale) => (
                   <SelectItem key={locale} value={locale}>
                     {localeLabels[locale]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          <Field id="sex" label="Sexe">
+            <Select name="sex" defaultValue={patient?.sex ?? "unspecified"}>
+              <SelectTrigger id="sex">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {patientSexes.map((sex) => (
+                  <SelectItem key={sex} value={sex}>
+                    {patientSexLabels[sex]}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -192,93 +268,50 @@ export const PatientForm = ({
         </div>
       </div>
 
+      {patient ? (
+        <>
+          <Separator tone="subtle" />
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Typography as="h3" variant="eyebrow" tone="muted">
+                Consentement
+              </Typography>
+              {consent ? (
+                <Badge variant="success" tone="subtle" size="sm">
+                  {`Recueilli le ${formatDate(consent.date)} · ${consentChannelLabels[consent.channel]}`}
+                </Badge>
+              ) : (
+                <Badge variant="warning" tone="subtle" size="sm">
+                  Pas encore enregistré
+                </Badge>
+              )}
+            </div>
+            <Typography size="sm" tone="muted">
+              Le consentement consigné à la main avant l&apos;inscription en
+              ligne. Il se lit ici et ne se modifie plus : le patient donnera
+              ses consentements lui-même à l&apos;inscription.
+            </Typography>
+          </div>
+        </>
+      ) : null}
+
       <Separator tone="subtle" />
 
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <Typography as="h3" variant="eyebrow" tone="muted">
-            Consentement
-          </Typography>
-          {consent ? (
-            <Badge variant="success" tone="subtle" size="sm">
-              {`Recueilli le ${formatDate(consent.date)} · ${consentChannelLabels[consent.channel]}`}
-            </Badge>
-          ) : (
-            <Badge variant="warning" tone="subtle" size="sm">
-              Pas encore enregistré
-            </Badge>
-          )}
-        </div>
-
-        <Typography size="sm" tone="muted">
-          Le consentement consigné à la main avant l&apos;inscription en ligne.
-          Il se lit ici et ne se modifie plus : le patient donnera ses
-          consentements lui-même à l&apos;inscription.
-        </Typography>
-      </div>
+      <QuestionnaireFields
+        answers={questionnaire?.answers}
+        allergens={questionnaire?.allergens}
+        heightCm={patient?.heightCm ?? null}
+        weightKg={patient?.weightKg ?? null}
+        genotypeOpen={genotypeOpen}
+        careConsentGiven={careConsentGiven}
+      />
 
       <Separator tone="subtle" />
 
       <div className="flex flex-col gap-4">
         <Typography as="h3" variant="eyebrow" tone="muted">
-          Données cliniques
+          Suivi en consultation
         </Typography>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Field
-            id="birthDate"
-            label="Date de naissance"
-            optional
-            hint="L'âge en est déduit ; il n'est jamais stocké."
-          >
-            <Input
-              id="birthDate"
-              name="birthDate"
-              type="date"
-              defaultValue={patient?.birthDate ?? ""}
-            />
-          </Field>
-
-          <Field id="sex" label="Sexe">
-            <Select name="sex" defaultValue={patient?.sex ?? "unspecified"}>
-              <SelectTrigger id="sex">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {patientSexes.map((sex) => (
-                  <SelectItem key={sex} value={sex}>
-                    {patientSexLabels[sex]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-
-          <Field id="heightCm" label="Taille (cm)" optional>
-            <Input
-              id="heightCm"
-              name="heightCm"
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={280}
-              defaultValue={patient?.heightCm ?? ""}
-            />
-          </Field>
-
-          <Field id="weightKg" label="Poids (kg)" optional>
-            <Input
-              id="weightKg"
-              name="weightKg"
-              type="number"
-              inputMode="decimal"
-              step="0.1"
-              min={1}
-              max={500}
-              defaultValue={patient?.weightKg ?? ""}
-            />
-          </Field>
-        </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
@@ -332,82 +365,6 @@ export const PatientForm = ({
             defaultValue={patient?.referral ?? ""}
           />
         </Field>
-      </div>
-
-      <Separator tone="subtle" />
-
-      <div className="flex flex-col gap-4">
-        <Typography as="h3" variant="eyebrow" tone="muted">
-          Accompagnement
-        </Typography>
-
-        <Field
-          id="objective"
-          label="Objectif"
-          optional
-          hint="Ce que l'accompagnement vise. Visible sur le lien patient."
-        >
-          <Textarea
-            id="objective"
-            name="objective"
-            rows={2}
-            defaultValue={patient?.objective ?? ""}
-          />
-        </Field>
-
-        <Field
-          id="dietaryRegime"
-          label="Régime alimentaire"
-          optional
-          hint="Végétarien, sans gluten… Écrivez librement ; les propositions ne sont qu'une aide à la saisie."
-        >
-          <Input
-            id="dietaryRegime"
-            name="dietaryRegime"
-            list="dietaryRegimeSuggestions"
-            defaultValue={patient?.dietaryRegime ?? ""}
-          />
-        </Field>
-
-        {/*
-         * Outside the Field: it clones a single child to wire aria-describedby,
-         * and a second element would leave the hint unannounced.
-         */}
-        <datalist id="dietaryRegimeSuggestions">
-          {dietaryRegimeSuggestions.map((regime) => (
-            <option key={regime} value={regime} />
-          ))}
-        </datalist>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field
-            id="allergies"
-            label="Allergies"
-            optional
-            hint="Exclusions absolues. Séparées des intolérances : ce ne sont pas les mêmes conséquences."
-          >
-            <Textarea
-              id="allergies"
-              name="allergies"
-              rows={3}
-              defaultValue={patient?.allergies ?? ""}
-            />
-          </Field>
-
-          <Field
-            id="intolerances"
-            label="Intolérances"
-            optional
-            hint="Ce qui passe mal sans être dangereux."
-          >
-            <Textarea
-              id="intolerances"
-              name="intolerances"
-              rows={3}
-              defaultValue={patient?.intolerances ?? ""}
-            />
-          </Field>
-        </div>
 
         <Field
           id="constraints"
@@ -523,17 +480,59 @@ export const PatientForm = ({
         </Field>
       </div>
 
+      {legacy.length > 0 ? (
+        <>
+          <Separator tone="subtle" />
+          <div className="flex flex-col gap-3">
+            <Typography as="h3" variant="eyebrow" tone="muted">
+              Anciennes notes, en lecture seule
+            </Typography>
+            <Typography size="sm" tone="muted">
+              Le questionnaire remplace ces textes libres. Ils restent lisibles
+              ici et sur le lien patient.
+            </Typography>
+            <dl className="grid gap-3 sm:grid-cols-2">
+              {legacy.map((row) => (
+                <div key={row.label} className="flex flex-col gap-0.5">
+                  <dt>
+                    <Typography size="xs" tone="muted">
+                      {row.label}
+                    </Typography>
+                  </dt>
+                  <dd>
+                    <Typography size="sm" className="whitespace-pre-line">
+                      {row.value}
+                    </Typography>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </>
+      ) : null}
+
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" disabled={pending}>
           {pending
             ? "Enregistrement…"
             : patient
               ? "Enregistrer les modifications"
-              : "Créer le profil"}
+              : "Créer le dossier"}
         </Button>
         {state.error ? (
           <Typography size="sm" className="text-error-text" role="alert">
             {state.error}
+            {state.existingId ? (
+              <>
+                {" "}
+                <NextLink
+                  href={`/patients/${state.existingId}`}
+                  className="underline underline-offset-2"
+                >
+                  Ouvrir ce dossier
+                </NextLink>
+              </>
+            ) : null}
           </Typography>
         ) : null}
         {state.saved && !state.error && !pending ? (

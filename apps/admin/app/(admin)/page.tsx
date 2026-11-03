@@ -103,7 +103,7 @@ const Accueil = async () => {
         <Button asChild>
           <NextLink href="/patients/new">
             <Plus aria-hidden="true" />
-            Nouveau profil
+            Nouveau patient
           </NextLink>
         </Button>
       </div>
