@@ -5,6 +5,7 @@ import { recordAuditEvent, type AuditActor } from "../db/services/audit";
 import {
   getPatientAccountByEmail,
   getPatientAccountBySubject,
+  recordPatientAccountSeen,
 } from "../db/services/patient-accounts";
 import { getPatient } from "../db/services/patients";
 import { err, ok, type Result } from "../shared/result";
@@ -84,7 +85,8 @@ const recordPatientEvent = async (
  * The step after the identity store accepted the patient, by any method. The
  * identity must have a REMI account: a user with no patient file is refused
  * with `not_found`, and the caller signs it out. Writes one
- * `patient.signed_in` event, with the method as its detail.
+ * `patient.signed_in` event, with the method as its detail, and stamps the
+ * account's `lastSeenAt`.
  */
 export const completePatientSignIn = async (
   identity: AuthIdentity,
@@ -96,7 +98,10 @@ export const completePatientSignIn = async (
     return err("not_found", "this identity has no patient account");
   }
   await recordPatientEvent(account, "patient.signed_in", method, db);
-  return ok({ account, landing: patientLandingFor(account) });
+  // The inactivity clock starts again at each sign-in (`inactive-account-
+  // deletion`). It never fails the sign-in.
+  const seen = await recordPatientAccountSeen(account, { everyTime: true }, db);
+  return ok({ account: seen, landing: patientLandingFor(seen) });
 };
 
 const emailSchema = z.string().trim().toLowerCase().pipe(z.email());

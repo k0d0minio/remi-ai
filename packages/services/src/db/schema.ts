@@ -180,6 +180,16 @@ export const patientProfiles = pgTable("patient_profiles", {
     mode: "date",
   }),
   /**
+   * When an owner set the retention hold on this file (`inactive-account-
+   * deletion`, Morgane's question 6). Not null blocks the inactivity sweep:
+   * no notice and no deletion while the hold stands. Null is no hold. The
+   * audit trail records who set it and who cleared it.
+   */
+  retentionHoldAt: timestamp("retention_hold_at", {
+    withTimezone: true,
+    mode: "date",
+  }),
+  /**
    * Per patient-editable field, when the patient last changed it through
    * « Mon profil » — `{ allergies: "<iso>" }`. One small map rather than seven
    * timestamp columns: it only ever answers « modifié par la patiente le … »,
@@ -647,6 +657,22 @@ export const patientAccounts = pgTable("patient_accounts", {
   email: text("email").notNull().unique(),
   authSubject: text("auth_subject").notNull().unique(),
   activatedAt: timestamp("activated_at", { withTimezone: true, mode: "date" }),
+  /**
+   * When the patient last signed in, or last opened the app with a live
+   * session (`inactive-account-deletion`). The sign-in writes it every time.
+   * A session writes it at most once a day. With the patient's latest write in
+   * `audit_events`, it is the start of the inactivity clock.
+   */
+  lastSeenAt: timestamp("last_seen_at", { withTimezone: true, mode: "date" }),
+  /**
+   * When the inactivity sweep sent the notice of deletion. Null when no notice
+   * is in force: the sweep clears it when the patient comes back after it.
+   * It is also what stops a second notice on a second run.
+   */
+  inactivityNoticeSentAt: timestamp("inactivity_notice_sent_at", {
+    withTimezone: true,
+    mode: "date",
+  }),
   ...timestamps,
 });
 
@@ -1281,7 +1307,10 @@ export const leads = pgTable(
     /** The consent text the person ticked, by its version. */
     consentTextVersion: text("consent_text_version").notNull(),
     /** Set by Morgane in the console once she has written back. */
-    contactedAt: timestamp("contacted_at", { withTimezone: true, mode: "date" }),
+    contactedAt: timestamp("contacted_at", {
+      withTimezone: true,
+      mode: "date",
+    }),
     ...timestamps,
   },
   (table) => [

@@ -1,6 +1,9 @@
 import type { DatabaseClient } from "../db/client";
 import type { PatientAccount } from "../db/models/patient-account";
-import { getPatientAccountBySubject } from "../db/services/patient-accounts";
+import {
+  getPatientAccountBySubject,
+  recordPatientAccountSeen,
+} from "../db/services/patient-accounts";
 import type { Id } from "../types";
 import { getAuthProvider, type AuthIdentity } from "./provider";
 
@@ -42,6 +45,10 @@ export const readSession = async (
  * with no patient file, and for an operator. A patient page reads the
  * patient's id from here and never from its URL, so a patient only ever
  * reaches their own data.
+ *
+ * A live session counts as a sign-in for the inactivity clock (`inactive-
+ * account-deletion`): it stamps `lastSeenAt`, at most once a day. Without it,
+ * a patient who keeps a session for a year would be deleted while in use.
  */
 export const readPatientAccount = async (
   db?: DatabaseClient,
@@ -50,5 +57,6 @@ export const readPatientAccount = async (
   if (!identity) {
     return null;
   }
-  return getPatientAccountBySubject(identity.subject, db);
+  const account = await getPatientAccountBySubject(identity.subject, db);
+  return account ? recordPatientAccountSeen(account, {}, db) : null;
 };

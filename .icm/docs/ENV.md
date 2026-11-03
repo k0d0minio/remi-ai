@@ -108,12 +108,12 @@ needs no wiring either: `@neondatabase/serverless` v1 pulls in no `ws` package a
 `WebSocket` Node 22 provides, so there is no `neonConfig` to set and nothing to carry per
 environment. `DATABASE_URL` remains the whole of the storage configuration.
 
-| Variable                | Purpose                                                                                                                                                        | Where set | Public? |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
+| Variable                | Purpose                                                                                                                                                          | Where set | Public? |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
 | `DATABASE_URL`          | Neon connection string (pooled) — the **admin**, **web** and **marketing** projects. Production: production's project. Preview and `uat`: the UAT project's base | Vercel    | no      |
-| `DATABASE_URL_UNPOOLED` | Direct connection string of the same database. `vercel-build.sh` gives it to `db:migrate` and `db:verify`. The app does not read it                            | Vercel    | no      |
-| `MIGRATE_AT_BUILD`      | `1` forces a migration on a Vercel target other than `uat` and `preview`. Nothing sets it since the Neon integration makes the preview branches. Never by hand | Vercel    | no      |
-| `VERCEL_TARGET_ENV`     | The deployment's environment: `production`, `uat` or `preview`. Set by Vercel. The `uat` build migrates                                                        | Vercel    | no      |
+| `DATABASE_URL_UNPOOLED` | Direct connection string of the same database. `vercel-build.sh` gives it to `db:migrate` and `db:verify`. The app does not read it                              | Vercel    | no      |
+| `MIGRATE_AT_BUILD`      | `1` forces a migration on a Vercel target other than `uat` and `preview`. Nothing sets it since the Neon integration makes the preview branches. Never by hand   | Vercel    | no      |
+| `VERCEL_TARGET_ENV`     | The deployment's environment: `production`, `uat` or `preview`. Set by Vercel. The `uat` build migrates                                                          | Vercel    | no      |
 
 With `DATABASE_URL` unset nothing is registered and any screen that needs the database fails loudly
 with "no database adapter registered" — a deploy without a database never quietly renders nothing.
@@ -190,12 +190,14 @@ account or sandbox, never the live key. `EMAIL_FROM` is `REMI <no-reply@mail.jam
 every target until remiai.be is verified in Resend. Unset: the console mailer logs and sends nothing.
 
 Resend is the registered mail vendor: `packages/services/src/email/adapters/resend.ts` implements
-the `Mailer` seam. Two apps register it: `apps/marketing` for the waiting-list notification, and
-`apps/admin` for operator invitations and the patient link sent to a patient.
+the `Mailer` seam. Three apps register it: `apps/marketing` for the waiting-list notification,
+`apps/admin` for operator invitations and the patient link sent to a patient, and `apps/web` (the
+**app** project) for the notice of deletion of the inactivity sweep.
 
-**Both variables are required on the marketing project and on the admin project**, and `EMAIL_FROM`
+**Both variables are required on the marketing, admin and app projects**, and `EMAIL_FROM`
 has to be an address on a domain verified in Resend — an unverified sender is refused at the API.
-They are the same two variables in both places; nothing new was added for the admin console.
+They are the same two variables in each place. On the app project, without them the inactivity
+sweep answers 503 and sends and deletes nothing.
 
 With `RESEND_API_KEY` unset, nothing is registered and `@remi/services/email` keeps its
 `consoleMailer` fallback: it logs and sends nothing. That is deliberate — a preview deploy without
@@ -203,6 +205,17 @@ credentials is loud, not silently dropping mail — and every caller treats it a
 rather than acknowledging a message that went nowhere. The contact form tells the sender to write
 to the founders directly; the admin console falls back to a copyable invitation link and says on
 screen that no email will go out, and refuses to claim it emailed a patient their link.
+
+## Scheduled jobs
+
+| Variable      | Purpose                                                                                                     | Where set | Public? |
+| ------------- | ----------------------------------------------------------------------------------------------------------- | --------- | ------- |
+| `CRON_SECRET` | Shared secret of the cron routes (**app** project). Vercel Cron sends it as `Authorization: Bearer <value>` | Vercel    | no      |
+
+Value per target: one value per target, made with `openssl rand -base64 32`.
+uat and preview never reuse production's. Unset: `/api/cron/inactive-accounts` answers 503 and does
+nothing. Vercel Cron calls the route on the production deployment only, so preview and uat need the
+value only for a call by hand.
 
 ## Files
 

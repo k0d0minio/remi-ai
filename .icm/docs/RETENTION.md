@@ -6,8 +6,9 @@ happens if I ask you to delete it?_ It is written so Morgane can read it out lou
 file is wrong and gets fixed.
 
 Scope: the beta as it stands — Morgane accompanying 10–15 patients, the admin console as her tool,
-the share link as their view. No consent-management vendor, no automated deletion, no legal review
-sits behind any of this.
+the share link as their view. No consent-management vendor and no legal review sit behind any of
+this. One deletion is automatic: an account inactive for twelve months, after a notice
+(§ Inactive accounts).
 
 ## What is held about a patient
 
@@ -171,14 +172,54 @@ and that there is now a line in the trail saying it happened. REMI itself calls 
 
 ## How long an ended patient is kept
 
-**Indefinitely, until Morgane deletes them.** Setting a patient to `ended` changes how they sort
-and filter in the roster; it removes nothing and starts no clock. There is no expiry job, no
-deletion prompt, and no scheduled purge anywhere in the codebase.
+**Until Morgane deletes them, or until the inactivity rule below deletes the account.** Setting a
+patient to `ended` changes how they sort and filter in the roster. It removes nothing and starts no
+clock. The file status plays no part in the inactivity rule either.
 
-That is a description of today's behaviour, not a decided policy. Whether ended patients should be
-deleted after some period — and whether the console should prompt for it — is an open question for
-Morgane, recorded in the `data-care` spec and not answered here. When she answers it, this section
-says what she chose, and any automation lands with it.
+A file the console made, with a share link and no patient account, has no sign-in. The inactivity
+rule does not reach it: it stays until Morgane deletes it.
+
+## Inactive accounts
+
+The pilot privacy policy (section 7) promises that REMI deletes an inactive account after twelve
+months, after a notice. `GET /api/cron/inactive-accounts` on the app does it. Vercel Cron calls it
+once a day at 02:00 UTC: 03:00 in Brussels in winter, 04:00 in summer. The caller must send the
+shared secret `CRON_SECRET`. The rule lives in `packages/services/src/db/services/retention/`.
+
+**The clock.** It covers every patient account. It starts at the latest of:
+
+1. the account's creation;
+2. the patient's last sign-in, or the last day a live session opened the app
+   (`patient_accounts.last_seen_at`, written at most once a day);
+3. the patient's last write: the newest `audit_events` row with actor kind `patient`.
+
+Months are calendar months.
+
+**Eleven months after it**, REMI e-mails the patient once, in the language of the file:
+« Votre compte REMI sera supprimé le <date> », with a sign-in link. The practitioner who holds the
+file receives a copy in French, which names the pseudonym only. `patient_accounts.inactivity_notice_sent_at`
+records the notice, and the audit trail gets a `patient.inactivity_notice_sent` row with the date.
+
+**A return cancels it.** A sign-in, a session or a write after the notice voids it. The column goes
+back to null and the clock starts again. The next notice comes eleven months later.
+
+**Twelve months after it**, and never sooner than thirty days after the notice, the route deletes
+the file through `deletePatient`: the same cascade as the console, files first (§ What deleting a
+patient removes). The audit trail gets a `patient.deleted` row with actor kind `system` and the
+detail `inactivity`. When the file store refuses, nothing is deleted and the next run tries again.
+
+**The retention hold.** An owner of the console can set a hold on a file, in the « Zone sensible »
+of the file page (`patient_profiles.retention_hold_at`). While it stands, the route sends no notice
+and deletes nothing. It writes one log line per skipped file per run. Setting and clearing the hold
+each write an audit row with the owner's name. Morgane said on 2026-10-23 that no legal retention
+rule applies during the pilot, so the hold is the only exception.
+
+**What makes it safe to run twice.** A sent notice stamps its column, so a second run on the same
+day sends nothing. A deleted file is gone, so nothing is deleted twice. With no mailer registered,
+the route sends nothing and deletes nothing: no file goes without its notice.
+
+Vercel Cron runs on the production deployment only. Preview and UAT have no daily run. A call by
+hand with the secret runs the same sweep.
 
 ## Consent
 
@@ -205,7 +246,8 @@ audit events are written after the commit. The two takeover paths of
 
 ## Where this is enforced
 
-Nowhere automatically, and that is the honest answer. Deletion is Morgane's action in the console;
-retention is her judgement. What the code guarantees is only what is written above: that deleting
-really deletes, that the cascade reaches everything hanging off the profile, and that the audit
-trail survives it on purpose.
+Deletion is Morgane's action in the console, with one automatic exception: the inactivity rule
+above. Any other retention is her judgement. What the code guarantees is only what is written
+above: that deleting really deletes, that the cascade reaches everything hanging off the profile,
+that an inactive account goes only after its notice, and that the audit trail survives it on
+purpose.

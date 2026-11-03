@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { err, ok, type Result } from "../../../shared/result";
 import { getDatabase, type DatabaseClient } from "../../client";
+import type { Page } from "../../../types";
 import type { PatientAccount } from "../../models/patient-account";
 import { getPatient } from "../patients";
 
@@ -91,8 +92,71 @@ export const createPatientAccount = async (
       email,
       authSubject,
       activatedAt: null,
+      lastSeenAt: null,
+      inactivityNoticeSentAt: null,
     });
     return ok(created);
   };
   return db ? write(db) : getDatabase().transaction(write);
+};
+
+/** How stale `lastSeenAt` must be before a live session writes it again. */
+const SEEN_WRITE_INTERVAL_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Records that the patient is here: a sign-in, or a live session that opens
+ * the app (`inactive-account-deletion`). The inactivity clock starts again
+ * from it. A session writes at most once a day, so a page view costs no write.
+ * A sign-in passes `everyTime` and always writes.
+ *
+ * It never fails the caller. A sign-in that cannot stamp the column still
+ * signs the patient in. The log names the failure.
+ */
+export const recordPatientAccountSeen = async (
+  account: PatientAccount,
+  options: { everyTime?: boolean; now?: Date } = {},
+  db?: DatabaseClient,
+): Promise<PatientAccount> => {
+  const now = options.now ?? new Date();
+  const last = account.lastSeenAt?.getTime() ?? 0;
+  if (!options.everyTime && now.getTime() - last < SEEN_WRITE_INTERVAL_MS) {
+    return account;
+  }
+  try {
+    return (
+      (await accounts(db).update(account.id, { lastSeenAt: now })) ?? account
+    );
+  } catch (cause) {
+    console.error("[patient-account] the last sign-in was not recorded", {
+      account: account.id,
+      cause,
+    });
+    return account;
+  }
+};
+
+/** Every patient account, page by page. The inactivity sweep reads them all. */
+export const listPatientAccounts = async (
+  db?: DatabaseClient,
+): Promise<readonly PatientAccount[]> => {
+  const all: PatientAccount[] = [];
+  let cursor: string | null = null;
+  do {
+    const page: Page<PatientAccount> = await accounts(db).findMany(
+      {},
+      { limit: 500, cursor },
+    );
+    all.push(...page.items);
+    cursor = page.nextCursor;
+  } while (cursor);
+  return all;
+};
+
+/** Sets or clears the inactivity notice's timestamp. */
+export const setInactivityNoticeSentAt = async (
+  id: string,
+  at: Date | null,
+  db?: DatabaseClient,
+): Promise<void> => {
+  await accounts(db).update(id, { inactivityNoticeSentAt: at });
 };

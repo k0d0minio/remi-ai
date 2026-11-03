@@ -232,6 +232,13 @@
       "when": 1793670268332,
       "tag": "0032_leads",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1793700207577,
+      "tag": "0033_inactivity_retention",
+      "breakpoints": true
     }
   ]
 }

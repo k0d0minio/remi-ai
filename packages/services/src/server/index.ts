@@ -354,11 +354,7 @@ export {
   listLeads,
   setLeadContacted,
 } from "../db/services/leads";
-export type {
-  LeadInput,
-  LeadQuery,
-  LeadWrite,
-} from "../db/services/leads";
+export type { LeadInput, LeadQuery, LeadWrite } from "../db/services/leads";
 export type { Lead } from "../db/models/lead";
 
 export { listAuditEvents, recordAuditEvent } from "../db/services/audit";
@@ -406,6 +402,8 @@ export {
   getPatientAccountBySubject,
 } from "../db/services/patient-accounts";
 export type { PatientAccountInput } from "../db/services/patient-accounts";
+export { runInactivitySweep, setRetentionHold } from "../db/services/retention";
+export type { InactivitySweepCounts } from "../db/services/retention";
 export type { PatientAccount } from "../db/models/patient-account";
 
 export {

@@ -104,7 +104,11 @@ const Audit = async ({ searchParams }: { searchParams: SearchParams }) => {
                       than inferred; the journal says it out loud. */}
                   {event.actorKind === "patient"
                     ? `${event.actorName || "patiente"} — depuis son lien`
-                    : event.actorName || event.actorEmail || "compte supprimé"}
+                    : event.actorKind === "system"
+                      ? "REMI — automatique"
+                      : event.actorName ||
+                        event.actorEmail ||
+                        "compte supprimé"}
                 </Typography>
                 <Typography
                   as="span"

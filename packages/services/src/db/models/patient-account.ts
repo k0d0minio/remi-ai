@@ -15,4 +15,8 @@ export type PatientAccount = Entity & {
   email: string;
   authSubject: string;
   activatedAt: Date | null;
+  /** The last sign-in, or the last day a live session opened the app. */
+  lastSeenAt: Date | null;
+  /** When the inactivity notice went out. Null: no notice in force. */
+  inactivityNoticeSentAt: Date | null;
 };

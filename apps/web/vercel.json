@@ -1,4 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "ignoreCommand": "npx turbo-ignore @remi/web --fallback=HEAD^1"
+  "ignoreCommand": "npx turbo-ignore @remi/web --fallback=HEAD^1",
+  "crons": [
+    {
+      "path": "/api/cron/inactive-accounts",
+      "schedule": "0 2 * * *"
+    }
+  ]
 }
