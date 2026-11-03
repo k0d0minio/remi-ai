@@ -1,8 +1,5 @@
 import type { SignupFieldErrors } from "@remi/services/shared";
 
-/** Where a new patient lands, as a path under the locale. */
-export const QUESTIONNAIRE_PATH = "/questionnaire";
-
 /** A refusal of the whole form, not of one field. */
 export type SignupFormError =
   | "invalid_link"

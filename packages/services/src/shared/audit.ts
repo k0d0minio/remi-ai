@@ -23,6 +23,12 @@ export const auditActions = [
   "patient.created",
   /** A patient created their own account from a practitioner's sign-up link. */
   "patient.signed_up",
+  /** A patient signed in. The detail names the method. */
+  "patient.signed_in",
+  /** A patient asked for a password reset link. */
+  "patient.password_reset_requested",
+  /** A patient set a new password from the reset link. */
+  "patient.password_reset",
   "patient.updated",
   "patient.deleted",
   "recommendation.added",

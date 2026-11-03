@@ -28,7 +28,16 @@ import type {
 } from "@remi/services/shared";
 import type { Theme } from "@remi/ui/server";
 import type { PatientWriteError } from "@/lib/patient-link/actions";
+import type { SignInNotice } from "@/lib/patient-auth/paths";
+import type {
+  LinkRequestState,
+  NewPasswordFormError,
+  SignInFormError,
+} from "@/lib/patient-auth/state";
 import type { SignupFormError } from "@/lib/signup/state";
+
+/** What a form that sends a link can answer. */
+type LinkStatus = NonNullable<LinkRequestState["status"]>;
 
 export type NavItem = {
   /** Path without the locale prefix — the shell adds it. */
@@ -552,4 +561,66 @@ export type Content = {
     title: string;
     comingSoon: string;
   };
+  /**
+   * The patient's sign-in at `/connexion` (story 2): the password form, the
+   * magic link and the notices the page can open with.
+   */
+  patientSignIn: {
+    metaTitle: string;
+    title: string;
+    intro: string;
+    emailLabel: string;
+    passwordLabel: string;
+    submit: string;
+    submitting: string;
+    form: Record<SignInFormError, string>;
+    notices: Record<SignInNotice, string>;
+    forgotLink: string;
+    magicLink: {
+      title: string;
+      intro: string;
+      submit: string;
+      submitting: string;
+      status: Record<LinkStatus, string>;
+    };
+    /** For a visitor with no account: it comes from the practitioner's link. */
+    noAccount: string;
+  };
+  /** « Mot de passe oublié » at `/connexion/mot-de-passe-oublie`. */
+  forgotPassword: {
+    metaTitle: string;
+    title: string;
+    intro: string;
+    emailLabel: string;
+    submit: string;
+    submitting: string;
+    status: Record<LinkStatus, string>;
+    back: string;
+  };
+  /** The page the reset link opens, at `/connexion/nouveau-mot-de-passe`. */
+  newPassword: {
+    metaTitle: string;
+    title: string;
+    intro: string;
+    emailLabel: string;
+    passwordLabel: string;
+    passwordHint: string;
+    submit: string;
+    submitting: string;
+    form: Record<NewPasswordFormError, string>;
+    /** The link carries no token, or the identity store refused it. */
+    invalidLink: string;
+    requestAgain: string;
+  };
+  /**
+   * Where an activated patient lands, at `/accueil`. A holding page until
+   * `patient-home-navigation` builds the patient space.
+   */
+  patientHome: {
+    metaTitle: string;
+    title: string;
+    comingSoon: string;
+  };
+  /** The sign-out button on the pages behind the patient session. */
+  signOut: string;
 };

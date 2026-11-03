@@ -529,4 +529,84 @@ export const en: Content = {
     comingSoon:
       "Your questionnaire is coming soon. You will fill it in here before your consultation.",
   },
+  patientSignIn: {
+    metaTitle: "Sign in",
+    title: "Sign in",
+    intro: "Sign in with the account you created when you signed up.",
+    emailLabel: "E-mail address",
+    passwordLabel: "Password",
+    submit: "Sign in",
+    submitting: "Signing in…",
+    form: {
+      wrong_credentials: "Wrong e-mail address or password.",
+      no_account:
+        "No REMI account uses this address. Sign up with the link from the person who supports you.",
+      rate_limited: "Too many attempts. Try again in a few minutes.",
+      unavailable: "The sign-in did not go through. Try again in a moment.",
+    },
+    notices: {
+      no_account:
+        "No REMI account uses this address. Sign up with the link from the person who supports you.",
+      password_changed: "Your new password is saved. Sign in with it.",
+    },
+    forgotLink: "Forgot your password?",
+    magicLink: {
+      title: "Get a sign-in link",
+      intro:
+        "No password needed: we send a link to your e-mail address. It signs you in with one click.",
+      submit: "Get a link",
+      submitting: "Sending…",
+      status: {
+        sent:
+          "If this address has an account, a sign-in link is on its way. Open it from your inbox.",
+        rate_limited: "Too many attempts. Try again in a few minutes.",
+        unavailable: "The link could not be sent. Try again in a moment.",
+      },
+    },
+    noAccount:
+      "No account yet? It is created with the link from the person who supports you.",
+  },
+  forgotPassword: {
+    metaTitle: "Forgot password",
+    title: "Forgot your password",
+    intro:
+      "Enter your account's e-mail address. We send a link there to choose a new password.",
+    emailLabel: "E-mail address",
+    submit: "Get the link",
+    submitting: "Sending…",
+    status: {
+      sent:
+        "If this address has an account, a link is on its way. It is valid for one hour and works once.",
+      rate_limited: "Too many attempts. Try again in a few minutes.",
+      unavailable: "The link could not be sent. Try again in a moment.",
+    },
+    back: "Back to sign-in",
+  },
+  newPassword: {
+    metaTitle: "New password",
+    title: "Choose a new password",
+    intro: "Confirm your account's e-mail address and choose a new password.",
+    emailLabel: "E-mail address",
+    passwordLabel: "New password",
+    passwordHint: "At least 8 characters.",
+    submit: "Save and sign in",
+    submitting: "Saving…",
+    form: {
+      too_short: "The password needs at least 8 characters.",
+      too_long: "This password is too long.",
+      invalid_link:
+        "This link has expired or was already used. Ask for a new one.",
+      rate_limited: "Too many attempts. Try again in a few minutes.",
+      unavailable: "The password was not saved. Try again in a moment.",
+    },
+    invalidLink: "This link has expired or was already used.",
+    requestAgain: "Ask for a new link",
+  },
+  patientHome: {
+    metaTitle: "Home",
+    title: "Welcome",
+    comingSoon:
+      "Your space is coming soon. Your recommendations and recipes will be here.",
+  },
+  signOut: "Sign out",
 };
