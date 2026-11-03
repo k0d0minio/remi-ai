@@ -1001,6 +1001,12 @@ export const operators = pgTable("operators", {
     .default(
       sql`translate(encode(decode(substr(replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', ''), 1, 48), 'hex'), 'base64'), '+/', '-_')`,
     ),
+  /**
+   * The order of the practitioner's patient list (story 5): `appointment` or
+   * `name`, from `patientListSorts`. Text with the set in code, like `role`.
+   * The default is Morgane's first sort and covers the existing operators.
+   */
+  patientListSort: text("patient_list_sort").notNull().default("appointment"),
   ...timestamps,
 });
 

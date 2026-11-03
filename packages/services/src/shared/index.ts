@@ -96,8 +96,15 @@ export {
   isFileStatus,
 } from "./file-status";
 export type { FileStatus } from "./file-status";
-export { canManageOperators, isAtLeast, operatorRoles } from "./operator";
-export type { OperatorRoleName } from "./operator";
+export {
+  canManageOperators,
+  defaultPatientListSort,
+  isAtLeast,
+  isPatientListSort,
+  operatorRoles,
+  patientListSorts,
+} from "./operator";
+export type { OperatorRoleName, PatientListSort } from "./operator";
 export {
   anamnesisCategories,
   challengeOutcomes,
