@@ -1,6 +1,12 @@
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { getFileStore, isFileStoreConfigured } from "../../../files";
+import {
+  canMoveFileStatus,
+  fileStatuses,
+  initialFileStatus,
+  type FileStatus,
+} from "../../../shared/file-status";
 import { patientFilesPrefix } from "../../../shared/files";
 import { locales } from "../../../shared/i18n";
 import {
@@ -15,6 +21,7 @@ import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientDocument } from "../../models/patient-document";
+import { recordAuditEvent, type AuditActor } from "../audit";
 import type {
   PatientEditableProfileField,
   PatientProfile,
@@ -319,6 +326,7 @@ export const createPatient = async (
     email: data.email ? data.email : null,
     locale: data.locale ?? "fr",
     status: data.status ?? "active",
+    fileStatus: initialFileStatus,
     birthDate: data.birthDate ? data.birthDate : null,
     sex: data.sex ?? "unspecified",
     heightCm: data.heightCm ? data.heightCm : null,
@@ -425,6 +433,75 @@ export const updatePatient = async (
 
   const patient = await patients().update(id, patch);
   return patient ? ok(patient) : err("not_found", "no such patient");
+};
+
+const fileStatusSchema = z.enum(fileStatuses);
+
+const reasonSchema = z.string().trim().min(1, "a reason is required").max(500);
+
+/**
+ * The one write of `fileStatus` (D-31). `updatePatient` never touches it.
+ *
+ * It applies one move of `fileStatusTransitions` and writes one
+ * `patient.file_status_changed` event with the previous status, the next one
+ * and the reason (D-32). A move the table does not allow is a `conflict`: the
+ * caller asked for something the file's current state forbids, and nothing is
+ * written. The same status as now is `ok` and writes nothing, so a caller that
+ * fires on every save does not fill the trail.
+ *
+ * The callers are the triggers in other epics: the questionnaire's last
+ * mandatory field (`ready`), the first saved recommendation (`to_validate`) and
+ * the activation (`active`).
+ */
+export const setFileStatus = async (
+  patientId: Id,
+  next: FileStatus,
+  actor: AuditActor | null,
+  reason: string,
+  db?: DatabaseClient,
+): Promise<Result<PatientProfile>> => {
+  if (!isValidId(patientId)) {
+    return err("not_found", "no such patient");
+  }
+  const target = fileStatusSchema.safeParse(next);
+  if (!target.success) {
+    return err("invalid_input", "that file status does not exist");
+  }
+  const why = reasonSchema.safeParse(reason);
+  if (!why.success) {
+    return invalid(why.error.issues[0]);
+  }
+  const current = await patients(db).findById(patientId);
+  if (!current) {
+    return err("not_found", "no such patient");
+  }
+  // A row read before the migration has no value. The migration sets every
+  // existing row, so this only covers an in-memory row from an old fixture.
+  const previous = current.fileStatus ?? initialFileStatus;
+  if (previous === target.data) {
+    return ok(current);
+  }
+  if (!canMoveFileStatus(previous, target.data)) {
+    return err(
+      "conflict",
+      `a file cannot move from ${previous} to ${target.data}`,
+    );
+  }
+  const updated = await patients(db).update(patientId, {
+    fileStatus: target.data,
+  });
+  if (!updated) {
+    return err("not_found", "no such patient");
+  }
+  await recordAuditEvent({
+    actor,
+    action: "patient.file_status_changed",
+    targetType: "patient",
+    targetId: patientId,
+    targetLabel: updated.pseudonym,
+    detail: `${previous} → ${target.data}: ${why.data}`,
+  });
+  return ok(updated);
 };
 
 /**

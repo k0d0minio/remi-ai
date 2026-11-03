@@ -29,6 +29,7 @@ export {
   patientsOf,
   recordPatientLinkOpened,
   regenerateShareToken,
+  setFileStatus,
   setPatientNextConsultationPrep,
   updatePatient,
   updatePatientProfileByPatient,

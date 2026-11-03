@@ -1,4 +1,5 @@
 import type { Entity, Id } from "../../types";
+import type { FileStatus } from "../../shared/file-status";
 import type { Locale } from "../../shared/i18n";
 import type {
   consentChannels,
@@ -43,6 +44,11 @@ export type PatientProfile = Entity & {
   email: string | null;
   locale: Locale;
   status: PatientStatus;
+  /**
+   * Where the file stands in the care (D-31). Not `status`, which is the
+   * retention lifecycle. Written only through `setFileStatus`.
+   */
+  fileStatus: FileStatus;
   /** `YYYY-MM-DD`. A birthday has no timezone, so it is not an instant. */
   birthDate: string | null;
   sex: PatientSex;

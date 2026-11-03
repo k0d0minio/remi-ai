@@ -66,6 +66,7 @@ export {
   patientOfRecord,
   patientsOf,
   regenerateShareToken,
+  setFileStatus,
   setPatientNextConsultationPrep,
   updatePatient,
 } from "./services/patients";
