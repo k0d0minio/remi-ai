@@ -26,6 +26,7 @@ values and restores DEFAULT.
 
 ## Acceptance criteria
 
+- [ ] The genetic consent text appears only after « Oui » to the test question. The patient gives or refuses it there, and the decision is recorded with `recordConsent`
 - [ ] The three lists are hidden until « Oui » is selected and the genetic consent is `given`
 - [ ] Each list accepts one value. An unanswered list stays empty. No value is invented
 - [ ] `macroProfile()` returns DEFAULT 45/30/25 when any of the three is empty or the trio has no table entry
@@ -42,3 +43,4 @@ values and restores DEFAULT.
 
 - D-30. cross-epic: `consent-and-data/genetic-consent-and-optional-data`, `genotype-macro-split/genotype-reference-table` (the table `macroProfile()` reads).
 - The 28 Aug rule stands: a doctor orders the test. REMI never suggests one.
+- The consent screen criterion moved here from `consent-and-data/genetic-consent-and-optional-data` (Jamie, 2026-11-03). That stub built the rules: `savePatientQuestionnaire` refuses a genotype value without a `given` genetic consent (`not_permitted`), and a refusal or a withdrawal clears the three fields.

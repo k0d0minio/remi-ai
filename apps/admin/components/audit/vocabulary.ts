@@ -105,6 +105,7 @@ export const actionLabels: Record<AuditActionName, string> = {
   "consent.given": "consentement donné",
   "consent.refused": "consentement refusé",
   "consent.withdrawn": "consentement retiré",
+  "genotype.cleared": "génotype effacé",
   "share_link.regenerated": "lien patient régénéré",
   "share_link.emailed": "lien patient envoyé",
   "context.exported": "contexte copié",
@@ -229,6 +230,8 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "consent.refused": "info",
   // A withdrawal stops processing: Morgane must see it.
   "consent.withdrawn": "warning",
+  // The genotype is gone from the file: the macronutrient split falls back.
+  "genotype.cleared": "warning",
   "share_link.regenerated": "warning",
   "share_link.emailed": "info",
   // Health data left the console, pseudonymous but real — worth the eye, not an

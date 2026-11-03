@@ -30,6 +30,8 @@ type Props = {
   lastEditedAt: string;
   /** « Recueilli le … · WhatsApp », or `null` when it is not recorded. */
   consent: string | null;
+  /** The latest `care` decision is `given`: the form unlocks the care fields. */
+  careConsentGiven: boolean;
   /**
    * Per field the patient last changed from « Mon profil », the day they did —
    * formatted on the server for the same reason as the two dates above.
@@ -64,6 +66,7 @@ export const ProfileSummary = ({
   patient,
   lastEditedAt,
   consent,
+  careConsentGiven,
   patientEditedOn,
 }: Props) => {
   const [editing, setEditing] = useState(false);
@@ -73,7 +76,13 @@ export const ProfileSummary = ({
   const close = useCallback(() => setEditing(false), []);
 
   if (editing) {
-    return <PatientForm patient={patient} onSaved={close} />;
+    return (
+      <PatientForm
+        patient={patient}
+        careConsentGiven={careConsentGiven}
+        onSaved={close}
+      />
+    );
   }
 
   const age = ageInYears(patient.birthDate);

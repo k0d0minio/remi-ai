@@ -147,6 +147,11 @@ export const auditActions = [
   "consent.given",
   "consent.refused",
   "consent.withdrawn",
+  /**
+   * The genotype emptied because the genetic consent is no longer in force
+   * (`genetic-consent-and-optional-data`). The detail names the decision.
+   */
+  "genotype.cleared",
   "share_link.regenerated",
   "share_link.emailed",
   /**

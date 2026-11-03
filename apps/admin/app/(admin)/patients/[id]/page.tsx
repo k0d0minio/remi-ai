@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import {
   MAX_ACTIVE_GOALS,
+  consentsOf,
   countGoalCheckInsAwaitingAttention,
   countMealEntriesAwaitingFeedback,
   getCurrentChallenge,
@@ -189,6 +190,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     scoreStrips,
     goalsAwaitingAttention,
     messages,
+    consents,
   ] = await Promise.all([
     listPatientRecommendations(patient.id),
     listArchivedPatientRecommendations(patient.id),
@@ -219,6 +221,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     listGoalScoreStrips(patient.id),
     countGoalCheckInsAwaitingAttention(patient.id),
     listPatientMessages(patient.id),
+    consentsOf(patient.id),
   ]);
   // Derived from the thread already in hand rather than a second read.
   const unreadMessages = messages.filter(
@@ -1067,6 +1070,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 patient={patient}
                 lastEditedAt={formatDate(patient.lastEditedAt)}
                 consent={consent}
+                careConsentGiven={consents.care?.decision === "given"}
                 patientEditedOn={Object.fromEntries(
                   Object.entries(patient.patientEditedAt).flatMap(
                     ([field, at]) => (at ? [[field, formatDate(at)]] : []),
