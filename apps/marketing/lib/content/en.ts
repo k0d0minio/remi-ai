@@ -687,13 +687,7 @@ export const en: Content = {
         role: "Co-founder — product & nutrition",
         email: "morgane@remiai.be",
         phone: "+32 486 12 46 83",
-      },
-      {
-        name: "Arnaud Ruelle",
-        role: "Co-founder — strategy & development",
-        email: "arnaud@remiai.be",
-        phone: "+32 486 16 31 55",
-      },
+      }
     ],
     form: {
       name: "Your name",
