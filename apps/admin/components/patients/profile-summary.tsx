@@ -62,10 +62,12 @@ type Props = {
   genotypeOpen: boolean;
 };
 
-/** One line of the read summary. `null` reads as an em dash. */
+/** One line of the read summary. `null` reads as `empty`, an em dash by default. */
 type Row = {
   label: string;
   value: string | null;
+  /** What an empty value reads as, when an em dash says too little. */
+  empty?: string;
   /** « modifié par la patiente le … » — the value on screen is theirs. */
   patientEditedOn?: string;
 };
@@ -163,7 +165,11 @@ export const ProfileSummary = ({
           : `${answers.desiredWeightKg} kg`,
     },
     { label: "Motif de consultation", value: answers.consultationReason },
-    { label: "Date de consultation", value: consultationDate },
+    {
+      label: "Date de consultation",
+      value: consultationDate,
+      empty: "Non renseigné",
+    },
     {
       label: "Régime",
       value: answers.diet
@@ -364,7 +370,7 @@ const SummaryGroup = ({ title, rows }: GroupProps) => (
             </dt>
             <dd className="flex flex-col items-start gap-1">
               <Typography size="sm" className="whitespace-pre-line">
-                {hasValue(row) ? row.value : "—"}
+                {hasValue(row) ? row.value : (row.empty ?? "—")}
               </Typography>
               {row.patientEditedOn ? (
                 <Badge variant="info" tone="subtle" size="sm">
