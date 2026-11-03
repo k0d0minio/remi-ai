@@ -12,6 +12,8 @@ import type { Intent } from "@remi/ui/server";
 export const actionLabels: Record<AuditActionName, string> = {
   "patient.created": "profil créé",
   "patient.signed_up": "inscription par le lien",
+  "patient.file_taken_over": "dossier repris par le patient",
+  "patient.file_claim_sent": "lien de reprise envoyé",
   "patient.signed_in": "connexion",
   "patient.password_reset_requested": "lien de nouveau mot de passe demandé",
   "patient.password_reset": "nouveau mot de passe défini",
@@ -139,6 +141,8 @@ export const actionLabels: Record<AuditActionName, string> = {
 export const actionIntents: Record<AuditActionName, Intent> = {
   "patient.created": "neutral",
   "patient.signed_up": "neutral",
+  "patient.file_taken_over": "neutral",
+  "patient.file_claim_sent": "neutral",
   "patient.signed_in": "neutral",
   "patient.password_reset_requested": "neutral",
   "patient.password_reset": "warning",

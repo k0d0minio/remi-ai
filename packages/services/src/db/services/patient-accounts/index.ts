@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { err, ok, type Result } from "../../../shared/result";
 import { getDatabase, type DatabaseClient } from "../../client";
-import type { Page } from "../../../types";
+import type { Id, Page } from "../../../types";
 import type { PatientAccount } from "../../models/patient-account";
 import { getPatient } from "../patients";
 
@@ -54,6 +54,17 @@ export const getPatientAccountByEmail = async (
     return null;
   }
   return findOne({ email: address }, db);
+};
+
+/** The account of one file, or null: a file the practitioner created has none. */
+export const getPatientAccountByProfile = async (
+  patientProfileId: Id,
+  db?: DatabaseClient,
+): Promise<PatientAccount | null> => {
+  if (!z.uuid().safeParse(patientProfileId).success) {
+    return null;
+  }
+  return findOne({ patientProfileId }, db);
 };
 
 /**

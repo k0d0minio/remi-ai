@@ -16,6 +16,8 @@ import type { Content } from "@/lib/content/types";
 import { fill } from "@/lib/content/fill";
 import { SIGN_IN_PATH } from "@/lib/patient-auth/paths";
 import { signUpAction } from "@/lib/signup/actions";
+import { requestClaimAction } from "@/lib/takeover/actions";
+import { initialClaimRequestState } from "@/lib/takeover/state";
 import {
   initialSignupState,
   isConsentError,
@@ -68,6 +70,12 @@ export const SignupForm = ({ token, locale, content, consents }: Props) => {
   const [state, formAction, pending] = useActionState(
     signUpAction,
     initialSignupState,
+  );
+  // « Recevoir un lien par e-mail » after `file_exists` (patient-takes-over-
+  // file). It posts this same form: the token and the e-mail travel with it.
+  const [claim, claimAction, claimPending] = useActionState(
+    requestClaimAction,
+    initialClaimRequestState,
   );
   const [values, setValues] = useState(empty);
   const [step, setStep] = useState<"consent" | "details">("consent");
@@ -168,6 +176,34 @@ export const SignupForm = ({ token, locale, content, consents }: Props) => {
               </>
             ) : null}
           </Typography>
+        ) : null}
+
+        {/* A file the practitioner created holds the e-mail: the patient
+            takes it over by a one-time link, never through a second file. */}
+        {formError === "file_exists" ? (
+          <div className="flex flex-col gap-3">
+            <Button
+              type="submit"
+              formAction={claimAction}
+              variant="outline"
+              size="lg"
+              className="min-h-11 w-full"
+              disabled={claimPending}
+            >
+              {claimPending ? content.claim.requesting : content.claim.request}
+            </Button>
+            {claim.status !== "idle" ? (
+              <Typography
+                size="sm"
+                role="status"
+                className={
+                  claim.status === "sent" ? undefined : "text-error-text"
+                }
+              >
+                {content.claim.status[claim.status]}
+              </Typography>
+            ) : null}
+          </div>
         ) : null}
 
         {signupFields.map((name) => {

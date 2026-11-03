@@ -503,6 +503,7 @@ export const fr: Content = {
       invalid_link:
         "Ce lien n'est pas valide. Demandez-en un nouveau à la personne qui vous suit.",
       already_registered: "Vous avez déjà un compte.",
+      file_exists: "Un dossier existe déjà pour cette adresse.",
       rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
       unavailable:
         "L'inscription n'a pas abouti. Réessayez dans un instant : vos réponses sont gardées.",
@@ -512,6 +513,17 @@ export const fr: Content = {
         "Le texte a changé depuis l'ouverture de la page. Rechargez la page pour lire la version en vigueur. Aucun compte n'a été créé.",
     },
     signIn: "Connectez-vous.",
+    claim: {
+      request: "Recevoir un lien par e-mail",
+      requesting: "Envoi du lien…",
+      status: {
+        sent: "Si un dossier existe pour cette adresse, un lien vient d'y partir. Il sert une seule fois et expire dans 24 heures.",
+        rate_limited:
+          "Un lien est parti il y a moins de cinq minutes. Regardez dans votre boîte de réception, puis réessayez plus tard.",
+        unavailable:
+          "Le lien n'a pas pu partir. Réessayez dans un instant.",
+      },
+    },
     submit: "Créer mon compte",
     submitting: "Création du compte…",
     consent: {
@@ -674,6 +686,34 @@ export const fr: Content = {
     },
     invalidLink: "Ce lien a expiré ou a déjà servi.",
     requestAgain: "Demander un nouveau lien",
+  },
+  takeover: {
+    metaTitle: "Reprendre mon dossier",
+    title: "Reprenez votre dossier REMI",
+    greeting: "Bonjour {name},",
+    intro:
+      "La personne qui vous suit a ouvert votre dossier. Donnez votre accord sur le traitement de vos données, puis choisissez un mot de passe. Vous retrouvez ensuite les informations déjà enregistrées.",
+    passwordLabel: "Mot de passe",
+    passwordHint: "Au moins 8 caractères.",
+    submit: "Créer mon compte",
+    submitting: "Création du compte…",
+    form: {
+      consent_missing:
+        "Cochez chaque consentement obligatoire. Aucun compte n'a été créé.",
+      consent_stale:
+        "Le texte a changé depuis l'ouverture de la page. Rechargez la page pour lire la version en vigueur. Aucun compte n'a été créé.",
+      too_short: "Le mot de passe compte au moins 8 caractères.",
+      too_long: "Ce mot de passe est trop long.",
+      spent: "Ce lien n'est plus valide. Aucun compte n'a été créé.",
+      has_account: "Vous avez déjà un compte.",
+      rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
+      unavailable:
+        "Le compte n'a pas été créé. Réessayez dans un instant.",
+    },
+    signIn: "Connectez-vous.",
+    spent:
+      "Ce lien n'est plus valide : il a déjà servi ou il a expiré. Connectez-vous si vous avez déjà un compte. Sinon, demandez un nouveau lien depuis le lien d'inscription de la personne qui vous suit.",
+    hasAccount: "Vous avez déjà un compte pour ce dossier.",
   },
   patientHome: {
     metaTitle: "Accueil",

@@ -42,3 +42,12 @@ consents of story 3 before the password is set. Then the account is attached to 
 
 - cross-epic: `patient-signup-account/auth-seam`, `patient-signup-account/duplicate-email-guard`, `care-activation` (sends the e-mail that carries the link).
 - The claim e-mail goes through the email seam (Resend), from the address Morgane names.
+- Jamie accepted the defaults of the pull request's questions on 2026-11-03:
+  1. The activation link stays valid 7 days.
+  2. The claim link stays valid 24 hours.
+  3. This ticket ships `issueActivationLink` and sends no activation e-mail. `care-activation/activation-email` puts the link in its e-mail.
+  4. Path 2 offers only a file of the link's practitioner. `triage/one-practitioner-per-patient-email` changes the other case.
+  5. `triage/one-practitioner-per-patient-email` stays its own ticket.
+  6. « Un dossier existe déjà pour cette adresse » stays, as story 1 writes it.
+  7. The claim e-mail goes from `EMAIL_FROM`, « REMI ».
+  8. One claim e-mail per file per 5 minutes. A new link voids the earlier one.

@@ -1,22 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import {
-  currentConsentText,
-  getPractitionerBySignupToken,
-} from "@remi/services/server";
-import {
-  consentTextLocaleFor,
-  formatDate,
-  isLocale,
-  mandatoryConsentKeys,
-  type Locale,
-} from "@remi/services/shared";
-import { Markdown, Typography, Wordmark } from "@remi/ui/server";
-import type { ConsentStepText } from "@/components/signup/consent-step";
+import { getPractitionerBySignupToken } from "@remi/services/server";
+import { isLocale } from "@remi/services/shared";
+import { Typography, Wordmark } from "@remi/ui/server";
 import { SignupForm } from "@/components/signup/signup-form";
 import { getContent } from "@/lib/content";
 import { fill } from "@/lib/content/fill";
 import { ensureDatabase } from "@/lib/database";
+import { consentTexts } from "@/lib/signup/consent-texts";
 
 /** Reads the database on every hit — never prerendered. */
 export const dynamic = "force-dynamic";
@@ -33,28 +24,6 @@ export const generateMetadata = async ({
     title: getContent(isLocale(locale) ? locale : "en").signupLink.metaTitle,
   };
 };
-
-/**
- * The mandatory consent texts in the page's language, or in French when that
- * language has no text yet. The body renders here, on the server: `Markdown`
- * is a server component, and the client step only places it.
- */
-const consentTexts = (locale: Locale): ConsentStepText[] =>
-  mandatoryConsentKeys.map((key) => {
-    const text = currentConsentText(key, consentTextLocaleFor(locale));
-    return {
-      key,
-      version: text.version,
-      locale: text.locale,
-      // Noon UTC: the same calendar day in every time zone of Europe.
-      date: formatDate(
-        `${text.date}T12:00:00Z`,
-        locale === "fr" ? "fr-BE" : "en-GB",
-      ),
-      lang: text.locale === "fr-BE" ? "fr" : "en",
-      body: <Markdown>{text.body}</Markdown>,
-    };
-  });
 
 /**
  * Where a practitioner's permanent sign-up link lands (stories 1 and 2). The

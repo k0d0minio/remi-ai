@@ -86,6 +86,10 @@ export const signUpAction = async (
       // sign-in link and names no data of the existing file.
       case "conflict":
         return { fields, form: "already_registered" };
+      // A file the practitioner created holds the e-mail: the patient takes
+      // it over by the claim e-mail, never through a second file (story 1).
+      case "file_exists":
+        return { fields, form: "file_exists" };
       case "rate_limited":
         return { fields, form: "rate_limited" };
       default:

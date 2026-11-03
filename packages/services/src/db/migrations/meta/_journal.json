@@ -246,6 +246,13 @@
       "when": 1793701691582,
       "tag": "0034_inactivity_retention",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1793708382339,
+      "tag": "0035_patient_file_claims",
+      "breakpoints": true
     }
   ]
 }

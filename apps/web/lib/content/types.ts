@@ -37,6 +37,10 @@ import type {
   SignInFormError,
 } from "@/lib/patient-auth/state";
 import type { SignupFormError } from "@/lib/signup/state";
+import type {
+  ClaimRequestState,
+  TakeoverFormError,
+} from "@/lib/takeover/state";
 
 /** What a form that sends a link can answer. */
 type LinkStatus = NonNullable<LinkRequestState["status"]>;
@@ -540,6 +544,15 @@ export type Content = {
      * read as one message. Neither names any data of the existing file.
      */
     signIn: string;
+    /**
+     * After `form.file_exists`: the button that sends the one-time claim link
+     * (`patient-takes-over-file`), and each answer of the request.
+     */
+    claim: {
+      request: string;
+      requesting: string;
+      status: Record<Exclude<ClaimRequestState["status"], "idle">, string>;
+    };
     submit: string;
     submitting: string;
     /** The consent step, before the form (story 3). */
@@ -664,6 +677,29 @@ export type Content = {
     /** The link carries no token, or the identity store refused it. */
     invalidLink: string;
     requestAgain: string;
+  };
+  /**
+   * The takeover of a practitioner-created file, at
+   * `/inscription/reprendre/[token]` (`patient-takes-over-file`). The consent
+   * step reuses `signupLink.consent`.
+   */
+  takeover: {
+    metaTitle: string;
+    title: string;
+    /** Holds `{name}`: the patient's first name. */
+    greeting: string;
+    intro: string;
+    passwordLabel: string;
+    passwordHint: string;
+    submit: string;
+    submitting: string;
+    form: Record<TakeoverFormError, string>;
+    /** The link after `has_account`, to the sign-in page. */
+    signIn: string;
+    /** The page when the link served once or expired. */
+    spent: string;
+    /** The page when the file or its e-mail already holds an account. */
+    hasAccount: string;
   };
   /**
    * Where an activated patient lands, at `/accueil`. A holding page until

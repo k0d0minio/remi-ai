@@ -4,6 +4,11 @@ import type { SignupFieldErrors } from "@remi/services/shared";
 export type SignupFormError =
   | "invalid_link"
   | "already_registered"
+  /**
+   * A file of this practitioner holds the e-mail and has no account
+   * (`patient-takes-over-file`). The form offers the claim e-mail.
+   */
+  | "file_exists"
   | "rate_limited"
   | "unavailable"
   /** A mandatory consent has no tick (story 3). */
