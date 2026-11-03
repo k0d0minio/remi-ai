@@ -149,6 +149,23 @@ describe("patient consents", () => {
     }
   });
 
+  it("refuses the genetic consent from an operator, in any decision", async () => {
+    for (const decision of ["given", "refused"] as const) {
+      const recorded = await recordConsent({
+        patientId: claireId,
+        key: "genetic",
+        version: "1",
+        locale: "fr-BE",
+        decision,
+        actor: morgane,
+      });
+      expect(recorded.ok).toBe(false);
+      if (!recorded.ok) {
+        expect(recorded.error).toBe("not_permitted");
+      }
+    }
+  });
+
   it("refuses a version, a locale or a key that no text file carries", async () => {
     const cases = [
       { key: "care", version: "legacy", locale: "fr-BE" },
@@ -204,7 +221,8 @@ describe("patient consents", () => {
       throw new Error(written.message);
     }
     expect(written.data.row.consentKey).toBe("care");
-    expect(written.data.audit).toMatchObject({
+    expect(written.data.audits).toHaveLength(1);
+    expect(written.data.audits[0]).toMatchObject({
       action: "consent.given",
       targetId: claireId,
       targetLabel: "Claire",

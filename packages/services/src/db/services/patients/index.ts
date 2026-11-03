@@ -19,6 +19,7 @@ import type {
   PatientEditableProfileField,
   PatientProfile,
 } from "../../models/patient-profile";
+import { consentInForce } from "../patient-consents/in-force";
 
 /**
  * The patient-profile service — the callable surface behind Morgane's admin
@@ -300,6 +301,16 @@ const newPatientFields = patientFields
 
 export type NewPatientInput = z.input<typeof newPatientFields>;
 
+/**
+ * Médicaments and compléments are optional data: stored only under a `given`
+ * care consent (story 3, `genetic-consent-and-optional-data`). A clear needs
+ * no consent.
+ */
+const careGatedFields = ["medications", "supplements"] as const;
+
+const CARE_CONSENT_REQUIRED =
+  "the medications and the supplements need the care consent";
+
 export const createPatient = async (
   input: NewPatientInput,
   db?: DatabaseClient,
@@ -309,6 +320,10 @@ export const createPatient = async (
     return invalid(parsed.error.issues[0]);
   }
   const data = parsed.data;
+  // A new file holds no consent yet: the sign-up records them after the row.
+  if (careGatedFields.some((field) => data[field])) {
+    return err("not_permitted", CARE_CONSENT_REQUIRED);
+  }
   const patient = await patients(db).insert({
     practitionerId: data.practitionerId,
     pseudonym: data.pseudonym,
@@ -413,6 +428,14 @@ export const updatePatient = async (
   const current = await patients().findById(id);
   if (!current) {
     return err("not_found", "no such patient");
+  }
+  // The console form posts every field, so a value it sends back unchanged
+  // passes. Only a new non-empty value needs the consent.
+  const writesCareData = careGatedFields.some(
+    (field) => patch[field] && patch[field] !== current[field],
+  );
+  if (writesCareData && !(await consentInForce(id, "care"))) {
+    return err("not_permitted", CARE_CONSENT_REQUIRED);
   }
   assign(
     patch,
