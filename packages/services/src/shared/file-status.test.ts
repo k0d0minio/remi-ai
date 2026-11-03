@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  appearsInPatientList,
   canMoveFileStatus,
   fileStatuses,
   fileStatusLabels,
@@ -59,6 +60,39 @@ describe("the allowed moves", () => {
   it("treats the same status as no move", () => {
     for (const status of fileStatuses) {
       expect(canMoveFileStatus(status, status)).toBe(false);
+    }
+  });
+});
+
+describe("the patient list's appearance rule", () => {
+  it("hides a file the patient opened while its questionnaire is incomplete", () => {
+    expect(
+      appearsInPatientList({ createdBy: "patient", fileStatus: "to_complete" }),
+    ).toBe(false);
+  });
+
+  it("shows a file the patient opened from « Prêt pour consultation » on", () => {
+    for (const fileStatus of ["ready", "to_validate", "active"] as const) {
+      expect(appearsInPatientList({ createdBy: "patient", fileStatus })).toBe(
+        true,
+      );
+    }
+  });
+
+  it("shows a file the practitioner opened at once, as « Dossier à compléter »", () => {
+    expect(
+      appearsInPatientList({
+        createdBy: "practitioner",
+        fileStatus: "to_complete",
+      }),
+    ).toBe(true);
+  });
+
+  it("keeps showing a practitioner's file at every later status", () => {
+    for (const fileStatus of fileStatuses) {
+      expect(
+        appearsInPatientList({ createdBy: "practitioner", fileStatus }),
+      ).toBe(true);
     }
   });
 });

@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { getDatabase, registerDatabase } from "../../client";
 import type { PatientProfile } from "../../models/patient-profile";
 import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
+import { createPatientAccount } from "../patient-accounts";
 import { recordConsent } from "../patient-consents";
 import { addGoalCheckIn, addPatientGoal } from "../patient-goals";
 import { listAuditEvents, type AuditActor } from "../audit";
@@ -1401,5 +1402,83 @@ describe("the practitioner's patient list", () => {
       prenom: "",
     });
     expect(names("", "Léa", "")).toEqual({ nom: "P-1", prenom: "" });
+  });
+});
+
+describe("which files the practitioner's list shows", () => {
+  // A practitioner of its own, so no file of another describe block lands here.
+  const practitioner = "00000000-0000-4000-8000-000000000061";
+  const pseudonymsOf = async () =>
+    (await patientListOf(practitioner)).map((row) => row.pseudonym);
+
+  it("saves a signed-up patient's file and keeps it out of the list while incomplete", async () => {
+    const file = unwrapOk(
+      await createPatient({
+        practitionerId: practitioner,
+        pseudonym: "P-signup-incomplete",
+        createdBy: "patient",
+      }),
+    );
+    expect(file.createdBy).toBe("patient");
+    expect(unwrapOk(await getPatient(file.id)).fileStatus).toBe("to_complete");
+    expect(await pseudonymsOf()).not.toContain("P-signup-incomplete");
+  });
+
+  it("lists the signed-up patient as « Prêt pour consultation » once the file is ready", async () => {
+    const file = unwrapOk(
+      await createPatient({
+        practitionerId: practitioner,
+        pseudonym: "P-signup-ready",
+        createdBy: "patient",
+      }),
+    );
+    expect(await pseudonymsOf()).not.toContain("P-signup-ready");
+    unwrapOk(
+      await setFileStatus(
+        file.id,
+        "ready",
+        null,
+        "every mandatory field is filled",
+      ),
+    );
+    const row = (await patientListOf(practitioner)).find(
+      (patient) => patient.id === file.id,
+    );
+    expect(row?.fileStatus).toBe("ready");
+  });
+
+  it("lists a practitioner's file at once as « Dossier à compléter »", async () => {
+    const file = unwrapOk(
+      await createPatient({
+        practitionerId: practitioner,
+        pseudonym: "P-console",
+      }),
+    );
+    expect(file.createdBy).toBe("practitioner");
+    const row = (await patientListOf(practitioner)).find(
+      (patient) => patient.id === file.id,
+    );
+    expect(row?.fileStatus).toBe("to_complete");
+  });
+
+  it("lists a practitioner's file once after the patient takes it over", async () => {
+    const file = unwrapOk(
+      await createPatient({
+        practitionerId: practitioner,
+        pseudonym: "P-taken-over",
+      }),
+    );
+    unwrapOk(
+      await createPatientAccount({
+        patientProfileId: file.id,
+        email: "taken-over@example.test",
+        authSubject: "subject-taken-over",
+      }),
+    );
+    const rows = await patientListOf(practitioner);
+    expect(rows.filter((row) => row.id === file.id)).toHaveLength(1);
+    expect(rows.find((row) => row.id === file.id)?.createdBy).toBe(
+      "practitioner",
+    );
   });
 });

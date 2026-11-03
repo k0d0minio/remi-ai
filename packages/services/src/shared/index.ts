@@ -88,14 +88,16 @@ export type {
 } from "./protocol-reuse";
 export type { AppKey } from "./links";
 export {
+  appearsInPatientList,
   canMoveFileStatus,
+  fileOrigins,
   fileStatuses,
   fileStatusLabels,
   fileStatusTransitions,
   initialFileStatus,
   isFileStatus,
 } from "./file-status";
-export type { FileStatus } from "./file-status";
+export type { FileOrigin, FileStatus } from "./file-status";
 export {
   canManageOperators,
   defaultPatientListSort,
