@@ -27,9 +27,13 @@ const initial: ConsultationDateFormState = { error: null, saved: false };
  */
 export const ConsultationDate = ({ patientId, value, formatted }: Props) => {
   const [editing, setEditing] = useState(false);
+  // « Enregistré. » belongs to the last save only. Opening the editor again
+  // hides it, so a cancel never shows a save that did not happen.
+  const [savedNotice, setSavedNotice] = useState(false);
   const [state, formAction, pending] = useActionState(
     async (previous: ConsultationDateFormState, formData: FormData) => {
       const next = await setConsultationDateAction(previous, formData);
+      setSavedNotice(next.saved);
       if (next.saved) {
         setEditing(false);
       }
@@ -83,7 +87,10 @@ export const ConsultationDate = ({ patientId, value, formatted }: Props) => {
             type="button"
             size="sm"
             variant="outline"
-            onClick={() => setEditing(true)}
+            onClick={() => {
+              setSavedNotice(false);
+              setEditing(true);
+            }}
           >
             <Pencil aria-hidden="true" />
             {value ? "Modifier" : "Renseigner"}
@@ -110,7 +117,7 @@ export const ConsultationDate = ({ patientId, value, formatted }: Props) => {
           {state.error}
         </Typography>
       ) : null}
-      {state.saved ? (
+      {savedNotice ? (
         <Typography size="sm" tone="muted" role="status">
           Enregistré.
         </Typography>
