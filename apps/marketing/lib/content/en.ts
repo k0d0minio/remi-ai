@@ -28,6 +28,16 @@ import type { Content } from "./types";
  * pricing (none is decided), no testimonials, and no invented traction.
  */
 export const en: Content = {
+  underConstruction: {
+    meta: {
+      title: "Under construction",
+      description: "REMI is being built with a first group of practitioners. The site opens soon.",
+    },
+    eyebrow: "Coming soon",
+    title: "REMI is under construction",
+    lead: "We are building REMI with a first group of practitioners. The site opens soon.",
+    contactLead: "A question in the meantime? Write to us:",
+  },
   nav: [
     { href: "/practitioners", label: "For practitioners" },
     { href: "/individuals", label: "For you" },

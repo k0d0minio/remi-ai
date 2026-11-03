@@ -87,6 +87,15 @@ export type ListSectionContent = {
 };
 
 export type Content = {
+  /** The holding page production shows until the site opens. */
+  underConstruction: {
+    meta: PageMeta;
+    eyebrow: string;
+    title: string;
+    lead: string;
+    /** Introduces the founders' addresses, taken from `contact.people`. */
+    contactLead: string;
+  };
   nav: NavItem[];
   header: {
     contact: string;
