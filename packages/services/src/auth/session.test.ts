@@ -1,10 +1,14 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { registerDatabase } from "../db/client";
-import { createPatientAccount } from "../db/services/patient-accounts";
+import {
+  createPatientAccount,
+  recordPatientAccountSeen,
+} from "../db/services/patient-accounts";
 import { createPatient } from "../db/services/patients";
 import { createMemoryDatabase, testPractitionerId } from "../db/test-helpers";
 import { ok } from "../shared/result";
 import { registerAuthProvider, type AuthIdentity } from "./provider";
+import { completePatientSignIn } from "./patient-sign-in";
 import { readPatientAccount, readSession } from "./session";
 
 /** The identity the fake adapter reports. Each test sets it. */
@@ -87,5 +91,39 @@ describe("the patient account read", () => {
     const account = await readPatientAccount();
     expect(account?.id).toBe(accountId);
     expect(account?.authSubject).toBe("user-linked");
+  });
+});
+
+describe("the last sign-in, for the inactivity clock", () => {
+  it("stamps a live session at most once a day", async () => {
+    current = linked;
+    const first = await readPatientAccount();
+    const stamped = first?.lastSeenAt?.getTime();
+    expect(stamped).toBeTypeOf("number");
+    const second = await readPatientAccount();
+    expect(second?.lastSeenAt?.getTime()).toBe(stamped);
+  });
+
+  it("stamps a session again after a day", async () => {
+    current = linked;
+    const account = await readPatientAccount();
+    if (!account?.lastSeenAt) {
+      throw new Error("the session was not stamped");
+    }
+    const tomorrow = new Date(account.lastSeenAt.getTime() + 25 * 3600_000);
+    const later = await recordPatientAccountSeen(account, { now: tomorrow });
+    expect(later.lastSeenAt).toEqual(tomorrow);
+  });
+
+  it("stamps every sign-in", async () => {
+    const before = Date.now();
+    const result = await completePatientSignIn(linked, "password");
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.data.account.lastSeenAt?.getTime()).toBeGreaterThanOrEqual(
+      before,
+    );
   });
 });

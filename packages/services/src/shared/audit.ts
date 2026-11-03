@@ -14,8 +14,11 @@
  * so the trail records the kind explicitly rather than leaving it inferred
  * from an empty email — an empty email is also what a system write would
  * leave, and "nobody" and "the patient" are not the same answer.
+ *
+ * `system` is REMI itself, with no person behind the act: the daily
+ * inactivity sweep (`inactive-account-deletion`) is the first such actor.
  */
-export const auditActorKinds = ["operator", "patient"] as const;
+export const auditActorKinds = ["operator", "patient", "system"] as const;
 
 export type AuditActorKindName = (typeof auditActorKinds)[number];
 
@@ -38,6 +41,15 @@ export const auditActions = [
    */
   "patient.consultation_date_changed",
   "patient.deleted",
+  /**
+   * The inactivity sweep sent the notice of deletion (`inactive-account-
+   * deletion`). The detail names the deletion date. The deletion itself is
+   * `patient.deleted` with the `system` actor and the detail `inactivity`.
+   */
+  "patient.inactivity_notice_sent",
+  /** An owner set or cleared the retention hold that blocks that deletion. */
+  "patient.retention_hold_set",
+  "patient.retention_hold_cleared",
   "recommendation.added",
   "recommendation.updated",
   "recommendation.archived",

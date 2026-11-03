@@ -516,6 +516,7 @@ export const createPatient = async (
     shareToken: newShareToken(),
     linkLastOpenedAt: null,
     linkLastWroteAt: null,
+    retentionHoldAt: null,
     patientEditedAt: {},
   });
   return ok(patient);

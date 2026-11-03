@@ -100,6 +100,11 @@ export type PatientProfile = Entity & {
    */
   linkLastWroteAt: Date | null;
   /**
+   * When an owner set the retention hold. Not null blocks the inactivity
+   * sweep's notice and deletion (`inactive-account-deletion`).
+   */
+  retentionHoldAt: Date | null;
+  /**
    * Per patient-editable field, when the patient last changed it through their
    * link — an ISO instant. A field is absent when its latest change was
    * Morgane's (or nobody's): her own change to a field removes its entry, so

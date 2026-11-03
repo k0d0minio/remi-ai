@@ -40,7 +40,17 @@ export type PatientActor = {
   name: string;
 };
 
-export type AuditActor = OperatorActor | PatientActor;
+/**
+ * REMI itself, acting on a schedule with no person behind it. No id and no
+ * email: the name says which job acted.
+ */
+export type SystemActor = {
+  kind: "system";
+  id: null;
+  name: string;
+};
+
+export type AuditActor = OperatorActor | PatientActor | SystemActor;
 
 const kindOf = (actor: AuditActor | null): AuditActorKind =>
   actor && "kind" in actor ? actor.kind : "operator";

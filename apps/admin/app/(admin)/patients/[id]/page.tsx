@@ -40,6 +40,7 @@ import {
 import {
   ageInYears,
   appHref,
+  canManageOperators,
   fileStatusLabels,
   formatDate,
   mandatoryQuestionnaireFieldLabels,
@@ -62,6 +63,7 @@ import { ChallengeSection } from "@/components/patients/challenge-section";
 import { ConsultationDate } from "@/components/patients/consultation-date";
 import { CopyContextCard } from "@/components/patients/copy-context-card";
 import { DeletePatient } from "@/components/patients/delete-patient";
+import { RetentionHold } from "@/components/patients/retention-hold";
 import {
   DocumentSection,
   type AttachmentOption,
@@ -1161,6 +1163,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                     ses observations et le lien patient — définitivement. Les
                     recettes elles-mêmes restent dans la bibliothèque.
                   </Typography>
+                  {canManageOperators(operator.role) ? (
+                    <RetentionHold
+                      patientId={patient.id}
+                      heldAt={patient.retentionHoldAt}
+                    />
+                  ) : null}
                   <DeletePatient
                     patientId={patient.id}
                     pseudonym={patient.pseudonym}
