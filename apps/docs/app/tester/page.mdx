@@ -1,0 +1,67 @@
+# Tester REMI
+
+Où aller pour essayer REMI, et ce qu’il ne faut pas toucher. Cette page est écrite pour Morgane et pour toute
+personne qui teste une nouvelle version avant sa mise en ligne.
+
+## Les adresses de test
+
+Trois adresses, toujours les mêmes. Gardez-les en favori.
+
+| Ce que vous testez                  | Adresse                                                    | Ce que vous y faites                                                         |
+| ----------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **La console** (le côté praticien)  | [uat-admin.remiai.be](https://uat-admin.remiai.be)         | Créer et compléter un dossier patient, rédiger une consultation, répondre aux messages |
+| **L’espace patient**                | [uat-app.remiai.be](https://uat-app.remiai.be)             | Voir REMI comme un patient : inscription, connexion, sa page du jour         |
+| **Le site public**                  | [uat.remiai.be](https://uat.remiai.be)                     | La page d’accueil et l’inscription à la liste d’attente                      |
+
+Ces adresses ont leur propre base de données, séparée de celle des vrais patients. Vous pouvez y créer,
+modifier et supprimer ce que vous voulez : rien n’atteint la production.
+
+## Les adresses à ne pas utiliser pour tester
+
+| Adresse                                          | Pourquoi                                     |
+| ------------------------------------------------ | -------------------------------------------- |
+| [admin.remiai.be](https://admin.remiai.be)       | La vraie console, avec les vrais patients    |
+| [app.remiai.be](https://app.remiai.be)           | Le vrai espace patient                       |
+| [remiai.be](https://remiai.be)                   | Le vrai site public                          |
+
+Un patient fictif créé ici serait un faux dossier parmi les vrais. Testez uniquement sur les adresses `uat-`.
+
+## Comment une nouveauté arrive jusqu’à vous
+
+1. Jamie termine une modification. Elle arrive automatiquement sur les adresses de test.
+2. Jamie vous prévient qu’un lot de nouveautés est prêt à tester.
+3. Vous essayez, puis vous dites « c’est bon » ou ce qui ne va pas.
+4. Rien ne part en production sans votre accord.
+
+## Se connecter
+
+**À la console.** Jamie vous envoie une invitation par e-mail. Le lien vous fait choisir un mot de passe.
+Ce compte de test est distinct de votre compte de production : son mot de passe peut être différent.
+
+**Comme un patient.** Vous n’avez pas besoin d’un vrai patient.
+
+1. Dans la console de test, ouvrez **Mon compte**, puis copiez **Mon lien d’inscription**.
+2. Ouvrez ce lien dans une fenêtre de navigation privée, ou sur votre téléphone.
+3. Inscrivez-vous comme le ferait un patient, avec une adresse e-mail que vous pouvez lire.
+4. Le nouveau patient apparaît dans la liste des patients de la console de test.
+
+## Quelques conseils
+
+- **Des patients fictifs uniquement.** Un prénom comme « Test » et des données inventées. Jamais les données d’un
+  vrai patient, même sur les adresses de test.
+- **Deux fenêtres.** La console dans une fenêtre normale, le patient dans une fenêtre privée. Ainsi les deux connexions
+  ne se mélangent pas.
+- **Le téléphone d’abord pour le patient.** L’espace patient est pensé pour un téléphone. Essayez-le là.
+- **Un e-mail qui n’arrive pas** n’est pas forcément un défaut : l’environnement de test n’envoie pas toujours ses
+  e-mails. Signalez-le, Jamie vérifie.
+
+## Signaler un problème
+
+Envoyez à Jamie, en quelques lignes :
+
+- l’adresse de la page où vous étiez ;
+- ce que vous avez fait ;
+- ce que vous attendiez, et ce qui s’est passé ;
+- une capture d’écran, si possible.
+
+Un message court suffit. Un problème bien décrit est corrigé plus vite.
