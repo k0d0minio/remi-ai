@@ -2,7 +2,7 @@
   <!-- The fill and the glyph are BRAND_COLORS.brand600 and BRAND_GLYPH_PATH in
        packages/ui/src/lib/brand.ts. A static metadata file is served verbatim and
        cannot import, so this copy and that module move together. -->
-  <rect width="64" height="64" rx="14" fill="#1762b6" />
+  <rect width="64" height="64" rx="14" fill="#045cc7" />
   <path
     transform="translate(11.4 11) scale(0.42)"
     fill="#ffffff"

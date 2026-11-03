@@ -15,17 +15,16 @@ export const BRAND_NAME = "REMI";
 export const BRAND_LEGAL_NAME = "Remi AI";
 
 /**
- * The canonical one-liner, in both languages the product ships in. Marketing
+ * The canonical one-liner, in both languages the estate ships in. Marketing
  * copy quotes it; nothing paraphrases it.
  *
- * The French is not a translation of the English — it is the line the francophone
- * copy was written in, and `apps/marketing/lib/content/fr.ts` is where it came
- * from. Translating the English afresh would produce a second, slightly different
- * French tagline, which is the exact thing this module exists to prevent.
+ * The French is the line Morgane wrote for the public site's footer
+ * (2 November 2026) and is the one that is canonical. The English is a
+ * translation of it for the product's English surfaces, not a second tagline.
  */
 export const BRAND_TAGLINE = {
-  en: "The wellness copilot that extends a practitioner's guidance between consultations.",
-  fr: "Le copilote bien-être qui prolonge l'accompagnement du praticien entre deux consultations.",
+  en: "Personalised nutrition recommendations, easy to apply every day.",
+  fr: "Des recommandations nutritionnelles personnalisées, faciles à appliquer au quotidien.",
 } as const;
 
 /**
@@ -38,18 +37,26 @@ export const BRAND_TAGLINE = {
  * away from the site they belong to.
  */
 export const BRAND_COLORS = {
-  /** `--brand-600`, the primary fill — the icon square, and the brand on paper. */
-  brand600: "#1762b6",
-  /** The brand lightened to stay legible on `ink`; `brand600` is not. */
-  brandOnDark: "#6b8dff",
-  /** `--grey-950`, the dark surface the social card sits on. */
-  ink: "#0b1220",
+  /** `--brand-600`, the primary fill — the logo's R, and the brand on paper. */
+  brand600: "#045cc7",
+  /** `--brand-300`, the brand lightened to stay legible on `ink`; `brand600` is not. */
+  brandOnDark: "#76beff",
+  /** `--vital-500`, the logo's teal — the I of the wordmark. */
+  teal500: "#00a7a8",
+  /** `--grey-950`, the navy ink the social card sits on. */
+  ink: "#050d1e",
   /** `--grey-50`, the near-white that reads on `ink`. */
-  paper: "#f7f8fa",
+  paper: "#f9fafc",
 } as const;
 
 /**
- * The mark: a serif R as outline, drawn on a 100-unit cap height and spanning
+ * The brand's mark is the logo image in `packages/ui/brand/logo/` — the
+ * gradient wordmark Morgane delivered on 2 November 2026 — and the public site
+ * renders that file. The glyph below is the earlier serif R, kept only for the
+ * favicons of the product, the console and the docs until those take the logo
+ * mark too (`triage/logo-mark-in-every-app`).
+ *
+ * The glyph: a serif R as outline, drawn on a 100-unit cap height and spanning
  * x 8…90. Outline plus counter in one path, so it needs `fill-rule="evenodd"`.
  *
  * A path rather than a `<text>` element because the icon has to render where no
