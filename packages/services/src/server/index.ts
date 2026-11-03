@@ -26,6 +26,8 @@ export {
   getPatient,
   getPatientByShareToken,
   patientOf,
+  patientListNames,
+  patientListOf,
   patientOfRecord,
   patientsOf,
   recordPatientLinkOpened,
@@ -37,6 +39,8 @@ export {
 } from "../db/services/patients";
 export type {
   PatientInput,
+  PatientListQuery,
+  PatientListRow,
   PatientQuery,
   PatientRecordKind,
   PatientSort,
@@ -323,6 +327,7 @@ export {
   getPractitionerBySignupToken,
   hasOperator,
   listOperators,
+  setOperatorPatientListSort,
   setOperatorRole,
   updateOperatorName,
   verifyOperator,

@@ -1,6 +1,10 @@
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
-import { operatorRoles } from "../../../shared/operator";
+import {
+  defaultPatientListSort,
+  operatorRoles,
+  patientListSorts,
+} from "../../../shared/operator";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { verifyPassword, hashPassword } from "../../../auth/password";
@@ -103,6 +107,7 @@ export const createOperator = async (
     passwordHash: await hashPassword(parsed.data.password),
     role: parsed.data.role ?? "operator",
     signupLinkToken: newSignupLinkToken(),
+    patientListSort: defaultPatientListSort,
   });
   return ok(operator);
 };
@@ -163,6 +168,27 @@ export const updateOperatorName = async (
     return err("invalid_input", parsed.error.issues[0].message);
   }
   const updated = await operators().update(id, { name: parsed.data });
+  return updated ? ok(updated) : err("not_found", "no such operator");
+};
+
+/**
+ * Remembers the order of the practitioner's patient list (story 5). The list
+ * reads it back from the operator on the next visit, on any device.
+ */
+export const setOperatorPatientListSort = async (
+  id: Id,
+  sort: string,
+): Promise<Result<Operator>> => {
+  if (!z.uuid().safeParse(id).success) {
+    return err("not_found", "no such operator");
+  }
+  const parsed = z.enum(patientListSorts).safeParse(sort);
+  if (!parsed.success) {
+    return err("invalid_input", "the sort must be appointment or name");
+  }
+  const updated = await operators().update(id, {
+    patientListSort: parsed.data,
+  });
   return updated ? ok(updated) : err("not_found", "no such operator");
 };
 

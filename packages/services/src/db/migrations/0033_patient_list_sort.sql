@@ -1,0 +1,1 @@
+ALTER TABLE "operators" ADD COLUMN "patient_list_sort" text DEFAULT 'appointment' NOT NULL;
