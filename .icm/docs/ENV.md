@@ -110,7 +110,7 @@ environment. `DATABASE_URL` remains the whole of the storage configuration.
 
 | Variable                | Purpose                                                                                                                                                        | Where set | Public? |
 | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
-| `DATABASE_URL`          | Neon connection string (pooled) — the **admin** and **web** projects. Production: production's project. Preview and `uat`: the UAT project's base              | Vercel    | no      |
+| `DATABASE_URL`          | Neon connection string (pooled) — the **admin**, **web** and **marketing** projects. Production: production's project. Preview and `uat`: the UAT project's base | Vercel    | no      |
 | `DATABASE_URL_UNPOOLED` | Direct connection string of the same database. `vercel-build.sh` gives it to `db:migrate` and `db:verify`. The app does not read it                            | Vercel    | no      |
 | `MIGRATE_AT_BUILD`      | `1` forces a migration on a Vercel target other than `uat` and `preview`. Nothing sets it since the Neon integration makes the preview branches. Never by hand | Vercel    | no      |
 | `VERCEL_TARGET_ENV`     | The deployment's environment: `production`, `uat` or `preview`. Set by Vercel. The `uat` build migrates                                                        | Vercel    | no      |
@@ -190,7 +190,7 @@ account or sandbox, never the live key. `EMAIL_FROM` is `REMI <no-reply@mail.jam
 every target until remiai.be is verified in Resend. Unset: the console mailer logs and sends nothing.
 
 Resend is the registered mail vendor: `packages/services/src/email/adapters/resend.ts` implements
-the `Mailer` seam. Two apps register it: `apps/marketing` for the public contact form, and
+the `Mailer` seam. Two apps register it: `apps/marketing` for the waiting-list notification, and
 `apps/admin` for operator invitations and the patient link sent to a patient.
 
 **Both variables are required on the marketing project and on the admin project**, and `EMAIL_FROM`

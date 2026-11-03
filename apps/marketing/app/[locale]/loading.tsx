@@ -4,13 +4,10 @@ import { Container, Section, Skeleton, VisuallyHidden } from "@remi/ui/server";
  * The header and footer come from the layout above, so this only stands in for
  * the page body — a hero block and the band of content under it, at roughly the
  * measure the real sections use, so the footer does not jump when they arrive.
- *
- * One string in both languages: a loading boundary receives no params, so there
- * is no locale here to pick a dictionary with.
  */
 const Loading = () => (
   <Section spacing="lg" aria-live="polite" role="status">
-    <VisuallyHidden>Loading · Chargement</VisuallyHidden>
+    <VisuallyHidden>Chargement</VisuallyHidden>
 
     <Container className="flex flex-col gap-16">
       <div className="flex max-w-2xl flex-col gap-5">

@@ -1,41 +1,41 @@
 # Architecture
 
-## Repository structure
+## Structure du dépôt
 
 ```text
 apps/
-  web/        the product app — signed-in surface (:3000)
-  marketing/  the public site — unauthenticated, indexable (:3001)
-  admin/      internal operations — operator-only (:3002)
-  docs/       this site — Nextra (:3003)
+  web/        l'application produit - surface connectee (:3000)
+  marketing/  le site public - sans authentification, indexable (:3001)
+  admin/      operations internes - operateur uniquement (:3002)
+  docs/       ce site - Nextra (:3003)
 packages/
-  ui/         @remi/ui — the design system, the only home for primitives
-  services/   @remi/services — storage, email, AI, env; vendor seams, not integrations
-.icm/         the work layer — intake, docs, and the delivery pipeline
+  ui/         @remi/ui - le design system, seul foyer des primitives
+  services/   @remi/services - stockage, e-mail, IA, env ; des points de jonction fournisseur, pas des integrations
+.icm/         la couche de travail - intake, docs et pipeline de livraison
 ```
 
-The dependency arrow only ever points **app → package**. A package importing an app is a lint
-error, and there is no app-to-app import at all: anything two apps need lives in `packages/`.
+La flèche de dépendance ne pointe jamais que **application → package**. Un package qui importe une application est une
+erreur de lint, et il n’existe aucun import d’application à application : tout ce dont deux applications ont besoin vit dans `packages/`.
 
-## Technology stack
+## Pile technologique
 
-| Layer      | Choice                                          |
-| ---------- | ----------------------------------------------- |
-| Monorepo   | Turborepo 2, pnpm 10 workspaces, Node 22        |
-| Framework  | Next.js 16, App Router, React 19                |
-| Language   | TypeScript 5 — strict everywhere                |
-| Styling    | Tailwind CSS 4, tokens in `@remi/ui/tokens.css` |
-| Primitives | shadcn/ui (New York) over Radix                 |
-| Docs       | Nextra 4                                        |
-| Packages   | tsup → ESM                                      |
-| Hosting    | Vercel — one project per app                    |
+| Couche       | Choix                                           |
+| ------------ | ----------------------------------------------- |
+| Monorepo     | Turborepo 2, pnpm 10 workspaces, Node 22        |
+| Framework    | Next.js 16, App Router, React 19                |
+| Langage      | TypeScript 5 — strict partout                   |
+| Styles       | Tailwind CSS 4, tokens dans `@remi/ui/tokens.css` |
+| Primitives   | shadcn/ui (New York) sur Radix                  |
+| Docs         | Nextra 4                                        |
+| Packages     | tsup → ESM                                      |
+| Hébergement  | Vercel — un projet par application              |
 
-Storage, auth, email and AI are **not** in this table on purpose: `@remi/services` defines the
-seams and no vendor is committed yet. See the packages page.
+Le stockage, l’authentification, l’e-mail et l’IA ne figurent **pas** dans ce tableau, volontairement : `@remi/services` définit les
+points de jonction et aucun fournisseur n’est encore retenu. Voir la page Packages.
 
-## How a request flows
+## Trajet d’une requête
 
-A page in `apps/web` renders as a server component, calls a service through
-`@remi/services/server`, and renders primitives from `@remi/ui`. The import path is the statement
-about where code runs — `/shared` is isomorphic, `/server` is Node-only — so a client bundle can
-never accidentally acquire a database driver.
+Une page de `apps/web` s’affiche comme composant serveur, appelle un service via
+`@remi/services/server`, et affiche des primitives de `@remi/ui`. Le chemin d’import est l’énoncé
+de l’endroit où le code s’exécute — `/shared` est isomorphe, `/server` ne tourne que sous Node — si bien qu’un bundle client
+ne peut jamais acquérir par accident un pilote de base de données.

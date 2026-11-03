@@ -1,153 +1,152 @@
-# Roles
+# Rôles
 
-Who the product serves, what each of them sees, and what each can change. Scope reads this page to
-decide who a change is for; Design reads it for the lens a prototype is drawn through.
+Qui le produit sert, ce que chacun voit et ce que chacun peut modifier. Scope lit cette page pour
+décider à qui s’adresse un changement ; Design la lit pour savoir à travers quel prisme un prototype est dessiné.
 
-Three roles, and only two of them are a session in the product. The session carries which one,
-because it decides the navigation, the landing route and what the query layer will answer. The
-operator is not a product session at all — it lives in a separate deployment, with its own URL and
-its own access control.
+Trois rôles, et deux seulement sont une session dans le produit. La session porte lequel, car elle décide de la
+navigation, de la route d’arrivée et de ce que la couche de requêtes acceptera de répondre. L’opérateur n’est pas du tout
+une session du produit — il vit dans un déploiement séparé, avec sa propre URL et son propre contrôle d’accès.
 
 ## Patient
 
-The individual being accompanied. They are the first audience of V2 and, in this phase, the only
-one with a surface of their own: the patient experience is built and validated before the
-practitioner space is built at all.
+La personne accompagnée. Elle est la première audience de la V2 et, dans cette phase, la seule
+à avoir une surface propre : l’expérience patient est construite et validée avant même que l’espace
+praticien soit construit.
 
-- **What they are trying to do** — apply what their practitioner told them, in a week that already
-  has a job, a kitchen and a Tuesday at 7pm in it. Not to manage a condition, and not to use an app.
-- **How they arrive** — through their practitioner, who recommends REMI and carries the clinical
-  relationship. Acquisition is the practitioner's, not a marketing funnel's. The terrain cohort
-  Morgane accompanies uses REMI free — their feedback is the payment; patients joining from the
-  December open day onward subscribe. No price is decided.
-- **What they can see** — their own accompaniment and nothing else: their profile, the
-  recommendations they were given, the daily hub, their meals, their micro-actions and their
-  supplement journal. No other patient's data, nothing about the practice, and no clinical record —
-  REMI is not the medical record.
-- **What their link opens on** — their **today**, not a summary. « Aujourd'hui / cette semaine »
-  leads, and always renders: first the challenge their practitioner is running with them — one
-  habit at a time, with its start date — or a line saying none is running; then the goals they are
-  working on; then « La consigne de la semaine », the week's consigne their practitioner wrote _to
-  them_ (a separate field from the standing consigne she steers by, which is addressed to REMI and
-  never shown here — the page shows nothing rather than falling back to it). Then the way in to the meal
-  loop, the main recommendations — the first of each category, the same set the console calls
-  « principales », so reordering there reorders here — the recipes they currently hold, the
-  newest documents their practitioner put on the page, the essentials to keep in, the general
-  feedback box, and the living summary last. Each of those blocks is a preview that links
-  into its own segment, and a block whose segment is empty does not render at all.
-- **Their documents** — the PDFs, images and links their practitioner puts on the page (her recipe
-  PDFs, a personalised list, a meal feedback), newest first under « Documents », each with the day
-  it was added; those classed as a recipe are listed under « Recettes » too, and one attached to a
-  goal or a recipe sits beside it. A file opens through a link that expires after five minutes and
-  only their own link can open it. They read documents; they never upload one.
-- **Their messages** — one general place to say how the week went, in their practitioner's words:
-  « Comment se passe votre accompagnement cette semaine ? Vous pouvez également indiquer ici ce que
-  vous avez pensé des recettes, des challenges ou des recommandations proposées. » The box sits on
-  the home and on « Messages », which also shows the whole thread newest first — what they wrote,
-  and each reply under the name of whoever answered — and the day they last wrote. No comments on
-  individual recipes or recommendations, nothing sent to them by email or notification; a message
-  is never edited or deleted, and the thread goes with the patient.
-- **Their profile** — « Mon profil » is where they keep their food profile true: diet, allergies,
-  intolerances, the foods they like and dislike, whether they like cooking, the time they have to
-  cook (faible / moyen / important) and their budget (économique / standard / confort). They can
-  clear an allergy as freely as add one; their practitioner sees « modifié par la patiente le … »
-  on every field they changed until she changes it herself. Below it they read what she has on
-  record — their name, age, height and weight — and never the birth date, the anamnesis, the
-  referral or the consent.
-- **What they can change** — what they log, the messages they write, their own pace and preferences, the seven fields of « Mon profil », and their answer to
-  the running challenge: « Challenge acquis », then « Prêt(e) pour le prochain » once acquired —
-  each undoable until their practitioner closes the challenge, which freezes what they said. Never the
-  recommendations or the frame those sit in; outside the frame REMI does not improvise, it says so
-  and points back to the practitioner.
-- **How they are identified** — by the link itself. The unguessable token in `/p/[token]` is the
-  whole credential: it now accepts writes as well as reads (decision #2, 10 September 2026), and
-  there is still no account, no password and no session. Everything written through it is
-  attributed to that link's patient, marked `written_by: patient` on the tables the practitioner
-  also writes, and recorded in the audit trail with a `patient` actor. Two consequences the page
-  states rather than implies: anyone holding the link can write as the patient, which the page says
-  to them in their own language so they can choose who to forward it to; and the link is ceilinged
-  — ten writes a minute, a hundred a day, text only, no uploads. A link reaches its own patient's
-  record and no other: a write naming a row that belongs to someone else is refused in the same
-  words as a link that never existed, so one patient can neither read nor write another's. Patient accounts are parked in
-  `beyond-december`, and that is where the question of whether a URL is a good enough credential
-  for health-data writes gets answered.
-- **Which app they live in** — `web`.
+- **Ce qu’elle essaie de faire** — appliquer ce que son praticien lui a dit, dans une semaine qui contient déjà
+  un travail, une cuisine et un mardi à 19 h. Pas gérer une maladie, ni utiliser une application.
+- **Comment elle arrive** — par son praticien, qui recommande REMI et porte la relation clinique.
+  L’acquisition est celle du praticien, pas celle d’un entonnoir marketing. La cohorte de terrain
+  que Morgane accompagne utilise REMI gratuitement — son retour tient lieu de paiement ; les patients qui rejoignent à partir de la
+  journée portes ouvertes de décembre s’abonnent. Aucun prix n’est décidé.
+- **Ce qu’elle peut voir** — son propre accompagnement et rien d’autre : son profil, les
+  recommandations qui lui ont été données, le hub quotidien, ses repas, ses micro-actions et son
+  journal de suppléments. Aucune donnée d’un autre patient, rien sur le cabinet, et aucun dossier clinique —
+  REMI n’est pas le dossier médical.
+- **Sur quoi s’ouvre son lien** — son **aujourd’hui**, pas un résumé. « Aujourd’hui / cette semaine »
+  vient en tête, et s’affiche toujours : d’abord le challenge que son praticien mène avec elle — une
+  habitude à la fois, avec sa date de début — ou une ligne disant qu’aucun n’est en cours ; puis les objectifs sur lesquels elle
+  travaille ; puis « La consigne de la semaine », la consigne de la semaine que son praticien a écrite _pour
+  elle_ (un champ distinct de la consigne permanente qui oriente le praticien, laquelle s’adresse à REMI et
+  n’est jamais montrée ici — la page n’affiche rien plutôt que de se rabattre dessus). Viennent ensuite l’accès à la boucle
+  des repas, les recommandations principales — la première de chaque catégorie, le même ensemble que la console appelle
+  « principales », si bien que les réordonner là-bas les réordonne ici — les recettes qu’elle détient actuellement,
+  les documents les plus récents que son praticien a déposés sur la page, les essentiels à garder, la boîte
+  de retour général, et le résumé vivant en dernier. Chacun de ces blocs est un aperçu qui renvoie
+  vers son propre segment, et un bloc dont le segment est vide ne s’affiche pas du tout.
+- **Ses documents** — les PDF, images et liens que son praticien dépose sur la page (ses PDF
+  de recettes, une liste personnalisée, un retour sur un repas), du plus récent au plus ancien sous « Documents », chacun avec le
+  jour de son ajout ; ceux classés comme recette sont aussi listés sous « Recettes », et celui rattaché à un
+  objectif ou à une recette est placé à côté. Un fichier s’ouvre par un lien qui expire au bout de cinq minutes et
+  que seul son propre lien peut ouvrir. Elle lit les documents ; elle n’en envoie jamais.
+- **Ses messages** — un seul endroit général pour dire comment la semaine s’est passée, avec les mots de son praticien :
+  « Comment se passe votre accompagnement cette semaine ? Vous pouvez également indiquer ici ce que
+  vous avez pensé des recettes, des challenges ou des recommandations proposées. » La boîte se trouve
+  sur l’accueil et sur « Messages », qui montre aussi tout le fil du plus récent au plus ancien — ce qu’elle a écrit,
+  et chaque réponse sous le nom de la personne qui a répondu — ainsi que le jour de son dernier message. Pas de commentaires
+  sur des recettes ou des recommandations individuelles, rien ne lui est envoyé par e-mail ou notification ; un message
+  n’est jamais modifié ni supprimé, et le fil disparaît avec le patient.
+- **Son profil** — « Mon profil » est l’endroit où elle garde son profil alimentaire exact : régime, allergies,
+  intolérances, les aliments qu’elle aime et n’aime pas, si elle aime cuisiner, le temps dont elle dispose pour
+  cuisiner (faible / moyen / important) et son budget (économique / standard / confort). Elle peut retirer une allergie aussi librement
+  qu’en ajouter une ; son praticien voit « modifié par la patiente le … »
+  sur chaque champ qu’elle a changé, jusqu’à ce que le praticien le change lui-même. En dessous, elle lit ce que le praticien a
+  au dossier — son nom, son âge, sa taille et son poids — et jamais la date de naissance, l’anamnèse, l’orientation
+  ni le consentement.
+- **Ce qu’elle peut modifier** — ce qu’elle consigne, les messages qu’elle écrit, son propre rythme et ses préférences, les sept champs de « Mon profil », et sa réponse au
+  challenge en cours : « Challenge acquis », puis « Prêt(e) pour le prochain » une fois acquis —
+  chacun annulable jusqu’à ce que son praticien clôture le challenge, ce qui fige ce qu’elle a dit. Jamais les
+  recommandations ni le cadre dans lequel elles s’inscrivent ; hors du cadre, REMI n’improvise pas, il le dit
+  et renvoie vers le praticien.
+- **Comment elle est identifiée** — par le lien lui-même. Le jeton impossible à deviner dans `/p/[token]` est
+  tout le justificatif : il accepte désormais les écritures en plus des lectures (décision n° 2, 10 septembre 2026), et
+  il n’y a toujours ni compte, ni mot de passe, ni session. Tout ce qui est écrit par ce biais
+  est attribué au patient de ce lien, marqué `written_by: patient` sur les tables que le praticien
+  alimente aussi, et consigné dans la piste d’audit avec un acteur `patient`. Deux conséquences que la page
+  énonce plutôt que de les laisser implicites : quiconque détient le lien peut écrire en tant que patient, ce que la page dit
+  au patient dans sa propre langue afin qu’il choisisse à qui le transmettre ; et le lien est plafonné
+  — dix écritures par minute, cent par jour, du texte seulement, aucun envoi de fichier. Un lien atteint le dossier de son propre patient
+  et d’aucun autre : une écriture qui désigne une ligne appartenant à quelqu’un d’autre est refusée dans les mêmes
+  mots qu’un lien qui n’a jamais existé, de sorte qu’un patient ne peut ni lire ni écrire chez un autre. Les comptes patient sont mis de côté dans
+  `beyond-december`, et c’est là que sera tranchée la question de savoir si une URL est un justificatif suffisant
+  pour des écritures de données de santé.
+- **Dans quelle application elle vit** — `web`.
 
-## Practitioner
+## Praticien
 
-The professional whose recommendations REMI extends, and the prescriber: a patient reaches REMI
-because a practitioner sent them. They stay the clinical reference throughout — REMI applies, it
-never prescribes. The braindump also makes them the paying customer through a practitioner-side
-subscription; that model is parked with the practitioner space, and the revenue path in front of the
-December open day is the patient subscription instead.
+Le professionnel dont REMI prolonge les recommandations, et le prescripteur : un patient arrive sur REMI
+parce qu’un praticien l’y a envoyé. Il reste la référence clinique en permanence — REMI applique, il
+ne prescrit jamais. Le modèle économique envisagé est dans
+[Business model et OKR](/business/initiatives) : un abonnement mensuel pour les praticiens et un
+pour les patients autonomes, tarifs à valider.
 
-- **What they are trying to do** — keep their recommendations alive between consultations without
-  adding to their workload, and open the next session from what actually happened rather than from
-  what anyone remembers.
-- **What they can do today** — set up a patient and encode that patient's profile and
-  recommendations in the patient's own space. That is deliberate: it is what lets the real product
-  be tested on real patients before a practitioner space exists.
-- **What they will be able to see** — the patients they support, and nobody else: adherence at a
-  glance, one patient's detail, and who is struggling. Access follows the care relationship and ends
-  when that relationship does.
-- **What they will be able to change** — the recommendations and the rules for a patient they
-  support, remotely, with the accompaniment regenerated from them. Tightening what may be suggested
-  is theirs alone and needs nobody else's say-so.
-- **Which app they live in** — `web`. The dashboard and the rest of the practitioner space are
-  parked until the patient experience is validated, and are re-specified from terrain experience
-  when they are picked up; see [V2 scope](/business/scope).
+- **Ce qu’il essaie de faire** — garder ses recommandations vivantes entre les consultations sans
+  alourdir sa charge, et ouvrir la séance suivante à partir de ce qui s’est réellement passé plutôt qu’à partir de
+  ce dont chacun se souvient.
+- **Ce qu’il peut faire aujourd’hui** — créer un patient et encoder son profil et ses
+  recommandations dans l’espace propre du patient. C’est délibéré : c’est ce qui permet de tester le vrai produit
+  sur de vrais patients avant qu’un espace praticien n’existe.
+- **Ce qu’il pourra voir** — les patients qu’il accompagne, et personne d’autre : l’adhésion en
+  un coup d’œil, le détail d’un patient, et qui est en difficulté. L’accès suit la relation de soin et prend fin
+  avec elle.
+- **Ce qu’il pourra modifier** — les recommandations et les règles d’un patient qu’il
+  accompagne, à distance, l’accompagnement étant régénéré à partir d’elles. Resserrer ce qui peut être suggéré
+  lui revient à lui seul et n’a besoin de l’accord de personne d’autre.
+- **Dans quelle application il vit** — `web`. Le tableau de bord et le reste de l’espace praticien sont
+  mis de côté jusqu’à la validation de l’expérience patient, et seront respécifiés à partir de l’expérience de terrain quand ils
+  seront repris ; voir [Roadmap produit](/business/scope).
 
-## Operator
+## Opérateur
 
-Internal, and today that means the founders. The role exists to run the platform and to be able to
-answer for what it did.
+Interne, et aujourd’hui cela veut dire les fondateurs. Le rôle existe pour faire tourner la plateforme et pour pouvoir
+répondre de ce qu’elle a fait.
 
-- **What they are trying to do** — know which accounts exist and in what state, see what a
-  practitioner or a patient is stuck on, and be able to say what changed and who changed it.
-- **What they can see** — accounts and their status, the patient roster and the profiles and
-  recommendations behind it. A patient's page opens on a working view — status, goals, the
-  standing instruction, the summary head, recent meals, the latest messages with how many await a
-  reply, the main recommendations, and a note for the next consultation — with every other section behind navigation: a section index on desktop,
-  a segmented control (Suivi · Journal · Dossier · Profil) on phone. Behind that navigation the
-  anamnesis shows what has been filled in first, the profile reads as a summary before it offers
-  its form, and anything archived is a closed fold with its count at the foot of its section.
-  Plus the support inbox,
-  feature flags and the audit log. A practitioner's roster shows as activity — is anything moving
-  on this account — rather than as plan content.
-- **What they can change** — access to an account (suspend, restore, reset) and platform flags, with
-  a confirmation and an audit entry on anything destructive. No commercial terms: there are none to
-  render, and an operator who could set a price from a table is one mis-click from a term nobody
-  agreed to.
-- **How a protocol gets encoded a second time** — a section's rows can be filled from another
-  patient's, or from a named set the operator has saved and can reuse anywhere. Two rules bound it.
-  A copy carries the **factual** fields and arrives with the **personal** ones blank: a supplement's
-  dose and moment travel, the « raison » written to one person does not. And reading one patient's
-  rows into another's record is recorded in the audit trail, naming the source patient, at the
-  moment of the copy rather than at the save — nothing is written to either patient until the
-  section's own save. A saved set belongs to the operator who saved it and is private until she
-  shares it with the console.
-- **Which app they live in** — `admin`, a separate deployment. Never a route group inside the
-  product, where every operator capability would be one routing mistake away from a customer.
+- **Ce qu’il essaie de faire** — savoir quels comptes existent et dans quel état, voir sur quoi un
+  praticien ou un patient est bloqué, et pouvoir dire ce qui a changé et qui l’a changé.
+- **Ce qu’il peut voir** — les comptes et leur statut, la liste des patients et les profils et
+  recommandations qui la sous-tendent. La page d’un patient s’ouvre sur une vue de travail — statut, objectifs, la
+  consigne permanente, le début du résumé, les repas récents, les derniers messages avec le nombre de ceux qui attendent une
+  réponse, les recommandations principales, et une note pour la prochaine consultation — avec toutes les autres sections derrière la navigation : un index des sections sur ordinateur,
+  un contrôle segmenté (Suivi · Journal · Dossier · Profil) sur téléphone. Derrière cette navigation, l’anamnèse
+  montre d’abord ce qui a été renseigné, le profil se lit comme un résumé avant d’offrir
+  son formulaire, et tout ce qui est archivé est un pli fermé avec son compte au pied de sa section.
+  S’y ajoutent la boîte de support,
+  les feature flags et le journal d’audit. La liste des patients d’un praticien s’affiche comme de l’activité — quelque chose bouge-t-il
+  sur ce compte — plutôt que comme du contenu de plan.
+- **Ce qu’il peut modifier** — l’accès à un compte (suspendre, rétablir, réinitialiser) et les flags de la plateforme, avec
+  une confirmation et une entrée d’audit pour tout ce qui est destructif. Aucune condition commerciale : il n’y en a aucune à
+  afficher, et un opérateur qui pourrait fixer un prix depuis un tableau est à un clic malheureux d’une condition que personne n’a
+  convenue.
+- **Comment un protocole est encodé une seconde fois** — les lignes d’une section peuvent être remplies à partir de celles d’un autre
+  patient, ou d’un ensemble nommé que l’opérateur a enregistré et peut réutiliser partout. Deux règles l’encadrent.
+  Une copie emporte les champs **factuels** et arrive avec les champs **personnels** vides : la dose et le moment d’un
+  supplément voyagent, la « raison » écrite pour une personne non. Et lire les lignes d’un patient dans le dossier d’un autre
+  est consigné dans la piste d’audit, avec le patient source, au moment de la copie plutôt qu’à
+  l’enregistrement — rien n’est écrit pour l’un ou l’autre patient avant l’enregistrement propre de la
+  section. Un ensemble enregistré appartient à l’opérateur qui l’a enregistré et reste privé tant que l’opérateur ne
+  le partage pas avec la console.
+- **Dans quelle application il vit** — `admin`, un déploiement séparé. Jamais un groupe de routes dans le
+  produit, où chaque capacité d’opérateur serait à une erreur de routage d’un client.
 
-## What each role sees, per app
+## Ce que chaque rôle voit, par application
 
-| App                 | Patient                                                              | Practitioner                                         | Operator                                               |
+| Application         | Patient                                                              | Praticien                                            | Opérateur                                              |
 | ------------------- | -------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ |
-| `web` (:3000)       | Their profile, the daily hub, meals, micro-actions, supplements — read and write, on their link | Their patients — parked until the patient half lands | Nothing — no operator session exists in the product    |
-| `admin` (:3002)     | Nothing — the app has no public route                                | Nothing                                              | The console: accounts, patients, support, flags, audit |
-| `marketing` (:3001) | The public site, signed out, in English or French                    | The same site, plus the practitioner page            | The same as anyone                                     |
-| `docs` (:3003)      | Not a product surface — this site is reference material for the team | The same                                             | The same                                               |
+| `web` (:3000)       | Son profil, le hub quotidien, les repas, les micro-actions, les suppléments — lecture et écriture, sur son lien | Ses patients — mis de côté jusqu’à l’arrivée de la moitié patient | Rien — aucune session d’opérateur n’existe dans le produit |
+| `admin` (:3002)     | Rien — l’application n’a aucune route publique                       | Rien                                                 | La console : comptes, patients, support, flags, audit  |
+| `marketing` (:3001) | Le site public, déconnecté, en anglais ou en français                | Le même site, plus la page praticien                 | Comme tout le monde                                    |
+| `docs` (:3003)      | Pas une surface du produit — ce site est un matériel de référence pour l’équipe | Idem                                      | Idem                                                   |
 
-Two of those cells matter more than they look. `web` is the only app where the role changes what is
-rendered, and `admin` is the only app no role but the operator can reach at all — that boundary is
-the reason it is a separate deployment rather than a route group.
+Deux de ces cellules comptent plus qu’il n’y paraît. `web` est la seule application où le rôle change ce qui est
+affiché, et `admin` est la seule application qu’aucun rôle autre que l’opérateur ne peut atteindre — cette frontière
+est la raison pour laquelle c’est un déploiement séparé plutôt qu’un groupe de routes.
 
-## Why this page is worth keeping accurate
+## Pourquoi cette page mérite d’être tenue exacte
 
-Decision rights are the most common silent assumption in a scope. Written here once, a scope
-document does not have to re-derive them, and a spec that gives a patient something only a
-practitioner may change contradicts a page rather than an opinion.
+Les droits de décision sont l’hypothèse silencieuse la plus courante d’un périmètre. Écrits ici une fois, un document de
+périmètre n’a pas à les redériver, et une spécification qui donne à un patient quelque chose que seul un
+praticien peut modifier contredit une page plutôt qu’une opinion.
 
-The pipeline's label vocabulary carries the `persona:` axis this page defines — `patient`,
-`practitioner`, `operator`, the same three names used above — as the `personas` list in
+Le vocabulaire d’étiquettes du pipeline porte l’axe `persona:` que cette page définit — `patient`,
+`practitioner`, `operator`, les trois mêmes noms que ci-dessus — comme la liste `personas` dans
 `.icm/project.json`.

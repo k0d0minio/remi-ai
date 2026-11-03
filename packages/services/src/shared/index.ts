@@ -52,6 +52,13 @@ export type {
   ConsentTextLocale,
   ShownConsent,
 } from "./consent";
+export {
+  isLeadType,
+  isOfferInterest,
+  leadTypes,
+  offerInterests,
+} from "./leads";
+export type { LeadType, OfferInterest } from "./leads";
 export { appHref, appOrigin } from "./links";
 export {
   documentFileTypes,
@@ -187,6 +194,7 @@ export type {
   GoalDirection,
   HabitsProfile,
   IntoleranceKey,
+  Lead,
   MealEntry,
   MealIntent,
   MealSlot,

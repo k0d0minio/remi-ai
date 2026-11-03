@@ -20,9 +20,12 @@ copy is true.
 
 ## Copy
 
-Sentence case everywhere — headings, buttons, labels, badges. Claims must be true and checkable:
-if the product cannot do it today, the page does not say it can. When a claim involves a number,
-the number comes from somewhere real, and the page says where.
+The copy is Morgane's, from her transmission of 2 November 2026, and it lives in
+`lib/content/landing.ts` and `lib/content/legal.ts`. A wording change is a change there, never in
+a component, and her text wins over any earlier copy. Sentence case everywhere — headings, buttons,
+labels, badges. Claims must be true and checkable: if the product cannot do it today, the page does
+not say it can. The pilot prices on the page are hers (347 € and 109 € for 8 weeks), and the CGV
+read them from the same list.
 
 ## Imports
 
@@ -32,27 +35,30 @@ comes from `@remi/services/shared`, because the product app ships in the same tw
 cross-app link has to build the path this site actually serves. So do `appHref()` / `appOrigin()`,
 the catalogue of where the four apps answer: this site's own `metadataBase` and every link that
 leaves it come from there, and no origin is written out in this app.
-`@remi/services/server` is available for the few server-side needs a public site has — a contact
-form submission, a newsletter signup — and nothing else. This app holds no customer data.
+`@remi/services/server` is available for the few server-side needs a public site has, and this
+site has one: the waiting-list forms call `submitLead` (`lib/leads/actions.ts`), which stores a
+lead with `createLead` and emails `morgane@remiai.be`. The site reads nothing back. `lib/database.ts`
+and `lib/mailer.ts` are the two registration points, both conditional on their variables.
 
 ## Structure
 
 ```text
-app/[locale]/ routes — one folder per page, `page.tsx` + local components;
-              every page exists under /en and /fr
-components/   sections and blocks composed from @remi/ui, prop-driven so both
-              locales share them
-lib/content/  one dictionary per locale (`en.ts`, `fr.ts`), typed by `types.ts`
-              so a missing translation is a type error
-lib/          metadata helpers; the mailer registration and the contact address
-public/       static assets
-proxy.ts      redirects bare paths to the visitor's language
+app/[locale]/          `fr` only: the landing page, `[legal]/` for the four legal pages,
+                       the holding page, the OG image
+components/sections/   the eight sections of the landing page, in Morgane's order
+components/            header, footer, logo, the sign-up flow, the practitioner dialog,
+                       the sticky button, the form helpers under `forms/`
+lib/content/           `landing.ts` (her copy) and `legal.ts` (her legal texts)
+lib/site.ts            the pilot date, the contact details, the consent version, the publisher
+lib/leads/             the server action, its types and the browser-side checks
+lib/                   metadata helpers, the database and mailer registrations, the lead email
+public/brand/, public/team/   the logo and the three portraits
+proxy.ts               redirects bare paths and /en to /fr
 ```
 
-## Locales and truthfulness
+## Language and truthfulness
 
-The site is bilingual (English, French) with shared slugs. Copy lives only in
-`lib/content/` — a wording change never means editing a component, and the two
-dictionaries must tell the same story. The product is pre-launch: the site
-sells the pilot programme and what is being built, and never presents a
-capability as live. No pricing appears anywhere until pricing is decided.
+The site is French only (Jamie, 2026-11-03). The `[locale]` segment stays so every address keeps
+the `/fr` prefix the other apps link to. The product is pre-launch: the site sells the pilot
+programme and what is being built, and never presents a capability as live. The two previews in
+the features section are drawings, and the section says so.

@@ -1,83 +1,223 @@
-# Initiatives
+# Business model, milestones et OKR
 
-The strategy the current work ladders up to, and what this period is measured against. Scope and
-Define read this page for the why-now; Release ties the changelog entry back to an objective from it.
-The feature list the work is drawn from is [V2 scope](/business/scope).
+Les trois documents de direction de REMI, écrits par Morgane Paquet et repris ici tels quels : le
+business model, les milestones 2026–2027 et les OKR de novembre 2026 à février 2027. Scope et Define
+lisent cette page pour le pourquoi ; Release rattache chaque entrée du journal à un objectif ou à un
+résultat clé de cette page. Le périmètre produit est dans [Roadmap produit](/business/scope).
 
-## Current initiative
+## Business model
 
-**A patient experience validated on real terrain, in time for the December open day.** REMI is
-pre-launch: nothing is sold, no customer data is processed, there is no revenue and there is no
-traction to report. What this period is trying to move is one question — does REMI actually help a
-patient apply what their practitioner told them — and the horizon is the clinical partner's open
-day on 19 December 2026, where the new version is presented and commercialisation begins.
+### 1. Vision
 
-The method is deliberate and it is the opposite of the previous plan. Rather than building the
-complete product and confronting it with users afterwards, Morgane accompanies 10–15 of her own
-patients now — with tools as simple as a messaging thread where that is enough — and each brick of
-REMI is tested against that accompaniment as it is built. Terrain, test, feedback, build, test
-again. Less is built, and what is built is built right.
+Permettre à chacun de reprendre en main sa santé grâce à un accès simple et clair au savoir, pour comprendre son corps, savoir pourquoi agir, comment le faire et être accompagné par les bonnes personnes sur le long terme.
 
-Two consequences follow, and both are scope decisions rather than preferences:
+### 2. Mission 2026–2027
 
-- **The patient experience comes first, alone.** A practitioner encodes a patient's profile and
-  recommendations in the patient's own space, which is what makes it possible to test the real
-  product without a practitioner dashboard existing yet.
-- **The practitioner space is the admin console, reorganised** — not a second signed-in surface.
-  Morgane's feedback on the first version (2026-09-10) overturned the earlier "parked until the
-  patient half is validated": she cannot accompany patients with a console that takes too long to
-  encode one, so the console follows the consultation and is built from what she has learned,
-  which is what the earlier decision was waiting for. She stays an operator, and no practitioner
-  app, account or sign-up is in this period. Decisions D-1 and D-5 of 2026-09-10,
-  `.icm/intake/README.md` § Decisions of record.
+Aider les patients à passer du « je sais » au « je fais » en transformant des conseils de santé complexes en actions simples et applicables au quotidien, notamment au niveau alimentaire, tout en permettant aux praticiens de rester connectés aux progrès de leurs patients.
 
-> **There is no pilot, no pilot price and no billing date.** Earlier versions of this page carried
-> a founding cohort with commercial terms, a ceiling and an enrolment window. None of it existed:
-> it was demo fixture data in the operator console that an earlier audit read as a signed
-> agreement. The ~15 practitioners in the braindump are a **beta recruitment target**, nobody has
-> signed anything, and no price is decided — the braindump's own figures are written as
-> _réflexions_. A stage that needs a commercial number does not have one to take.
+### 3. Ambitions
 
-## Objectives
+**Court terme :** Développer une application web qui génère des recettes personnalisées selon le profil du patient, les recommandations de son praticien et, lorsque disponibles, ses données génétiques.
 
-| Objective                                                      | Measure                                                                                     | Where it stands                                                                                |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| The patient loop working end to end for one real patient       | A profile, the practitioner's recommendations, and a first micro-action inside a minute     | `web` is still fixture-backed; the operator's patient roster is the first screen that persists |
-| A usable patient version for the partner clinic to test        | Testable by their team on 1 December 2026                                                   | Not started as product; the terrain accompaniment is running                                   |
-| The database and accounts under it                             | A real database behind the surfaces: real accounts, real records, real recommendations      | Neon Postgres wired — schema, migrations and the first patient records land in the admin       |
-| The data question answered before the first real record exists | EU hosting, processing agreements and retention rules written down before processing        | Trust page live; nothing processes personal data yet                                           |
-| The build kept inside what self-funding allows                 | Every feature outside [V2 scope](/business/scope) is a no, and the estate is sized to match | The scope is frozen; the estate is four apps                                                   |
+**Moyen terme :** Développer une application qui aide les praticiens à établir leurs protocoles, à mieux suivre leurs patients entre deux consultations et à faciliter l'application de leurs recommandations au quotidien.
 
-Where each of those actually stands, in more words than a cell holds:
+**Long terme :** Créer des cliniques REMI spécialisées dans la santé intestinale et la nutrition.
 
-- **The patient loop.** In `web`, today, meals, steps and the plan behind them are built, and so
-  is the practitioner side of the same fixture data; every screen reads through the query layer, so
-  pointing a query at the database moves no caller. The operator console is ahead of it: its
-  patient roster and profiles are real rows, which is what the December version is built out from.
-- **The December version.** The terrain phase has started outside the product — real patients,
-  simple tools, real observations. The product work that meets it is the patient core loop:
-  onboarding, « améliore mon assiette », the daily hub, the supplement journal, micro-actions.
-- **The database.** Neon Postgres, by owner decision on 27 August 2026 — the braindump names
-  Supabase and was settled the other way. The adapter, the schema and the migrations are in the
-  repo, and the operator's patient-profile surface is its first real consumer.
-- **The data question.** The trust posture is published on the public site. The database is now
-  committed, so residency is a live obligation rather than a selection criterion; email and AI are
-  still seams in `@remi/services`, and the protection groundwork has to land before the first real
-  patient record does.
-- **The budget.** V2 is self-funded and deliberately capped, which is why the frozen scope is a
-  gate rather than a wish list: anything outside it spends money the project does not have. The
-  figure itself is not published here — a stage that needs it asks the owner.
+### 4. Problèmes rencontrés
 
-## What this page does not claim
+**Patients :** Changer ses habitudes alimentaires est difficile. Manque de compréhension, de connaissances et d'idées, contraintes du quotidien, stress, fatigue, émotions et difficulté à savoir comment appliquer les recommandations reçues.
 
-No users, no results, no revenue, no signed practitioners, no price. The three statistics on the
-public site are WHO figures describing the problem REMI addresses, not outcomes REMI has produced,
-and this page holds to the same rule: a number that cannot be sourced does not appear here, and
-fixture data is not evidence.
+**Praticiens :** Construire un protocole personnalisé demande du temps et de l'énergie, sans garantie que le patient applique les recommandations. Le manque de suivi entre les consultations peut entraîner de la frustration, du découragement et une perte d'efficacité.
 
-## How the pipeline uses this page
+### 5. Proposition de valeur
 
-Release ties the changelog entry back to an objective on this page. Define connects a spec's
-**Problem** to one. If
-a feature cannot be tied to a line above, that is a signal about the feature, not about the page —
-and if it is not on [V2 scope](/business/scope) either, it is not in this build.
+**Patients :** REMI aide à comprendre et appliquer les recommandations nutritionnelles grâce à des recettes personnalisées, des idées concrètes et des suggestions pour améliorer les repas du quotidien. L'objectif est de faciliter le changement d'habitudes et d'accompagner les patients dans la durée. Qu’il voit une vrai amélioration sans culpabilité.
+
+**Praticiens :** REMI permet de gagner du temps et d’énergie, de faciliter la personnalisation des recommandations et de mieux accompagner les patients entre les consultations. L'objectif est d'améliorer l'adhésion aux conseils, la qualité du suivi et l'efficacité de l'accompagnement.
+
+### 6. Segments de clientèle
+
+**Patients :** Personnes qui souhaitent améliorer leur alimentation et leur bien-être, notamment celles qui suivent des recommandations nutritionnelles spécifiques.
+
+**Praticiens :** Nutrithérapeutes, diététiciens, nutritionnistes, naturopathes, médecins fonctionnels et autres professionnels accompagnant leurs patients dans leur alimentation.
+
+**Utilisateurs :** Patients et praticiens.
+
+**Clients payants envisagés :** Praticiens abonnés à REMI et patients utilisant l'application de manière autonome.
+
+### 7. Lean Canvas
+
+| Bloc | Contenu |
+| --- | --- |
+| **1. Problème** | Les patients ont du mal à appliquer les conseils nutritionnels. Les praticiens manquent de temps et de visibilité sur leur application entre les consultations. |
+| **2. Segments clients** | Praticiens en nutrition et santé intégrative ; patients souhaitant améliorer leur alimentation. Premiers utilisateurs : patients pilotes, puis praticiens pilotes. |
+| **3. Proposition de valeur unique** | Faire le lien entre les recommandations du praticien et le quotidien du patient, grâce à un accompagnement nutritionnel simple et personnalisé. |
+| **4. Solution** | Recettes personnalisées, suggestions d'amélioration des repas et outil de suivi et d'accompagnement pour les praticiens. |
+| **5. Canaux d'acquisition** | Site internet, réseaux de praticiens, recommandations, partenariats, événements et communication digitale. |
+| **6. Sources de revenus** | Abonnements mensuels pour les praticiens et les patients autonomes. Test génétique, complément alimentaire. |
+| **7. Structure des coûts** | Développement de l'application, IA, hébergement, maintenance, bases de données, marketing et accompagnement des utilisateurs. |
+| **8. Indicateurs clés** | Patients actifs, praticiens actifs, fréquence d'utilisation, satisfaction, fidélisation, gain de temps et conversion en abonnements payants. |
+| **9. Avantage difficile à copier** | À construire et valider : expertise nutritionnelle, qualité des données, personnalisation selon les recommandations et partenariats scientifiques. |
+
+**Hypothèse principale :** REMI peut améliorer l'application des recommandations nutritionnelles par les patients tout en apportant un gain de temps et une meilleure qualité de suivi aux praticiens.
+
+### 8. Analyse du marché et des concurrents
+
+**Marché :** Nutrition personnalisée, santé préventive, santé digitale et accompagnement des patients.
+
+**Concurrents :**
+
+- Applications de recettes et de planification alimentaire.
+- Applications de suivi nutritionnel.
+- Logiciels destinés aux praticiens.
+- Assistants nutritionnels basés sur l'intelligence artificielle.
+
+**À analyser :**
+
+- Fonctionnalités proposées.
+- Tarifs et modèles économiques.
+- Forces et limites.
+- Besoins des utilisateurs encore insuffisamment couverts.
+
+_Analyse concurrentielle à réaliser._
+
+### 9. Positionnement et différenciation
+
+**Positionnement :** REMI est un assistant nutritionnel qui transforme les recommandations des praticiens en actions concrètes et adaptées au quotidien des patients.
+
+**Éléments de différenciation envisagés :**
+
+- Personnalisation selon les recommandations du praticien.
+- Prise en compte des besoins, préférences et contraintes alimentaires.
+- Utilisation de bases de données nutritionnelles et scientifiques.
+- Intégration possible de données génétiques.
+- Accompagnement entre deux consultations.
+- Praticien au centre des décisions et de l'accompagnement.
+
+### 10. Modèle économique envisagé
+
+**Patients autonomes :** Abonnement mensuel donnant accès à l'application et aux recettes personnalisées.
+
+**Praticiens :** Abonnement mensuel donnant accès à l'interface professionnelle et à l'accompagnement de leurs patients.
+
+**Tarifs de travail :**
+
+- Praticiens Premium : 49 €/mois, jusqu'à 25 patients.
+- Patients autonomes : 12 €/mois.
+
+Ces tarifs restent à valider auprès des utilisateurs.
+
+### 11. Hypothèses à valider
+
+**Phase 1 — Pilote patients**
+
+- Les patients comprennent facilement comment utiliser REMI.
+- Les recettes proposées correspondent à leurs besoins et contraintes.
+- REMI facilite l'application des recommandations nutritionnelles.
+- Les patients utilisent régulièrement l'application.
+- REMI apporte une valeur suffisante pour donner envie de continuer à l'utiliser et que l’utilisateur souhaite payer.
+
+**Phase 2 — Pilote praticiens**
+
+- REMI fait gagner du temps aux praticiens.
+- Les praticiens trouvent un intérêt à suivre leurs patients entre les consultations.
+- L'outil facilite la personnalisation et l'application des recommandations.
+- Les praticiens utilisent régulièrement REMI avec leurs patients.
+- Les praticiens sont prêts à payer pour ce service.
+
+### 12. Questions stratégiques à approfondir
+
+- Quel est notre client prioritaire à long terme : le praticien, le patient ou les deux ?
+- Quel problème REMI doit-il résoudre en priorité ?
+- Quelle est la fonctionnalité qui apporte le plus de valeur ?
+- Qu'est-ce qui différencie réellement REMI des solutions existantes ?
+- Quelles hypothèses devons-nous valider avant de commercialiser l'application ?
+
+## Milestones business 2026–2027
+
+**Objectif :** Structurer les grandes étapes du développement de REMI, du premier MVP patient jusqu'au lancement commercial du SaaS en 2027.
+
+| Date cible | Catégorie | Milestone | Résultat attendu |
+| --- | --- | --- | --- |
+| Novembre 2026 | Laboratoires & Génétique | Collaboration avec un laboratoire | Identifier un laboratoire partenaire et définir les modalités d'intégration des tests génotypiques dans REMI. Trouver également un doc (Funmeddev ?) |
+| Mi-novembre 2026 | Produit | MVP patient fonctionnel | Première version testable avec les 6 premiers patients. |
+| Novembre 2026 | Business | Offre pilote patients | Définir le tarif consultation + REMI, avec une réduction en échange de retours utilisateurs. Et une offre avec test génétique |
+| Novembre 2026 | Juridique | RGPD & réglementation | Vérifier et adapter le RGPD, l'AI Act, la confidentialité et le cadre réglementaire avant les tests patients. |
+| Début décembre 2026 | Partenariats | Présentation à FunMedDev | Présenter la première version de REMI et proposer leur participation à la porte ouverte du 17 décembre. |
+| Décembre 2026 – janvier 2027 | Patients pilotes | Validation du pilote patients | Récolter les retours, améliorer l'application et valider le passage à la phase praticiens (Go / No-Go). |
+| Janvier – février 2027 | Produit | MVP praticien fonctionnel | Finaliser les fonctionnalités indispensables au suivi des patients et à l'utilisation par les praticiens. |
+| Janvier – février 2027 | Juridique | Conformité du pilote praticiens | Adapter les documents, contrats et protections des données au programme praticiens. |
+| Février 2027 | Équipe & Organisation | Planning technique validé | Valider avec Jamie les échéances, les priorités et les ressources nécessaires au développement. |
+| Février 2027 | Marketing | Événement de lancement praticiens | Présenter REMI aux professionnels et annoncer le démarrage du programme pilote. |
+| Février – mars 2027 | Praticiens pilotes | 15 praticiens pilotes engagés | Recruter 15 praticiens prêts à utiliser REMI et à participer à son amélioration. |
+| Avril – juin 2027 | Praticiens pilotes | Validation du pilote praticiens | Utilisation en consultation, retours structurés et identification des améliorations prioritaires. |
+| Avril – juin 2027 | Finances | Préparation et lancement de la levée de fonds | Définir les besoins financiers, préparer le dossier investisseurs et lancer les échanges lorsque 15 praticiens seront engagés. |
+| Été 2027 | Produit | Première version SaaS commercialisable | Développer une version de REMI suffisamment complète et fiable pour accueillir davantage de praticiens. |
+| Avant commercialisation | Juridique | Conformité commerciale | Finaliser les contrats, conditions d'utilisation et obligations réglementaires applicables au SaaS. |
+| Septembre – décembre 2027 | Marketing & Business | Lancement commercial de REMI | Déployer le SaaS, développer l'acquisition et recruter les premiers clients payants. |
+| Fin 2027 | Business | Première validation commerciale | Analyser les premiers revenus, l'utilisation, la satisfaction et la fidélisation des clients. |
+
+## OKR — novembre 2026 à février 2027
+
+Les colonnes « Précédent », « Actuel » et « % cible » sont tenues à jour par Morgane. Un tiret
+veut dire : pas encore mesuré.
+
+### 1. Disposer d’un MVP patient utilisable/testable · novembre 2026
+
+| Résultat clé | Échéance | Cible | Précédent | Actuel | % cible |
+| --- | --- | --- | --- | --- | --- |
+| KR1 6 parcours patients complets exécutés sans blocage critique (profil → recommandations → recettes). | 15/11/26 | 6 / 6 | — | — | — |
+| KR2 100 % des scénarios critiques allergies, évictions et contre-indications testés avec résultat conforme. | 30/11/26 | 100 % | — | — | — |
+| KR3 Au moins 90 % des recettes proposées dans le jeu de test respectent les consignes du profil. | 30/11/26 | ≥ 90 % | — | — | — |
+
+### 2. Recruter et engager une cohorte de patients pilotes · novembre 2026 – janvier 2027
+
+| Résultat clé | Échéance | Cible | Précédent | Actuel | % cible |
+| --- | --- | --- | --- | --- | --- |
+| KR1 6 patients initiaux ont donné leur consentement et ont activé leur compte. | 30/11/26 | 6 / 6 | — | — | — |
+| KR2 10 patients supplémentaires éligibles et consentants sont recrutés pour élargir les tests. | 31/01/27 | 10 | — | — | — |
+| KR3 Au moins 80 % des patients activés utilisent REMI chaque semaine pendant 8 semaines de suivi. | 31/01/27 | ≥ 80 % | — | — | — |
+
+### 3. Valider la valeur du produit patient avant le pilote praticiens · décembre 2026 – février 2027
+
+| Résultat clé | Échéance | Cible | Précédent | Actuel | % cible |
+| --- | --- | --- | --- | --- | --- |
+| KR1 Au moins 12 patients ont achevé un cycle de 8 semaines et un entretien de retour structuré. | 31/01/27 | ≥ 12 | — | — | — |
+| KR2 Au moins 80 % des répondants jugent les propositions adaptées à leurs besoins et applicables au quotidien. | 15/02/27 | ≥ 80 % | — | — | — |
+| KR3 Une décision Go / Itérer / No-Go est prise sur la base des résultats, avec 0 anomalie critique ouverte. | 28/02/27 | 1 décision ; 0 critique | — | — | — |
+
+### 4. Sécuriser les partenariats qui rendent le pilote crédible · novembre 2026 – février 2027
+
+| Résultat clé | Échéance | Cible | Précédent | Actuel | % cible |
+| --- | --- | --- | --- | --- | --- |
+| KR1 Un laboratoire confirme par écrit une solution faisable (marqueurs, prix, délais et cadre légal). | 30/11/26 | 1 accord écrit | — | — | — |
+| KR2 Une démonstration REMI a lieu avec FunMedDev et donne lieu à un retour structuré. | 15/12/26 | 1 démo + feedback | — | — | — |
+| KR3 Un cadre de collaboration ou de test avec FunMedDev est confirmé par écrit. | 28/02/27 | 1 confirmation | — | — | — |
+
+### 5. Préparer le lancement du pilote praticiens et recruter 15 praticiens pilotes · janvier – février 2027
+
+| Résultat clé | Échéance | Cible | Précédent | Actuel | % cible |
+| --- | --- | --- | --- | --- | --- |
+| KR1 Prospecter des praticiens qualifiés et présenter REMI | 31/01/27 | 30 praticiens | — | — | — |
+| KR2 Organiser un évènement de présentation de REMI (version patient) auprès des praticiens | 28/02/27 | 50 praticiens | — | — | — |
+| KR3 Obtenir des engagements de participation au pilote praticiens | 28/02/27 | 15 praticiens | — | — | — |
+
+### 7. Rendre REMI finançable pour la phase suivante · janvier – février 2027
+
+| Résultat clé | Échéance | Cible | Précédent | Actuel | % cible |
+| --- | --- | --- | --- | --- | --- |
+| KR1 Le budget et le besoin de trésorerie pour les 12 mois suivants sont chiffrés et documentés. | 31/01/27 | 1 budget | — | — | — |
+| KR2 Un dossier de financement expose les résultats du pilote, l’offre, les coûts et les jalons. | 28/02/27 | 1 dossier | — | — | — |
+| KR3 Au moins 3 échanges qualifiés avec financeurs ou dispositifs d’aide sont réalisés. | 28/02/27 | ≥ 3 échanges | — | — | — |
+
+### Points de vigilance
+
+MRR : ne compter que les abonnements réellement facturés et récurrents. Aucun MRR n’est présumé avant février ; le suivi mensuel commence dès le premier abonnement. Consultations et génotypages ponctuels sont suivis séparément.
+
+Les seuils proposés (80 %, 10 nouveaux patients, 15 contacts, etc.) sont des hypothèses de pilotage, pas des résultats acquis. Pour les petites cohortes, conserver aussi les nombres absolus et les verbatims.
+
+## Ce que cette page ne dit pas
+
+Aucun utilisateur, aucun résultat, aucun revenu, aucun praticien signé. Les cibles ci-dessus sont des
+hypothèses de pilotage, et les tarifs sont des tarifs de travail à valider. Un chiffre qui n’a pas de
+source n’apparaît pas ici.

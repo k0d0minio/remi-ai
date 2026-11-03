@@ -1255,3 +1255,44 @@ export const nutritionRules = pgTable("nutrition_rules", {
   archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
   ...timestamps,
 });
+
+/**
+ * A waiting-list lead from the public site (triage/morgane-transmission): a
+ * patient pilot, an information request or a practitioner pilot. The site
+ * writes the row, the console reads it, and Morgane gets one email per row.
+ *
+ * `email` is stored lower-cased, which is what makes (type, email) unique:
+ * the same person may be on two lists, and the same address on one list is
+ * one row. The site treats a second submit as a success, so the visitor
+ * learns nothing about who is already on a list.
+ */
+export const leads = pgTable(
+  "leads",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    type: text("type").notNull(),
+    email: text("email").notNull(),
+    firstName: text("first_name"),
+    lastName: text("last_name"),
+    phone: text("phone"),
+    offerInterest: text("offer_interest"),
+    profession: text("profession"),
+    message: text("message"),
+    /** The consent text the person ticked, by its version. */
+    consentTextVersion: text("consent_text_version").notNull(),
+    /** Set by Morgane in the console once she has written back. */
+    contactedAt: timestamp("contacted_at", { withTimezone: true, mode: "date" }),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("leads_type_email_idx").on(table.type, table.email),
+    check(
+      "leads_type_check",
+      sql`${table.type} in ('patient_pilot', 'info_request', 'practitioner_pilot')`,
+    ),
+    check(
+      "leads_offer_interest_check",
+      sql`${table.offerInterest} is null or ${table.offerInterest} in ('genetic', 'consultation', 'undecided')`,
+    ),
+  ],
+);

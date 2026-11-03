@@ -11,7 +11,8 @@ import "nextra-theme-docs/style.css";
  * from `@remi/ui/server`. next.config.ts keeps this app off the design system on
  * purpose — it is reference material, not product surface — and taking a
  * dependency on it for two string constants would undo that for no gain. The
- * names still have to match `BRAND_NAME` / `BRAND_LEGAL_NAME`.
+ * names still have to match `BRAND_NAME` / `BRAND_LEGAL_NAME`. The logo image
+ * under `public/` is a copy of `packages/ui/brand/logo/remi-logo.png`.
  *
  * The origins below are the opposite case, and that is why `@remi/services` is
  * the one workspace dependency this app does take: an origin spelled out here
@@ -32,33 +33,27 @@ export const metadata: Metadata = {
     default: `${brandName} — docs`,
     template: `%s · ${brandName} docs`,
   },
-  description: `How ${brandName} works — business direction and technical reference.`,
+  description: `Comment fonctionne ${brandName} — direction de l’entreprise et référence technique.`,
   robots: { index: false, follow: false },
 };
 
 /**
- * The wordmark, hand-styled. `@remi/ui`'s `Wordmark` is the canonical one, but
- * this app has no Tailwind pass and no design-system dependency by design, so
- * the mark is spelled out here in inline styles — the same three decisions the
- * component makes, and nothing more: the display serif, set caps, and the
- * tracking that keeps four letters reading as a mark rather than an acronym.
- *
- * The serif is a stack rather than a loaded face. `@remi/ui` falls back to
- * `ui-serif, Georgia` wherever no app has declared `--font-display`, which is
- * exactly this app's situation, so the fallback *is* the match — loading
- * Instrument Serif here would buy a closer mark at the cost of a font request
- * on a reference site that has none.
+ * The logo. Morgane's image is the brand mark (`packages/ui/brand/logo/`), so
+ * the navbar shows the image and types nothing: a typed name would be a second
+ * logo this repo would then have to keep in step. The copy under `public/` is
+ * the 560 px export; the navbar shows it at 26 px high.
  *
  * "docs" stays in the theme's own sans at a lower weight and opacity: it is the
- * qualifier, not part of the brand, and typesetting it like one would invent a
- * second wordmark this repo would then have to keep in step.
+ * qualifier, not part of the brand.
+ *
+ * The visible image is `aria-hidden` and the accessible name comes from the
+ * hidden label, so a screen reader hears the product name once, as a word.
+ * The dark theme lifts the image's brightness: the mark is set for paper.
  */
-const wordmarkStyle: CSSProperties = {
-  fontFamily: "ui-serif, Georgia, serif",
-  fontSize: "1.25rem",
-  fontWeight: 400,
-  letterSpacing: "0.06em",
-  lineHeight: 1,
+const logoImageStyle: CSSProperties = {
+  display: "block",
+  height: "1.625rem",
+  width: "auto",
 };
 
 const qualifierStyle: CSSProperties = {
@@ -69,11 +64,6 @@ const qualifierStyle: CSSProperties = {
   opacity: 0.65,
 };
 
-/**
- * The visible letters are `aria-hidden` and the accessible name comes from the
- * hidden label, for the reason `Wordmark` gives: leaving both exposed announces
- * the name twice, and a set-caps product name is not reliably read as a word.
- */
 const hiddenLabelStyle: CSSProperties = {
   position: "absolute",
   width: 1,
@@ -88,16 +78,25 @@ const hiddenLabelStyle: CSSProperties = {
 
 const logoStyle: CSSProperties = {
   display: "inline-flex",
-  alignItems: "baseline",
-  gap: "0.4em",
+  alignItems: "center",
+  gap: "0.5em",
 };
+
+const darkLogoCss = "html.dark .remi-logo { filter: brightness(1.7); }";
 
 const Logo = () => (
   <span style={logoStyle}>
+    <style>{darkLogoCss}</style>
     <span style={hiddenLabelStyle}>{brandLegalName} docs</span>
-    <span aria-hidden="true" style={wordmarkStyle}>
-      {brandName}
-    </span>
+    <img
+      src="/remi-logo.png"
+      alt=""
+      aria-hidden="true"
+      className="remi-logo"
+      style={logoImageStyle}
+      width={560}
+      height={193}
+    />
     <span aria-hidden="true" style={qualifierStyle}>
       docs
     </span>
@@ -119,7 +118,7 @@ const navLinkStyle: CSSProperties = {
 const OutboundLinks = () => (
   <>
     <a href={appHref("web")} style={navLinkStyle}>
-      App
+      Application
     </a>
     <a href={appHref("marketing")} style={navLinkStyle}>
       Site
@@ -128,7 +127,7 @@ const OutboundLinks = () => (
 );
 
 const RootLayout = async ({ children }: { children: ReactNode }) => (
-  <html lang="en" dir="ltr" suppressHydrationWarning>
+  <html lang="fr" dir="ltr" suppressHydrationWarning>
     <Head />
     <body>
       <Layout

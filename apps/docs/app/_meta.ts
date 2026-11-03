@@ -1,6 +1,6 @@
 export default {
-  index: "Overview",
-  business: "Business",
-  technical: "Technical",
-  changelog: "Changelog",
+  index: "Vue d’ensemble",
+  business: "Direction",
+  technical: "Technique",
+  changelog: "Journal des changements",
 };

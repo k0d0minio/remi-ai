@@ -1,84 +1,49 @@
 import NextLink from "next/link";
-import { appHref, localePath, type Locale } from "@remi/services/shared";
+import { localePath } from "@remi/services/shared";
 import { Button } from "@remi/ui";
-import { BRAND_LEGAL_NAME, Container, Link, Wordmark } from "@remi/ui/server";
-import { LocaleSwitcher } from "@/components/locale-switcher";
+import { Container, Link } from "@remi/ui/server";
+import { Logo } from "@/components/logo";
 import { MobileNav } from "@/components/mobile-nav";
-import { getContent } from "@/lib/content";
+import { HEADER, NAV } from "@/lib/content/landing";
 
-type Props = {
-  locale: Locale;
-};
+const home = localePath("fr", "/");
 
 /**
- * A server component. Only the mobile panel and the locale switcher need the
- * client, and each is its own island — the header itself, and the links inside
- * it, cost nothing.
+ * A server component. Only the mobile panel needs the client, and it is its
+ * own island. The links are anchors on the one page, prefixed with the
+ * page's path so they also work from a legal page.
  */
-export const SiteHeader = ({ locale }: Props) => {
-  const content = getContent(locale);
+export const SiteHeader = () => (
+  <header className="border-border/60 bg-background/90 sticky top-0 z-40 border-b backdrop-blur-md">
+    <Container className="flex h-16 items-center justify-between gap-4">
+      <NextLink
+        href={`${home}#top`}
+        aria-label={HEADER.logoLabel}
+        className="focus-visible:ring-ring/40 rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
+      >
+        <Logo height={30} priority />
+      </NextLink>
 
-  return (
-    <header className="border-border/60 bg-background/80 sticky top-0 z-40 border-b backdrop-blur-md">
-      <Container className="flex h-16 items-center justify-between gap-6">
-        <NextLink
-          href={localePath(locale, "/")}
-          aria-label={`${BRAND_LEGAL_NAME}, ${content.header.homeLabel}`}
-          className="focus-visible:ring-ring/40 rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
-        >
-          <Wordmark />
-        </NextLink>
+      <nav aria-label="Navigation principale" className="hidden items-center gap-6 lg:flex">
+        {NAV.map((item) => (
+          <Link
+            key={item.href}
+            as={NextLink}
+            href={`${home}${item.href}`}
+            variant="muted"
+            className="text-sm font-medium"
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
 
-        {/* Four links plus the buttons: the gap tightens at md so the row does
-            not wrap between the tablet breakpoint and a laptop width, which is
-            also why sign-in only joins the row at lg. */}
-        <nav
-          aria-label="Main"
-          className="hidden items-center gap-6 md:flex lg:gap-8"
-        >
-          {content.nav.map((item) => (
-            <Link
-              key={item.href}
-              as={NextLink}
-              href={localePath(locale, item.href)}
-              variant="muted"
-              className="text-sm"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="hidden items-center gap-3 md:flex">
-          <LocaleSwitcher locale={locale} />
-          {/* A plain anchor: the product is its own deployment, so the router
-              cannot navigate into it. Held back to lg because the md row is
-              already full at two buttons — between the two breakpoints the
-              footer carries the same link, and below md the mobile panel does. */}
-          <Button asChild variant="ghost" size="sm" className="hidden lg:flex">
-            <a href={appHref("web", "/", locale)}>{content.header.signIn}</a>
-          </Button>
-          <Button asChild variant="ghost" size="sm">
-            <NextLink href={localePath(locale, "/contact")}>
-              {content.header.contact}
-            </NextLink>
-          </Button>
-          <Button asChild size="sm">
-            <NextLink href={localePath(locale, content.header.cta.href)}>
-              {content.header.cta.label}
-            </NextLink>
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-2 md:hidden">
-          <LocaleSwitcher locale={locale} />
-          <MobileNav
-            locale={locale}
-            nav={content.nav}
-            header={content.header}
-          />
-        </div>
-      </Container>
-    </header>
-  );
-};
+      <div className="flex items-center gap-2">
+        <Button asChild size="sm">
+          <NextLink href={`${home}#inscription`}>{HEADER.cta}</NextLink>
+        </Button>
+        <MobileNav />
+      </div>
+    </Container>
+  </header>
+);
