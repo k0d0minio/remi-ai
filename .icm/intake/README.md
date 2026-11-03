@@ -32,7 +32,7 @@ consultation → practitioner validation → activation and e-mail → the patie
 | --- | --------------------------------------------------------------------- | ------------------------------------------------------------------------ | ----------- |
 | 2   | « Inscription et compte patient »                                     | [`patient-signup-account/`](_done/patient-signup-account/breakdown.md)   | 1           |
 | 3   | « Consentement et données personnelles »                              | [`consent-and-data/`](consent-and-data/breakdown.md)                     | 1           |
-| 1   | « Création du dossier patient »                                       | [`patient-file-creation/`](patient-file-creation/breakdown.md)           | 1           |
+| 1   | « Création du dossier patient »                                       | [`patient-file-creation/`](_done/patient-file-creation/breakdown.md)     | 1           |
 | 4   | « Questionnaire préparatoire du patient »                             | [`preparatory-questionnaire/`](preparatory-questionnaire/breakdown.md)   | 1           |
 | 5   | « Liste des patients et statuts du dossier »                          | [`patient-list-and-status/`](patient-list-and-status/breakdown.md)       | 1           |
 | 6   | « Consultation du dossier patient avant le rendez-vous »              | [`patient-file-view/`](patient-file-view/breakdown.md)                   | 1           |
@@ -73,35 +73,34 @@ surface drops them.
 Set by Jamie on 2026-10-27. The epics follow the table above. `triage` comes last.
 
 1. consent-and-data
-2. patient-file-creation
-3. preparatory-questionnaire
-4. patient-list-and-status
-5. patient-file-view
-6. bmi
-7. protein-needs
-8. energy-needs
-9. food-directives
-10. eviction-safety
-11. knowledge-base-requests
-12. priority-goals
-13. lifestyle-advice
-14. supplement-interventions
-15. meal-structure
-16. intermittent-fasting
-17. care-activation
-18. protocol-versions
-19. patient-change-signals
-20. patient-access
-21. patient-home-navigation
-22. patient-recommendations
-23. recipe-space
-24. recipe-card
-25. shopping-list
-26. meal-improvement
-27. practitioner-daily-recipes
-28. restaurant-menu
-29. genotype-macro-split
-30. triage
+2. preparatory-questionnaire
+3. patient-list-and-status
+4. patient-file-view
+5. bmi
+6. protein-needs
+7. energy-needs
+8. food-directives
+9. eviction-safety
+10. knowledge-base-requests
+11. priority-goals
+12. lifestyle-advice
+13. supplement-interventions
+14. meal-structure
+15. intermittent-fasting
+16. care-activation
+17. protocol-versions
+18. patient-change-signals
+19. patient-access
+20. patient-home-navigation
+21. patient-recommendations
+22. recipe-space
+23. recipe-card
+24. shopping-list
+25. meal-improvement
+26. practitioner-daily-recipes
+27. restaurant-menu
+28. genotype-macro-split
+29. triage
 
 `genotype-macro-split` (story 10) comes after the recipe and analysis epics (Jamie, 2026-10-28).
 
