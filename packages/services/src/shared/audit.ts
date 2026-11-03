@@ -23,6 +23,12 @@ export const auditActions = [
   "patient.created",
   /** A patient created their own account from a practitioner's sign-up link. */
   "patient.signed_up",
+  /** A patient signed in. The detail names the method. */
+  "patient.signed_in",
+  /** A patient asked for a password reset link. */
+  "patient.password_reset_requested",
+  /** A patient set a new password from the reset link. */
+  "patient.password_reset",
   "patient.updated",
   /** The file moved to its next status (D-31). The detail names both and why. */
   "patient.file_status_changed",
@@ -141,6 +147,11 @@ export const auditActions = [
   "consent.given",
   "consent.refused",
   "consent.withdrawn",
+  /**
+   * The genotype emptied because the genetic consent is no longer in force
+   * (`genetic-consent-and-optional-data`). The detail names the decision.
+   */
+  "genotype.cleared",
   "share_link.regenerated",
   "share_link.emailed",
   /**

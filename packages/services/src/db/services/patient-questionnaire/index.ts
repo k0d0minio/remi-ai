@@ -25,6 +25,7 @@ import type {
   PatientQuestionnaire,
 } from "../../models/patient-questionnaire";
 import type { AuditActor } from "../audit";
+import { consentInForce } from "../patient-consents/in-force";
 import { setFileStatus } from "../patients";
 
 /**
@@ -35,6 +36,11 @@ import { setFileStatus } from "../patients";
  *
  * Null is « Non renseigné » everywhere (D-30). An empty string from a form
  * clears a field to null. It is never stored.
+ *
+ * Optional data needs its consent (story 3, `genetic-consent-and-optional-
+ * data`). A genotype value is written only under a `given` genetic consent,
+ * and every read returns it as null without one. The desired weight is
+ * written only under a `given` care consent. A clear is always allowed.
  */
 
 type QuestionnaireRow = { id: Id } & PatientQuestionnaire;
@@ -79,6 +85,19 @@ const readAnswers = (row: QuestionnaireRow): PatientQuestionnaire => {
     answers[field] = row[field] ?? null;
   }
   return answers as PatientQuestionnaire;
+};
+
+const genotypeFields = ["apoe", "dio2", "amy1a"] as const;
+
+/** The answers a reader may see: no genotype without the genetic consent. */
+const visibleAnswers = async (
+  row: QuestionnaireRow,
+): Promise<PatientQuestionnaire> => {
+  const answers = readAnswers(row);
+  if (await consentInForce(row.id, "genetic")) {
+    return answers;
+  }
+  return { ...answers, apoe: null, dio2: null, amy1a: null };
 };
 
 /** `""` or null clears the field. */
@@ -329,7 +348,7 @@ export const getPatientQuestionnaire = async (
   }
   const page = await allergenRows().findMany({ patientId }, { limit: 500 });
   return ok({
-    answers: readAnswers(row),
+    answers: await visibleAnswers(row),
     allergens: [...page.items].sort(byRank),
   });
 };
@@ -355,9 +374,23 @@ export const savePatientQuestionnaire = async (
       (patch as Record<string, unknown>)[field] = value;
     }
   }
+  if (!(await profiles().findById(patientId))) {
+    return err("not_found", "no such patient");
+  }
+  const writesGenotype = genotypeFields.some(
+    (field) => patch[field] !== undefined && patch[field] !== null,
+  );
+  if (writesGenotype && !(await consentInForce(patientId, "genetic"))) {
+    return err("not_permitted", "the genotype needs the genetic consent");
+  }
+  const writesDesiredWeight =
+    patch.desiredWeightKg !== undefined && patch.desiredWeightKg !== null;
+  if (writesDesiredWeight && !(await consentInForce(patientId, "care"))) {
+    return err("not_permitted", "the desired weight needs the care consent");
+  }
   const written = await profiles().update(patientId, patch);
   return written
-    ? ok(readAnswers(written))
+    ? ok(await visibleAnswers(written))
     : err("not_found", "no such patient");
 };
 

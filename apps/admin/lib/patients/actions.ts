@@ -264,6 +264,13 @@ const asCategory = (value: string): RecommendationCategory =>
     : "nutrition";
 
 /**
+ * A field the form disabled posts nothing. `undefined` leaves the column as it
+ * is, where `field()` would answer `""` and clear it.
+ */
+const postedField = (formData: FormData, name: string) =>
+  formData.has(name) ? field(formData, name) : undefined;
+
+/**
  * The profile half of the patient form. `objective`, `dietaryRegime`,
  * `allergies` and `intolerances` are absent on purpose: the questionnaire's
  * fields replaced them in the form (Jamie, 2026-11-03), so a save leaves the
@@ -294,8 +301,9 @@ const patientInputFrom = (formData: FormData): PatientInput => {
     likesCooking: asCookingAffinity(field(formData, "likesCooking")),
     cookingTime: asCookingTime(field(formData, "cookingTime")),
     foodBudget: asFoodBudget(field(formData, "foodBudget")),
-    medications: field(formData, "medications"),
-    supplements: field(formData, "supplements"),
+    // Locked without the care consent (story 3), so possibly absent.
+    medications: postedField(formData, "medications"),
+    supplements: postedField(formData, "supplements"),
     referral: field(formData, "referral"),
     anamnesis: field(formData, "anamnesis"),
   };

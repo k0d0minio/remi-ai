@@ -16,7 +16,8 @@ import {
 } from "@remi/services/shared";
 import { ensureAuthProvider } from "@/lib/auth/provider";
 import { ensureDatabase } from "@/lib/database";
-import { QUESTIONNAIRE_PATH, type SignupState } from "./state";
+import { QUESTIONNAIRE_PATH } from "@/lib/patient-auth/paths";
+import type { SignupState } from "./state";
 
 /**
  * The sign-up form's submit (story 2). A public endpoint: every value is

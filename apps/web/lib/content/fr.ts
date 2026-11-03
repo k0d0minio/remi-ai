@@ -536,4 +536,86 @@ export const fr: Content = {
     comingSoon:
       "Votre questionnaire arrive bientôt. Vous le remplirez ici avant votre consultation.",
   },
+  patientSignIn: {
+    metaTitle: "Connexion",
+    title: "Connexion",
+    intro: "Connectez-vous avec le compte créé lors de votre inscription.",
+    emailLabel: "Adresse e-mail",
+    passwordLabel: "Mot de passe",
+    submit: "Se connecter",
+    submitting: "Connexion…",
+    form: {
+      wrong_credentials: "Adresse e-mail ou mot de passe incorrect.",
+      no_account:
+        "Aucun compte REMI n'est lié à cette adresse. Inscrivez-vous avec le lien reçu de la personne qui vous suit.",
+      rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
+      unavailable: "La connexion n'a pas abouti. Réessayez dans un instant.",
+    },
+    notices: {
+      no_account:
+        "Aucun compte REMI n'est lié à cette adresse. Inscrivez-vous avec le lien reçu de la personne qui vous suit.",
+      password_changed:
+        "Votre nouveau mot de passe est enregistré. Connectez-vous avec lui.",
+    },
+    forgotLink: "Mot de passe oublié ?",
+    magicLink: {
+      title: "Recevoir un lien de connexion",
+      intro:
+        "Sans mot de passe : nous envoyons un lien à votre adresse e-mail. Il vous connecte en un clic.",
+      submit: "Recevoir un lien",
+      submitting: "Envoi…",
+      status: {
+        sent:
+          "Si cette adresse a un compte, un lien de connexion vient de partir. Ouvrez-le depuis votre boîte mail.",
+        rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
+        unavailable: "Le lien n'a pas pu partir. Réessayez dans un instant.",
+      },
+    },
+    noAccount:
+      "Pas encore de compte ? Il se crée avec le lien reçu de la personne qui vous suit.",
+  },
+  forgotPassword: {
+    metaTitle: "Mot de passe oublié",
+    title: "Mot de passe oublié",
+    intro:
+      "Indiquez l'adresse e-mail de votre compte. Nous y envoyons un lien pour choisir un nouveau mot de passe.",
+    emailLabel: "Adresse e-mail",
+    submit: "Recevoir le lien",
+    submitting: "Envoi…",
+    status: {
+      sent:
+        "Si cette adresse a un compte, un lien vient de partir. Il est valable une heure et sert une seule fois.",
+      rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
+      unavailable: "Le lien n'a pas pu partir. Réessayez dans un instant.",
+    },
+    back: "Retour à la connexion",
+  },
+  newPassword: {
+    metaTitle: "Nouveau mot de passe",
+    title: "Choisissez un nouveau mot de passe",
+    intro:
+      "Confirmez l'adresse e-mail de votre compte et choisissez un nouveau mot de passe.",
+    emailLabel: "Adresse e-mail",
+    passwordLabel: "Nouveau mot de passe",
+    passwordHint: "Au moins 8 caractères.",
+    submit: "Enregistrer et me connecter",
+    submitting: "Enregistrement…",
+    form: {
+      too_short: "Le mot de passe compte au moins 8 caractères.",
+      too_long: "Ce mot de passe est trop long.",
+      invalid_link: "Ce lien a expiré ou a déjà servi. Demandez-en un nouveau.",
+      rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
+      unavailable:
+        "Le mot de passe n'a pas été enregistré. Réessayez dans un instant.",
+    },
+    invalidLink: "Ce lien a expiré ou a déjà servi.",
+    requestAgain: "Demander un nouveau lien",
+  },
+  patientHome: {
+    metaTitle: "Accueil",
+    title: "Bienvenue",
+    comingSoon:
+      "Votre espace arrive bientôt. Vous y trouverez vos recommandations et vos recettes.",
+  },
+  signOut: "Se déconnecter",
 };

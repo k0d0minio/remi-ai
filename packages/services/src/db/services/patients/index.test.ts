@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { getDatabase, registerDatabase } from "../../client";
 import type { PatientProfile } from "../../models/patient-profile";
 import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
+import { recordConsent } from "../patient-consents";
 import { addGoalCheckIn, addPatientGoal } from "../patient-goals";
 import { listAuditEvents, type AuditActor } from "../audit";
 import { addPatientRecommendation } from "../patient-recommendations";
@@ -170,8 +171,6 @@ describe("clinical fields", () => {
         sex: "female",
         heightCm: "168",
         weightKg: "62.5",
-        medications: "levothyroxine 50 µg",
-        supplements: "vitamin D",
         referral: "Dr Laurent",
       }),
     );
@@ -179,7 +178,6 @@ describe("clinical fields", () => {
     expect(created.sex).toBe("female");
     expect(created.heightCm).toBe(168);
     expect(created.weightKg).toBe(62.5);
-    expect(created.medications).toBe("levothyroxine 50 µg");
     expect(created.referral).toBe("Dr Laurent");
   });
 
@@ -956,6 +954,95 @@ describe("the care relationship", () => {
         )
       ).ok,
     ).toBe(false);
+  });
+});
+
+describe("médicaments and compléments under the care consent", () => {
+  const create = async (pseudonym: string) =>
+    unwrapOk(
+      await createPatient({ practitionerId: testPractitionerId, pseudonym }),
+    );
+
+  const giveCare = async (patient: PatientProfile) => {
+    const given = await recordConsent({
+      patientId: patient.id,
+      key: "care",
+      version: "1",
+      locale: "fr-BE",
+      decision: "given",
+      actor: { kind: "patient", id: patient.id, name: patient.pseudonym },
+    });
+    expect(given.ok).toBe(true);
+  };
+
+  it("refuses them on a new file, which holds no consent yet", async () => {
+    for (const input of [
+      { medications: "levothyroxine 50 µg" },
+      { supplements: "vitamin D" },
+    ]) {
+      const created = await createPatient({
+        practitionerId: testPractitionerId,
+        pseudonym: "Nouveau",
+        ...input,
+      });
+      expect(created.ok).toBe(false);
+      if (!created.ok) {
+        expect(created.error).toBe("not_permitted");
+      }
+    }
+  });
+
+  it("refuses a new value without a given care consent", async () => {
+    const patient = await create("Sans consentement");
+    const updated = await updatePatient(patient.id, {
+      medications: "levothyroxine 50 µg",
+    });
+    expect(updated.ok).toBe(false);
+    if (!updated.ok) {
+      expect(updated.error).toBe("not_permitted");
+    }
+    expect(unwrapOk(await getPatient(patient.id)).medications).toBe("");
+  });
+
+  it("stores them once the care consent is given", async () => {
+    const patient = await create("Avec consentement");
+    await giveCare(patient);
+    const updated = unwrapOk(
+      await updatePatient(patient.id, {
+        medications: "levothyroxine 50 µg",
+        supplements: "vitamin D",
+      }),
+    );
+    expect(updated.medications).toBe("levothyroxine 50 µg");
+    expect(updated.supplements).toBe("vitamin D");
+  });
+
+  it("refuses a new value after the care consent is withdrawn, and still clears", async () => {
+    const patient = await create("Retrait");
+    await giveCare(patient);
+    unwrapOk(await updatePatient(patient.id, { supplements: "vitamin D" }));
+    await tick();
+    const withdrawn = await recordConsent({
+      patientId: patient.id,
+      key: "care",
+      version: "1",
+      locale: "fr-BE",
+      decision: "withdrawn",
+      actor: { kind: "patient", id: patient.id, name: patient.pseudonym },
+    });
+    expect(withdrawn.ok).toBe(true);
+
+    // The form posts the stored value back on every save: that passes.
+    expect(
+      (await updatePatient(patient.id, { supplements: "vitamin D" })).ok,
+    ).toBe(true);
+    expect(
+      (await updatePatient(patient.id, { supplements: "magnesium" })).ok,
+    ).toBe(false);
+    const cleared = unwrapOk(
+      await updatePatient(patient.id, { supplements: "" }),
+    );
+    expect(cleared.supplements).toBe("");
   });
 });
 

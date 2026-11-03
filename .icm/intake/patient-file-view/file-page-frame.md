@@ -31,6 +31,7 @@ other epics add. The page opens for any file of this practitioner, from sign-up 
 - [ ] A URL to another practitioner's file returns not found
 - [ ] Every saved answer of the questionnaire is on the page, in the questionnaire's order
 - [ ] The page renders on a tablet width without horizontal scroll
+- [ ] The genotype is hidden when the genetic consent is not `given`. The page reads it through `getPatientQuestionnaire`, which returns it as null
 
 ## Out of scope
 
@@ -40,3 +41,4 @@ other epics add. The page opens for any file of this practitioner, from sign-up 
 
 - D-30, D-31. cross-epic: `preparatory-questionnaire/questionnaire-fields` (the fields), `patient-file-creation/care-relationship` (the scope), `patient-list-and-status/file-status-enum` (the label).
 - The anamnesis and the living summary move below the questionnaire as collapsed sections, per Morgane's question 1.
+- The genotype criterion moved here from `consent-and-data/genetic-consent-and-optional-data` (Jamie, 2026-11-03). That stub masks the genotype in the service.

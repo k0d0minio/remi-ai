@@ -5,7 +5,7 @@ import { createPatient } from "../db/services/patients";
 import { createMemoryDatabase, testPractitionerId } from "../db/test-helpers";
 import { ok } from "../shared/result";
 import { registerAuthProvider, type AuthIdentity } from "./provider";
-import { readSession } from "./session";
+import { readPatientAccount, readSession } from "./session";
 
 /** The identity the fake adapter reports. Each test sets it. */
 let current: AuthIdentity | null = null;
@@ -71,5 +71,21 @@ describe("the session read", () => {
     const session = await readSession();
     expect(session?.identity.email).toBe("new@example.be");
     expect(session?.principal).toBeNull();
+  });
+});
+
+describe("the patient account read", () => {
+  it("is null for a visitor and for an identity with no patient file", async () => {
+    current = null;
+    expect(await readPatientAccount()).toBeNull();
+    current = { ...linked, subject: "user-new", email: "new@example.be" };
+    expect(await readPatientAccount()).toBeNull();
+  });
+
+  it("returns the signed-in patient's own account", async () => {
+    current = linked;
+    const account = await readPatientAccount();
+    expect(account?.id).toBe(accountId);
+    expect(account?.authSubject).toBe("user-linked");
   });
 });

@@ -285,7 +285,7 @@ export const signUpPatient = async ({
             tx,
           ),
         );
-        consentAudits.push(written.audit);
+        consentAudits.push(...written.audits);
       }
       return created;
     });

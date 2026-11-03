@@ -50,6 +50,13 @@ import {
 
 const initial: PatientFormState = { error: null, saved: false };
 
+/**
+ * A disabled field posts nothing, so the action leaves the stored value as it
+ * is. The patient gives the care consent in REMI, never the console.
+ */
+const CARE_CONSENT_REQUIRED =
+  "Consentement requis : enregistré une fois que la personne a donné son consentement aux soins dans REMI.";
+
 type Props = {
   /** Present when editing; absent on `/patients/new`. */
   patient?: PatientProfile;
@@ -63,6 +70,11 @@ type Props = {
    * new file: nobody has consented to anything yet.
    */
   genotypeOpen?: boolean;
+  /**
+   * The patient's latest `care` decision is `given`. Without it, médicaments
+   * and compléments are locked (story 3): a new file holds no consent yet.
+   */
+  careConsentGiven?: boolean;
   /**
    * Called once a save has succeeded. The profile page collapses the form back
    * to its read summary with it; `/patients/new` redirects instead and passes
@@ -94,6 +106,7 @@ export const PatientForm = ({
   patient,
   questionnaire,
   genotypeOpen = false,
+  careConsentGiven = false,
   onSaved,
 }: Props) => {
   const [state, action, pending] = useActionState(savePatientAction, initial);
@@ -290,6 +303,7 @@ export const PatientForm = ({
         heightCm={patient?.heightCm ?? null}
         weightKg={patient?.weightKg ?? null}
         genotypeOpen={genotypeOpen}
+        careConsentGiven={careConsentGiven}
       />
 
       <Separator tone="subtle" />
@@ -304,12 +318,17 @@ export const PatientForm = ({
             id="medications"
             label="Traitements en cours"
             optional
-            hint="Séparés des contraintes pour rester lisibles d'un coup d'œil."
+            hint={
+              careConsentGiven
+                ? "Séparés des contraintes pour rester lisibles d'un coup d'œil."
+                : CARE_CONSENT_REQUIRED
+            }
           >
             <Textarea
               id="medications"
               name="medications"
               rows={3}
+              disabled={!careConsentGiven}
               defaultValue={patient?.medications ?? ""}
             />
           </Field>
@@ -318,12 +337,17 @@ export const PatientForm = ({
             id="supplements"
             label="Compléments déjà pris, hors protocole"
             optional
-            hint="Ce que la personne prend déjà d'elle-même — le protocole prescrit se tient plus haut."
+            hint={
+              careConsentGiven
+                ? "Ce que la personne prend déjà d'elle-même — le protocole prescrit se tient plus haut."
+                : CARE_CONSENT_REQUIRED
+            }
           >
             <Textarea
               id="supplements"
               name="supplements"
               rows={3}
+              disabled={!careConsentGiven}
               defaultValue={patient?.supplements ?? ""}
             />
           </Field>

@@ -200,6 +200,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     scoreStrips,
     goalsAwaitingAttention,
     messages,
+    consents,
   ] = await Promise.all([
     listPatientRecommendations(patient.id),
     listArchivedPatientRecommendations(patient.id),
@@ -230,13 +231,13 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     listGoalScoreStrips(patient.id),
     countGoalCheckInsAwaitingAttention(patient.id),
     listPatientMessages(patient.id),
+    consentsOf(patient.id),
   ]);
   // The questionnaire half of the file (story 1): its answers for the form,
   // what is still missing, and whether the genotype may be entered.
-  const [questionnaire, missing, consents] = await Promise.all([
+  const [questionnaire, missing] = await Promise.all([
     getPatientQuestionnaire(patient.id),
     missingQuestionnaireFields(patient.id),
-    consentsOf(patient.id),
   ]);
   if (!questionnaire.ok) {
     notFound();
@@ -1116,6 +1117,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 patient={patient}
                 lastEditedAt={formatDate(patient.lastEditedAt)}
                 consent={consent}
+                careConsentGiven={consents.care?.decision === "given"}
                 patientEditedOn={Object.fromEntries(
                   Object.entries(patient.patientEditedAt).flatMap(
                     ([field, at]) => (at ? [[field, formatDate(at)]] : []),

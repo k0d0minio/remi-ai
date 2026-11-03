@@ -11,9 +11,10 @@ import {
   intoleranceLabels,
   intolerances,
 } from "../../../shared/questionnaire";
-import { registerDatabase } from "../../client";
+import { getDatabase, registerDatabase } from "../../client";
 import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { listAuditEvents } from "../audit";
+import { recordConsent } from "../patient-consents";
 import { createPatient, getPatient, updatePatient } from "../patients";
 import {
   checkAllergenAnswer,
@@ -27,17 +28,47 @@ import {
 
 let patientId: string;
 
-beforeAll(async () => {
-  registerDatabase(createMemoryDatabase());
+const newPatient = async (pseudonym: string) => {
   const created = await createPatient({
     practitionerId: testPractitionerId,
-    pseudonym: "Claire",
+    pseudonym,
     sex: "other",
   });
   if (!created.ok) {
     throw new Error("test patient not created");
   }
-  patientId = created.data.id;
+  return created.data;
+};
+
+/** One decision of the patient, on the current version 1 text. */
+const decide = async (
+  patient: { id: string; pseudonym: string },
+  key: "care" | "genetic",
+  decision: "given" | "refused" | "withdrawn",
+) => {
+  const recorded = await recordConsent({
+    patientId: patient.id,
+    key,
+    version: "1",
+    locale: "fr-BE",
+    decision,
+    actor: { kind: "patient", id: patient.id, name: patient.pseudonym },
+  });
+  if (!recorded.ok) {
+    throw new Error(recorded.message);
+  }
+};
+
+/** Two rows share a millisecond otherwise, and the latest is chosen by time. */
+const tick = () => new Promise((resolve) => setTimeout(resolve, 5));
+
+beforeAll(async () => {
+  registerDatabase(createMemoryDatabase());
+  const claire = await newPatient("Claire");
+  patientId = claire.id;
+  // Claire gave both consents: the answers below are about storage, not consent.
+  await decide(claire, "care", "given");
+  await decide(claire, "genetic", "given");
 });
 
 const unwrapOk = <T>(result: { ok: true; data: T } | { ok: false }): T => {
@@ -564,5 +595,111 @@ describe("the missing fields and the move to « Prêt pour consultation »", () 
         ),
       ),
     ).toBe("not_found");
+  });
+});
+
+describe("optional data under its consent", () => {
+  it("refuses a genotype value without a given genetic consent, and stores the gate answer", async () => {
+    const patient = await newPatient("Sans génétique");
+    await decide(patient, "care", "given");
+    expect(
+      errorOf(
+        await savePatientQuestionnaire(patient.id, {
+          geneticTest: "yes",
+          apoe: "E3/E4",
+        }),
+      ),
+    ).toBe("not_permitted");
+    // Nothing of the refused save was written.
+    let view = unwrapOk(await getPatientQuestionnaire(patient.id));
+    expect(view.answers.geneticTest).toBe(null);
+    expect(view.answers.apoe).toBe(null);
+
+    unwrapOk(
+      await savePatientQuestionnaire(patient.id, { geneticTest: "yes" }),
+    );
+    // A clear needs no consent.
+    unwrapOk(await savePatientQuestionnaire(patient.id, { apoe: "" }));
+    view = unwrapOk(await getPatientQuestionnaire(patient.id));
+    expect(view.answers.geneticTest).toBe("yes");
+  });
+
+  it("stores a refusal and changes nothing else", async () => {
+    const patient = await newPatient("Refus");
+    await decide(patient, "care", "given");
+    const before = unwrapOk(await getPatientQuestionnaire(patient.id));
+    await decide(patient, "genetic", "refused");
+    const after = unwrapOk(await getPatientQuestionnaire(patient.id));
+    expect(after).toEqual(before);
+    expect(
+      errorOf(await savePatientQuestionnaire(patient.id, { dio2: "A" })),
+    ).toBe("not_permitted");
+    const events = await listAuditEvents({ targetId: patient.id });
+    expect(events.map((event) => event.action).sort()).toEqual([
+      "consent.given",
+      "consent.refused",
+    ]);
+  });
+
+  it("clears the three genotype fields on a withdrawal, with an audit event", async () => {
+    const patient = await newPatient("Retrait");
+    await decide(patient, "care", "given");
+    await decide(patient, "genetic", "given");
+    const stored = unwrapOk(
+      await savePatientQuestionnaire(patient.id, {
+        geneticTest: "yes",
+        apoe: "E2/E3",
+        dio2: "M",
+        amy1a: "A",
+      }),
+    );
+    expect(stored.apoe).toBe("E2/E3");
+
+    await tick();
+    await decide(patient, "genetic", "withdrawn");
+    const view = unwrapOk(await getPatientQuestionnaire(patient.id));
+    expect(view.answers.apoe).toBe(null);
+    expect(view.answers.dio2).toBe(null);
+    expect(view.answers.amy1a).toBe(null);
+    expect(view.answers.geneticTest).toBe("yes");
+    // The row itself is empty, not only the read.
+    const row = await getDatabase()
+      .collection<{ id: string; apoe: string | null }>("patient_profiles")
+      .findById(patient.id);
+    expect(row?.apoe).toBe(null);
+
+    const cleared = await listAuditEvents({
+      targetId: patient.id,
+      action: "genotype.cleared",
+    });
+    expect(cleared).toHaveLength(1);
+    expect(cleared[0].detail).toBe("consent withdrawn");
+  });
+
+  it("hides a stored genotype from every read without the genetic consent", async () => {
+    const patient = await newPatient("Masque");
+    // A value written before this rule, with no consent row behind it.
+    await getDatabase()
+      .collection<{ id: string; apoe: string | null }>("patient_profiles")
+      .update(patient.id, { apoe: "E4/E4" });
+    const view = unwrapOk(await getPatientQuestionnaire(patient.id));
+    expect(view.answers.apoe).toBe(null);
+  });
+
+  it("refuses the desired weight without a given care consent", async () => {
+    const patient = await newPatient("Sans soins");
+    expect(
+      errorOf(
+        await savePatientQuestionnaire(patient.id, { desiredWeightKg: 60 }),
+      ),
+    ).toBe("not_permitted");
+    unwrapOk(
+      await savePatientQuestionnaire(patient.id, { desiredWeightKg: "" }),
+    );
+    await decide(patient, "care", "given");
+    const answers = unwrapOk(
+      await savePatientQuestionnaire(patient.id, { desiredWeightKg: 60 }),
+    );
+    expect(answers.desiredWeightKg).toBe(60);
   });
 });

@@ -38,6 +38,11 @@ type Props = {
   weightKg: number | null;
   /** The patient gave the genetic consent. Locked without it. */
   genotypeOpen: boolean;
+  /**
+   * The patient gave the care consent. The desired weight is optional data
+   * and stays locked without it (story 3): the service refuses it.
+   */
+  careConsentGiven: boolean;
 };
 
 /** The hint of a field of `mandatoryQuestionnaireFields`. */
@@ -104,6 +109,7 @@ export const QuestionnaireFields = ({
   heightCm,
   weightKg,
   genotypeOpen,
+  careConsentGiven,
 }: Props) => (
   <div className="flex flex-col gap-6">
     <Section title="Profil">
@@ -163,7 +169,17 @@ export const QuestionnaireFields = ({
           />
         </Field>
 
-        <Field id="desiredWeightKg" label="Poids souhaité (kg)" optional>
+        {/* Disabled posts nothing, so the stored value stays as it is. */}
+        <Field
+          id="desiredWeightKg"
+          label="Poids souhaité (kg)"
+          optional
+          hint={
+            careConsentGiven
+              ? undefined
+              : "Verrouillé jusqu'au consentement aux soins du patient."
+          }
+        >
           <Input
             id="desiredWeightKg"
             name="desiredWeightKg"
@@ -172,6 +188,7 @@ export const QuestionnaireFields = ({
             step="0.1"
             min={1}
             max={500}
+            disabled={!careConsentGiven}
             defaultValue={answers?.desiredWeightKg ?? ""}
           />
         </Field>

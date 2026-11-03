@@ -44,6 +44,8 @@ type Props = {
   lastEditedAt: string;
   /** « Recueilli le … · WhatsApp », or `null` when it is not recorded. */
   consent: string | null;
+  /** The latest `care` decision is `given`: the form unlocks the care fields. */
+  careConsentGiven: boolean;
   /**
    * Per field the patient last changed from « Mon profil », the day they did —
    * formatted on the server for the same reason as the two dates above.
@@ -87,6 +89,7 @@ export const ProfileSummary = ({
   patient,
   lastEditedAt,
   consent,
+  careConsentGiven,
   patientEditedOn,
   questionnaire,
   consultationDate,
@@ -104,6 +107,7 @@ export const ProfileSummary = ({
         patient={patient}
         questionnaire={questionnaire}
         genotypeOpen={genotypeOpen}
+        careConsentGiven={careConsentGiven}
         onSaved={close}
       />
     );
