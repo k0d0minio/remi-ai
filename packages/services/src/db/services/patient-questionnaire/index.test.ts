@@ -435,7 +435,9 @@ describe("the allergy and intolerance lists", () => {
 describe("checking a submit before any write", () => {
   it("accepts valid answers and refuses an unknown value with its field", () => {
     expect(checkQuestionnaireInput({ activityLevel: "high" }).ok).toBe(true);
-    const refused = checkQuestionnaireInput({ activityLevel: "extreme" });
+    const refused = checkQuestionnaireInput({
+      activityLevel: "extreme" as "high",
+    });
     expect(refused.ok).toBe(false);
     if (!refused.ok) {
       expect(refused.message).toMatch(/^activityLevel:/);
