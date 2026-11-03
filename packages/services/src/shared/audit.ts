@@ -180,6 +180,9 @@ export const auditActions = [
   "template.deleted",
   "template.shared",
   "template.unshared",
+  /** Morgane marked a waiting-list row as written back to, or took the mark off. */
+  "lead.contacted",
+  "lead.reopened",
   "operator.invited",
   "operator.invite_revoked",
   "operator.joined",

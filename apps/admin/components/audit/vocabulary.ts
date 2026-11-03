@@ -116,6 +116,8 @@ export const actionLabels: Record<AuditActionName, string> = {
   "template.deleted": "modèle supprimé",
   "template.shared": "modèle partagé",
   "template.unshared": "partage du modèle retiré",
+  "lead.contacted": "inscription marquée contactée",
+  "lead.reopened": "inscription remise à contacter",
   "operator.invited": "invitation envoyée",
   "operator.invite_revoked": "invitation retirée",
   "operator.joined": "compte créé",
@@ -248,6 +250,8 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   // A set that was hers alone is now readable by every operator of the console.
   "template.shared": "warning",
   "template.unshared": "info",
+  "lead.contacted": "neutral",
+  "lead.reopened": "neutral",
   "operator.invited": "info",
   "operator.invite_revoked": "warning",
   "operator.joined": "info",

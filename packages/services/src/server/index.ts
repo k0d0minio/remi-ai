@@ -343,6 +343,19 @@ export type {
 } from "../db/services/operator-invitations";
 export type { OperatorInvitation } from "../db/models/operator-invitation";
 
+export {
+  createLead,
+  getLead,
+  listLeads,
+  setLeadContacted,
+} from "../db/services/leads";
+export type {
+  LeadInput,
+  LeadQuery,
+  LeadWrite,
+} from "../db/services/leads";
+export type { Lead } from "../db/models/lead";
+
 export { listAuditEvents, recordAuditEvent } from "../db/services/audit";
 export type { AuditActor, AuditQuery, AuditRecord } from "../db/services/audit";
 export type { AuditAction, AuditEvent } from "../db/models/audit-event";

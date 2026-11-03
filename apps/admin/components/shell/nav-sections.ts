@@ -3,6 +3,7 @@ import {
   Carrot,
   ChefHat,
   Home,
+  Inbox,
   ScrollText,
   Users,
   UsersRound,
@@ -23,7 +24,7 @@ export type NavSection = {
 };
 
 /**
- * The console's whole surface. It is deliberately six rows: this console is
+ * The console's whole surface. It is deliberately seven rows: this console is
  * Morgane's patient tool and the accounts that reach it, and nothing else. The
  * practitioner, pilot, support and flag screens that used to live here were
  * fixtures with no data behind them — they were deleted rather than hidden.
@@ -50,6 +51,10 @@ export const navSections: readonly NavSection[] = [
       // Beside them for the same reason: the nutrition corpus belongs to no
       // patient either. It is what REMI knows, not what anyone was told.
       { href: "/knowledge", label: "Connaissances", icon: BookOpen },
+      // The waiting lists of the public site: who asked to be a pilot, who
+      // asked a question, which practitioner wants in. Read here, answered
+      // by email, marked here.
+      { href: "/leads", label: "Liste d'attente", icon: Inbox },
     ],
   },
   {
