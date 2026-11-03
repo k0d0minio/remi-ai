@@ -1,79 +1,57 @@
 import NextLink from "next/link";
-import { appHref, localePath, type Locale } from "@remi/services/shared";
-import {
-  BRAND_LEGAL_NAME,
-  Container,
-  Link,
-  Separator,
-  Typography,
-  Wordmark,
-} from "@remi/ui/server";
-import { getContent } from "@/lib/content";
-
-type Props = {
-  locale: Locale;
-};
+import { localePath } from "@remi/services/shared";
+import { Container, Link, Typography } from "@remi/ui/server";
+import { Logo } from "@/components/logo";
+import { FOOTER, LEGAL_NAV } from "@/lib/content/landing";
+import { SITE } from "@/lib/site";
 
 const year = new Date().getFullYear();
 
-export const SiteFooter = ({ locale }: Props) => {
-  const content = getContent(locale);
-
-  return (
-    <footer className="border-border/60 border-t">
-      <Container className="flex flex-col gap-8 py-12">
-        <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex max-w-xs flex-col gap-2">
-            <Wordmark size="sm" />
-            <Typography size="sm" tone="muted">
-              {content.footer.tagline}
-            </Typography>
-          </div>
-
-          <nav
-            aria-label={content.footer.navLabel}
-            className="flex flex-col gap-2.5"
-          >
-            {content.nav.map((item) => (
-              <Link
-                key={item.href}
-                as={NextLink}
-                href={localePath(locale, item.href)}
-                variant="muted"
-                className="text-sm"
-              >
-                {item.label}
-              </Link>
-            ))}
-            <Link
-              as={NextLink}
-              href={localePath(locale, "/contact")}
-              variant="muted"
-              className="text-sm"
-            >
-              {content.header.contact}
-            </Link>
-            {/* A plain anchor, not NextLink: the app is a separate deployment,
-                so a client-side navigation cannot cross into it. The locale
-                goes with the reader — the app publishes the same two languages
-                under the same prefixes, so someone reading the French site
-                stays in French when they leave it. */}
-            <Link
-              href={appHref("web", "/", locale)}
-              variant="muted"
-              className="text-sm"
-            >
-              {content.footer.signIn}
-            </Link>
-          </nav>
+export const SiteFooter = () => (
+  <footer className="bg-foreground text-background/80">
+    <Container className="flex flex-col gap-8 py-12">
+      <div className="grid gap-8 md:grid-cols-[2fr_1fr_1fr]">
+        <div className="flex max-w-sm flex-col items-start gap-3">
+          <span className="bg-background inline-flex rounded-lg px-2.5 py-1.5">
+            <Logo height={28} />
+          </span>
+          <Typography size="sm" className="text-background/80">
+            {FOOTER.tagline}
+          </Typography>
         </div>
 
-        <Separator tone="subtle" />
+        <div className="flex flex-col gap-2">
+          <Typography size="sm" weight="semibold" className="text-background">
+            {FOOTER.contactTitle}
+          </Typography>
+          <Link href={`mailto:${SITE.contactEmail}`} className="text-background text-sm">
+            {SITE.contactEmail}
+          </Link>
+          <Link href={SITE.contactPhoneHref} className="text-background text-sm">
+            {SITE.contactPhone}
+          </Link>
+        </div>
 
-        <Typography size="xs" tone="muted">
-          © {year} {BRAND_LEGAL_NAME}. {content.footer.disclaimer}
-        </Typography>
-      </Container>
-    </footer>
-  );
-};
+        <nav aria-label={FOOTER.infoLabel} className="flex flex-col gap-2">
+          <Typography size="sm" weight="semibold" className="text-background">
+            {FOOTER.infoTitle}
+          </Typography>
+          {LEGAL_NAV.map((item) => (
+            <Link
+              key={item.slug}
+              as={NextLink}
+              href={localePath("fr", `/${item.slug}`)}
+              className="text-background text-sm"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
+
+      <Typography size="xs" className="text-background/60">
+        {FOOTER.copyright(year)}
+      </Typography>
+    </Container>
+  </footer>
+);

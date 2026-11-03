@@ -1,24 +1,20 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
-import { isLocale, locales } from "@remi/services/shared";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { getContent } from "@/lib/content";
+import { META } from "@/lib/content/landing";
 import { siteName, siteUrl } from "@/lib/metadata";
 import { underConstruction } from "@/lib/under-construction";
 import "../globals.css";
 
 /**
- * Two families, self-hosted by `next/font` so there is no third-party request on
- * the critical path and no layout shift while a webfont arrives.
- *
- * Inter carries everything; its `latin` subset includes the accented range
- * French needs. Instrument Serif is headlines only, via Typography's `display`
- * variant — the typographic grammar of medical journals and health
- * institutions, which is the register this product needs.
+ * One family, self-hosted by `next/font`: no third-party request on the
+ * critical path and no layout shift while a webfont arrives. Inter carries
+ * everything for now (Jamie, 2026-11-03). With no `--font-display` set, the
+ * design system's display face falls back to Inter too.
  */
 const inter = Inter({
   subsets: ["latin"],
@@ -26,48 +22,32 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const display = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  display: "swap",
-  variable: "--font-display",
-});
-
 type Params = { locale: string };
 
-export const generateStaticParams = (): Params[] =>
-  locales.map((locale) => ({ locale }));
-
 /**
- * Only /en and /fr exist. The proxy already redirects everything else, but
- * this closes the door at the router too: an unknown locale is a 404, not a
- * page rendered with a half-valid param.
+ * The site is French only (Jamie, 2026-11-03). The `[locale]` segment stays,
+ * so every address keeps the `/fr` prefix the other apps link to, and `fr`
+ * is the one value it takes. The proxy sends every other prefix here.
  */
+const locale = "fr";
+
+export const generateStaticParams = (): Params[] => [{ locale }];
+
 export const dynamicParams = false;
 
-export const generateMetadata = async ({
-  params,
-}: {
-  params: Promise<Params>;
-}): Promise<Metadata> => {
-  const { locale } = await params;
-  const content = getContent(isLocale(locale) ? locale : "en");
-
-  return {
-    metadataBase: new URL(siteUrl),
-    title: {
-      default: `${siteName} — ${content.home.meta.title}`,
-      template: `%s · ${siteName}`,
-    },
-    description: content.home.meta.description,
-    openGraph: {
-      siteName,
-      locale: locale === "fr" ? "fr_BE" : "en_GB",
-      type: "website",
-    },
-    twitter: { card: "summary_large_image" },
-  };
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: META.title,
+    template: `%s · ${siteName}`,
+  },
+  description: META.description,
+  openGraph: {
+    siteName,
+    locale: "fr_BE",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 const RootLayout = async ({
@@ -77,21 +57,17 @@ const RootLayout = async ({
   children: ReactNode;
   params: Promise<Params>;
 }) => {
-  const { locale } = await params;
-  if (!isLocale(locale)) {
+  const { locale: requested } = await params;
+  if (requested !== locale) {
     notFound();
   }
 
   return (
-    <html
-      lang={locale}
-      className={`${inter.variable} ${display.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang="fr" className={inter.variable} suppressHydrationWarning>
       <body className="flex min-h-dvh flex-col antialiased">
-        {underConstruction ? null : <SiteHeader locale={locale} />}
+        {underConstruction ? null : <SiteHeader />}
         <main className="flex-1">{children}</main>
-        {underConstruction ? null : <SiteFooter locale={locale} />}
+        {underConstruction ? null : <SiteFooter />}
         <Analytics />
       </body>
     </html>
