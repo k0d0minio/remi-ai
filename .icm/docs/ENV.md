@@ -26,19 +26,24 @@ that app's project.
 
 ## App configuration
 
-| Variable                    | Purpose                                        | Where set | Public? |
-| --------------------------- | ---------------------------------------------- | --------- | ------- |
-| `NODE_ENV`                  | `development` \| `test` \| `production`        | toolchain | no      |
-| `APP_URL`                   | Absolute base URL of the app doing the reading | Vercel    | no      |
-| `NEXT_PUBLIC_APP_URL`       | Where `apps/web` answers                       | Vercel    | yes     |
-| `NEXT_PUBLIC_MARKETING_URL` | Where `apps/marketing` answers                 | Vercel    | yes     |
-| `NEXT_PUBLIC_ADMIN_URL`     | Where `apps/admin` answers                     | Vercel    | yes     |
-| `NEXT_PUBLIC_DOCS_URL`      | Where `apps/docs` answers                      | Vercel    | yes     |
+| Variable                    | Purpose                                                               | Where set | Public? |
+| --------------------------- | --------------------------------------------------------------------- | --------- | ------- |
+| `NODE_ENV`                  | `development` \| `test` \| `production`                               | toolchain | no      |
+| `APP_URL`                   | Absolute base URL of the app doing the reading                        | Vercel    | no      |
+| `NEXT_PUBLIC_APP_URL`       | Where `apps/web` answers                                              | Vercel    | yes     |
+| `NEXT_PUBLIC_MARKETING_URL` | Where `apps/marketing` answers                                        | Vercel    | yes     |
+| `NEXT_PUBLIC_ADMIN_URL`     | Where `apps/admin` answers                                            | Vercel    | yes     |
+| `NEXT_PUBLIC_DOCS_URL`      | Where `apps/docs` answers                                             | Vercel    | yes     |
+| `UNDER_CONSTRUCTION`        | `1`: `apps/marketing` shows its under-construction page on every page | Vercel    | no      |
 
 Value per target: production takes the production address of each app, uat the uat address
 (`https://uat-app.remi-ai.tech`, `https://uat-admin.remi-ai.tech`; marketing and docs have no uat,
 so uat takes their production address), preview is unset today. The addresses live in
 `.icm/environments.md`.
+
+`UNDER_CONSTRUCTION` is `1` on the production target of the **marketing** project only, until the
+site opens. uat and preview leave it unset, so they show the full site. To open the site, delete
+the variable and redeploy production.
 
 `NODE_ENV` is the one row nobody sets: Next.js, Turborepo and the test runner set it themselves, and
 it is listed here because it is in the zod schema and in `turbo.json` like every other variable, and

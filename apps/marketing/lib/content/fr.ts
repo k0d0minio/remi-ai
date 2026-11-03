@@ -28,6 +28,16 @@ import type { Content } from "./types";
  * tarif (rien n'est décidé), pas de témoignages, pas de traction inventée.
  */
 export const fr: Content = {
+  underConstruction: {
+    meta: {
+      title: "En construction",
+      description: "REMI se construit avec un premier groupe de praticiens. Le site ouvre bientôt.",
+    },
+    eyebrow: "Bientôt",
+    title: "REMI est en construction",
+    lead: "Nous construisons REMI avec un premier groupe de praticiens. Le site ouvre bientôt.",
+    contactLead: "Une question d'ici là ? Écrivez-nous :",
+  },
   nav: [
     { href: "/practitioners", label: "Praticiens" },
     { href: "/individuals", label: "Pour vous" },

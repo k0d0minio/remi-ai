@@ -24,6 +24,8 @@ export const auditActions = [
   /** A patient created their own account from a practitioner's sign-up link. */
   "patient.signed_up",
   "patient.updated",
+  /** The file moved to its next status (D-31). The detail names both and why. */
+  "patient.file_status_changed",
   "patient.deleted",
   "recommendation.added",
   "recommendation.updated",

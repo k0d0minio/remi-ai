@@ -69,6 +69,12 @@ export const patientProfiles = pgTable("patient_profiles", {
   locale: text("locale").notNull().default("fr"),
   status: text("status").notNull().default("active"),
   /**
+   * Where the file stands in the care (D-31): `to_complete`, `ready`,
+   * `to_validate`, `active`. Text, with the values in `shared/file-status.ts`,
+   * like `status`. A different fact from `status`, the retention lifecycle.
+   */
+  fileStatus: text("file_status").notNull().default("to_complete"),
+  /**
    * Birth date as a plain calendar date, not an instant: a birthday has no
    * timezone, and storing one is how an age drifts by a day across a border.
    * Age is derived at the read site and never stored.

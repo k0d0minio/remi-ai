@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getContent } from "@/lib/content";
 import { siteName, siteUrl } from "@/lib/metadata";
+import { underConstruction } from "@/lib/under-construction";
 import "../globals.css";
 
 /**
@@ -88,9 +89,9 @@ const RootLayout = async ({
       suppressHydrationWarning
     >
       <body className="flex min-h-dvh flex-col antialiased">
-        <SiteHeader locale={locale} />
+        {underConstruction ? null : <SiteHeader locale={locale} />}
         <main className="flex-1">{children}</main>
-        <SiteFooter locale={locale} />
+        {underConstruction ? null : <SiteFooter locale={locale} />}
         <Analytics />
       </body>
     </html>
