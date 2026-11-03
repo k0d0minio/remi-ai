@@ -495,8 +495,7 @@ export const en: Content = {
     form: {
       invalid_link:
         "This link is not valid. Ask your practitioner for a new one.",
-      already_registered:
-        "This address already has an account. No new account was created.",
+      already_registered: "You already have an account.",
       rate_limited: "Too many attempts. Try again in a few minutes.",
       unavailable:
         "The sign-up did not go through. Try again in a moment: your answers are kept.",
@@ -505,6 +504,7 @@ export const en: Content = {
       consent_stale:
         "The text changed after the page opened. Reload the page to read the current version. No account was created.",
     },
+    signIn: "Sign in.",
     submit: "Create my account",
     submitting: "Creating your account…",
     consent: {

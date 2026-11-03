@@ -502,8 +502,7 @@ export const fr: Content = {
     form: {
       invalid_link:
         "Ce lien n'est pas valide. Demandez-en un nouveau à la personne qui vous suit.",
-      already_registered:
-        "Cette adresse a déjà un compte. Aucun nouveau compte n'a été créé.",
+      already_registered: "Vous avez déjà un compte.",
       rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
       unavailable:
         "L'inscription n'a pas abouti. Réessayez dans un instant : vos réponses sont gardées.",
@@ -512,6 +511,7 @@ export const fr: Content = {
       consent_stale:
         "Le texte a changé depuis l'ouverture de la page. Rechargez la page pour lire la version en vigueur. Aucun compte n'a été créé.",
     },
+    signIn: "Connectez-vous.",
     submit: "Créer mon compte",
     submitting: "Création du compte…",
     consent: {

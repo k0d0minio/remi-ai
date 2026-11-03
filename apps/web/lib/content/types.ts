@@ -533,6 +533,11 @@ export type Content = {
     invalid: Record<SignupField, string>;
     tooShort: string;
     form: Record<SignupFormError, string>;
+    /**
+     * The link after `form.already_registered`, to the sign-in page. The two
+     * read as one message. Neither names any data of the existing file.
+     */
+    signIn: string;
     submit: string;
     submitting: string;
     /** The consent step, before the form (story 3). */
