@@ -79,10 +79,11 @@ export const AllergenField = ({ kind, noneKnown, rows }: Props) => {
   const [checked, setChecked] = useState<ReadonlySet<string>>(
     () => new Set(rows.map((row) => boxValue(row.key, row.subKey))),
   );
-  const otherTexts = new Map(
+  // Keyed by the box's key: `other`, or the category of a sub-list « Autre ».
+  const otherTexts = new Map<string, string>(
     rows
       .filter((row) => row.otherText !== null)
-      .map((row) => [row.key, row.otherText ?? ""]),
+      .map((row): [string, string] => [row.key, row.otherText ?? ""]),
   );
 
   // Unchecking a category unchecks its sub-list too: a sub-box alone would
