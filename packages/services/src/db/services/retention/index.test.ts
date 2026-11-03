@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import {
   consoleMailer,
   registerMailer,
@@ -73,8 +81,27 @@ const accountOf = async (id: string) =>
 
 const hourAfter = (date: Date) => new Date(date.getTime() + 60 * 60 * 1000);
 
-beforeEach(() => {
+/** The tables the sweep reads. Each test starts with them empty. */
+const sweptTables = [
+  "patient_accounts",
+  "patient_profiles",
+  "patient_documents",
+  "audit_events",
+  "operators",
+];
+
+beforeAll(() => {
   registerDatabase(createMemoryDatabase());
+});
+
+beforeEach(async () => {
+  for (const name of sweptTables) {
+    const rows = getDatabase().collection<{ id: string }>(name);
+    const page = await rows.findMany({}, { limit: 10_000 });
+    for (const row of page.items) {
+      await rows.remove(row.id);
+    }
+  }
   sent = [];
   registerMailer({
     provider: "test",
