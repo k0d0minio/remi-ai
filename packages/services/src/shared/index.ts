@@ -26,6 +26,8 @@ export {
 } from "./i18n";
 export type { Locale } from "./i18n";
 export { auditActions } from "./audit";
+export { fileClaimPurposes, fileTakeoverPath } from "./file-claim";
+export type { FileClaimPurpose } from "./file-claim";
 export { minPasswordLength, signupFields } from "./signup";
 export type {
   PatientLanding,

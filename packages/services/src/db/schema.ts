@@ -685,6 +685,31 @@ export const patientAccounts = pgTable("patient_accounts", {
 });
 
 /**
+ * A one-time link that lets a patient take over a file their practitioner
+ * created (`patient-takes-over-file`, story 1). `activation` goes out in the
+ * activation e-mail. `claim` answers a sign-up with the e-mail of such a file.
+ *
+ * The token is stored hashed, as `operator_invitations` does: it is a
+ * credential that mints an account, so a dump of this table must not be a set
+ * of working links. `used_at` set or `expires_at` past: the link is spent.
+ */
+export const patientFileClaims = pgTable("patient_file_claims", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientProfileId: uuid("patient_profile_id")
+    .notNull()
+    .references(() => patientProfiles.id, { onDelete: "cascade" }),
+  /** `activation` or `claim`: values in `shared/file-claim.ts`. */
+  purpose: text("purpose").notNull(),
+  tokenHash: text("token_hash").notNull().unique(),
+  expiresAt: timestamp("expires_at", {
+    withTimezone: true,
+    mode: "date",
+  }).notNull(),
+  usedAt: timestamp("used_at", { withTimezone: true, mode: "date" }),
+  ...timestamps,
+});
+
+/**
  * Each consent decision of a patient — story 3, D-32. Append-only: no service
  * updates or deletes a row, and the latest row per key is the answer.
  *

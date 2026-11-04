@@ -8,14 +8,15 @@ import { getPractitionerBySignupToken } from "../db/services/operators";
 import {
   createPatientAccount,
   getPatientAccountByEmail,
+  getPatientAccountByProfile,
   getPatientAccountBySubject,
 } from "../db/services/patient-accounts";
-import { systemActor } from "../db/services/access";
+import { operatorActor, systemActor } from "../db/services/access";
 import { insertConsent } from "../db/services/patient-consents";
-import { createPatient } from "../db/services/patients";
+import { createPatient, findPatientByEmail } from "../db/services/patients";
 import type { ShownConsent } from "../shared/consent";
 import type { Locale } from "../shared/i18n";
-import { err, ok, type Result } from "../shared/result";
+import { err, ok, type Result, type ServiceErrorCode } from "../shared/result";
 import {
   minPasswordLength,
   signupFields,
@@ -193,6 +194,9 @@ const orRollback = <T>(result: Result<T>): T => {
   return result.data;
 };
 
+/** The sign-up's refusals: the service codes, and the file to take over. */
+export type SignupError = ServiceErrorCode | "file_exists";
+
 export type PatientSignupInput = {
   /** The practitioner's permanent link token, from the route. */
   token: string;
@@ -217,6 +221,9 @@ export type PatientSignupInput = {
  *   identity store's user.
  * - `not_found`: the token names no practitioner. Nothing is written.
  * - `conflict`: the e-mail already has an account. Nothing is written.
+ * - `file_exists`: a file of this practitioner holds the e-mail and has no
+ *   account (`patient-takes-over-file`). Nothing is written. The page offers
+ *   the claim e-mail, so the patient takes that file over.
  * - `rate_limited`, `upstream_failed`: the identity store refused. Nothing is written.
  */
 export const signUpPatient = async ({
@@ -225,7 +232,7 @@ export const signUpPatient = async ({
   data,
   callbackPath,
   consents,
-}: PatientSignupInput): Promise<Result<{ patientId: Id }>> => {
+}: PatientSignupInput): Promise<Result<{ patientId: Id }, SignupError>> => {
   // No account without the mandatory consents (story 3, criterion 2).
   const consentCheck = checkSignupConsents(consents);
   if (!consentCheck.ok) {
@@ -240,6 +247,20 @@ export const signUpPatient = async ({
   }
   if (await getPatientAccountByEmail(data.email)) {
     return alreadyRegistered();
+  }
+  // A file the practitioner created with this e-mail is taken over, never
+  // doubled (story 1). A file of another practitioner never matches.
+  const existing = await findPatientByEmail(
+    operatorActor({ id: practitioner.data.id, role: "practitioner" }),
+    data.email,
+  );
+  if (existing) {
+    return (await getPatientAccountByProfile(existing.id))
+      ? alreadyRegistered()
+      : err(
+          "file_exists",
+          "a file of this practitioner holds this e-mail and has no account",
+        );
   }
   const identity = await identityFor(data, callbackPath);
   if (!identity.ok) {

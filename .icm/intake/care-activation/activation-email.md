@@ -23,6 +23,7 @@ On a successful activation the email seam sends « Votre espace REMI est prêt �
 - [ ] « Renvoyer l'e-mail » sends the same e-mail again and records the new result.
 - [ ] A later validation of the protocol sends no e-mail.
 - [ ] Each send is an audit event.
+- [ ] On a file the practitioner created, the e-mail carries the one-time link from `issueActivationLink` (`patient-file-creation/patient-takes-over-file`).
 
 ## Out of scope
 
@@ -31,3 +32,5 @@ On a successful activation the email seam sends « Votre espace REMI est prêt �
 ## Notes
 
 D-32. Files: `packages/services/src/email/templates/`, a `sent_at` and `last_error` pair on the file or a small `patient_emails` table (Jamie's call), `apps/admin/app/(admin)/patients/[id]/`. Cross-epic: `patient-access/activation-email-content`.
+
+The link: `issueActivationLink(patientId, linkFor)` in `@remi/services/server` returns the URL and its expiry (7 days). `linkFor` builds the URL with `appHref("web", fileTakeoverPath(token), locale)`. It answers `conflict` for a file that already has an account. That patient signs in.

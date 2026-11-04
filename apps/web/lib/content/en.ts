@@ -496,6 +496,7 @@ export const en: Content = {
       invalid_link:
         "This link is not valid. Ask your practitioner for a new one.",
       already_registered: "You already have an account.",
+      file_exists: "A file already exists for this address.",
       rate_limited: "Too many attempts. Try again in a few minutes.",
       unavailable:
         "The sign-up did not go through. Try again in a moment: your answers are kept.",
@@ -505,6 +506,16 @@ export const en: Content = {
         "The text changed after the page opened. Reload the page to read the current version. No account was created.",
     },
     signIn: "Sign in.",
+    claim: {
+      request: "Get a link by e-mail",
+      requesting: "Sending the link…",
+      status: {
+        sent: "If a file exists for this address, a link just went to it. It works once and expires in 24 hours.",
+        rate_limited:
+          "A link went out less than five minutes ago. Look in your inbox, then try again later.",
+        unavailable: "The link could not go out. Try again in a moment.",
+      },
+    },
     submit: "Create my account",
     submitting: "Creating your account…",
     consent: {
@@ -665,6 +676,33 @@ export const en: Content = {
     },
     invalidLink: "This link has expired or was already used.",
     requestAgain: "Ask for a new link",
+  },
+  takeover: {
+    metaTitle: "Take over my file",
+    title: "Take over your REMI file",
+    greeting: "Hello {name},",
+    intro:
+      "The person who follows you opened your file. Give your consent to the processing of your data, then choose a password. You then find the information already recorded.",
+    passwordLabel: "Password",
+    passwordHint: "At least 8 characters.",
+    submit: "Create my account",
+    submitting: "Creating the account…",
+    form: {
+      consent_missing:
+        "Tick each mandatory consent. No account was created.",
+      consent_stale:
+        "The text changed since the page opened. Reload the page to read the current version. No account was created.",
+      too_short: "The password needs at least 8 characters.",
+      too_long: "This password is too long.",
+      spent: "This link is no longer valid. No account was created.",
+      has_account: "You already have an account.",
+      rate_limited: "Too many attempts. Try again in a few minutes.",
+      unavailable: "The account was not created. Try again in a moment.",
+    },
+    signIn: "Sign in.",
+    spent:
+      "This link is no longer valid: it served once already, or it expired. Sign in if you already have an account. Otherwise, ask for a new link from the sign-up link of the person who follows you.",
+    hasAccount: "You already have an account for this file.",
   },
   patientHome: {
     metaTitle: "Home",

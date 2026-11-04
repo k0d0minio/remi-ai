@@ -26,6 +26,17 @@ export const auditActions = [
   "patient.created",
   /** A patient created their own account from a practitioner's sign-up link. */
   "patient.signed_up",
+  /**
+   * A patient took over a file their practitioner created
+   * (`patient-takes-over-file`). The detail names the path: `activation` or
+   * `claim`.
+   */
+  "patient.file_taken_over",
+  /**
+   * A sign-up found the e-mail on a file with no account, and REMI sent the
+   * one-time claim link to that address.
+   */
+  "patient.file_claim_sent",
   /** A patient signed in. The detail names the method. */
   "patient.signed_in",
   /** A patient asked for a password reset link. */

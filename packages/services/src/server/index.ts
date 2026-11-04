@@ -406,16 +406,32 @@ export { signUpPatient, validateSignup } from "../auth/patient-signup";
 export type {
   PatientSignupInput,
   SignupData,
+  SignupError,
   SignupValidation,
 } from "../auth/patient-signup";
+export {
+  checkFileTakeover,
+  issueActivationLink,
+  requestFileClaim,
+  takeOverPatientFile,
+} from "../auth/patient-takeover";
+export type {
+  FileClaimRequest,
+  TakeoverError,
+  TakeoverInput,
+  TakeoverLinkFor,
+  TakeoverTarget,
+} from "../auth/patient-takeover";
 export type { AuthSession, Principal, PrincipalKind } from "../auth/session";
 export { createNeonAuthProvider } from "../auth/adapters/neon-auth";
 
 export {
   createPatientAccount,
   getPatientAccountByEmail,
+  getPatientAccountByProfile,
   getPatientAccountBySubject,
 } from "../db/services/patient-accounts";
+export type { PatientFileClaim } from "../db/models/patient-file-claim";
 export type { PatientAccountInput } from "../db/services/patient-accounts";
 export { runInactivitySweep, setRetentionHold } from "../db/services/retention";
 export type { InactivitySweepCounts } from "../db/services/retention";
@@ -453,6 +469,7 @@ export {
   createResendMailer,
   getMailer,
   isMailerRegistered,
+  fileClaimEmail,
   operatorInvitationEmail,
   patientLinkEmail,
   registerMailer,
