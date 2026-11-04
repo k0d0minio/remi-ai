@@ -50,7 +50,7 @@ export const GeneticSection = () => {
                 return (
                   <li
                     key={axis.id}
-                    className="border-border grid grid-cols-[44px_1fr] items-start gap-3 rounded-lg border p-3.5 md:grid-cols-1 md:p-4"
+                    className="border-border grid grid-cols-[44px_1fr] content-start items-start gap-3 rounded-lg border p-3.5 md:grid-cols-1 md:gap-4 md:p-4"
                   >
                     <span className="bg-brand-gradient grid size-11 place-items-center rounded-xl text-white">
                       <Icon aria-hidden="true" className="size-5.5" />

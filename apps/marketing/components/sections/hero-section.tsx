@@ -1,14 +1,15 @@
 import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@remi/ui";
 import { Badge, Container, Typography } from "@remi/ui/server";
-import { PhoneMock } from "@/components/mocks";
 import { HERO } from "@/lib/content/landing";
 import { SITE } from "@/lib/site";
 
 /**
  * The headline is in the server HTML: it is the LCP element whether or not
- * JavaScript arrives. The phone is a drawing, not a screenshot, and the
- * features section says so.
+ * JavaScript arrives. The photo is Morgane's (4 November 2026), a person with
+ * a phone, cut out on the page's gradient. It is decorative: the headline
+ * says what the page says, so `alt` is empty.
  */
 export const HeroSection = () => (
   <section
@@ -48,7 +49,15 @@ export const HeroSection = () => (
         </div>
       </div>
       <div className="hidden lg:block">
-        <PhoneMock />
+        <Image
+          src="/hero/patiente-pilote.png"
+          alt=""
+          width={742}
+          height={495}
+          sizes="(min-width: 1024px) 40vw, 0px"
+          priority
+          className="mx-auto h-auto w-full max-w-[560px]"
+        />
       </div>
     </Container>
   </section>

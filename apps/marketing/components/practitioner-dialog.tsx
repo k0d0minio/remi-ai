@@ -96,7 +96,7 @@ export const PractitionerDialog = () => {
         <Button
           variant="outline"
           size="lg"
-          className="border-background text-background hover:bg-background/10 hover:text-background"
+          className="border-background text-background bg-transparent hover:bg-background/10 hover:text-background"
         >
           {PRACTITIONERS.cta}
         </Button>
