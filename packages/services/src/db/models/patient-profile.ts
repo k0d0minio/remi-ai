@@ -1,5 +1,5 @@
 import type { Entity, Id } from "../../types";
-import type { FileStatus } from "../../shared/file-status";
+import type { FileOrigin, FileStatus } from "../../shared/file-status";
 import type { Locale } from "../../shared/i18n";
 import type {
   consentChannels,
@@ -49,6 +49,11 @@ export type PatientProfile = Entity & {
    * retention lifecycle. Written only through `setFileStatus`.
    */
   fileStatus: FileStatus;
+  /**
+   * Who opened the file: the practitioner or the patient (story 5). The list
+   * reads it through `appearsInPatientList`. Set once, at the creation.
+   */
+  createdBy: FileOrigin;
   /** `YYYY-MM-DD`. A birthday has no timezone, so it is not an instant. */
   birthDate: string | null;
   sex: PatientSex;

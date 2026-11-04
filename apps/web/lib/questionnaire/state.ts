@@ -26,6 +26,7 @@ export const answerFields = [
   "diet",
   "dietNote",
   "pathologies",
+  "celiacDisease",
   "geneticTest",
 ] as const;
 

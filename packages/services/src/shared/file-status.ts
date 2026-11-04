@@ -64,3 +64,24 @@ export const isFileStatus = (value: unknown): value is FileStatus =>
 /** True when the table allows `from → to`. The same status is no move. */
 export const canMoveFileStatus = (from: FileStatus, to: FileStatus) =>
   (fileStatusTransitions[from] as readonly FileStatus[]).includes(to);
+
+/**
+ * Who opened the file (story 5). The practitioner from the console, or the
+ * patient from the practitioner's sign-up link. A file keeps its origin for
+ * life: a patient who takes over a practitioner's file does not change it.
+ */
+export const fileOrigins = ["practitioner", "patient"] as const;
+
+export type FileOrigin = (typeof fileOrigins)[number];
+
+/**
+ * The one rule of which files the practitioner's list shows (story 5,
+ * criteria 5, 8 and 9). A file the practitioner opened shows at once, as
+ * « Dossier à compléter ». A file the patient opened shows only once its
+ * mandatory fields are filled, that is from `ready` on. The patient's
+ * answers are saved before that. Only the list hides the file.
+ */
+export const appearsInPatientList = (file: {
+  createdBy: FileOrigin;
+  fileStatus: FileStatus;
+}) => file.createdBy === "practitioner" || file.fileStatus !== "to_complete";

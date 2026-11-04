@@ -607,6 +607,7 @@ export type Content = {
       diet: string;
       dietNote: string;
       pathologies: string;
+      celiacDisease: string;
       medications: string;
       supplements: string;
       geneticTest: string;
@@ -622,6 +623,7 @@ export type Content = {
       allergies: string;
       intolerances: string;
       otherText: string;
+      celiacDisease: string;
       medications: string;
       supplements: string;
       geneticComingSoon: string;

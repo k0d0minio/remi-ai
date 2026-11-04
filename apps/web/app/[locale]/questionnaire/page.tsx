@@ -94,6 +94,7 @@ const QuestionnairePage = async ({
     diet: answers.diet ?? "",
     dietNote: answers.dietNote ?? "",
     pathologies: answers.pathologies ?? "",
+    celiacDisease: answers.celiacDisease,
     medications: profile.medications,
     supplements: profile.supplements,
     geneticTest: answers.geneticTest ?? "",

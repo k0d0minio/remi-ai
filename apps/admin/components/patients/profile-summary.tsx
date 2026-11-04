@@ -181,6 +181,7 @@ export const ProfileSummary = ({
     {
       label: "Allergies déclarées",
       value: listAnswer("allergy", answers.noKnownAllergies, questionnaire),
+      empty: "Non renseigné",
     },
     {
       label: "Intolérances déclarées",
@@ -189,6 +190,7 @@ export const ProfileSummary = ({
         answers.noKnownIntolerances,
         questionnaire,
       ),
+      empty: "Non renseigné",
     },
     { label: "Pathologies", value: answers.pathologies },
     {

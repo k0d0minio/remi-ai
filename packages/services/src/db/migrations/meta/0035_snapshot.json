@@ -1,5 +1,5 @@
 {
-  "id": "ae457c4a-a0fa-4442-98e2-93dbc44de7f3",
+  "id": "64adf483-329e-4405-b808-b1f8f4ffeebf",
   "prevId": "b6dcb846-1167-4dd9-b730-a2f84be08a5f",
   "version": "7",
   "dialect": "postgresql",
@@ -1460,92 +1460,6 @@
       },
       "isRLSEnabled": false
     },
-    "public.patient_file_claims": {
-      "name": "patient_file_claims",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "patient_profile_id": {
-          "name": "patient_profile_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "purpose": {
-          "name": "purpose",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "token_hash": {
-          "name": "token_hash",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "used_at": {
-          "name": "used_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "patient_file_claims_patient_profile_id_patient_profiles_id_fk": {
-          "name": "patient_file_claims_patient_profile_id_patient_profiles_id_fk",
-          "tableFrom": "patient_file_claims",
-          "tableTo": "patient_profiles",
-          "columnsFrom": [
-            "patient_profile_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "patient_file_claims_token_hash_unique": {
-          "name": "patient_file_claims_token_hash_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "token_hash"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.patient_goal_check_ins": {
       "name": "patient_goal_check_ins",
       "schema": "",
@@ -2395,6 +2309,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'to_complete'"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'practitioner'"
         },
         "birth_date": {
           "name": "birth_date",

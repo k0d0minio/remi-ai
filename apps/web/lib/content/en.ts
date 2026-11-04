@@ -579,6 +579,7 @@ export const en: Content = {
       diet: "Diet / type of eating",
       dietNote: "Describe your diet",
       pathologies: "Medical conditions",
+      celiacDisease: "Coeliac disease",
       medications: "Medications",
       supplements: "Food supplements",
       geneticTest:
@@ -593,9 +594,11 @@ export const en: Content = {
       dietDefault:
         "“No particular diet” is shown by default. Tap your answer to save it.",
       allergies:
-        "Tick “No known allergy” or each allergy. A ticked category is excluded whole.",
+        "Tick “No known allergy” or each allergy. A ticked category with no detail is excluded whole.",
       intolerances: "Tick “No known intolerance” or each intolerance.",
       otherText: "Specify “Other” to save it.",
+      celiacDisease:
+        "Tick if a doctor diagnosed it. Gluten is then excluded strictly, cross-contamination included.",
       medications: "The ones you take today, with their dose if you know it.",
       supplements: "Vitamins, minerals, herbs…",
       geneticComingSoon: "The rest of this section is coming soon.",

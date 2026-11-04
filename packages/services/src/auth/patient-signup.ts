@@ -265,6 +265,8 @@ export const signUpPatient = async ({
         await createPatient(
           {
             practitionerId: practitioner.data.id,
+            // The list hides this file until the questionnaire is complete.
+            createdBy: "patient",
             pseudonym: newPseudonym(),
             fullName: `${data.firstName} ${data.lastName}`,
             firstName: data.firstName,
