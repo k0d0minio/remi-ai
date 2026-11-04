@@ -5,6 +5,7 @@ import type { Id } from "../../../types";
 import { getDatabase } from "../../client";
 import type { MealEntry, WrittenBy } from "../../models/meal-entry";
 import { getPatient, touchPatient } from "../patients";
+import { byPatient, byRecord, noSuchPatient, systemActor } from "../access";
 
 /**
  * The meal journal — § 5's loop, transcribed out of WhatsApp and answered here.
@@ -75,13 +76,13 @@ const allForPatient = async (patientId: Id): Promise<readonly MealEntry[]> => {
 };
 
 /** The journal as Morgane reads it — newest meal first, archived excluded. */
-export const listMealEntries = async (
+const unscopedListMealEntries = async (
   patientId: Id,
 ): Promise<readonly MealEntry[]> =>
   (await allForPatient(patientId)).filter((entry) => entry.archivedAt === null);
 
 /** What was taken out of the journal, newest archive first. */
-export const listArchivedMealEntries = async (
+const unscopedListArchivedMealEntries = async (
   patientId: Id,
 ): Promise<readonly MealEntry[]> =>
   (await allForPatient(patientId))
@@ -94,14 +95,14 @@ export const listArchivedMealEntries = async (
  * The week's backlog, in one number: entries she has transcribed but not yet
  * answered. It is what the card marks — the journal chases nothing on its own.
  */
-export const countMealEntriesAwaitingFeedback = async (
+const unscopedCountMealEntriesAwaitingFeedback = async (
   patientId: Id,
 ): Promise<number> =>
-  (await listMealEntries(patientId)).filter(
+  (await unscopedListMealEntries(patientId)).filter(
     (entry) => entry.feedbackWrittenAt === null,
   ).length;
 
-export const getMealEntry = async (id: Id): Promise<Result<MealEntry>> => {
+const unscopedGetMealEntry = async (id: Id): Promise<Result<MealEntry>> => {
   if (!uuidSchema.safeParse(id).success) {
     return err("not_found", "no such meal entry");
   }
@@ -144,7 +145,7 @@ const feedbackPatch = (
  * arrives through `writeThroughPatientLink`, which is the only caller that
  * knows the token resolved.
  */
-export const addMealEntry = async (
+const unscopedAddMealEntry = async (
   patientId: Id,
   input: MealEntryInput,
   writtenBy: WrittenBy = "practitioner",
@@ -164,7 +165,7 @@ export const addMealEntry = async (
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
   }
-  if (!(await getPatient(patientId)).ok) {
+  if (!(await getPatient(systemActor, patientId)).ok) {
     return err("not_found", "no such patient");
   }
 
@@ -189,7 +190,7 @@ export const addMealEntry = async (
   return ok(created);
 };
 
-export const updateMealEntry = async (
+const unscopedUpdateMealEntry = async (
   id: Id,
   input: MealEntryInput,
 ): Promise<Result<MealEntry>> => {
@@ -232,7 +233,7 @@ export const updateMealEntry = async (
  * second press on a stale page is the ordinary case rather than an attack, so
  * it reads as "no such planned meal" instead of silently rewriting a row.
  */
-export const markMealEntryEaten = async (
+const unscopedMarkMealEntryEaten = async (
   id: Id,
 ): Promise<Result<MealEntry>> => {
   if (!uuidSchema.safeParse(id).success) {
@@ -259,11 +260,11 @@ export const markMealEntryEaten = async (
  * which is one patient reading another's record away from being wrong.
  */
 export const mealEntryOwner = async (id: Id): Promise<Id | null> => {
-  const entry = await getMealEntry(id);
+  const entry = await unscopedGetMealEntry(id);
   return entry.ok ? entry.data.patientId : null;
 };
 
-export const archiveMealEntry = async (
+const unscopedArchiveMealEntry = async (
   id: Id,
   archived: boolean,
 ): Promise<Result<MealEntry>> => {
@@ -284,7 +285,7 @@ export const archiveMealEntry = async (
  * The permanent one. Archiving is the everyday move; this is for the entry
  * logged against the wrong patient and caught immediately.
  */
-export const deleteMealEntry = async (id: Id): Promise<Result<true>> => {
+const unscopedDeleteMealEntry = async (id: Id): Promise<Result<true>> => {
   if (!uuidSchema.safeParse(id).success) {
     return err("not_found", "no such meal entry");
   }
@@ -298,3 +299,59 @@ export const deleteMealEntry = async (id: Id): Promise<Result<true>> => {
   }
   return ok(true);
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const listMealEntries = byPatient(
+  "read",
+  unscopedListMealEntries,
+  () => [],
+);
+export const listArchivedMealEntries = byPatient(
+  "read",
+  unscopedListArchivedMealEntries,
+  () => [],
+);
+export const countMealEntriesAwaitingFeedback = byPatient(
+  "read",
+  unscopedCountMealEntriesAwaitingFeedback,
+  () => 0,
+);
+export const getMealEntry = byRecord(
+  "mealEntry",
+  "read",
+  unscopedGetMealEntry,
+  noSuchPatient,
+);
+export const addMealEntry = byPatient(
+  "write",
+  unscopedAddMealEntry,
+  noSuchPatient,
+);
+export const updateMealEntry = byRecord(
+  "mealEntry",
+  "write",
+  unscopedUpdateMealEntry,
+  noSuchPatient,
+);
+export const markMealEntryEaten = byRecord(
+  "mealEntry",
+  "write",
+  unscopedMarkMealEntryEaten,
+  noSuchPatient,
+);
+export const archiveMealEntry = byRecord(
+  "mealEntry",
+  "write",
+  unscopedArchiveMealEntry,
+  noSuchPatient,
+);
+export const deleteMealEntry = byRecord(
+  "mealEntry",
+  "write",
+  unscopedDeleteMealEntry,
+  noSuchPatient,
+);

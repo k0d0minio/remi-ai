@@ -18,7 +18,7 @@ import type { Operator, OperatorRole } from "../../models/operator";
  * is no self-serve sign-up.
  *
  * One invariant runs through this file: **the console always has at least one
- * owner.** Every path that could remove the last one — deleting an account,
+ * admin.** Every path that could remove the last one — deleting an account,
  * demoting it — refuses instead. A console nobody can administer is not
  * recoverable from inside the console, which is exactly when you need it.
  */
@@ -57,7 +57,7 @@ export const findOperatorByEmail = async (
   return page.items[0] ?? null;
 };
 
-/** Owners first, then alphabetically — the roster reads as a hierarchy. */
+/** Admins first, then alphabetically — the roster reads as a hierarchy. */
 export const listOperators = async (): Promise<readonly Operator[]> => {
   const page = await operators().findMany({}, { limit: 200 });
   return [...page.items].sort((a, b) => {
@@ -67,9 +67,9 @@ export const listOperators = async (): Promise<readonly Operator[]> => {
   });
 };
 
-const countOwners = async (): Promise<number> => {
+const countAdmins = async (): Promise<number> => {
   const page = await operators().findMany({}, { limit: 200 });
-  return page.items.filter((operator) => operator.role === "owner").length;
+  return page.items.filter((operator) => operator.role === "admin").length;
 };
 
 const passwordSchema = z
@@ -105,7 +105,7 @@ export const createOperator = async (
     email,
     name: parsed.data.name,
     passwordHash: await hashPassword(parsed.data.password),
-    role: parsed.data.role ?? "operator",
+    role: parsed.data.role ?? "practitioner",
     signupLinkToken: newSignupLinkToken(),
     patientListSort: defaultPatientListSort,
   });
@@ -236,10 +236,10 @@ export const setOperatorRole = async (
   if (operator.role === role) {
     return ok(operator);
   }
-  if (operator.role === "owner" && (await countOwners()) <= 1) {
+  if (operator.role === "admin" && (await countAdmins()) <= 1) {
     return err(
       "not_permitted",
-      "this is the last owner — promote someone else before changing this account",
+      "this is the last admin — promote someone else before changing this account",
     );
   }
   const updated = await operators().update(id, { role });
@@ -251,10 +251,10 @@ export const deleteOperator = async (id: Id): Promise<Result<true>> => {
   if (!operator) {
     return err("not_found", "no such operator");
   }
-  if (operator.role === "owner" && (await countOwners()) <= 1) {
+  if (operator.role === "admin" && (await countAdmins()) <= 1) {
     return err(
       "not_permitted",
-      "this is the last owner — the console would have nobody who can manage it",
+      "this is the last admin — the console would have nobody who can manage it",
     );
   }
   // The foreign key refuses it too. This answer says why, before the driver

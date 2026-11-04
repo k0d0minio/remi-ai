@@ -23,7 +23,7 @@ const matches = (href: string, pathname: string) =>
  * A client island purely because the current route decides which link is
  * highlighted. The sidebar and header around it stay on the server.
  *
- * The owner-only rows are filtered by a boolean prop rather than by reading the
+ * The admin-only rows are filtered by a boolean prop rather than by reading the
  * session here: a role is not serialisable across the boundary as anything an
  * operator's browser should be trusted with, and hiding a link is a courtesy in
  * any case. The route itself is guarded server-side, which is the real check.
@@ -35,7 +35,7 @@ export const NavLinks = ({ canManageOperators, onNavigate }: Props) => {
     .map((section) => ({
       ...section,
       items: section.items.filter(
-        (item) => !item.ownerOnly || canManageOperators,
+        (item) => !item.adminOnly || canManageOperators,
       ),
     }))
     .filter((section) => section.items.length > 0);

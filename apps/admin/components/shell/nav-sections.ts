@@ -15,7 +15,7 @@ export type NavItem = {
   label: string;
   icon: ComponentType<{ className?: string }>;
   /** Hidden from anyone who cannot manage accounts. */
-  ownerOnly?: boolean;
+  adminOnly?: boolean;
 };
 
 export type NavSection = {
@@ -60,7 +60,7 @@ export const navSections: readonly NavSection[] = [
   {
     title: "Console",
     items: [
-      { href: "/team", label: "Équipe", icon: UsersRound, ownerOnly: true },
+      { href: "/team", label: "Équipe", icon: UsersRound, adminOnly: true },
       { href: "/audit", label: "Journal", icon: ScrollText },
     ],
   },

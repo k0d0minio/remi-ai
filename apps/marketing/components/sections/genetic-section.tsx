@@ -81,7 +81,10 @@ export const GeneticSection = () => {
             </Typography>
             <ol className="grid gap-3 md:grid-cols-3 md:gap-5">
               {GENETIC.steps.map((step, index) => (
-                <li key={step.title} className="grid grid-cols-[32px_1fr] items-start gap-3">
+                <li
+                  key={step.title}
+                  className="grid grid-cols-[32px_1fr] items-start gap-3"
+                >
                   <span className="bg-primary text-primary-foreground grid size-8 place-items-center rounded-full text-sm font-bold">
                     {index + 1}
                   </span>
@@ -130,7 +133,11 @@ export const GeneticSection = () => {
             <Faq items={GENETIC.faq} />
           </div>
 
-          <Typography size="xs" tone="muted" className="border-border border-t pt-4">
+          <Typography
+            size="xs"
+            tone="muted"
+            className="border-border border-t pt-4"
+          >
             {GENETIC.caution}
           </Typography>
         </article>

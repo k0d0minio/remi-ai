@@ -4,6 +4,7 @@ import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientNote } from "../../models/patient-note";
 import { touchPatient } from "../patients";
+import { byPatient, byRecord, noSuchPatient } from "../access";
 
 /**
  * The consultation notes behind a profile — Morgane's working record, and the
@@ -42,7 +43,7 @@ export type NoteInput = Partial<z.infer<typeof noteFields>>;
  * is how Morgane reaches for the last session. `createdAt` breaks a tie
  * between two notes written for the same day.
  */
-export const listPatientNotes = async (
+const unscopedListPatientNotes = async (
   patientId: Id,
 ): Promise<readonly PatientNote[]> => {
   if (!uuidSchema.safeParse(patientId).success) {
@@ -57,7 +58,7 @@ export const listPatientNotes = async (
   });
 };
 
-export const addPatientNote = async (
+const unscopedAddPatientNote = async (
   patientId: Id,
   input: NoteInput & { authorName?: string },
   db?: DatabaseClient,
@@ -88,7 +89,7 @@ export const addPatientNote = async (
   return ok(created);
 };
 
-export const updatePatientNote = async (
+const unscopedUpdatePatientNote = async (
   id: Id,
   input: NoteInput,
 ): Promise<Result<PatientNote>> => {
@@ -107,7 +108,7 @@ export const updatePatientNote = async (
   return ok(updated);
 };
 
-export const deletePatientNote = async (id: Id): Promise<Result<true>> => {
+const unscopedDeletePatientNote = async (id: Id): Promise<Result<true>> => {
   if (!uuidSchema.safeParse(id).success) {
     return err("not_found", "no such note");
   }
@@ -121,3 +122,31 @@ export const deletePatientNote = async (id: Id): Promise<Result<true>> => {
   }
   return ok(true);
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const listPatientNotes = byPatient(
+  "read",
+  unscopedListPatientNotes,
+  () => [],
+);
+export const addPatientNote = byPatient(
+  "write",
+  unscopedAddPatientNote,
+  noSuchPatient,
+);
+export const updatePatientNote = byRecord(
+  "note",
+  "write",
+  unscopedUpdatePatientNote,
+  noSuchPatient,
+);
+export const deletePatientNote = byRecord(
+  "note",
+  "write",
+  unscopedDeletePatientNote,
+  noSuchPatient,
+);

@@ -29,6 +29,7 @@ import {
   runInactivitySweep,
   setRetentionHold,
 } from "./index";
+import { systemActor } from "../../services/access";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -52,12 +53,12 @@ const seed = async (email = "claire@example.be") => {
       email: "morgane@example.be",
       name: "Morgane",
       passwordHash: "x",
-      role: "owner",
+      role: "admin",
       signupLinkToken: "t".repeat(32),
       patientListSort: "appointment",
     });
   const patient = unwrapOk(
-    await createPatient({
+    await createPatient(systemActor, {
       practitionerId: practitioner.id,
       pseudonym: "Claire P.",
       firstName: "Claire",
@@ -161,7 +162,7 @@ describe("the notice at eleven months", () => {
     expect(sent[1]?.text).toContain("Claire P.");
     expect(sent[1]?.text).not.toContain("claire@example.be");
     expect((await accountOf(account.id))?.inactivityNoticeSentAt).toEqual(now);
-    const notices = await listAuditEvents({
+    const notices = await listAuditEvents(systemActor, {
       action: "patient.inactivity_notice_sent",
     });
     expect(notices).toContainEqual(
@@ -210,7 +211,7 @@ describe("the notice at eleven months", () => {
       signInUrl,
     });
     expect(result.ok ? null : result.error).toBe("upstream_failed");
-    expect((await getPatient(patient.id)).ok).toBe(true);
+    expect((await getPatient(systemActor, patient.id)).ok).toBe(true);
     expect((await accountOf(account.id))?.inactivityNoticeSentAt).toBeNull();
   });
 });
@@ -235,7 +236,7 @@ describe("a sign-in after the notice", () => {
       new Date(addMonthsUtc(account.createdAt, 12).getTime() + 31 * DAY_MS),
     );
     expect(atTwelve).toMatchObject({ voided: 1, deleted: 0, noticed: 0 });
-    expect((await getPatient(patient.id)).ok).toBe(true);
+    expect((await getPatient(systemActor, patient.id)).ok).toBe(true);
 
     sent = [];
     const before = await sweepAt(
@@ -260,8 +261,10 @@ describe("the deletion at twelve months", () => {
 
     const counts = await sweepAt(hourAfter(due));
     expect(counts.deleted).toBe(1);
-    expect((await getPatient(patient.id)).ok).toBe(false);
-    const deletions = await listAuditEvents({ action: "patient.deleted" });
+    expect((await getPatient(systemActor, patient.id)).ok).toBe(false);
+    const deletions = await listAuditEvents(systemActor, {
+      action: "patient.deleted",
+    });
     expect(deletions).toContainEqual(
       expect.objectContaining({
         actorKind: "system",
@@ -281,7 +284,7 @@ describe("the deletion at twelve months", () => {
     expect((await sweepAt(noticeAt)).noticed).toBe(1);
     const tooSoon = await sweepAt(new Date(noticeAt.getTime() + 29 * DAY_MS));
     expect(tooSoon.deleted).toBe(0);
-    expect((await getPatient(patient.id)).ok).toBe(true);
+    expect((await getPatient(systemActor, patient.id)).ok).toBe(true);
     const due = await sweepAt(new Date(noticeAt.getTime() + 30 * DAY_MS));
     expect(due.deleted).toBe(1);
   });
@@ -292,7 +295,7 @@ describe("the retention hold", () => {
     const { account, patient, practitioner } = await seed();
     const info = vi.spyOn(console, "info").mockImplementation(() => {});
     unwrapOk(
-      await setRetentionHold(patient.id, true, {
+      await setRetentionHold(systemActor, patient.id, true, {
         id: practitioner.id,
         email: practitioner.email,
         name: practitioner.name,
@@ -302,11 +305,11 @@ describe("the retention hold", () => {
     const counts = await sweepAt(addMonthsUtc(account.createdAt, 24));
     expect(counts).toMatchObject({ held: 1, noticed: 0, deleted: 0 });
     expect(sent).toEqual([]);
-    expect((await getPatient(patient.id)).ok).toBe(true);
+    expect((await getPatient(systemActor, patient.id)).ok).toBe(true);
     expect(info).toHaveBeenCalledTimes(1);
     expect(info.mock.calls[0]?.[0]).toContain(patient.id);
 
-    const set = await listAuditEvents({
+    const set = await listAuditEvents(systemActor, {
       action: "patient.retention_hold_set",
     });
     expect(set).toContainEqual(
@@ -319,7 +322,7 @@ describe("the retention hold", () => {
     const noticeAt = hourAfter(addMonthsUtc(account.createdAt, 11));
     await sweepAt(noticeAt);
     vi.spyOn(console, "info").mockImplementation(() => {});
-    await setRetentionHold(patient.id, true, {
+    await setRetentionHold(systemActor, patient.id, true, {
       id: practitioner.id,
       email: practitioner.email,
       name: practitioner.name,
@@ -328,7 +331,7 @@ describe("the retention hold", () => {
       hourAfter(deletionDateFor(account.createdAt, noticeAt)),
     );
     expect(counts).toMatchObject({ held: 1, deleted: 0 });
-    expect((await getPatient(patient.id)).ok).toBe(true);
+    expect((await getPatient(systemActor, patient.id)).ok).toBe(true);
   });
 
   it("clears the hold and writes one event per change", async () => {
@@ -338,15 +341,21 @@ describe("the retention hold", () => {
       email: practitioner.email,
       name: practitioner.name,
     };
-    await setRetentionHold(patient.id, true, actor);
-    await setRetentionHold(patient.id, true, actor);
-    const cleared = unwrapOk(await setRetentionHold(patient.id, false, actor));
+    await setRetentionHold(systemActor, patient.id, true, actor);
+    await setRetentionHold(systemActor, patient.id, true, actor);
+    const cleared = unwrapOk(
+      await setRetentionHold(systemActor, patient.id, false, actor),
+    );
     expect(cleared.retentionHoldAt).toBeNull();
     expect(
-      await listAuditEvents({ action: "patient.retention_hold_set" }),
+      await listAuditEvents(systemActor, {
+        action: "patient.retention_hold_set",
+      }),
     ).toHaveLength(1);
     expect(
-      await listAuditEvents({ action: "patient.retention_hold_cleared" }),
+      await listAuditEvents(systemActor, {
+        action: "patient.retention_hold_cleared",
+      }),
     ).toHaveLength(1);
   });
 });

@@ -4,6 +4,7 @@ import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientInstruction } from "../../models/patient-instruction";
 import { touchPatient } from "../patients";
+import { byPatient, byRecord, noSuchPatient } from "../access";
 
 /**
  * The standing consigne Morgane steers a patient by — brainstorm § E.
@@ -56,7 +57,7 @@ const allForPatient = async (
 };
 
 /** The consigne in force, or `null` when she has not written one. */
-export const getPatientInstruction = async (
+const unscopedGetPatientInstruction = async (
   patientId: Id,
   db?: DatabaseClient,
 ): Promise<PatientInstruction | null> => {
@@ -74,7 +75,7 @@ export const getPatientInstruction = async (
 };
 
 /** What she used to steer by, newest replacement first. */
-export const listArchivedPatientInstructions = async (
+const unscopedListArchivedPatientInstructions = async (
   patientId: Id,
 ): Promise<readonly PatientInstruction[]> =>
   (await allForPatient(patientId))
@@ -94,7 +95,7 @@ export const listArchivedPatientInstructions = async (
  * to herself about. The result is the new instruction, or `null` when she
  * cleared both.
  */
-export const setPatientInstruction = async (
+const unscopedSetPatientInstruction = async (
   patientId: Id,
   bodies: InstructionBodies,
   db?: DatabaseClient,
@@ -113,7 +114,7 @@ export const setPatientInstruction = async (
 
   const body = parsed.data;
   const patientBody = orNull(parsedPatient.data);
-  const current = await getPatientInstruction(patientId, db);
+  const current = await unscopedGetPatientInstruction(patientId, db);
 
   // Saving the same words is not a replacement. Without this, re-saving an
   // untouched form would archive the row, insert an identical one, and reset
@@ -148,7 +149,7 @@ export const setPatientInstruction = async (
  * The permanent one. Archiving is what replacing does; this exists for a row
  * that should never have been written.
  */
-export const deletePatientInstruction = async (
+const unscopedDeletePatientInstruction = async (
   id: Id,
 ): Promise<Result<true>> => {
   if (!uuidSchema.safeParse(id).success) {
@@ -164,3 +165,30 @@ export const deletePatientInstruction = async (
   }
   return ok(true);
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const getPatientInstruction = byPatient(
+  "read",
+  unscopedGetPatientInstruction,
+  () => null,
+);
+export const listArchivedPatientInstructions = byPatient(
+  "read",
+  unscopedListArchivedPatientInstructions,
+  () => [],
+);
+export const setPatientInstruction = byPatient(
+  "write",
+  unscopedSetPatientInstruction,
+  noSuchPatient,
+);
+export const deletePatientInstruction = byRecord(
+  "instruction",
+  "write",
+  unscopedDeletePatientInstruction,
+  noSuchPatient,
+);

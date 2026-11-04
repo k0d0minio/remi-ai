@@ -60,12 +60,12 @@ type Props = {
 };
 
 /**
- * The accounts, and the two things an owner does to one: change what it can
+ * The accounts, and the two things an admin does to one: change what it can
  * reach, or remove it.
  *
  * Your own row keeps neither control. Demoting yourself out of this page while
  * standing on it, or deleting the account you are signed in as, are both
- * recoverable only from the database — and the service refuses the last-owner
+ * recoverable only from the database — and the service refuses the last-admin
  * cases anyway, so hiding them here just stops the console offering an action
  * it will then refuse.
  */
@@ -74,8 +74,8 @@ export const OperatorList = ({ operators }: Props) => (
     <CardHeader>
       <CardTitle>Comptes</CardTitle>
       <CardDescription>
-        {roleLabels.owner} : {roleDescriptions.owner} — {roleLabels.operator} :{" "}
-        {roleDescriptions.operator}
+        {roleLabels.admin} : {roleDescriptions.admin} —{" "}
+        {roleLabels.practitioner} : {roleDescriptions.practitioner}
       </CardDescription>
     </CardHeader>
 

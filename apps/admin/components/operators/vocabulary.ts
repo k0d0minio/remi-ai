@@ -12,16 +12,18 @@ import type { Intent } from "@remi/ui/server";
  */
 
 export const roleLabels: Record<OperatorRoleName, string> = {
-  owner: "accès complet",
-  operator: "accès patients",
+  admin: "accès équipe REMI",
+  practitioner: "accès à ses patients",
 };
 
 export const roleDescriptions: Record<OperatorRoleName, string> = {
-  owner: "Gère les profils patients, et les accès à la console.",
-  operator: "Gère les profils patients. Ne touche pas aux accès.",
+  admin:
+    "Gère ses patients et les accès à la console. Ouvre en lecture tout autre dossier patient, avec un motif enregistré au journal.",
+  practitioner:
+    "Gère les dossiers de ses propres patients. Ne voit aucun autre dossier.",
 };
 
 export const roleIntents: Record<OperatorRoleName, Intent> = {
-  owner: "info",
-  operator: "neutral",
+  admin: "info",
+  practitioner: "neutral",
 };

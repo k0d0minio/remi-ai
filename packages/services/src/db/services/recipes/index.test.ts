@@ -14,6 +14,7 @@ import {
   listRecipes,
   updateRecipe,
 } from "./index";
+import { systemActor } from "../../services/access";
 
 const body =
   "Une boîte de sardines, du citron, du pain complet. Écraser, tartiner.";
@@ -129,11 +130,11 @@ describe("the recipe library", () => {
 
   it("counts the patients currently holding a recipe", async () => {
     const recipe = await created("Dahl de lentilles");
-    const claire = await createPatient({
+    const claire = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Claire",
     });
-    const luc = await createPatient({
+    const luc = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Luc",
     });
@@ -142,10 +143,12 @@ describe("the recipe library", () => {
     }
 
     expect(await countRecipeAssignments(recipe.id)).toBe(0);
-    await assignRecipes(claire.data.id, [recipe.id], {
+    await assignRecipes(systemActor, claire.data.id, [recipe.id], {
       assignedOn: "2026-09-01",
     });
-    await assignRecipes(luc.data.id, [recipe.id], { assignedOn: "2026-09-01" });
+    await assignRecipes(systemActor, luc.data.id, [recipe.id], {
+      assignedOn: "2026-09-01",
+    });
     expect(await countRecipeAssignments(recipe.id)).toBe(2);
   });
 
@@ -206,7 +209,7 @@ describe("duplicating a recipe as a variant", () => {
   });
 
   it("leaves the origin's holder count alone", async () => {
-    const claire = await createPatient({
+    const claire = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Manon",
     });
@@ -214,7 +217,7 @@ describe("duplicating a recipe as a variant", () => {
       throw new Error("patient not created");
     }
     const origin = await created("Quiche aux poireaux");
-    await assignRecipes(claire.data.id, [origin.id], {
+    await assignRecipes(systemActor, claire.data.id, [origin.id], {
       assignedOn: "2026-09-01",
     });
     expect(await countRecipeAssignments(origin.id)).toBe(1);

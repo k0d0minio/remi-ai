@@ -17,7 +17,11 @@ export const ImproveDemo = () => (
     aria-label={copy.label}
     className="bg-primary-subtle gap-3 rounded-xl p-3 text-[0.8125rem]"
   >
-    <TabsList aria-label={copy.pickLabel} variant="pill" className="flex-wrap gap-1.5 bg-transparent p-0">
+    <TabsList
+      aria-label={copy.pickLabel}
+      variant="pill"
+      className="flex-wrap gap-1.5 bg-transparent p-0"
+    >
       {copy.meals.map((meal) => (
         <TabsTrigger
           key={meal.id}
@@ -31,7 +35,11 @@ export const ImproveDemo = () => (
       ))}
     </TabsList>
     {copy.meals.map((meal) => (
-      <TabsContent key={meal.id} value={meal.id} className="animate-fade-in flex flex-col gap-2">
+      <TabsContent
+        key={meal.id}
+        value={meal.id}
+        className="animate-fade-in flex flex-col gap-2"
+      >
         <p className="bg-primary text-primary-foreground max-w-[90%] self-end rounded-[14px_14px_4px_14px] px-3 py-2 font-semibold">
           {meal.message}
         </p>
@@ -41,7 +49,9 @@ export const ImproveDemo = () => (
               key={suggestion.action}
               className="bg-background flex max-w-[92%] flex-col gap-0.5 rounded-[14px_14px_14px_4px] px-3 py-2"
             >
-              <span className="text-primary font-semibold">{suggestion.action}</span>
+              <span className="text-primary font-semibold">
+                {suggestion.action}
+              </span>
               <span className="text-muted-foreground">{suggestion.why}</span>
             </li>
           ))}

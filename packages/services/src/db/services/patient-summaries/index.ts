@@ -4,6 +4,7 @@ import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientSummary } from "../../models/patient-summary";
 import { touchPatient } from "../patients";
+import { byPatient, noSuchPatient } from "../access";
 
 /**
  * The living summary — brainstorm § C's PATIENT_SUMMARY.
@@ -39,7 +40,7 @@ const rowFor = async (
 };
 
 /** The patient's living summary, or `null` when she has not written one. */
-export const getPatientSummary = async (
+const unscopedGetPatientSummary = async (
   patientId: Id,
   db?: DatabaseClient,
 ): Promise<PatientSummary | null> => rowFor(patientId, db);
@@ -54,7 +55,7 @@ export const getPatientSummary = async (
  * same words is a no-op, so re-saving an untouched textarea does not bump
  * `updatedAt` and read as freshly revised.
  */
-export const setPatientSummary = async (
+const unscopedSetPatientSummary = async (
   patientId: Id,
   body: string,
   db?: DatabaseClient,
@@ -92,3 +93,19 @@ export const setPatientSummary = async (
   await touchPatient(patientId, db);
   return ok(created);
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const getPatientSummary = byPatient(
+  "read",
+  unscopedGetPatientSummary,
+  () => null,
+);
+export const setPatientSummary = byPatient(
+  "write",
+  unscopedSetPatientSummary,
+  noSuchPatient,
+);

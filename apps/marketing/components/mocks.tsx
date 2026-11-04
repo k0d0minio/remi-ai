@@ -7,8 +7,11 @@ export const RecipesMock = () => (
     className="bg-primary-subtle flex flex-col gap-2 rounded-xl p-3 text-[0.8125rem]"
   >
     {MOCK.meals.map((meal) => (
-      <li key={meal.slot} className="bg-background flex flex-col rounded-lg px-2.5 py-2">
-        <span className="text-success-text text-[0.6875rem] font-bold tracking-wider uppercase">
+      <li
+        key={meal.slot}
+        className="bg-background flex flex-col rounded-lg px-2.5 py-2"
+      >
+        <span className="text-success-text text-[0.6875rem] font-bold uppercase tracking-wider">
           {meal.slot}
         </span>
         <span className="font-semibold">{meal.name}</span>

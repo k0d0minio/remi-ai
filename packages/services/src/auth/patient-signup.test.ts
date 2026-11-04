@@ -11,8 +11,13 @@ import { getPatient } from "../db/services/patients";
 import { createMemoryDatabase } from "../db/test-helpers";
 import type { ShownConsent } from "../shared/consent";
 import { err, ok } from "../shared/result";
-import { signUpPatient, validateSignup, type SignupData } from "./patient-signup";
+import {
+  signUpPatient,
+  validateSignup,
+  type SignupData,
+} from "./patient-signup";
 import { registerAuthProvider, type AuthIdentity } from "./provider";
+import { systemActor } from "../db/services/access";
 
 /** Set to make the next consent write fail inside the sign-up transaction. */
 const consentWrite = vi.hoisted(() => ({ fails: false }));
@@ -24,7 +29,9 @@ vi.mock("../db/services/patient-consents", async (importOriginal) => {
     ...actual,
     insertConsent: (...args: Parameters<typeof actual.insertConsent>) =>
       consentWrite.fails
-        ? Promise.resolve(failure("upstream_failed", "the consent write failed"))
+        ? Promise.resolve(
+            failure("upstream_failed", "the consent write failed"),
+          )
         : actual.insertConsent(...args),
   };
 });
@@ -90,7 +97,7 @@ beforeAll(async () => {
     email: "morgane@example.be",
     name: "Morgane",
     password: "long enough password",
-    role: "owner",
+    role: "admin",
   });
   if (!operator.ok) {
     throw new Error("test practitioner not created");
@@ -192,7 +199,7 @@ describe("the sign-up", () => {
     if (!result.ok) {
       throw new Error(result.message);
     }
-    const patient = await getPatient(result.data.patientId);
+    const patient = await getPatient(systemActor, result.data.patientId);
     if (!patient.ok) {
       throw new Error("patient not written");
     }
@@ -214,7 +221,7 @@ describe("the sign-up", () => {
       users.get("claire@example.be")?.identity.subject,
     );
 
-    const events = await listAuditEvents({
+    const events = await listAuditEvents(systemActor, {
       action: "patient.signed_up",
       targetId: patient.data.id,
     });
@@ -240,7 +247,7 @@ describe("the sign-up", () => {
       email: "arnaud@example.be",
       name: "Arnaud",
       password: "long enough password",
-      role: "owner",
+      role: "admin",
     });
     if (!other.ok) {
       throw new Error("second practitioner not created");
@@ -311,7 +318,7 @@ describe("the sign-up", () => {
     if (!result.ok) {
       throw new Error(result.message);
     }
-    const consents = await consentsOf(result.data.patientId);
+    const consents = await consentsOf(systemActor, result.data.patientId);
     expect(Object.keys(consents)).toEqual(["care"]);
     expect(consents.care).toMatchObject({
       decision: "given",
@@ -322,7 +329,7 @@ describe("the sign-up", () => {
       actorKind: "patient",
     });
 
-    const events = await listAuditEvents({
+    const events = await listAuditEvents(systemActor, {
       action: "consent.given",
       targetId: result.data.patientId,
     });
@@ -337,14 +344,15 @@ describe("the sign-up", () => {
   it("rolls back the file and the account when the consent write fails", async () => {
     consentWrite.fails = true;
     const before = (await profiles()).length;
-    const signedUp = (await listAuditEvents({ action: "patient.signed_up" }))
-      .length;
+    const signedUp = (
+      await listAuditEvents(systemActor, { action: "patient.signed_up" })
+    ).length;
     const result = await signUp({ email: "remi@example.be" });
     expect(result).toMatchObject({ ok: false, error: "upstream_failed" });
     expect(await profiles()).toHaveLength(before);
     expect(await getPatientAccountByEmail("remi@example.be")).toBeNull();
     expect(
-      await listAuditEvents({ action: "patient.signed_up" }),
+      await listAuditEvents(systemActor, { action: "patient.signed_up" }),
     ).toHaveLength(signedUp);
   });
 });

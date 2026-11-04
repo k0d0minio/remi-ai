@@ -17,6 +17,7 @@ import {
   listPatientRecommendations,
   listPatientSupplements,
   recordPatientLinkOpened,
+  patientActor,
 } from "@remi/services/server";
 import { ensureDatabase } from "@/lib/database";
 import { LINK_PREVIEW_COOKIE } from "./preview";
@@ -60,20 +61,20 @@ export const loadPatientLink = cache(async (token: string) => {
     pastChallenges,
     messages,
   ] = await Promise.all([
-    getPatientSummary(patient.id),
-    getPatientInstruction(patient.id),
-    getCurrentChallenge(patient.id),
-    listPatientGoals(patient.id),
-    listPatientRecommendations(patient.id),
-    listPatientSupplements(patient.id),
-    listPantryEssentials(patient.id),
-    listPatientRecipes(patient.id),
-    listMealEntries(patient.id),
-    listPatientDocuments(patient.id),
-    getWeeklyCheckIn(patient.id),
-    listGoalScoreStrips(patient.id),
-    listPastChallenges(patient.id),
-    listPatientMessages(patient.id),
+    getPatientSummary(patientActor(patient.id), patient.id),
+    getPatientInstruction(patientActor(patient.id), patient.id),
+    getCurrentChallenge(patientActor(patient.id), patient.id),
+    listPatientGoals(patientActor(patient.id), patient.id),
+    listPatientRecommendations(patientActor(patient.id), patient.id),
+    listPatientSupplements(patientActor(patient.id), patient.id),
+    listPantryEssentials(patientActor(patient.id), patient.id),
+    listPatientRecipes(patientActor(patient.id), patient.id),
+    listMealEntries(patientActor(patient.id), patient.id),
+    listPatientDocuments(patientActor(patient.id), patient.id),
+    getWeeklyCheckIn(patientActor(patient.id), patient.id),
+    listGoalScoreStrips(patientActor(patient.id), patient.id),
+    listPastChallenges(patientActor(patient.id), patient.id),
+    listPatientMessages(patientActor(patient.id), patient.id),
   ]);
 
   // Awaited rather than fired and forgotten: an unawaited promise in a server

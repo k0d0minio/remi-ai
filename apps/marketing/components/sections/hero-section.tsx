@@ -21,7 +21,13 @@ export const HeroSection = () => (
         <Badge variant="warning" tone="subtle">
           {HERO.badge}
         </Badge>
-        <Typography as="h1" size="4xl" weight="bold" balance className="md:text-5xl">
+        <Typography
+          as="h1"
+          size="4xl"
+          weight="bold"
+          balance
+          className="md:text-5xl"
+        >
           <span className="block">{HERO.titleFirst}</span>
           <span className="text-primary block">{HERO.titleSecond}</span>
         </Typography>

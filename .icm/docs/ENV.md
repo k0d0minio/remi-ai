@@ -146,7 +146,7 @@ through the auth seam below (D-26). The patient link's token stays until the pat
 replaces it.
 
 The console now has more than one account. `OPERATOR_EMAIL` creates the **first** one and stops
-working the moment it exists; every account after that arrives by invitation from an owner, through
+working the moment it exists; every account after that arrives by invitation from an admin, through
 a hashed single-use token in the `operator_invitations` table. There is no second environment
 variable behind that — the invitation is data, not configuration.
 

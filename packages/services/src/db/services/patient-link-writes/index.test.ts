@@ -13,6 +13,7 @@ import {
   PATIENT_LINK_WRITES_PER_MINUTE,
   writeThroughPatientLink,
 } from "./index";
+import { systemActor } from "../../services/access";
 
 beforeAll(() => {
   registerDatabase(createMemoryDatabase());
@@ -24,7 +25,7 @@ afterEach(() => {
 
 /** A fresh patient per test, so one test's ledger never counts in another's. */
 const newPatient = async (pseudonym: string): Promise<PatientProfile> => {
-  const created = await createPatient({
+  const created = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym,
   });
@@ -52,6 +53,7 @@ describe("writing through a patient link", () => {
       text: { bodies: ["Spaghetti sauce tomate"] },
       write: (resolved) =>
         addMealEntry(
+          systemActor,
           resolved.id,
           { eatenOn: "2026-09-17", description: "Spaghetti sauce tomate" },
           "patient",
@@ -62,7 +64,7 @@ describe("writing through a patient link", () => {
     // The row itself says whose it is, not only the trail beside it.
     expect(result.ok && result.data.writtenBy).toBe("patient");
 
-    const after = await getPatient(patient.id);
+    const after = await getPatient(systemActor, patient.id);
     expect(after.ok).toBe(true);
     if (!after.ok) {
       return;
@@ -72,7 +74,9 @@ describe("writing through a patient link", () => {
     // roster sorts on the latter.
     expect(after.data.lastEditedAt.getTime()).toBe(editedBefore);
 
-    const [event] = await listAuditEvents({ actorKind: "patient" });
+    const [event] = await listAuditEvents(systemActor, {
+      actorKind: "patient",
+    });
     expect(event.actorKind).toBe("patient");
     expect(event.actorName).toBe("Claire");
     expect(event.actorEmail).toBe("");
@@ -99,7 +103,7 @@ describe("writing through a patient link", () => {
   it("refuses an unknown, malformed or regenerated token without a trace", async () => {
     const patient = await newPatient("Sofia");
     const dead = patient.shareToken;
-    await regenerateShareToken(patient.id);
+    await regenerateShareToken(systemActor, patient.id);
 
     for (const token of [dead, "not a token", "", "x".repeat(64)]) {
       const result = await writeThroughPatientLink({
@@ -116,10 +120,10 @@ describe("writing through a patient link", () => {
 
     // Nothing ran, nothing was recorded, and the refusal says the same thing
     // whether the token never existed or was revoked a second ago.
-    const after = await getPatient(patient.id);
+    const after = await getPatient(systemActor, patient.id);
     expect(after.ok && after.data.linkLastWroteAt).toBeNull();
     expect(
-      (await listAuditEvents({ actorKind: "patient" })).some(
+      (await listAuditEvents(systemActor, { actorKind: "patient" })).some(
         (event) => event.actorId === patient.id,
       ),
     ).toBe(false);
@@ -157,11 +161,11 @@ describe("writing through a patient link", () => {
 
     // Nothing was written and nothing was recorded against either patient.
     for (const patient of [mine, theirs]) {
-      const after = await getPatient(patient.id);
+      const after = await getPatient(systemActor, patient.id);
       expect(after.ok && after.data.linkLastWroteAt).toBeNull();
     }
     expect(
-      (await listAuditEvents({ actorKind: "patient" })).some(
+      (await listAuditEvents(systemActor, { actorKind: "patient" })).some(
         (event) => event.actorId === mine.id,
       ),
     ).toBe(false);
@@ -367,10 +371,10 @@ describe("writing through a patient link", () => {
     });
 
     expect(result.ok).toBe(true);
-    const after = await getPatient(patient.id);
+    const after = await getPatient(systemActor, patient.id);
     expect(after.ok && after.data.linkLastWroteAt).toBeNull();
     expect(
-      (await listAuditEvents({ actorKind: "patient" })).some(
+      (await listAuditEvents(systemActor, { actorKind: "patient" })).some(
         (event) => event.actorId === patient.id,
       ),
     ).toBe(false);
@@ -387,10 +391,10 @@ describe("writing through a patient link", () => {
     });
 
     expect(result.ok).toBe(false);
-    const after = await getPatient(patient.id);
+    const after = await getPatient(systemActor, patient.id);
     expect(after.ok && after.data.linkLastWroteAt).toBeNull();
     expect(
-      (await listAuditEvents({ actorKind: "patient" })).some(
+      (await listAuditEvents(systemActor, { actorKind: "patient" })).some(
         (event) => event.actorId === patient.id,
       ),
     ).toBe(false);

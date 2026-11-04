@@ -143,7 +143,10 @@ export const GENETIC = {
     "Cette approche avant-gardiste et innovante associe ces informations au contexte clinique pour orienter certaines recommandations alimentaires, notamment l’équilibre entre graisses et glucides.",
   stepsTitle: "Du test à votre assiette",
   steps: [
-    { title: "Un test ADN ciblé", text: "Quelques variantes, pas tout votre ADN." },
+    {
+      title: "Un test ADN ciblé",
+      text: "Quelques variantes, pas tout votre ADN.",
+    },
     {
       title: "Une consultation d’une heure",
       text: "Un médecin spécialisé interprète vos résultats et définit vos recommandations.",
@@ -208,8 +211,14 @@ export const FEATURES = [
 export const MOCK = {
   mealsLabel: "Exemple de repas du jour",
   meals: [
-    { slot: "Petit-déjeuner", name: "Pancakes à l’avoine, yaourt et fruits rouges" },
-    { slot: "Déjeuner", name: "Poulet rôti au citron, patates douces et brocoli" },
+    {
+      slot: "Petit-déjeuner",
+      name: "Pancakes à l’avoine, yaourt et fruits rouges",
+    },
+    {
+      slot: "Déjeuner",
+      name: "Poulet rôti au citron, patates douces et brocoli",
+    },
     { slot: "Dîner", name: "Curry doux de pois chiches et épinards" },
     { slot: "Collation", name: "Houmous et bâtonnets de légumes croquants" },
   ],
@@ -237,7 +246,8 @@ export const MOCK = {
             why: "Pour enrichir votre repas en fibres, vitamines et minéraux.",
           },
           {
-            action: "Remplacez une partie de la crème par une alternative végétale adaptée.",
+            action:
+              "Remplacez une partie de la crème par une alternative végétale adaptée.",
             why: "Pour ajuster l’apport en graisses saturées selon votre profil.",
           },
         ],
@@ -277,7 +287,8 @@ export const MOCK = {
             why: "Pour enrichir votre repas en fibres, vitamines et minéraux.",
           },
           {
-            action: "Ajoutez une source de protéines adaptée : poulet, houmous ou tofu.",
+            action:
+              "Ajoutez une source de protéines adaptée : poulet, houmous ou tofu.",
             why: "Pour apporter des protéines et favoriser la satiété.",
           },
         ],
@@ -285,7 +296,8 @@ export const MOCK = {
     ],
     personal:
       "Avec REMI, chaque suggestion tient compte de votre profil, de vos objectifs et de vos besoins nutritionnels.",
-    message: "Mangez ce que vous aimez. REMI vous aide à faire les bons ajustements.",
+    message:
+      "Mangez ce que vous aimez. REMI vous aide à faire les bons ajustements.",
   },
 };
 
@@ -451,7 +463,8 @@ export const TIMELINE = [
 
 export const PRACTITIONERS = {
   eyebrow: "Pour les praticiens",
-  title: "Vous accompagnez vos patients. Et si REMI vous aidait à aller plus loin ?",
+  title:
+    "Vous accompagnez vos patients. Et si REMI vous aidait à aller plus loin ?",
   lead: "Nous développons REMI avec des professionnels de santé pour simplifier la rédaction de leurs recommandations, faciliter le suivi entre les consultations et aider leurs patients à passer à l’action.",
   sub: "Rejoignez notre liste d’attente pour participer au programme praticiens pilotes dès 2027.",
   cta: "Je rejoins la liste d’attente praticiens",
@@ -468,7 +481,8 @@ export const PRACTITIONERS = {
     submit: "Rejoindre la liste d’attente",
     close: "Fermer",
     doneTitle: "Merci, vous êtes sur la liste !",
-    doneText: "Nous reviendrons vers vous pour le programme praticiens pilotes.",
+    doneText:
+      "Nous reviendrons vers vous pour le programme praticiens pilotes.",
   },
 };
 
@@ -503,8 +517,10 @@ export const MESSAGES = {
   required: "Ce champ est requis.",
   email: "Veuillez saisir une adresse e-mail valide.",
   phone: "Veuillez saisir un numéro valide (ou laissez vide).",
-  consent: "Votre accord est nécessaire pour que nous puissions vous recontacter.",
-  network: "Connexion impossible pour le moment. Vérifiez votre connexion et réessayez.",
+  consent:
+    "Votre accord est nécessaire pour que nous puissions vous recontacter.",
+  network:
+    "Connexion impossible pour le moment. Vérifiez votre connexion et réessayez.",
   server: `L’inscription est momentanément indisponible. Vous pouvez nous écrire à ${SITE.contactEmail}.`,
 };
 

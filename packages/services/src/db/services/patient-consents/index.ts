@@ -11,13 +11,16 @@ import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientConsent } from "../../models/patient-consent";
 import type { PatientQuestionnaire } from "../../models/patient-questionnaire";
-import {
-  recordAuditEvent,
-  type AuditActor,
-  type AuditRecord,
-} from "../audit";
+import { recordAuditEvent, type AuditActor, type AuditRecord } from "../audit";
 import { getPatient } from "../patients";
 import { consentRows, historyOf } from "./in-force";
+import type { Actor } from "../../models/actor";
+import {
+  byPatient,
+  mayAccessPatient,
+  noSuchPatient,
+  systemActor,
+} from "../access";
 
 /**
  * The patient's consent decisions — story 3, D-32. The table is append-only:
@@ -72,7 +75,7 @@ const clearGenotype = async (
 };
 
 /** The latest decision per key. A key with no row is absent. */
-export const consentsOf = async (
+const unscopedConsentsOf = async (
   patientId: Id,
 ): Promise<Partial<Record<ConsentKey, PatientConsent>>> => {
   const latest: Partial<Record<ConsentKey, PatientConsent>> = {};
@@ -122,7 +125,7 @@ export const insertConsent = async (
   if (key === "genetic" && !("kind" in actor)) {
     return err("not_permitted", "only the patient records the genetic consent");
   }
-  const patient = await getPatient(patientId, db);
+  const patient = await getPatient(systemActor, patientId, db);
   if (!patient.ok) {
     return err("not_found", "no such patient");
   }
@@ -180,8 +183,12 @@ export const insertConsent = async (
  * clearing commit together. The events follow the commit.
  */
 export const recordConsent = async (
+  actor: Actor,
   input: ConsentInput,
 ): Promise<Result<PatientConsent>> => {
+  if (!(await mayAccessPatient(actor, input.patientId, "write"))) {
+    return noSuchPatient();
+  }
   const written = await getDatabase().transaction((tx) =>
     insertConsent(input, tx),
   );
@@ -193,3 +200,10 @@ export const recordConsent = async (
   }
   return ok(written.data.row);
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const consentsOf = byPatient("read", unscopedConsentsOf, () => ({}));

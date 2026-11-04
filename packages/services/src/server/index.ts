@@ -41,10 +41,18 @@ export type {
   PatientInput,
   PatientListQuery,
   PatientListRow,
+  PatientListScope,
   PatientQuery,
-  PatientRecordKind,
   PatientSort,
 } from "../db/services/patients";
+
+export {
+  adminOpenablePatient,
+  operatorActor,
+  patientActor,
+} from "../db/services/access";
+export type { PatientRecordKind } from "../db/services/access";
+export type { AccessMode, Actor } from "../db/models/actor";
 
 export { writeThroughPatientLink } from "../db/services/patient-link-writes";
 export type { PatientLinkWriteRequest } from "../db/services/patient-link-writes";
@@ -432,8 +440,11 @@ export type {
 export type { PatientConsent } from "../db/models/patient-consent";
 
 export {
+  ADMIN_OPEN_TTL_SECONDS,
   SESSION_TTL_SECONDS,
+  createOpenGrantToken,
   createSessionToken,
+  verifyOpenGrantToken,
   verifySessionToken,
 } from "../auth/session-token";
 

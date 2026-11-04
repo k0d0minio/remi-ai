@@ -27,7 +27,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Your own account. Deliberately the only page in the console where an
- * operator changes their own credentials — an owner can grant and revoke
+ * operator changes their own credentials — an admin can grant and revoke
  * access from `/team`, but nobody sets anybody else's password.
  */
 const Account = async () => {

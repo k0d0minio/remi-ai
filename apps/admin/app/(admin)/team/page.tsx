@@ -4,7 +4,7 @@ import { Typography } from "@remi/ui/server";
 import { InviteForm } from "@/components/operators/invite-form";
 import { InvitationList } from "@/components/operators/invitation-list";
 import { OperatorList } from "@/components/operators/operator-list";
-import { requireOwner } from "@/lib/auth/session";
+import { requireAdmin } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 import { mailerReady } from "@/lib/mailer";
 
@@ -18,12 +18,12 @@ export const dynamic = "force-dynamic";
 /**
  * Who can reach this console, and how someone new gets in.
  *
- * Owner-only, guarded here as well as in every action on it: this page is the
+ * Admin-only, guarded here as well as in every action on it: this page is the
  * one place in the console where a mistake hands someone access to real patient
  * records rather than changing a record.
  */
 const Team = async () => {
-  const operator = await requireOwner();
+  const operator = await requireAdmin();
   ensureDatabase();
 
   const [operators, pending] = await Promise.all([

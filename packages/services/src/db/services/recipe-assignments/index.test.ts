@@ -18,6 +18,7 @@ import {
   removeRecipeAssignment,
   updateRecipeAssignment,
 } from "./index";
+import { systemActor } from "../../services/access";
 
 let patientId: string;
 let otherPatientId: string;
@@ -71,11 +72,11 @@ const recipeNamed = async (title: string) => {
 
 beforeAll(async () => {
   registerDatabase(withInjectedFailure(createMemoryDatabase()));
-  const claire = await createPatient({
+  const claire = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym: "Claire",
   });
-  const luc = await createPatient({
+  const luc = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym: "Luc",
   });
@@ -89,11 +90,13 @@ beforeAll(async () => {
 });
 
 const held = async (id: string) =>
-  (await listPatientRecipes(id)).map((entry) => entry.recipe.title);
+  (await listPatientRecipes(systemActor, id)).map(
+    (entry) => entry.recipe.title,
+  );
 
 describe("recipes assigned to a patient", () => {
   it("gives a recipe with a personal note and a date", async () => {
-    const result = await assignRecipes(patientId, [sardines], {
+    const result = await assignRecipes(systemActor, patientId, [sardines], {
       note: "Pour tes oméga-3, et tu aimes déjà ça",
       assignedOn: "2026-09-01",
     });
@@ -107,13 +110,13 @@ describe("recipes assigned to a patient", () => {
   });
 
   it("joins the recipe, because nothing renders an assignment alone", async () => {
-    const [first] = await listPatientRecipes(patientId);
+    const [first] = await listPatientRecipes(systemActor, patientId);
     expect(first.recipe.title).toBe("Tartine de sardines");
     expect(first.recipe.body).not.toBe("");
   });
 
   it("defaults the note to empty and caps it at a note's length", async () => {
-    const bare = await assignRecipes(otherPatientId, [sardines], {
+    const bare = await assignRecipes(systemActor, otherPatientId, [sardines], {
       assignedOn: "2026-09-01",
     });
     expect(bare.ok).toBe(true);
@@ -121,7 +124,7 @@ describe("recipes assigned to a patient", () => {
       expect(bare.data[0].note).toBe("");
     }
 
-    const wordy = await assignRecipes(otherPatientId, [dahl], {
+    const wordy = await assignRecipes(systemActor, otherPatientId, [dahl], {
       note: "n".repeat(501),
       assignedOn: "2026-09-01",
     });
@@ -130,15 +133,23 @@ describe("recipes assigned to a patient", () => {
 
   it("requires a valid date", async () => {
     expect(
-      (await assignRecipes(patientId, [dahl], { assignedOn: "le 1er" })).ok,
+      (
+        await assignRecipes(systemActor, patientId, [dahl], {
+          assignedOn: "le 1er",
+        })
+      ).ok,
     ).toBe(false);
     expect(
-      (await assignRecipes(patientId, [dahl], { assignedOn: "2026-13-45" })).ok,
+      (
+        await assignRecipes(systemActor, patientId, [dahl], {
+          assignedOn: "2026-13-45",
+        })
+      ).ok,
     ).toBe(false);
   });
 
   it("refuses a second active assignment of the same recipe", async () => {
-    const again = await assignRecipes(patientId, [sardines], {
+    const again = await assignRecipes(systemActor, patientId, [sardines], {
       assignedOn: "2026-09-08",
     });
     expect(again.ok).toBe(false);
@@ -148,30 +159,36 @@ describe("recipes assigned to a patient", () => {
   });
 
   it("archives what rotates out and keeps the dated row", async () => {
-    const [current] = await listPatientRecipes(patientId);
-    const archived = await archiveRecipeAssignment(current.assignment.id, true);
+    const [current] = await listPatientRecipes(systemActor, patientId);
+    const archived = await archiveRecipeAssignment(
+      systemActor,
+      current.assignment.id,
+      true,
+    );
     expect(archived.ok).toBe(true);
     expect(await held(patientId)).toEqual([]);
     expect(
-      (await listArchivedPatientRecipes(patientId)).map(
+      (await listArchivedPatientRecipes(systemActor, patientId)).map(
         (entry) => entry.recipe.title,
       ),
     ).toEqual(["Tartine de sardines"]);
   });
 
   it("allows the same recipe again later — that repetition is the trail", async () => {
-    const again = await assignRecipes(patientId, [sardines], {
+    const again = await assignRecipes(systemActor, patientId, [sardines], {
       note: "On la reprend cette semaine",
       assignedOn: "2026-10-06",
     });
     expect(again.ok).toBe(true);
     expect(await held(patientId)).toEqual(["Tartine de sardines"]);
     // The archived giving is still there: two rows, two dates, one recipe.
-    expect(await listArchivedPatientRecipes(patientId)).toHaveLength(1);
+    expect(
+      await listArchivedPatientRecipes(systemActor, patientId),
+    ).toHaveLength(1);
   });
 
   it("orders the current set newest giving first", async () => {
-    const older = await assignRecipes(patientId, [dahl], {
+    const older = await assignRecipes(systemActor, patientId, [dahl], {
       assignedOn: "2026-09-29",
     });
     expect(older.ok).toBe(true);
@@ -182,18 +199,19 @@ describe("recipes assigned to a patient", () => {
   });
 
   it("restores an archived giving to the current set", async () => {
-    const [archived] = await listArchivedPatientRecipes(patientId);
+    const [archived] = await listArchivedPatientRecipes(systemActor, patientId);
     // Restoring a recipe the patient holds again would be two active rows for
     // one recipe, so this run archives the newer one first.
-    const current = (await listPatientRecipes(patientId)).find(
+    const current = (await listPatientRecipes(systemActor, patientId)).find(
       (entry) => entry.recipe.title === "Tartine de sardines",
     );
     if (!current) {
       throw new Error("expected the sardines to be held");
     }
-    await archiveRecipeAssignment(current.assignment.id, true);
+    await archiveRecipeAssignment(systemActor, current.assignment.id, true);
 
     const restored = await archiveRecipeAssignment(
+      systemActor,
       archived.assignment.id,
       false,
     );
@@ -202,11 +220,15 @@ describe("recipes assigned to a patient", () => {
   });
 
   it("edits the note and the date without touching the recipe", async () => {
-    const [entry] = await listPatientRecipes(patientId);
-    const updated = await updateRecipeAssignment(entry.assignment.id, {
-      note: "Version revue",
-      assignedOn: "2026-10-13",
-    });
+    const [entry] = await listPatientRecipes(systemActor, patientId);
+    const updated = await updateRecipeAssignment(
+      systemActor,
+      entry.assignment.id,
+      {
+        note: "Version revue",
+        assignedOn: "2026-10-13",
+      },
+    );
     expect(updated.ok).toBe(true);
     if (updated.ok) {
       expect(updated.data.note).toBe("Version revue");
@@ -216,11 +238,14 @@ describe("recipes assigned to a patient", () => {
   });
 
   it("removes only its own row", async () => {
-    const before = await listPatientRecipes(patientId);
-    const removed = await removeRecipeAssignment(before[0].assignment.id);
+    const before = await listPatientRecipes(systemActor, patientId);
+    const removed = await removeRecipeAssignment(
+      systemActor,
+      before[0].assignment.id,
+    );
     expect(removed.ok).toBe(true);
 
-    const after = await listPatientRecipes(patientId);
+    const after = await listPatientRecipes(systemActor, patientId);
     expect(after).toHaveLength(before.length - 1);
     // The other patient's giving of the same recipe is untouched.
     expect(await held(otherPatientId)).toContain("Tartine de sardines");
@@ -228,12 +253,12 @@ describe("recipes assigned to a patient", () => {
 
   it("reports an unknown patient, recipe or assignment rather than throwing", async () => {
     const missing = "00000000-0000-4000-8000-000000000000";
-    const noPatient = await assignRecipes(missing, [sardines], {
+    const noPatient = await assignRecipes(systemActor, missing, [sardines], {
       assignedOn: "2026-09-01",
     });
     expect(noPatient.ok).toBe(false);
 
-    const noRecipe = await assignRecipes(patientId, [missing], {
+    const noRecipe = await assignRecipes(systemActor, patientId, [missing], {
       assignedOn: "2026-09-01",
     });
     expect(noRecipe.ok).toBe(false);
@@ -241,14 +266,16 @@ describe("recipes assigned to a patient", () => {
       expect(noRecipe.error).toBe("not_found");
     }
 
-    expect((await archiveRecipeAssignment(missing, true)).ok).toBe(false);
-    expect((await removeRecipeAssignment(missing)).ok).toBe(false);
+    expect((await archiveRecipeAssignment(systemActor, missing, true)).ok).toBe(
+      false,
+    );
+    expect((await removeRecipeAssignment(systemActor, missing)).ok).toBe(false);
   });
 });
 
 describe("giving several recipes at once", () => {
   it("writes one row per recipe from a single note and date", async () => {
-    const claire = await createPatient({
+    const claire = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Inès",
     });
@@ -258,10 +285,15 @@ describe("giving several recipes at once", () => {
     const soup = await recipeNamed("Soupe de courge");
     const bowl = await recipeNamed("Bowl de sarrasin");
 
-    const result = await assignRecipes(claire.data.id, [soup, bowl], {
-      note: "Pour la semaine",
-      assignedOn: "2026-09-15",
-    });
+    const result = await assignRecipes(
+      systemActor,
+      claire.data.id,
+      [soup, bowl],
+      {
+        note: "Pour la semaine",
+        assignedOn: "2026-09-15",
+      },
+    );
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data).toHaveLength(2);
@@ -276,7 +308,7 @@ describe("giving several recipes at once", () => {
   });
 
   it("counts a recipe chosen twice in one selection once", async () => {
-    const patient = await createPatient({
+    const patient = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Théo",
     });
@@ -284,9 +316,14 @@ describe("giving several recipes at once", () => {
     if (!patient.ok) {
       throw new Error("patient not created");
     }
-    const result = await assignRecipes(patient.data.id, [soup, soup], {
-      assignedOn: "2026-09-15",
-    });
+    const result = await assignRecipes(
+      systemActor,
+      patient.data.id,
+      [soup, soup],
+      {
+        assignedOn: "2026-09-15",
+      },
+    );
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data).toHaveLength(1);
@@ -294,7 +331,7 @@ describe("giving several recipes at once", () => {
   });
 
   it("refuses the whole batch when one is already held, and names it", async () => {
-    const patient = await createPatient({
+    const patient = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Nora",
     });
@@ -303,13 +340,18 @@ describe("giving several recipes at once", () => {
     if (!patient.ok) {
       throw new Error("patient not created");
     }
-    await assignRecipes(patient.data.id, [kept], {
+    await assignRecipes(systemActor, patient.data.id, [kept], {
       assignedOn: "2026-09-01",
     });
 
-    const again = await assignRecipes(patient.data.id, [fresh, kept], {
-      assignedOn: "2026-09-08",
-    });
+    const again = await assignRecipes(
+      systemActor,
+      patient.data.id,
+      [fresh, kept],
+      {
+        assignedOn: "2026-09-08",
+      },
+    );
     expect(again.ok).toBe(false);
     if (!again.ok) {
       expect(again.error).toBe("conflict");
@@ -320,7 +362,7 @@ describe("giving several recipes at once", () => {
   });
 
   it("refuses an empty selection and an unknown recipe without writing", async () => {
-    const patient = await createPatient({
+    const patient = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Yann",
     });
@@ -328,15 +370,23 @@ describe("giving several recipes at once", () => {
       throw new Error("patient not created");
     }
     expect(
-      (await assignRecipes(patient.data.id, [], { assignedOn: "2026-09-01" }))
-        .ok,
+      (
+        await assignRecipes(systemActor, patient.data.id, [], {
+          assignedOn: "2026-09-01",
+        })
+      ).ok,
     ).toBe(false);
 
     const good = await recipeNamed("Pain perdu");
     const missing = "00000000-0000-4000-8000-000000000000";
-    const mixed = await assignRecipes(patient.data.id, [good, missing], {
-      assignedOn: "2026-09-01",
-    });
+    const mixed = await assignRecipes(
+      systemActor,
+      patient.data.id,
+      [good, missing],
+      {
+        assignedOn: "2026-09-01",
+      },
+    );
     expect(mixed.ok).toBe(false);
     expect(await held(patient.data.id)).toEqual([]);
   });
@@ -344,7 +394,7 @@ describe("giving several recipes at once", () => {
 
 describe("writing a recipe and giving it in one save", () => {
   it("creates the library row and the assignment together", async () => {
-    const patient = await createPatient({
+    const patient = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Sam",
     });
@@ -352,6 +402,7 @@ describe("writing a recipe and giving it in one save", () => {
       throw new Error("patient not created");
     }
     const result = await createAndAssignRecipe(
+      systemActor,
       patient.data.id,
       { title: "Tartine d'avocat", body: "Du pain, un avocat, du citron." },
       { note: "Pour les matins pressés", assignedOn: "2026-09-16" },
@@ -371,7 +422,7 @@ describe("writing a recipe and giving it in one save", () => {
   });
 
   it("writes neither half when the recipe is invalid", async () => {
-    const patient = await createPatient({
+    const patient = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Ava",
     });
@@ -380,6 +431,7 @@ describe("writing a recipe and giving it in one save", () => {
     }
     const before = (await listRecipes()).length;
     const result = await createAndAssignRecipe(
+      systemActor,
       patient.data.id,
       { title: "", body: "Sans titre." },
       { assignedOn: "2026-09-16" },
@@ -390,7 +442,7 @@ describe("writing a recipe and giving it in one save", () => {
   });
 
   it("writes neither half when the date is invalid", async () => {
-    const patient = await createPatient({
+    const patient = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Iris",
     });
@@ -399,6 +451,7 @@ describe("writing a recipe and giving it in one save", () => {
     }
     const before = (await listRecipes()).length;
     const result = await createAndAssignRecipe(
+      systemActor,
       patient.data.id,
       { title: "Riz au lait", body: "Du riz, du lait." },
       { assignedOn: "le 16" },
@@ -410,7 +463,7 @@ describe("writing a recipe and giving it in one save", () => {
   });
 
   it("leaves no library row when the assignment fails after it", async () => {
-    const patient = await createPatient({
+    const patient = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Théo",
     });
@@ -424,6 +477,7 @@ describe("writing a recipe and giving it in one save", () => {
     // an orphaned library row — and the library has no delete to take it back.
     failInsertInto = "patient_recipe_assignments";
     const save = createAndAssignRecipe(
+      systemActor,
       patient.data.id,
       { title: "Soupe de courge", body: "De la courge, du bouillon." },
       { assignedOn: "2026-09-18" },
@@ -438,11 +492,11 @@ describe("writing a recipe and giving it in one save", () => {
 
 describe("adapting a recipe for one person", () => {
   it("gives the variant and retires the original's giving, for that person only", async () => {
-    const mine = await createPatient({
+    const mine = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Lou",
     });
-    const theirs = await createPatient({
+    const theirs = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Max",
     });
@@ -450,10 +504,15 @@ describe("adapting a recipe for one person", () => {
       throw new Error("patients not created");
     }
     const shared = await recipeNamed("Curry de pois chiches");
-    await assignRecipes(mine.data.id, [shared], { assignedOn: "2026-09-01" });
-    await assignRecipes(theirs.data.id, [shared], { assignedOn: "2026-09-01" });
+    await assignRecipes(systemActor, mine.data.id, [shared], {
+      assignedOn: "2026-09-01",
+    });
+    await assignRecipes(systemActor, theirs.data.id, [shared], {
+      assignedOn: "2026-09-01",
+    });
 
     const result = await duplicateAndAssignRecipe(
+      systemActor,
       mine.data.id,
       shared,
       { title: "Curry de pois chiches sans piment", body: "Sans piment." },
@@ -472,7 +531,7 @@ describe("adapting a recipe for one person", () => {
       "Curry de pois chiches sans piment",
     ]);
     expect(
-      (await listArchivedPatientRecipes(mine.data.id)).map(
+      (await listArchivedPatientRecipes(systemActor, mine.data.id)).map(
         (entry) => entry.recipe.title,
       ),
     ).toContain("Curry de pois chiches");
@@ -482,7 +541,7 @@ describe("adapting a recipe for one person", () => {
   });
 
   it("carries the origin's tags and reports the origin on the card", async () => {
-    const patient = await createPatient({
+    const patient = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Zoé",
     });
@@ -495,6 +554,7 @@ describe("adapting a recipe for one person", () => {
       throw new Error("fixture not created");
     }
     const result = await duplicateAndAssignRecipe(
+      systemActor,
       patient.data.id,
       tagged.data.id,
       {},
@@ -507,12 +567,12 @@ describe("adapting a recipe for one person", () => {
       expect(result.data.recipe.title).toBe("Gratin d'hiver (variante)");
     }
 
-    const [entry] = await listPatientRecipes(patient.data.id);
+    const [entry] = await listPatientRecipes(systemActor, patient.data.id);
     expect(entry.origin?.title).toBe("Gratin d'hiver");
   });
 
   it("works when the patient does not already hold the original", async () => {
-    const patient = await createPatient({
+    const patient = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Élie",
     });
@@ -521,6 +581,7 @@ describe("adapting a recipe for one person", () => {
       throw new Error("patient not created");
     }
     const result = await duplicateAndAssignRecipe(
+      systemActor,
       patient.data.id,
       never,
       {},
@@ -528,12 +589,14 @@ describe("adapting a recipe for one person", () => {
     );
     expect(result.ok).toBe(true);
     expect(await held(patient.data.id)).toEqual(["Houmous maison (variante)"]);
-    expect(await listArchivedPatientRecipes(patient.data.id)).toHaveLength(0);
+    expect(
+      await listArchivedPatientRecipes(systemActor, patient.data.id),
+    ).toHaveLength(0);
   });
 
   it("reports an unknown patient or recipe rather than throwing", async () => {
     const missing = "00000000-0000-4000-8000-000000000000";
-    const patient = await createPatient({
+    const patient = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Bo",
     });
@@ -544,6 +607,7 @@ describe("adapting a recipe for one person", () => {
     expect(
       (
         await duplicateAndAssignRecipe(
+          systemActor,
           missing,
           recipe,
           {},
@@ -554,6 +618,7 @@ describe("adapting a recipe for one person", () => {
     expect(
       (
         await duplicateAndAssignRecipe(
+          systemActor,
           patient.data.id,
           missing,
           {},

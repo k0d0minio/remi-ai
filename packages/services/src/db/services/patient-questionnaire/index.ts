@@ -27,6 +27,7 @@ import type {
 import { recordAuditEvent, type AuditActor } from "../audit";
 import { consentInForce } from "../patient-consents/in-force";
 import { setFileStatus } from "../patients";
+import { byPatient, noSuchPatient, systemActor } from "../access";
 
 /**
  * The preparatory questionnaire's storage — story 4, `questionnaire-fields`.
@@ -345,7 +346,7 @@ export const checkAllergenAnswer = (
 };
 
 /** The questionnaire's answers and the patient's checked boxes. */
-export const getPatientQuestionnaire = async (
+const unscopedGetPatientQuestionnaire = async (
   patientId: Id,
 ): Promise<Result<PatientQuestionnaireView>> => {
   if (!isValidId(patientId)) {
@@ -371,7 +372,7 @@ export const getPatientQuestionnaire = async (
  * (`appointment-date`). Every writer of the column passes here, so the console
  * and the patient's questionnaire get the same trail.
  */
-export const savePatientQuestionnaire = async (
+const unscopedSavePatientQuestionnaire = async (
   patientId: Id,
   input: QuestionnaireInput,
   actor: AuditActor | null = null,
@@ -453,7 +454,9 @@ const profileAnswerSchema = z
     phone: z
       .string()
       .transform((value) => value.replace(/\s/g, ""))
-      .pipe(z.string().regex(/^\+?\d{8,15}$/, "that phone number is not valid")),
+      .pipe(
+        z.string().regex(/^\+?\d{8,15}$/, "that phone number is not valid"),
+      ),
     // The column is an integer.
     heightCm: z.union([z.null(), z.number().int().positive().max(300)]),
     weightKg: z.union([z.null(), weightKg]),
@@ -478,7 +481,7 @@ const careGatedProfileFields = ["medications", "supplements"] as const;
  * never moves `lastEditedAt`: that column means the practitioner worked on
  * the file, and sorts her roster.
  */
-export const savePatientProfileAnswers = async (
+const unscopedSavePatientProfileAnswers = async (
   patientId: Id,
   input: ProfileAnswerInput,
 ): Promise<Result<PatientProfile>> => {
@@ -526,7 +529,7 @@ export const savePatientProfileAnswers = async (
  * - `declared` writes the boxes and sets the flag to `false`.
  * - `unanswered` deletes the rows and sets the flag to null.
  */
-export const setPatientAllergens = async (
+const unscopedSetPatientAllergens = async (
   patientId: Id,
   kind: string,
   answer: AllergenAnswer,
@@ -595,7 +598,7 @@ type CompletenessRow = PatientProfile & PatientQuestionnaire;
  * `shared/questionnaire.ts`). Taille and poids live on the profile, the rest
  * on the questionnaire's columns and rows.
  */
-export const missingQuestionnaireFields = async (
+const unscopedMissingQuestionnaireFields = async (
   patientId: Id,
 ): Promise<Result<MandatoryQuestionnaireField[]>> => {
   if (!isValidId(patientId)) {
@@ -632,11 +635,11 @@ export const missingQuestionnaireFields = async (
  * `to_complete`: a field cleared later never moves a file back (D-31).
  * Answers the file's status after the call.
  */
-export const markReadyWhenComplete = async (
+const unscopedMarkReadyWhenComplete = async (
   patientId: Id,
   actor: AuditActor | null,
 ): Promise<Result<PatientProfile["fileStatus"]>> => {
-  const missing = await missingQuestionnaireFields(patientId);
+  const missing = await unscopedMissingQuestionnaireFields(patientId);
   if (!missing.ok) {
     return missing;
   }
@@ -650,6 +653,7 @@ export const markReadyWhenComplete = async (
     return ok(row.fileStatus);
   }
   const moved = await setFileStatus(
+    systemActor,
     patientId,
     "ready",
     actor,
@@ -657,3 +661,39 @@ export const markReadyWhenComplete = async (
   );
   return moved.ok ? ok(moved.data.fileStatus) : moved;
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const getPatientQuestionnaire = byPatient(
+  "read",
+  unscopedGetPatientQuestionnaire,
+  noSuchPatient,
+);
+export const savePatientQuestionnaire = byPatient(
+  "write",
+  unscopedSavePatientQuestionnaire,
+  noSuchPatient,
+);
+export const savePatientProfileAnswers = byPatient(
+  "write",
+  unscopedSavePatientProfileAnswers,
+  noSuchPatient,
+);
+export const setPatientAllergens = byPatient(
+  "write",
+  unscopedSetPatientAllergens,
+  noSuchPatient,
+);
+export const missingQuestionnaireFields = byPatient(
+  "read",
+  unscopedMissingQuestionnaireFields,
+  noSuchPatient,
+);
+export const markReadyWhenComplete = byPatient(
+  "write",
+  unscopedMarkReadyWhenComplete,
+  noSuchPatient,
+);

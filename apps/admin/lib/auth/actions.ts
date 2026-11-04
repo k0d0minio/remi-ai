@@ -37,8 +37,8 @@ export const signInAction = async (
  * `OPERATOR_EMAIL` in the deployment's environment. There is no self-serve
  * sign-up behind it.
  *
- * It mints an **owner**, and it is the only path that does so without an
- * existing owner's say-so. That is the point: a deployment with no accounts has
+ * It mints an **admin**, and it is the only path that does so without an
+ * existing admin's say-so. That is the point: a deployment with no accounts has
  * nobody who could invite the first one, so this is the way in — and once one
  * account exists it stops working, which is what keeps it from being a second
  * door.
@@ -68,7 +68,7 @@ export const bootstrapAction = async (
     email,
     name: String(formData.get("name") ?? ""),
     password: String(formData.get("password") ?? ""),
-    role: "owner",
+    role: "admin",
   });
   if (!result.ok) {
     return { error: result.message };

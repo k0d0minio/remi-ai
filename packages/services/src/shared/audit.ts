@@ -47,7 +47,12 @@ export const auditActions = [
    * `patient.deleted` with the `system` actor and the detail `inactivity`.
    */
   "patient.inactivity_notice_sent",
-  /** An owner set or cleared the retention hold that blocks that deletion. */
+  /**
+   * An admin opened a file of another practitioner, read-only (story 3, D-27).
+   * The detail is the reason the admin typed.
+   */
+  "patient.admin_opened",
+  /** An admin set or cleared the retention hold that blocks that deletion. */
   "patient.retention_hold_set",
   "patient.retention_hold_cleared",
   "recommendation.added",

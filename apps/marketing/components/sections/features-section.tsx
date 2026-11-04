@@ -12,7 +12,13 @@ export const FeaturesSection = () => (
     className="from-primary-subtle to-success-subtle bg-linear-to-b py-16 md:py-24"
   >
     <Container className="flex flex-col gap-8">
-      <Typography as="h2" size="3xl" weight="bold" balance className="max-w-2xl">
+      <Typography
+        as="h2"
+        size="3xl"
+        weight="bold"
+        balance
+        className="max-w-2xl"
+      >
         {FEATURES_SECTION.title}
       </Typography>
       <div className="grid gap-5 md:grid-cols-2">

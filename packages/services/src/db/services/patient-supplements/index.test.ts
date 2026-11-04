@@ -13,12 +13,13 @@ import {
   savePatientSupplements,
   updatePatientSupplement,
 } from "./index";
+import { systemActor } from "../../services/access";
 
 let patientId: string;
 
 beforeAll(async () => {
   registerDatabase(createMemoryDatabase());
-  const created = await createPatient({
+  const created = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym: "Claire",
   });
@@ -29,7 +30,7 @@ beforeAll(async () => {
 });
 
 const names = async (id: string) =>
-  (await listPatientSupplements(id)).map((entry) => entry.name);
+  (await listPatientSupplements(systemActor, id)).map((entry) => entry.name);
 
 /** Throws rather than asserting non-null — a missing row is a broken test. */
 const entryNamed = (
@@ -45,7 +46,7 @@ const entryNamed = (
 
 describe("patient supplements", () => {
   it("round-trips all four fields", async () => {
-    const result = await addPatientSupplement(patientId, {
+    const result = await addPatientSupplement(systemActor, patientId, {
       name: "Magnésium bisglycinate",
       dose: "300 mg",
       timing: "le soir, au coucher",
@@ -63,13 +64,15 @@ describe("patient supplements", () => {
   });
 
   it("requires a name", async () => {
-    const result = await addPatientSupplement(patientId, { name: "  " });
+    const result = await addPatientSupplement(systemActor, patientId, {
+      name: "  ",
+    });
     expect(result.ok).toBe(false);
   });
 
   it("appends in order and reorders on request", async () => {
-    await addPatientSupplement(patientId, { name: "Oméga-3" });
-    await addPatientSupplement(patientId, { name: "Vitamine D" });
+    await addPatientSupplement(systemActor, patientId, { name: "Oméga-3" });
+    await addPatientSupplement(systemActor, patientId, { name: "Vitamine D" });
     expect(await names(patientId)).toEqual([
       "Magnésium bisglycinate",
       "Oméga-3",
@@ -77,10 +80,10 @@ describe("patient supplements", () => {
     ]);
 
     const last = entryNamed(
-      await listPatientSupplements(patientId),
+      await listPatientSupplements(systemActor, patientId),
       "Vitamine D",
     );
-    const moved = await movePatientSupplement(last.id, "up");
+    const moved = await movePatientSupplement(systemActor, last.id, "up");
     expect(moved.ok).toBe(true);
     expect(await names(patientId)).toEqual([
       "Magnésium bisglycinate",
@@ -90,19 +93,21 @@ describe("patient supplements", () => {
   });
 
   it("moving past the end does nothing and is not an error", async () => {
-    const first = (await listPatientSupplements(patientId))[0];
+    const first = (await listPatientSupplements(systemActor, patientId))[0];
     const before = await names(patientId);
-    const result = await movePatientSupplement(first.id, "up");
+    const result = await movePatientSupplement(systemActor, first.id, "up");
     expect(result.ok).toBe(true);
     expect(await names(patientId)).toEqual(before);
   });
 
   it("updates a field without disturbing the others", async () => {
     const entry = entryNamed(
-      await listPatientSupplements(patientId),
+      await listPatientSupplements(systemActor, patientId),
       "Oméga-3",
     );
-    const updated = await updatePatientSupplement(entry.id, { dose: "2 g" });
+    const updated = await updatePatientSupplement(systemActor, entry.id, {
+      dose: "2 g",
+    });
     expect(updated.ok).toBe(true);
     if (!updated.ok) {
       return;
@@ -113,39 +118,60 @@ describe("patient supplements", () => {
 
   it("archives out of the protocol then restores, keeping the row", async () => {
     const entry = entryNamed(
-      await listPatientSupplements(patientId),
+      await listPatientSupplements(systemActor, patientId),
       "Vitamine D",
     );
-    const archived = await archivePatientSupplement(entry.id, true);
+    const archived = await archivePatientSupplement(
+      systemActor,
+      entry.id,
+      true,
+    );
     expect(archived.ok).toBe(true);
     expect(await names(patientId)).not.toContain("Vitamine D");
 
-    const history = await listArchivedPatientSupplements(patientId);
+    const history = await listArchivedPatientSupplements(
+      systemActor,
+      patientId,
+    );
     expect(history.map((item) => item.name)).toContain("Vitamine D");
 
-    const restored = await archivePatientSupplement(entry.id, false);
+    const restored = await archivePatientSupplement(
+      systemActor,
+      entry.id,
+      false,
+    );
     expect(restored.ok).toBe(true);
     expect(await names(patientId)).toContain("Vitamine D");
   });
 
   it("deletes an entry permanently", async () => {
-    const first = (await listPatientSupplements(patientId))[0];
-    const deleted = await deletePatientSupplement(first.id);
+    const first = (await listPatientSupplements(systemActor, patientId))[0];
+    const deleted = await deletePatientSupplement(systemActor, first.id);
     expect(deleted.ok).toBe(true);
-    const remaining = await listPatientSupplements(patientId);
+    const remaining = await listPatientSupplements(systemActor, patientId);
     expect(remaining.some((entry) => entry.id === first.id)).toBe(false);
   });
 
   it("answers an empty list for a malformed patient id", async () => {
-    expect(await listPatientSupplements("not-a-uuid")).toEqual([]);
-    expect(await listArchivedPatientSupplements("not-a-uuid")).toEqual([]);
+    expect(await listPatientSupplements(systemActor, "not-a-uuid")).toEqual([]);
+    expect(
+      await listArchivedPatientSupplements(systemActor, "not-a-uuid"),
+    ).toEqual([]);
   });
 
   it("treats a malformed entry id as not found", async () => {
-    expect((await movePatientSupplement("not-a-uuid", "up")).ok).toBe(false);
-    expect((await archivePatientSupplement("not-a-uuid", true)).ok).toBe(false);
-    expect((await updatePatientSupplement("not-a-uuid", {})).ok).toBe(false);
-    expect((await deletePatientSupplement("not-a-uuid")).ok).toBe(false);
+    expect(
+      (await movePatientSupplement(systemActor, "not-a-uuid", "up")).ok,
+    ).toBe(false);
+    expect(
+      (await archivePatientSupplement(systemActor, "not-a-uuid", true)).ok,
+    ).toBe(false);
+    expect(
+      (await updatePatientSupplement(systemActor, "not-a-uuid", {})).ok,
+    ).toBe(false);
+    expect((await deletePatientSupplement(systemActor, "not-a-uuid")).ok).toBe(
+      false,
+    );
   });
 });
 
@@ -155,7 +181,7 @@ describe("saving the whole protocol at once", () => {
   let sectionPatientId: string;
 
   beforeAll(async () => {
-    const created = await createPatient({
+    const created = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Margaux",
     });
@@ -166,7 +192,7 @@ describe("saving the whole protocol at once", () => {
   });
 
   it("writes the four columns of several rows in one call", async () => {
-    const saved = await savePatientSupplements(sectionPatientId, [
+    const saved = await savePatientSupplements(systemActor, sectionPatientId, [
       {
         name: "Oméga-3",
         dose: "2 g",
@@ -182,7 +208,10 @@ describe("saving the whole protocol at once", () => {
     ]);
 
     expect(saved.ok && saved.data.added).toBe(2);
-    const protocol = await listPatientSupplements(sectionPatientId);
+    const protocol = await listPatientSupplements(
+      systemActor,
+      sectionPatientId,
+    );
     expect(protocol.map((row) => row.name)).toEqual([
       "Oméga-3",
       "Magnésium bisglycinate",
@@ -191,9 +220,9 @@ describe("saving the whole protocol at once", () => {
   });
 
   it("applies an edit, an addition, a removal and a reorder in one save", async () => {
-    const before = await listPatientSupplements(sectionPatientId);
+    const before = await listPatientSupplements(systemActor, sectionPatientId);
 
-    const saved = await savePatientSupplements(sectionPatientId, [
+    const saved = await savePatientSupplements(systemActor, sectionPatientId, [
       {
         id: before[1].id,
         name: before[1].name,
@@ -211,35 +240,38 @@ describe("saving the whole protocol at once", () => {
       reordered: 1,
     });
 
-    const after = await listPatientSupplements(sectionPatientId);
+    const after = await listPatientSupplements(systemActor, sectionPatientId);
     expect(after.map((row) => row.name)).toEqual([
       "Magnésium bisglycinate",
       "Vitamine D",
     ]);
     expect(after[0].dose).toBe("400 mg");
     expect(
-      (await listArchivedPatientSupplements(sectionPatientId)).map(
+      (await listArchivedPatientSupplements(systemActor, sectionPatientId)).map(
         (row) => row.name,
       ),
     ).toContain("Oméga-3");
   });
 
   it("refuses the whole save on a bad row, naming which one", async () => {
-    const before = await listPatientSupplements(sectionPatientId);
+    const before = await listPatientSupplements(systemActor, sectionPatientId);
 
-    const saved = await savePatientSupplements(sectionPatientId, [
+    const saved = await savePatientSupplements(systemActor, sectionPatientId, [
       { name: "Zinc", dose: "", timing: "", reason: "" },
       { name: "", dose: "15 mg", timing: "", reason: "" },
     ]);
 
     expect(!saved.ok && saved.message).toContain("row 2");
-    expect(await listPatientSupplements(sectionPatientId)).toEqual(before);
+    expect(await listPatientSupplements(systemActor, sectionPatientId)).toEqual(
+      before,
+    );
   });
 
   it("does nothing when the section comes back unchanged", async () => {
-    const before = await listPatientSupplements(sectionPatientId);
+    const before = await listPatientSupplements(systemActor, sectionPatientId);
 
     const saved = await savePatientSupplements(
+      systemActor,
       sectionPatientId,
       before.map((row) => ({
         id: row.id,
@@ -251,10 +283,14 @@ describe("saving the whole protocol at once", () => {
     );
 
     expect(saved.ok && saved.data.added).toBe(0);
-    expect(await listPatientSupplements(sectionPatientId)).toEqual(before);
+    expect(await listPatientSupplements(systemActor, sectionPatientId)).toEqual(
+      before,
+    );
   });
 
   it("treats a malformed patient id as not found", async () => {
-    expect((await savePatientSupplements("not-a-uuid", [])).ok).toBe(false);
+    expect(
+      (await savePatientSupplements(systemActor, "not-a-uuid", [])).ok,
+    ).toBe(false);
   });
 });

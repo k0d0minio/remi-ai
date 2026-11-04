@@ -3,7 +3,7 @@ import { Badge, Separator, Typography, Wordmark } from "@remi/ui/server";
 import { NavLinks } from "@/components/shell/nav-links";
 
 type Props = {
-  /** Owners see the accounts section; operators have no route to hide behind. */
+  /** Admins see the accounts section. Practitioners have no route to hide behind. */
   canManageOperators: boolean;
 };
 

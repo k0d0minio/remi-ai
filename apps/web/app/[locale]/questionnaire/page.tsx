@@ -4,6 +4,7 @@ import {
   getPatient,
   getPatientQuestionnaire,
   missingQuestionnaireFields,
+  patientActor,
 } from "@remi/services/server";
 import { isLocale, type Locale } from "@remi/services/shared";
 import { Wordmark } from "@remi/ui/server";
@@ -66,9 +67,9 @@ const QuestionnairePage = async ({
   const account = await requirePatient(locale);
   const patientId = account.patientProfileId;
   const [patient, questionnaire, missing] = await Promise.all([
-    getPatient(patientId),
-    getPatientQuestionnaire(patientId),
-    missingQuestionnaireFields(patientId),
+    getPatient(patientActor(patientId), patientId),
+    getPatientQuestionnaire(patientActor(patientId), patientId),
+    missingQuestionnaireFields(patientActor(patientId), patientId),
   ]);
   if (!patient.ok || !questionnaire.ok || !missing.ok) {
     notFound();
