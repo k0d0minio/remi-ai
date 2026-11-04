@@ -10,6 +10,7 @@ import { ok } from "../shared/result";
 import { registerAuthProvider, type AuthIdentity } from "./provider";
 import { completePatientSignIn } from "./patient-sign-in";
 import { readPatientAccount, readSession } from "./session";
+import { systemActor } from "../db/services/access";
 
 /** The identity the fake adapter reports. Each test sets it. */
 let current: AuthIdentity | null = null;
@@ -39,7 +40,7 @@ beforeAll(async () => {
     },
   });
 
-  const patient = await createPatient({
+  const patient = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym: "Claire",
   });

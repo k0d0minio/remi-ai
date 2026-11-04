@@ -1,11 +1,13 @@
 import { auditActions } from "../../../shared/audit";
 import type { Id } from "../../../types";
 import { getDatabase } from "../../client";
+import type { Actor } from "../../models/actor";
 import type {
   AuditAction,
   AuditActorKind,
   AuditEvent,
 } from "../../models/audit-event";
+import { listablePatientIds } from "../access";
 
 /**
  * The audit trail — `apps/admin/AGENTS.md`'s "an admin action with no trace is
@@ -102,15 +104,48 @@ export type AuditQuery = {
   limit?: number;
 };
 
-/** Newest first — a journal is read from the top. */
+/**
+ * Whether a practitioner's journal shows this event (story 3, question 6). It
+ * shows the practitioner's own acts, the acts of their patients, and every
+ * event on one of their files. The events on another practitioner's files
+ * stay out: their labels carry that practitioner's patients.
+ */
+const concerns = (
+  event: AuditEvent,
+  operatorId: Id,
+  files: ReadonlySet<Id>,
+): boolean =>
+  event.actorId === operatorId ||
+  (event.actorKind === "patient" &&
+    event.actorId !== null &&
+    files.has(event.actorId)) ||
+  (event.targetType === "patient" &&
+    event.targetId !== null &&
+    files.has(event.targetId));
+
+/**
+ * Newest first — a journal is read from the top. An admin reads every event.
+ * A practitioner reads the events that concern them. A patient reads none.
+ */
 export const listAuditEvents = async (
+  actor: Actor,
   query: AuditQuery = {},
 ): Promise<readonly AuditEvent[]> => {
+  if (actor.kind === "patient") {
+    return [];
+  }
   const limit = Math.min(Math.max(query.limit ?? 100, 1), 500);
+  const files = await listablePatientIds(actor);
+  const operatorId = actor.kind === "operator" ? actor.id : null;
   // Filtered in memory for the same reason the roster is: the seam does exact
   // match only, and the journal is read at a scale where that is honest.
   const page = await events().findMany({}, { limit: 500 });
   return page.items
+    .filter((event) =>
+      files === null || operatorId === null
+        ? true
+        : concerns(event, operatorId, files),
+    )
     .filter((event) =>
       query.action && query.action !== "all"
         ? event.action === query.action

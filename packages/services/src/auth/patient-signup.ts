@@ -10,6 +10,7 @@ import {
   getPatientAccountByEmail,
   getPatientAccountBySubject,
 } from "../db/services/patient-accounts";
+import { systemActor } from "../db/services/access";
 import { insertConsent } from "../db/services/patient-consents";
 import { createPatient } from "../db/services/patients";
 import type { ShownConsent } from "../shared/consent";
@@ -23,7 +24,11 @@ import {
   type SignupFieldErrors,
 } from "../shared/signup";
 import type { Id } from "../types";
-import { getAuthProvider, type AuthIdentity, type AuthResult } from "./provider";
+import {
+  getAuthProvider,
+  type AuthIdentity,
+  type AuthResult,
+} from "./provider";
 
 /**
  * A patient creates their own account from their practitioner's permanent
@@ -96,8 +101,7 @@ const signupSchema = z.object({
 export type SignupData = z.output<typeof signupSchema>;
 
 export type SignupValidation =
-  | { ok: true; data: SignupData }
-  | { ok: false; fields: SignupFieldErrors };
+  { ok: true; data: SignupData } | { ok: false; fields: SignupFieldErrors };
 
 const isFieldError = (code: string): code is SignupFieldError =>
   code === "required" || code === "invalid" || code === "too_short";
@@ -166,7 +170,10 @@ const identityFor = async (
     email: data.email,
     password: data.password,
   });
-  if (!signedIn.ok || (await getPatientAccountBySubject(signedIn.data.subject))) {
+  if (
+    !signedIn.ok ||
+    (await getPatientAccountBySubject(signedIn.data.subject))
+  ) {
     return alreadyRegistered();
   }
   return signedIn;
@@ -245,6 +252,7 @@ export const signUpPatient = async ({
     patient = await getDatabase().transaction(async (tx) => {
       const created = orRollback(
         await createPatient(
+          systemActor,
           {
             practitionerId: practitioner.data.id,
             pseudonym: newPseudonym(),

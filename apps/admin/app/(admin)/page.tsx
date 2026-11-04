@@ -25,7 +25,7 @@ import {
   patientStatusIntents,
   patientStatusLabels,
 } from "@/components/patients/vocabulary";
-import { requireOperator } from "@/lib/auth/session";
+import { requireActor } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 
 export const metadata: Metadata = {
@@ -48,9 +48,9 @@ const PREVIEW = 5;
  */
 const Accueil = async () => {
   ensureDatabase();
-  const operator = await requireOperator();
+  const actor = await requireActor();
   const [patients, ciqual] = await Promise.all([
-    patientsOf(operator.id, { sort: "recent" }),
+    patientsOf(actor, { sort: "recent" }),
     getCiqualImport(),
   ]);
 
@@ -59,7 +59,8 @@ const Accueil = async () => {
   const withCounts = await Promise.all(
     patients.map(async (patient) => ({
       patient,
-      recommendations: (await listPatientRecommendations(patient.id)).length,
+      recommendations: (await listPatientRecommendations(actor, patient.id))
+        .length,
     })),
   );
 

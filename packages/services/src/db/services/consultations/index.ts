@@ -15,6 +15,7 @@ import {
 import { addPatientNote } from "../patient-notes";
 import { getPatientSummary, setPatientSummary } from "../patient-summaries";
 import { getPatient, setPatientNextConsultationPrep } from "../patients";
+import { byPatient, noSuchPatient, systemActor } from "../access";
 
 /**
  * Writing up a consultation — the five edits Morgane used to make in five
@@ -92,11 +93,11 @@ const saysSomething = (entry: ConsultationCheckInInput) =>
   (entry.measure ?? "").trim() !== "" ||
   (entry.note ?? "").trim() !== "";
 
-export const recordConsultation = async (
+const unscopedRecordConsultation = async (
   patientId: Id,
   input: ConsultationInput,
 ): Promise<Result<ConsultationRecord>> => {
-  const patient = await getPatient(patientId);
+  const patient = await getPatient(systemActor, patientId);
   if (!patient.ok) {
     return patient;
   }
@@ -106,7 +107,7 @@ export const recordConsultation = async (
   // goal by id alone; without this, a tampered form could hang a check-in off
   // another patient's goal while the single audit row named this one.
   const ownGoals = new Set(
-    (await listPatientGoals(patientId)).map((goal) => goal.id),
+    (await listPatientGoals(systemActor, patientId)).map((goal) => goal.id),
   );
   const submitted = (input.checkIns ?? []).filter(saysSomething);
   if (submitted.some((entry) => !ownGoals.has(entry.goalId))) {
@@ -119,7 +120,7 @@ export const recordConsultation = async (
         // The note first: it is the one thing on this screen with no other
         // home, so a failure below never costs what she typed.
         const note = orRollback(
-          await addPatientNote(patientId, input.note, tx),
+          await addPatientNote(systemActor, patientId, input.note, tx),
         );
 
         const checkIns: PatientGoalCheckIn[] = [];
@@ -134,7 +135,13 @@ export const recordConsultation = async (
             orRollback(
               // Written by Morgane at the consultation, not by the patient
               // through their link — the same default the single-row path uses.
-              await addGoalCheckIn(entry.goalId, checkIn, "practitioner", tx),
+              await addGoalCheckIn(
+                systemActor,
+                entry.goalId,
+                checkIn,
+                "practitioner",
+                tx,
+              ),
             ),
           );
         }
@@ -144,12 +151,17 @@ export const recordConsultation = async (
           input.instruction !== undefined ||
           input.patientInstruction !== undefined
         ) {
-          const before = await getPatientInstruction(patientId, tx);
+          const before = await getPatientInstruction(
+            systemActor,
+            patientId,
+            tx,
+          );
           // A field absent from the form keeps what is on the row: the two
           // halves live on one row, so writing only the half she edited would
           // otherwise clear the other.
           const after = orRollback(
             await setPatientInstruction(
+              systemActor,
               patientId,
               {
                 body: input.instruction ?? before?.body ?? "",
@@ -164,9 +176,9 @@ export const recordConsultation = async (
 
         let summaryChanged = false;
         if (input.summary !== undefined) {
-          const before = await getPatientSummary(patientId, tx);
+          const before = await getPatientSummary(systemActor, patientId, tx);
           const after = orRollback(
-            await setPatientSummary(patientId, input.summary, tx),
+            await setPatientSummary(systemActor, patientId, input.summary, tx),
           );
           summaryChanged = (after?.body ?? null) !== (before?.body ?? null);
         }
@@ -176,6 +188,7 @@ export const recordConsultation = async (
           const before = patient.data.nextConsultationPrep;
           const after = orRollback(
             await setPatientNextConsultationPrep(
+              systemActor,
               patientId,
               input.nextConsultationPrep,
               tx,
@@ -218,3 +231,14 @@ export const describeConsultation = (record: ConsultationRecord): string => {
   }
   return parts.join(", ");
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const recordConsultation = byPatient(
+  "write",
+  unscopedRecordConsultation,
+  noSuchPatient,
+);

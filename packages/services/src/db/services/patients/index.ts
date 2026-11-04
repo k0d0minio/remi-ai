@@ -32,6 +32,14 @@ import type {
   PatientProfile,
 } from "../../models/patient-profile";
 import { consentInForce } from "../patient-consents/in-force";
+import type { AccessMode, Actor } from "../../models/actor";
+import {
+  allows,
+  byPatient,
+  noSuchPatient,
+  patientIdOfRecord,
+  type PatientRecordKind,
+} from "../access";
 
 /**
  * The patient-profile service — the callable surface behind Morgane's admin
@@ -151,7 +159,14 @@ export type PatientInput = Partial<z.input<typeof patientFields>>;
 
 export type PatientSort = "recent" | "name" | "created";
 
+/**
+ * `mine`: the files the operator holds. `all`: every file, for an admin only
+ * (story 3). A practitioner who asks for `all` gets `mine`.
+ */
+export type PatientListScope = "mine" | "all";
+
 export type PatientQuery = {
+  scope?: PatientListScope;
   /** Matched case-insensitively against the pseudonym and the full name. */
   search?: string;
   status?: PatientProfile["status"] | "all";
@@ -202,7 +217,36 @@ const sorters: Record<
 };
 
 /**
- * One practitioner's files (D-27). The console lists patients through this
+ * The files a list shows to this actor (D-27, story 3). An operator lists the
+ * files it holds. An admin that asks for `all` lists every file. A patient
+ * lists its own file. The system lists every file.
+ */
+const listedFiles = async <T extends PatientProfile>(
+  actor: Actor,
+  scope: PatientListScope = "mine",
+): Promise<readonly T[]> => {
+  const files = getDatabase().collection<T>("patient_profiles");
+  if (actor.kind === "patient") {
+    const own = isValidId(actor.patientId)
+      ? await files.findById(actor.patientId)
+      : null;
+    return own ? [own] : [];
+  }
+  if (
+    actor.kind === "operator" &&
+    !(scope === "all" && actor.role === "admin")
+  ) {
+    if (!isValidId(actor.id)) {
+      return [];
+    }
+    return (await files.findMany({ practitionerId: actor.id }, { limit: 200 }))
+      .items;
+  }
+  return (await files.findMany({}, { limit: 500 })).items;
+};
+
+/**
+ * The files of one actor (D-27). The console lists patients through this
  * and nothing else, so no screen can show another practitioner's file.
  *
  * Search, filter and sort happen here rather than in the driver: the storage
@@ -211,15 +255,12 @@ const sorters: Record<
  * rows, the fix is a richer seam, not a filter in the page.
  */
 export const patientsOf = async (
-  practitionerId: Id,
+  actor: Actor,
   query: PatientQuery = {},
 ): Promise<readonly PatientProfile[]> => {
-  if (!isValidId(practitionerId)) {
-    return [];
-  }
-  const page = await patients().findMany({ practitionerId }, { limit: 200 });
+  const items = await listedFiles(actor, query.scope);
   const status = query.status && query.status !== "all" ? query.status : null;
-  return page.items
+  return items
     .filter((patient) => (status ? patient.status === status : true))
     .filter((patient) => matchesSearch(patient, query.search ?? ""))
     .sort(sorters[query.sort ?? "recent"]);
@@ -308,17 +349,12 @@ const listSorters: Record<
  * date on each row.
  */
 export const patientListOf = async (
-  practitionerId: Id,
+  actor: Actor,
   query: PatientListQuery = {},
 ): Promise<readonly PatientListRow[]> => {
-  if (!isValidId(practitionerId)) {
-    return [];
-  }
-  const page = await getDatabase()
-    .collection<PatientListRow>("patient_profiles")
-    .findMany({ practitionerId }, { limit: 200 });
+  const items = await listedFiles<PatientListRow>(actor, query.scope);
   const status = query.status && query.status !== "all" ? query.status : null;
-  return page.items
+  return items
     .map((patient) => ({
       ...patient,
       consultationDate: patient.consultationDate ?? null,
@@ -328,7 +364,7 @@ export const patientListOf = async (
     .sort(listSorters[query.sort ?? defaultPatientListSort]);
 };
 
-export const getPatient = async (
+const unscopedGetPatient = async (
   id: Id,
   db?: DatabaseClient,
 ): Promise<Result<PatientProfile>> => {
@@ -348,14 +384,17 @@ const emailKey = (email: string) => email.trim().toLowerCase();
  * never matches (D-27): « Ce dossier existe déjà » would confirm it exists.
  */
 export const findPatientByEmail = async (
-  practitionerId: Id,
+  actor: Actor,
   email: string,
 ): Promise<PatientProfile | null> => {
   const key = emailKey(email);
-  if (!key || !isValidId(practitionerId)) {
+  if (!key || actor.kind !== "operator" || !isValidId(actor.id)) {
     return null;
   }
-  const page = await patients().findMany({ practitionerId }, { limit: 500 });
+  const page = await patients().findMany(
+    { practitionerId: actor.id },
+    { limit: 500 },
+  );
   return (
     page.items.find(
       (patient) => patient.email !== null && emailKey(patient.email) === key,
@@ -364,73 +403,29 @@ export const findPatientByEmail = async (
 };
 
 /**
- * One file, only when this practitioner holds it. A file of another
- * practitioner answers `not_found`, like a missing one: « forbidden » would
- * confirm that the id exists.
+ * One file, only when the actor may read it, or write it with `mode` `write`
+ * (D-27, story 3). A file the actor may not reach answers `not_found`, like a
+ * missing one: « forbidden » would confirm that the id exists.
  */
 export const patientOf = async (
-  practitionerId: Id,
+  actor: Actor,
   id: Id,
+  mode: AccessMode = "read",
   db?: DatabaseClient,
 ): Promise<Result<PatientProfile>> => {
-  const found = await getPatient(id, db);
-  return found.ok && found.data.practitionerId === practitionerId
-    ? found
-    : err("not_found", "no such patient");
+  const found = await unscopedGetPatient(id, db);
+  return found.ok && allows(actor, found.data, mode) ? found : noSuchPatient();
 };
 
-/**
- * The collections whose rows sit in one patient file, each by its
- * `patientId`. A console action that names a row, not a file, finds the file
- * through this map before it writes.
- */
-const patientRecordCollections = {
-  recommendation: "patient_recommendations",
-  supplement: "patient_supplements",
-  pantryEssential: "patient_pantry_essentials",
-  mealEntry: "patient_meal_entries",
-  observation: "patient_observations",
-  goal: "patient_goals",
-  challenge: "patient_challenges",
-  message: "patient_messages",
-  recipeAssignment: "patient_recipe_assignments",
-  note: "patient_notes",
-  document: "patient_documents",
-} as const;
-
-/** A check-in hangs from a goal, not from the file: one step more. */
-export type PatientRecordKind =
-  keyof typeof patientRecordCollections | "goalCheckIn";
-
-type FileRow = { id: Id; patientId: Id };
-
-const patientIdOfRecord = async (
-  kind: PatientRecordKind,
-  id: Id,
-): Promise<Id | null> => {
-  const db = getDatabase();
-  if (kind === "goalCheckIn") {
-    const checkIn = await db
-      .collection<{ id: Id; goalId: Id }>("patient_goal_check_ins")
-      .findById(id);
-    return checkIn ? patientIdOfRecord("goal", checkIn.goalId) : null;
-  }
-  const row = await db
-    .collection<FileRow>(patientRecordCollections[kind])
-    .findById(id);
-  return row?.patientId ?? null;
-};
-
-/** The file a row sits in, only when this practitioner holds it. */
+/** The file a row sits in, only when the actor may reach it. */
 export const patientOfRecord = async (
-  practitionerId: Id,
+  actor: Actor,
   kind: PatientRecordKind,
   id: Id,
+  mode: AccessMode = "read",
 ): Promise<Result<PatientProfile>> => {
-  const patientId = isValidId(id) ? await patientIdOfRecord(kind, id) : null;
-  return patientId
-    ? patientOf(practitionerId, patientId)
-    : err("not_found", "no such patient");
+  const patientId = await patientIdOfRecord(kind, id);
+  return patientId ? patientOf(actor, patientId, mode) : noSuchPatient();
 };
 
 export const getPatientByShareToken = async (
@@ -468,7 +463,12 @@ const careGatedFields = ["medications", "supplements"] as const;
 const CARE_CONSENT_REQUIRED =
   "the medications and the supplements need the care consent";
 
+/**
+ * A new file. An operator creates files for itself only. A patient creates no
+ * file: the sign-up creates it as the system.
+ */
 export const createPatient = async (
+  actor: Actor,
   input: NewPatientInput,
   db?: DatabaseClient,
 ): Promise<Result<PatientProfile>> => {
@@ -477,6 +477,12 @@ export const createPatient = async (
     return invalid(parsed.error.issues[0]);
   }
   const data = parsed.data;
+  if (
+    actor.kind === "patient" ||
+    (actor.kind === "operator" && data.practitionerId !== actor.id)
+  ) {
+    return err("not_permitted", "a practitioner creates files for itself only");
+  }
   // A new file holds no consent yet: the sign-up records them after the row.
   if (careGatedFields.some((field) => data[field])) {
     return err("not_permitted", CARE_CONSENT_REQUIRED);
@@ -548,7 +554,7 @@ const withoutEdits = (
   return kept;
 };
 
-export const updatePatient = async (
+const unscopedUpdatePatient = async (
   id: Id,
   input: PatientInput,
 ): Promise<Result<PatientProfile>> => {
@@ -633,7 +639,7 @@ const reasonSchema = z.string().trim().min(1, "a reason is required").max(500);
  * mandatory field (`ready`), the first saved recommendation (`to_validate`) and
  * the activation (`active`).
  */
-export const setFileStatus = async (
+const unscopedSetFileStatus = async (
   patientId: Id,
   next: FileStatus,
   actor: AuditActor | null,
@@ -720,7 +726,7 @@ export type PatientProfileEdited = {
  * It never moves `lastEditedAt`: that column means Morgane worked on this
  * patient and sorts her roster.
  */
-export const updatePatientProfileByPatient = async (
+const unscopedUpdatePatientProfileByPatient = async (
   id: Id,
   input: PatientProfileEdit,
 ): Promise<Result<PatientProfileEdited>> => {
@@ -849,7 +855,7 @@ export const recordPatientLinkWrote = async (id: Id): Promise<void> => {
 };
 
 /** Cuts off the old link — the recovery move when a share URL leaks. */
-export const regenerateShareToken = async (
+const unscopedRegenerateShareToken = async (
   id: Id,
 ): Promise<Result<PatientProfile>> => {
   if (!isValidId(id)) {
@@ -870,7 +876,7 @@ export const regenerateShareToken = async (
  * revise flow. `""` clears it back to `null`. Writing it counts as working on
  * the patient, so `lastEditedAt` moves like any operator edit.
  */
-export const setPatientNextConsultationPrep = async (
+const unscopedSetPatientNextConsultationPrep = async (
   id: Id,
   value: string,
   db?: DatabaseClient,
@@ -897,7 +903,7 @@ export const setPatientNextConsultationPrep = async (
  * their files stay behind. Without a configured store, a patient who has
  * files is refused for the same reason; one who has none is deleted as ever.
  */
-export const deletePatient = async (id: Id): Promise<Result<true>> => {
+const unscopedDeletePatient = async (id: Id): Promise<Result<true>> => {
   if (!isValidId(id)) {
     return err("not_found", "no such patient");
   }
@@ -927,3 +933,40 @@ export const deletePatient = async (id: Id): Promise<Result<true>> => {
   const removed = await patients().remove(id);
   return removed ? ok(true) : err("not_found", "no such patient");
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const getPatient = byPatient("read", unscopedGetPatient, noSuchPatient);
+export const updatePatient = byPatient(
+  "write",
+  unscopedUpdatePatient,
+  noSuchPatient,
+);
+export const setFileStatus = byPatient(
+  "write",
+  unscopedSetFileStatus,
+  noSuchPatient,
+);
+export const updatePatientProfileByPatient = byPatient(
+  "write",
+  unscopedUpdatePatientProfileByPatient,
+  noSuchPatient,
+);
+export const regenerateShareToken = byPatient(
+  "write",
+  unscopedRegenerateShareToken,
+  noSuchPatient,
+);
+export const setPatientNextConsultationPrep = byPatient(
+  "write",
+  unscopedSetPatientNextConsultationPrep,
+  noSuchPatient,
+);
+export const deletePatient = byPatient(
+  "write",
+  unscopedDeletePatient,
+  noSuchPatient,
+);

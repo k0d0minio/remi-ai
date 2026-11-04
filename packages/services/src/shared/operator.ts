@@ -5,24 +5,33 @@
  */
 
 /**
- * `owner` manages accounts as well as patients; `operator` manages patients
- * only. Two roles, not three — a third would need a screen it can actually be
- * granted from, and there is no such need yet.
+ * The two roles of D-27. `admin` is the REMI team: it manages the accounts, and
+ * it may open any patient file with a reason, read-only (story 3). The open is
+ * logged. `practitioner` reads and writes only the files it holds. The roles
+ * replace `owner` and `operator`. Migration 0035 renamed the stored values.
  *
  * Order matters: the array reads most-privileged first, and
  * `isAtLeast()` compares by index.
  */
-export const operatorRoles = ["owner", "operator"] as const;
+export const operatorRoles = ["admin", "practitioner"] as const;
 
 export type OperatorRoleName = (typeof operatorRoles)[number];
 
-/** Whether `role` carries at least the privilege of `required`. */
-export const isAtLeast = (role: OperatorRoleName, required: OperatorRoleName) =>
-  operatorRoles.indexOf(role) <= operatorRoles.indexOf(required);
+/**
+ * Whether `role` carries at least the privilege of `required`. A value outside
+ * the list carries no privilege: an unknown role is never read as the first one.
+ */
+export const isAtLeast = (
+  role: OperatorRoleName,
+  required: OperatorRoleName,
+) => {
+  const held = operatorRoles.indexOf(role);
+  return held !== -1 && held <= operatorRoles.indexOf(required);
+};
 
 /** The single answer to "may this account touch other accounts". */
 export const canManageOperators = (role: OperatorRoleName) =>
-  isAtLeast(role, "owner");
+  isAtLeast(role, "admin");
 
 /**
  * The two orders of the practitioner's patient list (story 5). The list keeps

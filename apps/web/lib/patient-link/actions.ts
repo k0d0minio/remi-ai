@@ -11,6 +11,7 @@ import {
   setChallengeReadyForNext,
   updatePatientProfileByPatient,
   type WeeklyAnswer,
+  patientActor,
 } from "@remi/services/server";
 import {
   cookingAffinities,
@@ -129,6 +130,7 @@ export const logMealAction = async (
     target: { type: "meal_entry" },
     write: async (patient) =>
       addMealEntry(
+        patientActor(patient.id),
         patient.id,
         {
           // The day the patient is in, not the day the server is in.
@@ -164,7 +166,7 @@ export const markMealEatenAction = async (
     // plain uuid that travels — a screenshot, a pasted link — and without this
     // check a patient posting someone else's id would write into their record.
     target: { type: "meal_entry", id, ownerOf: mealEntryOwner },
-    write: async () => markMealEntryEaten(id),
+    write: async (patient) => markMealEntryEaten(patientActor(patient.id), id),
   });
 
   return result.ok ? written : { error: asPatientError(result.error) };
@@ -212,10 +214,10 @@ export const tapChallengeAction = async (
     // A challenge id is a plain uuid that travels like a meal id does; naming
     // it makes the ownership check mandatory.
     target: { type: "patient_challenge", id, ownerOf: challengeOwner },
-    write: async () =>
+    write: async (patient) =>
       tap === "acquired"
-        ? setChallengeAcquired(id, set)
-        : setChallengeReadyForNext(id, set),
+        ? setChallengeAcquired(patientActor(patient.id), id, set)
+        : setChallengeReadyForNext(patientActor(patient.id), id, set),
   });
 
   if (result.ok) {
@@ -267,7 +269,8 @@ export const weeklyCheckInAction = async (
     action: "goal.checked_in",
     text: { bodies: answers.map((answer) => answer.note ?? "") },
     target: { type: "patient_goal_check_in" },
-    write: async (patient) => recordWeeklyCheckIn(patient.id, answers),
+    write: async (patient) =>
+      recordWeeklyCheckIn(patientActor(patient.id), patient.id, answers),
   });
 
   if (result.ok) {
@@ -302,7 +305,8 @@ export const sendMessageAction = async (
     action: "message.sent",
     text: { bodies: [body] },
     target: { type: "patient_message" },
-    write: async (patient) => sendPatientMessage(patient.id, body),
+    write: async (patient) =>
+      sendPatientMessage(patientActor(patient.id), patient.id, body),
   });
 
   return result.ok ? written : { error: asPatientError(result.error) };
@@ -369,7 +373,7 @@ export const saveProfileAction = async (
     },
     target: { type: "patient" },
     write: async (patient) =>
-      updatePatientProfileByPatient(patient.id, {
+      updatePatientProfileByPatient(patientActor(patient.id), patient.id, {
         dietaryRegime,
         allergies,
         intolerances,

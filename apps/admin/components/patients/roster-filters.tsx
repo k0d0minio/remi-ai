@@ -29,6 +29,8 @@ type Props = {
   status: PatientStatus | "all";
   /** The practitioner's remembered order, read from their operator row. */
   sort: PatientListSort;
+  /** An admin's list of every file (story 3). The filters keep it. */
+  all?: boolean;
 };
 
 /** Morgane's words for the two orders of story 5. */
@@ -50,8 +52,11 @@ const DEBOUNCE_MS = 250;
  * the address it has. The sort is not in the URL: the practitioner's operator
  * row remembers it (story 5).
  */
-const rosterHref = (q: string, status: string) => {
+const rosterHref = (q: string, status: string, all: boolean) => {
   const params = new URLSearchParams();
+  if (all) {
+    params.set("scope", "all");
+  }
   if (q.trim()) {
     params.set("q", q.trim());
   }
@@ -73,7 +78,7 @@ const rosterHref = (q: string, status: string) => {
  * has no intermediate states worth waiting through. The sort select writes the
  * practitioner's remembered order, and the action refreshes the list.
  */
-export const RosterFilters = ({ search, status, sort }: Props) => {
+export const RosterFilters = ({ search, status, sort, all = false }: Props) => {
   const router = useRouter();
   const [sorting, startSorting] = useTransition();
 
@@ -95,11 +100,11 @@ export const RosterFilters = ({ search, status, sort }: Props) => {
       return;
     }
     const timer = setTimeout(
-      () => router.push(rosterHref(query, status)),
+      () => router.push(rosterHref(query, status, all)),
       DEBOUNCE_MS,
     );
     return () => clearTimeout(timer);
-  }, [query, search, status, router]);
+  }, [query, search, status, all, router]);
 
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -123,7 +128,7 @@ export const RosterFilters = ({ search, status, sort }: Props) => {
 
       <Select
         value={status}
-        onValueChange={(value) => router.push(rosterHref(query, value))}
+        onValueChange={(value) => router.push(rosterHref(query, value, all))}
       >
         <SelectTrigger aria-label="Filtrer par statut" className="w-44">
           <SelectValue />
@@ -164,7 +169,7 @@ export const RosterFilters = ({ search, status, sort }: Props) => {
           size="sm"
           onClick={() => {
             setQuery("");
-            router.push("/patients");
+            router.push(rosterHref("", "all", all));
           }}
         >
           <X aria-hidden="true" />

@@ -6,14 +6,14 @@ import { setRetentionHoldAction } from "@/lib/patients/retention-hold";
 
 type Props = {
   patientId: string;
-  /** When an owner set the hold. Null: no hold. */
+  /** When an admin set the hold. Null: no hold. */
   heldAt: Date | null;
 };
 
 /**
  * The retention hold (`inactive-account-deletion`). REMI deletes an account
  * after twelve months without activity, after a notice. The hold stops both
- * on this file. The page renders it for an owner only.
+ * on this file. The page renders it for an admin only.
  */
 export const RetentionHold = ({ patientId, heldAt }: Props) => (
   <form

@@ -12,6 +12,7 @@ import {
   type AllergenSelection,
   type ProfileAnswerInput,
   type QuestionnaireInput,
+  patientActor,
 } from "@remi/services/server";
 import { allergenKinds, type Result } from "@remi/services/shared";
 import { currentPatient } from "@/lib/patient-auth/session";
@@ -87,7 +88,7 @@ const writeAnswer = async (
       return failed(code === "required" ? "required" : "invalid");
     }
     return fromService(
-      await savePatientProfileAnswers(patientId, {
+      await savePatientProfileAnswers(patientActor(patientId), patientId, {
         [field]: value,
       } as ProfileAnswerInput),
     );
@@ -96,7 +97,11 @@ const writeAnswer = async (
     const heightCm = heightOf(value);
     return typeof heightCm === "string"
       ? failed(heightCm)
-      : fromService(await savePatientProfileAnswers(patientId, { heightCm }));
+      : fromService(
+          await savePatientProfileAnswers(patientActor(patientId), patientId, {
+            heightCm,
+          }),
+        );
   }
   if (field === "weightKg" || field === "desiredWeightKg") {
     const kg = weightOf(value);
@@ -105,13 +110,17 @@ const writeAnswer = async (
     }
     return fromService(
       field === "weightKg"
-        ? await savePatientProfileAnswers(patientId, { weightKg: kg })
-        : await savePatientQuestionnaire(patientId, { desiredWeightKg: kg }),
+        ? await savePatientProfileAnswers(patientActor(patientId), patientId, {
+            weightKg: kg,
+          })
+        : await savePatientQuestionnaire(patientActor(patientId), patientId, {
+            desiredWeightKg: kg,
+          }),
     );
   }
   if (field === "medications" || field === "supplements") {
     return fromService(
-      await savePatientProfileAnswers(patientId, {
+      await savePatientProfileAnswers(patientActor(patientId), patientId, {
         [field]: value,
       } as ProfileAnswerInput),
     );
@@ -122,7 +131,7 @@ const writeAnswer = async (
       return failed("invalid");
     }
     return fromService(
-      await savePatientQuestionnaire(patientId, {
+      await savePatientQuestionnaire(patientActor(patientId), patientId, {
         celiacDisease: value === "true",
       }),
     );
@@ -132,30 +141,37 @@ const writeAnswer = async (
     field === "diet" && value !== "other"
       ? { diet: value as QuestionnaireInput["diet"], dietNote: null }
       : ({ [field]: value } as QuestionnaireInput);
-  return fromService(await savePatientQuestionnaire(patientId, input));
+  return fromService(
+    await savePatientQuestionnaire(patientActor(patientId), patientId, input),
+  );
 };
 
 /** The file's status and the missing fields after a write. */
 const settle = async (patientId: string): Promise<SaveResult> => {
-  const patient = await getPatient(patientId);
+  const patient = await getPatient(patientActor(patientId), patientId);
   if (!patient.ok) {
     return failed("unavailable");
   }
-  const status = await markReadyWhenComplete(patientId, {
-    kind: "patient",
-    id: patientId,
-    name: patient.data.pseudonym,
-  });
-  const missing = await missingQuestionnaireFields(patientId);
+  const status = await markReadyWhenComplete(
+    patientActor(patientId),
+    patientId,
+    {
+      kind: "patient",
+      id: patientId,
+      name: patient.data.pseudonym,
+    },
+  );
+  const missing = await missingQuestionnaireFields(
+    patientActor(patientId),
+    patientId,
+  );
   if (!status.ok || !missing.ok) {
     return failed("unavailable");
   }
   return { ok: true, status: status.data, missing: missing.data };
 };
 
-const isAnswerField = (
-  field: unknown,
-): field is AnswerField =>
+const isAnswerField = (field: unknown): field is AnswerField =>
   typeof field === "string" &&
   (answerFields as readonly string[]).includes(field);
 
@@ -235,7 +251,7 @@ export const saveAllergensAction = async (
   }
   const patientId = account.patientProfileId;
   const refused = fromService(
-    await setPatientAllergens(patientId, kind, parsed),
+    await setPatientAllergens(patientActor(patientId), patientId, kind, parsed),
   );
   return refused ?? settle(patientId);
 };

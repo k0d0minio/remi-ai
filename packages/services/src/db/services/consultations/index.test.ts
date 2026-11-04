@@ -7,6 +7,7 @@ import { listPatientNotes } from "../patient-notes";
 import { getPatientSummary } from "../patient-summaries";
 import { createPatient, getPatient } from "../patients";
 import { describeConsultation, recordConsultation } from "./index";
+import { systemActor } from "../../services/access";
 
 /**
  * A fresh patient and goal per test: these assert on what a save left behind,
@@ -31,20 +32,22 @@ beforeAll(() => {
 
 beforeEach(async () => {
   patientId = unwrapOk(
-    await createPatient({
+    await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Claire",
     }),
   ).id;
   goalId = unwrapOk(
-    await addPatientGoal(patientId, { title: "Dormir sans réveil" }),
+    await addPatientGoal(systemActor, patientId, {
+      title: "Dormir sans réveil",
+    }),
   ).id;
 });
 
 describe("recording a consultation", () => {
   it("writes the note, the check-ins and the three revised fields at once", async () => {
     const record = unwrapOk(
-      await recordConsultation(patientId, {
+      await recordConsultation(systemActor, patientId, {
         note: {
           occurredAt: "2026-09-17",
           title: "Deuxième consultation",
@@ -63,32 +66,32 @@ describe("recording a consultation", () => {
     expect(record.summaryChanged).toBe(true);
     expect(record.prepChanged).toBe(true);
 
-    expect(await listPatientNotes(patientId)).toHaveLength(1);
-    expect(await listGoalCheckIns(goalId)).toHaveLength(1);
-    expect((await getPatientInstruction(patientId))?.body).toBe(
+    expect(await listPatientNotes(systemActor, patientId)).toHaveLength(1);
+    expect(await listGoalCheckIns(systemActor, goalId)).toHaveLength(1);
+    expect((await getPatientInstruction(systemActor, patientId))?.body).toBe(
       "Une marche de vingt minutes après le dîner.",
     );
-    expect((await getPatientSummary(patientId))?.body).toBe(
+    expect((await getPatientSummary(systemActor, patientId))?.body).toBe(
       "Contexte : fatigue chronique depuis le printemps.",
     );
-    expect(unwrapOk(await getPatient(patientId)).nextConsultationPrep).toBe(
-      "Revoir le petit-déjeuner.",
-    );
+    expect(
+      unwrapOk(await getPatient(systemActor, patientId)).nextConsultationPrep,
+    ).toBe("Revoir le petit-déjeuner.");
   });
 
   it("dates each check-in with the consultation, not with today", async () => {
-    await recordConsultation(patientId, {
+    await recordConsultation(systemActor, patientId, {
       note: { occurredAt: "2026-09-10", body: "Séance de rattrapage." },
       checkIns: [{ goalId, measure: "6/10" }],
     });
 
-    const checkIns = await listGoalCheckIns(goalId);
+    const checkIns = await listGoalCheckIns(systemActor, goalId);
     expect(checkIns[0].checkedOn).toBe("2026-09-10");
   });
 
   it("skips a goal she left blank and reports only what changed", async () => {
     const record = unwrapOk(
-      await recordConsultation(patientId, {
+      await recordConsultation(systemActor, patientId, {
         note: { occurredAt: "2026-09-17", body: "Rien de neuf." },
         checkIns: [{ goalId, direction: "", measure: "", note: "" }],
         instruction: "",
@@ -101,19 +104,19 @@ describe("recording a consultation", () => {
     expect(record.instructionChanged).toBe(false);
     expect(record.summaryChanged).toBe(false);
     expect(record.prepChanged).toBe(false);
-    expect(await listGoalCheckIns(goalId)).toHaveLength(0);
+    expect(await listGoalCheckIns(systemActor, goalId)).toHaveLength(0);
     expect(describeConsultation(record)).toBe("note");
   });
 
   it("re-saving the same consigne and the same résumé changes nothing", async () => {
-    await recordConsultation(patientId, {
+    await recordConsultation(systemActor, patientId, {
       note: { occurredAt: "2026-09-01", body: "Première." },
       instruction: "Une marche après le dîner.",
       summary: "Fatigue chronique.",
     });
 
     const second = unwrapOk(
-      await recordConsultation(patientId, {
+      await recordConsultation(systemActor, patientId, {
         note: { occurredAt: "2026-09-17", body: "Deuxième." },
         instruction: "Une marche après le dîner.",
         summary: "Fatigue chronique.",
@@ -125,16 +128,16 @@ describe("recording a consultation", () => {
   });
 
   it("refuses a note with neither a title nor a body, and writes nothing", async () => {
-    const result = await recordConsultation(patientId, {
+    const result = await recordConsultation(systemActor, patientId, {
       note: { occurredAt: "2026-09-17" },
       checkIns: [{ goalId, measure: "7/10" }],
       instruction: "Une marche après le dîner.",
     });
 
     expect(result.ok).toBe(false);
-    expect(await listPatientNotes(patientId)).toHaveLength(0);
-    expect(await listGoalCheckIns(goalId)).toHaveLength(0);
-    expect(await getPatientInstruction(patientId)).toBeNull();
+    expect(await listPatientNotes(systemActor, patientId)).toHaveLength(0);
+    expect(await listGoalCheckIns(systemActor, goalId)).toHaveLength(0);
+    expect(await getPatientInstruction(systemActor, patientId)).toBeNull();
   });
 
   /**
@@ -142,7 +145,7 @@ describe("recording a consultation", () => {
    * fails, so a save that did not roll back would leave the note behind.
    */
   it("rolls the note back when a later write fails", async () => {
-    const result = await recordConsultation(patientId, {
+    const result = await recordConsultation(systemActor, patientId, {
       note: { occurredAt: "2026-09-17", body: "Le sommeil s'améliore." },
       checkIns: [
         { goalId, measure: "7/10" },
@@ -155,58 +158,60 @@ describe("recording a consultation", () => {
     if (!result.ok) {
       expect(result.error).toBe("not_found");
     }
-    expect(await listPatientNotes(patientId)).toHaveLength(0);
-    expect(await listGoalCheckIns(goalId)).toHaveLength(0);
-    expect(await getPatientInstruction(patientId)).toBeNull();
+    expect(await listPatientNotes(systemActor, patientId)).toHaveLength(0);
+    expect(await listGoalCheckIns(systemActor, goalId)).toHaveLength(0);
+    expect(await getPatientInstruction(systemActor, patientId)).toBeNull();
   });
 
   it("refuses a check-in on a goal that is not this patient's, and writes nothing", async () => {
     const otherPatient = unwrapOk(
-      await createPatient({
+      await createPatient(systemActor, {
         practitionerId: testPractitionerId,
         pseudonym: "Alix",
       }),
     );
     const otherGoal = unwrapOk(
-      await addPatientGoal(otherPatient.id, { title: "Bouger plus" }),
+      await addPatientGoal(systemActor, otherPatient.id, {
+        title: "Bouger plus",
+      }),
     );
 
-    const result = await recordConsultation(patientId, {
+    const result = await recordConsultation(systemActor, patientId, {
       note: { occurredAt: "2026-09-17", body: "Le sommeil s'améliore." },
       checkIns: [{ goalId: otherGoal.id, measure: "9/10" }],
     });
 
     expect(result.ok).toBe(false);
-    expect(await listPatientNotes(patientId)).toHaveLength(0);
-    expect(await listGoalCheckIns(otherGoal.id)).toHaveLength(0);
+    expect(await listPatientNotes(systemActor, patientId)).toHaveLength(0);
+    expect(await listGoalCheckIns(systemActor, otherGoal.id)).toHaveLength(0);
   });
 
   it("does not touch a field the form did not send", async () => {
-    await recordConsultation(patientId, {
+    await recordConsultation(systemActor, patientId, {
       note: { occurredAt: "2026-09-01", body: "Première." },
       instruction: "Une marche après le dîner.",
       summary: "Fatigue chronique.",
       nextConsultationPrep: "Revoir le petit-déjeuner.",
     });
 
-    await recordConsultation(patientId, {
+    await recordConsultation(systemActor, patientId, {
       note: { occurredAt: "2026-09-17", body: "Deuxième." },
     });
 
-    expect((await getPatientInstruction(patientId))?.body).toBe(
+    expect((await getPatientInstruction(systemActor, patientId))?.body).toBe(
       "Une marche après le dîner.",
     );
-    expect((await getPatientSummary(patientId))?.body).toBe(
+    expect((await getPatientSummary(systemActor, patientId))?.body).toBe(
       "Fatigue chronique.",
     );
-    expect(unwrapOk(await getPatient(patientId)).nextConsultationPrep).toBe(
-      "Revoir le petit-déjeuner.",
-    );
+    expect(
+      unwrapOk(await getPatient(systemActor, patientId)).nextConsultationPrep,
+    ).toBe("Revoir le petit-déjeuner.");
   });
 
   it("names every changed field in the audit detail", async () => {
     const record = unwrapOk(
-      await recordConsultation(patientId, {
+      await recordConsultation(systemActor, patientId, {
         note: { occurredAt: "2026-09-17", body: "Deuxième." },
         checkIns: [{ goalId, direction: "better" }],
         instruction: "Une marche après le dîner.",

@@ -21,6 +21,7 @@ import {
   startChallenge,
   updateChallenge,
 } from "./index";
+import { systemActor } from "../../services/access";
 
 /**
  * The memory client, wrapped so one test can make the next challenge insert
@@ -57,7 +58,7 @@ beforeAll(() => {
 
 /** A fresh patient per test, so no test inherits another's running challenge. */
 const newPatient = async (pseudonym: string): Promise<PatientProfile> => {
-  const created = await createPatient({
+  const created = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym,
   });
@@ -76,6 +77,7 @@ const start = async (
   closeCurrentWith?: "acquired" | "not_acquired" | "abandoned",
 ) => {
   const result = await startChallenge(
+    systemActor,
     patientId,
     { text, why: "", startedOn: today },
     closeCurrentWith,
@@ -89,14 +91,14 @@ const start = async (
 describe("starting a challenge", () => {
   it("opens one current challenge with its words and start date", async () => {
     const patient = await newPatient("Claire");
-    const result = await startChallenge(patient.id, {
+    const result = await startChallenge(systemActor, patient.id, {
       text: "Boire 1,5 L d'eau par jour",
       why: "Pour la digestion",
       startedOn: today,
     });
 
     expect(result.ok).toBe(true);
-    const current = await getCurrentChallenge(patient.id);
+    const current = await getCurrentChallenge(systemActor, patient.id);
     expect(current?.text).toBe("Boire 1,5 L d'eau par jour");
     expect(current?.why).toBe("Pour la digestion");
     expect(current?.startedOn).toBe(today);
@@ -106,7 +108,7 @@ describe("starting a challenge", () => {
 
   it("refuses a start date in the future", async () => {
     const patient = await newPatient("Inès");
-    const result = await startChallenge(patient.id, {
+    const result = await startChallenge(systemActor, patient.id, {
       text: "Manger plus lentement",
       why: "",
       startedOn: "2999-01-01",
@@ -114,12 +116,12 @@ describe("starting a challenge", () => {
 
     expect(result.ok).toBe(false);
     expect(!result.ok && result.error).toBe("invalid_input");
-    expect(await getCurrentChallenge(patient.id)).toBeNull();
+    expect(await getCurrentChallenge(systemActor, patient.id)).toBeNull();
   });
 
   it("refuses an empty challenge", async () => {
     const patient = await newPatient("Léa");
-    const result = await startChallenge(patient.id, {
+    const result = await startChallenge(systemActor, patient.id, {
       text: "   ",
       why: "",
       startedOn: today,
@@ -132,14 +134,14 @@ describe("starting a challenge", () => {
     const patient = await newPatient("Marc");
     await start(patient.id, "Boire 1,5 L d'eau par jour");
 
-    const second = await startChallenge(patient.id, {
+    const second = await startChallenge(systemActor, patient.id, {
       text: "Manger plus lentement",
       why: "",
       startedOn: today,
     });
 
     expect(!second.ok && second.error).toBe("conflict");
-    expect((await getCurrentChallenge(patient.id))?.text).toBe(
+    expect((await getCurrentChallenge(systemActor, patient.id))?.text).toBe(
       "Boire 1,5 L d'eau par jour",
     );
   });
@@ -153,10 +155,10 @@ describe("starting a challenge", () => {
     expect(next.closed?.id).toBe(first.created.id);
     expect(next.closed?.outcome).toBe("acquired");
     expect(next.closed?.closedOn).toBe(today);
-    expect((await getCurrentChallenge(patient.id))?.text).toBe(
+    expect((await getCurrentChallenge(systemActor, patient.id))?.text).toBe(
       "Manger plus lentement",
     );
-    const past = await listPastChallenges(patient.id);
+    const past = await listPastChallenges(systemActor, patient.id);
     expect(past.map((challenge) => challenge.text)).toEqual([
       "Boire 1,5 L d'eau par jour",
     ]);
@@ -169,17 +171,18 @@ describe("starting a challenge", () => {
     failNextChallengeInsert = true;
     await expect(
       startChallenge(
+        systemActor,
         patient.id,
         { text: "Manger plus lentement", why: "", startedOn: today },
         "not_acquired",
       ),
     ).rejects.toThrow("insert failed");
 
-    const current = await getCurrentChallenge(patient.id);
+    const current = await getCurrentChallenge(systemActor, patient.id);
     expect(current?.id).toBe(first.created.id);
     expect(current?.closedOn).toBeNull();
     expect(current?.outcome).toBeNull();
-    expect(await listPastChallenges(patient.id)).toEqual([]);
+    expect(await listPastChallenges(systemActor, patient.id)).toEqual([]);
   });
 });
 
@@ -188,7 +191,7 @@ describe("editing and closing", () => {
     const patient = await newPatient("Anna");
     const { created } = await start(patient.id, "Boire de l'eau");
 
-    const updated = await updateChallenge(created.id, {
+    const updated = await updateChallenge(systemActor, created.id, {
       text: "Boire 1,5 L d'eau par jour",
       why: "La fatigue de l'après-midi",
       startedOn: today,
@@ -202,11 +205,11 @@ describe("editing and closing", () => {
     const patient = await newPatient("Paul");
     const { created } = await start(patient.id, "Manger plus lentement");
 
-    const closed = await closeChallenge(created.id, "abandoned");
+    const closed = await closeChallenge(systemActor, created.id, "abandoned");
 
     expect(closed.ok && closed.data.outcome).toBe("abandoned");
-    expect(await getCurrentChallenge(patient.id)).toBeNull();
-    const [past] = await listPastChallenges(patient.id);
+    expect(await getCurrentChallenge(systemActor, patient.id)).toBeNull();
+    const [past] = await listPastChallenges(systemActor, patient.id);
     expect(past.outcome).toBe("abandoned");
     expect(past.closedOn).toBe(today);
   });
@@ -215,27 +218,33 @@ describe("editing and closing", () => {
     const patient = await newPatient("Nora");
     const { created } = await start(patient.id, "Manger plus lentement");
 
-    const closed = await closeChallenge(created.id, "maybe" as never);
+    const closed = await closeChallenge(
+      systemActor,
+      created.id,
+      "maybe" as never,
+    );
 
     expect(!closed.ok && closed.error).toBe("invalid_input");
-    expect((await getCurrentChallenge(patient.id))?.id).toBe(created.id);
+    expect((await getCurrentChallenge(systemActor, patient.id))?.id).toBe(
+      created.id,
+    );
   });
 
   it("freezes a closed challenge: no edit, no second close", async () => {
     const patient = await newPatient("Yves");
     const { created } = await start(patient.id, "Manger plus lentement");
-    await closeChallenge(created.id, "acquired");
+    await closeChallenge(systemActor, created.id, "acquired");
 
-    const edited = await updateChallenge(created.id, {
+    const edited = await updateChallenge(systemActor, created.id, {
       text: "Autre chose",
       why: "",
       startedOn: today,
     });
-    const reclosed = await closeChallenge(created.id, "abandoned");
+    const reclosed = await closeChallenge(systemActor, created.id, "abandoned");
 
     expect(!edited.ok && edited.error).toBe("not_found");
     expect(!reclosed.ok && reclosed.error).toBe("not_found");
-    const [past] = await listPastChallenges(patient.id);
+    const [past] = await listPastChallenges(systemActor, patient.id);
     expect(past.text).toBe("Manger plus lentement");
     expect(past.outcome).toBe("acquired");
   });
@@ -246,11 +255,15 @@ describe("the patient's two taps", () => {
     const patient = await newPatient("Iris");
     const { created } = await start(patient.id, "Boire 1,5 L d'eau par jour");
 
-    const tooEarly = await setChallengeReadyForNext(created.id, true);
+    const tooEarly = await setChallengeReadyForNext(
+      systemActor,
+      created.id,
+      true,
+    );
     expect(!tooEarly.ok && tooEarly.error).toBe("conflict");
 
-    await setChallengeAcquired(created.id, true);
-    const ready = await setChallengeReadyForNext(created.id, true);
+    await setChallengeAcquired(systemActor, created.id, true);
+    const ready = await setChallengeReadyForNext(systemActor, created.id, true);
 
     expect(ready.ok && ready.data.acquiredAt).not.toBeNull();
     expect(ready.ok && ready.data.readyForNextAt).not.toBeNull();
@@ -259,15 +272,19 @@ describe("the patient's two taps", () => {
   it("toggles, and clearing « acquis » clears « prêt(e) » with it", async () => {
     const patient = await newPatient("Tom");
     const { created } = await start(patient.id, "Boire 1,5 L d'eau par jour");
-    await setChallengeAcquired(created.id, true);
-    await setChallengeReadyForNext(created.id, true);
+    await setChallengeAcquired(systemActor, created.id, true);
+    await setChallengeReadyForNext(systemActor, created.id, true);
 
-    const unready = await setChallengeReadyForNext(created.id, false);
+    const unready = await setChallengeReadyForNext(
+      systemActor,
+      created.id,
+      false,
+    );
     expect(unready.ok && unready.data.readyForNextAt).toBeNull();
     expect(unready.ok && unready.data.acquiredAt).not.toBeNull();
 
-    await setChallengeReadyForNext(created.id, true);
-    const cleared = await setChallengeAcquired(created.id, false);
+    await setChallengeReadyForNext(systemActor, created.id, true);
+    const cleared = await setChallengeAcquired(systemActor, created.id, false);
     expect(cleared.ok && cleared.data.acquiredAt).toBeNull();
     expect(cleared.ok && cleared.data.readyForNextAt).toBeNull();
   });
@@ -276,8 +293,8 @@ describe("the patient's two taps", () => {
     const patient = await newPatient("Zoé");
     const { created } = await start(patient.id, "Boire 1,5 L d'eau par jour");
 
-    const first = await setChallengeAcquired(created.id, true);
-    const again = await setChallengeAcquired(created.id, true);
+    const first = await setChallengeAcquired(systemActor, created.id, true);
+    const again = await setChallengeAcquired(systemActor, created.id, true);
 
     expect(first.ok && again.ok).toBe(true);
     if (first.ok && again.ok) {
@@ -290,13 +307,13 @@ describe("the patient's two taps", () => {
   it("refuses a tap on a closed challenge, which keeps what the patient said", async () => {
     const patient = await newPatient("Eva");
     const { created } = await start(patient.id, "Boire 1,5 L d'eau par jour");
-    await setChallengeAcquired(created.id, true);
-    await closeChallenge(created.id, "acquired");
+    await setChallengeAcquired(systemActor, created.id, true);
+    await closeChallenge(systemActor, created.id, "acquired");
 
-    const tapped = await setChallengeAcquired(created.id, false);
+    const tapped = await setChallengeAcquired(systemActor, created.id, false);
 
     expect(!tapped.ok && tapped.error).toBe("not_found");
-    const [past] = await listPastChallenges(patient.id);
+    const [past] = await listPastChallenges(systemActor, patient.id);
     expect(past.acquiredAt).not.toBeNull();
   });
 
@@ -314,11 +331,13 @@ describe("the patient's two taps", () => {
         id: created.id,
         ownerOf: challengeOwner,
       },
-      write: async () => setChallengeAcquired(created.id, true),
+      write: async () => setChallengeAcquired(systemActor, created.id, true),
     });
 
     expect(!result.ok && result.error).toBe("not_found");
-    expect((await getCurrentChallenge(owner.id))?.acquiredAt).toBeNull();
+    expect(
+      (await getCurrentChallenge(systemActor, owner.id))?.acquiredAt,
+    ).toBeNull();
   });
 });
 
@@ -330,20 +349,20 @@ describe("the console's signals", () => {
     const closed = await newPatient("Vera");
 
     const a = await start(ready.id, "Boire 1,5 L d'eau par jour");
-    await setChallengeAcquired(a.created.id, true);
-    await setChallengeReadyForNext(a.created.id, true);
+    await setChallengeAcquired(systemActor, a.created.id, true);
+    await setChallengeReadyForNext(systemActor, a.created.id, true);
 
     const b = await start(acquired.id, "Manger plus lentement");
-    await setChallengeAcquired(b.created.id, true);
+    await setChallengeAcquired(systemActor, b.created.id, true);
 
     await start(quiet.id, "Tester deux nouveaux lunchs");
 
     const d = await start(closed.id, "Ajouter des protéines au petit-déjeuner");
-    await setChallengeAcquired(d.created.id, true);
-    await setChallengeReadyForNext(d.created.id, true);
+    await setChallengeAcquired(systemActor, d.created.id, true);
+    await setChallengeReadyForNext(systemActor, d.created.id, true);
     await start(closed.id, "Boire 1,5 L d'eau par jour", "acquired");
 
-    const signals = await listChallengeSignals();
+    const signals = await listChallengeSignals(systemActor);
 
     expect(signals.get(ready.id)).toBe("ready_for_next");
     expect(signals.get(acquired.id)).toBe("acquired");

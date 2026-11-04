@@ -14,7 +14,7 @@ import {
   ConsultationForm,
   type ConsultationGoal,
 } from "@/components/patients/consultation-form";
-import { requireOperator } from "@/lib/auth/session";
+import { requireActor } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 
 /** Reads the database on every hit — never prerendered. */
@@ -53,24 +53,24 @@ const protocolLinks = (id: string) =>
 const NewConsultation = async ({ params }: PageProps) => {
   ensureDatabase();
   const { id } = await params;
-  const operator = await requireOperator();
-  const result = await patientOf(operator.id, id);
+  const actor = await requireActor();
+  const result = await patientOf(actor, id, "write");
   if (!result.ok) {
     notFound();
   }
   const patient = result.data;
 
   const [goals, instruction, summary] = await Promise.all([
-    listPatientGoals(patient.id),
-    getPatientInstruction(patient.id),
-    getPatientSummary(patient.id),
+    listPatientGoals(actor, patient.id),
+    getPatientInstruction(actor, patient.id),
+    getPatientSummary(actor, patient.id),
   ]);
 
   // What she is moving from, one read per active goal — two or three of them.
   const withLastCheckIn: ConsultationGoal[] = await Promise.all(
     goals.map(async (goal) => ({
       goal,
-      lastCheckIn: (await listGoalCheckIns(goal.id))[0] ?? null,
+      lastCheckIn: (await listGoalCheckIns(actor, goal.id))[0] ?? null,
     })),
   );
 

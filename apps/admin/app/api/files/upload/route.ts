@@ -1,6 +1,6 @@
 import { answerUploadRequest, patientOf } from "@remi/services/server";
 import { isPatientFileKey } from "@remi/services/shared";
-import { getOperatorSession } from "@/lib/auth/session";
+import { actorOf, getOperatorSession } from "@/lib/auth/session";
 import { fileStoreReady } from "@/lib/files";
 
 /**
@@ -45,12 +45,14 @@ export const POST = async (request: Request): Promise<Response> => {
       { status: 503 },
     );
   }
+  const actor = await actorOf(operator);
   return answerUploadRequest(request, async (key, clientPayload) => {
     const patientId = patientIdOf(clientPayload);
     if (!patientId) {
       return false;
     }
-    const patient = await patientOf(operator.id, patientId);
+    // An upload writes into the file: the holder only, never an admin open.
+    const patient = await patientOf(actor, patientId, "write");
     return patient.ok && isPatientFileKey(key, patientId);
   });
 };

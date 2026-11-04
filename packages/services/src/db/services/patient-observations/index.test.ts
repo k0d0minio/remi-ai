@@ -12,6 +12,7 @@ import {
   listPatientObservations,
   updatePatientObservation,
 } from "./index";
+import { systemActor } from "../../services/access";
 
 let patientId: string;
 
@@ -21,7 +22,7 @@ beforeAll(() => {
 
 /** A fresh patient per test — the same isolation the service itself gives. */
 beforeEach(async () => {
-  const created = await createPatient({
+  const created = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym: "Claire",
   });
@@ -32,7 +33,10 @@ beforeEach(async () => {
 });
 
 const observe = async (body: string, observedOn: string) => {
-  const result = await addPatientObservation(patientId, { body, observedOn });
+  const result = await addPatientObservation(systemActor, patientId, {
+    body,
+    observedOn,
+  });
   if (!result.ok) {
     throw new Error(`expected an observation, got ${result.message}`);
   }
@@ -45,13 +49,15 @@ describe("patient observations", () => {
 
     expect(observation.body).toBe("Yaourts sucrés le matin");
     expect(observation.observedOn).toBe("2026-09-01");
-    expect(await listPatientObservations(patientId)).toHaveLength(1);
+    expect(await listPatientObservations(systemActor, patientId)).toHaveLength(
+      1,
+    );
   });
 
   it("requires a body and a valid date", async () => {
     expect(
       (
-        await addPatientObservation(patientId, {
+        await addPatientObservation(systemActor, patientId, {
           body: "",
           observedOn: "2026-09-01",
         })
@@ -59,7 +65,7 @@ describe("patient observations", () => {
     ).toBe(false);
     expect(
       (
-        await addPatientObservation(patientId, {
+        await addPatientObservation(systemActor, patientId, {
           body: "Quelque chose",
           observedOn: "hier",
         })
@@ -67,7 +73,7 @@ describe("patient observations", () => {
     ).toBe(false);
     expect(
       (
-        await addPatientObservation(patientId, {
+        await addPatientObservation(systemActor, patientId, {
           body: "x".repeat(1001),
           observedOn: "2026-09-01",
         })
@@ -76,7 +82,7 @@ describe("patient observations", () => {
   });
 
   it("refuses an observation for a patient that does not exist", async () => {
-    const result = await addPatientObservation("not-a-uuid", {
+    const result = await addPatientObservation(systemActor, "not-a-uuid", {
       body: "Quelque chose",
       observedOn: "2026-09-01",
     });
@@ -87,38 +93,48 @@ describe("patient observations", () => {
   it("edits, archives, restores and deletes", async () => {
     const observation = await observe("Première version", "2026-09-01");
 
-    const edited = await updatePatientObservation(observation.id, {
+    const edited = await updatePatientObservation(systemActor, observation.id, {
       body: "Deuxième version",
     });
     expect(edited.ok).toBe(true);
 
-    await archivePatientObservation(observation.id, true);
-    expect(await listPatientObservations(patientId)).toHaveLength(0);
-    expect(await listArchivedPatientObservations(patientId)).toHaveLength(1);
+    await archivePatientObservation(systemActor, observation.id, true);
+    expect(await listPatientObservations(systemActor, patientId)).toHaveLength(
+      0,
+    );
+    expect(
+      await listArchivedPatientObservations(systemActor, patientId),
+    ).toHaveLength(1);
 
-    await archivePatientObservation(observation.id, false);
-    expect(await listPatientObservations(patientId)).toHaveLength(1);
+    await archivePatientObservation(systemActor, observation.id, false);
+    expect(await listPatientObservations(systemActor, patientId)).toHaveLength(
+      1,
+    );
 
-    expect((await deletePatientObservation(observation.id)).ok).toBe(true);
-    expect((await deletePatientObservation(observation.id)).ok).toBe(false);
+    expect(
+      (await deletePatientObservation(systemActor, observation.id)).ok,
+    ).toBe(true);
+    expect(
+      (await deletePatientObservation(systemActor, observation.id)).ok,
+    ).toBe(false);
   });
 });
 
 describe("the learnings view", () => {
   it("merges per-entry learnings with standalone observations, newest first", async () => {
-    await addMealEntry(patientId, {
+    await addMealEntry(systemActor, patientId, {
       eatenOn: "2026-09-02",
       description: "Saumon",
       learning: "Aime le saumon",
     });
     await observe("Yaourts sucrés le matin", "2026-09-03");
-    await addMealEntry(patientId, {
+    await addMealEntry(systemActor, patientId, {
       eatenOn: "2026-08-31",
       description: "Pâtes",
       learning: "Portion de pâtes trop grande",
     });
 
-    const learnings = await listPatientLearnings(patientId);
+    const learnings = await listPatientLearnings(systemActor, patientId);
 
     expect(learnings.map((learning) => learning.body)).toEqual([
       "Yaourts sucrés le matin",
@@ -133,13 +149,13 @@ describe("the learnings view", () => {
   });
 
   it("carries the meal a per-entry learning came from", async () => {
-    await addMealEntry(patientId, {
+    await addMealEntry(systemActor, patientId, {
       eatenOn: "2026-09-02",
       description: "Saumon, riz complet",
       learning: "Aime le saumon",
     });
 
-    const [learning] = await listPatientLearnings(patientId);
+    const [learning] = await listPatientLearnings(systemActor, patientId);
     expect(learning.kind).toBe("meal");
     if (learning.kind !== "meal") {
       return;
@@ -148,16 +164,16 @@ describe("the learnings view", () => {
   });
 
   it("leaves out meals that carry no learning", async () => {
-    await addMealEntry(patientId, {
+    await addMealEntry(systemActor, patientId, {
       eatenOn: "2026-09-02",
       description: "Un plat sans remarque",
     });
 
-    expect(await listPatientLearnings(patientId)).toHaveLength(0);
+    expect(await listPatientLearnings(systemActor, patientId)).toHaveLength(0);
   });
 
   it("drops a learning when its entry is archived, and an archived observation", async () => {
-    const entry = await addMealEntry(patientId, {
+    const entry = await addMealEntry(systemActor, patientId, {
       eatenOn: "2026-09-02",
       description: "Saumon",
       learning: "Aime le saumon",
@@ -167,9 +183,9 @@ describe("the learnings view", () => {
       throw new Error("test entry not created");
     }
 
-    await archiveMealEntry(entry.data.id, true);
-    await archivePatientObservation(observation.id, true);
+    await archiveMealEntry(systemActor, entry.data.id, true);
+    await archivePatientObservation(systemActor, observation.id, true);
 
-    expect(await listPatientLearnings(patientId)).toHaveLength(0);
+    expect(await listPatientLearnings(systemActor, patientId)).toHaveLength(0);
   });
 });

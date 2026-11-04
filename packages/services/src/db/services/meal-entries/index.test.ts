@@ -15,6 +15,7 @@ import {
   mealEntryOwner,
   updateMealEntry,
 } from "./index";
+import { systemActor } from "../../services/access";
 
 let patientId: string;
 
@@ -31,7 +32,7 @@ beforeAll(() => {
  * way the service does.
  */
 beforeEach(async () => {
-  const created = await createPatient({
+  const created = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym: "Claire",
   });
@@ -51,8 +52,8 @@ const unwrapEntry = (
   return result.data;
 };
 
-const log = async (fields: Parameters<typeof addMealEntry>[1]) =>
-  unwrapEntry(await addMealEntry(patientId, fields));
+const log = async (fields: Parameters<typeof addMealEntry>[2]) =>
+  unwrapEntry(await addMealEntry(systemActor, patientId, fields));
 
 describe("meal entries", () => {
   it("records a meal with its slot, comment and learning", async () => {
@@ -80,11 +81,11 @@ describe("meal entries", () => {
     });
 
     expect(entry.slot).toBeNull();
-    expect(await listMealEntries(patientId)).toHaveLength(1);
+    expect(await listMealEntries(systemActor, patientId)).toHaveLength(1);
   });
 
   it("refuses a slot outside the vocabulary", async () => {
-    const result = await addMealEntry(patientId, {
+    const result = await addMealEntry(systemActor, patientId, {
       eatenOn: "2026-09-01",
       description: "Un plat",
       // Cast because the point of the test is the runtime guard, not the type.
@@ -97,7 +98,7 @@ describe("meal entries", () => {
   it("requires a description and a valid date", async () => {
     expect(
       (
-        await addMealEntry(patientId, {
+        await addMealEntry(systemActor, patientId, {
           eatenOn: "2026-09-01",
           description: "",
         })
@@ -105,7 +106,7 @@ describe("meal entries", () => {
     ).toBe(false);
     expect(
       (
-        await addMealEntry(patientId, {
+        await addMealEntry(systemActor, patientId, {
           eatenOn: "hier",
           description: "Un plat",
         })
@@ -114,7 +115,7 @@ describe("meal entries", () => {
   });
 
   it("refuses an entry for a patient that does not exist", async () => {
-    const result = await addMealEntry("not-a-uuid", {
+    const result = await addMealEntry(systemActor, "not-a-uuid", {
       eatenOn: "2026-09-01",
       description: "Un plat",
     });
@@ -128,7 +129,9 @@ describe("meal entries", () => {
     await log({ eatenOn: "2026-09-01", description: "Mardi" });
 
     expect(
-      (await listMealEntries(patientId)).map((entry) => entry.description),
+      (await listMealEntries(systemActor, patientId)).map(
+        (entry) => entry.description,
+      ),
     ).toEqual(["Mercredi", "Mardi", "Vendredi"]);
   });
 
@@ -140,14 +143,16 @@ describe("meal entries", () => {
 
     expect(entry.feedback).toBe("");
     expect(entry.feedbackWrittenAt).toBeNull();
-    expect(await listMealEntries(patientId)).toHaveLength(1);
-    expect(await countMealEntriesAwaitingFeedback(patientId)).toBe(1);
+    expect(await listMealEntries(systemActor, patientId)).toHaveLength(1);
+    expect(await countMealEntriesAwaitingFeedback(systemActor, patientId)).toBe(
+      1,
+    );
   });
 
   it("stamps feedback when it is first written and clears it when emptied", async () => {
     const entry = await log({ eatenOn: "2026-09-01", description: "Un plat" });
 
-    const answered = await updateMealEntry(entry.id, {
+    const answered = await updateMealEntry(systemActor, entry.id, {
       feedback: "Bien pour les légumes. Décale le dessert.",
     });
     expect(answered.ok).toBe(true);
@@ -155,26 +160,34 @@ describe("meal entries", () => {
       return;
     }
     expect(answered.data.feedbackWrittenAt).not.toBeNull();
-    expect(await countMealEntriesAwaitingFeedback(patientId)).toBe(0);
+    expect(await countMealEntriesAwaitingFeedback(systemActor, patientId)).toBe(
+      0,
+    );
 
-    const cleared = await updateMealEntry(entry.id, { feedback: "" });
+    const cleared = await updateMealEntry(systemActor, entry.id, {
+      feedback: "",
+    });
     expect(cleared.ok).toBe(true);
     if (!cleared.ok) {
       return;
     }
     expect(cleared.data.feedback).toBe("");
     expect(cleared.data.feedbackWrittenAt).toBeNull();
-    expect(await countMealEntriesAwaitingFeedback(patientId)).toBe(1);
+    expect(await countMealEntriesAwaitingFeedback(systemActor, patientId)).toBe(
+      1,
+    );
   });
 
   it("keeps the first-answered moment when feedback is edited", async () => {
     const entry = await log({ eatenOn: "2026-09-01", description: "Un plat" });
-    const first = await updateMealEntry(entry.id, { feedback: "Bien." });
+    const first = await updateMealEntry(systemActor, entry.id, {
+      feedback: "Bien.",
+    });
     if (!first.ok) {
       throw new Error("feedback not written");
     }
 
-    const edited = await updateMealEntry(entry.id, {
+    const edited = await updateMealEntry(systemActor, entry.id, {
       feedback: "Bien, et pense à l'eau.",
     });
     expect(edited.ok).toBe(true);
@@ -194,52 +207,75 @@ describe("meal entries", () => {
     });
 
     expect(entry.feedbackWrittenAt).not.toBeNull();
-    expect(await countMealEntriesAwaitingFeedback(patientId)).toBe(0);
+    expect(await countMealEntriesAwaitingFeedback(systemActor, patientId)).toBe(
+      0,
+    );
   });
 
   it("archives out of the journal and restores back into it", async () => {
     const entry = await log({ eatenOn: "2026-09-01", description: "Un plat" });
 
-    await archiveMealEntry(entry.id, true);
-    expect(await listMealEntries(patientId)).toHaveLength(0);
-    expect(await listArchivedMealEntries(patientId)).toHaveLength(1);
-    expect(await countMealEntriesAwaitingFeedback(patientId)).toBe(0);
+    await archiveMealEntry(systemActor, entry.id, true);
+    expect(await listMealEntries(systemActor, patientId)).toHaveLength(0);
+    expect(await listArchivedMealEntries(systemActor, patientId)).toHaveLength(
+      1,
+    );
+    expect(await countMealEntriesAwaitingFeedback(systemActor, patientId)).toBe(
+      0,
+    );
 
-    await archiveMealEntry(entry.id, false);
-    expect(await listMealEntries(patientId)).toHaveLength(1);
-    expect(await listArchivedMealEntries(patientId)).toHaveLength(0);
+    await archiveMealEntry(systemActor, entry.id, false);
+    expect(await listMealEntries(systemActor, patientId)).toHaveLength(1);
+    expect(await listArchivedMealEntries(systemActor, patientId)).toHaveLength(
+      0,
+    );
   });
 
   it("reads one entry back by id, and refuses an unknown one", async () => {
     const entry = await log({ eatenOn: "2026-09-01", description: "Un plat" });
 
-    expect((await getMealEntry(entry.id)).ok).toBe(true);
-    expect((await getMealEntry("not-a-uuid")).ok).toBe(false);
+    expect((await getMealEntry(systemActor, entry.id)).ok).toBe(true);
+    expect((await getMealEntry(systemActor, "not-a-uuid")).ok).toBe(false);
   });
 
   it("deletes permanently, and refuses an unknown id", async () => {
     const entry = await log({ eatenOn: "2026-09-01", description: "Un plat" });
 
-    expect((await deleteMealEntry(entry.id)).ok).toBe(true);
-    expect(await listMealEntries(patientId)).toHaveLength(0);
-    expect((await deleteMealEntry(entry.id)).ok).toBe(false);
+    expect((await deleteMealEntry(systemActor, entry.id)).ok).toBe(true);
+    expect(await listMealEntries(systemActor, patientId)).toHaveLength(0);
+    expect((await deleteMealEntry(systemActor, entry.id)).ok).toBe(false);
   });
 
   it("refuses text beyond the field limits", async () => {
     const entry = await log({ eatenOn: "2026-09-01", description: "Un plat" });
 
     expect(
-      (await updateMealEntry(entry.id, { description: "x".repeat(2001) })).ok,
+      (
+        await updateMealEntry(systemActor, entry.id, {
+          description: "x".repeat(2001),
+        })
+      ).ok,
     ).toBe(false);
     expect(
-      (await updateMealEntry(entry.id, { patientComment: "x".repeat(1001) }))
-        .ok,
+      (
+        await updateMealEntry(systemActor, entry.id, {
+          patientComment: "x".repeat(1001),
+        })
+      ).ok,
     ).toBe(false);
     expect(
-      (await updateMealEntry(entry.id, { feedback: "x".repeat(2001) })).ok,
+      (
+        await updateMealEntry(systemActor, entry.id, {
+          feedback: "x".repeat(2001),
+        })
+      ).ok,
     ).toBe(false);
     expect(
-      (await updateMealEntry(entry.id, { learning: "x".repeat(501) })).ok,
+      (
+        await updateMealEntry(systemActor, entry.id, {
+          learning: "x".repeat(501),
+        })
+      ).ok,
     ).toBe(false);
   });
   it("treats an entry with no stated intent as one already eaten", async () => {
@@ -262,7 +298,7 @@ describe("meal entries", () => {
   });
 
   it("refuses an intent outside the vocabulary", async () => {
-    const result = await addMealEntry(patientId, {
+    const result = await addMealEntry(systemActor, patientId, {
       eatenOn: "2026-09-01",
       description: "Un plat",
       // Cast because the point of the test is the runtime guard, not the type.
@@ -281,7 +317,7 @@ describe("meal entries", () => {
       intent: "planned",
     });
 
-    const flipped = await markMealEntryEaten(planned.id);
+    const flipped = await markMealEntryEaten(systemActor, planned.id);
 
     expect(flipped.ok).toBe(true);
     if (flipped.ok) {
@@ -299,9 +335,9 @@ describe("meal entries", () => {
       description: "Spaghetti sauce tomate",
       intent: "planned",
     });
-    expect((await markMealEntryEaten(planned.id)).ok).toBe(true);
+    expect((await markMealEntryEaten(systemActor, planned.id)).ok).toBe(true);
 
-    expect((await markMealEntryEaten(planned.id)).ok).toBe(false);
+    expect((await markMealEntryEaten(systemActor, planned.id)).ok).toBe(false);
   });
 
   it("refuses to flip an entry that was never planned, or that does not exist", async () => {
@@ -310,8 +346,10 @@ describe("meal entries", () => {
       description: "Un plat",
     });
 
-    expect((await markMealEntryEaten(eaten.id)).ok).toBe(false);
-    expect((await markMealEntryEaten("not-a-uuid")).ok).toBe(false);
+    expect((await markMealEntryEaten(systemActor, eaten.id)).ok).toBe(false);
+    expect((await markMealEntryEaten(systemActor, "not-a-uuid")).ok).toBe(
+      false,
+    );
   });
 
   it("does not let an ordinary edit move the intent", async () => {
@@ -323,7 +361,7 @@ describe("meal entries", () => {
 
     // No cast: `intent` is a legitimate `MealEntryInput` key — the point is
     // that this path strips it rather than refusing it.
-    const updated = await updateMealEntry(planned.id, {
+    const updated = await updateMealEntry(systemActor, planned.id, {
       description: "Spaghetti bolognaise",
       intent: "eaten",
     });

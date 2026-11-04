@@ -9,7 +9,7 @@ import { Badge, EmptyState, Typography } from "@remi/ui/server";
 import { ScrollText } from "lucide-react";
 import { AuditFilters } from "@/components/audit/audit-filters";
 import { actionIntents, actionLabels } from "@/components/audit/vocabulary";
-import { requireOperator } from "@/lib/auth/session";
+import { requireActor, requireOperator } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 
 export const metadata: Metadata = {
@@ -33,19 +33,22 @@ const asAction = (value: string | undefined): AuditActionName | "all" =>
  * Every operator action, newest first. The rest of the console shows what the
  * state is; this shows how it got there.
  *
- * Readable by any operator, not just owners. A trail only one person can read
- * is a trail that answers to nobody — and everything in it is an action that
- * an operator either took or could have taken.
+ * Readable by any operator, not just admins. A trail only one person can read
+ * is a trail that answers to nobody. An admin reads every event. A
+ * practitioner reads their own acts and the events on their own files (story
+ * 3): the labels of another practitioner's events name that practitioner's
+ * patients. The filter « accès admin » lists each admin open with its reason.
  */
 const Audit = async ({ searchParams }: { searchParams: SearchParams }) => {
   const operator = await requireOperator();
+  const actor = await requireActor();
   ensureDatabase();
 
   const params = await searchParams;
   const action = asAction(first(params.action));
   const mine = first(params.mine) === "1";
 
-  const events = await listAuditEvents({
+  const events = await listAuditEvents(actor, {
     action,
     actorId: mine ? operator.id : undefined,
     limit: 200,

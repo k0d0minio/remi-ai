@@ -23,8 +23,10 @@ const unwrapOk = <T>(result: { ok: true; data: T } | { ok: false }): T => {
   return result.data;
 };
 
-const invite = (email: string, role: "owner" | "operator" = "operator") =>
-  createInvitation({ email, name: "Invitee", role }, "morgane@example.com");
+const invite = (
+  email: string,
+  role: "admin" | "practitioner" = "practitioner",
+) => createInvitation({ email, name: "Invitee", role }, "morgane@example.com");
 
 describe("operator invitations", () => {
   it("issues a token that is not what gets stored", async () => {
@@ -51,7 +53,7 @@ describe("operator invitations", () => {
     expect(
       (
         await createInvitation(
-          { email: "not-an-email", name: "", role: "operator" },
+          { email: "not-an-email", name: "", role: "practitioner" },
           "morgane@example.com",
         )
       ).ok,
@@ -72,7 +74,7 @@ describe("operator invitations", () => {
   });
 
   it("turns an invitation into an account with the invited role, not a chosen one", async () => {
-    const issued = unwrapOk(await invite("owner-to-be@example.com", "owner"));
+    const issued = unwrapOk(await invite("owner-to-be@example.com", "admin"));
     const operator = unwrapOk(
       await acceptInvitation(issued.token, {
         name: "New Owner",
@@ -81,7 +83,7 @@ describe("operator invitations", () => {
     );
     expect(operator.email).toBe("owner-to-be@example.com");
     expect(operator.name).toBe("New Owner");
-    expect(operator.role).toBe("owner");
+    expect(operator.role).toBe("admin");
     expect(
       (
         await verifyOperator(

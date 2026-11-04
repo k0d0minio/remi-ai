@@ -15,6 +15,7 @@ import {
   signInPatient,
 } from "./patient-sign-in";
 import { registerAuthProvider, type AuthIdentity } from "./provider";
+import { systemActor } from "../db/services/access";
 
 /** The identity store of the fake adapter: e-mail → password and user. */
 const users = new Map<string, { password: string; identity: AuthIdentity }>();
@@ -93,7 +94,7 @@ beforeAll(async () => {
     },
   });
 
-  const patient = await createPatient({
+  const patient = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym: "Patient ABCD",
   });
@@ -129,7 +130,7 @@ beforeEach(() => {
 });
 
 const countOf = async (action: AuditAction) =>
-  (await listAuditEvents({ action })).length;
+  (await listAuditEvents(systemActor, { action })).length;
 
 describe("the landing", () => {
   it("is the questionnaire before activation and the home after it", () => {
@@ -150,7 +151,9 @@ describe("the password sign-in", () => {
       expect(result.data.account.id).toBe(claire.id);
       expect(result.data.landing).toBe("questionnaire");
     }
-    const events = await listAuditEvents({ action: "patient.signed_in" });
+    const events = await listAuditEvents(systemActor, {
+      action: "patient.signed_in",
+    });
     expect(events).toHaveLength(before + 1);
     expect(events).toContainEqual(
       expect.objectContaining({
@@ -263,7 +266,7 @@ describe("the reset request", () => {
     });
     expect(result.ok).toBe(true);
     expect(resetRequests).toEqual(["claire@example.be"]);
-    const events = await listAuditEvents({
+    const events = await listAuditEvents(systemActor, {
       action: "patient.password_reset_requested",
     });
     expect(events).toHaveLength(before + 1);
@@ -310,11 +313,15 @@ describe("the new password", () => {
       ok: true,
       data: { signedIn: true, landing: "questionnaire" },
     });
-    const resets = await listAuditEvents({ action: "patient.password_reset" });
+    const resets = await listAuditEvents(systemActor, {
+      action: "patient.password_reset",
+    });
     expect(resets).toContainEqual(
       expect.objectContaining({ actorId: claireId }),
     );
-    const signIns = await listAuditEvents({ action: "patient.signed_in" });
+    const signIns = await listAuditEvents(systemActor, {
+      action: "patient.signed_in",
+    });
     expect(signIns).toContainEqual(
       expect.objectContaining({ detail: "password_reset" }),
     );
@@ -345,7 +352,9 @@ describe("the new password", () => {
     });
     expect(result).toEqual({ ok: true, data: { signedIn: false } });
     expect(users.get("claire@example.be")?.password).toBe("new horse staple");
-    const resets = await listAuditEvents({ action: "patient.password_reset" });
+    const resets = await listAuditEvents(systemActor, {
+      action: "patient.password_reset",
+    });
     expect(resets).toContainEqual(
       expect.objectContaining({
         actorId: null,

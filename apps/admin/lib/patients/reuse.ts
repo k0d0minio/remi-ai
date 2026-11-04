@@ -13,6 +13,7 @@ import {
   renameProtocolTemplate,
   saveProtocolTemplate,
   setProtocolTemplateShared,
+  type Actor,
 } from "@remi/services/server";
 import {
   blankPersonalFields,
@@ -25,7 +26,7 @@ import {
   type ProtocolTemplateKindName,
 } from "@remi/services/shared";
 import { audit } from "@/lib/audit";
-import { requireOperator } from "@/lib/auth/session";
+import { requireActor, requireOperator } from "@/lib/auth/session";
 
 /**
  * Reuse and duplicate — filling a section's grid from something that already
@@ -93,13 +94,13 @@ const asTemplateKind = (value: string): ProtocolTemplateKindName | null =>
 export const listCopySourcesAction = async (
   excludePatientId: string,
 ): Promise<readonly CopySource[]> => {
-  const operator = await requireOperator();
-  const patients = await patientsOf(operator.id);
+  const actor = await requireActor();
+  const patients = await patientsOf(actor);
   const others = patients.filter((patient) => patient.id !== excludePatientId);
 
   const sources = await Promise.all(
     others.map(async (patient) => {
-      const notes = await listPatientNotes(patient.id);
+      const notes = await listPatientNotes(actor, patient.id);
       const last = notes.reduce<string | null>(
         (latest, note) =>
           latest === null || note.occurredAt.localeCompare(latest) > 0
@@ -140,33 +141,38 @@ export const readCopyRowsAction = async (
   sourcePatientId: string,
   kind: string,
 ): Promise<CopyRowsResult> => {
-  const operator = await requireOperator();
+  const actor = await requireActor();
   const copyKind = asCopyKind(kind);
   if (!copyKind) {
     return { error: "Type de lignes inconnu.", rows: [] };
   }
-  // Another practitioner's patient reads as gone (D-27).
-  const source = await patientOf(operator.id, sourcePatientId);
+  // Another practitioner's patient reads as gone (D-27). An admin's open of
+  // another file reads only: its rows never cross into a file (story 3).
+  const source = await patientOf(actor, sourcePatientId, "write");
   if (!source.ok) {
     return { error: "Ce patient n'existe plus.", rows: [] };
   }
 
-  return { error: null, rows: await copyEntries(sourcePatientId, copyKind) };
+  return {
+    error: null,
+    rows: await copyEntries(actor, sourcePatientId, copyKind),
+  };
 };
 
 const copyEntries = async (
+  actor: Actor,
   patientId: string,
   kind: ProtocolCopyKindName,
 ): Promise<readonly CopyRow[]> => {
   if (kind === "recipe") {
     // A recipe's id is the library row's, not the assignment's: it is what the
     // assign form ticks, and what the copy actually carries across.
-    return (await assignableRecipes(patientId)).map((entry) => ({
+    return (await assignableRecipes(actor, patientId)).map((entry) => ({
       id: entry.recipe.id,
       label: entry.recipe.title,
     }));
   }
-  return (await sourceRows(patientId, kind)).map((entry) => ({
+  return (await sourceRows(actor, patientId, kind)).map((entry) => ({
     id: entry.id,
     label: labelFor(kind, entry.row),
   }));
@@ -190,8 +196,8 @@ const labelFor = (kind: ProtocolTemplateKindName, row: ProtocolRow): string => {
  * offering it here would tick a row the form has no checkbox for — a copy that
  * silently does nothing.
  */
-const assignableRecipes = async (patientId: string) =>
-  (await listPatientRecipes(patientId)).filter(
+const assignableRecipes = async (actor: Actor, patientId: string) =>
+  (await listPatientRecipes(actor, patientId)).filter(
     (entry) => entry.recipe.archivedAt === null,
   );
 
@@ -209,6 +215,7 @@ export const takeCopyRowsAction = async (
   formData: FormData,
 ): Promise<TakenRows> => {
   const operator = await requireOperator();
+  const actor = await requireActor();
   const empty = { rows: [], recipeIds: [] };
 
   const kind = asCopyKind(String(formData.get("kind") ?? ""));
@@ -226,34 +233,41 @@ export const takeCopyRowsAction = async (
     return { error: "Aucune ligne sélectionnée.", ...empty };
   }
 
-  const source = await patientOf(operator.id, sourcePatientId);
+  const source = await patientOf(actor, sourcePatientId, "write");
   if (!source.ok) {
     return { error: "Ce patient n'existe plus.", ...empty };
   }
-  if (!(await patientOf(operator.id, targetPatientId)).ok) {
+  if (!(await patientOf(actor, targetPatientId, "write")).ok) {
     return { error: "Ce patient n'existe plus.", ...empty };
   }
 
   const taken =
     kind === "recipe"
-      ? await takeRecipes(sourcePatientId, chosen)
-      : await takeProtocolRows(sourcePatientId, kind, chosen);
+      ? await takeRecipes(actor, sourcePatientId, chosen)
+      : await takeProtocolRows(actor, sourcePatientId, kind, chosen);
 
   const count = taken.rows.length + taken.recipeIds.length;
   if (count === 0) {
     return { error: "Ces lignes ne sont plus disponibles.", ...empty };
   }
 
-  await recordedCopy(operator, source.data.pseudonym, targetPatientId, count);
+  await recordedCopy(
+    operator,
+    actor,
+    source.data.pseudonym,
+    targetPatientId,
+    count,
+  );
   return { error: null, ...taken };
 };
 
 const takeProtocolRows = async (
+  actor: Actor,
   sourcePatientId: string,
   kind: ProtocolTemplateKindName,
   chosen: readonly string[],
 ): Promise<{ rows: ProtocolRow[]; recipeIds: string[] }> => {
-  const stored = await sourceRows(sourcePatientId, kind);
+  const stored = await sourceRows(actor, sourcePatientId, kind);
   const byId = new Map(stored.map((entry) => [entry.id, entry.row]));
   const rows = chosen
     .map((id) => byId.get(id))
@@ -266,17 +280,18 @@ const takeProtocolRows = async (
 type SourceRow = { id: string; row: ProtocolRow };
 
 const sourceRows = async (
+  actor: Actor,
   patientId: string,
   kind: ProtocolTemplateKindName,
 ): Promise<readonly SourceRow[]> => {
   if (kind === "recommendation") {
-    return (await listPatientRecommendations(patientId)).map((row) => ({
+    return (await listPatientRecommendations(actor, patientId)).map((row) => ({
       id: row.id,
       row: { category: row.category, title: row.title, detail: row.detail },
     }));
   }
   if (kind === "supplement") {
-    return (await listPatientSupplements(patientId)).map((row) => ({
+    return (await listPatientSupplements(actor, patientId)).map((row) => ({
       id: row.id,
       row: {
         name: row.name,
@@ -286,7 +301,7 @@ const sourceRows = async (
       },
     }));
   }
-  return (await listPantryEssentials(patientId)).map((row) => ({
+  return (await listPantryEssentials(actor, patientId)).map((row) => ({
     id: row.id,
     row: { item: row.item, why: row.why },
   }));
@@ -299,10 +314,11 @@ const sourceRows = async (
  * note and today, which is the criterion.
  */
 const takeRecipes = async (
+  actor: Actor,
   sourcePatientId: string,
   chosen: readonly string[],
 ): Promise<{ rows: ProtocolRow[]; recipeIds: string[] }> => {
-  const given = await assignableRecipes(sourcePatientId);
+  const given = await assignableRecipes(actor, sourcePatientId);
   const recipeIds = chosen.filter((id) =>
     given.some((entry) => entry.recipe.id === id),
   );
@@ -321,11 +337,12 @@ const takeRecipes = async (
  */
 const recordedCopy = async (
   operator: Awaited<ReturnType<typeof requireOperator>>,
+  actor: Actor,
   sourcePseudonym: string,
   targetPatientId: string,
   count: number,
 ) => {
-  const target = await patientOf(operator.id, targetPatientId);
+  const target = await patientOf(actor, targetPatientId);
   await audit(operator, "protocol.copied_from_patient", {
     type: "patient",
     id: targetPatientId,

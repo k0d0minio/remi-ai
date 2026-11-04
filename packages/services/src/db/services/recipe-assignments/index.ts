@@ -14,6 +14,7 @@ import {
   recipeFields,
   type RecipeInput,
 } from "../recipes";
+import { byPatient, byRecord, noSuchPatient, systemActor } from "../access";
 
 /**
  * Recipes given to a patient — the personal half of § I, and the weekly record.
@@ -117,7 +118,7 @@ const byGiving = (a: RecipeAssignment, b: RecipeAssignment) =>
   a.createdAt.getTime() - b.createdAt.getTime();
 
 /** What the patient currently holds — newest giving first. */
-export const listPatientRecipes = async (
+const unscopedListPatientRecipes = async (
   patientId: Id,
 ): Promise<readonly AssignedRecipe[]> =>
   withRecipes(
@@ -127,7 +128,7 @@ export const listPatientRecipes = async (
   );
 
 /** What rotated out, newest archive first — the weeks before this one. */
-export const listArchivedPatientRecipes = async (
+const unscopedListArchivedPatientRecipes = async (
   patientId: Id,
 ): Promise<readonly AssignedRecipe[]> =>
   withRecipes(
@@ -149,7 +150,7 @@ export const listArchivedPatientRecipes = async (
  * All-or-nothing on purpose: a batch that half-lands leaves her to work out
  * which half, which is worse than a refusal naming the recipe at fault.
  */
-export const assignRecipes = async (
+const unscopedAssignRecipes = async (
   patientId: Id,
   recipeIds: readonly Id[],
   input: AssignmentInput,
@@ -172,7 +173,7 @@ export const assignRecipes = async (
   }
   // Both sides are checked before the insert rather than after the FK
   // violation: a constraint error is not something a form can render.
-  if (!(await getPatient(patientId)).ok) {
+  if (!(await getPatient(systemActor, patientId)).ok) {
     return err("not_found", "no such patient");
   }
 
@@ -232,7 +233,7 @@ export type GivenRecipe = {
  * The recipe still lands in the shared library: this is a faster way in, not a
  * private copy per patient.
  */
-export const createAndAssignRecipe = async (
+const unscopedCreateAndAssignRecipe = async (
   patientId: Id,
   recipe: RecipeInput,
   input: AssignmentInput,
@@ -250,7 +251,7 @@ export const createAndAssignRecipe = async (
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
   }
-  if (!(await getPatient(patientId)).ok) {
+  if (!(await getPatient(systemActor, patientId)).ok) {
     return err("not_found", "no such patient");
   }
 
@@ -284,7 +285,7 @@ export const createAndAssignRecipe = async (
  * replacing one with the version she just adapted. The archived row stays as
  * the record of what that person held before.
  */
-export const duplicateAndAssignRecipe = async (
+const unscopedDuplicateAndAssignRecipe = async (
   patientId: Id,
   recipeId: Id,
   /** The title and body as she edited them before saving; empty means as-is. */
@@ -301,7 +302,7 @@ export const duplicateAndAssignRecipe = async (
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
   }
-  if (!(await getPatient(patientId)).ok) {
+  if (!(await getPatient(systemActor, patientId)).ok) {
     return err("not_found", "no such patient");
   }
   if (!(await library().findById(recipeId))) {
@@ -340,7 +341,7 @@ export const duplicateAndAssignRecipe = async (
 };
 
 /** The note and the date — the recipe itself is the library's to change. */
-export const updateRecipeAssignment = async (
+const unscopedUpdateRecipeAssignment = async (
   id: Id,
   input: AssignmentInput,
 ): Promise<Result<RecipeAssignment>> => {
@@ -363,7 +364,7 @@ export const updateRecipeAssignment = async (
  * The weekly refresh: what rotates out is archived, not deleted, so "what did
  * she give in September" is answered by rows rather than by memory.
  */
-export const archiveRecipeAssignment = async (
+const unscopedArchiveRecipeAssignment = async (
   id: Id,
   archived: boolean,
 ): Promise<Result<RecipeAssignment>> => {
@@ -384,7 +385,9 @@ export const archiveRecipeAssignment = async (
  * The permanent one, for the assignment that should never have been written —
  * the wrong patient, caught immediately. Archiving is the everyday move.
  */
-export const removeRecipeAssignment = async (id: Id): Promise<Result<true>> => {
+const unscopedRemoveRecipeAssignment = async (
+  id: Id,
+): Promise<Result<true>> => {
   if (!uuidSchema.safeParse(id).success) {
     return err("not_found", "no such assignment");
   }
@@ -398,3 +401,52 @@ export const removeRecipeAssignment = async (id: Id): Promise<Result<true>> => {
   }
   return ok(true);
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const listPatientRecipes = byPatient(
+  "read",
+  unscopedListPatientRecipes,
+  () => [],
+);
+export const listArchivedPatientRecipes = byPatient(
+  "read",
+  unscopedListArchivedPatientRecipes,
+  () => [],
+);
+export const assignRecipes = byPatient(
+  "write",
+  unscopedAssignRecipes,
+  noSuchPatient,
+);
+export const createAndAssignRecipe = byPatient(
+  "write",
+  unscopedCreateAndAssignRecipe,
+  noSuchPatient,
+);
+export const duplicateAndAssignRecipe = byPatient(
+  "write",
+  unscopedDuplicateAndAssignRecipe,
+  noSuchPatient,
+);
+export const updateRecipeAssignment = byRecord(
+  "recipeAssignment",
+  "write",
+  unscopedUpdateRecipeAssignment,
+  noSuchPatient,
+);
+export const archiveRecipeAssignment = byRecord(
+  "recipeAssignment",
+  "write",
+  unscopedArchiveRecipeAssignment,
+  noSuchPatient,
+);
+export const removeRecipeAssignment = byRecord(
+  "recipeAssignment",
+  "write",
+  unscopedRemoveRecipeAssignment,
+  noSuchPatient,
+);

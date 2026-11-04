@@ -3,6 +3,7 @@ import { registerDatabase } from "../../client";
 import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { createPatient, getPatient, getPatientByShareToken } from "../patients";
 import { getPatientSummary, setPatientSummary } from "./index";
+import { systemActor } from "../../services/access";
 
 let patientId: string;
 let shareToken: string;
@@ -15,7 +16,7 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 5));
 
 beforeAll(async () => {
   registerDatabase(createMemoryDatabase());
-  const created = await createPatient({
+  const created = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym: "Claire",
   });
@@ -28,17 +29,18 @@ beforeAll(async () => {
 
 /** The single row per patient, read straight off the collection. */
 const rowCount = async (): Promise<number> => {
-  const one = await getPatientSummary(patientId);
+  const one = await getPatientSummary(systemActor, patientId);
   return one ? 1 : 0;
 };
 
 describe("the living summary", () => {
   it("starts absent, and no absence is an error", async () => {
-    expect(await getPatientSummary(patientId)).toBeNull();
+    expect(await getPatientSummary(systemActor, patientId)).toBeNull();
   });
 
   it("inserts the first body written", async () => {
     const result = await setPatientSummary(
+      systemActor,
       patientId,
       "Contexte : fatigue chronique. Vigilance : fer bas. Va bien : sommeil.",
     );
@@ -50,14 +52,15 @@ describe("the living summary", () => {
   });
 
   it("updates in place rather than adding a second row", async () => {
-    const first = await getPatientSummary(patientId);
+    const first = await getPatientSummary(systemActor, patientId);
     const second = await setPatientSummary(
+      systemActor,
       patientId,
       "Révisé : l'énergie remonte, le fer est corrigé.",
     );
     expect(second.ok).toBe(true);
 
-    const active = await getPatientSummary(patientId);
+    const active = await getPatientSummary(systemActor, patientId);
     expect(active?.body).toBe(
       "Révisé : l'énergie remonte, le fer est corrigé.",
     );
@@ -66,11 +69,11 @@ describe("the living summary", () => {
   });
 
   it("treats re-saving the same words as a no-op, not a revision", async () => {
-    const before = await getPatientSummary(patientId);
+    const before = await getPatientSummary(systemActor, patientId);
     if (!before) {
       throw new Error("expected a summary");
     }
-    const again = await setPatientSummary(patientId, before.body);
+    const again = await setPatientSummary(systemActor, patientId, before.body);
     expect(again.ok).toBe(true);
     if (again.ok) {
       expect(again.data?.id).toBe(before.id);
@@ -80,17 +83,17 @@ describe("the living summary", () => {
   });
 
   it("clears to none when saved empty, keeping no blank row", async () => {
-    const cleared = await setPatientSummary(patientId, "   ");
+    const cleared = await setPatientSummary(systemActor, patientId, "   ");
     expect(cleared.ok).toBe(true);
     if (cleared.ok) {
       expect(cleared.data).toBeNull();
     }
-    expect(await getPatientSummary(patientId)).toBeNull();
+    expect(await getPatientSummary(systemActor, patientId)).toBeNull();
     expect(await rowCount()).toBe(0);
   });
 
   it("treats clearing a patient who has none as a no-op", async () => {
-    const cleared = await setPatientSummary(patientId, "");
+    const cleared = await setPatientSummary(systemActor, patientId, "");
     expect(cleared.ok).toBe(true);
     if (cleared.ok) {
       expect(cleared.data).toBeNull();
@@ -98,10 +101,10 @@ describe("the living summary", () => {
   });
 
   it("moves the roster's last-edited stamp on a real write", async () => {
-    const before = await getPatient(patientId);
+    const before = await getPatient(systemActor, patientId);
     await tick();
-    await setPatientSummary(patientId, "Nouveau point de départ.");
-    const after = await getPatient(patientId);
+    await setPatientSummary(systemActor, patientId, "Nouveau point de départ.");
+    const after = await getPatient(systemActor, patientId);
     if (!before.ok || !after.ok) {
       throw new Error("patient not found");
     }
@@ -111,12 +114,18 @@ describe("the living summary", () => {
   });
 
   it("treats malformed ids as empty or not found", async () => {
-    expect(await getPatientSummary("not-a-uuid")).toBeNull();
-    expect((await setPatientSummary("not-a-uuid", "x")).ok).toBe(false);
+    expect(await getPatientSummary(systemActor, "not-a-uuid")).toBeNull();
+    expect((await setPatientSummary(systemActor, "not-a-uuid", "x")).ok).toBe(
+      false,
+    );
   });
 
   it("never reaches the patient link", async () => {
-    await setPatientSummary(patientId, "Résumé vivant, écrit pour elle.");
+    await setPatientSummary(
+      systemActor,
+      patientId,
+      "Résumé vivant, écrit pour elle.",
+    );
     const patient = await getPatientByShareToken(shareToken);
     if (!patient.ok) {
       throw new Error("patient not found by share token");
@@ -124,6 +133,6 @@ describe("the living summary", () => {
     // The link's read is `patient_profiles` alone: no summary travels with the
     // profile. § J's render at the link is the patient-surface epic's.
     expect(Object.keys(patient.data)).not.toContain("summary");
-    expect(await getPatientSummary(patientId)).not.toBeNull();
+    expect(await getPatientSummary(systemActor, patientId)).not.toBeNull();
   });
 });

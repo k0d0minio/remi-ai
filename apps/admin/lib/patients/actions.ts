@@ -88,6 +88,7 @@ import {
   type QuestionnaireInput,
   type PatientRecordKind,
   type SectionSaveCounts,
+  type Actor,
 } from "@remi/services/server";
 import {
   appHref,
@@ -115,7 +116,7 @@ import {
   type RecommendationCategory,
 } from "@remi/services/shared";
 import { audit } from "@/lib/audit";
-import { requireOperator } from "@/lib/auth/session";
+import { requireActor, requireOperator } from "@/lib/auth/session";
 import { fileStoreReady } from "@/lib/files";
 import { mailerReady } from "@/lib/mailer";
 import {
@@ -177,15 +178,12 @@ const NO_SUCH_FILE = "ce dossier patient est introuvable";
  * The form posts the ids, so each action checks them again: the page that
  * rendered the form is no guard. Another practitioner's file reads as missing.
  */
-const holdsPatient = async (operator: Operator, patientId: string) =>
-  (await patientOf(operator.id, patientId)).ok;
+const holdsPatient = async (actor: Actor, patientId: string) =>
+  (await patientOf(actor, patientId, "write")).ok;
 
 /** The same check for an action that names a row of the file, not the file. */
-const holdsRecord = async (
-  operator: Operator,
-  kind: PatientRecordKind,
-  id: string,
-) => (await patientOfRecord(operator.id, kind, id)).ok;
+const holdsRecord = async (actor: Actor, kind: PatientRecordKind, id: string) =>
+  (await patientOfRecord(actor, kind, id, "write")).ok;
 
 /**
  * `undefined` when the form did not carry the field at all, which is a
@@ -323,8 +321,8 @@ const actorOf = (operator: Operator) => ({
 });
 
 /** Morgane's question 5: the genotype waits on the patient's genetic consent. */
-const geneticConsentGiven = async (patientId: string) =>
-  (await consentsOf(patientId)).genetic?.decision === "given";
+const geneticConsentGiven = async (actor: Actor, patientId: string) =>
+  (await consentsOf(actor, patientId)).genetic?.decision === "given";
 
 const GENOTYPE_LOCKED =
   "Le génotype reste verrouillé tant que le patient n'a pas donné son consentement génétique.";
@@ -372,6 +370,7 @@ const changedFieldNames = (
  */
 const writeQuestionnaire = async (
   operator: Operator,
+  actor: Actor,
   patientId: string,
   answers: QuestionnaireInput,
   lists: { allergy?: AllergenAnswer; intolerance?: AllergenAnswer },
@@ -379,6 +378,7 @@ const writeQuestionnaire = async (
   // An empty patch is no write: the database refuses an update with no value.
   if (Object.keys(answers).length > 0) {
     const saved = await savePatientQuestionnaire(
+      actor,
       patientId,
       answers,
       actorOf(operator),
@@ -390,7 +390,7 @@ const writeQuestionnaire = async (
   for (const kind of ["allergy", "intolerance"] as const) {
     const answer = lists[kind];
     if (answer) {
-      const written = await setPatientAllergens(patientId, kind, answer);
+      const written = await setPatientAllergens(actor, patientId, kind, answer);
       if (!written.ok) {
         return written.message;
       }
@@ -414,6 +414,7 @@ export const savePatientAction = async (
   formData: FormData,
 ): Promise<PatientFormState> => {
   const operator = await requireOperator();
+  const actor = await requireActor();
   const id = field(formData, "id");
   const input = patientInputFrom(formData);
   const lists = {
@@ -421,11 +422,11 @@ export const savePatientAction = async (
     intolerance: allergenAnswerFrom(formData, "intolerance"),
   };
 
-  if (id && !(await holdsPatient(operator, id))) {
+  if (id && !(await holdsPatient(actor, id))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   // A new file has no consent yet, so its genotype is always locked.
-  const genotypeOpen = id ? await geneticConsentGiven(id) : false;
+  const genotypeOpen = id ? await geneticConsentGiven(actor, id) : false;
   if (postsGenotype(formData) && !genotypeOpen) {
     return { error: GENOTYPE_LOCKED, saved: false };
   }
@@ -449,7 +450,7 @@ export const savePatientAction = async (
   }
 
   const sameEmail = input.email
-    ? await findPatientByEmail(operator.id, input.email)
+    ? await findPatientByEmail(actor, input.email)
     : null;
 
   if (!id) {
@@ -458,7 +459,7 @@ export const savePatientAction = async (
       redirect(`/patients/${sameEmail.id}?exists=1`);
     }
     // The new file belongs to the practitioner who creates it (D-27).
-    const created = await createPatient({
+    const created = await createPatient(actor, {
       ...input,
       pseudonym: input.pseudonym ?? "",
       practitionerId: operator.id,
@@ -468,6 +469,7 @@ export const savePatientAction = async (
     }
     const failed = await writeQuestionnaire(
       operator,
+      actor,
       created.data.id,
       answers,
       lists,
@@ -481,7 +483,7 @@ export const savePatientAction = async (
       // The file exists: the practitioner finishes it from its page.
       redirect(`/patients/${created.data.id}`);
     }
-    await markReadyWhenComplete(created.data.id, actorOf(operator));
+    await markReadyWhenComplete(actor, created.data.id, actorOf(operator));
     revalidatePath("/patients");
     revalidatePath("/");
     redirect(`/patients/${created.data.id}`);
@@ -492,27 +494,27 @@ export const savePatientAction = async (
   }
 
   const [before, beforeAnswers] = await Promise.all([
-    getPatient(id),
-    getPatientQuestionnaire(id),
+    getPatient(actor, id),
+    getPatientQuestionnaire(actor, id),
   ]);
   const beforeView = beforeAnswers.ok ? beforeAnswers.data : null;
   const status = asStatus(field(formData, "status"));
-  const updated = await updatePatient(id, { ...input, status });
+  const updated = await updatePatient(actor, id, { ...input, status });
   if (!updated.ok) {
     return { error: updated.message, saved: false };
   }
-  const failed = await writeQuestionnaire(operator, id, answers, lists);
+  const failed = await writeQuestionnaire(operator, actor, id, answers, lists);
   if (failed) {
     return { error: failed, saved: false };
   }
-  const afterAnswers = await getPatientQuestionnaire(id);
+  const afterAnswers = await getPatientQuestionnaire(actor, id);
   const afterView = afterAnswers.ok ? afterAnswers.data : null;
 
   const changed = [
-    ...changedFieldNames(
-      before.ok ? { ...before.data } : {},
-      { ...input, status },
-    ),
+    ...changedFieldNames(before.ok ? { ...before.data } : {}, {
+      ...input,
+      status,
+    }),
     ...changedFieldNames(
       { ...(beforeView?.answers ?? {}) },
       answers as Record<string, unknown>,
@@ -529,7 +531,7 @@ export const savePatientAction = async (
     label: updated.data.pseudonym,
     detail: changed.length > 0 ? `champs : ${changed.join(", ")}` : "",
   });
-  const fileStatus = await markReadyWhenComplete(id, actorOf(operator));
+  const fileStatus = await markReadyWhenComplete(actor, id, actorOf(operator));
   revalidatePatient(id);
   if (fileStatus.ok && fileStatus.data !== updated.data.fileStatus) {
     revalidatePath("/patients");
@@ -548,13 +550,14 @@ export const deletePatientAction = async (
   formData: FormData,
 ): Promise<DeletePatientState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "id")))) {
     return { error: NO_SUCH_FILE };
   }
   const id = field(formData, "id");
   fileStoreReady();
-  const existing = await getPatient(id);
-  const removed = await deletePatient(id);
+  const existing = await getPatient(actor, id);
+  const removed = await deletePatient(actor, id);
   if (!removed.ok && removed.error !== "not_found") {
     return { error: removed.message };
   }
@@ -572,11 +575,12 @@ export const deletePatientAction = async (
 
 export const regenerateShareTokenAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
-  const result = await regenerateShareToken(id);
+  const result = await regenerateShareToken(actor, id);
   if (result.ok) {
     await audit(operator, "share_link.regenerated", {
       type: "patient",
@@ -598,8 +602,9 @@ export const emailShareLinkAction = async (
   formData: FormData,
 ): Promise<ShareFormState> => {
   const operator = await requireOperator();
+  const actor = await requireActor();
   const id = field(formData, "id");
-  const found = await patientOf(operator.id, id);
+  const found = await patientOf(actor, id);
   if (!found.ok) {
     return { error: NO_SUCH_FILE, sent: false };
   }
@@ -654,11 +659,12 @@ export const addRecommendationAction = async (
   formData: FormData,
 ): Promise<RecommendationFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE };
   }
   const patientId = field(formData, "patientId");
-  const result = await addPatientRecommendation(patientId, {
+  const result = await addPatientRecommendation(actor, patientId, {
     category: asCategory(field(formData, "category")),
     title: field(formData, "title"),
     detail: field(formData, "detail"),
@@ -681,11 +687,12 @@ export const updateRecommendationAction = async (
   formData: FormData,
 ): Promise<RecommendationFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "recommendation", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "recommendation", field(formData, "id")))) {
     return { error: NO_SUCH_FILE };
   }
   const id = field(formData, "id");
-  const result = await updatePatientRecommendation(id, {
+  const result = await updatePatientRecommendation(actor, id, {
     category: asCategory(field(formData, "category")),
     title: field(formData, "title"),
     detail: field(formData, "detail"),
@@ -703,12 +710,12 @@ export const updateRecommendationAction = async (
 };
 
 export const moveRecommendationAction = async (formData: FormData) => {
-  const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "recommendation", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "recommendation", field(formData, "id")))) {
     return;
   }
   const direction = field(formData, "direction") === "up" ? "up" : "down";
-  await movePatientRecommendation(field(formData, "id"), direction);
+  await movePatientRecommendation(actor, field(formData, "id"), direction);
   // Not audited: reordering changes how a protocol reads, never what it says,
   // and a journal full of nudges is a journal nobody reads.
   revalidatePatient(field(formData, "patientId"));
@@ -716,12 +723,13 @@ export const moveRecommendationAction = async (formData: FormData) => {
 
 export const archiveRecommendationAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "recommendation", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "recommendation", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
-  const result = await archivePatientRecommendation(id, archived);
+  const result = await archivePatientRecommendation(actor, id, archived);
   if (result.ok) {
     await audit(
       operator,
@@ -734,11 +742,12 @@ export const archiveRecommendationAction = async (formData: FormData) => {
 
 export const deleteRecommendationAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "recommendation", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "recommendation", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
-  const removed = await deletePatientRecommendation(id);
+  const removed = await deletePatientRecommendation(actor, id);
   if (removed.ok) {
     await audit(operator, "recommendation.deleted", {
       type: "recommendation",
@@ -761,11 +770,12 @@ export const addSupplementAction = async (
   formData: FormData,
 ): Promise<SupplementFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE };
   }
   const patientId = field(formData, "patientId");
-  const result = await addPatientSupplement(patientId, {
+  const result = await addPatientSupplement(actor, patientId, {
     name: field(formData, "name"),
     dose: field(formData, "dose"),
     timing: field(formData, "timing"),
@@ -788,11 +798,12 @@ export const updateSupplementAction = async (
   formData: FormData,
 ): Promise<SupplementFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "supplement", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "supplement", field(formData, "id")))) {
     return { error: NO_SUCH_FILE };
   }
   const id = field(formData, "id");
-  const result = await updatePatientSupplement(id, {
+  const result = await updatePatientSupplement(actor, id, {
     name: field(formData, "name"),
     dose: field(formData, "dose"),
     timing: field(formData, "timing"),
@@ -811,12 +822,12 @@ export const updateSupplementAction = async (
 };
 
 export const moveSupplementAction = async (formData: FormData) => {
-  const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "supplement", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "supplement", field(formData, "id")))) {
     return;
   }
   const direction = field(formData, "direction") === "up" ? "up" : "down";
-  await movePatientSupplement(field(formData, "id"), direction);
+  await movePatientSupplement(actor, field(formData, "id"), direction);
   // Not audited, like the recommendations: reordering changes how a protocol
   // reads, never what it prescribes.
   revalidatePatient(field(formData, "patientId"));
@@ -824,12 +835,13 @@ export const moveSupplementAction = async (formData: FormData) => {
 
 export const archiveSupplementAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "supplement", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "supplement", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
-  const result = await archivePatientSupplement(id, archived);
+  const result = await archivePatientSupplement(actor, id, archived);
   if (result.ok) {
     await audit(
       operator,
@@ -842,11 +854,12 @@ export const archiveSupplementAction = async (formData: FormData) => {
 
 export const deleteSupplementAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "supplement", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "supplement", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
-  const removed = await deletePatientSupplement(id);
+  const removed = await deletePatientSupplement(actor, id);
   if (removed.ok) {
     await audit(operator, "supplement.deleted", {
       type: "patient_supplement",
@@ -871,11 +884,12 @@ export const addPantryEssentialAction = async (
   formData: FormData,
 ): Promise<PantryFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE };
   }
   const patientId = field(formData, "patientId");
-  const result = await addPantryEssential(patientId, {
+  const result = await addPantryEssential(actor, patientId, {
     item: field(formData, "item"),
     why: field(formData, "why"),
   });
@@ -896,13 +910,12 @@ export const updatePantryEssentialAction = async (
   formData: FormData,
 ): Promise<PantryFormState> => {
   const operator = await requireOperator();
-  if (
-    !(await holdsRecord(operator, "pantryEssential", field(formData, "id")))
-  ) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "pantryEssential", field(formData, "id")))) {
     return { error: NO_SUCH_FILE };
   }
   const id = field(formData, "id");
-  const result = await updatePantryEssential(id, {
+  const result = await updatePantryEssential(actor, id, {
     item: field(formData, "item"),
     why: field(formData, "why"),
   });
@@ -920,14 +933,13 @@ export const updatePantryEssentialAction = async (
 
 export const movePantryEssentialAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (
-    !(await holdsRecord(operator, "pantryEssential", field(formData, "id")))
-  ) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "pantryEssential", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
   const direction = field(formData, "direction") === "up" ? "up" : "down";
-  const result = await movePantryEssential(id, direction);
+  const result = await movePantryEssential(actor, id, direction);
   if (result.ok) {
     await audit(operator, "pantry.reordered", {
       type: "pantry_essential",
@@ -940,14 +952,13 @@ export const movePantryEssentialAction = async (formData: FormData) => {
 
 export const archivePantryEssentialAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (
-    !(await holdsRecord(operator, "pantryEssential", field(formData, "id")))
-  ) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "pantryEssential", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
-  const result = await archivePantryEssential(id, archived);
+  const result = await archivePantryEssential(actor, id, archived);
   if (result.ok) {
     await audit(operator, archived ? "pantry.archived" : "pantry.restored", {
       type: "pantry_essential",
@@ -960,13 +971,12 @@ export const archivePantryEssentialAction = async (formData: FormData) => {
 
 export const deletePantryEssentialAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (
-    !(await holdsRecord(operator, "pantryEssential", field(formData, "id")))
-  ) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "pantryEssential", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
-  const removed = await deletePantryEssential(id);
+  const removed = await deletePantryEssential(actor, id);
   if (removed.ok) {
     await audit(operator, "pantry.deleted", {
       type: "pantry_essential",
@@ -998,11 +1008,12 @@ export const addMealEntryAction = async (
   formData: FormData,
 ): Promise<MealFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE };
   }
   const patientId = field(formData, "patientId");
-  const result = await addMealEntry(patientId, {
+  const result = await addMealEntry(actor, patientId, {
     eatenOn: field(formData, "eatenOn"),
     slot: asMealSlot(field(formData, "slot")),
     description: field(formData, "description"),
@@ -1029,11 +1040,12 @@ export const updateMealEntryAction = async (
   formData: FormData,
 ): Promise<MealFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "mealEntry", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "mealEntry", field(formData, "id")))) {
     return { error: NO_SUCH_FILE };
   }
   const id = field(formData, "id");
-  const result = await updateMealEntry(id, {
+  const result = await updateMealEntry(actor, id, {
     eatenOn: field(formData, "eatenOn"),
     slot: asMealSlot(field(formData, "slot")),
     description: field(formData, "description"),
@@ -1057,12 +1069,13 @@ export const writeMealFeedbackAction = async (
   formData: FormData,
 ): Promise<MealFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "mealEntry", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "mealEntry", field(formData, "id")))) {
     return { error: NO_SUCH_FILE };
   }
   const id = field(formData, "id");
   const feedback = field(formData, "feedback");
-  const result = await updateMealEntry(id, {
+  const result = await updateMealEntry(actor, id, {
     feedback,
     learning: field(formData, "learning"),
   });
@@ -1084,12 +1097,13 @@ export const writeMealFeedbackAction = async (
 
 export const archiveMealEntryAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "mealEntry", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "mealEntry", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
-  const result = await archiveMealEntry(id, archived);
+  const result = await archiveMealEntry(actor, id, archived);
   if (result.ok) {
     await audit(operator, archived ? "meal.archived" : "meal.restored", {
       type: "meal_entry",
@@ -1102,11 +1116,12 @@ export const archiveMealEntryAction = async (formData: FormData) => {
 
 export const deleteMealEntryAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "mealEntry", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "mealEntry", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
-  const removed = await deleteMealEntry(id);
+  const removed = await deleteMealEntry(actor, id);
   if (removed.ok) {
     await audit(operator, "meal.deleted", {
       type: "meal_entry",
@@ -1130,11 +1145,12 @@ export const addObservationAction = async (
   formData: FormData,
 ): Promise<ObservationFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE };
   }
   const patientId = field(formData, "patientId");
-  const result = await addPatientObservation(patientId, {
+  const result = await addPatientObservation(actor, patientId, {
     body: field(formData, "body"),
     observedOn: field(formData, "observedOn"),
   });
@@ -1155,11 +1171,12 @@ export const updateObservationAction = async (
   formData: FormData,
 ): Promise<ObservationFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "observation", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "observation", field(formData, "id")))) {
     return { error: NO_SUCH_FILE };
   }
   const id = field(formData, "id");
-  const result = await updatePatientObservation(id, {
+  const result = await updatePatientObservation(actor, id, {
     body: field(formData, "body"),
     observedOn: field(formData, "observedOn"),
   });
@@ -1177,12 +1194,13 @@ export const updateObservationAction = async (
 
 export const archiveObservationAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "observation", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "observation", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
-  const result = await archivePatientObservation(id, archived);
+  const result = await archivePatientObservation(actor, id, archived);
   if (result.ok) {
     await audit(
       operator,
@@ -1199,11 +1217,12 @@ export const archiveObservationAction = async (formData: FormData) => {
 
 export const deleteObservationAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "observation", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "observation", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
-  const removed = await deletePatientObservation(id);
+  const removed = await deletePatientObservation(actor, id);
   if (removed.ok) {
     await audit(operator, "observation.deleted", {
       type: "patient_observation",
@@ -1226,11 +1245,12 @@ export const addGoalAction = async (
   formData: FormData,
 ): Promise<GoalFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE };
   }
   const patientId = field(formData, "patientId");
-  const result = await addPatientGoal(patientId, {
+  const result = await addPatientGoal(actor, patientId, {
     title: field(formData, "title"),
     baseline: field(formData, "baseline"),
   });
@@ -1251,11 +1271,12 @@ export const updateGoalAction = async (
   formData: FormData,
 ): Promise<GoalFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "goal", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "goal", field(formData, "id")))) {
     return { error: NO_SUCH_FILE };
   }
   const id = field(formData, "id");
-  const result = await updatePatientGoal(id, {
+  const result = await updatePatientGoal(actor, id, {
     title: field(formData, "title"),
     baseline: field(formData, "baseline"),
   });
@@ -1273,12 +1294,13 @@ export const updateGoalAction = async (
 
 export const moveGoalAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "goal", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "goal", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
   const direction = field(formData, "direction") === "up" ? "up" : "down";
-  const result = await movePatientGoal(id, direction);
+  const result = await movePatientGoal(actor, id, direction);
   if (result.ok) {
     await audit(operator, "goal.reordered", {
       type: "patient_goal",
@@ -1297,12 +1319,13 @@ export const moveGoalAction = async (formData: FormData) => {
  */
 export const archiveGoalAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "goal", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "goal", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
-  const result = await archivePatientGoal(id, archived);
+  const result = await archivePatientGoal(actor, id, archived);
   if (result.ok) {
     await audit(operator, archived ? "goal.archived" : "goal.restored", {
       type: "patient_goal",
@@ -1315,11 +1338,12 @@ export const archiveGoalAction = async (formData: FormData) => {
 
 export const deleteGoalAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "goal", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "goal", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
-  const removed = await deletePatientGoal(id);
+  const removed = await deletePatientGoal(actor, id);
   if (removed.ok) {
     await audit(operator, "goal.deleted", {
       type: "patient_goal",
@@ -1335,12 +1359,13 @@ export const addCheckInAction = async (
   formData: FormData,
 ): Promise<CheckInFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "goal", field(formData, "goalId")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "goal", field(formData, "goalId")))) {
     return { error: NO_SUCH_FILE };
   }
   const goalId = field(formData, "goalId");
   const direction = asGoalDirection(field(formData, "direction"));
-  const result = await addGoalCheckIn(goalId, {
+  const result = await addGoalCheckIn(actor, goalId, {
     checkedOn: field(formData, "checkedOn"),
     direction: direction === "" ? null : direction,
     measure: field(formData, "measure"),
@@ -1364,12 +1389,13 @@ export const updateCheckInAction = async (
   formData: FormData,
 ): Promise<CheckInFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "goalCheckIn", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "goalCheckIn", field(formData, "id")))) {
     return { error: NO_SUCH_FILE };
   }
   const id = field(formData, "id");
   const direction = asGoalDirection(field(formData, "direction"));
-  const result = await updateGoalCheckIn(id, {
+  const result = await updateGoalCheckIn(actor, id, {
     checkedOn: field(formData, "checkedOn"),
     direction: direction === "" ? null : direction,
     measure: field(formData, "measure"),
@@ -1390,11 +1416,12 @@ export const updateCheckInAction = async (
 
 export const deleteCheckInAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "goalCheckIn", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "goalCheckIn", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
-  const removed = await deleteGoalCheckIn(id);
+  const removed = await deleteGoalCheckIn(actor, id);
   if (removed.ok) {
     await audit(operator, "goal.check_in_deleted", {
       type: "patient_goal_check_in",
@@ -1413,11 +1440,12 @@ export const deleteCheckInAction = async (formData: FormData) => {
  */
 export const markCheckInSeenAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "goalCheckIn", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "goalCheckIn", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
-  const seen = await markGoalCheckInSeen(id);
+  const seen = await markGoalCheckInSeen(actor, id);
   if (seen.ok) {
     await audit(operator, "goal.check_in_seen", {
       type: "patient_goal_check_in",
@@ -1442,7 +1470,8 @@ export const setInstructionAction = async (
   formData: FormData,
 ): Promise<InstructionFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const patientId = field(formData, "patientId");
@@ -1451,8 +1480,11 @@ export const setInstructionAction = async (
   // Read before the write so the trail can tell a clearing from a save on a
   // patient who never had a consigne — the second changes nothing, and an
   // audit row for a non-event is worse than none.
-  const before = await getPatientInstruction(patientId);
-  const result = await setPatientInstruction(patientId, { body, patientBody });
+  const before = await getPatientInstruction(actor, patientId);
+  const result = await setPatientInstruction(actor, patientId, {
+    body,
+    patientBody,
+  });
   if (!result.ok) {
     return { error: result.message, saved: false };
   }
@@ -1484,7 +1516,8 @@ export const startChallengeAction = async (
   formData: FormData,
 ): Promise<ChallengeFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const patientId = field(formData, "patientId");
@@ -1498,6 +1531,7 @@ export const startChallengeAction = async (
     };
   }
   const result = await startChallenge(
+    actor,
     patientId,
     {
       text: field(formData, "text"),
@@ -1532,11 +1566,12 @@ export const updateChallengeAction = async (
   formData: FormData,
 ): Promise<ChallengeFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "challenge", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "challenge", field(formData, "id")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const id = field(formData, "id");
-  const result = await updateChallenge(id, {
+  const result = await updateChallenge(actor, id, {
     text: field(formData, "text"),
     why: field(formData, "why"),
     startedOn: field(formData, "startedOn"),
@@ -1558,7 +1593,8 @@ export const closeChallengeAction = async (
   formData: FormData,
 ): Promise<ChallengeFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "challenge", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "challenge", field(formData, "id")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const id = field(formData, "id");
@@ -1569,7 +1605,7 @@ export const closeChallengeAction = async (
       saved: false,
     };
   }
-  const result = await closeChallenge(id, outcome);
+  const result = await closeChallenge(actor, id, outcome);
   if (!result.ok) {
     return { error: result.message, saved: false };
   }
@@ -1593,11 +1629,13 @@ export const replyToPatientAction = async (
   formData: FormData,
 ): Promise<MessageFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const patientId = field(formData, "patientId");
   const result = await replyToPatient(
+    actor,
     patientId,
     operator.id,
     field(formData, "body"),
@@ -1630,11 +1668,12 @@ export const markMessageReadAction = async (
   formData: FormData,
 ): Promise<MessageFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "message", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "message", field(formData, "id")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const id = field(formData, "id");
-  const result = await markPatientMessageRead(id);
+  const result = await markPatientMessageRead(actor, id);
   if (!result.ok) {
     return { error: result.message, saved: false };
   }
@@ -1658,13 +1697,14 @@ export const setSummaryAction = async (
   formData: FormData,
 ): Promise<SummaryFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const patientId = field(formData, "patientId");
   const body = field(formData, "body");
-  const before = await getPatientSummary(patientId);
-  const result = await setPatientSummary(patientId, body);
+  const before = await getPatientSummary(actor, patientId);
+  const result = await setPatientSummary(actor, patientId, body);
   if (!result.ok) {
     return { error: result.message, saved: false };
   }
@@ -1697,12 +1737,14 @@ export const updateNextConsultationPrepAction = async (
   formData: FormData,
 ): Promise<PrepFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const patientId = field(formData, "patientId");
-  const before = await getPatient(patientId);
+  const before = await getPatient(actor, patientId);
   const result = await setPatientNextConsultationPrep(
+    actor,
     patientId,
     field(formData, "body"),
   );
@@ -1723,7 +1765,10 @@ export const updateNextConsultationPrepAction = async (
   return { error: null, saved: true };
 };
 
-export type ConsultationDateFormState = { error: string | null; saved: boolean };
+export type ConsultationDateFormState = {
+  error: string | null;
+  saved: boolean;
+};
 
 /**
  * Sets, changes or clears the file's consultation date from the working view
@@ -1735,11 +1780,13 @@ export const setConsultationDateAction = async (
   formData: FormData,
 ): Promise<ConsultationDateFormState> => {
   const operator = await requireOperator();
+  const actor = await requireActor();
   const patientId = field(formData, "patientId");
-  if (!(await holdsPatient(operator, patientId))) {
+  if (!(await holdsPatient(actor, patientId))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const saved = await savePatientQuestionnaire(
+    actor,
     patientId,
     { consultationDate: field(formData, "consultationDate") },
     actorOf(operator),
@@ -1772,8 +1819,12 @@ export const setConsultationDateAction = async (
  * thing in one unit, and one audit row names both halves — the recipe and the
  * person — because "recette attribuée" on its own does not say to whom.
  */
-const recipeAudited = async (patientId: string, recipes: string) => {
-  const patient = await getPatient(patientId);
+const recipeAudited = async (
+  actor: Actor,
+  patientId: string,
+  recipes: string,
+) => {
+  const patient = await getPatient(actor, patientId);
   return patient.ok ? `${recipes} → ${patient.data.pseudonym}` : recipes;
 };
 
@@ -1782,13 +1833,14 @@ export const assignRecipesAction = async (
   formData: FormData,
 ): Promise<AssignmentFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE };
   }
   const patientId = field(formData, "patientId");
   // One checkbox per recipe, so the selection arrives as repeats of one name.
   const recipeIds = formData.getAll("recipeId").map(String).filter(Boolean);
-  const result = await assignRecipes(patientId, recipeIds, {
+  const result = await assignRecipes(actor, patientId, recipeIds, {
     note: field(formData, "note"),
     assignedOn: field(formData, "assignedOn"),
   });
@@ -1798,7 +1850,7 @@ export const assignRecipesAction = async (
   await audit(operator, "recipe.assigned_bulk", {
     type: "recipe_assignment",
     id: result.data[0]?.id ?? null,
-    label: await recipeAudited(patientId, field(formData, "titles")),
+    label: await recipeAudited(actor, patientId, field(formData, "titles")),
     detail: `${result.data.length} attribution(s)`,
   });
   revalidatePatient(patientId);
@@ -1811,11 +1863,13 @@ export const createAndAssignRecipeAction = async (
   formData: FormData,
 ): Promise<AssignmentFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE };
   }
   const patientId = field(formData, "patientId");
   const result = await createAndAssignRecipe(
+    actor,
     patientId,
     // No tags here on purpose: the in-place form is the fast path, and a
     // recipe written mid-consultation is tagged later from /recipes if at all.
@@ -1831,7 +1885,7 @@ export const createAndAssignRecipeAction = async (
   await audit(operator, "recipe.created_and_assigned", {
     type: "recipe",
     id: result.data.recipe.id,
-    label: await recipeAudited(patientId, result.data.recipe.title),
+    label: await recipeAudited(actor, patientId, result.data.recipe.title),
   });
   revalidatePatient(patientId);
   revalidatePath("/recipes");
@@ -1846,11 +1900,13 @@ export const duplicateAndAssignRecipeAction = async (
   formData: FormData,
 ): Promise<AssignmentFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE };
   }
   const patientId = field(formData, "patientId");
   const result = await duplicateAndAssignRecipe(
+    actor,
     patientId,
     field(formData, "recipeId"),
     { title: field(formData, "title"), body: field(formData, "body") },
@@ -1865,7 +1921,7 @@ export const duplicateAndAssignRecipeAction = async (
   await audit(operator, "recipe.duplicated_as_variant", {
     type: "recipe",
     id: result.data.recipe.id,
-    label: await recipeAudited(patientId, result.data.recipe.title),
+    label: await recipeAudited(actor, patientId, result.data.recipe.title),
     detail: `variante de ${field(formData, "originTitle")}`,
   });
   revalidatePatient(patientId);
@@ -1878,13 +1934,12 @@ export const updateRecipeAssignmentAction = async (
   formData: FormData,
 ): Promise<AssignmentFormState> => {
   const operator = await requireOperator();
-  if (
-    !(await holdsRecord(operator, "recipeAssignment", field(formData, "id")))
-  ) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "recipeAssignment", field(formData, "id")))) {
     return { error: NO_SUCH_FILE };
   }
   const id = field(formData, "id");
-  const result = await updateRecipeAssignment(id, {
+  const result = await updateRecipeAssignment(actor, id, {
     note: field(formData, "note"),
     assignedOn: field(formData, "assignedOn"),
   });
@@ -1902,14 +1957,13 @@ export const updateRecipeAssignmentAction = async (
 
 export const archiveRecipeAssignmentAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (
-    !(await holdsRecord(operator, "recipeAssignment", field(formData, "id")))
-  ) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "recipeAssignment", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
   const archived = field(formData, "archived") === "true";
-  const result = await archiveRecipeAssignment(id, archived);
+  const result = await archiveRecipeAssignment(actor, id, archived);
   if (result.ok) {
     await audit(
       operator,
@@ -1930,13 +1984,12 @@ export const archiveRecipeAssignmentAction = async (formData: FormData) => {
  */
 export const removeRecipeAssignmentAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (
-    !(await holdsRecord(operator, "recipeAssignment", field(formData, "id")))
-  ) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "recipeAssignment", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
-  const removed = await removeRecipeAssignment(id);
+  const removed = await removeRecipeAssignment(actor, id);
   if (removed.ok) {
     await audit(operator, "recipe.assignment_removed", {
       type: "recipe_assignment",
@@ -1952,11 +2005,12 @@ export const addNoteAction = async (
   formData: FormData,
 ): Promise<NoteFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE };
   }
   const patientId = field(formData, "patientId");
-  const result = await addPatientNote(patientId, {
+  const result = await addPatientNote(actor, patientId, {
     occurredAt: field(formData, "occurredAt"),
     title: field(formData, "title"),
     body: field(formData, "body"),
@@ -1990,7 +2044,8 @@ export const recordConsultationAction = async (
   formData: FormData,
 ): Promise<ConsultationFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const patientId = field(formData, "patientId");
@@ -2008,7 +2063,7 @@ export const recordConsultationAction = async (
       note: field(formData, `note-${goalId}`),
     }));
 
-  const result = await recordConsultation(patientId, {
+  const result = await recordConsultation(actor, patientId, {
     note: {
       occurredAt: field(formData, "occurredAt"),
       title: field(formData, "title"),
@@ -2043,11 +2098,12 @@ export const updateNoteAction = async (
   formData: FormData,
 ): Promise<NoteFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "note", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "note", field(formData, "id")))) {
     return { error: NO_SUCH_FILE };
   }
   const id = field(formData, "id");
-  const result = await updatePatientNote(id, {
+  const result = await updatePatientNote(actor, id, {
     occurredAt: field(formData, "occurredAt"),
     title: field(formData, "title"),
     body: field(formData, "body"),
@@ -2066,11 +2122,12 @@ export const updateNoteAction = async (
 
 export const deleteNoteAction = async (formData: FormData) => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "note", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "note", field(formData, "id")))) {
     return;
   }
   const id = field(formData, "id");
-  const removed = await deletePatientNote(id);
+  const removed = await deletePatientNote(actor, id);
   if (removed.ok) {
     await audit(operator, "note.deleted", {
       type: "note",
@@ -2092,12 +2149,14 @@ export const saveAnamnesisAction = async (
   formData: FormData,
 ): Promise<AnamnesisFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE };
   }
   const patientId = field(formData, "patientId");
   const category = field(formData, "category");
   const result = await setPatientAnamnesis(
+    actor,
     patientId,
     category,
     field(formData, "body"),
@@ -2138,10 +2197,11 @@ export const recordContextExportAction = async (
   blocks: readonly string[],
 ) => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, patientId))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, patientId))) {
     return;
   }
-  const found = await getPatient(patientId);
+  const found = await getPatient(actor, patientId);
   await audit(operator, "context.exported", {
     type: "patient",
     id: patientId,
@@ -2228,7 +2288,8 @@ export const saveRecommendationSectionAction = async (
   formData: FormData,
 ): Promise<SectionSaveState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const patientId = field(formData, "patientId");
@@ -2237,6 +2298,7 @@ export const saveRecommendationSectionAction = async (
   let result;
   try {
     result = await savePatientRecommendations(
+      actor,
       patientId,
       rows.map((row) => ({
         id: rowId(row.id),
@@ -2266,7 +2328,8 @@ export const saveSupplementSectionAction = async (
   formData: FormData,
 ): Promise<SectionSaveState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const patientId = field(formData, "patientId");
@@ -2281,6 +2344,7 @@ export const saveSupplementSectionAction = async (
   let result;
   try {
     result = await savePatientSupplements(
+      actor,
       patientId,
       rows.map((row) => ({
         id: rowId(row.id),
@@ -2311,7 +2375,8 @@ export const savePantrySectionAction = async (
   formData: FormData,
 ): Promise<SectionSaveState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const patientId = field(formData, "patientId");
@@ -2320,6 +2385,7 @@ export const savePantrySectionAction = async (
   let result;
   try {
     result = await savePantryEssentials(
+      actor,
       patientId,
       rows.map((row) => ({
         id: rowId(row.id),
@@ -2354,11 +2420,13 @@ export const addDocumentLinkAction = async (
   formData: FormData,
 ): Promise<DocumentFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const patientId = field(formData, "patientId");
   const result = await addPatientDocumentLink(
+    actor,
     patientId,
     {
       title: field(formData, "title"),
@@ -2386,7 +2454,8 @@ export const addDocumentFileAction = async (
   formData: FormData,
 ): Promise<DocumentFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsPatient(operator, field(formData, "patientId")))) {
+  const actor = await requireActor();
+  if (!(await holdsPatient(actor, field(formData, "patientId")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   if (!fileStoreReady()) {
@@ -2397,6 +2466,7 @@ export const addDocumentFileAction = async (
   }
   const patientId = field(formData, "patientId");
   const result = await addPatientDocumentFile(
+    actor,
     patientId,
     {
       title: field(formData, "title"),
@@ -2424,11 +2494,12 @@ export const updateDocumentAction = async (
   formData: FormData,
 ): Promise<DocumentFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "document", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "document", field(formData, "id")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   const id = field(formData, "id");
-  const result = await updatePatientDocument(id, {
+  const result = await updatePatientDocument(actor, id, {
     title: field(formData, "title"),
     tag: asDocumentTag(field(formData, "tag")),
     ...attachmentFrom(formData),
@@ -2451,12 +2522,13 @@ export const removeDocumentAction = async (
   formData: FormData,
 ): Promise<DocumentFormState> => {
   const operator = await requireOperator();
-  if (!(await holdsRecord(operator, "document", field(formData, "id")))) {
+  const actor = await requireActor();
+  if (!(await holdsRecord(actor, "document", field(formData, "id")))) {
     return { error: NO_SUCH_FILE, saved: false };
   }
   fileStoreReady();
   const id = field(formData, "id");
-  const result = await removePatientDocument(id);
+  const result = await removePatientDocument(actor, id);
   if (!result.ok) {
     return { error: result.message, saved: false };
   }

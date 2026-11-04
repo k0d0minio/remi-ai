@@ -8,6 +8,7 @@ import type {
 } from "../../models/patient-observation";
 import { listMealEntries } from "../meal-entries";
 import { getPatient, touchPatient } from "../patients";
+import { byPatient, byRecord, noSuchPatient, systemActor } from "../access";
 
 /**
  * Standalone observations, and the merged learnings view they belong to.
@@ -63,14 +64,14 @@ const allForPatient = async (
   return [...page.items].sort(byObservedDate);
 };
 
-export const listPatientObservations = async (
+const unscopedListPatientObservations = async (
   patientId: Id,
 ): Promise<readonly PatientObservation[]> =>
   (await allForPatient(patientId)).filter(
     (observation) => observation.archivedAt === null,
   );
 
-export const listArchivedPatientObservations = async (
+const unscopedListArchivedPatientObservations = async (
   patientId: Id,
 ): Promise<readonly PatientObservation[]> =>
   (await allForPatient(patientId))
@@ -90,12 +91,12 @@ export const listArchivedPatientObservations = async (
  * Only entries that actually carry a learning appear: the journal is the place
  * to read every meal, and a view padded with blanks is one nobody scrolls.
  */
-export const listPatientLearnings = async (
+const unscopedListPatientLearnings = async (
   patientId: Id,
 ): Promise<readonly PatientLearning[]> => {
   const [entries, standalone] = await Promise.all([
-    listMealEntries(patientId),
-    listPatientObservations(patientId),
+    listMealEntries(systemActor, patientId),
+    unscopedListPatientObservations(patientId),
   ]);
 
   const fromMeals: PatientLearning[] = entries
@@ -121,7 +122,7 @@ export const listPatientLearnings = async (
   );
 };
 
-export const addPatientObservation = async (
+const unscopedAddPatientObservation = async (
   patientId: Id,
   input: PatientObservationInput,
 ): Promise<Result<PatientObservation>> => {
@@ -132,7 +133,7 @@ export const addPatientObservation = async (
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
   }
-  if (!(await getPatient(patientId)).ok) {
+  if (!(await getPatient(systemActor, patientId)).ok) {
     return err("not_found", "no such patient");
   }
   const created = await observations().insert({
@@ -145,7 +146,7 @@ export const addPatientObservation = async (
   return ok(created);
 };
 
-export const updatePatientObservation = async (
+const unscopedUpdatePatientObservation = async (
   id: Id,
   input: PatientObservationInput,
 ): Promise<Result<PatientObservation>> => {
@@ -164,7 +165,7 @@ export const updatePatientObservation = async (
   return ok(updated);
 };
 
-export const archivePatientObservation = async (
+const unscopedArchivePatientObservation = async (
   id: Id,
   archived: boolean,
 ): Promise<Result<PatientObservation>> => {
@@ -182,7 +183,7 @@ export const archivePatientObservation = async (
 };
 
 /** The permanent one, for the row that should never have been written. */
-export const deletePatientObservation = async (
+const unscopedDeletePatientObservation = async (
   id: Id,
 ): Promise<Result<true>> => {
   if (!uuidSchema.safeParse(id).success) {
@@ -198,3 +199,47 @@ export const deletePatientObservation = async (
   }
   return ok(true);
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const listPatientObservations = byPatient(
+  "read",
+  unscopedListPatientObservations,
+  () => [],
+);
+export const listArchivedPatientObservations = byPatient(
+  "read",
+  unscopedListArchivedPatientObservations,
+  () => [],
+);
+export const listPatientLearnings = byPatient(
+  "read",
+  unscopedListPatientLearnings,
+  () => [],
+);
+export const addPatientObservation = byPatient(
+  "write",
+  unscopedAddPatientObservation,
+  noSuchPatient,
+);
+export const updatePatientObservation = byRecord(
+  "observation",
+  "write",
+  unscopedUpdatePatientObservation,
+  noSuchPatient,
+);
+export const archivePatientObservation = byRecord(
+  "observation",
+  "write",
+  unscopedArchivePatientObservation,
+  noSuchPatient,
+);
+export const deletePatientObservation = byRecord(
+  "observation",
+  "write",
+  unscopedDeletePatientObservation,
+  noSuchPatient,
+);

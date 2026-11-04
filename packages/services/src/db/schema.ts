@@ -1002,12 +1002,12 @@ export const operators = pgTable("operators", {
   name: text("name").notNull(),
   passwordHash: text("password_hash").notNull(),
   /**
-   * `owner` manages accounts; `operator` manages patients only. The column
-   * defaults to the lesser role so an invite cannot accidentally mint an
-   * owner — the accounts that predate this column are promoted by the
-   * migration instead.
+   * `admin` manages accounts and may open any file with a reason, read-only.
+   * `practitioner` holds its own files only (D-27). The column defaults to the
+   * lesser role so an invite cannot accidentally mint an admin. Migration 0035
+   * renamed `owner` to `admin` and `operator` to `practitioner`.
    */
-  role: text("role").notNull().default("operator"),
+  role: text("role").notNull().default("practitioner"),
   /**
    * The practitioner's permanent sign-up link (story 1). A patient who signs
    * up through `/inscription/<token>` is attached to this practitioner.
@@ -1047,7 +1047,7 @@ export const operatorInvitations = pgTable("operator_invitations", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull(),
   name: text("name").notNull().default(""),
-  role: text("role").notNull().default("operator"),
+  role: text("role").notNull().default("practitioner"),
   tokenHash: text("token_hash").notNull().unique(),
   expiresAt: timestamp("expires_at", {
     withTimezone: true,

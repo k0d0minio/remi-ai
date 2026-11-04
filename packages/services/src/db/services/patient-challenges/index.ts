@@ -9,6 +9,13 @@ import type {
   PatientChallenge,
 } from "../../models/patient-challenge";
 import { touchPatient } from "../patients";
+import type { Actor } from "../../models/actor";
+import {
+  byPatient,
+  byRecord,
+  listablePatientIds,
+  noSuchPatient,
+} from "../access";
 
 /**
  * The one habit Morgane runs with a patient at a time — her 14 Sept document,
@@ -70,7 +77,7 @@ const allForPatient = async (
 };
 
 /** The challenge in force, or `null` when she has none running. */
-export const getCurrentChallenge = async (
+const unscopedGetCurrentChallenge = async (
   patientId: Id,
   db?: DatabaseClient,
 ): Promise<PatientChallenge | null> =>
@@ -79,7 +86,7 @@ export const getCurrentChallenge = async (
   ) ?? null;
 
 /** What has been closed, most recently closed first. */
-export const listPastChallenges = async (
+const unscopedListPastChallenges = async (
   patientId: Id,
 ): Promise<readonly PatientChallenge[]> =>
   (await allForPatient(patientId))
@@ -118,14 +125,20 @@ export const challengeSignalOf = (
  * The filter on open rows is done here rather than in the query: the seam's
  * filter is equality, and `closed_on = null` matches nothing in SQL.
  */
-export const listChallengeSignals = async (): Promise<
-  ReadonlyMap<Id, ChallengeSignal>
-> => {
+export const listChallengeSignals = async (
+  actor: Actor,
+): Promise<ReadonlyMap<Id, ChallengeSignal>> => {
+  // The list's own files only (story 3): a practitioner reads no signal of
+  // another practitioner's patient.
+  const listable = await listablePatientIds(actor);
   const signals = new Map<Id, ChallengeSignal>();
   let cursor: string | undefined;
   do {
     const page = await challenges().findMany({}, { limit: 500, cursor });
     for (const challenge of page.items) {
+      if (listable && !listable.has(challenge.patientId)) {
+        continue;
+      }
       const signal = challengeSignalOf(challenge);
       if (signal) {
         signals.set(challenge.patientId, signal);
@@ -172,7 +185,7 @@ export type StartedChallenge = {
  * with two. Without an outcome, a running challenge is a refusal — the form
  * always sends one, so reaching it means the page was stale.
  */
-export const startChallenge = async (
+const unscopedStartChallenge = async (
   patientId: Id,
   input: ChallengeInput,
   closeCurrentWith?: ChallengeOutcome,
@@ -191,7 +204,7 @@ export const startChallenge = async (
     return err("invalid_input", "that outcome is not one of hers");
   }
 
-  const current = await getCurrentChallenge(patientId);
+  const current = await unscopedGetCurrentChallenge(patientId);
   if (current && closeCurrentWith === undefined) {
     return err(
       "conflict",
@@ -225,7 +238,7 @@ export const startChallenge = async (
 };
 
 /** Edit the running challenge's words or start date. A closed one is frozen. */
-export const updateChallenge = async (
+const unscopedUpdateChallenge = async (
   id: Id,
   input: ChallengeInput,
 ): Promise<Result<PatientChallenge>> => {
@@ -246,7 +259,7 @@ export const updateChallenge = async (
 };
 
 /** Close the running challenge with the outcome she picked. */
-export const closeChallenge = async (
+const unscopedCloseChallenge = async (
   id: Id,
   outcome: ChallengeOutcome,
 ): Promise<Result<PatientChallenge>> => {
@@ -275,7 +288,7 @@ export const closeChallenge = async (
  * le prochain » with it: ready for the next one is only true of an acquired
  * habit.
  */
-export const setChallengeAcquired = async (
+const unscopedSetChallengeAcquired = async (
   id: Id,
   acquired: boolean,
 ): Promise<Result<PatientChallenge>> => {
@@ -297,7 +310,7 @@ export const setChallengeAcquired = async (
  * « Challenge acquis » is set — the link only offers it then, so reaching the
  * refusal means a page older than the patient's own last tap.
  */
-export const setChallengeReadyForNext = async (
+const unscopedSetChallengeReadyForNext = async (
   id: Id,
   ready: boolean,
 ): Promise<Result<PatientChallenge>> => {
@@ -313,3 +326,48 @@ export const setChallengeReadyForNext = async (
   });
   return updated ? ok(updated) : err("not_found", "no such challenge");
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const getCurrentChallenge = byPatient(
+  "read",
+  unscopedGetCurrentChallenge,
+  () => null,
+);
+export const listPastChallenges = byPatient(
+  "read",
+  unscopedListPastChallenges,
+  () => [],
+);
+export const startChallenge = byPatient(
+  "write",
+  unscopedStartChallenge,
+  noSuchPatient,
+);
+export const updateChallenge = byRecord(
+  "challenge",
+  "write",
+  unscopedUpdateChallenge,
+  noSuchPatient,
+);
+export const closeChallenge = byRecord(
+  "challenge",
+  "write",
+  unscopedCloseChallenge,
+  noSuchPatient,
+);
+export const setChallengeAcquired = byRecord(
+  "challenge",
+  "write",
+  unscopedSetChallengeAcquired,
+  noSuchPatient,
+);
+export const setChallengeReadyForNext = byRecord(
+  "challenge",
+  "write",
+  unscopedSetChallengeReadyForNext,
+  noSuchPatient,
+);

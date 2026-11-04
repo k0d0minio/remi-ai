@@ -18,7 +18,7 @@ import { requireOperator } from "@/lib/auth/session";
  * after the success branch — a refused write is not an action to record.
  *
  * Every action is open to any signed-in operator, `requireOperator` rather than
- * `requireOwner`, exactly as the recipe library is. Validating is the corpus'
+ * `requireAdmin`, exactly as the recipe library is. Validating is the corpus'
  * consequential act, and what makes it accountable is the journal row naming
  * who did it, not a role that would leave Arnaud unable to correct a typo.
  *

@@ -14,6 +14,7 @@ import type { PatientGoal } from "../../models/patient-goal";
 import type { WrittenBy } from "../../models/meal-entry";
 import type { PatientGoalCheckIn } from "../../models/patient-goal-check-in";
 import { touchPatient } from "../patients";
+import { byPatient, byRecord, noSuchPatient } from "../access";
 
 /**
  * The two or three priority goals Morgane steers an accompaniment by, and the
@@ -97,13 +98,13 @@ const allForPatient = async (
 };
 
 /** The goals in force, in her priority order. */
-export const listPatientGoals = async (
+const unscopedListPatientGoals = async (
   patientId: Id,
 ): Promise<readonly PatientGoal[]> =>
   (await allForPatient(patientId)).filter((goal) => goal.archivedAt === null);
 
 /** What has been worked on and set down, newest archive first. */
-export const listArchivedPatientGoals = async (
+const unscopedListArchivedPatientGoals = async (
   patientId: Id,
 ): Promise<readonly PatientGoal[]> =>
   (await allForPatient(patientId))
@@ -121,7 +122,7 @@ const nextPosition = async (patientId: Id) => {
   );
 };
 
-export const addPatientGoal = async (
+const unscopedAddPatientGoal = async (
   patientId: Id,
   input: PatientGoalInput,
 ): Promise<Result<PatientGoal>> => {
@@ -132,7 +133,7 @@ export const addPatientGoal = async (
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
   }
-  const active = await listPatientGoals(patientId);
+  const active = await unscopedListPatientGoals(patientId);
   if (active.length >= MAX_ACTIVE_GOALS) {
     return err(
       "conflict",
@@ -150,7 +151,7 @@ export const addPatientGoal = async (
   return ok(created);
 };
 
-export const updatePatientGoal = async (
+const unscopedUpdatePatientGoal = async (
   id: Id,
   input: PatientGoalInput,
 ): Promise<Result<PatientGoal>> => {
@@ -181,7 +182,7 @@ export const updatePatientGoal = async (
  * recommendation services: rows that predate a position all carry 0, so
  * swapping stored values would swap two zeroes.
  */
-export const movePatientGoal = async (
+const unscopedMovePatientGoal = async (
   id: Id,
   direction: "up" | "down",
 ): Promise<Result<PatientGoal>> => {
@@ -192,7 +193,7 @@ export const movePatientGoal = async (
   if (!existing) {
     return err("not_found", "no such goal");
   }
-  const run = await listPatientGoals(existing.patientId);
+  const run = await unscopedListPatientGoals(existing.patientId);
   const index = run.findIndex((goal) => goal.id === id);
   const target = direction === "up" ? index - 1 : index + 1;
   if (index === -1 || target < 0 || target >= run.length) {
@@ -219,7 +220,7 @@ export const movePatientGoal = async (
  * Archiving is the everyday exit; restoring is the undo. A restore has to pass
  * the same cap an add does, or the refusal would be trivially routed around.
  */
-export const archivePatientGoal = async (
+const unscopedArchivePatientGoal = async (
   id: Id,
   archived: boolean,
 ): Promise<Result<PatientGoal>> => {
@@ -231,7 +232,7 @@ export const archivePatientGoal = async (
     return err("not_found", "no such goal");
   }
   if (!archived && existing.archivedAt !== null) {
-    const active = await listPatientGoals(existing.patientId);
+    const active = await unscopedListPatientGoals(existing.patientId);
     if (active.length >= MAX_ACTIVE_GOALS) {
       return err(
         "conflict",
@@ -254,12 +255,12 @@ export const archivePatientGoal = async (
  * check-ins through the foreign key; removing them here is what makes the
  * behaviour the same through any client satisfying the seam.
  */
-export const deletePatientGoal = async (id: Id): Promise<Result<true>> => {
+const unscopedDeletePatientGoal = async (id: Id): Promise<Result<true>> => {
   if (!uuidSchema.safeParse(id).success) {
     return err("not_found", "no such goal");
   }
   const existing = await goals().findById(id);
-  for (const checkIn of await listGoalCheckIns(id)) {
+  for (const checkIn of await unscopedListGoalCheckIns(id)) {
     await checkIns().remove(checkIn.id);
   }
   const removed = await goals().remove(id);
@@ -273,7 +274,7 @@ export const deletePatientGoal = async (id: Id): Promise<Result<true>> => {
 };
 
 /** The goal's history, newest first — the date is the order, not the write. */
-export const listGoalCheckIns = async (
+const unscopedListGoalCheckIns = async (
   goalId: Id,
 ): Promise<readonly PatientGoalCheckIn[]> => {
   if (!uuidSchema.safeParse(goalId).success) {
@@ -304,7 +305,7 @@ const parseCheckIn = (input: GoalCheckInInput) =>
     });
 
 /** `writtenBy` is set by the code path, never by the payload — see `addMealEntry`. */
-export const addGoalCheckIn = async (
+const unscopedAddGoalCheckIn = async (
   goalId: Id,
   input: GoalCheckInInput,
   writtenBy: WrittenBy = "practitioner",
@@ -344,7 +345,7 @@ export const addGoalCheckIn = async (
   return ok(created);
 };
 
-export const updateGoalCheckIn = async (
+const unscopedUpdateGoalCheckIn = async (
   id: Id,
   input: GoalCheckInInput,
 ): Promise<Result<PatientGoalCheckIn>> => {
@@ -384,7 +385,7 @@ export const updateGoalCheckIn = async (
   return ok(updated);
 };
 
-export const deleteGoalCheckIn = async (id: Id): Promise<Result<true>> => {
+const unscopedDeleteGoalCheckIn = async (id: Id): Promise<Result<true>> => {
   if (!uuidSchema.safeParse(id).success) {
     return err("not_found", "no such check-in");
   }
@@ -465,7 +466,7 @@ const lastPatientCheckInOn = async (
   db?: DatabaseClient,
 ): Promise<string | null> => {
   let last: string | null = null;
-  for (const goal of await listPatientGoals(patientId)) {
+  for (const goal of await unscopedListPatientGoals(patientId)) {
     for (const row of await patientRowsOldestFirst(goal.id, db)) {
       if (last === null || row.checkedOn > last) {
         last = row.checkedOn;
@@ -476,7 +477,7 @@ const lastPatientCheckInOn = async (
 };
 
 /** Whether the patient's weekly question is open today, and since or until when. */
-export const getWeeklyCheckIn = async (
+const unscopedGetWeeklyCheckIn = async (
   patientId: Id,
   today: string = todayAtPractice(),
 ): Promise<WeeklyCheckInState> =>
@@ -491,7 +492,7 @@ export const getWeeklyCheckIn = async (
  * submission inside the week (a double tap, a second tab) finds the first one's
  * rows and is refused in the same way: it writes nothing.
  */
-export const recordWeeklyCheckIn = async (
+const unscopedRecordWeeklyCheckIn = async (
   patientId: Id,
   answers: readonly WeeklyAnswer[],
   today: string = todayAtPractice(),
@@ -501,7 +502,7 @@ export const recordWeeklyCheckIn = async (
     return err("invalid_input", parsed.error.issues[0].message);
   }
   const active = new Map(
-    (await listPatientGoals(patientId)).map((goal) => [goal.id, goal]),
+    (await unscopedListPatientGoals(patientId)).map((goal) => [goal.id, goal]),
   );
   if (parsed.data.some((answer) => !active.has(answer.goalId))) {
     return err("not_found", "no such goal");
@@ -562,11 +563,11 @@ export const GOAL_SCORE_STRIP_LENGTH = 12;
  * « Ma progression »'s strip for each active goal, in her order — the same
  * data on the link and in the console's at-a-glance slot (D-9).
  */
-export const listGoalScoreStrips = async (
+const unscopedListGoalScoreStrips = async (
   patientId: Id,
 ): Promise<readonly GoalScoreStrip[]> => {
   const strips: GoalScoreStrip[] = [];
-  for (const goal of await listPatientGoals(patientId)) {
+  for (const goal of await unscopedListPatientGoals(patientId)) {
     const scored = (await patientRowsOldestFirst(goal.id)).flatMap((row) =>
       row.score === null || row.score === undefined
         ? []
@@ -587,11 +588,11 @@ const awaitsAttention = (row: PatientGoalCheckIn) =>
   (row.seenAt ?? null) === null;
 
 /** How many of the patient's lower scores wait for her, across active goals. */
-export const countGoalCheckInsAwaitingAttention = async (
+const unscopedCountGoalCheckInsAwaitingAttention = async (
   patientId: Id,
 ): Promise<number> => {
   let count = 0;
-  for (const goal of await listPatientGoals(patientId)) {
+  for (const goal of await unscopedListPatientGoals(patientId)) {
     count += (await patientRowsOldestFirst(goal.id)).filter(
       awaitsAttention,
     ).length;
@@ -603,7 +604,7 @@ export const countGoalCheckInsAwaitingAttention = async (
  * Her « vu » on a patient's lower score. Idempotent: a row already seen keeps
  * the first time she saw it, so the trail says when she first knew.
  */
-export const markGoalCheckInSeen = async (
+const unscopedMarkGoalCheckInSeen = async (
   id: Id,
 ): Promise<Result<PatientGoalCheckIn>> => {
   if (!uuidSchema.safeParse(id).success) {
@@ -626,3 +627,98 @@ export const markGoalCheckInSeen = async (
   }
   return ok(updated);
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const listPatientGoals = byPatient(
+  "read",
+  unscopedListPatientGoals,
+  () => [],
+);
+export const listArchivedPatientGoals = byPatient(
+  "read",
+  unscopedListArchivedPatientGoals,
+  () => [],
+);
+export const addPatientGoal = byPatient(
+  "write",
+  unscopedAddPatientGoal,
+  noSuchPatient,
+);
+export const updatePatientGoal = byRecord(
+  "goal",
+  "write",
+  unscopedUpdatePatientGoal,
+  noSuchPatient,
+);
+export const movePatientGoal = byRecord(
+  "goal",
+  "write",
+  unscopedMovePatientGoal,
+  noSuchPatient,
+);
+export const archivePatientGoal = byRecord(
+  "goal",
+  "write",
+  unscopedArchivePatientGoal,
+  noSuchPatient,
+);
+export const deletePatientGoal = byRecord(
+  "goal",
+  "write",
+  unscopedDeletePatientGoal,
+  noSuchPatient,
+);
+export const listGoalCheckIns = byRecord(
+  "goal",
+  "read",
+  unscopedListGoalCheckIns,
+  () => [],
+);
+export const addGoalCheckIn = byRecord(
+  "goal",
+  "write",
+  unscopedAddGoalCheckIn,
+  noSuchPatient,
+);
+export const updateGoalCheckIn = byRecord(
+  "goalCheckIn",
+  "write",
+  unscopedUpdateGoalCheckIn,
+  noSuchPatient,
+);
+export const deleteGoalCheckIn = byRecord(
+  "goalCheckIn",
+  "write",
+  unscopedDeleteGoalCheckIn,
+  noSuchPatient,
+);
+export const getWeeklyCheckIn = byPatient(
+  "read",
+  unscopedGetWeeklyCheckIn,
+  () => weeklyCheckInState(null, todayAtPractice()),
+);
+export const recordWeeklyCheckIn = byPatient(
+  "write",
+  unscopedRecordWeeklyCheckIn,
+  noSuchPatient,
+);
+export const listGoalScoreStrips = byPatient(
+  "read",
+  unscopedListGoalScoreStrips,
+  () => [],
+);
+export const countGoalCheckInsAwaitingAttention = byPatient(
+  "read",
+  unscopedCountGoalCheckInsAwaitingAttention,
+  () => 0,
+);
+export const markGoalCheckInSeen = byRecord(
+  "goalCheckIn",
+  "write",
+  unscopedMarkGoalCheckInSeen,
+  noSuchPatient,
+);

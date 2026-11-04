@@ -10,6 +10,7 @@ import {
   planSectionSave,
   type SectionSaveCounts,
 } from "../section-save";
+import { byPatient, byRecord, noSuchPatient } from "../access";
 
 /**
  * The placard/frigo list Morgane keeps per patient — brainstorm § H.
@@ -60,7 +61,7 @@ const allForPatient = async (
 };
 
 /** The list in force — what Morgane hands the patient. */
-export const listPantryEssentials = async (
+const unscopedListPantryEssentials = async (
   patientId: Id,
 ): Promise<readonly PantryEssential[]> =>
   (await allForPatient(patientId)).filter(
@@ -68,7 +69,7 @@ export const listPantryEssentials = async (
   );
 
 /** What dropped off the list, newest archive first. */
-export const listArchivedPantryEssentials = async (
+const unscopedListArchivedPantryEssentials = async (
   patientId: Id,
 ): Promise<readonly PantryEssential[]> =>
   (await allForPatient(patientId))
@@ -86,7 +87,7 @@ const nextPosition = async (patientId: Id) => {
   );
 };
 
-export const addPantryEssential = async (
+const unscopedAddPantryEssential = async (
   patientId: Id,
   input: PantryEssentialInput,
 ): Promise<Result<PantryEssential>> => {
@@ -108,7 +109,7 @@ export const addPantryEssential = async (
   return ok(created);
 };
 
-export const updatePantryEssential = async (
+const unscopedUpdatePantryEssential = async (
   id: Id,
   input: PantryEssentialInput,
 ): Promise<Result<PantryEssential>> => {
@@ -140,7 +141,7 @@ export const updatePantryEssential = async (
  * swapping stored values would swap two zeroes, and a renumber leaves the run
  * canonical as a side effect of the first reorder.
  */
-export const movePantryEssential = async (
+const unscopedMovePantryEssential = async (
   id: Id,
   direction: "up" | "down",
 ): Promise<Result<PantryEssential>> => {
@@ -151,7 +152,7 @@ export const movePantryEssential = async (
   if (!existing) {
     return err("not_found", "no such pantry essential");
   }
-  const run = await listPantryEssentials(existing.patientId);
+  const run = await unscopedListPantryEssentials(existing.patientId);
   const index = run.findIndex((essential) => essential.id === id);
   const target = direction === "up" ? index - 1 : index + 1;
   if (index === -1 || target < 0 || target >= run.length) {
@@ -174,7 +175,7 @@ export const movePantryEssential = async (
   return moved ? ok(moved) : err("not_found", "no such pantry essential");
 };
 
-export const archivePantryEssential = async (
+const unscopedArchivePantryEssential = async (
   id: Id,
   archived: boolean,
 ): Promise<Result<PantryEssential>> => {
@@ -195,7 +196,7 @@ export const archivePantryEssential = async (
  * The permanent one. Archiving is the everyday move; this exists for a row
  * that should never have been written — a wrong patient, a typo caught twice.
  */
-export const deletePantryEssential = async (id: Id): Promise<Result<true>> => {
+const unscopedDeletePantryEssential = async (id: Id): Promise<Result<true>> => {
   if (!uuidSchema.safeParse(id).success) {
     return err("not_found", "no such pantry essential");
   }
@@ -229,7 +230,7 @@ export type PantryEssentialRow = {
  * submitted drops off the list by being archived, which is what makes "why did
  * we stop buying the sardines" still answerable.
  */
-export const savePantryEssentials = async (
+const unscopedSavePantryEssentials = async (
   patientId: Id,
   rows: readonly PantryEssentialRow[],
   /** The ids the editor was seeded with — see `planSectionSave`'s `known`. */
@@ -255,7 +256,7 @@ export const savePantryEssentials = async (
     });
   }
 
-  const existing = await listPantryEssentials(patientId);
+  const existing = await unscopedListPantryEssentials(patientId);
   const plan = planSectionSave<PantryEssentialRow, PantryEssential>({
     existing,
     groups: [parsedRows],
@@ -298,3 +299,53 @@ export const savePantryEssentials = async (
     return ok(counts);
   });
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const listPantryEssentials = byPatient(
+  "read",
+  unscopedListPantryEssentials,
+  () => [],
+);
+export const listArchivedPantryEssentials = byPatient(
+  "read",
+  unscopedListArchivedPantryEssentials,
+  () => [],
+);
+export const addPantryEssential = byPatient(
+  "write",
+  unscopedAddPantryEssential,
+  noSuchPatient,
+);
+export const updatePantryEssential = byRecord(
+  "pantryEssential",
+  "write",
+  unscopedUpdatePantryEssential,
+  noSuchPatient,
+);
+export const movePantryEssential = byRecord(
+  "pantryEssential",
+  "write",
+  unscopedMovePantryEssential,
+  noSuchPatient,
+);
+export const archivePantryEssential = byRecord(
+  "pantryEssential",
+  "write",
+  unscopedArchivePantryEssential,
+  noSuchPatient,
+);
+export const deletePantryEssential = byRecord(
+  "pantryEssential",
+  "write",
+  unscopedDeletePantryEssential,
+  noSuchPatient,
+);
+export const savePantryEssentials = byPatient(
+  "write",
+  unscopedSavePantryEssentials,
+  noSuchPatient,
+);

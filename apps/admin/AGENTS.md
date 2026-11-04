@@ -26,11 +26,17 @@ behind it.
 - Every route is operator-only. There is no public page in this app and no unauthenticated preview
   of admin data. The two exceptions prove it: `/sign-in` and `/invitation/[token]` are reached by
   someone who has no session yet, and they live outside the `(admin)` group for that reason alone.
-- **Two roles.** `owner` manages accounts as well as patients; `operator` manages patients only.
-  The vocabulary and the check both live in `@remi/services/shared` (`canManageOperators`), never
-  in a comparison written by hand at a call site.
+- **Two roles (D-27).** `admin` is the REMI team: it manages the accounts, and it may open any
+  patient file read-only after it types a reason. `practitioner` reads and writes only the files
+  it holds. The vocabulary and the check both live in `@remi/services/shared`
+  (`canManageOperators`), never in a comparison written by hand at a call site.
+- **Every patient service takes the actor (story 3).** `requireActor()` builds it from the session
+  and, for an admin, from the signed cookies of the files it opened. The service decides: a file
+  the actor may not reach reads as missing, and an admin's open writes nothing. The open itself is
+  `patient.admin_opened` in the journal, with the reason. The rule lives in
+  `packages/services/src/db/services/access`, never at a call site.
 - **Every guard is asserted twice.** The `(admin)` layout guards what renders; each server action
-  calls `requireOperator()` or `requireOwner()` again, because an action is an endpoint of its own.
+  calls `requireOperator()` or `requireAdmin()` again, because an action is an endpoint of its own.
   Hiding a nav row is a courtesy, not a control.
 - Destructive operations — delete, remove an account, regenerate a share link — confirm before
   acting and **write to the audit trail**. That is not advice: `lib/audit.ts` is the one way to
@@ -42,11 +48,11 @@ behind it.
 ## Accounts
 
 `OPERATOR_EMAIL` creates the **first** account and stops working the moment one exists. Every
-account after that arrives by invitation: an owner issues one, the token is stored hashed
+account after that arrives by invitation: an admin issues one, the token is stored hashed
 (`operator_invitations`), and accepting it mints the account with the invitation's email and role —
 never with anything the acceptance form posted.
 
-The console always keeps **at least one owner**. The service refuses the last demotion and the last
+The console always keeps **at least one admin**. The service refuses the last demotion and the last
 deletion; the UI hides those controls on your own row so it never offers an action it will refuse.
 
 Mail is best-effort by design. `lib/mailer.ts` registers Resend only when both `RESEND_API_KEY` and
