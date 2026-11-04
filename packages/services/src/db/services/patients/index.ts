@@ -223,11 +223,11 @@ const sorters: Record<
  * files it holds. An admin that asks for `all` lists every file. A patient
  * lists its own file. The system lists every file.
  */
-const listedFiles = async <T extends PatientProfile>(
+const listedFiles = async (
   actor: Actor,
   scope: PatientListScope = "mine",
-): Promise<readonly T[]> => {
-  const files = getDatabase().collection<T>("patient_profiles");
+): Promise<readonly PatientProfile[]> => {
+  const files = patients();
   if (actor.kind === "patient") {
     const own = isValidId(actor.patientId)
       ? await files.findById(actor.patientId)
@@ -356,7 +356,11 @@ export const patientListOf = async (
   actor: Actor,
   query: PatientListQuery = {},
 ): Promise<readonly PatientListRow[]> => {
-  const items = await listedFiles<PatientListRow>(actor, query.scope);
+  // The row carries `consultation_date`, which the profile type leaves out.
+  const items = (await listedFiles(
+    actor,
+    query.scope,
+  )) as readonly PatientListRow[];
   const status = query.status && query.status !== "all" ? query.status : null;
   return (
     items
