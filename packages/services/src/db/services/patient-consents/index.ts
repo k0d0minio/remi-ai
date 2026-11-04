@@ -15,7 +15,12 @@ import { recordAuditEvent, type AuditActor, type AuditRecord } from "../audit";
 import { getPatient } from "../patients";
 import { consentRows, historyOf } from "./in-force";
 import type { Actor } from "../../models/actor";
-import { byPatient, mayAccessPatient, systemActor } from "../access";
+import {
+  byPatient,
+  mayAccessPatient,
+  noSuchPatient,
+  systemActor,
+} from "../access";
 
 /**
  * The patient's consent decisions — story 3, D-32. The table is append-only:
