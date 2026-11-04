@@ -11,6 +11,7 @@
 branch is deleted. On 2026-11-04 the Neon project `uat-remi-ai` held 9 preview branches. The git
 branches of 7 of them were already deleted after their merge (#173 to #179). The project is at 10
 branches, so a new git branch gets no database and its `admin` and `app` previews fail at build.
+The 7 branches were deleted by hand later on 2026-11-04. The cause remains.
 
 ## Proposed change
 
