@@ -280,15 +280,25 @@ describe("the allergy and intolerance lists", () => {
     ]);
   });
 
-  it("keeps a bare category as the whole category, and drops it under sub-boxes", async () => {
+  it("stores a bare category as « Tous », and drops it under sub-boxes", async () => {
     const bare = unwrapOk(
       await setPatientAllergens(patientId, "allergy", {
         state: "declared",
-        items: [{ key: "crustaceans" }],
+        items: [{ key: "crustaceans" }, { key: "peanuts" }],
       }),
     );
     expect(bare.map((row) => [row.key, row.subKey])).toEqual([
-      ["crustaceans", null],
+      ["crustaceans", "all"],
+      ["peanuts", null],
+    ]);
+    const intolerance = unwrapOk(
+      await setPatientAllergens(patientId, "intolerance", {
+        state: "declared",
+        items: [{ key: "gluten" }],
+      }),
+    );
+    expect(intolerance.map((row) => [row.key, row.subKey])).toEqual([
+      ["gluten", null],
     ]);
     const precise = unwrapOk(
       await setPatientAllergens(patientId, "allergy", {

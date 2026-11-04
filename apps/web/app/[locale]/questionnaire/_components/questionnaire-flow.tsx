@@ -7,6 +7,9 @@ import {
   activityLevels,
   allergenLabels,
   allergens,
+  allergenSubLabels,
+  allergenSubLists,
+  allSubKeyLabel,
   dietLabels,
   diets,
   fileStatusLabels,
@@ -35,6 +38,7 @@ import {
 import type { SaveResult } from "@/lib/questionnaire/state";
 import { AllergenAnswer } from "./allergen-answer";
 import { ChoiceAnswer } from "./choice-answer";
+import { FlagAnswer } from "./flag-answer";
 import {
   MandatoryLabel,
   OptionalLabel,
@@ -59,6 +63,7 @@ export type QuestionnaireValues = {
   diet: string;
   dietNote: string;
   pathologies: string;
+  celiacDisease: boolean | null;
   medications: string;
   supplements: string;
   geneticTest: string;
@@ -76,6 +81,23 @@ type Props = {
   /** Where the page opens when the URL names no section. */
   initialSection: QuestionnaireSection;
 };
+
+/** The allergy sub-lists in the patient's language, each in the story's order. */
+const subListsOf = (locale: Locale) =>
+  Object.fromEntries(
+    Object.entries(allergenSubLists).map(([key, subKeys]) => {
+      const labels = allergenSubLabels[
+        key as keyof typeof allergenSubLabels
+      ] as Record<string, Record<Locale, string>>;
+      return [
+        key,
+        subKeys.map((subKey) => ({
+          key: subKey,
+          label: labels[subKey][locale],
+        })),
+      ];
+    }),
+  );
 
 const statusIntent = {
   to_complete: "warning",
@@ -343,6 +365,8 @@ export const QuestionnaireFlow = ({
               key,
               label: allergenLabels[key][locale],
             }))}
+            subLists={subListsOf(locale)}
+            allLabel={allSubKeyLabel[locale]}
             initialNoneKnown={values.noKnownAllergies}
             initialRows={values.allergens.filter(
               (row) => row.kind === "allergy",
@@ -357,6 +381,7 @@ export const QuestionnaireFlow = ({
               key,
               label: intoleranceLabels[key][locale],
             }))}
+            allLabel={allSubKeyLabel[locale]}
             initialNoneKnown={values.noKnownIntolerances}
             initialRows={values.allergens.filter(
               (row) => row.kind === "intolerance",
@@ -365,6 +390,12 @@ export const QuestionnaireFlow = ({
         </Section>
 
         <Section current={section} name="sante" title={text.sections.sante}>
+          <FlagAnswer
+            field="celiacDisease"
+            label={text.labels.celiacDisease}
+            hint={text.hints.celiacDisease}
+            initial={values.celiacDisease}
+          />
           <TextAnswer
             field="pathologies"
             multiline
