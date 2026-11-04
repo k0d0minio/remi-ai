@@ -462,6 +462,8 @@ export const savePatientAction = async (
       ...input,
       pseudonym: input.pseudonym ?? "",
       practitionerId: operator.id,
+      // The list shows this file at once, as « Dossier à compléter ».
+      createdBy: "practitioner",
     });
     if (!created.ok) {
       return { error: created.message, saved: false };

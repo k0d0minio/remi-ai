@@ -75,6 +75,13 @@ export const patientProfiles = pgTable("patient_profiles", {
    */
   fileStatus: text("file_status").notNull().default("to_complete"),
   /**
+   * Who opened the file: `practitioner` or `patient` (story 5). Text, with the
+   * values in `shared/file-status.ts`. The list hides a patient's file until
+   * it is `ready`. The audit trail holds the same fact, but the list would
+   * need a second read per page to get it from there.
+   */
+  createdBy: text("created_by").notNull().default("practitioner"),
+  /**
    * Birth date as a plain calendar date, not an instant: a birthday has no
    * timezone, and storing one is how an age drifts by a day across a border.
    * Age is derived at the read site and never stored.
