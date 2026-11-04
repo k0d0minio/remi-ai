@@ -55,11 +55,6 @@ export const HERO = {
   pilotAfter: `. Profitez de ${SITE.pilotDurationWeeks} semaines avec REMI à tarif préférentiel et participez à son développement.`,
   primary: "Je deviens patient pilote",
   secondary: "Découvrir les offres",
-  phone: {
-    label: "Aperçu illustratif de l’application REMI : les repas du jour",
-    title: "Vos repas du jour",
-    cta: "Améliorer mon repas",
-  },
 };
 
 export const OFFERS_SECTION = {
@@ -204,8 +199,8 @@ export const FEATURES = [
   },
   {
     id: "improve",
-    title: "Améliorez vos repas",
-    text: "Vous prévoyez un repas ? Décrivez-le à REMI. Il vous propose de petits ajustements personnalisés et vous explique pourquoi.",
+    title: "Améliorez vos repas, sans changer vos habitudes",
+    text: "Vous avez prévu des pâtes, une pizza ou un sandwich ? Dites à REMI ce que vous allez manger. Il vous propose de petits ajustements concrets, adaptés à votre profil nutritionnel, et vous explique leurs bienfaits.",
   },
 ] as const;
 
@@ -218,15 +213,79 @@ export const MOCK = {
     { slot: "Dîner", name: "Curry doux de pois chiches et épinards" },
     { slot: "Collation", name: "Houmous et bâtonnets de légumes croquants" },
   ],
+  /**
+   * The interactive preview (Morgane, 4 November 2026): a visitor picks a meal,
+   * it shows as a message to REMI, three concrete suggestions follow. The
+   * explanations of the pizza and the sandwich are ours, in the shape of hers.
+   */
   improve: {
     label: "Exemple d’amélioration d’un repas",
-    input: "Ce soir : des pâtes à la crème",
-    suggestions: [
-      "Ajouter une source de protéines",
-      "Enrichir le repas en fibres",
-      "Réduire un peu la crème",
+    pickLabel: "Choisissez un repas",
+    meals: [
+      {
+        id: "pasta",
+        name: "Pâtes à la crème",
+        emoji: "🍝",
+        message: "Ce soir, je prépare des pâtes à la crème 🍝",
+        suggestions: [
+          {
+            action: "Ajoutez du poulet ou des pois chiches.",
+            why: "Pour apporter des protéines et favoriser la satiété.",
+          },
+          {
+            action: "Ajoutez des brocolis ou des courgettes.",
+            why: "Pour enrichir votre repas en fibres, vitamines et minéraux.",
+          },
+          {
+            action: "Remplacez une partie de la crème par une alternative végétale adaptée.",
+            why: "Pour ajuster l’apport en graisses saturées selon votre profil.",
+          },
+        ],
+      },
+      {
+        id: "pizza",
+        name: "Pizza",
+        emoji: "🍕",
+        message: "Ce soir, c’est pizza 🍕",
+        suggestions: [
+          {
+            action: "Ajoutez des légumes : champignons, poivrons ou roquette.",
+            why: "Pour enrichir votre repas en fibres, vitamines et minéraux.",
+          },
+          {
+            action: "Accompagnez-la d’une salade.",
+            why: "Pour augmenter les fibres et favoriser la satiété.",
+          },
+          {
+            action: "Adaptez la garniture et la quantité de fromage.",
+            why: "Pour ajuster l’apport en graisses selon vos besoins.",
+          },
+        ],
+      },
+      {
+        id: "sandwich",
+        name: "Sandwich",
+        emoji: "🥪",
+        message: "À midi, je prends un sandwich 🥪",
+        suggestions: [
+          {
+            action: "Choisissez un pain complet, si votre profil le permet.",
+            why: "Pour plus de fibres et une énergie plus stable.",
+          },
+          {
+            action: "Ajoutez des crudités : roquette, concombre, tomates.",
+            why: "Pour enrichir votre repas en fibres, vitamines et minéraux.",
+          },
+          {
+            action: "Ajoutez une source de protéines adaptée : poulet, houmous ou tofu.",
+            why: "Pour apporter des protéines et favoriser la satiété.",
+          },
+        ],
+      },
     ],
-    why: "Pourquoi ? Pour rapprocher ce repas de vos objectifs, sans tout changer.",
+    personal:
+      "Avec REMI, chaque suggestion tient compte de votre profil, de vos objectifs et de vos besoins nutritionnels.",
+    message: "Mangez ce que vous aimez. REMI vous aide à faire les bons ajustements.",
   },
 };
 
