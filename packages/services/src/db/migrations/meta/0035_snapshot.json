@@ -1,5 +1,5 @@
 {
-  "id": "aa003862-1c64-4c3f-9fe5-27bdf03f0f8d",
+  "id": "64adf483-329e-4405-b808-b1f8f4ffeebf",
   "prevId": "b6dcb846-1167-4dd9-b730-a2f84be08a5f",
   "version": "7",
   "dialect": "postgresql",
@@ -616,7 +616,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'practitioner'"
+          "default": "'operator'"
         },
         "token_hash": {
           "name": "token_hash",
@@ -708,7 +708,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'practitioner'"
+          "default": "'operator'"
         },
         "signup_link_token": {
           "name": "signup_link_token",
@@ -2309,6 +2309,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'to_complete'"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'practitioner'"
         },
         "birth_date": {
           "name": "birth_date",

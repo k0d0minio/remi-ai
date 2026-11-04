@@ -2,7 +2,9 @@ import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { getFileStore, isFileStoreConfigured } from "../../../files";
 import {
+  appearsInPatientList,
   canMoveFileStatus,
+  fileOrigins,
   fileStatuses,
   initialFileStatus,
   type FileStatus,
@@ -346,7 +348,9 @@ const listSorters: Record<
 /**
  * The practitioner's patient list (story 5). The same scope, search and filter
  * as `patientsOf` (D-27), with the two sorts of the list and the appointment
- * date on each row.
+ * date on each row. A file the patient opened shows only once it is `ready`
+ * (`appearsInPatientList`). One row per file: a patient who takes over a
+ * practitioner's file adds an account, not a second file.
  */
 export const patientListOf = async (
   actor: Actor,
@@ -354,14 +358,24 @@ export const patientListOf = async (
 ): Promise<readonly PatientListRow[]> => {
   const items = await listedFiles<PatientListRow>(actor, query.scope);
   const status = query.status && query.status !== "all" ? query.status : null;
-  return items
-    .map((patient) => ({
-      ...patient,
-      consultationDate: patient.consultationDate ?? null,
-    }))
-    .filter((patient) => (status ? patient.status === status : true))
-    .filter((patient) => matchesSearch(patient, query.search ?? ""))
-    .sort(listSorters[query.sort ?? defaultPatientListSort]);
+  return (
+    items
+      .map((patient) => ({
+        ...patient,
+        consultationDate: patient.consultationDate ?? null,
+      }))
+      // A row read before the origin column has none. The migration sets every
+      // existing row, so this only covers an in-memory row from an old fixture.
+      .filter((patient) =>
+        appearsInPatientList({
+          createdBy: patient.createdBy ?? "practitioner",
+          fileStatus: patient.fileStatus ?? initialFileStatus,
+        }),
+      )
+      .filter((patient) => (status ? patient.status === status : true))
+      .filter((patient) => matchesSearch(patient, query.search ?? ""))
+      .sort(listSorters[query.sort ?? defaultPatientListSort])
+  );
 };
 
 const unscopedGetPatient = async (
@@ -443,12 +457,15 @@ export const getPatientByShareToken = async (
 /**
  * A new file names its practitioner, or the service refuses it. The id is not
  * in `patientFields`: an update never moves a file to another practitioner.
+ * `createdBy` is the same: set here once, never by an update. Without it the
+ * file is the practitioner's. Only the sign-up passes `patient`.
  */
 const newPatientFields = patientFields
   .partial()
   .required({ pseudonym: true })
   .extend({
     practitionerId: z.uuid("a practitioner is required"),
+    createdBy: z.enum(fileOrigins).optional(),
   });
 
 export type NewPatientInput = z.input<typeof newPatientFields>;
@@ -498,6 +515,7 @@ export const createPatient = async (
     locale: data.locale ?? "fr",
     status: data.status ?? "active",
     fileStatus: initialFileStatus,
+    createdBy: data.createdBy ?? "practitioner",
     birthDate: data.birthDate ? data.birthDate : null,
     sex: data.sex ?? "unspecified",
     heightCm: data.heightCm ? data.heightCm : null,

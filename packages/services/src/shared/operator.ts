@@ -8,7 +8,7 @@
  * The two roles of D-27. `admin` is the REMI team: it manages the accounts, and
  * it may open any patient file with a reason, read-only (story 3). The open is
  * logged. `practitioner` reads and writes only the files it holds. The roles
- * replace `owner` and `operator`. Migration 0035 renamed the stored values.
+ * replace `owner` and `operator`. Migration 0036 renamed the stored values.
  *
  * Order matters: the array reads most-privileged first, and
  * `isAtLeast()` compares by index.

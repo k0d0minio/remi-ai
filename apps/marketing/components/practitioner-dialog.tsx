@@ -18,7 +18,12 @@ import { SubmitError } from "@/components/forms/submit-error";
 import { PRACTITIONERS } from "@/lib/content/landing";
 import { submitLead } from "@/lib/leads/actions";
 import type { SubmitResult } from "@/lib/leads/state";
-import { isEmail, isPhone, MSG, type FieldErrors } from "@/lib/leads/validation";
+import {
+  isEmail,
+  isPhone,
+  MSG,
+  type FieldErrors,
+} from "@/lib/leads/validation";
 
 const copy = PRACTITIONERS.dialog;
 
@@ -96,7 +101,7 @@ export const PractitionerDialog = () => {
         <Button
           variant="outline"
           size="lg"
-          className="border-background text-background hover:bg-background/10 hover:text-background"
+          className="border-background text-background hover:bg-background/10 hover:text-background bg-transparent"
         >
           {PRACTITIONERS.cta}
         </Button>
@@ -109,12 +114,20 @@ export const PractitionerDialog = () => {
               <DialogTitle>{copy.doneTitle}</DialogTitle>
               <DialogDescription>{copy.doneText}</DialogDescription>
             </DialogHeader>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
               {copy.close}
             </Button>
           </div>
         ) : (
-          <form onSubmit={onSubmit} noValidate className="relative flex flex-col gap-4">
+          <form
+            onSubmit={onSubmit}
+            noValidate
+            className="relative flex flex-col gap-4"
+          >
             <DialogHeader>
               <DialogTitle>{copy.title}</DialogTitle>
               <DialogDescription>{copy.sub}</DialogDescription>
