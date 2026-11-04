@@ -99,7 +99,7 @@ export const InviteForm = ({ mailerReady }: Props) => {
           <Field
             id="invite-role"
             label="Accès"
-            hint={roleDescriptions.operator}
+            hint={roleDescriptions.practitioner}
           >
             <Select name="role" defaultValue="practitioner">
               <SelectTrigger id="invite-role">
