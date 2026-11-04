@@ -11,6 +11,7 @@ import { getPatient } from "../db/services/patients";
 import { err, ok, type Result } from "../shared/result";
 import { minPasswordLength, type PatientLanding } from "../shared/signup";
 import { getAuthProvider, type AuthIdentity } from "./provider";
+import { systemActor } from "../db/services/access";
 
 /**
  * A patient comes back to the account they created at sign-up (story 2, D-26).
@@ -53,7 +54,7 @@ const patientActor = async (
   account: PatientAccount,
   db?: DatabaseClient,
 ): Promise<AuditActor> => {
-  const patient = await getPatient(account.patientProfileId, db);
+  const patient = await getPatient(systemActor, account.patientProfileId, db);
   return {
     kind: "patient",
     id: account.patientProfileId,

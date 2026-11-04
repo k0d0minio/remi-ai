@@ -3,6 +3,7 @@ import { currentConsentText } from "../consent";
 import { getDatabase, registerDatabase } from "../db/client";
 import type { PatientFileClaim } from "../db/models/patient-file-claim";
 import type { PatientProfile } from "../db/models/patient-profile";
+import { systemActor } from "../db/services/access";
 import { listAuditEvents } from "../db/services/audit";
 import { createOperator } from "../db/services/operators";
 import {
@@ -77,13 +78,13 @@ beforeAll(async () => {
     email: "morgane@example.be",
     name: "Morgane",
     password: "long enough password",
-    role: "owner",
+    role: "admin",
   });
   const other = await createOperator({
     email: "other@example.be",
     name: "Other",
     password: "long enough password",
-    role: "operator",
+    role: "practitioner",
   });
   if (!morgane.ok || !other.ok) {
     throw new Error("test practitioners not created");
@@ -120,7 +121,7 @@ beforeEach(async () => {
 
 /** A file the practitioner created in the console: no account. */
 const practitionerFile = async (email = "Marie.Dupont@Example.be") => {
-  const created = await createPatient({
+  const created = await createPatient(systemActor, {
     practitionerId,
     pseudonym: "Patient ABCD",
     fullName: "Marie Dupont",
@@ -177,7 +178,7 @@ describe("the activation link (path 1)", () => {
     const account = await getPatientAccountByProfile(file.id);
     expect(account?.email).toBe("marie.dupont@example.be");
     expect(await profiles()).toHaveLength(1);
-    const kept = await getPatient(file.id);
+    const kept = await getPatient(systemActor, file.id);
     expect(kept.ok && kept.data.heightCm).toBe(168);
     expect(kept.ok && kept.data.fullName).toBe("Marie Dupont");
   });
@@ -186,14 +187,14 @@ describe("the activation link (path 1)", () => {
     const file = await practitionerFile();
     await takeOver(await activationToken(file.id));
 
-    const events = await listAuditEvents({ action: "patient.file_taken_over" });
+    const events = await listAuditEvents(systemActor, { action: "patient.file_taken_over" });
     expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({
       actorKind: "patient",
       targetId: file.id,
       detail: "activation",
     });
-    const consents = await consentsOf(file.id);
+    const consents = await consentsOf(systemActor, file.id);
     expect(consents.care?.decision).toBe("given");
   });
 
@@ -254,7 +255,7 @@ describe("the activation link (path 1)", () => {
   it("refuses a link on an e-mail that already has an account, with has_account", async () => {
     const file = await practitionerFile();
     const token = await activationToken(file.id);
-    const elsewhere = await createPatient({
+    const elsewhere = await createPatient(systemActor, {
       practitionerId,
       pseudonym: "Patient WXYZ",
     });
@@ -357,12 +358,12 @@ describe("the sign-up with the e-mail of a practitioner-created file (path 2)", 
     expect(sent[0].subject).toBe("Reprenez votre dossier REMI");
     const url = sent[0].text.split("\n").find((line) => line.startsWith("https://"));
     expect(url).toBeDefined();
-    const events = await listAuditEvents({ action: "patient.file_claim_sent" });
+    const events = await listAuditEvents(systemActor, { action: "patient.file_claim_sent" });
     expect(events).toHaveLength(1);
 
     const result = await takeOver(tokenOf(url ?? ""));
     expect(result).toEqual({ ok: true, data: { patientId: file.id } });
-    const taken = await listAuditEvents({ action: "patient.file_taken_over" });
+    const taken = await listAuditEvents(systemActor, { action: "patient.file_taken_over" });
     expect(taken[0].detail).toBe("claim");
     expect(await profiles()).toHaveLength(1);
   });
@@ -412,7 +413,7 @@ describe("the sign-up with the e-mail of a practitioner-created file (path 2)", 
     });
     expect(!request.ok && request.error).toBe("upstream_failed");
     expect(
-      await listAuditEvents({ action: "patient.file_claim_sent" }),
+      await listAuditEvents(systemActor, { action: "patient.file_claim_sent" }),
     ).toHaveLength(0);
     registerMailer(consoleMailer);
   });

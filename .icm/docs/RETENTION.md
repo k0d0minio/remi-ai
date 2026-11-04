@@ -208,10 +208,10 @@ the file through `deletePatient`: the same cascade as the console, files first (
 patient removes). The audit trail gets a `patient.deleted` row with actor kind `system` and the
 detail `inactivity`. When the file store refuses, nothing is deleted and the next run tries again.
 
-**The retention hold.** An owner of the console can set a hold on a file, in the « Zone sensible »
+**The retention hold.** An admin of the console can set a hold on a file, in the « Zone sensible »
 of the file page (`patient_profiles.retention_hold_at`). While it stands, the route sends no notice
 and deletes nothing. It writes one log line per skipped file per run. Setting and clearing the hold
-each write an audit row with the owner's name. Morgane said on 2026-10-23 that no legal retention
+each write an audit row with the admin's name. Morgane said on 2026-10-23 that no legal retention
 rule applies during the pilot, so the hold is the only exception.
 
 **What makes it safe to run twice.** A sent notice stamps its column, so a second run on the same

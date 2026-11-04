@@ -10,6 +10,7 @@ import {
   planSectionSave,
   type SectionSaveCounts,
 } from "../section-save";
+import { byPatient, byRecord, noSuchPatient } from "../access";
 
 /**
  * The prescribed supplement protocol — brainstorm § G. What Morgane prescribes,
@@ -60,7 +61,7 @@ const allForPatient = async (
 };
 
 /** The protocol in force. */
-export const listPatientSupplements = async (
+const unscopedListPatientSupplements = async (
   patientId: Id,
 ): Promise<readonly PatientSupplement[]> =>
   (await allForPatient(patientId)).filter(
@@ -68,7 +69,7 @@ export const listPatientSupplements = async (
   );
 
 /** What was in force and no longer is, newest archive first. */
-export const listArchivedPatientSupplements = async (
+const unscopedListArchivedPatientSupplements = async (
   patientId: Id,
 ): Promise<readonly PatientSupplement[]> =>
   (await allForPatient(patientId))
@@ -86,7 +87,7 @@ const nextPosition = async (patientId: Id) => {
   );
 };
 
-export const addPatientSupplement = async (
+const unscopedAddPatientSupplement = async (
   patientId: Id,
   input: SupplementInput,
 ): Promise<Result<PatientSupplement>> => {
@@ -112,7 +113,7 @@ export const addPatientSupplement = async (
   return ok(created);
 };
 
-export const updatePatientSupplement = async (
+const unscopedUpdatePatientSupplement = async (
   id: Id,
   input: SupplementInput,
 ): Promise<Result<PatientSupplement>> => {
@@ -144,7 +145,7 @@ export const updatePatientSupplement = async (
  * 0, so swapping stored values would swap two zeroes, and a renumber leaves the
  * run canonical as a side effect of the first reorder.
  */
-export const movePatientSupplement = async (
+const unscopedMovePatientSupplement = async (
   id: Id,
   direction: "up" | "down",
 ): Promise<Result<PatientSupplement>> => {
@@ -155,7 +156,7 @@ export const movePatientSupplement = async (
   if (!existing) {
     return err("not_found", "no such supplement");
   }
-  const run = await listPatientSupplements(existing.patientId);
+  const run = await unscopedListPatientSupplements(existing.patientId);
   const index = run.findIndex((supplement) => supplement.id === id);
   const target = direction === "up" ? index - 1 : index + 1;
   if (index === -1 || target < 0 || target >= run.length) {
@@ -178,7 +179,7 @@ export const movePatientSupplement = async (
   return moved ? ok(moved) : err("not_found", "no such supplement");
 };
 
-export const archivePatientSupplement = async (
+const unscopedArchivePatientSupplement = async (
   id: Id,
   archived: boolean,
 ): Promise<Result<PatientSupplement>> => {
@@ -199,7 +200,7 @@ export const archivePatientSupplement = async (
  * The permanent one. Archiving is the everyday move; this exists for a row that
  * should never have been written — a wrong patient, a test entry.
  */
-export const deletePatientSupplement = async (
+const unscopedDeletePatientSupplement = async (
   id: Id,
 ): Promise<Result<true>> => {
   if (!uuidSchema.safeParse(id).success) {
@@ -236,7 +237,7 @@ export type SupplementRow = {
  * archived, never deleted. Every row is validated before the first write, so a
  * bad row costs nothing. One flat run, so a row's rank is its index.
  */
-export const savePatientSupplements = async (
+const unscopedSavePatientSupplements = async (
   patientId: Id,
   rows: readonly SupplementRow[],
   /** The ids the editor was seeded with — see `planSectionSave`'s `known`. */
@@ -266,7 +267,7 @@ export const savePatientSupplements = async (
     });
   }
 
-  const existing = await listPatientSupplements(patientId);
+  const existing = await unscopedListPatientSupplements(patientId);
   const plan = planSectionSave<SupplementRow, PatientSupplement>({
     existing,
     groups: [parsedRows],
@@ -316,3 +317,53 @@ export const savePatientSupplements = async (
     return ok(counts);
   });
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const listPatientSupplements = byPatient(
+  "read",
+  unscopedListPatientSupplements,
+  () => [],
+);
+export const listArchivedPatientSupplements = byPatient(
+  "read",
+  unscopedListArchivedPatientSupplements,
+  () => [],
+);
+export const addPatientSupplement = byPatient(
+  "write",
+  unscopedAddPatientSupplement,
+  noSuchPatient,
+);
+export const updatePatientSupplement = byRecord(
+  "supplement",
+  "write",
+  unscopedUpdatePatientSupplement,
+  noSuchPatient,
+);
+export const movePatientSupplement = byRecord(
+  "supplement",
+  "write",
+  unscopedMovePatientSupplement,
+  noSuchPatient,
+);
+export const archivePatientSupplement = byRecord(
+  "supplement",
+  "write",
+  unscopedArchivePatientSupplement,
+  noSuchPatient,
+);
+export const deletePatientSupplement = byRecord(
+  "supplement",
+  "write",
+  unscopedDeletePatientSupplement,
+  noSuchPatient,
+);
+export const savePatientSupplements = byPatient(
+  "write",
+  unscopedSavePatientSupplements,
+  noSuchPatient,
+);

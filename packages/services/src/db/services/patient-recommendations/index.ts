@@ -12,6 +12,7 @@ import {
   planSectionSave,
   type SectionSaveCounts,
 } from "../section-save";
+import { byPatient, byRecord, noSuchPatient } from "../access";
 
 /**
  * The recommendations Morgane encodes into a patient profile — the protocol,
@@ -74,7 +75,7 @@ const allForPatient = async (
 };
 
 /** The protocol in force — what the patient link shows. */
-export const listPatientRecommendations = async (
+const unscopedListPatientRecommendations = async (
   patientId: Id,
 ): Promise<readonly PatientRecommendation[]> =>
   (await allForPatient(patientId)).filter(
@@ -82,7 +83,7 @@ export const listPatientRecommendations = async (
   );
 
 /** What was in force and no longer is, newest archive first. */
-export const listArchivedPatientRecommendations = async (
+const unscopedListArchivedPatientRecommendations = async (
   patientId: Id,
 ): Promise<readonly PatientRecommendation[]> =>
   (await allForPatient(patientId))
@@ -105,7 +106,7 @@ const nextPosition = async (
   );
 };
 
-export const addPatientRecommendation = async (
+const unscopedAddPatientRecommendation = async (
   patientId: Id,
   input: RecommendationInput,
 ): Promise<Result<PatientRecommendation>> => {
@@ -130,7 +131,7 @@ export const addPatientRecommendation = async (
   return ok(created);
 };
 
-export const updatePatientRecommendation = async (
+const unscopedUpdatePatientRecommendation = async (
   id: Id,
   input: RecommendationInput,
 ): Promise<Result<PatientRecommendation>> => {
@@ -173,7 +174,7 @@ export const updatePatientRecommendation = async (
  * than a backfill nobody remembers to run. A category holds a handful of
  * entries — the extra writes are not worth optimising away.
  */
-export const movePatientRecommendation = async (
+const unscopedMovePatientRecommendation = async (
   id: Id,
   direction: "up" | "down",
 ): Promise<Result<PatientRecommendation>> => {
@@ -184,9 +185,9 @@ export const movePatientRecommendation = async (
   if (!existing) {
     return err("not_found", "no such recommendation");
   }
-  const run = (await listPatientRecommendations(existing.patientId)).filter(
-    (recommendation) => recommendation.category === existing.category,
-  );
+  const run = (
+    await unscopedListPatientRecommendations(existing.patientId)
+  ).filter((recommendation) => recommendation.category === existing.category);
   const index = run.findIndex((recommendation) => recommendation.id === id);
   const target = direction === "up" ? index - 1 : index + 1;
   if (index === -1 || target < 0 || target >= run.length) {
@@ -209,7 +210,7 @@ export const movePatientRecommendation = async (
   return moved ? ok(moved) : err("not_found", "no such recommendation");
 };
 
-export const archivePatientRecommendation = async (
+const unscopedArchivePatientRecommendation = async (
   id: Id,
   archived: boolean,
 ): Promise<Result<PatientRecommendation>> => {
@@ -230,7 +231,7 @@ export const archivePatientRecommendation = async (
  * The permanent one. Archiving is the everyday move; this exists for a row
  * that should never have been written — a wrong patient, a test entry.
  */
-export const deletePatientRecommendation = async (
+const unscopedDeletePatientRecommendation = async (
   id: Id,
 ): Promise<Result<true>> => {
   if (!uuidSchema.safeParse(id).success) {
@@ -272,7 +273,7 @@ export type RecommendationRow = {
  * category order is the vocabulary's, and the only rank Morgane sets is the one
  * inside a category.
  */
-export const savePatientRecommendations = async (
+const unscopedSavePatientRecommendations = async (
   patientId: Id,
   rows: readonly RecommendationRow[],
   /** The ids the editor was seeded with — see `planSectionSave`'s `known`. */
@@ -301,7 +302,7 @@ export const savePatientRecommendations = async (
     });
   }
 
-  const existing = await listPatientRecommendations(patientId);
+  const existing = await unscopedListPatientRecommendations(patientId);
   const plan = planSectionSave<RecommendationRow, PatientRecommendation>({
     existing,
     // One group per category, in the vocabulary's reading order, so a row's
@@ -352,3 +353,53 @@ export const savePatientRecommendations = async (
     return ok(counts);
   });
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const listPatientRecommendations = byPatient(
+  "read",
+  unscopedListPatientRecommendations,
+  () => [],
+);
+export const listArchivedPatientRecommendations = byPatient(
+  "read",
+  unscopedListArchivedPatientRecommendations,
+  () => [],
+);
+export const addPatientRecommendation = byPatient(
+  "write",
+  unscopedAddPatientRecommendation,
+  noSuchPatient,
+);
+export const updatePatientRecommendation = byRecord(
+  "recommendation",
+  "write",
+  unscopedUpdatePatientRecommendation,
+  noSuchPatient,
+);
+export const movePatientRecommendation = byRecord(
+  "recommendation",
+  "write",
+  unscopedMovePatientRecommendation,
+  noSuchPatient,
+);
+export const archivePatientRecommendation = byRecord(
+  "recommendation",
+  "write",
+  unscopedArchivePatientRecommendation,
+  noSuchPatient,
+);
+export const deletePatientRecommendation = byRecord(
+  "recommendation",
+  "write",
+  unscopedDeletePatientRecommendation,
+  noSuchPatient,
+);
+export const savePatientRecommendations = byPatient(
+  "write",
+  unscopedSavePatientRecommendations,
+  noSuchPatient,
+);

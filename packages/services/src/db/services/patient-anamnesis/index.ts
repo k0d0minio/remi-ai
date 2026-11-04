@@ -8,6 +8,7 @@ import type {
   PatientAnamnesis,
 } from "../../models/patient-anamnesis";
 import { touchPatient } from "../patients";
+import { byPatient, noSuchPatient } from "../access";
 
 /**
  * The structured anamnesis — § B's twelve categories, one row per (patient,
@@ -41,7 +42,7 @@ const rank = (category: AnamnesisCategory) =>
  * looks each one up here, so an unknown key left over from a trimmed vocabulary
  * simply stops being rendered instead of breaking the page.
  */
-export const listPatientAnamnesis = async (
+const unscopedListPatientAnamnesis = async (
   patientId: Id,
 ): Promise<readonly PatientAnamnesis[]> => {
   if (!uuidSchema.safeParse(patientId).success) {
@@ -55,7 +56,7 @@ export const listPatientAnamnesis = async (
  * Write one category. The other eleven are never read or touched, which is what
  * makes the block safe to edit one area at a time mid-consultation.
  */
-export const setPatientAnamnesis = async (
+const unscopedSetPatientAnamnesis = async (
   patientId: Id,
   category: string,
   body: string,
@@ -100,3 +101,19 @@ export const setPatientAnamnesis = async (
   await touchPatient(patientId);
   return ok(written);
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const listPatientAnamnesis = byPatient(
+  "read",
+  unscopedListPatientAnamnesis,
+  () => [],
+);
+export const setPatientAnamnesis = byPatient(
+  "write",
+  unscopedSetPatientAnamnesis,
+  noSuchPatient,
+);

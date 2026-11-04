@@ -5,6 +5,7 @@ import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { listAuditEvents, type AuditActor } from "../audit";
 import { createPatient } from "../patients";
 import { consentsOf, insertConsent, recordConsent } from "./index";
+import { systemActor } from "../../services/access";
 
 let claireId: string;
 let claire: AuditActor;
@@ -20,7 +21,7 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 5));
 
 beforeAll(async () => {
   registerDatabase(createMemoryDatabase());
-  const created = await createPatient({
+  const created = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym: "Claire",
   });
@@ -34,7 +35,7 @@ beforeAll(async () => {
 describe("patient consents", () => {
   it("stores the key, the version, the locale, the hash, the decision and the time", async () => {
     const before = Date.now();
-    const recorded = await recordConsent({
+    const recorded = await recordConsent(systemActor, {
       patientId: claireId,
       key: "care",
       version: "1",
@@ -58,7 +59,7 @@ describe("patient consents", () => {
   });
 
   it("writes one audit event per decision, under the patient actor", async () => {
-    const events = await listAuditEvents({ targetId: claireId });
+    const events = await listAuditEvents(systemActor, { targetId: claireId });
     const given = events.filter((event) => event.action === "consent.given");
     expect(given).toHaveLength(1);
     expect(given[0].actorKind).toBe("patient");
@@ -68,7 +69,7 @@ describe("patient consents", () => {
 
   it("returns the latest decision per key, and no entry for a key never asked", async () => {
     await tick();
-    const refused = await recordConsent({
+    const refused = await recordConsent(systemActor, {
       patientId: claireId,
       key: "genetic",
       version: "1",
@@ -78,7 +79,7 @@ describe("patient consents", () => {
     });
     expect(refused.ok).toBe(true);
     await tick();
-    await recordConsent({
+    await recordConsent(systemActor, {
       patientId: claireId,
       key: "genetic",
       version: "1",
@@ -87,23 +88,23 @@ describe("patient consents", () => {
       actor: claire,
     });
 
-    const latest = await consentsOf(claireId);
+    const latest = await consentsOf(systemActor, claireId);
     expect(latest.care?.decision).toBe("given");
     expect(latest.genetic?.decision).toBe("given");
 
-    const marc = await createPatient({
+    const marc = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Marc",
     });
     if (!marc.ok) {
       throw new Error("test patient not created");
     }
-    expect(await consentsOf(marc.data.id)).toEqual({});
+    expect(await consentsOf(systemActor, marc.data.id)).toEqual({});
   });
 
   it("withdraws a consent in force, and the withdrawal becomes the answer", async () => {
     await tick();
-    const withdrawn = await recordConsent({
+    const withdrawn = await recordConsent(systemActor, {
       patientId: claireId,
       key: "genetic",
       version: "1",
@@ -112,14 +113,18 @@ describe("patient consents", () => {
       actor: claire,
     });
     expect(withdrawn.ok).toBe(true);
-    expect((await consentsOf(claireId)).genetic?.decision).toBe("withdrawn");
+    expect((await consentsOf(systemActor, claireId)).genetic?.decision).toBe(
+      "withdrawn",
+    );
 
-    const events = await listAuditEvents({ action: "consent.withdrawn" });
+    const events = await listAuditEvents(systemActor, {
+      action: "consent.withdrawn",
+    });
     expect(events).toHaveLength(1);
   });
 
   it("refuses a withdrawal with no consent in force", async () => {
-    const again = await recordConsent({
+    const again = await recordConsent(systemActor, {
       patientId: claireId,
       key: "genetic",
       version: "1",
@@ -135,7 +140,7 @@ describe("patient consents", () => {
 
   it("records an operator's decision under the operator actor", async () => {
     await tick();
-    const recorded = await recordConsent({
+    const recorded = await recordConsent(systemActor, {
       patientId: claireId,
       key: "care",
       version: "1",
@@ -151,7 +156,7 @@ describe("patient consents", () => {
 
   it("refuses the genetic consent from an operator, in any decision", async () => {
     for (const decision of ["given", "refused"] as const) {
-      const recorded = await recordConsent({
+      const recorded = await recordConsent(systemActor, {
         patientId: claireId,
         key: "genetic",
         version: "1",
@@ -174,7 +179,7 @@ describe("patient consents", () => {
       { key: "cookies" as never, version: "1", locale: "fr-BE" },
     ] as const;
     for (const named of cases) {
-      const result = await recordConsent({
+      const result = await recordConsent(systemActor, {
         ...named,
         patientId: claireId,
         decision: "given",
@@ -188,7 +193,7 @@ describe("patient consents", () => {
   });
 
   it("refuses an unknown patient", async () => {
-    const recorded = await recordConsent({
+    const recorded = await recordConsent(systemActor, {
       patientId: "33333333-3333-4333-8333-333333333333",
       key: "care",
       version: "1",
@@ -203,7 +208,8 @@ describe("patient consents", () => {
   });
 
   it("inserts on the client it is given and leaves the audit event to the caller", async () => {
-    const before = (await listAuditEvents({ targetId: claireId })).length;
+    const before = (await listAuditEvents(systemActor, { targetId: claireId }))
+      .length;
     const written = await getDatabase().transaction((tx) =>
       insertConsent(
         {
@@ -228,6 +234,8 @@ describe("patient consents", () => {
       targetLabel: "Claire",
       detail: "care v1 fr-BE",
     });
-    expect(await listAuditEvents({ targetId: claireId })).toHaveLength(before);
+    expect(
+      await listAuditEvents(systemActor, { targetId: claireId }),
+    ).toHaveLength(before);
   });
 });

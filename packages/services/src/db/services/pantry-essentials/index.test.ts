@@ -13,12 +13,13 @@ import {
   savePantryEssentials,
   updatePantryEssential,
 } from "./index";
+import { systemActor } from "../../services/access";
 
 let patientId: string;
 
 beforeAll(async () => {
   registerDatabase(createMemoryDatabase());
-  const created = await createPatient({
+  const created = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym: "Claire",
   });
@@ -29,7 +30,7 @@ beforeAll(async () => {
 });
 
 const items = async (id: string) =>
-  (await listPantryEssentials(id)).map((entry) => entry.item);
+  (await listPantryEssentials(systemActor, id)).map((entry) => entry.item);
 
 /** Throws rather than asserting non-null — a missing row is a broken test. */
 const entryNamed = (
@@ -45,7 +46,7 @@ const entryNamed = (
 
 describe("pantry essentials", () => {
   it("records an item with its why", async () => {
-    const result = await addPantryEssential(patientId, {
+    const result = await addPantryEssential(systemActor, patientId, {
       item: "Sardines",
       why: "Oméga-3, et tu aimes ça",
     });
@@ -57,17 +58,19 @@ describe("pantry essentials", () => {
   });
 
   it("requires an item", async () => {
-    const result = await addPantryEssential(patientId, { item: "  " });
+    const result = await addPantryEssential(systemActor, patientId, {
+      item: "  ",
+    });
     expect(result.ok).toBe(false);
   });
 
   it("caps the item and the why, so neither becomes a paragraph", async () => {
-    const long = await addPantryEssential(patientId, {
+    const long = await addPantryEssential(systemActor, patientId, {
       item: "a".repeat(121),
     });
     expect(long.ok).toBe(false);
 
-    const wordy = await addPantryEssential(patientId, {
+    const wordy = await addPantryEssential(systemActor, patientId, {
       item: "Lentilles",
       why: "b".repeat(281),
     });
@@ -75,7 +78,9 @@ describe("pantry essentials", () => {
   });
 
   it("defaults the why to empty — an item may stand on its own", async () => {
-    const result = await addPantryEssential(patientId, { item: "Citrons" });
+    const result = await addPantryEssential(systemActor, patientId, {
+      item: "Citrons",
+    });
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data.why).toBe("");
@@ -87,7 +92,9 @@ describe("pantry essentials", () => {
   });
 
   it("rejects an unknown patient", async () => {
-    const result = await addPantryEssential("not-a-uuid", { item: "Avoine" });
+    const result = await addPantryEssential(systemActor, "not-a-uuid", {
+      item: "Avoine",
+    });
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error).toBe("not_found");
@@ -96,10 +103,10 @@ describe("pantry essentials", () => {
 
   it("edits an item in place without moving it", async () => {
     const sardines = entryNamed(
-      await listPantryEssentials(patientId),
+      await listPantryEssentials(systemActor, patientId),
       "Sardines",
     );
-    const result = await updatePantryEssential(sardines.id, {
+    const result = await updatePantryEssential(systemActor, sardines.id, {
       why: "Oméga-3 — une boîte par semaine",
     });
     expect(result.ok).toBe(true);
@@ -112,38 +119,44 @@ describe("pantry essentials", () => {
 
   it("moves an item down and renumbers the run", async () => {
     const sardines = entryNamed(
-      await listPantryEssentials(patientId),
+      await listPantryEssentials(systemActor, patientId),
       "Sardines",
     );
-    const moved = await movePantryEssential(sardines.id, "down");
+    const moved = await movePantryEssential(systemActor, sardines.id, "down");
     expect(moved.ok).toBe(true);
     expect(await items(patientId)).toEqual(["Citrons", "Sardines"]);
     expect(
-      (await listPantryEssentials(patientId)).map((entry) => entry.position),
+      (await listPantryEssentials(systemActor, patientId)).map(
+        (entry) => entry.position,
+      ),
     ).toEqual([0, 1]);
   });
 
   it("leaves an item at the end of the list where it is", async () => {
     const citrons = entryNamed(
-      await listPantryEssentials(patientId),
+      await listPantryEssentials(systemActor, patientId),
       "Citrons",
     );
-    const moved = await movePantryEssential(citrons.id, "up");
+    const moved = await movePantryEssential(systemActor, citrons.id, "up");
     expect(moved.ok).toBe(true);
     expect(await items(patientId)).toEqual(["Citrons", "Sardines"]);
   });
 
   it("archives an item off the list without losing the row", async () => {
     const citrons = entryNamed(
-      await listPantryEssentials(patientId),
+      await listPantryEssentials(systemActor, patientId),
       "Citrons",
     );
-    const archived = await archivePantryEssential(citrons.id, true);
+    const archived = await archivePantryEssential(
+      systemActor,
+      citrons.id,
+      true,
+    );
     expect(archived.ok).toBe(true);
 
     expect(await items(patientId)).toEqual(["Sardines"]);
     expect(
-      (await listArchivedPantryEssentials(patientId)).map(
+      (await listArchivedPantryEssentials(systemActor, patientId)).map(
         (entry) => entry.item,
       ),
     ).toEqual(["Citrons"]);
@@ -151,27 +164,34 @@ describe("pantry essentials", () => {
 
   it("restores an archived item to the list", async () => {
     const citrons = entryNamed(
-      await listArchivedPantryEssentials(patientId),
+      await listArchivedPantryEssentials(systemActor, patientId),
       "Citrons",
     );
-    const restored = await archivePantryEssential(citrons.id, false);
+    const restored = await archivePantryEssential(
+      systemActor,
+      citrons.id,
+      false,
+    );
     expect(restored.ok).toBe(true);
-    expect(await listArchivedPantryEssentials(patientId)).toEqual([]);
+    expect(await listArchivedPantryEssentials(systemActor, patientId)).toEqual(
+      [],
+    );
     expect(await items(patientId)).toEqual(["Citrons", "Sardines"]);
   });
 
   it("deletes only its own row", async () => {
     const citrons = entryNamed(
-      await listPantryEssentials(patientId),
+      await listPantryEssentials(systemActor, patientId),
       "Citrons",
     );
-    const removed = await deletePantryEssential(citrons.id);
+    const removed = await deletePantryEssential(systemActor, citrons.id);
     expect(removed.ok).toBe(true);
     expect(await items(patientId)).toEqual(["Sardines"]);
   });
 
   it("reports a missing row rather than throwing", async () => {
     const result = await updatePantryEssential(
+      systemActor,
       "00000000-0000-4000-8000-000000000000",
       { item: "Avoine" },
     );
@@ -188,7 +208,7 @@ describe("saving the whole list at once", () => {
   let sectionPatientId: string;
 
   beforeAll(async () => {
-    const created = await createPatient({
+    const created = await createPatient(systemActor, {
       practitionerId: testPractitionerId,
       pseudonym: "Margaux",
     });
@@ -199,7 +219,7 @@ describe("saving the whole list at once", () => {
   });
 
   it("writes a pasted list of items in one call, in the order given", async () => {
-    const saved = await savePantryEssentials(sectionPatientId, [
+    const saved = await savePantryEssentials(systemActor, sectionPatientId, [
       { item: "Sardines", why: "oméga-3" },
       { item: "Œufs", why: "" },
       { item: "Épinards", why: "" },
@@ -207,14 +227,16 @@ describe("saving the whole list at once", () => {
 
     expect(saved.ok && saved.data.added).toBe(3);
     expect(
-      (await listPantryEssentials(sectionPatientId)).map((row) => row.item),
+      (await listPantryEssentials(systemActor, sectionPatientId)).map(
+        (row) => row.item,
+      ),
     ).toEqual(["Sardines", "Œufs", "Épinards"]);
   });
 
   it("applies an edit, an addition, a removal and a reorder in one save", async () => {
-    const before = await listPantryEssentials(sectionPatientId);
+    const before = await listPantryEssentials(systemActor, sectionPatientId);
 
-    const saved = await savePantryEssentials(sectionPatientId, [
+    const saved = await savePantryEssentials(systemActor, sectionPatientId, [
       { id: before[2].id, item: before[2].item, why: "fer" },
       { id: before[0].id, item: before[0].item, why: before[0].why },
       { item: "Lentilles", why: "" },
@@ -227,40 +249,49 @@ describe("saving the whole list at once", () => {
       reordered: 2,
     });
     expect(
-      (await listPantryEssentials(sectionPatientId)).map((row) => row.item),
+      (await listPantryEssentials(systemActor, sectionPatientId)).map(
+        (row) => row.item,
+      ),
     ).toEqual(["Épinards", "Sardines", "Lentilles"]);
     expect(
-      (await listArchivedPantryEssentials(sectionPatientId)).map(
+      (await listArchivedPantryEssentials(systemActor, sectionPatientId)).map(
         (row) => row.item,
       ),
     ).toContain("Œufs");
   });
 
   it("refuses the whole save on a bad row, naming which one", async () => {
-    const before = await listPantryEssentials(sectionPatientId);
+    const before = await listPantryEssentials(systemActor, sectionPatientId);
 
-    const saved = await savePantryEssentials(sectionPatientId, [
+    const saved = await savePantryEssentials(systemActor, sectionPatientId, [
       { item: "Amandes", why: "" },
       { item: "  ", why: "" },
     ]);
 
     expect(!saved.ok && saved.message).toContain("row 2");
-    expect(await listPantryEssentials(sectionPatientId)).toEqual(before);
+    expect(await listPantryEssentials(systemActor, sectionPatientId)).toEqual(
+      before,
+    );
   });
 
   it("does nothing when the section comes back unchanged", async () => {
-    const before = await listPantryEssentials(sectionPatientId);
+    const before = await listPantryEssentials(systemActor, sectionPatientId);
 
     const saved = await savePantryEssentials(
+      systemActor,
       sectionPatientId,
       before.map((row) => ({ id: row.id, item: row.item, why: row.why })),
     );
 
     expect(saved.ok && saved.data.added).toBe(0);
-    expect(await listPantryEssentials(sectionPatientId)).toEqual(before);
+    expect(await listPantryEssentials(systemActor, sectionPatientId)).toEqual(
+      before,
+    );
   });
 
   it("treats a malformed patient id as not found", async () => {
-    expect((await savePantryEssentials("not-a-uuid", [])).ok).toBe(false);
+    expect((await savePantryEssentials(systemActor, "not-a-uuid", [])).ok).toBe(
+      false,
+    );
   });
 });

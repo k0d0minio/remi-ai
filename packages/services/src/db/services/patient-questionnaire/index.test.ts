@@ -26,11 +26,12 @@ import {
   savePatientQuestionnaire,
   setPatientAllergens,
 } from "./index";
+import { systemActor } from "../../services/access";
 
 let patientId: string;
 
 const newPatient = async (pseudonym: string) => {
-  const created = await createPatient({
+  const created = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym,
     sex: "other",
@@ -47,7 +48,7 @@ const decide = async (
   key: "care" | "genetic",
   decision: "given" | "refused" | "withdrawn",
 ) => {
-  const recorded = await recordConsent({
+  const recorded = await recordConsent(systemActor, {
     patientId: patient.id,
     key,
     version: "1",
@@ -125,7 +126,9 @@ describe("the questionnaire vocabulary", () => {
 
 describe("the questionnaire's answers", () => {
   it("starts with every answer « Non renseigné »", async () => {
-    const view = unwrapOk(await getPatientQuestionnaire(patientId));
+    const view = unwrapOk(
+      await getPatientQuestionnaire(systemActor, patientId),
+    );
     expect(Object.values(view.answers).every((value) => value === null)).toBe(
       true,
     );
@@ -134,14 +137,16 @@ describe("the questionnaire's answers", () => {
 
   it("saves a subset and leaves the other answers as they are", async () => {
     unwrapOk(
-      await savePatientQuestionnaire(patientId, {
+      await savePatientQuestionnaire(systemActor, patientId, {
         sexForCalculation: "female",
         activityLevel: "moderate",
         consultationReason: "  Fatigue après les repas.  ",
       }),
     );
     const answers = unwrapOk(
-      await savePatientQuestionnaire(patientId, { desiredWeightKg: 62.5 }),
+      await savePatientQuestionnaire(systemActor, patientId, {
+        desiredWeightKg: 62.5,
+      }),
     );
     expect(answers.sexForCalculation).toBe("female");
     expect(answers.activityLevel).toBe("moderate");
@@ -151,15 +156,17 @@ describe("the questionnaire's answers", () => {
   });
 
   it("keeps the identity sex apart from the sex for the calculation", async () => {
-    const profile = unwrapOk(await getPatient(patientId));
+    const profile = unwrapOk(await getPatient(systemActor, patientId));
     expect(profile.sex).toBe("other");
-    const view = unwrapOk(await getPatientQuestionnaire(patientId));
+    const view = unwrapOk(
+      await getPatientQuestionnaire(systemActor, patientId),
+    );
     expect(view.answers.sexForCalculation).toBe("female");
   });
 
   it("clears a field on an empty string, and never stores the empty string", async () => {
     const answers = unwrapOk(
-      await savePatientQuestionnaire(patientId, {
+      await savePatientQuestionnaire(systemActor, patientId, {
         consultationReason: "",
         activityLevel: "",
       }),
@@ -170,7 +177,7 @@ describe("the questionnaire's answers", () => {
 
   it("stores the diet, its note, the pathologies and celiac disease", async () => {
     const answers = unwrapOk(
-      await savePatientQuestionnaire(patientId, {
+      await savePatientQuestionnaire(systemActor, patientId, {
         diet: "other",
         dietNote: "Sans porc",
         pathologies: "Hypothyroïdie",
@@ -186,7 +193,7 @@ describe("the questionnaire's answers", () => {
 
   it("stores the genotype gate and the three results as given", async () => {
     const answers = unwrapOk(
-      await savePatientQuestionnaire(patientId, {
+      await savePatientQuestionnaire(systemActor, patientId, {
         geneticTest: "yes",
         apoe: "E3/E4",
         dio2: "H",
@@ -202,14 +209,16 @@ describe("the questionnaire's answers", () => {
   it("refuses a key outside its list", async () => {
     expect(
       errorOf(
-        await savePatientQuestionnaire(patientId, {
+        await savePatientQuestionnaire(systemActor, patientId, {
           activityLevel: "extreme" as never,
         }),
       ),
     ).toBe("invalid_input");
     expect(
       errorOf(
-        await savePatientQuestionnaire(patientId, { apoe: "E1/E1" as never }),
+        await savePatientQuestionnaire(systemActor, patientId, {
+          apoe: "E1/E1" as never,
+        }),
       ),
     ).toBe("invalid_input");
   });
@@ -217,7 +226,9 @@ describe("the questionnaire's answers", () => {
   it("refuses a weight that is not a positive number", async () => {
     expect(
       errorOf(
-        await savePatientQuestionnaire(patientId, { desiredWeightKg: -4 }),
+        await savePatientQuestionnaire(systemActor, patientId, {
+          desiredWeightKg: -4,
+        }),
       ),
     ).toBe("invalid_input");
   });
@@ -225,7 +236,7 @@ describe("the questionnaire's answers", () => {
   it("refuses a field it does not know", async () => {
     expect(
       errorOf(
-        await savePatientQuestionnaire(patientId, {
+        await savePatientQuestionnaire(systemActor, patientId, {
           noKnownAllergies: true,
         } as never),
       ),
@@ -235,19 +246,22 @@ describe("the questionnaire's answers", () => {
   it("answers not found for an unknown or malformed patient", async () => {
     expect(
       errorOf(
-        await getPatientQuestionnaire("00000000-0000-4000-8000-000000000000"),
+        await getPatientQuestionnaire(
+          systemActor,
+          "00000000-0000-4000-8000-000000000000",
+        ),
       ),
     ).toBe("not_found");
-    expect(errorOf(await savePatientQuestionnaire("nope", {}))).toBe(
-      "not_found",
-    );
+    expect(
+      errorOf(await savePatientQuestionnaire(systemActor, "nope", {})),
+    ).toBe("not_found");
   });
 });
 
 describe("the allergy and intolerance lists", () => {
   it("records the checked boxes and marks the list answered", async () => {
     const rows = unwrapOk(
-      await setPatientAllergens(patientId, "allergy", {
+      await setPatientAllergens(systemActor, patientId, "allergy", {
         state: "declared",
         items: [
           { key: "fish", subKey: "salmon" },
@@ -261,13 +275,15 @@ describe("the allergy and intolerance lists", () => {
       ["fish", "cod"],
       ["peanuts", null],
     ]);
-    const view = unwrapOk(await getPatientQuestionnaire(patientId));
+    const view = unwrapOk(
+      await getPatientQuestionnaire(systemActor, patientId),
+    );
     expect(view.answers.noKnownAllergies).toBe(false);
   });
 
   it("keeps « Tous » alone when individual boxes of its category come with it", async () => {
     const rows = unwrapOk(
-      await setPatientAllergens(patientId, "allergy", {
+      await setPatientAllergens(systemActor, patientId, "allergy", {
         state: "declared",
         items: [
           { key: "tree_nuts", subKey: "almond" },
@@ -282,7 +298,7 @@ describe("the allergy and intolerance lists", () => {
 
   it("stores a bare category as « Tous », and drops it under sub-boxes", async () => {
     const bare = unwrapOk(
-      await setPatientAllergens(patientId, "allergy", {
+      await setPatientAllergens(systemActor, patientId, "allergy", {
         state: "declared",
         items: [{ key: "crustaceans" }, { key: "peanuts" }],
       }),
@@ -292,7 +308,7 @@ describe("the allergy and intolerance lists", () => {
       ["peanuts", null],
     ]);
     const intolerance = unwrapOk(
-      await setPatientAllergens(patientId, "intolerance", {
+      await setPatientAllergens(systemActor, patientId, "intolerance", {
         state: "declared",
         items: [{ key: "gluten" }],
       }),
@@ -301,7 +317,7 @@ describe("the allergy and intolerance lists", () => {
       ["gluten", null],
     ]);
     const precise = unwrapOk(
-      await setPatientAllergens(patientId, "allergy", {
+      await setPatientAllergens(systemActor, patientId, "allergy", {
         state: "declared",
         items: [{ key: "crustaceans" }, { key: "crustaceans", subKey: "crab" }],
       }),
@@ -313,7 +329,7 @@ describe("the allergy and intolerance lists", () => {
 
   it("declares a wheat allergy on its own, under gluten", async () => {
     const rows = unwrapOk(
-      await setPatientAllergens(patientId, "allergy", {
+      await setPatientAllergens(systemActor, patientId, "allergy", {
         state: "declared",
         items: [{ key: "gluten", subKey: "wheat" }],
       }),
@@ -326,7 +342,7 @@ describe("the allergy and intolerance lists", () => {
   it("needs a text on « Autre » and refuses one anywhere else", async () => {
     expect(
       errorOf(
-        await setPatientAllergens(patientId, "allergy", {
+        await setPatientAllergens(systemActor, patientId, "allergy", {
           state: "declared",
           items: [{ key: "other" }],
         }),
@@ -334,14 +350,14 @@ describe("the allergy and intolerance lists", () => {
     ).toBe("invalid_input");
     expect(
       errorOf(
-        await setPatientAllergens(patientId, "allergy", {
+        await setPatientAllergens(systemActor, patientId, "allergy", {
           state: "declared",
           items: [{ key: "soy", otherText: "beaucoup" }],
         }),
       ),
     ).toBe("invalid_input");
     const rows = unwrapOk(
-      await setPatientAllergens(patientId, "allergy", {
+      await setPatientAllergens(systemActor, patientId, "allergy", {
         state: "declared",
         items: [
           { key: "other", otherText: "  Kiwi  " },
@@ -364,7 +380,7 @@ describe("the allergy and intolerance lists", () => {
     for (const item of refused) {
       expect(
         errorOf(
-          await setPatientAllergens(patientId, "allergy", {
+          await setPatientAllergens(systemActor, patientId, "allergy", {
             state: "declared",
             items: [item],
           }),
@@ -373,7 +389,7 @@ describe("the allergy and intolerance lists", () => {
     }
     expect(
       errorOf(
-        await setPatientAllergens(patientId, "allergy", {
+        await setPatientAllergens(systemActor, patientId, "allergy", {
           state: "declared",
           items: [{ key: "soy" }, { key: "soy" }],
         }),
@@ -382,7 +398,7 @@ describe("the allergy and intolerance lists", () => {
     // Intolerances have no sub-lists.
     expect(
       errorOf(
-        await setPatientAllergens(patientId, "intolerance", {
+        await setPatientAllergens(systemActor, patientId, "intolerance", {
           state: "declared",
           items: [{ key: "gluten", subKey: "wheat" }],
         }),
@@ -393,7 +409,7 @@ describe("the allergy and intolerance lists", () => {
   it("refuses an empty declaration: no box is not « none known »", async () => {
     expect(
       errorOf(
-        await setPatientAllergens(patientId, "allergy", {
+        await setPatientAllergens(systemActor, patientId, "allergy", {
           state: "declared",
           items: [],
         }),
@@ -403,31 +419,31 @@ describe("the allergy and intolerance lists", () => {
 
   it("keeps the three states apart: none known, declared, no answer", async () => {
     unwrapOk(
-      await setPatientAllergens(patientId, "intolerance", {
+      await setPatientAllergens(systemActor, patientId, "intolerance", {
         state: "none_known",
       }),
     );
-    let view = unwrapOk(await getPatientQuestionnaire(patientId));
+    let view = unwrapOk(await getPatientQuestionnaire(systemActor, patientId));
     expect(view.answers.noKnownIntolerances).toBe(true);
     expect(view.allergens.filter((row) => row.kind === "intolerance")).toEqual(
       [],
     );
 
     unwrapOk(
-      await setPatientAllergens(patientId, "intolerance", {
+      await setPatientAllergens(systemActor, patientId, "intolerance", {
         state: "declared",
         items: [{ key: "lactose" }],
       }),
     );
-    view = unwrapOk(await getPatientQuestionnaire(patientId));
+    view = unwrapOk(await getPatientQuestionnaire(systemActor, patientId));
     expect(view.answers.noKnownIntolerances).toBe(false);
 
     unwrapOk(
-      await setPatientAllergens(patientId, "intolerance", {
+      await setPatientAllergens(systemActor, patientId, "intolerance", {
         state: "unanswered",
       }),
     );
-    view = unwrapOk(await getPatientQuestionnaire(patientId));
+    view = unwrapOk(await getPatientQuestionnaire(systemActor, patientId));
     expect(view.answers.noKnownIntolerances).toBe(null);
     expect(view.allergens.filter((row) => row.kind === "intolerance")).toEqual(
       [],
@@ -435,17 +451,21 @@ describe("the allergy and intolerance lists", () => {
   });
 
   it("leaves the other list untouched when one list changes", async () => {
-    const before = unwrapOk(await getPatientQuestionnaire(patientId));
+    const before = unwrapOk(
+      await getPatientQuestionnaire(systemActor, patientId),
+    );
     const allergiesBefore = before.allergens.filter(
       (row) => row.kind === "allergy",
     );
     unwrapOk(
-      await setPatientAllergens(patientId, "intolerance", {
+      await setPatientAllergens(systemActor, patientId, "intolerance", {
         state: "declared",
         items: [{ key: "histamine" }],
       }),
     );
-    const after = unwrapOk(await getPatientQuestionnaire(patientId));
+    const after = unwrapOk(
+      await getPatientQuestionnaire(systemActor, patientId),
+    );
     expect(after.allergens.filter((row) => row.kind === "allergy")).toEqual(
       allergiesBefore,
     );
@@ -457,7 +477,7 @@ describe("the allergy and intolerance lists", () => {
   it("refuses a list that does not exist, and an unknown patient", async () => {
     expect(
       errorOf(
-        await setPatientAllergens(patientId, "preference", {
+        await setPatientAllergens(systemActor, patientId, "preference", {
           state: "none_known",
         }),
       ),
@@ -465,6 +485,7 @@ describe("the allergy and intolerance lists", () => {
     expect(
       errorOf(
         await setPatientAllergens(
+          systemActor,
           "00000000-0000-4000-8000-000000000000",
           "allergy",
           { state: "none_known" },
@@ -516,12 +537,17 @@ describe("checking a submit before any write", () => {
 describe("the missing fields and the move to « Prêt pour consultation »", () => {
   const newFile = async (pseudonym: string) =>
     unwrapOk(
-      await createPatient({ practitionerId: testPractitionerId, pseudonym }),
+      await createPatient(systemActor, {
+        practitionerId: testPractitionerId,
+        pseudonym,
+      }),
     );
 
   it("lists every mandatory field on an empty file, in the list's order", async () => {
     const file = await newFile("Empty");
-    expect(unwrapOk(await missingQuestionnaireFields(file.id))).toEqual([
+    expect(
+      unwrapOk(await missingQuestionnaireFields(systemActor, file.id)),
+    ).toEqual([
       "sexForCalculation",
       "heightCm",
       "weightKg",
@@ -534,14 +560,16 @@ describe("the missing fields and the move to « Prêt pour consultation »", () 
 
   it("keeps the file « Dossier à compléter » while a field is missing", async () => {
     const file = await newFile("Partial");
-    await savePatientQuestionnaire(file.id, {
+    await savePatientQuestionnaire(systemActor, file.id, {
       sexForCalculation: "female",
       activityLevel: "moderate",
     });
-    expect(unwrapOk(await markReadyWhenComplete(file.id, null))).toBe(
-      "to_complete",
-    );
-    expect(unwrapOk(await missingQuestionnaireFields(file.id))).toEqual([
+    expect(
+      unwrapOk(await markReadyWhenComplete(systemActor, file.id, null)),
+    ).toBe("to_complete");
+    expect(
+      unwrapOk(await missingQuestionnaireFields(systemActor, file.id)),
+    ).toEqual([
       "heightCm",
       "weightKg",
       "consultationReason",
@@ -552,24 +580,32 @@ describe("the missing fields and the move to « Prêt pour consultation »", () 
 
   it("moves the file to ready once the last mandatory field is saved, and audits it", async () => {
     const file = await newFile("Complete");
-    await updatePatient(file.id, { heightCm: 168, weightKg: 61 });
-    await savePatientQuestionnaire(file.id, {
+    await updatePatient(systemActor, file.id, { heightCm: 168, weightKg: 61 });
+    await savePatientQuestionnaire(systemActor, file.id, {
       sexForCalculation: "female",
       activityLevel: "moderate",
       consultationReason: "Fatigue",
     });
-    await setPatientAllergens(file.id, "allergy", { state: "none_known" });
-    expect(unwrapOk(await markReadyWhenComplete(file.id, null))).toBe(
-      "to_complete",
-    );
-    await setPatientAllergens(file.id, "intolerance", {
+    await setPatientAllergens(systemActor, file.id, "allergy", {
+      state: "none_known",
+    });
+    expect(
+      unwrapOk(await markReadyWhenComplete(systemActor, file.id, null)),
+    ).toBe("to_complete");
+    await setPatientAllergens(systemActor, file.id, "intolerance", {
       state: "declared",
       items: [{ key: "lactose" }],
     });
-    expect(unwrapOk(await missingQuestionnaireFields(file.id))).toEqual([]);
-    expect(unwrapOk(await markReadyWhenComplete(file.id, null))).toBe("ready");
-    expect(unwrapOk(await getPatient(file.id)).fileStatus).toBe("ready");
-    const events = await listAuditEvents({
+    expect(
+      unwrapOk(await missingQuestionnaireFields(systemActor, file.id)),
+    ).toEqual([]);
+    expect(
+      unwrapOk(await markReadyWhenComplete(systemActor, file.id, null)),
+    ).toBe("ready");
+    expect(unwrapOk(await getPatient(systemActor, file.id)).fileStatus).toBe(
+      "ready",
+    );
+    const events = await listAuditEvents(systemActor, {
       action: "patient.file_status_changed",
       targetId: file.id,
     });
@@ -578,29 +614,40 @@ describe("the missing fields and the move to « Prêt pour consultation »", () 
 
   it("never moves a file back when a field is cleared later", async () => {
     const file = await newFile("Cleared");
-    await updatePatient(file.id, { heightCm: 170, weightKg: 70 });
-    await savePatientQuestionnaire(file.id, {
+    await updatePatient(systemActor, file.id, { heightCm: 170, weightKg: 70 });
+    await savePatientQuestionnaire(systemActor, file.id, {
       sexForCalculation: "male",
       activityLevel: "low",
       consultationReason: "Sommeil",
     });
-    await setPatientAllergens(file.id, "allergy", { state: "none_known" });
-    await setPatientAllergens(file.id, "intolerance", { state: "none_known" });
-    expect(unwrapOk(await markReadyWhenComplete(file.id, null))).toBe("ready");
-    await savePatientQuestionnaire(file.id, { consultationReason: "" });
-    expect(unwrapOk(await markReadyWhenComplete(file.id, null))).toBe("ready");
-    expect(unwrapOk(await missingQuestionnaireFields(file.id))).toEqual([
-      "consultationReason",
-    ]);
+    await setPatientAllergens(systemActor, file.id, "allergy", {
+      state: "none_known",
+    });
+    await setPatientAllergens(systemActor, file.id, "intolerance", {
+      state: "none_known",
+    });
+    expect(
+      unwrapOk(await markReadyWhenComplete(systemActor, file.id, null)),
+    ).toBe("ready");
+    await savePatientQuestionnaire(systemActor, file.id, {
+      consultationReason: "",
+    });
+    expect(
+      unwrapOk(await markReadyWhenComplete(systemActor, file.id, null)),
+    ).toBe("ready");
+    expect(
+      unwrapOk(await missingQuestionnaireFields(systemActor, file.id)),
+    ).toEqual(["consultationReason"]);
   });
 
   it("answers not found for a missing file", async () => {
-    expect(errorOf(await missingQuestionnaireFields("not-a-uuid"))).toBe(
-      "not_found",
-    );
+    expect(
+      errorOf(await missingQuestionnaireFields(systemActor, "not-a-uuid")),
+    ).toBe("not_found");
     expect(
       errorOf(
         await markReadyWhenComplete(
+          systemActor,
           "00000000-0000-4000-8000-0000000000ab",
           null,
         ),
@@ -615,37 +662,47 @@ describe("optional data under its consent", () => {
     await decide(patient, "care", "given");
     expect(
       errorOf(
-        await savePatientQuestionnaire(patient.id, {
+        await savePatientQuestionnaire(systemActor, patient.id, {
           geneticTest: "yes",
           apoe: "E3/E4",
         }),
       ),
     ).toBe("not_permitted");
     // Nothing of the refused save was written.
-    let view = unwrapOk(await getPatientQuestionnaire(patient.id));
+    let view = unwrapOk(await getPatientQuestionnaire(systemActor, patient.id));
     expect(view.answers.geneticTest).toBe(null);
     expect(view.answers.apoe).toBe(null);
 
     unwrapOk(
-      await savePatientQuestionnaire(patient.id, { geneticTest: "yes" }),
+      await savePatientQuestionnaire(systemActor, patient.id, {
+        geneticTest: "yes",
+      }),
     );
     // A clear needs no consent.
-    unwrapOk(await savePatientQuestionnaire(patient.id, { apoe: "" }));
-    view = unwrapOk(await getPatientQuestionnaire(patient.id));
+    unwrapOk(
+      await savePatientQuestionnaire(systemActor, patient.id, { apoe: "" }),
+    );
+    view = unwrapOk(await getPatientQuestionnaire(systemActor, patient.id));
     expect(view.answers.geneticTest).toBe("yes");
   });
 
   it("stores a refusal and changes nothing else", async () => {
     const patient = await newPatient("Refus");
     await decide(patient, "care", "given");
-    const before = unwrapOk(await getPatientQuestionnaire(patient.id));
+    const before = unwrapOk(
+      await getPatientQuestionnaire(systemActor, patient.id),
+    );
     await decide(patient, "genetic", "refused");
-    const after = unwrapOk(await getPatientQuestionnaire(patient.id));
+    const after = unwrapOk(
+      await getPatientQuestionnaire(systemActor, patient.id),
+    );
     expect(after).toEqual(before);
     expect(
-      errorOf(await savePatientQuestionnaire(patient.id, { dio2: "A" })),
+      errorOf(
+        await savePatientQuestionnaire(systemActor, patient.id, { dio2: "A" }),
+      ),
     ).toBe("not_permitted");
-    const events = await listAuditEvents({ targetId: patient.id });
+    const events = await listAuditEvents(systemActor, { targetId: patient.id });
     expect(events.map((event) => event.action).sort()).toEqual([
       "consent.given",
       "consent.refused",
@@ -657,7 +714,7 @@ describe("optional data under its consent", () => {
     await decide(patient, "care", "given");
     await decide(patient, "genetic", "given");
     const stored = unwrapOk(
-      await savePatientQuestionnaire(patient.id, {
+      await savePatientQuestionnaire(systemActor, patient.id, {
         geneticTest: "yes",
         apoe: "E2/E3",
         dio2: "M",
@@ -668,7 +725,9 @@ describe("optional data under its consent", () => {
 
     await tick();
     await decide(patient, "genetic", "withdrawn");
-    const view = unwrapOk(await getPatientQuestionnaire(patient.id));
+    const view = unwrapOk(
+      await getPatientQuestionnaire(systemActor, patient.id),
+    );
     expect(view.answers.apoe).toBe(null);
     expect(view.answers.dio2).toBe(null);
     expect(view.answers.amy1a).toBe(null);
@@ -679,7 +738,7 @@ describe("optional data under its consent", () => {
       .findById(patient.id);
     expect(row?.apoe).toBe(null);
 
-    const cleared = await listAuditEvents({
+    const cleared = await listAuditEvents(systemActor, {
       targetId: patient.id,
       action: "genotype.cleared",
     });
@@ -693,7 +752,9 @@ describe("optional data under its consent", () => {
     await getDatabase()
       .collection<{ id: string; apoe: string | null }>("patient_profiles")
       .update(patient.id, { apoe: "E4/E4" });
-    const view = unwrapOk(await getPatientQuestionnaire(patient.id));
+    const view = unwrapOk(
+      await getPatientQuestionnaire(systemActor, patient.id),
+    );
     expect(view.answers.apoe).toBe(null);
   });
 
@@ -701,15 +762,21 @@ describe("optional data under its consent", () => {
     const patient = await newPatient("Sans soins");
     expect(
       errorOf(
-        await savePatientQuestionnaire(patient.id, { desiredWeightKg: 60 }),
+        await savePatientQuestionnaire(systemActor, patient.id, {
+          desiredWeightKg: 60,
+        }),
       ),
     ).toBe("not_permitted");
     unwrapOk(
-      await savePatientQuestionnaire(patient.id, { desiredWeightKg: "" }),
+      await savePatientQuestionnaire(systemActor, patient.id, {
+        desiredWeightKg: "",
+      }),
     );
     await decide(patient, "care", "given");
     const answers = unwrapOk(
-      await savePatientQuestionnaire(patient.id, { desiredWeightKg: 60 }),
+      await savePatientQuestionnaire(systemActor, patient.id, {
+        desiredWeightKg: 60,
+      }),
     );
     expect(answers.desiredWeightKg).toBe(60);
   });
@@ -719,7 +786,7 @@ describe("the profile columns the questionnaire asks", () => {
   it("saves the identity and keeps the full name joined", async () => {
     const patient = await newPatient("Identité");
     const saved = unwrapOk(
-      await savePatientProfileAnswers(patient.id, {
+      await savePatientProfileAnswers(systemActor, patient.id, {
         firstName: "  Claire ",
         lastName: "Dubois",
         birthDate: "1984-05-12",
@@ -732,7 +799,9 @@ describe("the profile columns the questionnaire asks", () => {
     expect(saved.phone).toBe("+32470123456");
 
     const renamed = unwrapOk(
-      await savePatientProfileAnswers(patient.id, { lastName: "Martin" }),
+      await savePatientProfileAnswers(systemActor, patient.id, {
+        lastName: "Martin",
+      }),
     );
     expect(renamed.fullName).toBe("Claire Martin");
   });
@@ -741,7 +810,9 @@ describe("the profile columns the questionnaire asks", () => {
     const patient = await newPatient("Sans retouche");
     await tick();
     const saved = unwrapOk(
-      await savePatientProfileAnswers(patient.id, { heightCm: 172 }),
+      await savePatientProfileAnswers(systemActor, patient.id, {
+        heightCm: 172,
+      }),
     );
     expect(saved.lastEditedAt).toEqual(patient.lastEditedAt);
   });
@@ -749,7 +820,7 @@ describe("the profile columns the questionnaire asks", () => {
   it("saves and clears taille and poids", async () => {
     const patient = await newPatient("Mesures");
     const saved = unwrapOk(
-      await savePatientProfileAnswers(patient.id, {
+      await savePatientProfileAnswers(systemActor, patient.id, {
         heightCm: 168,
         weightKg: 64.5,
       }),
@@ -757,7 +828,9 @@ describe("the profile columns the questionnaire asks", () => {
     expect(saved.heightCm).toBe(168);
     expect(saved.weightKg).toBe(64.5);
     const cleared = unwrapOk(
-      await savePatientProfileAnswers(patient.id, { weightKg: null }),
+      await savePatientProfileAnswers(systemActor, patient.id, {
+        weightKg: null,
+      }),
     );
     expect(cleared.weightKg).toBe(null);
     expect(cleared.heightCm).toBe(168);
@@ -766,17 +839,29 @@ describe("the profile columns the questionnaire asks", () => {
   it("refuses a cleared identity field, a broken value and an unknown field", async () => {
     const patient = await newPatient("Refus");
     expect(
-      errorOf(await savePatientProfileAnswers(patient.id, { firstName: " " })),
-    ).toBe("invalid_input");
-    expect(
-      errorOf(await savePatientProfileAnswers(patient.id, { phone: "12" })),
-    ).toBe("invalid_input");
-    expect(
-      errorOf(await savePatientProfileAnswers(patient.id, { heightCm: 172.5 })),
+      errorOf(
+        await savePatientProfileAnswers(systemActor, patient.id, {
+          firstName: " ",
+        }),
+      ),
     ).toBe("invalid_input");
     expect(
       errorOf(
-        await savePatientProfileAnswers(patient.id, {
+        await savePatientProfileAnswers(systemActor, patient.id, {
+          phone: "12",
+        }),
+      ),
+    ).toBe("invalid_input");
+    expect(
+      errorOf(
+        await savePatientProfileAnswers(systemActor, patient.id, {
+          heightCm: 172.5,
+        }),
+      ),
+    ).toBe("invalid_input");
+    expect(
+      errorOf(
+        await savePatientProfileAnswers(systemActor, patient.id, {
           pseudonym: "x",
         } as never),
       ),
@@ -787,15 +872,19 @@ describe("the profile columns the questionnaire asks", () => {
     const patient = await newPatient("Traitement");
     expect(
       errorOf(
-        await savePatientProfileAnswers(patient.id, {
+        await savePatientProfileAnswers(systemActor, patient.id, {
           medications: "Levothyrox",
         }),
       ),
     ).toBe("not_permitted");
-    unwrapOk(await savePatientProfileAnswers(patient.id, { supplements: "" }));
+    unwrapOk(
+      await savePatientProfileAnswers(systemActor, patient.id, {
+        supplements: "",
+      }),
+    );
     await decide(patient, "care", "given");
     const saved = unwrapOk(
-      await savePatientProfileAnswers(patient.id, {
+      await savePatientProfileAnswers(systemActor, patient.id, {
         medications: "Levothyrox",
       }),
     );
@@ -804,11 +893,14 @@ describe("the profile columns the questionnaire asks", () => {
 
   it("answers not_found for an unknown patient", async () => {
     expect(
-      errorOf(await savePatientProfileAnswers("nope", { heightCm: 170 })),
+      errorOf(
+        await savePatientProfileAnswers(systemActor, "nope", { heightCm: 170 }),
+      ),
     ).toBe("not_found");
     expect(
       errorOf(
         await savePatientProfileAnswers(
+          systemActor,
           "00000000-0000-4000-8000-000000000000",
           { heightCm: 170 },
         ),

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import {
   MAX_ACTIVE_GOALS,
+  adminOpenablePatient,
   consentsOf,
   countGoalCheckInsAwaitingAttention,
   countMealEntriesAwaitingFeedback,
@@ -56,6 +57,7 @@ import {
   CardTitle,
   Typography,
 } from "@remi/ui/server";
+import { AdminOpenForm } from "@/components/patients/admin-open-form";
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
 import { ChallengeHistory } from "@/components/patients/challenge-history";
@@ -119,7 +121,7 @@ import {
   type PatientSegment,
 } from "@/components/patients/vocabulary";
 import { patientContextInput } from "@/lib/patients/context";
-import { requireOperator } from "@/lib/auth/session";
+import { requireActor, requireOperator } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 import { fileStoreReady } from "@/lib/files";
 
@@ -167,13 +169,23 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     : segmentParam;
   const initialSegment: PatientSegment =
     segmentValue && isPatientSegment(segmentValue) ? segmentValue : "suivi";
-  // Another practitioner's file answers 404, like a missing one (D-27).
+  // Another practitioner's file answers 404, like a missing one (D-27). An
+  // admin is asked for a reason first, then reads the file read-only (story 3).
   const operator = await requireOperator();
-  const result = await patientOf(operator.id, id);
+  const actor = await requireActor();
+  const result = await patientOf(actor, id);
   if (!result.ok) {
+    const openable = await adminOpenablePatient(actor, id);
+    if (openable.ok) {
+      return (
+        <AdminOpenForm patientId={id} pseudonym={openable.data.pseudonym} />
+      );
+    }
     notFound();
   }
   const patient = result.data;
+  // An admin's open of another practitioner's file: every write is refused.
+  const readOnly = patient.practitionerId !== operator.id;
 
   const [
     recommendations,
@@ -205,42 +217,42 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     messages,
     consents,
   ] = await Promise.all([
-    listPatientRecommendations(patient.id),
-    listArchivedPatientRecommendations(patient.id),
-    listPatientSupplements(patient.id),
-    listArchivedPatientSupplements(patient.id),
-    listPantryEssentials(patient.id),
-    listArchivedPantryEssentials(patient.id),
-    listPatientRecipes(patient.id),
-    listArchivedPatientRecipes(patient.id),
+    listPatientRecommendations(actor, patient.id),
+    listArchivedPatientRecommendations(actor, patient.id),
+    listPatientSupplements(actor, patient.id),
+    listArchivedPatientSupplements(actor, patient.id),
+    listPantryEssentials(actor, patient.id),
+    listArchivedPantryEssentials(actor, patient.id),
+    listPatientRecipes(actor, patient.id),
+    listArchivedPatientRecipes(actor, patient.id),
     // The picker offers the active library only — an archived recipe is out of
     // circulation, which is exactly what archiving it meant.
     listRecipes(),
-    listMealEntries(patient.id),
-    listArchivedMealEntries(patient.id),
-    countMealEntriesAwaitingFeedback(patient.id),
-    listPatientLearnings(patient.id),
-    listArchivedPatientObservations(patient.id),
-    listPatientNotes(patient.id),
-    listPatientAnamnesis(patient.id),
-    listPatientGoals(patient.id),
-    listArchivedPatientGoals(patient.id),
-    getPatientInstruction(patient.id),
-    listArchivedPatientInstructions(patient.id),
-    getPatientSummary(patient.id),
-    getCurrentChallenge(patient.id),
-    listPastChallenges(patient.id),
-    listPatientDocuments(patient.id),
-    listGoalScoreStrips(patient.id),
-    countGoalCheckInsAwaitingAttention(patient.id),
-    listPatientMessages(patient.id),
-    consentsOf(patient.id),
+    listMealEntries(actor, patient.id),
+    listArchivedMealEntries(actor, patient.id),
+    countMealEntriesAwaitingFeedback(actor, patient.id),
+    listPatientLearnings(actor, patient.id),
+    listArchivedPatientObservations(actor, patient.id),
+    listPatientNotes(actor, patient.id),
+    listPatientAnamnesis(actor, patient.id),
+    listPatientGoals(actor, patient.id),
+    listArchivedPatientGoals(actor, patient.id),
+    getPatientInstruction(actor, patient.id),
+    listArchivedPatientInstructions(actor, patient.id),
+    getPatientSummary(actor, patient.id),
+    getCurrentChallenge(actor, patient.id),
+    listPastChallenges(actor, patient.id),
+    listPatientDocuments(actor, patient.id),
+    listGoalScoreStrips(actor, patient.id),
+    countGoalCheckInsAwaitingAttention(actor, patient.id),
+    listPatientMessages(actor, patient.id),
+    consentsOf(actor, patient.id),
   ]);
   // The questionnaire half of the file (story 1): its answers for the form,
   // what is still missing, and whether the genotype may be entered.
   const [questionnaire, missing] = await Promise.all([
-    getPatientQuestionnaire(patient.id),
-    missingQuestionnaireFields(patient.id),
+    getPatientQuestionnaire(actor, patient.id),
+    missingQuestionnaireFields(actor, patient.id),
   ]);
   if (!questionnaire.ok) {
     notFound();
@@ -259,7 +271,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   const trails = await Promise.all(
     [...goals, ...archivedGoals].map(async (goal) => ({
       id: goal.id,
-      entries: await listGoalCheckIns(goal.id),
+      entries: await listGoalCheckIns(actor, goal.id),
     })),
   );
   const checkIns = Object.fromEntries(
@@ -431,6 +443,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               {fileStatusLabels[patient.fileStatus].fr}
             </Badge>
           </div>
+          {readOnly ? (
+            <Typography size="sm" role="status" className="text-warning-text">
+              Lecture seule : accès équipe REMI à un dossier suivi par un autre
+              compte. Le motif est au journal. Toute modification est refusée.
+            </Typography>
+          ) : null}
           {alreadyExists ? (
             <Typography size="sm" role="status" className="text-info-text">
               Ce dossier existe déjà : l&apos;adresse email saisie est la
@@ -1163,16 +1181,18 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                     ses observations et le lien patient — définitivement. Les
                     recettes elles-mêmes restent dans la bibliothèque.
                   </Typography>
-                  {canManageOperators(operator.role) ? (
+                  {canManageOperators(operator.role) && !readOnly ? (
                     <RetentionHold
                       patientId={patient.id}
                       heldAt={patient.retentionHoldAt}
                     />
                   ) : null}
-                  <DeletePatient
-                    patientId={patient.id}
-                    pseudonym={patient.pseudonym}
-                  />
+                  {readOnly ? null : (
+                    <DeletePatient
+                      patientId={patient.id}
+                      pseudonym={patient.pseudonym}
+                    />
+                  )}
                 </div>
               </SectionFold>
             </CardContent>

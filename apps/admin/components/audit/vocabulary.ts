@@ -23,6 +23,7 @@ export const actionLabels: Record<AuditActionName, string> = {
   "patient.deleted": "profil supprimé",
   "patient.inactivity_notice_sent":
     "avis de suppression pour inactivité envoyé",
+  "patient.admin_opened": "accès admin",
   "patient.retention_hold_set": "conservation posée",
   "patient.retention_hold_cleared": "conservation levée",
   "recommendation.added": "recommandation ajoutée",
@@ -151,6 +152,7 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "patient.consultation_date_changed": "neutral",
   "patient.deleted": "error",
   "patient.inactivity_notice_sent": "warning",
+  "patient.admin_opened": "warning",
   "patient.retention_hold_set": "info",
   "patient.retention_hold_cleared": "warning",
   "recommendation.added": "neutral",

@@ -8,6 +8,13 @@ import type {
 } from "../../models/patient-message";
 import { getOperator } from "../operators";
 import { touchPatient } from "../patients";
+import type { Actor } from "../../models/actor";
+import {
+  byPatient,
+  byRecord,
+  listablePatientIds,
+  noSuchPatient,
+} from "../access";
 
 /**
  * The general thread — her 14 Sept document, § 6: « un endroit très simple où
@@ -62,7 +69,7 @@ const isUnread = (message: PatientMessage) =>
  * The thread, newest first, each reply carrying its author's name. Names are
  * read per distinct operator — one or two per patient — rather than per row.
  */
-export const listPatientMessages = async (
+const unscopedListPatientMessages = async (
   patientId: Id,
 ): Promise<readonly PatientMessageEntry[]> => {
   const rows = [...(await allForPatient(patientId))].sort(newestFirst);
@@ -83,7 +90,7 @@ export const listPatientMessages = async (
 };
 
 /** What the console marks: the patient's messages she has not dealt with. */
-export const countUnreadPatientMessages = async (
+const unscopedCountUnreadPatientMessages = async (
   patientId: Id,
 ): Promise<number> => (await allForPatient(patientId)).filter(isUnread).length;
 
@@ -92,9 +99,12 @@ export const countUnreadPatientMessages = async (
  * challenge signals, never one read per row. The unread filter runs here: the
  * seam's filter is equality, and `read_at = null` matches nothing in SQL.
  */
-export const listUnreadMessageCounts = async (): Promise<
-  ReadonlyMap<Id, number>
-> => {
+export const listUnreadMessageCounts = async (
+  actor: Actor,
+): Promise<ReadonlyMap<Id, number>> => {
+  // The list's own files only (story 3): a practitioner reads no signal of
+  // another practitioner's patient.
+  const listable = await listablePatientIds(actor);
   const counts = new Map<Id, number>();
   let cursor: string | undefined;
   do {
@@ -103,6 +113,9 @@ export const listUnreadMessageCounts = async (): Promise<
       { limit: 500, cursor },
     );
     for (const message of page.items) {
+      if (listable && !listable.has(message.patientId)) {
+        continue;
+      }
       if (isUnread(message)) {
         counts.set(message.patientId, (counts.get(message.patientId) ?? 0) + 1);
       }
@@ -118,7 +131,7 @@ export const listUnreadMessageCounts = async (): Promise<
  * write, so this does not touch the roster timestamp: a patient writing is not
  * her working on the patient.
  */
-export const sendPatientMessage = async (
+const unscopedSendPatientMessage = async (
   patientId: Id,
   body: string,
 ): Promise<Result<PatientMessage>> => {
@@ -151,7 +164,7 @@ export type SentReply = {
  * every patient message sent up to the reply, so a message that arrives while
  * she types stays unread.
  */
-export const replyToPatient = async (
+const unscopedReplyToPatient = async (
   patientId: Id,
   operatorId: Id,
   body: string,
@@ -191,7 +204,7 @@ export const replyToPatient = async (
  * message has a read state; marking one already read is a no-op, not a
  * refusal, so a double tap lands where she meant.
  */
-export const markPatientMessageRead = async (
+const unscopedMarkPatientMessageRead = async (
   id: Id,
 ): Promise<Result<PatientMessage>> => {
   if (!uuidSchema.safeParse(id).success) {
@@ -207,3 +220,35 @@ export const markPatientMessageRead = async (
   const updated = await messages().update(id, { readAt: new Date() });
   return updated ? ok(updated) : err("not_found", "no such message");
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const listPatientMessages = byPatient(
+  "read",
+  unscopedListPatientMessages,
+  () => [],
+);
+export const countUnreadPatientMessages = byPatient(
+  "read",
+  unscopedCountUnreadPatientMessages,
+  () => 0,
+);
+export const sendPatientMessage = byPatient(
+  "write",
+  unscopedSendPatientMessage,
+  noSuchPatient,
+);
+export const replyToPatient = byPatient(
+  "write",
+  unscopedReplyToPatient,
+  noSuchPatient,
+);
+export const markPatientMessageRead = byRecord(
+  "message",
+  "write",
+  unscopedMarkPatientMessageRead,
+  noSuchPatient,
+);

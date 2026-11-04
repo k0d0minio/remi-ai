@@ -4,6 +4,7 @@ import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { listAuditEvents, type OperatorActor } from "../audit";
 import { createPatient } from "../patients";
 import { getPatientQuestionnaire, savePatientQuestionnaire } from "./index";
+import { systemActor } from "../../services/access";
 
 // `appointment-date`: the file's one consultation date, and its audit trail.
 
@@ -17,7 +18,7 @@ let patientId: string;
 
 beforeAll(async () => {
   registerDatabase(createMemoryDatabase());
-  const created = await createPatient({
+  const created = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym: "Inès",
     sex: "other",
@@ -32,13 +33,13 @@ beforeAll(async () => {
 const tick = () => new Promise((resolve) => setTimeout(resolve, 5));
 
 const dateEvents = async () =>
-  listAuditEvents({
+  listAuditEvents(systemActor, {
     action: "patient.consultation_date_changed",
     targetId: patientId,
   });
 
 const dateOf = async () => {
-  const view = await getPatientQuestionnaire(patientId);
+  const view = await getPatientQuestionnaire(systemActor, patientId);
   if (!view.ok) {
     throw new Error(view.message);
   }
@@ -53,6 +54,7 @@ describe("the consultation date", () => {
 
   it("sets the date and records the empty old value and the new one", async () => {
     const saved = await savePatientQuestionnaire(
+      systemActor,
       patientId,
       { consultationDate: "2026-11-12" },
       morgane,
@@ -76,6 +78,7 @@ describe("the consultation date", () => {
   it("changes the date and records both values", async () => {
     await tick();
     await savePatientQuestionnaire(
+      systemActor,
       patientId,
       { consultationDate: "2026-11-19" },
       morgane,
@@ -89,6 +92,7 @@ describe("the consultation date", () => {
 
   it("writes no event when the date does not change", async () => {
     await savePatientQuestionnaire(
+      systemActor,
       patientId,
       { consultationDate: "2026-11-19" },
       morgane,
@@ -98,6 +102,7 @@ describe("the consultation date", () => {
 
   it("writes no event when a save does not name the date", async () => {
     await savePatientQuestionnaire(
+      systemActor,
       patientId,
       { consultationReason: "Fatigue." },
       morgane,
@@ -109,6 +114,7 @@ describe("the consultation date", () => {
   it("clears the date from an empty string and records the cleared value", async () => {
     await tick();
     await savePatientQuestionnaire(
+      systemActor,
       patientId,
       { consultationDate: "" },
       morgane,
@@ -122,6 +128,7 @@ describe("the consultation date", () => {
 
   it("refuses a date that is not a calendar day, and writes nothing", async () => {
     const saved = await savePatientQuestionnaire(
+      systemActor,
       patientId,
       { consultationDate: "12/11/2026" },
       morgane,
@@ -133,7 +140,7 @@ describe("the consultation date", () => {
 
   it("records an event with no actor when the caller names none", async () => {
     await tick();
-    await savePatientQuestionnaire(patientId, {
+    await savePatientQuestionnaire(systemActor, patientId, {
       consultationDate: "2026-12-03",
     });
     const events = await dateEvents();

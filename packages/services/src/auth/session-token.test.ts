@@ -1,5 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { createSessionToken, verifySessionToken } from "./session-token";
+import {
+  createOpenGrantToken,
+  createSessionToken,
+  verifyOpenGrantToken,
+  verifySessionToken,
+} from "./session-token";
 
 const OPERATOR_ID = "e3a1c1de-0000-4000-8000-000000000001";
 
@@ -36,5 +41,31 @@ describe("session tokens", () => {
     expect(verifySessionToken("just-one-part")).toBeNull();
     expect(verifySessionToken("two.parts")).toBeNull();
     expect(verifySessionToken("a.b.c")).toBeNull();
+  });
+});
+
+describe("admin open grants", () => {
+  const admin = "00000000-0000-4000-8000-00000000ad00";
+  const file = "00000000-0000-4000-8000-00000000f11e";
+
+  it("names the opened file for its own admin only", () => {
+    const token = createOpenGrantToken(admin, file);
+    expect(verifyOpenGrantToken(token, admin)).toBe(file);
+    expect(
+      verifyOpenGrantToken(token, "00000000-0000-4000-8000-00000000b2a0"),
+    ).toBeNull();
+  });
+
+  it("refuses an expired or a tampered grant", () => {
+    expect(
+      verifyOpenGrantToken(createOpenGrantToken(admin, file, -1), admin),
+    ).toBeNull();
+    const [payload] = createOpenGrantToken(admin, file).split(".");
+    expect(verifyOpenGrantToken(`${payload}.forged`, admin)).toBeNull();
+  });
+
+  it("never verifies as a session, nor a session as a grant", () => {
+    expect(verifySessionToken(createOpenGrantToken(admin, file))).toBeNull();
+    expect(verifyOpenGrantToken(createSessionToken(admin), admin)).toBeNull();
   });
 });

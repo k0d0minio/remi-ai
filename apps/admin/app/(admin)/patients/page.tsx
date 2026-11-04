@@ -3,13 +3,16 @@ import { Plus, Users } from "lucide-react";
 import NextLink from "next/link";
 import {
   listChallengeSignals,
+  listOperators,
   listUnreadMessageCounts,
   patientListNames,
   patientListOf,
   type ChallengeSignal,
+  type Operator,
 } from "@remi/services/server";
 import {
   appHref,
+  canManageOperators,
   defaultPatientListSort,
   fileStatusLabels,
   formatDate,
@@ -23,7 +26,7 @@ import { Badge, EmptyState, Typography, type Intent } from "@remi/ui/server";
 import { SignupLink } from "@/components/operators/signup-link";
 import { RosterFilters } from "@/components/patients/roster-filters";
 import { messagesAwaitingLabel } from "@/components/patients/vocabulary";
-import { requireOperator } from "@/lib/auth/session";
+import { requireActor, requireOperator } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 
 export const metadata: Metadata = {
@@ -90,16 +93,31 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
   const search = first(params.q) ?? "";
   const status = asStatus(first(params.status));
   const operator = await requireOperator();
+  const actor = await requireActor();
+  // An admin may list every file (story 3). A practitioner lists its own only,
+  // whatever the URL says: the service applies the same rule.
+  const isAdmin = canManageOperators(operator.role);
+  const all = isAdmin && first(params.scope) === "all";
   // The practitioner's remembered order (story 5), not a URL parameter.
   const sort = isPatientListSort(operator.patientListSort)
     ? operator.patientListSort
     : defaultPatientListSort;
 
-  const [patients, challengeSignals, unreadMessages] = await Promise.all([
-    patientListOf(operator.id, { search, status, sort }),
-    listChallengeSignals(),
-    listUnreadMessageCounts(),
-  ]);
+  const [patients, challengeSignals, unreadMessages, operators] =
+    await Promise.all([
+      patientListOf(actor, {
+        search,
+        status,
+        sort,
+        scope: all ? "all" : "mine",
+      }),
+      listChallengeSignals(actor),
+      listUnreadMessageCounts(actor),
+      all ? listOperators() : Promise.resolve<readonly Operator[]>([]),
+    ]);
+  const practitionerNames = new Map(
+    operators.map((account) => [account.id, account.name]),
+  );
   const filtered = search !== "" || status !== "all";
 
   return (
@@ -134,7 +152,37 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
         />
       </section>
 
-      <RosterFilters search={search} status={status} sort={sort} />
+      {isAdmin ? (
+        <nav aria-label="Dossiers listés" className="flex flex-wrap gap-2">
+          <Button asChild size="sm" variant={all ? "outline" : "secondary"}>
+            <NextLink href="/patients" aria-current={all ? undefined : "page"}>
+              Mes patients
+            </NextLink>
+          </Button>
+          <Button asChild size="sm" variant={all ? "secondary" : "outline"}>
+            <NextLink
+              href="/patients?scope=all"
+              aria-current={all ? "page" : undefined}
+            >
+              Tous les praticiens
+            </NextLink>
+          </Button>
+          {all ? (
+            <Typography
+              as="span"
+              size="xs"
+              tone="muted"
+              className="self-center"
+            >
+              Le dossier d&apos;un patient suivi par un autre compte
+              s&apos;ouvre en lecture seule, après un motif enregistré au
+              journal.
+            </Typography>
+          ) : null}
+        </nav>
+      ) : null}
+
+      <RosterFilters search={search} status={status} sort={sort} all={all} />
 
       {patients.length === 0 ? (
         <EmptyState
@@ -193,6 +241,13 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
                     {patient.pseudonym !== nom ? (
                       <Typography as="span" size="xs" tone="muted">
                         {patient.pseudonym}
+                      </Typography>
+                    ) : null}
+                    {all ? (
+                      <Typography as="span" size="xs" tone="muted">
+                        {patient.practitionerId === operator.id
+                          ? "· mon patient"
+                          : `· suivi par ${practitionerNames.get(patient.practitionerId) ?? "un compte supprimé"}`}
                       </Typography>
                     ) : null}
                     <span className="ml-auto flex items-center gap-3">

@@ -11,6 +11,7 @@ import {
   getPatientAccountByProfile,
   getPatientAccountBySubject,
 } from "../db/services/patient-accounts";
+import { operatorActor, systemActor } from "../db/services/access";
 import { insertConsent } from "../db/services/patient-consents";
 import { createPatient, findPatientByEmail } from "../db/services/patients";
 import type { ShownConsent } from "../shared/consent";
@@ -24,7 +25,11 @@ import {
   type SignupFieldErrors,
 } from "../shared/signup";
 import type { Id } from "../types";
-import { getAuthProvider, type AuthIdentity, type AuthResult } from "./provider";
+import {
+  getAuthProvider,
+  type AuthIdentity,
+  type AuthResult,
+} from "./provider";
 
 /**
  * A patient creates their own account from their practitioner's permanent
@@ -97,8 +102,7 @@ const signupSchema = z.object({
 export type SignupData = z.output<typeof signupSchema>;
 
 export type SignupValidation =
-  | { ok: true; data: SignupData }
-  | { ok: false; fields: SignupFieldErrors };
+  { ok: true; data: SignupData } | { ok: false; fields: SignupFieldErrors };
 
 const isFieldError = (code: string): code is SignupFieldError =>
   code === "required" || code === "invalid" || code === "too_short";
@@ -167,7 +171,10 @@ const identityFor = async (
     email: data.email,
     password: data.password,
   });
-  if (!signedIn.ok || (await getPatientAccountBySubject(signedIn.data.subject))) {
+  if (
+    !signedIn.ok ||
+    (await getPatientAccountBySubject(signedIn.data.subject))
+  ) {
     return alreadyRegistered();
   }
   return signedIn;
@@ -243,7 +250,10 @@ export const signUpPatient = async ({
   }
   // A file the practitioner created with this e-mail is taken over, never
   // doubled (story 1). A file of another practitioner never matches.
-  const existing = await findPatientByEmail(practitioner.data.id, data.email);
+  const existing = await findPatientByEmail(
+    operatorActor({ id: practitioner.data.id, role: "practitioner" }),
+    data.email,
+  );
   if (existing) {
     return (await getPatientAccountByProfile(existing.id))
       ? alreadyRegistered()
@@ -263,6 +273,7 @@ export const signUpPatient = async ({
     patient = await getDatabase().transaction(async (tx) => {
       const created = orRollback(
         await createPatient(
+          systemActor,
           {
             practitionerId: practitioner.data.id,
             // The list hides this file until the questionnaire is complete.

@@ -7,17 +7,18 @@ import {
   getPatientAccountByEmail,
   getPatientAccountBySubject,
 } from "./index";
+import { systemActor } from "../../services/access";
 
 let claireId: string;
 let marcId: string;
 
 beforeAll(async () => {
   registerDatabase(createMemoryDatabase());
-  const claire = await createPatient({
+  const claire = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym: "Claire",
   });
-  const marc = await createPatient({
+  const marc = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym: "Marc",
   });

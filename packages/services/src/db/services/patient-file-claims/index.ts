@@ -5,6 +5,7 @@ import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientFileClaim } from "../../models/patient-file-claim";
+import { systemActor } from "../access";
 import { getPatientAccountByProfile } from "../patient-accounts";
 import { getPatient } from "../patients";
 
@@ -63,7 +64,7 @@ export const issueFileClaim = async (
   options: { now?: Date } = {},
   db?: DatabaseClient,
 ): Promise<Result<IssuedFileClaim>> => {
-  const patient = await getPatient(patientId, db);
+  const patient = await getPatient(systemActor, patientId, db);
   if (!patient.ok) {
     return patient;
   }

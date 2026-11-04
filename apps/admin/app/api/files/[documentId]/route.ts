@@ -3,7 +3,7 @@ import {
   patientOf,
   signedFileUrl,
 } from "@remi/services/server";
-import { getOperatorSession } from "@/lib/auth/session";
+import { actorOf, getOperatorSession } from "@/lib/auth/session";
 import { fileStoreReady } from "@/lib/files";
 
 /**
@@ -21,13 +21,15 @@ export const GET = async (
   if (!operator) {
     return new Response("Not signed in", { status: 401 });
   }
+  const actor = await actorOf(operator);
   const { documentId } = await params;
-  const document = await getPatientDocument(documentId);
+  // The service answers null for a file of a patient the actor may not read
+  // (D-27): another practitioner's patient answers 404, like a missing file.
+  const document = await getPatientDocument(actor, documentId);
   if (!document || document.kind !== "file" || !document.blobKey) {
     return new Response("Not found", { status: 404 });
   }
-  // A file of another practitioner's patient answers 404 too (D-27).
-  if (!(await patientOf(operator.id, document.patientId)).ok) {
+  if (!(await patientOf(actor, document.patientId)).ok) {
     return new Response("Not found", { status: 404 });
   }
   if (!fileStoreReady()) {

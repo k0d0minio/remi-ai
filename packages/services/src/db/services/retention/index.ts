@@ -17,6 +17,8 @@ import {
   setInactivityNoticeSentAt,
 } from "../patient-accounts";
 import { deletePatient, getPatient } from "../patients";
+import type { Actor } from "../../models/actor";
+import { systemActor } from "../access";
 
 /**
  * Retention: the inactivity sweep and the hold that stops it
@@ -200,7 +202,7 @@ const sendNotice = async (
 };
 
 const removeInactive = async (patient: PatientProfile): Promise<Step> => {
-  const removed = await deletePatient(patient.id);
+  const removed = await deletePatient(systemActor, patient.id);
   if (!removed.ok) {
     if (removed.error === "not_found") {
       return null;
@@ -229,7 +231,7 @@ const sweepAccount = async (
   now: Date,
   db: DatabaseClient,
 ): Promise<readonly Step[]> => {
-  const patient = await getPatient(account.patientProfileId, db);
+  const patient = await getPatient(systemActor, account.patientProfileId, db);
   if (!patient.ok) {
     return [];
   }
@@ -305,11 +307,19 @@ export const runInactivitySweep = async (
  * operator may (an owner who holds the file). The audit event names the actor.
  */
 export const setRetentionHold = async (
+  actor: Actor,
   patientId: Id,
   held: boolean,
   operator: OperatorActor,
 ): Promise<Result<PatientProfile>> => {
-  const patient = await getPatient(patientId);
+  // An admin act on any file (Morgane, question 6). A practitioner sets none.
+  if (
+    actor.kind !== "system" &&
+    !(actor.kind === "operator" && actor.role === "admin")
+  ) {
+    return err("not_found", "no such patient");
+  }
+  const patient = await getPatient(systemActor, patientId);
   if (!patient.ok) {
     return patient;
   }

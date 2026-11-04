@@ -4,6 +4,7 @@ import { getDatabase, type DatabaseClient } from "../../client";
 import type { Id, Page } from "../../../types";
 import type { PatientAccount } from "../../models/patient-account";
 import { getPatient } from "../patients";
+import { systemActor } from "../access";
 
 /**
  * The patient's account row — the link between a patient file and the auth
@@ -85,7 +86,7 @@ export const createPatientAccount = async (
   const { patientProfileId, email, authSubject } = parsed.data;
 
   const write = async (db: DatabaseClient): Promise<Result<PatientAccount>> => {
-    const patient = await getPatient(patientProfileId, db);
+    const patient = await getPatient(systemActor, patientProfileId, db);
     if (!patient.ok) {
       return err("not_found", "no such patient");
     }

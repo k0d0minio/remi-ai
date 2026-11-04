@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { Id } from "../types";
 import type { Collection, DatabaseClient } from "./client";
+import type { Actor } from "./models/actor";
 
 /**
  * The practitioner who holds the fixtures' patient files (D-27). The memory
@@ -109,3 +110,14 @@ export const createMemoryDatabase = (): DatabaseClient => {
   };
   return client;
 };
+
+/**
+ * A practitioner's actor (D-27): it holds the files whose `practitionerId` is
+ * its id. The tests of the scope build their own admin and patient actors.
+ */
+export const practitionerActor = (id: Id = testPractitionerId): Actor => ({
+  kind: "operator",
+  id,
+  role: "practitioner",
+  openedPatientIds: [],
+});

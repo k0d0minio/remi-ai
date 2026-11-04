@@ -18,6 +18,7 @@ import {
   removePatientDocument,
   updatePatientDocument,
 } from "./index";
+import { systemActor } from "../../services/access";
 
 /**
  * Written from the acceptance criteria: a file or a link with a title and a
@@ -69,7 +70,7 @@ beforeEach(() => {
 });
 
 const newPatient = async (pseudonym: string): Promise<PatientProfile> => {
-  const created = await createPatient({
+  const created = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym,
   });
@@ -111,12 +112,13 @@ describe("adding a document", () => {
   it("records a link with its title, tag and today's date", async () => {
     const patient = await newPatient("Claire");
     const result = await addPatientDocumentLink(
+      systemActor,
       patient.id,
       link,
       "morgane@example.org",
     );
     expect(result.ok).toBe(true);
-    const [document] = await listPatientDocuments(patient.id);
+    const [document] = await listPatientDocuments(systemActor, patient.id);
     expect(document.kind).toBe("link");
     expect(document.title).toBe("Mes 15 aliments");
     expect(document.url).toBe("https://example.org/liste");
@@ -128,6 +130,7 @@ describe("adding a document", () => {
   it("refuses a link that is not https", async () => {
     const patient = await newPatient("Inès");
     const result = await addPatientDocumentLink(
+      systemActor,
       patient.id,
       { ...link, url: "http://example.org/liste" },
       "",
@@ -138,6 +141,7 @@ describe("adding a document", () => {
   it("refuses an empty title", async () => {
     const patient = await newPatient("Lou");
     const result = await addPatientDocumentLink(
+      systemActor,
       patient.id,
       { ...link, title: "  " },
       "",
@@ -149,12 +153,13 @@ describe("adding a document", () => {
     const patient = await newPatient("Marc");
     const key = uploaded(patient.id, "gratin.pdf", "application/pdf", 42_000);
     const result = await addPatientDocumentFile(
+      systemActor,
       patient.id,
       { title: "Gratin de légumes", key, tag: "recipe" },
       "",
     );
     expect(result.ok).toBe(true);
-    const [document] = await listPatientDocuments(patient.id);
+    const [document] = await listPatientDocuments(systemActor, patient.id);
     expect(document.kind).toBe("file");
     expect(document.tag).toBe("recipe");
     expect(document.blobKey).toBe(key);
@@ -167,13 +172,14 @@ describe("adding a document", () => {
     const patient = await newPatient("Sam");
     const key = uploaded(patient.id, "photo.heic", "image/heic");
     const result = await addPatientDocumentFile(
+      systemActor,
       patient.id,
       { title: "Photo", key, tag: "document" },
       "",
     );
     expect(!result.ok && result.error).toBe("invalid_input");
     expect(removed).toEqual([key]);
-    expect(await listPatientDocuments(patient.id)).toEqual([]);
+    expect(await listPatientDocuments(systemActor, patient.id)).toEqual([]);
   });
 
   it("removes the upload from the store when the add is refused", async () => {
@@ -182,6 +188,7 @@ describe("adding a document", () => {
     const goal = await goalOf(other.id);
     const key = uploaded(patient.id, "liste.pdf", "application/pdf");
     const result = await addPatientDocumentFile(
+      systemActor,
       patient.id,
       { title: "Liste", key, tag: "document", goalId: goal.id },
       "",
@@ -194,12 +201,22 @@ describe("adding a document", () => {
     const patient = await newPatient("Quentin");
     const key = uploaded(patient.id, "menu.pdf", "application/pdf");
     const input = { title: "Menu", key, tag: "document" as const };
-    const first = await addPatientDocumentFile(patient.id, input, "");
-    const second = await addPatientDocumentFile(patient.id, input, "");
+    const first = await addPatientDocumentFile(
+      systemActor,
+      patient.id,
+      input,
+      "",
+    );
+    const second = await addPatientDocumentFile(
+      systemActor,
+      patient.id,
+      input,
+      "",
+    );
     expect(first.ok && second.ok && second.data.id).toBe(
       first.ok ? first.data.id : "",
     );
-    expect(await listPatientDocuments(patient.id)).toHaveLength(1);
+    expect(await listPatientDocuments(systemActor, patient.id)).toHaveLength(1);
   });
 
   it("refuses a file uploaded under another patient's prefix", async () => {
@@ -207,6 +224,7 @@ describe("adding a document", () => {
     const other = await newPatient("Zoé");
     const key = uploaded(other.id, "liste.pdf", "application/pdf");
     const result = await addPatientDocumentFile(
+      systemActor,
       patient.id,
       { title: "Liste", key, tag: "document" },
       "",
@@ -220,6 +238,7 @@ describe("attaching a document", () => {
     const patient = await newPatient("Anna");
     const goal = await goalOf(patient.id);
     const result = await addPatientDocumentLink(
+      systemActor,
       patient.id,
       { ...link, goalId: goal.id },
       "",
@@ -231,6 +250,7 @@ describe("attaching a document", () => {
     const patient = await newPatient("Basile");
     const assignment = await assignmentOf(patient.id);
     const result = await addPatientDocumentLink(
+      systemActor,
       patient.id,
       { ...link, recipeAssignmentId: assignment.id },
       "",
@@ -243,6 +263,7 @@ describe("attaching a document", () => {
     const goal = await goalOf(patient.id);
     const assignment = await assignmentOf(patient.id);
     const result = await addPatientDocumentLink(
+      systemActor,
       patient.id,
       { ...link, goalId: goal.id, recipeAssignmentId: assignment.id },
       "",
@@ -255,6 +276,7 @@ describe("attaching a document", () => {
     const other = await newPatient("Emma");
     const goal = await goalOf(other.id);
     const result = await addPatientDocumentLink(
+      systemActor,
       patient.id,
       { ...link, goalId: goal.id },
       "",
@@ -267,17 +289,22 @@ describe("editing and removing a document", () => {
   it("edits the title, the tag and the attachment", async () => {
     const patient = await newPatient("Fanny");
     const goal = await goalOf(patient.id);
-    const created = await addPatientDocumentLink(patient.id, link, "");
+    const created = await addPatientDocumentLink(
+      systemActor,
+      patient.id,
+      link,
+      "",
+    );
     if (!created.ok) {
       throw new Error(created.message);
     }
-    const result = await updatePatientDocument(created.data.id, {
+    const result = await updatePatientDocument(systemActor, created.data.id, {
       title: "Les 15 aliments de Fanny",
       tag: "recipe",
       goalId: goal.id,
     });
     expect(result.ok).toBe(true);
-    const [document] = await listPatientDocuments(patient.id);
+    const [document] = await listPatientDocuments(systemActor, patient.id);
     expect(document.title).toBe("Les 15 aliments de Fanny");
     expect(document.tag).toBe("recipe");
     expect(document.goalId).toBe(goal.id);
@@ -288,6 +315,7 @@ describe("editing and removing a document", () => {
     const patient = await newPatient("Gaël");
     const key = uploaded(patient.id, "menu.pdf", "application/pdf");
     const created = await addPatientDocumentFile(
+      systemActor,
       patient.id,
       { title: "Menu", key, tag: "document" },
       "",
@@ -295,16 +323,17 @@ describe("editing and removing a document", () => {
     if (!created.ok) {
       throw new Error(created.message);
     }
-    const result = await removePatientDocument(created.data.id);
+    const result = await removePatientDocument(systemActor, created.data.id);
     expect(result.ok && result.data.title).toBe("Menu");
     expect(removed).toEqual([key]);
-    expect(await listPatientDocuments(patient.id)).toEqual([]);
+    expect(await listPatientDocuments(systemActor, patient.id)).toEqual([]);
   });
 
   it("keeps the row when the store refuses the removal", async () => {
     const patient = await newPatient("Hugo");
     const key = uploaded(patient.id, "plan.pdf", "application/pdf");
     const created = await addPatientDocumentFile(
+      systemActor,
       patient.id,
       { title: "Plan", key, tag: "document" },
       "",
@@ -313,19 +342,29 @@ describe("editing and removing a document", () => {
       throw new Error(created.message);
     }
     failRemovals = true;
-    const result = await removePatientDocument(created.data.id);
+    const result = await removePatientDocument(systemActor, created.data.id);
     expect(!result.ok && result.error).toBe("upstream_failed");
-    expect(await listPatientDocuments(patient.id)).toHaveLength(1);
+    expect(await listPatientDocuments(systemActor, patient.id)).toHaveLength(1);
   });
 });
 
 describe("listing", () => {
   it("lists newest first", async () => {
     const patient = await newPatient("Jade");
-    await addPatientDocumentLink(patient.id, { ...link, title: "Premier" }, "");
+    await addPatientDocumentLink(
+      systemActor,
+      patient.id,
+      { ...link, title: "Premier" },
+      "",
+    );
     await new Promise((resolve) => setTimeout(resolve, 5));
-    await addPatientDocumentLink(patient.id, { ...link, title: "Second" }, "");
-    const titles = (await listPatientDocuments(patient.id)).map(
+    await addPatientDocumentLink(
+      systemActor,
+      patient.id,
+      { ...link, title: "Second" },
+      "",
+    );
+    const titles = (await listPatientDocuments(systemActor, patient.id)).map(
       (document) => document.title,
     );
     expect(titles).toEqual(["Second", "Premier"]);
@@ -336,7 +375,7 @@ describe("deleting the patient", () => {
   it("removes the patient's files from the store before the patient", async () => {
     const patient = await newPatient("Karim");
     uploaded(patient.id, "a.pdf", "application/pdf");
-    const result = await deletePatient(patient.id);
+    const result = await deletePatient(systemActor, patient.id);
     expect(result.ok).toBe(true);
     expect(removedPrefixes).toEqual([patientFilesPrefix(patient.id)]);
     expect(
@@ -349,7 +388,7 @@ describe("deleting the patient", () => {
   it("stops the deletion when the store refuses", async () => {
     const patient = await newPatient("Léa");
     failRemovals = true;
-    const result = await deletePatient(patient.id);
+    const result = await deletePatient(systemActor, patient.id);
     expect(!result.ok && result.error).toBe("upstream_failed");
     expect(
       await getDatabase().collection("patient_profiles").findById(patient.id),

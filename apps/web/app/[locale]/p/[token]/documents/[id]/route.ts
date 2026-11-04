@@ -2,6 +2,7 @@ import {
   getPatientByShareToken,
   getPatientDocument,
   signedFileUrl,
+  patientActor,
 } from "@remi/services/server";
 import { ensureDatabase } from "@/lib/database";
 import { fileStoreReady } from "@/lib/files";
@@ -24,7 +25,9 @@ export const GET = async (
   const { token, id } = await params;
   ensureDatabase();
   const patient = await getPatientByShareToken(token);
-  const document = patient.ok ? await getPatientDocument(id) : null;
+  const document = patient.ok
+    ? await getPatientDocument(patientActor(patient.data.id), id)
+    : null;
   if (
     !patient.ok ||
     !document ||

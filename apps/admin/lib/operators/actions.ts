@@ -19,14 +19,14 @@ import {
   type OperatorRoleName,
 } from "@remi/services/shared";
 import { audit } from "@/lib/audit";
-import { requireOperator, requireOwner } from "@/lib/auth/session";
+import { requireOperator, requireAdmin } from "@/lib/auth/session";
 import { setSessionCookie } from "@/lib/auth/cookie";
 import { ensureDatabase } from "@/lib/database";
 import { mailerReady } from "@/lib/mailer";
 
 /**
  * Account management. Every action re-asserts its own guard before touching
- * anything — `requireOwner` for the ones that reach another account,
+ * anything — `requireAdmin` for the ones that reach another account,
  * `requireOperator` for the ones that reach only your own. The page decides
  * what renders; an action is an endpoint of its own.
  */
@@ -37,7 +37,7 @@ const field = (formData: FormData, name: string) =>
 const asRole = (value: string): OperatorRoleName =>
   (operatorRoles as readonly string[]).includes(value)
     ? (value as OperatorRoleName)
-    : "operator";
+    : "practitioner";
 
 export type InviteFormState = {
   error: string | null;
@@ -60,7 +60,7 @@ export const inviteOperatorAction = async (
   _previous: InviteFormState,
   formData: FormData,
 ): Promise<InviteFormState> => {
-  const operator = await requireOwner();
+  const operator = await requireAdmin();
   ensureDatabase();
 
   const issued = await createInvitation(
@@ -109,7 +109,7 @@ export const inviteOperatorAction = async (
 };
 
 export const revokeInvitationAction = async (formData: FormData) => {
-  const operator = await requireOwner();
+  const operator = await requireAdmin();
   ensureDatabase();
   const id = field(formData, "id");
   const email = field(formData, "email");
@@ -130,7 +130,7 @@ export const setOperatorRoleAction = async (
   _previous: OperatorActionState,
   formData: FormData,
 ): Promise<OperatorActionState> => {
-  const operator = await requireOwner();
+  const operator = await requireAdmin();
   ensureDatabase();
   const id = field(formData, "id");
   const role = asRole(field(formData, "role"));
@@ -152,7 +152,7 @@ export const removeOperatorAction = async (
   _previous: OperatorActionState,
   formData: FormData,
 ): Promise<OperatorActionState> => {
-  const operator = await requireOwner();
+  const operator = await requireAdmin();
   ensureDatabase();
   const id = field(formData, "id");
   const email = field(formData, "email");
@@ -180,7 +180,7 @@ export type AcceptFormState = { error: string | null };
  * The one action here with no operator guard, because it is how someone stops
  * being a stranger: the token IS the credential. The email and the role come
  * from the invitation rather than the form, so a posted `role` field cannot
- * turn an operator invite into an owner account.
+ * turn an operator invite into an admin account.
  */
 export const acceptInvitationAction = async (
   _previous: AcceptFormState,

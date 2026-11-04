@@ -2,6 +2,7 @@ import { checkSignupConsents } from "../consent";
 import { getDatabase } from "../db/client";
 import type { PatientFileClaim } from "../db/models/patient-file-claim";
 import type { PatientProfile } from "../db/models/patient-profile";
+import { operatorActor, systemActor } from "../db/services/access";
 import { recordAuditEvent, type AuditRecord } from "../db/services/audit";
 import { getPractitionerBySignupToken } from "../db/services/operators";
 import {
@@ -89,7 +90,8 @@ const openTarget = async (
       ? err("not_found", claim.message)
       : err("spent", claim.message);
   }
-  const patient = await getPatient(claim.data.patientProfileId, db);
+  // The token is the credential: the takeover reads its file as REMI itself.
+  const patient = await getPatient(systemActor, claim.data.patientProfileId, db);
   if (!patient.ok) {
     return err("not_found", "the file of this link is gone");
   }
@@ -280,7 +282,7 @@ export const issueActivationLink = async (
   patientId: Id,
   linkFor: TakeoverLinkFor,
 ): Promise<Result<{ url: string; expiresAt: Date }>> => {
-  const patient = await getPatient(patientId);
+  const patient = await getPatient(systemActor, patientId);
   if (!patient.ok) {
     return patient;
   }
@@ -323,7 +325,10 @@ export const requestFileClaim = async ({
   if (!practitioner.ok) {
     return err("not_found", practitioner.message);
   }
-  const patient = await findPatientByEmail(practitioner.data.id, email);
+  const patient = await findPatientByEmail(
+    operatorActor({ id: practitioner.data.id, role: "practitioner" }),
+    email,
+  );
   if (!patient?.email || (await getPatientAccountByProfile(patient.id))) {
     return ok(null);
   }

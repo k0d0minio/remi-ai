@@ -38,7 +38,7 @@ describe("operators", () => {
       email: "  Morgane@Example.com ",
       name: "Morgane",
       password: "long enough password",
-      role: "owner",
+      role: "admin",
     });
     expect(created.ok).toBe(true);
     expect(await hasOperator()).toBe(true);
@@ -99,12 +99,12 @@ describe("operators", () => {
         password: "another long password",
       }),
     );
-    expect(created.role).toBe("operator");
+    expect(created.role).toBe("practitioner");
   });
 
-  it("lists owners first, then alphabetically", async () => {
+  it("lists admins first, then alphabetically", async () => {
     const listed = await listOperators();
-    expect(listed[0]?.role).toBe("owner");
+    expect(listed[0]?.role).toBe("admin");
     expect(listed.map((operator) => operator.name)).toEqual([
       "Morgane",
       "Arnaud",
@@ -112,22 +112,22 @@ describe("operators", () => {
   });
 });
 
-describe("the last-owner invariant", () => {
-  it("refuses to demote the only owner", async () => {
+describe("the last-admin invariant", () => {
+  it("refuses to demote the only admin", async () => {
     const morgane = await findOperatorByEmail("morgane@example.com");
     expect(morgane).not.toBeNull();
     if (!morgane) {
       throw new Error("unreachable");
     }
-    const result = await setOperatorRole(morgane.id, "operator");
+    const result = await setOperatorRole(morgane.id, "practitioner");
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error).toBe("not_permitted");
     }
-    expect((await getOperator(morgane.id))?.role).toBe("owner");
+    expect((await getOperator(morgane.id))?.role).toBe("admin");
   });
 
-  it("refuses to delete the only owner", async () => {
+  it("refuses to delete the only admin", async () => {
     const morgane = await findOperatorByEmail("morgane@example.com");
     if (!morgane) {
       throw new Error("unreachable");
@@ -139,18 +139,18 @@ describe("the last-owner invariant", () => {
     }
   });
 
-  it("allows both once a second owner exists", async () => {
+  it("allows both once a second admin exists", async () => {
     const arnaud = await findOperatorByEmail("arnaud@example.com");
     const morgane = await findOperatorByEmail("morgane@example.com");
     if (!arnaud || !morgane) {
       throw new Error("unreachable");
     }
-    expect(unwrapOk(await setOperatorRole(arnaud.id, "owner")).role).toBe(
-      "owner",
+    expect(unwrapOk(await setOperatorRole(arnaud.id, "admin")).role).toBe(
+      "admin",
     );
-    expect(unwrapOk(await setOperatorRole(morgane.id, "operator")).role).toBe(
-      "operator",
-    );
+    expect(
+      unwrapOk(await setOperatorRole(morgane.id, "practitioner")).role,
+    ).toBe("practitioner");
     expect(unwrapOk(await deleteOperator(morgane.id))).toBe(true);
     expect(await findOperatorByEmail("morgane@example.com")).toBeNull();
   });
@@ -179,8 +179,8 @@ describe("the last-owner invariant", () => {
     if (!arnaud) {
       throw new Error("unreachable");
     }
-    expect(unwrapOk(await setOperatorRole(arnaud.id, "owner")).role).toBe(
-      "owner",
+    expect(unwrapOk(await setOperatorRole(arnaud.id, "admin")).role).toBe(
+      "admin",
     );
   });
 });
@@ -236,7 +236,7 @@ describe("an operator's own account", () => {
 
   it("treats a malformed id as not found", async () => {
     expect(await getOperator("not-a-uuid")).toBeNull();
-    expect((await setOperatorRole("not-a-uuid", "owner")).ok).toBe(false);
+    expect((await setOperatorRole("not-a-uuid", "admin")).ok).toBe(false);
     expect((await deleteOperator("not-a-uuid")).ok).toBe(false);
     expect((await updateOperatorName("not-a-uuid", "Name")).ok).toBe(false);
     expect(

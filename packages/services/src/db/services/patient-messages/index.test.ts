@@ -14,6 +14,7 @@ import {
   replyToPatient,
   sendPatientMessage,
 } from "./index";
+import { systemActor } from "../../services/access";
 
 let morgane: Operator;
 
@@ -36,7 +37,7 @@ afterEach(() => {
 
 /** A fresh patient per test, so no test inherits another's thread. */
 const newPatient = async (pseudonym: string): Promise<PatientProfile> => {
-  const created = await createPatient({
+  const created = await createPatient(systemActor, {
     practitionerId: testPractitionerId,
     pseudonym,
   });
@@ -53,7 +54,7 @@ const at = (iso: string) => {
 };
 
 const send = async (patientId: string, body: string) => {
-  const result = await sendPatientMessage(patientId, body);
+  const result = await sendPatientMessage(systemActor, patientId, body);
   if (!result.ok) {
     throw new Error(`message "${body}" refused: ${result.message}`);
   }
@@ -69,28 +70,36 @@ describe("the patient's message", () => {
     expect(message.body).toBe("Une bonne semaine.");
     expect(message.readAt).toBeNull();
     expect(message.operatorId).toBeNull();
-    expect(await countUnreadPatientMessages(patient.id)).toBe(1);
+    expect(await countUnreadPatientMessages(systemActor, patient.id)).toBe(1);
   });
 
   it("refuses an empty message and stores nothing", async () => {
     const patient = await newPatient("Inès");
-    const result = await sendPatientMessage(patient.id, "   ");
+    const result = await sendPatientMessage(systemActor, patient.id, "   ");
 
     expect(!result.ok && result.error).toBe("invalid_input");
-    expect(await listPatientMessages(patient.id)).toHaveLength(0);
+    expect(await listPatientMessages(systemActor, patient.id)).toHaveLength(0);
   });
 
   it("refuses a message over 2000 characters and stores nothing", async () => {
     const patient = await newPatient("Léa");
-    const result = await sendPatientMessage(patient.id, "a".repeat(2001));
+    const result = await sendPatientMessage(
+      systemActor,
+      patient.id,
+      "a".repeat(2001),
+    );
 
     expect(!result.ok && result.error).toBe("invalid_input");
-    expect(await listPatientMessages(patient.id)).toHaveLength(0);
+    expect(await listPatientMessages(systemActor, patient.id)).toHaveLength(0);
   });
 
   it("accepts exactly 2000 characters", async () => {
     const patient = await newPatient("Nora");
-    const result = await sendPatientMessage(patient.id, "a".repeat(2000));
+    const result = await sendPatientMessage(
+      systemActor,
+      patient.id,
+      "a".repeat(2000),
+    );
 
     expect(result.ok).toBe(true);
   });
@@ -103,11 +112,15 @@ describe("the patient's message", () => {
       text: { bodies: ["Les recettes me plaisent."] },
       target: { type: "patient_message" },
       write: async (resolved) =>
-        sendPatientMessage(resolved.id, "Les recettes me plaisent."),
+        sendPatientMessage(
+          systemActor,
+          resolved.id,
+          "Les recettes me plaisent.",
+        ),
     });
 
     expect(result.ok).toBe(true);
-    const [message] = await listPatientMessages(patient.id);
+    const [message] = await listPatientMessages(systemActor, patient.id);
     expect(message.author).toBe("patient");
     expect(message.patientId).toBe(patient.id);
   });
@@ -119,11 +132,11 @@ describe("the thread", () => {
     at("2026-09-21T09:00:00Z");
     await send(patient.id, "Première semaine");
     at("2026-09-22T09:00:00Z");
-    await replyToPatient(patient.id, morgane.id, "Merci Paul");
+    await replyToPatient(systemActor, patient.id, morgane.id, "Merci Paul");
     at("2026-09-28T09:00:00Z");
     await send(patient.id, "Deuxième semaine");
 
-    const thread = await listPatientMessages(patient.id);
+    const thread = await listPatientMessages(systemActor, patient.id);
     expect(thread.map((message) => message.body)).toEqual([
       "Deuxième semaine",
       "Merci Paul",
@@ -144,13 +157,18 @@ describe("unread, and what clears it", () => {
     at("2026-09-22T09:00:00Z");
     await send(patient.id, "Mardi");
     at("2026-09-23T09:00:00Z");
-    const replied = await replyToPatient(patient.id, morgane.id, "Bien reçu");
+    const replied = await replyToPatient(
+      systemActor,
+      patient.id,
+      morgane.id,
+      "Bien reçu",
+    );
     at("2026-09-24T09:00:00Z");
     await send(patient.id, "Mercredi");
 
     expect(replied.ok && replied.data.markedRead).toBe(2);
-    expect(await countUnreadPatientMessages(patient.id)).toBe(1);
-    const unread = (await listPatientMessages(patient.id)).filter(
+    expect(await countUnreadPatientMessages(systemActor, patient.id)).toBe(1);
+    const unread = (await listPatientMessages(systemActor, patient.id)).filter(
       (message) => message.author === "patient" && message.readAt === null,
     );
     expect(unread.map((message) => message.body)).toEqual(["Mercredi"]);
@@ -158,19 +176,29 @@ describe("unread, and what clears it", () => {
 
   it("a reply is never itself unread", async () => {
     const patient = await newPatient("Sam");
-    await replyToPatient(patient.id, morgane.id, "Comment allez-vous ?");
+    await replyToPatient(
+      systemActor,
+      patient.id,
+      morgane.id,
+      "Comment allez-vous ?",
+    );
 
-    expect(await countUnreadPatientMessages(patient.id)).toBe(0);
+    expect(await countUnreadPatientMessages(systemActor, patient.id)).toBe(0);
   });
 
   it("refuses an empty reply and changes nothing", async () => {
     const patient = await newPatient("Ugo");
     await send(patient.id, "Une question");
-    const result = await replyToPatient(patient.id, morgane.id, "  ");
+    const result = await replyToPatient(
+      systemActor,
+      patient.id,
+      morgane.id,
+      "  ",
+    );
 
     expect(!result.ok && result.error).toBe("invalid_input");
-    expect(await countUnreadPatientMessages(patient.id)).toBe(1);
-    expect(await listPatientMessages(patient.id)).toHaveLength(1);
+    expect(await countUnreadPatientMessages(systemActor, patient.id)).toBe(1);
+    expect(await listPatientMessages(systemActor, patient.id)).toHaveLength(1);
   });
 
   it("« Marquer comme lu » clears one message without a reply", async () => {
@@ -178,16 +206,16 @@ describe("unread, and what clears it", () => {
     const first = await send(patient.id, "Tout va bien");
     await send(patient.id, "Et une question");
 
-    const result = await markPatientMessageRead(first.id);
+    const result = await markPatientMessageRead(systemActor, first.id);
     expect(result.ok && result.data.readAt).toBeInstanceOf(Date);
-    expect(await countUnreadPatientMessages(patient.id)).toBe(1);
+    expect(await countUnreadPatientMessages(systemActor, patient.id)).toBe(1);
   });
 
   it("marking a read message again is a no-op, not a refusal", async () => {
     const patient = await newPatient("Zoé");
     const message = await send(patient.id, "Merci");
-    const first = await markPatientMessageRead(message.id);
-    const second = await markPatientMessageRead(message.id);
+    const first = await markPatientMessageRead(systemActor, message.id);
+    const second = await markPatientMessageRead(systemActor, message.id);
 
     expect(second.ok).toBe(true);
     expect(first.ok && second.ok && second.data.readAt).toEqual(
@@ -197,13 +225,21 @@ describe("unread, and what clears it", () => {
 
   it("refuses to mark her own reply, or an unknown id", async () => {
     const patient = await newPatient("Yann");
-    const replied = await replyToPatient(patient.id, morgane.id, "Bonjour");
+    const replied = await replyToPatient(
+      systemActor,
+      patient.id,
+      morgane.id,
+      "Bonjour",
+    );
     if (!replied.ok) {
       throw new Error(replied.message);
     }
 
-    const own = await markPatientMessageRead(replied.data.reply.id);
-    const unknown = await markPatientMessageRead("not-a-uuid");
+    const own = await markPatientMessageRead(
+      systemActor,
+      replied.data.reply.id,
+    );
+    const unknown = await markPatientMessageRead(systemActor, "not-a-uuid");
     expect(!own.ok && own.error).toBe("not_found");
     expect(!unknown.ok && unknown.error).toBe("not_found");
   });
@@ -211,9 +247,9 @@ describe("unread, and what clears it", () => {
   it("reading the thread clears nothing", async () => {
     const patient = await newPatient("Xavier");
     await send(patient.id, "Une nouvelle");
-    await listPatientMessages(patient.id);
+    await listPatientMessages(systemActor, patient.id);
 
-    expect(await countUnreadPatientMessages(patient.id)).toBe(1);
+    expect(await countUnreadPatientMessages(systemActor, patient.id)).toBe(1);
   });
 
   it("the roster counts per patient, and only unread ones", async () => {
@@ -222,9 +258,9 @@ describe("unread, and what clears it", () => {
     await send(busy.id, "Un");
     await send(busy.id, "Deux");
     await send(answered.id, "Trois");
-    await replyToPatient(answered.id, morgane.id, "Merci");
+    await replyToPatient(systemActor, answered.id, morgane.id, "Merci");
 
-    const counts = await listUnreadMessageCounts();
+    const counts = await listUnreadMessageCounts(systemActor);
     expect(counts.get(busy.id)).toBe(2);
     expect(counts.has(answered.id)).toBe(false);
   });

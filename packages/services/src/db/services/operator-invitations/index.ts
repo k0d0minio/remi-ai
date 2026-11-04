@@ -166,7 +166,7 @@ export type AcceptInput = z.input<typeof acceptSchema>;
  * Turns an invitation into an account. The email and the role come from the
  * invitation, never from the form: the recipient chooses their name and their
  * password, and nothing else. Otherwise an invitation for `operator` would be
- * a form field away from minting an owner.
+ * a form field away from minting an admin.
  */
 export const acceptInvitation = async (
   token: string,

@@ -13,6 +13,7 @@ import type { PatientDocument } from "../../models/patient-document";
 import type { PatientGoal } from "../../models/patient-goal";
 import type { RecipeAssignment } from "../../models/recipe-assignment";
 import { touchPatient } from "../patients";
+import { byPatient, byRecord, noSuchPatient } from "../access";
 
 /**
  * The documents Morgane puts on a patient's page — her 14 Sept document, § 3
@@ -103,7 +104,7 @@ const newestFirst = (a: PatientDocument, b: PatientDocument) => {
  * Every document of one patient, newest first. She adds a handful a month, so
  * a year is a few dozen rows and one page holds them all.
  */
-export const listPatientDocuments = async (
+const unscopedListPatientDocuments = async (
   patientId: Id,
 ): Promise<readonly PatientDocument[]> => {
   if (!uuidSchema.safeParse(patientId).success) {
@@ -113,7 +114,7 @@ export const listPatientDocuments = async (
   return [...page.items].sort(newestFirst);
 };
 
-export const getPatientDocument = async (
+const unscopedGetPatientDocument = async (
   id: Id,
 ): Promise<PatientDocument | null> => {
   if (!uuidSchema.safeParse(id).success) {
@@ -123,7 +124,7 @@ export const getPatientDocument = async (
 };
 
 /** Add a link — a title and an https URL she wants the patient to open. */
-export const addPatientDocumentLink = async (
+const unscopedAddPatientDocumentLink = async (
   patientId: Id,
   input: DocumentLinkInput,
   addedByEmail: string,
@@ -189,7 +190,7 @@ const discardUpload = async (patientId: Id, key: unknown) => {
  * is under this patient's prefix and that what landed is an accepted type
  * within the cap — and removes it from the store when it is not.
  */
-export const addPatientDocumentFile = async (
+const unscopedAddPatientDocumentFile = async (
   patientId: Id,
   input: DocumentFileInput,
   addedByEmail: string,
@@ -239,11 +240,11 @@ export const addPatientDocumentFile = async (
 };
 
 /** Edit the title, the tag and the attachment. The file or URL stays. */
-export const updatePatientDocument = async (
+const unscopedUpdatePatientDocument = async (
   id: Id,
   input: DocumentInput,
 ): Promise<Result<PatientDocument>> => {
-  const existing = await getPatientDocument(id);
+  const existing = await unscopedGetPatientDocument(id);
   if (!existing) {
     return err("not_found", "no such document");
   }
@@ -272,10 +273,10 @@ export const updatePatientDocument = async (
  * Remove a document. A file leaves the store before its row does; when the
  * store refuses, nothing is removed and the caller says so.
  */
-export const removePatientDocument = async (
+const unscopedRemovePatientDocument = async (
   id: Id,
 ): Promise<Result<PatientDocument>> => {
-  const existing = await getPatientDocument(id);
+  const existing = await unscopedGetPatientDocument(id);
   if (!existing) {
     return err("not_found", "no such document");
   }
@@ -296,3 +297,42 @@ export const removePatientDocument = async (
   await touchPatient(existing.patientId);
   return ok(existing);
 };
+
+/**
+ * The scoped surface (story 3, D-27). Each service takes the actor first, and
+ * `db/services/access` checks it before the body runs. A refused call answers
+ * as a missing file.
+ */
+export const listPatientDocuments = byPatient(
+  "read",
+  unscopedListPatientDocuments,
+  () => [],
+);
+export const getPatientDocument = byRecord(
+  "document",
+  "read",
+  unscopedGetPatientDocument,
+  () => null,
+);
+export const addPatientDocumentLink = byPatient(
+  "write",
+  unscopedAddPatientDocumentLink,
+  noSuchPatient,
+);
+export const addPatientDocumentFile = byPatient(
+  "write",
+  unscopedAddPatientDocumentFile,
+  noSuchPatient,
+);
+export const updatePatientDocument = byRecord(
+  "document",
+  "write",
+  unscopedUpdatePatientDocument,
+  noSuchPatient,
+);
+export const removePatientDocument = byRecord(
+  "document",
+  "write",
+  unscopedRemovePatientDocument,
+  noSuchPatient,
+);
