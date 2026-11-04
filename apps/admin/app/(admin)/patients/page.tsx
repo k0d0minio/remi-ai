@@ -8,6 +8,7 @@ import {
   patientListNames,
   patientListOf,
   type ChallengeSignal,
+  type Operator,
 } from "@remi/services/server";
 import {
   appHref,
@@ -112,7 +113,7 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
       }),
       listChallengeSignals(actor),
       listUnreadMessageCounts(actor),
-      all ? listOperators() : Promise.resolve([]),
+      all ? listOperators() : Promise.resolve<readonly Operator[]>([]),
     ]);
   const practitionerNames = new Map(
     operators.map((account) => [account.id, account.name]),
