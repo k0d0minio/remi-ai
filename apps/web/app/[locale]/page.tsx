@@ -14,7 +14,8 @@ import {
 } from "@remi/ui/server";
 import { SignInForm } from "@/components/auth/sign-in-form";
 import { landingPath } from "@/lib/auth/landing";
-import { getSession } from "@/lib/auth/session";
+import { getSession, isDevelopmentSessionAllowed } from "@/lib/auth/session";
+import { SIGN_IN_PATH } from "@/lib/patient-auth/paths";
 import { getContent } from "@/lib/content";
 import { resolveLocale, type LocaleParams } from "@/lib/locale-params";
 
@@ -37,6 +38,13 @@ export const generateMetadata = async ({
  */
 const Page = async ({ params }: { params: Promise<LocaleParams> }) => {
   const locale = await resolveLocale(params);
+
+  // On a deployment the entry screen is the patient sign-in. It sends a
+  // signed-in patient on to their own page.
+  if (!isDevelopmentSessionAllowed()) {
+    redirect(localePath(locale, SIGN_IN_PATH));
+  }
+
   const session = await getSession();
 
   if (session) {

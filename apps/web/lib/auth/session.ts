@@ -1,3 +1,4 @@
+import { env } from "@remi/services/server";
 import type { Actor, Id, Locale } from "@remi/services/shared";
 
 /**
@@ -51,10 +52,20 @@ export const isSessionProviderRegistered = () => provider !== null;
  * cookie is absent, which is what gives the signed-out state — the entry screen
  * at `/[locale]` — something to key off. Registering a real provider takes
  * precedence.
+ *
+ * The stand-in answers only in local development. On a deployment (UAT,
+ * production, a preview) its cookie opens nothing: any password used to reach
+ * the fixture surfaces there.
  */
+export const isDevelopmentSessionAllowed = () =>
+  env().NODE_ENV === "development";
+
 export const getSession = async (): Promise<Session | null> => {
   if (provider) {
     return provider.current();
+  }
+  if (!isDevelopmentSessionAllowed()) {
+    return null;
   }
   const { developmentSessionProvider } = await import("./development-session");
   return developmentSessionProvider.current();
