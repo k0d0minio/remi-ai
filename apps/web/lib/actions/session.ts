@@ -10,10 +10,17 @@ import {
 } from "@remi/services/shared";
 import { isRole, ROLE_COOKIE } from "@/lib/auth/development-session";
 import { landingPath } from "@/lib/auth/landing";
-import type { Role } from "@/lib/auth/session";
+import { isDevelopmentSessionAllowed, type Role } from "@/lib/auth/session";
+import { SIGN_IN_PATH } from "@/lib/patient-auth/paths";
 
-/** Writes the dev session, then lands on the surface that role starts from. */
+/**
+ * Writes the dev session, then lands on the surface that role starts from.
+ * On a deployment it writes nothing and opens the patient sign-in.
+ */
 const enter = async (role: Role, locale: Locale) => {
+  if (!isDevelopmentSessionAllowed()) {
+    redirect(localePath(locale, SIGN_IN_PATH));
+  }
   const store = await cookies();
   store.set(ROLE_COOKIE, role, { httpOnly: true, sameSite: "lax", path: "/" });
   redirect(localePath(locale, landingPath(role)));
