@@ -90,6 +90,14 @@ export type AuthProvider = {
     input: PasswordResetRequestInput,
   ) => Promise<AuthResult<null>>;
   resetPassword: (input: PasswordResetInput) => Promise<AuthResult<null>>;
+  /**
+   * Completes a sign-in that returns from an e-mail link. The link proves the
+   * identity on the auth server's own host. This call turns that proof into a
+   * session on this app's host. It answers the redirect that stores the
+   * session, or `null` when the request carries no proof or the proof fails.
+   * The caller is the route where the link lands, with that route's request.
+   */
+  completeRedirectSignIn: (request: Request) => Promise<Response | null>;
   routeHandlers: () => AuthRouteHandlers;
 };
 

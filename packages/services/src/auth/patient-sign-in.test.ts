@@ -89,6 +89,7 @@ beforeAll(async () => {
       }
       return ok(null);
     },
+    completeRedirectSignIn: async () => null,
     routeHandlers: () => {
       throw new Error("not used");
     },

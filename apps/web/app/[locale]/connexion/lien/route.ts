@@ -11,9 +11,10 @@ export const dynamic = "force-dynamic";
 type Context = { params: Promise<{ locale: string }> };
 
 /**
- * Where the magic link lands (story 2). The auth API checked the link and set
- * the session before it redirected here. This handler takes the input of no
- * caller: it reads the session only.
+ * Where the magic link lands (story 2). The auth server checks the link on its
+ * own host, then redirects here with a one-time proof. The first hit turns the
+ * proof into the session cookies and redirects to this address again, without
+ * the proof. The second hit reads the session.
  *
  * - A patient account: one `patient.signed_in` event, then the patient's
  *   current page.
@@ -24,12 +25,18 @@ type Context = { params: Promise<{ locale: string }> };
  * A signed-in patient who opens this address again writes one more event.
  * The trail then reads one sign-in too many, never one too few.
  */
-export const GET = async (_request: Request, { params }: Context) => {
+export const GET = async (request: Request, { params }: Context) => {
   const { locale: raw } = await params;
   const locale = isLocale(raw) ? raw : "fr";
   const signIn = localePath(locale, SIGN_IN_PATH);
   ensureDatabase();
   const provider = ensureAuthProvider();
+  const exchanged = provider
+    ? await provider.completeRedirectSignIn(request)
+    : null;
+  if (exchanged) {
+    return exchanged;
+  }
   const identity = provider ? await provider.readIdentity() : null;
   if (!provider || !identity) {
     redirect(signIn);
