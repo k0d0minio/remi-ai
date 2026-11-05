@@ -167,6 +167,14 @@ live in the `neon_auth` schema of the same Neon branch, so each preview branch h
 auth API at `/api/auth/[...path]`. Neon Auth's own settings (sign-in methods, the magic link, the
 SMTP sender, the trusted origins) live in the Neon console, per project, not in a variable.
 
+`require_email_verification` is `false` in `remi-ai` and in `uat-remi-ai` (Jamie, 2026-11-05).
+The app has no page for the e-mail code. With the setting on, a new patient cannot sign in.
+
+The magic link lands on the Neon Auth host first. That host redirects to `/[locale]/connexion/lien`
+with the query parameter `neon_auth_session_verifier`. The landing route exchanges it for the
+session cookies through the seam (`completeRedirectSignIn`). The exchange needs the challenge
+cookie that the link request set, so the link signs in only in the browser that asked for it.
+
 | Variable                  | Purpose                                                                                                                          | Where set | Public? |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
 | `NEON_AUTH_BASE_URL`      | The Neon Auth server of the deployment's branch (**app** project). Set by the Neon integration, never by hand                    | Vercel    | no      |
