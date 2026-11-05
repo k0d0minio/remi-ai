@@ -31,17 +31,30 @@ const fakeClient = (): NeonAuthClient => ({
   handler: vi.fn(() => {
     throw new Error("not used");
   }),
-  middleware: vi.fn(() => async () => new Response(null, { status: 200 })),
 });
 
 const landing = "https://app.example.be/fr/connexion/lien";
 
-/** A redirect answer, as the SDK's middleware gives one. */
-const redirectTo = (location: string) =>
-  new Response(null, {
-    status: 307,
-    headers: { location, "set-cookie": "session=1; Path=/" },
+type RouteContext = { params: Promise<{ path: string[] }> };
+type Get = (request: Request, context: RouteContext) => Promise<Response>;
+
+/** Route handlers whose GET answers `answer`, the way the auth proxy does. */
+const handlersAnswering = (answer: Response) => {
+  const GET = vi.fn<Get>(async () => answer);
+  const unused = vi.fn();
+  return { GET, POST: unused, PUT: unused, PATCH: unused, DELETE: unused };
+};
+
+/** The proxy's `get-session` answer: the user and the session cookies. */
+const sessionAnswer = () => {
+  const headers = new Headers({ "content-type": "application/json" });
+  headers.append("set-cookie", "session_token=t; Path=/; HttpOnly");
+  headers.append("set-cookie", "session_data=d; Path=/; HttpOnly");
+  return new Response(JSON.stringify({ user, session: { id: "s-1" } }), {
+    status: 200,
+    headers,
   });
+};
 
 describe("the Neon Auth adapter", () => {
   it("passes the e-mail, the name and the return path to the magic link", async () => {
@@ -137,26 +150,31 @@ describe("the Neon Auth adapter", () => {
     expect(
       await provider.completeRedirectSignIn(new Request(landing)),
     ).toBeNull();
-    expect(client.middleware).not.toHaveBeenCalled();
+    expect(client.handler).not.toHaveBeenCalled();
   });
 
-  it("answers the middleware's redirect when the verifier is exchanged", async () => {
+  it("sends the verifier to get-session and redirects with the cookies", async () => {
     const client = fakeClient();
-    const answer = redirectTo(landing);
-    const run = vi.fn(async () => answer);
-    client.middleware = vi.fn(() => run);
+    const handlers = handlersAnswering(sessionAnswer());
+    client.handler = vi.fn(() => handlers);
     const request = new Request(`${landing}?${SESSION_VERIFIER_PARAM}=proof`);
     const provider = neonAuthProviderFrom(client);
-    expect(await provider.completeRedirectSignIn(request)).toBe(answer);
-    expect(client.middleware).toHaveBeenCalledWith({ loginUrl: "/" });
-    expect(run).toHaveBeenCalledWith(request);
+    const answer = await provider.completeRedirectSignIn(request);
+    const [sent, context] = handlers.GET.mock.calls[0] ?? [];
+    expect(sent).toBe(request);
+    expect(await context?.params).toEqual({ path: ["get-session"] });
+    expect(answer?.status).toBe(303);
+    expect(answer?.headers.get("location")).toBe(landing);
+    expect(answer?.headers.getSetCookie()).toHaveLength(2);
   });
 
-  it("answers null when the exchange fails", async () => {
+  it("answers null when get-session returns no user", async () => {
     const client = fakeClient();
-    client.middleware = vi.fn(
-      () => async () => redirectTo("https://app.example.be/"),
-    );
+    const empty = new Response("null", {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+    client.handler = vi.fn(() => handlersAnswering(empty));
     const request = new Request(`${landing}?${SESSION_VERIFIER_PARAM}=spent`);
     const provider = neonAuthProviderFrom(client);
     expect(await provider.completeRedirectSignIn(request)).toBeNull();

@@ -172,8 +172,9 @@ The app has no page for the e-mail code. With the setting on, a new patient cann
 
 The magic link lands on the Neon Auth host first. That host redirects to `/[locale]/connexion/lien`
 with the query parameter `neon_auth_session_verifier`. The landing route exchanges it for the
-session cookies through the seam (`completeRedirectSignIn`). The exchange needs the challenge
-cookie that the link request set, so the link signs in only in the browser that asked for it.
+session cookies through the seam (`completeRedirectSignIn`): the mounted auth handler sends the
+verifier to `get-session`, as the browser SDK does. The verifier alone is the proof, so the link
+signs in from any browser.
 
 | Variable                  | Purpose                                                                                                                          | Where set | Public? |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |

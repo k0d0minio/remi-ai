@@ -65,20 +65,11 @@ export type NeonAuthClient = {
     newPassword: string;
   }) => SdkAnswer<unknown>;
   handler: () => AuthRouteHandlers;
-  /**
-   * The SDK's Next.js middleware. It is the one SDK path that exchanges the
-   * session verifier of an e-mail link for a session cookie on this app's
-   * host. It reads `request.nextUrl`, so the request must be the one that
-   * Next.js passed to a route handler.
-   */
-  middleware: (config: {
-    loginUrl: string;
-  }) => (request: Request) => Promise<Response>;
 };
 
 /**
  * The query parameter that Neon Auth adds when it redirects back from an
- * e-mail link. Its value is the one-time proof that the middleware exchanges.
+ * e-mail link. Its value is the one-time proof that `get-session` exchanges.
  */
 export const SESSION_VERIFIER_PARAM = "neon_auth_session_verifier";
 
@@ -141,7 +132,10 @@ const signedIn = async (
 /** Build the provider over any client of the SDK's shape. The tests pass a fake. */
 export const neonAuthProviderFrom = (client: NeonAuthClient): AuthProvider => {
   let handlers: AuthRouteHandlers | null = null;
-  let exchange: ((request: Request) => Promise<Response>) | null = null;
+  const routeHandlers = () => {
+    handlers ??= client.handler();
+    return handlers;
+  };
 
   return {
     name: "neon-auth",
@@ -171,32 +165,33 @@ export const neonAuthProviderFrom = (client: NeonAuthClient): AuthProvider => {
     resetPassword: async ({ token, newPassword }) =>
       done(client.resetPassword({ token, newPassword })),
     // The link lands on the auth server's host, and the server redirects back
-    // with the verifier. The middleware swaps it for the session cookies and
-    // answers a redirect to the same path without the verifier. Its login URL
-    // is "/": no landing path sits under it, so the middleware never skips the
-    // exchange as a login page. Any other answer means the exchange failed.
+    // with the verifier. The auth handler sends it to `get-session`, as the
+    // browser SDK does, and answers the session cookies for this app's host.
+    // The route then redirects to the same path without the verifier.
     completeRedirectSignIn: async (request) => {
       const url = new URL(request.url);
       if (!url.searchParams.has(SESSION_VERIFIER_PARAM)) {
         return null;
       }
-      exchange ??= client.middleware({ loginUrl: "/" });
-      const response = await exchange(request);
-      const location = response.headers.get("location");
-      if (!location) {
+      const answer = await routeHandlers().GET(request, {
+        params: Promise.resolve({ path: ["get-session"] }),
+      });
+      const body = (await answer
+        .clone()
+        .json()
+        .catch(() => null)) as { user?: unknown } | null;
+      const cookies = answer.headers.getSetCookie();
+      if (!answer.ok || !body?.user || cookies.length === 0) {
         return null;
       }
-      const target = new URL(location, url);
-      const exchanged =
-        target.origin === url.origin &&
-        target.pathname === url.pathname &&
-        !target.searchParams.has(SESSION_VERIFIER_PARAM);
-      return exchanged ? response : null;
+      url.searchParams.delete(SESSION_VERIFIER_PARAM);
+      const headers = new Headers({ location: url.toString() });
+      for (const cookie of cookies) {
+        headers.append("set-cookie", cookie);
+      }
+      return new Response(null, { status: 303, headers });
     },
-    routeHandlers: () => {
-      handlers ??= client.handler();
-      return handlers;
-    },
+    routeHandlers,
   };
 };
 
