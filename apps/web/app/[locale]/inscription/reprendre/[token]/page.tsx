@@ -24,8 +24,10 @@ export const generateMetadata = async ({
   const { locale } = await params;
   return {
     title: getContent(isLocale(locale) ? locale : "en").takeover.metaTitle,
-    // A one-time credential lives in the URL: no page it links to reads it.
-    referrer: "no-referrer",
+    // A one-time credential lives in the URL: no other site it links to reads
+    // it. Not "no-referrer": that policy sends `Origin: null` on the form's
+    // POST, and Next.js then refuses the server action.
+    referrer: "same-origin",
   };
 };
 
