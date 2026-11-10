@@ -150,12 +150,16 @@ export {
   mandatoryQuestionnaireFieldLabels,
   mandatoryQuestionnaireFields,
   missingMandatoryFields,
+  missingOptionalFields,
   noneKnownLabels,
+  optionalQuestionnaireFieldLabels,
   sexesForCalculation,
   sexForCalculationLabels,
 } from "./questionnaire";
 export type {
   MandatoryQuestionnaireField,
+  OptionalQuestionnaireAnswers,
+  OptionalQuestionnaireField,
   QuestionnaireCompleteness,
   QuestionnaireLabel,
 } from "./questionnaire";

@@ -402,3 +402,85 @@ export const missingMandatoryFields = (
   };
   return mandatoryQuestionnaireFields.filter((field) => !filled[field]);
 };
+
+/**
+ * The optional fields of the questionnaire, in the order the patient meets
+ * them: every field that is not mandatory (story 6, criterion 3). The console's
+ * « Informations manquantes » lists the empty ones under « Facultatives ».
+ * Jamie accepted the list on 2026-11-10.
+ *
+ * `dietNote` counts only after « Autre ». The three genotypes count only after
+ * « Oui » to the test, and only under a `given` genetic consent: without it the
+ * service returns them as null, and an absence the practitioner cannot see is
+ * no missing field.
+ */
+export const optionalQuestionnaireFields = [
+  "birthDate",
+  "phone",
+  "desiredWeightKg",
+  "consultationDate",
+  "diet",
+  "dietNote",
+  "celiacDisease",
+  "pathologies",
+  "medications",
+  "supplements",
+  "geneticTest",
+  "apoe",
+  "dio2",
+  "amy1a",
+] as const;
+
+export type OptionalQuestionnaireField =
+  (typeof optionalQuestionnaireFields)[number];
+
+export const optionalQuestionnaireFieldLabels = {
+  birthDate: { fr: "Date de naissance", en: "Date of birth" },
+  phone: { fr: "Téléphone", en: "Phone" },
+  desiredWeightKg: { fr: "Poids souhaité", en: "Desired weight" },
+  consultationDate: { fr: "Date de consultation", en: "Consultation date" },
+  diet: { fr: "Régime / type d'alimentation", en: "Diet / type of eating" },
+  dietNote: { fr: "Précision du régime", en: "Diet details" },
+  celiacDisease: { fr: "Maladie cœliaque", en: "Coeliac disease" },
+  pathologies: { fr: "Pathologies", en: "Medical conditions" },
+  medications: { fr: "Médicaments", en: "Medications" },
+  supplements: { fr: "Compléments alimentaires", en: "Food supplements" },
+  geneticTest: { fr: "Test génétique", en: "Genetic test" },
+  apoe: { fr: "Génotype APOE", en: "APOE genotype" },
+  dio2: { fr: "Génotype DIO2", en: "DIO2 genotype" },
+  amy1a: { fr: "Génotype AMY1A", en: "AMY1A genotype" },
+} as const satisfies Record<OptionalQuestionnaireField, QuestionnaireLabel>;
+
+/** What the optional check reads. Null, or an empty text, is « Non renseigné ». */
+export type OptionalQuestionnaireAnswers = Readonly<
+  Record<
+    OptionalQuestionnaireField,
+    string | number | boolean | null | undefined
+  >
+> & {
+  /** The genetic consent is `given`: the genotype is visible. */
+  genotypeOpen: boolean;
+};
+
+const answered = (value: string | number | boolean | null | undefined) =>
+  value !== null &&
+  value !== undefined &&
+  (typeof value !== "string" || value.trim() !== "");
+
+/** The optional fields still empty, in the list's order. */
+export const missingOptionalFields = (
+  input: OptionalQuestionnaireAnswers,
+): OptionalQuestionnaireField[] => {
+  const asked = (field: OptionalQuestionnaireField) => {
+    if (field === "dietNote") {
+      return input.diet === "other";
+    }
+    if (field === "apoe" || field === "dio2" || field === "amy1a") {
+      return input.genotypeOpen && input.geneticTest === "yes";
+    }
+    return true;
+  };
+  return optionalQuestionnaireFields.filter(
+    (field) => asked(field) && !answered(input[field]),
+  );
+};
