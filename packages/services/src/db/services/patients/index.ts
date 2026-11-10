@@ -33,6 +33,7 @@ import type {
   PatientEditableProfileField,
   PatientProfile,
 } from "../../models/patient-profile";
+import { refreshBmiEstimate } from "../patient-calculations";
 import { consentInForce } from "../patient-consents/in-force";
 import type { AccessMode, Actor } from "../../models/actor";
 import {
@@ -547,8 +548,22 @@ export const createPatient = async (
     retentionHoldAt: null,
     patientEditedAt: {},
   });
+  if (patient.heightCm !== null || patient.weightKg !== null) {
+    await refreshBmiEstimate(patient.id, db);
+  }
   return ok(patient);
 };
+
+/**
+ * The patch changes the height or the weight: the BMI must be computed again
+ * (story 7). No other field changes it.
+ */
+export const changesMeasures = (
+  current: Pick<PatientProfile, "heightCm" | "weightKg">,
+  patch: Partial<Pick<PatientProfile, "heightCm" | "weightKg">>,
+) =>
+  (patch.heightCm !== undefined && patch.heightCm !== current.heightCm) ||
+  (patch.weightKg !== undefined && patch.weightKg !== current.weightKg);
 
 type EditableValues = Pick<PatientProfile, PatientEditableProfileField>;
 
@@ -640,6 +655,9 @@ const unscopedUpdatePatient = async (
   );
 
   const patient = await patients().update(id, patch);
+  if (patient && changesMeasures(current, patch)) {
+    await refreshBmiEstimate(id);
+  }
   return patient ? ok(patient) : err("not_found", "no such patient");
 };
 

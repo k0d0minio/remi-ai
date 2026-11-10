@@ -66,6 +66,11 @@ export const auditActions = [
   /** An admin set or cleared the retention hold that blocks that deletion. */
   "patient.retention_hold_set",
   "patient.retention_hold_cleared",
+  /**
+   * The practitioner validated an automatic calculation (D-30, D-32). The
+   * detail is JSON: the kind, the value and the parameters used.
+   */
+  "calculation.validated",
   "recommendation.added",
   "recommendation.updated",
   "recommendation.archived",

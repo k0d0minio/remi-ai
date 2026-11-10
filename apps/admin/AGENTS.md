@@ -98,9 +98,13 @@ fast, states that say what is actually happening. It uses the same design system
 the two never drift — but it is allowed to be plainer.
 
 **Phone-usable is a requirement, not a nicety.** Morgane works from consultations. The patient page
-opens on a working view — status, goals, instruction, summary head, last meals, main
-recommendations, a preparation note, and quick actions. Every other section is behind navigation: a
-section index on desktop, a segmented control on phone (Suivi · Journal · Dossier · Profil).
+opens on the patient file (story 6): the name, the file status and the appointment in the header,
+« Informations manquantes » with the mandatory fields apart from the optional ones, then every
+questionnaire answer in the patient's order, each one its value or « Non renseigné ». The living
+summary and the anamnesis follow, folded, then the preparation tools: the consultation date, the
+preparation note, the context to copy and the quick actions. Every other section is behind
+navigation: a section index on desktop, a segmented control on phone (Suivi · Journal · Dossier ·
+Profil).
 
 The secondary sections read the way she works, not the way the schema stores things. The anamnesis
 lists what she has written first and offers the rest as « Compléter »; the profile is a read summary

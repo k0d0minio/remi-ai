@@ -1,4 +1,5 @@
 import type { PatientGoal, PatientGoalCheckIn } from "@remi/services/shared";
+import { Typography } from "@remi/ui/server";
 import { GoalItem } from "@/components/patients/goal-item";
 
 type Props = {
@@ -26,3 +27,16 @@ export const GoalList = ({ goals, checkIns, ranked, today }: Props) => (
     ))}
   </ul>
 );
+
+/**
+ * « N objectif(s) en baisse » — worded and placed like the meals awaiting a
+ * reply. Cleared row by row with « Vu » in the goal's trail.
+ */
+export const GoalsAwaitingAttention = ({ count }: { count: number }) =>
+  count > 0 ? (
+    <Typography size="sm" tone="muted">
+      {count === 1
+        ? "1 objectif en baisse attend votre regard."
+        : `${count} objectifs en baisse attendent votre regard.`}
+    </Typography>
+  ) : null;

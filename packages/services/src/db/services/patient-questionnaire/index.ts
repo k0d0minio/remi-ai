@@ -26,7 +26,8 @@ import type {
 } from "../../models/patient-questionnaire";
 import { recordAuditEvent, type AuditActor } from "../audit";
 import { consentInForce } from "../patient-consents/in-force";
-import { setFileStatus } from "../patients";
+import { refreshBmiEstimate } from "../patient-calculations";
+import { changesMeasures, setFileStatus } from "../patients";
 import { byPatient, noSuchPatient, systemActor } from "../access";
 
 /**
@@ -518,6 +519,9 @@ const unscopedSavePatientProfileAnswers = async (
     patch.fullName = `${first} ${last}`.trim();
   }
   const written = await rows.update(patientId, patch);
+  if (written && changesMeasures(current, patch)) {
+    await refreshBmiEstimate(patientId);
+  }
   return written ? ok(written) : err("not_found", "no such patient");
 };
 

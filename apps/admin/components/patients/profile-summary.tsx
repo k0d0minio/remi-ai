@@ -3,27 +3,23 @@
 import { Pencil } from "lucide-react";
 import { useCallback, useState } from "react";
 import type {
-  PatientAllergen,
   PatientEditableProfileField,
   PatientProfile,
-  PatientQuestionnaire,
 } from "@remi/services/shared";
 import {
   activityLevelDetails,
   ageInYears,
-  ALL_SUB_KEY,
-  allergenLabels,
-  allergenSubLabels,
-  allSubKeyLabel,
   dietLabels,
   geneticTestAnswerLabels,
-  intoleranceLabels,
-  noneKnownLabels,
   sexForCalculationLabels,
 } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Badge, Separator, Typography } from "@remi/ui/server";
 import { PatientForm } from "@/components/patients/patient-form";
+import {
+  listAnswer,
+  type QuestionnaireView,
+} from "@/components/patients/questionnaire-answers";
 import {
   cookingAffinityLabels,
   cookingTimeLabels,
@@ -52,22 +48,17 @@ type Props = {
    */
   patientEditedOn: Partial<Record<PatientEditableProfileField, string>>;
   /** The questionnaire's answers and boxes, read and handed to the form. */
-  questionnaire: {
-    answers: PatientQuestionnaire;
-    allergens: readonly PatientAllergen[];
-  };
+  questionnaire: QuestionnaireView;
   /** `consultationDate`, formatted on the server like the dates above. */
   consultationDate: string | null;
   /** The patient gave the genetic consent. The form unlocks the genotype. */
   genotypeOpen: boolean;
 };
 
-/** One line of the read summary. `null` reads as `empty`, an em dash by default. */
+/** One line of the read summary. `null` reads « Non renseigné » (D-30). */
 type Row = {
   label: string;
   value: string | null;
-  /** What an empty value reads as, when an em dash says too little. */
-  empty?: string;
   /** « modifié par la patiente le … » — the value on screen is theirs. */
   patientEditedOn?: string;
 };
@@ -168,7 +159,6 @@ export const ProfileSummary = ({
     {
       label: "Date de consultation",
       value: consultationDate,
-      empty: "Non renseigné",
     },
     {
       label: "Régime",
@@ -180,17 +170,11 @@ export const ProfileSummary = ({
     },
     {
       label: "Allergies déclarées",
-      value: listAnswer("allergy", answers.noKnownAllergies, questionnaire),
-      empty: "Non renseigné",
+      value: listAnswer("allergy", questionnaire),
     },
     {
       label: "Intolérances déclarées",
-      value: listAnswer(
-        "intolerance",
-        answers.noKnownIntolerances,
-        questionnaire,
-      ),
-      empty: "Non renseigné",
+      value: listAnswer("intolerance", questionnaire),
     },
     { label: "Pathologies", value: answers.pathologies },
     {
@@ -309,39 +293,6 @@ export const ProfileSummary = ({
   );
 };
 
-/** One box as it reads: « Poissons : Saumon », « Autre : kiwi ». */
-const boxLabel = (row: PatientAllergen) => {
-  const labels: Record<string, { fr: string }> =
-    row.kind === "allergy" ? allergenLabels : intoleranceLabels;
-  const name = labels[row.key]?.fr ?? row.key;
-  if (row.subKey === null) {
-    return row.otherText ? `${name} : ${row.otherText}` : name;
-  }
-  const subLabels = allergenSubLabels[
-    row.key as keyof typeof allergenSubLabels
-  ] as Record<string, { fr: string }> | undefined;
-  const sub =
-    row.subKey === ALL_SUB_KEY
-      ? allSubKeyLabel.fr
-      : (subLabels?.[row.subKey]?.fr ?? row.subKey);
-  return row.otherText
-    ? `${name} : ${sub} (${row.otherText})`
-    : `${name} : ${sub}`;
-};
-
-/** A list's answer as one line, or null when the list has no answer. */
-const listAnswer = (
-  kind: "allergy" | "intolerance",
-  noneKnown: boolean | null,
-  questionnaire: Props["questionnaire"],
-) => {
-  if (noneKnown === true) {
-    return noneKnownLabels[kind].fr;
-  }
-  const boxes = questionnaire.allergens.filter((row) => row.kind === kind);
-  return boxes.length > 0 ? boxes.map(boxLabel).join(", ") : null;
-};
-
 type GroupProps = {
   title: string;
   rows: readonly Row[];
@@ -372,7 +323,7 @@ const SummaryGroup = ({ title, rows }: GroupProps) => (
             </dt>
             <dd className="flex flex-col items-start gap-1">
               <Typography size="sm" className="whitespace-pre-line">
-                {hasValue(row) ? row.value : (row.empty ?? "—")}
+                {hasValue(row) ? row.value : "Non renseigné"}
               </Typography>
               {row.patientEditedOn ? (
                 <Badge variant="info" tone="subtle" size="sm">

@@ -127,6 +127,8 @@ export {
   setPatientSummary,
 } from "../db/services/patient-summaries";
 
+export { listPatientCalculations } from "../db/services/patient-calculations";
+
 export {
   addPatientRecommendation,
   archivePatientRecommendation,

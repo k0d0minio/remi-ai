@@ -30,6 +30,8 @@ One row in `patient_profiles`, plus what hangs off it:
 | The genetic test answer, the APOE, DIO2 and AMY1A results          | `patient_profiles`        | no — stored, never interpreted (D-35)              |
 | Allergies and intolerances as checked boxes                        | `patient_allergens`       | no — no page shows them yet                        |
 | Whether the patient declared « no known » allergy or intolerance   | `patient_profiles`        | no — no page shows them yet                        |
+| The practitioner's « situation particulière » and its note         | `patient_profiles`        | no                                                 |
+| The automatic calculations: estimate, validated value, parameters  | `patient_calculations`    | no                                                 |
 | The share token, when the link was last opened, last written       | `patient_profiles`        | the token is the link                              |
 | The protocol, entry by entry                                       | `patient_recommendations` | yes, unless archived                               |
 | Consultation notes                                                 | `patient_notes`           | no                                                 |

@@ -21,7 +21,7 @@ import {
   listArchivedPatientRecipes,
   listArchivedPatientRecommendations,
   listGoalCheckIns,
-  listGoalScoreStrips,
+  listPatientCalculations,
   listMealEntries,
   listPantryEssentials,
   listPastChallenges,
@@ -39,14 +39,18 @@ import {
   missingQuestionnaireFields,
 } from "@remi/services/server";
 import {
-  ageInYears,
   appHref,
+  bmiIndicator,
+  calculationKinds,
   canManageOperators,
   fileStatusLabels,
   formatDate,
-  mandatoryQuestionnaireFieldLabels,
+  missingCalculationInputs,
+  missingOptionalFields,
   patientLinkPreviewParam,
   todayAtPractice,
+  type CalculationInput,
+  type CalculationKind,
 } from "@remi/services/shared";
 import {
   Badge,
@@ -60,18 +64,23 @@ import {
 import { AdminOpenForm } from "@/components/patients/admin-open-form";
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
+import { CalculationsSummary } from "@/components/patients/calculations-summary";
 import { ChallengeHistory } from "@/components/patients/challenge-history";
 import { ChallengeSection } from "@/components/patients/challenge-section";
 import { ConsultationDate } from "@/components/patients/consultation-date";
 import { CopyContextCard } from "@/components/patients/copy-context-card";
 import { DeletePatient } from "@/components/patients/delete-patient";
+import { FoldedCard } from "@/components/patients/folded-card";
 import { RetentionHold } from "@/components/patients/retention-hold";
 import {
   DocumentSection,
   type AttachmentOption,
 } from "@/components/patients/document-section";
 import { GoalAddForm } from "@/components/patients/goal-add-form";
-import { GoalList } from "@/components/patients/goal-list";
+import {
+  GoalList,
+  GoalsAwaitingAttention,
+} from "@/components/patients/goal-list";
 import { InstructionBlock } from "@/components/patients/instruction-block";
 import {
   ArchivedObservations,
@@ -89,6 +98,7 @@ import { PantryAddForm } from "@/components/patients/pantry-add-form";
 import { PantryList } from "@/components/patients/pantry-list";
 import { PantrySection } from "@/components/patients/pantry-section";
 import { ProfileSummary } from "@/components/patients/profile-summary";
+import { QuestionnaireFile } from "@/components/patients/questionnaire-file";
 import { PrepNote } from "@/components/patients/prep-note";
 import { QuickActions } from "@/components/patients/quick-actions";
 import { RecipeAssignments } from "@/components/patients/recipe-assignments";
@@ -98,24 +108,14 @@ import { RecommendationSection } from "@/components/patients/recommendation-sect
 import { SectionFold } from "@/components/patients/section-fold";
 import { ShareLinkCard } from "@/components/patients/share-link-card";
 import { SummaryBlock } from "@/components/patients/summary-block";
-import { SummaryHead } from "@/components/patients/summary-head";
 import { SupplementAddForm } from "@/components/patients/supplement-add-form";
 import { SupplementProtocol } from "@/components/patients/supplement-protocol";
 import { SupplementSection } from "@/components/patients/supplement-section";
-import {
-  GoalsAwaitingAttention,
-  WorkingGoals,
-} from "@/components/patients/working-goals";
-import { WorkingChallenge } from "@/components/patients/working-challenge";
 import { MessageThread } from "@/components/patients/message-thread";
-import { WorkingMeals } from "@/components/patients/working-meals";
-import { WorkingMessages } from "@/components/patients/working-messages";
-import { WorkingRecommendations } from "@/components/patients/working-recommendations";
 import {
   consentChannelLabels,
   messagesAwaitingLabel,
   patientSegments,
-  patientSexLabels,
   patientStatusIntents,
   patientStatusLabels,
   type PatientSegment,
@@ -144,14 +144,14 @@ const isPatientSegment = (value: string): value is PatientSegment =>
   (patientSegments as readonly string[]).includes(value);
 
 /**
- * One patient, opening on a working view that answers the four consultation
- * questions at a glance — status, goals with their evolution, the consigne, the
- * summary head, recent meals, the main recommendations, the preparation note
- * for the next consultation, and quick actions. Every other section is behind
- * navigation: a section index on desktop, a segmented control on phone
- * (Suivi · Journal · Dossier · Profil), an anchor row in between. One DOM
- * order — the views are classes and segments over it, never a second tree.
- * Bodies of the secondary sections are untouched.
+ * One patient's file (story 6), opening on the questionnaire: the header names
+ * the patient, the file status and the appointment, « Informations
+ * manquantes » lists what is empty, and every answer follows in the order the
+ * patient met it. The living summary and the anamnesis sit under it, folded,
+ * then the preparation tools. Every other section is behind navigation: a
+ * section index on desktop, a segmented control on phone (Suivi · Journal ·
+ * Dossier · Profil), an anchor row in between. One DOM order — the views are
+ * classes and segments over it, never a second tree.
  */
 const PatientDetail = async ({ params, searchParams }: PageProps) => {
   // The page's own graph, not the layout's — the two render in parallel.
@@ -212,7 +212,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     currentChallenge,
     pastChallenges,
     documents,
-    scoreStrips,
     goalsAwaitingAttention,
     messages,
     consents,
@@ -243,23 +242,63 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     getCurrentChallenge(actor, patient.id),
     listPastChallenges(actor, patient.id),
     listPatientDocuments(actor, patient.id),
-    listGoalScoreStrips(actor, patient.id),
     countGoalCheckInsAwaitingAttention(actor, patient.id),
     listPatientMessages(actor, patient.id),
     consentsOf(actor, patient.id),
   ]);
   // The questionnaire half of the file (story 1): its answers for the form,
-  // what is still missing, and whether the genotype may be entered.
-  const [questionnaire, missing] = await Promise.all([
+  // what is still missing, and whether the genotype may be entered. Then the
+  // automatic calculations that read those answers (stories 7, 8 and 9).
+  const [questionnaire, missing, calculations] = await Promise.all([
     getPatientQuestionnaire(actor, patient.id),
     missingQuestionnaireFields(actor, patient.id),
+    listPatientCalculations(actor, patient.id),
   ]);
   if (!questionnaire.ok) {
     notFound();
   }
-  const missingFields = missing.ok ? missing.data : [];
-  const consultationDate = questionnaire.data.answers.consultationDate;
+  const missingMandatory = missing.ok ? missing.data : [];
+  const answers = questionnaire.data.answers;
+  const consultationDate = answers.consultationDate;
   const genotypeOpen = consents.genetic?.decision === "given";
+  const missingOptional = missingOptionalFields({
+    birthDate: patient.birthDate,
+    phone: patient.phone,
+    desiredWeightKg: answers.desiredWeightKg,
+    consultationDate,
+    diet: answers.diet,
+    dietNote: answers.dietNote,
+    celiacDisease: answers.celiacDisease,
+    pathologies: answers.pathologies,
+    medications: patient.medications,
+    supplements: patient.supplements,
+    geneticTest: answers.geneticTest,
+    apoe: answers.apoe,
+    dio2: answers.dio2,
+    amy1a: answers.amy1a,
+    genotypeOpen,
+  });
+  const calculationData = {
+    sexForCalculation: answers.sexForCalculation,
+    birthDate: patient.birthDate,
+    heightCm: patient.heightCm,
+    weightKg: patient.weightKg,
+    activityLevel: answers.activityLevel,
+  };
+  const missingCalculation = Object.fromEntries(
+    calculationKinds.map((kind) => [
+      kind,
+      missingCalculationInputs(kind, calculationData),
+    ]),
+  ) as Record<CalculationKind, CalculationInput[]>;
+  // The name the patient gave, else the one the practitioner typed, else the
+  // working name: the pseudonym always exists.
+  const name =
+    [patient.firstName, patient.lastName]
+      .filter((part) => part !== null && part.trim() !== "")
+      .join(" ") ||
+    patient.fullName ||
+    patient.pseudonym;
 
   // Derived from the thread already in hand rather than a second read.
   const unreadMessages = messages.filter(
@@ -276,9 +315,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   );
   const checkIns = Object.fromEntries(
     trails.map((trail) => [trail.id, trail.entries]),
-  );
-  const strips = Object.fromEntries(
-    scoreStrips.map((strip) => [strip.goalId, strip.scores]),
   );
   // Both halves or neither: a date with no channel says nothing about what the
   // patient actually agreed through, so it still reads as not recorded.
@@ -310,8 +346,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
       label: `Recette · ${recipe.title} (précédente)`,
     })),
   ];
-  const age = ageInYears(patient.birthDate);
-
   // The default consultation date, resolved server-side: a date input seeded
   // from the browser's clock disagrees with the server the moment someone is
   // working across midnight or from another timezone.
@@ -320,9 +354,17 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   // The section registry — the one list the desktop index, the phone segments
   // and the medium anchor row all read. Every rendered section, in DOM order.
   const sections: PatientSectionEntry[] = [
-    { id: "working-view", label: "Vue de travail", segment: "suivi" },
-    { id: "patient-link", label: "Lien patient", segment: "dossier" },
+    { id: "patient-file", label: "Dossier patient", segment: "suivi" },
+    { id: "calculations", label: "Calculs", segment: "suivi" },
     { id: "summary", label: "Résumé vivant", segment: "suivi" },
+    {
+      id: "anamnesis",
+      label: "Anamnèse",
+      segment: "suivi",
+      count: anamnesis.length,
+    },
+    { id: "preparation", label: "Préparation", segment: "suivi" },
+    { id: "patient-link", label: "Lien patient", segment: "dossier" },
     {
       id: "objectifs",
       label: "Objectifs et consigne",
@@ -389,12 +431,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
       segment: "dossier",
       count: notes.length,
     },
-    {
-      id: "anamnesis",
-      label: "Anamnèse",
-      segment: "dossier",
-      count: anamnesis.length,
-    },
     { id: "profile", label: "Profil", segment: "profil" },
   ];
 
@@ -424,15 +460,8 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
           </NextLink>
           <div className="flex flex-wrap items-center gap-3">
             <Typography as="h1" size="2xl" weight="semibold">
-              {patient.pseudonym}
+              {name}
             </Typography>
-            <Badge
-              variant={patientStatusIntents[patient.status]}
-              tone="subtle"
-              size="sm"
-            >
-              {patientStatusLabels[patient.status]}
-            </Badge>
             <Badge
               variant={
                 patient.fileStatus === "to_complete" ? "warning" : "info"
@@ -442,7 +471,19 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
             >
               {fileStatusLabels[patient.fileStatus].fr}
             </Badge>
+            <Badge
+              variant={patientStatusIntents[patient.status]}
+              tone="subtle"
+              size="sm"
+            >
+              {patientStatusLabels[patient.status]}
+            </Badge>
           </div>
+          <Typography size="sm" tone="muted">
+            {`Pseudonyme : ${patient.pseudonym} · Rendez-vous : ${
+              consultationDate ? formatDate(consultationDate) : "Non renseigné"
+            }`}
+          </Typography>
           {readOnly ? (
             <Typography size="sm" role="status" className="text-warning-text">
               Lecture seule : accès équipe REMI à un dossier suivi par un autre
@@ -455,29 +496,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               sienne. Aucun second dossier n&apos;a été créé.
             </Typography>
           ) : null}
-          {missingFields.length > 0 ? (
-            <Typography size="sm" tone="muted">
-              {`Champs manquants : ${missingFields
-                .map((name) => mandatoryQuestionnaireFieldLabels[name].fr)
-                .join(", ")}.`}{" "}
-              <a href="#profile" className="underline underline-offset-2">
-                Compléter
-              </a>
-            </Typography>
-          ) : null}
-          <Typography size="sm" tone="muted">
-            {[
-              patient.fullName,
-              age !== null ? `${age} ans` : null,
-              patient.sex !== "unspecified"
-                ? patientSexLabels[patient.sex]
-                : null,
-              patient.heightCm ? `${patient.heightCm} cm` : null,
-              patient.weightKg ? `${patient.weightKg} kg` : null,
-            ]
-              .filter((part) => part !== null && part !== "")
-              .join(" · ") || "Profil à compléter"}
-          </Typography>
         </div>
 
         {/* The anchor row — medium only; the rail takes over from lg, the
@@ -497,126 +515,90 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
           ))}
         </nav>
 
-        {/* The working view — the landing state. */}
+        {/* The patient file — the landing state (story 6). */}
         <section
-          id="working-view"
+          id="patient-file"
           data-segment="suivi"
-          aria-label="Vue de travail"
-          className="flex scroll-mt-32 flex-col gap-6"
+          aria-label="Dossier patient"
+          className="scroll-mt-32"
         >
           <Card>
             <CardHeader>
-              <CardTitle>Objectifs</CardTitle>
+              <CardTitle>Dossier patient</CardTitle>
               <CardDescription>
-                Ce que vous suivez en ce moment — la dernière mesure
-                d&apos;abord, puis la direction. Les objectifs archivés sont
-                masqués ici.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-6">
-              <WorkingGoals
-                goals={goals}
-                checkIns={checkIns}
-                scoreStrips={strips}
-                awaitingAttention={goalsAwaitingAttention}
-              />
-
-              {goals.length < MAX_ACTIVE_GOALS ? (
-                <GoalAddForm patientId={patient.id} />
-              ) : (
-                <Typography size="sm" tone="muted">
-                  {`${MAX_ACTIVE_GOALS} objectifs actifs — archivez-en un pour en ajouter un autre.`}
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Challenge</CardTitle>
-              <CardDescription>
-                L&apos;habitude en cours et ce que la personne en dit — lancer,
-                modifier ou clore se fait dans la section Challenges.
+                Les réponses du questionnaire, dans son ordre. Un champ vide
+                reste « Non renseigné ».
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <WorkingChallenge challenge={currentChallenge} />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Consigne</CardTitle>
-              <CardDescription>
-                La consigne que vous vous donnez pour cet accompagnement. Les
-                consignes précédentes sont masquées ici.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <InstructionBlock
-                patientId={patient.id}
-                pseudonym={patient.pseudonym}
-                instruction={instruction}
-                superseded={[]}
+              <QuestionnaireFile
+                patient={patient}
+                questionnaire={questionnaire.data}
+                genotypeOpen={genotypeOpen}
+                missingMandatory={missingMandatory}
+                missingOptional={missingOptional}
               />
             </CardContent>
           </Card>
+        </section>
 
+        {/* « Calculs » — under the data, above the protocol (story 6). */}
+        <section
+          id="calculations"
+          data-segment="suivi"
+          className="scroll-mt-32"
+        >
           <Card>
             <CardHeader>
-              <CardTitle>Résumé</CardTitle>
+              <CardTitle>Calculs</CardTitle>
               <CardDescription>
-                Le début de la synthèse — la révision complète est la section
-                Résumé vivant.
+                Calculés à partir du dossier. Une valeur reste une estimation
+                tant que vous ne l&apos;avez pas validée.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <SummaryHead summary={summary} />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Derniers repas</CardTitle>
-              <CardDescription>
-                Ce qui est arrivé depuis la dernière fois — le journal complet
-                est une des sections Journal.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <WorkingMeals
-                entries={mealEntries}
-                awaitingFeedback={awaitingFeedback}
+              <CalculationsSummary
+                calculations={calculations}
+                missing={missingCalculation}
+                bmi={bmiIndicator(calculationData)}
               />
             </CardContent>
           </Card>
+        </section>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Messages</CardTitle>
-              <CardDescription>
-                Ce que la personne écrit depuis son lien — répondre se fait dans
-                la section Messages.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <WorkingMessages messages={messages} unread={unreadMessages} />
-            </CardContent>
-          </Card>
+        <section id="summary" data-segment="suivi" className="scroll-mt-32">
+          <FoldedCard
+            id="summary-fold"
+            title="Résumé vivant"
+            description="La synthèse de la personne. Une seule, révisée à chaque consultation."
+            openLabel="Afficher le résumé"
+          >
+            <SummaryBlock
+              patientId={patient.id}
+              pseudonym={patient.pseudonym}
+              summary={summary}
+            />
+          </FoldedCard>
+        </section>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Recommandations</CardTitle>
-              <CardDescription>
-                La première de chaque catégorie — le protocole complet est la
-                section Recommandations.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <WorkingRecommendations recommendations={recommendations} />
-            </CardContent>
-          </Card>
+        <section id="anamnesis" data-segment="suivi" className="scroll-mt-32">
+          <FoldedCard
+            id="anamnesis-fold"
+            title="Anamnèse"
+            description="Le terrain, catégorie par catégorie. Ne s'affiche jamais sur le lien patient."
+            openLabel={`Afficher l'anamnèse · ${anamnesis.length}`}
+          >
+            <AnamnesisBlock patientId={patient.id} entries={anamnesis} />
+          </FoldedCard>
+        </section>
 
+        {/* The preparation tools — kept from the September working view. */}
+        <section
+          id="preparation"
+          data-segment="suivi"
+          aria-label="Préparation"
+          className="flex scroll-mt-32 flex-col gap-6"
+        >
           <Card>
             <CardHeader>
               <CardTitle>Date de consultation</CardTitle>
@@ -706,25 +688,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 email={patient.email}
                 lastOpenedAt={patient.linkLastOpenedAt}
                 lastWroteAt={patient.linkLastWroteAt}
-              />
-            </CardContent>
-          </Card>
-        </section>
-
-        <section id="summary" data-segment="suivi" className="scroll-mt-32">
-          <Card>
-            <CardHeader>
-              <CardTitle>Résumé vivant</CardTitle>
-              <CardDescription>
-                La synthèse de la personne — ce que vous relisez en premier. Une
-                seule, révisée à chaque consultation.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <SummaryBlock
-                patientId={patient.id}
-                pseudonym={patient.pseudonym}
-                summary={summary}
               />
             </CardContent>
           </Card>
@@ -1123,22 +1086,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 notes={notes}
                 today={today}
               />
-            </CardContent>
-          </Card>
-        </section>
-
-        <section id="anamnesis" data-segment="dossier" className="scroll-mt-32">
-          <Card>
-            <CardHeader>
-              <CardTitle>Anamnèse</CardTitle>
-              <CardDescription>
-                Le terrain, catégorie par catégorie : ce qui est renseigné
-                d&apos;abord, le reste à compléter en dessous. Ne s&apos;affiche
-                jamais sur le lien patient.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AnamnesisBlock patientId={patient.id} entries={anamnesis} />
             </CardContent>
           </Card>
         </section>

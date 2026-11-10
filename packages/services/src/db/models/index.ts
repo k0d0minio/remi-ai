@@ -73,6 +73,10 @@ export type {
   SexForCalculation,
 } from "./patient-questionnaire";
 export type { PatientRecommendation } from "./patient-recommendation";
+export type {
+  CalculationParameters,
+  PatientCalculation,
+} from "./patient-calculation";
 export type { PatientSummary } from "./patient-summary";
 export type { PatientSupplement } from "./patient-supplement";
 export type {

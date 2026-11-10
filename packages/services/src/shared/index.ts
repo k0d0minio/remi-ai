@@ -26,6 +26,21 @@ export {
 } from "./i18n";
 export type { Locale } from "./i18n";
 export { auditActions } from "./audit";
+export {
+  bmiClass,
+  bmiIndicator,
+  bmiInputRanges,
+  bmiNeedsReview,
+  calculationInputLabels,
+  calculationKindLabels,
+  calculationKinds,
+  missingCalculationInputs,
+} from "./calculations";
+export type {
+  BmiIndicator,
+  CalculationInput,
+  CalculationKind,
+} from "./calculations";
 export { fileClaimPurposes, fileTakeoverPath } from "./file-claim";
 export type { FileClaimPurpose } from "./file-claim";
 export { minPasswordLength, signupFields } from "./signup";
@@ -150,12 +165,18 @@ export {
   mandatoryQuestionnaireFieldLabels,
   mandatoryQuestionnaireFields,
   missingMandatoryFields,
+  heightCmRange,
+  missingOptionalFields,
   noneKnownLabels,
+  optionalQuestionnaireFieldLabels,
   sexesForCalculation,
   sexForCalculationLabels,
+  weightKgRange,
 } from "./questionnaire";
 export type {
   MandatoryQuestionnaireField,
+  OptionalQuestionnaireAnswers,
+  OptionalQuestionnaireField,
   QuestionnaireCompleteness,
   QuestionnaireLabel,
 } from "./questionnaire";
@@ -233,6 +254,7 @@ export type {
   PatientSex,
   PatientStatus,
   PatientSummary,
+  PatientCalculation,
   PersonalisationDimension,
   PersonalisationProfile,
   Person,

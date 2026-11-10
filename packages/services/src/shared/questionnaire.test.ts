@@ -3,6 +3,10 @@ import {
   mandatoryQuestionnaireFieldLabels,
   mandatoryQuestionnaireFields,
   missingMandatoryFields,
+  missingOptionalFields,
+  optionalQuestionnaireFieldLabels,
+  optionalQuestionnaireFields,
+  type OptionalQuestionnaireAnswers,
   type QuestionnaireCompleteness,
 } from "./questionnaire";
 
@@ -63,5 +67,88 @@ describe("the mandatory questionnaire fields", () => {
         sexForCalculation: null,
       }),
     ).toEqual(["sexForCalculation", "heightCm", "activityLevel"]);
+  });
+});
+
+const emptyOptional: OptionalQuestionnaireAnswers = {
+  birthDate: null,
+  phone: null,
+  desiredWeightKg: null,
+  consultationDate: null,
+  diet: null,
+  dietNote: null,
+  celiacDisease: null,
+  pathologies: null,
+  medications: "",
+  supplements: "",
+  geneticTest: null,
+  apoe: null,
+  dio2: null,
+  amy1a: null,
+  genotypeOpen: false,
+};
+
+describe("the optional questionnaire fields", () => {
+  it("labels each field in French and English", () => {
+    for (const field of optionalQuestionnaireFields) {
+      expect(optionalQuestionnaireFieldLabels[field].fr).not.toBe("");
+      expect(optionalQuestionnaireFieldLabels[field].en).not.toBe("");
+    }
+  });
+
+  it("shares no field with the mandatory list", () => {
+    const mandatory: readonly string[] = mandatoryQuestionnaireFields;
+    for (const field of optionalQuestionnaireFields) {
+      expect(mandatory).not.toContain(field);
+    }
+  });
+
+  it("lists every asked field of an empty file, in order", () => {
+    expect(missingOptionalFields(emptyOptional)).toEqual([
+      "birthDate",
+      "phone",
+      "desiredWeightKg",
+      "consultationDate",
+      "diet",
+      "celiacDisease",
+      "pathologies",
+      "medications",
+      "supplements",
+      "geneticTest",
+    ]);
+  });
+
+  it("asks the diet note only after « Autre »", () => {
+    expect(
+      missingOptionalFields({ ...emptyOptional, diet: "vegan" }),
+    ).not.toContain("dietNote");
+    expect(
+      missingOptionalFields({ ...emptyOptional, diet: "other" }),
+    ).toContain("dietNote");
+  });
+
+  it("asks the genotype only after « Oui » and under the consent", () => {
+    const yes = { ...emptyOptional, geneticTest: "yes" };
+    expect(missingOptionalFields(yes)).not.toContain("apoe");
+    expect(
+      missingOptionalFields({ ...yes, genotypeOpen: true }).slice(-3),
+    ).toEqual(["apoe", "dio2", "amy1a"]);
+    expect(
+      missingOptionalFields({
+        ...emptyOptional,
+        geneticTest: "no_or_unknown",
+        genotypeOpen: true,
+      }),
+    ).not.toContain("apoe");
+  });
+
+  it("counts false and zero as answers, blank text as none", () => {
+    const missing = missingOptionalFields({
+      ...emptyOptional,
+      celiacDisease: false,
+      pathologies: "   ",
+    });
+    expect(missing).not.toContain("celiacDisease");
+    expect(missing).toContain("pathologies");
   });
 });
