@@ -3,6 +3,8 @@ import {
   bmi,
   bmiClass,
   bmiClasses,
+  bmiIndicator,
+  bmiNeedsReview,
   calculationInputLabels,
   calculationInputs,
   calculationKindLabels,
@@ -100,5 +102,74 @@ describe("the missing data of a calculation", () => {
         expect(calculationInputLabels[input].en).not.toBe("");
       }
     }
+  });
+});
+
+describe("the BMI indicator", () => {
+  it("shows 23,9 · Corpulence normale for 165 cm and 65 kg, with no alert", () => {
+    const indicator = bmiIndicator({ heightCm: 165, weightKg: 65 });
+    expect(indicator).toMatchObject({
+      state: "computed",
+      value: 23.9,
+      needsReview: false,
+    });
+    if (indicator.state === "computed") {
+      expect(indicator.bmiClass.label.fr).toBe("Corpulence normale");
+    }
+  });
+
+  it.each([
+    [17.9, true],
+    [18.4, true],
+    [18.5, false],
+    [22.0, false],
+    [24.9, false],
+    [25.0, true],
+    [30.0, true],
+  ])("flags %d: %s", (value, flagged) => {
+    expect(bmiNeedsReview(value)).toBe(flagged);
+  });
+
+  it("flags the rounded value, so the screen and the alert agree", () => {
+    // 50.3 kg / 1.65² = 18.475…: under 18.5 raw, 18,5 on screen.
+    expect(bmiIndicator({ heightCm: 165, weightKg: 50.3 })).toMatchObject({
+      value: 18.5,
+      needsReview: false,
+    });
+  });
+
+  it("names a missing height and gives no value", () => {
+    expect(bmiIndicator({ heightCm: null, weightKg: 65 })).toEqual({
+      state: "missing",
+      inputs: ["heightCm"],
+    });
+    expect(bmiIndicator({ heightCm: null, weightKg: null })).toEqual({
+      state: "missing",
+      inputs: ["heightCm", "weightKg"],
+    });
+  });
+
+  it("names a value out of range and gives no value", () => {
+    expect(bmiIndicator({ heightCm: 99, weightKg: 65 })).toEqual({
+      state: "out_of_range",
+      inputs: ["heightCm"],
+    });
+    expect(bmiIndicator({ heightCm: 165, weightKg: 301 })).toEqual({
+      state: "out_of_range",
+      inputs: ["weightKg"],
+    });
+    expect(bmiIndicator({ heightCm: 251, weightKg: 24.9 })).toEqual({
+      state: "out_of_range",
+      inputs: ["heightCm", "weightKg"],
+    });
+  });
+
+  it("computes at the edges of the ranges", () => {
+    expect(bmiIndicator({ heightCm: 100, weightKg: 25 }).state).toBe(
+      "computed",
+    );
+    expect(bmiIndicator({ heightCm: 250, weightKg: 300 }).state).toBe(
+      "computed",
+    );
   });
 });

@@ -36,7 +36,7 @@ consultation → practitioner validation → activation and e-mail → the patie
 | 4   | « Questionnaire préparatoire du patient »                             | [`preparatory-questionnaire/`](preparatory-questionnaire/breakdown.md)   | 1           |
 | 5   | « Liste des patients et statuts du dossier »                          | [`patient-list-and-status/`](patient-list-and-status/breakdown.md)       | 1           |
 | 6   | « Consultation du dossier patient avant le rendez-vous »              | [`patient-file-view/`](patient-file-view/breakdown.md)                   | 1           |
-| 7   | « Calcul de l'IMC »                                                   | [`bmi/`](bmi/breakdown.md)                                               | 1           |
+| 7   | « Calcul de l'IMC »                                                   | [`bmi/`](_done/bmi/breakdown.md)                                         | 1           |
 | 8   | « Calcul des besoins protéiques »                                     | [`protein-needs/`](protein-needs/breakdown.md)                           | 1           |
 | 9   | « Calcul énergétique »                                                | [`energy-needs/`](energy-needs/breakdown.md)                             | 1           |
 | 10  | « Répartition des macronutriments selon le génotype »                 | [`genotype-macro-split/`](genotype-macro-split/breakdown.md)             | 1           |
@@ -76,31 +76,30 @@ Set by Jamie on 2026-10-27. The epics follow the table above. `triage` comes las
 2. preparatory-questionnaire
 3. patient-list-and-status
 4. patient-file-view
-5. bmi
-6. protein-needs
-7. energy-needs
-8. food-directives
-9. eviction-safety
-10. knowledge-base-requests
-11. priority-goals
-12. lifestyle-advice
-13. supplement-interventions
-14. meal-structure
-15. intermittent-fasting
-16. care-activation
-17. protocol-versions
-18. patient-change-signals
-19. patient-access
-20. patient-home-navigation
-21. patient-recommendations
-22. recipe-space
-23. recipe-card
-24. shopping-list
-25. meal-improvement
-26. practitioner-daily-recipes
-27. restaurant-menu
-28. genotype-macro-split
-29. triage
+5. protein-needs
+6. energy-needs
+7. food-directives
+8. eviction-safety
+9. knowledge-base-requests
+10. priority-goals
+11. lifestyle-advice
+12. supplement-interventions
+13. meal-structure
+14. intermittent-fasting
+15. care-activation
+16. protocol-versions
+17. patient-change-signals
+18. patient-access
+19. patient-home-navigation
+20. patient-recommendations
+21. recipe-space
+22. recipe-card
+23. shopping-list
+24. meal-improvement
+25. practitioner-daily-recipes
+26. restaurant-menu
+27. genotype-macro-split
+28. triage
 
 `genotype-macro-split` (story 10) comes after the recipe and analysis epics (Jamie, 2026-10-28).
 
@@ -216,14 +215,14 @@ Morgane filed these in the Drive `remi-ai/` root between 23 and 25 October 2026.
 Each one answers a question a breakdown asks, or is reference for a build. The story and D-30 win
 where one differs.
 
-| File                                                      | Read by                                                                                   |
-| --------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| « Genotyp Tabs.xlsx », « Genotyp Last version .xlsx »     | `genotype-macro-split` (the table, informative beside the story's own)                    |
-| « Recommandation alimentaire.docx », « Recommandations alimentaires.docx » | `bmi`, `protein-needs`, `energy-needs`, `genotype-macro-split`. The 24 October version carries the complete 28-row genotype table and the definition of « Validation médicale » |
-| « Calendrier fruits et légumes de saison.xlsx »           | `recipe-space` (the season table, question 2)                                             |
-| « Résumé du Livre du Docteur Mouton.docx »                | `genotype-macro-split` (the biology behind the table, never a rule)                       |
-| « Prompt.docx », `01-weekly-planner.md`, `02-single-meal.md` | `recipe-space`, `meal-improvement` (the v1 prompts, reference for tone and structure)      |
-| « Questions pour Morgane — user stories REMI — 23 octobre 2026 » | every breakdown. Her answers return to the breakdowns in the pull request that acts on them |
+| File                                                                                                     | Read by                                                                                                                                                                                                                              |
+| -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| « Genotyp Tabs.xlsx », « Genotyp Last version .xlsx »                                                    | `genotype-macro-split` (the table, informative beside the story's own)                                                                                                                                                               |
+| « Recommandation alimentaire.docx », « Recommandations alimentaires.docx »                               | `bmi`, `protein-needs`, `energy-needs`, `genotype-macro-split`. The 24 October version carries the complete 28-row genotype table and the definition of « Validation médicale »                                                      |
+| « Calendrier fruits et légumes de saison.xlsx »                                                          | `recipe-space` (the season table, question 2)                                                                                                                                                                                        |
+| « Résumé du Livre du Docteur Mouton.docx »                                                               | `genotype-macro-split` (the biology behind the table, never a rule)                                                                                                                                                                  |
+| « Prompt.docx », `01-weekly-planner.md`, `02-single-meal.md`                                             | `recipe-space`, `meal-improvement` (the v1 prompts, reference for tone and structure)                                                                                                                                                |
+| « Questions pour Morgane — user stories REMI — 23 octobre 2026 »                                         | every breakdown. Her answers return to the breakdowns in the pull request that acts on them                                                                                                                                          |
 | The e-mail thread « REMI & Fagron \| contact », 3 to 24 September 2026 (Gmail, label `projects/remi-ai`) | `preparatory-questionnaire`, `genotype-macro-split`. Fagron NutriGen is a candidate laboratory, not decided. Its sample reports show what a laboratory report looks like. The laboratory choice is `genotype-macro-split` question 6 |
 
 ## Milestones
@@ -238,14 +237,14 @@ Morgane what 1 December must show. She answered on the call of 2026-10-23 (recor
 simplest form**, phases 1 and 2. The P0 set follows that answer. A missed date
 is reported on the Friday call, not absorbed.
 
-| By          | Phase                                                                                                  | Epics                                                                                                                                                                                      |
-| ----------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| By          | Phase                                                                                                  | Epics                                                                                                                                                                                                                                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 14 November | **1 — The file.** A practitioner creates or receives a patient, reads the file, sees the calculations. | `patient-signup-account`, `consent-and-data`, `patient-file-creation`, `preparatory-questionnaire`, `patient-list-and-status`, `patient-file-view`, `bmi`, `protein-needs`, `energy-needs`, `genotype-macro-split` (its place is the pull request's question 1) |
-| 21 November | **2 — The protocol.** The practitioner writes the recommendations REMI will apply.                     | `food-directives`, `eviction-safety`, `knowledge-base-requests`, `priority-goals`, `lifestyle-advice`, `supplement-interventions`, `meal-structure`, `intermittent-fasting`                |
-| 26 November | **3 — Activation and the patient's space.** The patient signs in and reads.                            | `care-activation`, `protocol-versions`, `patient-change-signals`, `patient-access`, `patient-home-navigation`, `patient-recommendations`                                                   |
-| 1 December  | **4 — Recipes and the suggestion.** REMI proposes. FunMedDev's team tests.                             | `recipe-space`, `recipe-card`, `shopping-list`, `meal-improvement`, `practitioner-daily-recipes`                                                                                           |
-| 12 December | **Freeze.** Fixes only until the open day.                                                             | triage                                                                                                                                                                                     |
-| 19 December | **5 — Open day.** The bonus if time allows.                                                            | `restaurant-menu`                                                                                                                                                                          |
+| 21 November | **2 — The protocol.** The practitioner writes the recommendations REMI will apply.                     | `food-directives`, `eviction-safety`, `knowledge-base-requests`, `priority-goals`, `lifestyle-advice`, `supplement-interventions`, `meal-structure`, `intermittent-fasting`                                                                                     |
+| 26 November | **3 — Activation and the patient's space.** The patient signs in and reads.                            | `care-activation`, `protocol-versions`, `patient-change-signals`, `patient-access`, `patient-home-navigation`, `patient-recommendations`                                                                                                                        |
+| 1 December  | **4 — Recipes and the suggestion.** REMI proposes. FunMedDev's team tests.                             | `recipe-space`, `recipe-card`, `shopping-list`, `meal-improvement`, `practitioner-daily-recipes`                                                                                                                                                                |
+| 12 December | **Freeze.** Fixes only until the open day.                                                             | triage                                                                                                                                                                                                                                                          |
+| 19 December | **5 — Open day.** The bonus if time allows.                                                            | `restaurant-menu`                                                                                                                                                                                                                                               |
 
 `recipe-space/ai-gateway-adapter` does not wait for phase 4. It starts beside phase 1, so the
 model has a slot on day one of phase 4 and the prompts are proven on real protocols before then.

@@ -14,7 +14,12 @@ import {
   type QuestionnaireInput,
   patientActor,
 } from "@remi/services/server";
-import { allergenKinds, type Result } from "@remi/services/shared";
+import {
+  allergenKinds,
+  heightCmRange,
+  weightKgRange,
+  type Result,
+} from "@remi/services/shared";
 import { currentPatient } from "@/lib/patient-auth/session";
 import {
   answerFields,
@@ -43,7 +48,7 @@ const fromService = (result: Result<unknown>): SaveResult | null => {
   return failed(result.error === "invalid_input" ? "invalid" : "unavailable");
 };
 
-/** Story 4: taille 100 to 250 cm, whole centimetres (the column is an integer). */
+/** Story 4: taille in `heightCmRange`, whole centimetres (the column is an integer). */
 const heightOf = (value: string): number | null | SaveError => {
   if (value === "") {
     return null;
@@ -52,10 +57,12 @@ const heightOf = (value: string): number | null | SaveError => {
     return "height_range";
   }
   const cm = Number(value);
-  return cm >= 100 && cm <= 250 ? cm : "height_range";
+  return cm >= heightCmRange.min && cm <= heightCmRange.max
+    ? cm
+    : "height_range";
 };
 
-/** Story 4: poids 25 to 300 kg, one decimal, with a comma or a point. */
+/** Story 4: poids in `weightKgRange`, one decimal, with a comma or a point. */
 const weightOf = (value: string): number | null | SaveError => {
   if (value === "") {
     return null;
@@ -64,7 +71,9 @@ const weightOf = (value: string): number | null | SaveError => {
     return "weight_range";
   }
   const kg = Number(value.replace(",", "."));
-  return kg >= 25 && kg <= 300 ? kg : "weight_range";
+  return kg >= weightKgRange.min && kg <= weightKgRange.max
+    ? kg
+    : "weight_range";
 };
 
 const identityFields = ["firstName", "lastName", "birthDate", "phone"] as const;

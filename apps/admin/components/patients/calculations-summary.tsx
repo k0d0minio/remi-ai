@@ -1,9 +1,13 @@
 import type {
+  BmiIndicator,
   CalculationInput,
   CalculationKind,
   PatientCalculation,
 } from "@remi/services/shared";
 import {
+  bmiClass,
+  bmiInputRanges,
+  bmiNeedsReview,
   calculationInputLabels,
   calculationKindLabels,
   calculationKinds,
@@ -16,6 +20,8 @@ type Props = {
   calculations: readonly PatientCalculation[];
   /** Per kind, the data the file lacks (`missingCalculationInputs`). */
   missing: Readonly<Record<CalculationKind, readonly CalculationInput[]>>;
+  /** The BMI's state from the file's height and weight (`bmiIndicator`). */
+  bmi: BmiIndicator;
 };
 
 /** The unit each value reads with. */
@@ -25,13 +31,109 @@ const units: Record<CalculationKind, string> = {
   energy: " kcal/jour",
 };
 
+const NOT_AVAILABLE = "Calcul pas encore disponible";
+
 /** One line under « Non calculé »: what the row waits on. */
-const reasonLine = (missing: readonly CalculationInput[]) =>
-  missing.length > 0
-    ? `Non renseigné : ${missing
-        .map((input) => calculationInputLabels[input].fr)
-        .join(", ")}`
-    : "Calcul pas encore disponible";
+const missingLine = (missing: readonly CalculationInput[]) =>
+  `Non renseigné : ${missing
+    .map((input) => calculationInputLabels[input].fr)
+    .join(", ")}`;
+
+/** « Hors limites : taille (100 à 250 cm) ». */
+const outOfRangeLine = (inputs: readonly (keyof typeof bmiInputRanges)[]) =>
+  `Hors limites : ${inputs
+    .map((input) => {
+      const range = bmiInputRanges[input];
+      const unit = input === "heightCm" ? "cm" : "kg";
+      return `${calculationInputLabels[input].fr} (${range.min} à ${range.max} ${unit})`;
+    })
+    .join(", ")}`;
+
+const NotCalculated = ({ reason }: { reason: string }) => (
+  <>
+    <Typography size="sm">Non calculé</Typography>
+    <Typography size="xs" tone="muted">
+      {reason}
+    </Typography>
+  </>
+);
+
+const EstimateBadge = () => (
+  <Badge variant="info" tone="subtle" size="sm">
+    estimation
+  </Badge>
+);
+
+/**
+ * The BMI row (story 7): « IMC 23,9 · Corpulence normale », an indicator and
+ * never a diagnosis. Under 18,5 or at 25 and above it carries the alert. The
+ * alert changes nothing. No field anywhere takes a BMI: REMI computes it at
+ * each save of the height or the weight.
+ */
+const BmiValue = ({
+  indicator,
+  row,
+}: {
+  indicator: BmiIndicator;
+  row: PatientCalculation | undefined;
+}) => {
+  if (indicator.state === "missing") {
+    return <NotCalculated reason={missingLine(indicator.inputs)} />;
+  }
+  if (indicator.state === "out_of_range") {
+    return <NotCalculated reason={outOfRangeLine(indicator.inputs)} />;
+  }
+  const value = row?.estimatedValue ?? null;
+  if (value === null) {
+    return <NotCalculated reason={NOT_AVAILABLE} />;
+  }
+  return (
+    <>
+      <div className="flex flex-wrap items-center gap-2">
+        <Typography size="sm" weight="medium">
+          {`IMC ${formatNumber(value, "fr-BE", 1)} · ${bmiClass(value).label.fr}`}
+        </Typography>
+        <EstimateBadge />
+        {bmiNeedsReview(value) ? (
+          <Badge variant="warning" tone="subtle" size="sm">
+            À évaluer par le praticien
+          </Badge>
+        ) : null}
+      </div>
+      <Typography size="xs" tone="muted">
+        Indicateur, pas un diagnostic
+      </Typography>
+    </>
+  );
+};
+
+/** A row the other epics fill: the validated value, else the estimate. */
+const CalculationValue = ({
+  kind,
+  missing,
+  row,
+}: {
+  kind: CalculationKind;
+  missing: readonly CalculationInput[];
+  row: PatientCalculation | undefined;
+}) => {
+  if (missing.length > 0) {
+    return <NotCalculated reason={missingLine(missing)} />;
+  }
+  const validated = row?.validatedValue ?? null;
+  const value = validated ?? row?.estimatedValue ?? null;
+  if (value === null) {
+    return <NotCalculated reason={NOT_AVAILABLE} />;
+  }
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <Typography size="sm" weight="medium">
+        {`${formatNumber(value, "fr-BE")}${units[kind]}`}
+      </Typography>
+      {validated === null ? <EstimateBadge /> : null}
+    </div>
+  );
+};
 
 /**
  * « Calculs » (story 6): one row per calculation, under the questionnaire
@@ -40,15 +142,10 @@ const reasonLine = (missing: readonly CalculationInput[]) =>
  * the missing data. The calculation epics fill the rows. This slot is the
  * only one.
  */
-export const CalculationsSummary = ({ calculations, missing }: Props) => (
+export const CalculationsSummary = ({ calculations, missing, bmi }: Props) => (
   <dl className="flex flex-col gap-4">
     {calculationKinds.map((kind) => {
       const row = calculations.find((entry) => entry.kind === kind);
-      // A missing datum wins over a stored value: D-30 shows no value then.
-      const waiting = missing[kind].length > 0;
-      const validated = waiting ? null : (row?.validatedValue ?? null);
-      const estimated = waiting ? null : (row?.estimatedValue ?? null);
-      const value = validated ?? estimated;
       return (
         <div key={kind} className="flex min-w-0 flex-col gap-1">
           <dt>
@@ -57,24 +154,10 @@ export const CalculationsSummary = ({ calculations, missing }: Props) => (
             </Typography>
           </dt>
           <dd className="flex flex-col items-start gap-1">
-            {value === null ? (
-              <>
-                <Typography size="sm">Non calculé</Typography>
-                <Typography size="xs" tone="muted">
-                  {reasonLine(missing[kind])}
-                </Typography>
-              </>
+            {kind === "bmi" ? (
+              <BmiValue indicator={bmi} row={row} />
             ) : (
-              <div className="flex flex-wrap items-center gap-2">
-                <Typography size="sm" weight="medium">
-                  {`${formatNumber(value, "fr-BE")}${units[kind]}`}
-                </Typography>
-                {validated === null ? (
-                  <Badge variant="info" tone="subtle" size="sm">
-                    estimation
-                  </Badge>
-                ) : null}
-              </div>
+              <CalculationValue kind={kind} missing={missing[kind]} row={row} />
             )}
           </dd>
         </div>

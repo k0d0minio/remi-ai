@@ -3,7 +3,8 @@ import { getDatabase, registerDatabase } from "../../client";
 import type { AuditEvent } from "../../models/audit-event";
 import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { operatorActor, systemActor } from "../access";
-import { createPatient } from "../patients";
+import { savePatientProfileAnswers } from "../patient-questionnaire";
+import { createPatient, updatePatient } from "../patients";
 import {
   listPatientCalculations,
   setCalculationEstimate,
@@ -191,5 +192,88 @@ describe("the calculations of a patient", () => {
       practitioner,
     );
     expect(validation.ok).toBe(false);
+  });
+});
+
+describe("the BMI estimate", () => {
+  let measuredId: string;
+
+  const bmiRow = async () =>
+    (await listPatientCalculations(systemActor, measuredId)).find(
+      (row) => row.kind === "bmi",
+    );
+
+  beforeAll(async () => {
+    const created = await createPatient(systemActor, {
+      practitionerId: testPractitionerId,
+      pseudonym: "Inès",
+      heightCm: 165,
+      weightKg: 65,
+    });
+    if (!created.ok) {
+      throw new Error("test patient not created");
+    }
+    measuredId = created.data.id;
+  });
+
+  it("is written when a file starts with a height and a weight", async () => {
+    const row = await bmiRow();
+    expect(row?.estimatedValue).toBe(23.9);
+    expect(row?.estimateParameters).toEqual({ heightCm: 165, weightKg: 65 });
+  });
+
+  it("is not written for a file with no measure", async () => {
+    const bare = await createPatient(systemActor, {
+      practitionerId: testPractitionerId,
+      pseudonym: "Louise",
+    });
+    if (!bare.ok) {
+      throw new Error("test patient not created");
+    }
+    expect(await listPatientCalculations(systemActor, bare.data.id)).toEqual(
+      [],
+    );
+  });
+
+  it("stays as it is on a save of any other field", async () => {
+    const before = await bmiRow();
+    const saved = await updatePatient(systemActor, measuredId, {
+      objective: "Retrouver de l'énergie",
+      heightCm: 165,
+      weightKg: 65,
+    });
+    expect(saved.ok).toBe(true);
+    const after = await bmiRow();
+    expect(after?.estimatedAt).toEqual(before?.estimatedAt);
+    expect(after?.updatedAt).toEqual(before?.updatedAt);
+  });
+
+  it("is computed again on a save of the weight", async () => {
+    const saved = await updatePatient(systemActor, measuredId, {
+      weightKg: 72,
+    });
+    expect(saved.ok).toBe(true);
+    expect((await bmiRow())?.estimatedValue).toBe(26.4);
+  });
+
+  it("is computed again on the patient's save of the height", async () => {
+    const saved = await savePatientProfileAnswers(systemActor, measuredId, {
+      heightCm: 170,
+    });
+    expect(saved.ok).toBe(true);
+    const row = await bmiRow();
+    expect(row?.estimatedValue).toBe(24.9);
+    expect(row?.estimateParameters).toEqual({ heightCm: 170, weightKg: 72 });
+  });
+
+  it("is cleared when the height goes, or leaves the range", async () => {
+    await savePatientProfileAnswers(systemActor, measuredId, {
+      heightCm: null,
+    });
+    expect((await bmiRow())?.estimatedValue).toBeNull();
+    await savePatientProfileAnswers(systemActor, measuredId, {
+      heightCm: 260,
+    });
+    expect((await bmiRow())?.estimatedValue).toBeNull();
   });
 });

@@ -109,6 +109,15 @@ export const dietLabels = {
   other: { fr: "Autre", en: "Other" },
 } as const satisfies Record<(typeof diets)[number], QuestionnaireLabel>;
 
+/**
+ * Story 4's plausible ranges, inclusive: « taille 100 à 250 cm », « poids 25
+ * à 300 kg ». The questionnaire refuses a value outside them, and the BMI
+ * computes nothing from one (story 7). One home, so the two never disagree.
+ */
+export const heightCmRange = { min: 100, max: 250 } as const;
+
+export const weightKgRange = { min: 25, max: 300 } as const;
+
 /** The two kinds of row in `patient_allergens`. */
 export const allergenKinds = ["allergy", "intolerance"] as const;
 

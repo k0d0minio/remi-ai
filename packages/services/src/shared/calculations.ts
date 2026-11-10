@@ -11,6 +11,7 @@
  */
 
 import type { Locale } from "./i18n";
+import { heightCmRange, weightKgRange } from "./questionnaire";
 
 /** One row of `patient_calculations` per kind and patient. */
 export const calculationKinds = ["bmi", "protein", "energy"] as const;
@@ -147,3 +148,64 @@ export const missingCalculationInputs = (
   calculationInputs[kind].filter((input) =>
     input === "age" ? data.birthDate === null : data[input] === null,
   );
+
+/**
+ * A BMI under 18.5 or at 25 and above is flagged to the practitioner
+ * (story 7). The flag is the whole effect: nothing adjusts from it.
+ * `protein-needs` reads the same condition.
+ */
+export const bmiNeedsReview = (value: number) => value < 18.5 || value >= 25;
+
+/** The two BMI inputs, with the range each must sit in. */
+export const bmiInputRanges = {
+  heightCm: heightCmRange,
+  weightKg: weightKgRange,
+} as const;
+
+export type BmiInput = keyof typeof bmiInputRanges;
+
+/** What the file can say about the BMI. */
+export type BmiIndicator =
+  | { state: "missing"; inputs: BmiInput[] }
+  | { state: "out_of_range"; inputs: BmiInput[] }
+  | {
+      state: "computed";
+      value: number;
+      bmiClass: BmiClass;
+      needsReview: boolean;
+    };
+
+const bmiInputs: readonly BmiInput[] = ["heightCm", "weightKg"];
+
+/**
+ * The BMI of a file (story 7). It computes only when the height and the
+ * current weight are both present and plausible. Else it names the missing
+ * data, or the data out of range, and gives no value (D-30).
+ */
+export const bmiIndicator = (data: {
+  heightCm: number | null;
+  weightKg: number | null;
+}): BmiIndicator => {
+  const { heightCm, weightKg } = data;
+  if (heightCm === null || weightKg === null) {
+    return {
+      state: "missing",
+      inputs: bmiInputs.filter((input) => data[input] === null),
+    };
+  }
+  const outOfRange = bmiInputs.filter((input) => {
+    const value = input === "heightCm" ? heightCm : weightKg;
+    const range = bmiInputRanges[input];
+    return value < range.min || value > range.max;
+  });
+  if (outOfRange.length > 0) {
+    return { state: "out_of_range", inputs: outOfRange };
+  }
+  const value = bmi(weightKg, heightCm);
+  return {
+    state: "computed",
+    value,
+    bmiClass: bmiClass(value),
+    needsReview: bmiNeedsReview(value),
+  };
+};

@@ -40,6 +40,7 @@ import {
 } from "@remi/services/server";
 import {
   appHref,
+  bmiIndicator,
   calculationKinds,
   canManageOperators,
   fileStatusLabels,
@@ -559,6 +560,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               <CalculationsSummary
                 calculations={calculations}
                 missing={missingCalculation}
+                bmi={bmiIndicator(calculationData)}
               />
             </CardContent>
           </Card>

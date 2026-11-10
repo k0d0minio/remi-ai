@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  bmiIndicator,
   calculationKinds,
   type CalculationKind,
 } from "../../../shared/calculations";
@@ -10,6 +11,7 @@ import type {
   CalculationParameters,
   PatientCalculation,
 } from "../../models/patient-calculation";
+import type { PatientProfile } from "../../models/patient-profile";
 import { recordAuditEvent, type OperatorActor } from "../audit";
 import { byPatient, noSuchPatient } from "../access";
 
@@ -167,6 +169,45 @@ const unscopedValidateCalculation = async (
     }),
   });
   return ok(updated);
+};
+
+type Measures = Pick<PatientProfile, "id" | "heightCm" | "weightKg">;
+
+/**
+ * Recompute the BMI estimate from the file's height and current weight
+ * (story 7). The services that save one of the two call it after the save,
+ * and nothing else does: no other datum changes the BMI. Unscoped: the
+ * caller has checked the actor before its own write.
+ *
+ * Missing or implausible data clears the estimate (D-30). A file with no
+ * estimate yet gets no empty row.
+ */
+export const refreshBmiEstimate = async (
+  patientId: Id,
+  db?: DatabaseClient,
+): Promise<void> => {
+  const profile = await (db ?? getDatabase())
+    .collection<Measures>("patient_profiles")
+    .findById(patientId);
+  if (!profile) {
+    return;
+  }
+  const heightCm = profile.heightCm ?? null;
+  const weightKg = profile.weightKg ?? null;
+  const indicator = bmiIndicator({ heightCm, weightKg });
+  if (indicator.state === "computed") {
+    await unscopedSetCalculationEstimate(
+      patientId,
+      "bmi",
+      { value: indicator.value, parameters: { heightCm, weightKg } },
+      db,
+    );
+    return;
+  }
+  const row = await rowFor(patientId, "bmi", db);
+  if (row && row.estimatedValue !== null) {
+    await unscopedSetCalculationEstimate(patientId, "bmi", null, db);
+  }
 };
 
 /**
