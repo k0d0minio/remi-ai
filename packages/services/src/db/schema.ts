@@ -257,6 +257,14 @@ export const patientProfiles = pgTable("patient_profiles", {
    */
   noKnownAllergies: boolean("no_known_allergies"),
   noKnownIntolerances: boolean("no_known_intolerances"),
+  /**
+   * The practitioner's « situation particulière » (story 8): a key of
+   * `specialSituations` in `shared/calculations.ts`. Null until entered: `none`
+   * is an answer (D-30). `protein-needs` reads it.
+   */
+  specialSituation: text("special_situation"),
+  /** The note behind the `other` situation. */
+  specialSituationNote: text("special_situation_note"),
   ...timestamps,
 });
 
@@ -616,6 +624,55 @@ export const patientMessages = pgTable(
     ...timestamps,
   },
   (table) => [index().on(table.patientId)],
+);
+
+/**
+ * The automatic calculations of a patient — stories 7, 8 and 9. One row per
+ * patient and kind (`bmi`, `protein`, `energy`, the keys of
+ * `calculationKinds`). The estimate REMI computes and the value the
+ * practitioner validates are separate columns, each with the parameters it
+ * came from (D-30). A validation writes `calculation.validated` to the audit
+ * trail (D-32). The rows go with the patient (`on delete cascade`).
+ */
+export const patientCalculations = pgTable(
+  "patient_calculations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(),
+    estimatedValue: doublePrecision("estimated_value"),
+    estimateParameters: jsonb("estimate_parameters").$type<
+      Record<string, unknown>
+    >(),
+    estimatedAt: timestamp("estimated_at", {
+      withTimezone: true,
+      mode: "date",
+    }),
+    validatedValue: doublePrecision("validated_value"),
+    validationParameters: jsonb("validation_parameters").$type<
+      Record<string, unknown>
+    >(),
+    validatedAt: timestamp("validated_at", {
+      withTimezone: true,
+      mode: "date",
+    }),
+    /** The operator who validated. No foreign key, like `audit_events`. */
+    validatedBy: uuid("validated_by"),
+    needsRevalidation: boolean("needs_revalidation").notNull().default(false),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("patient_calculations_patient_kind_idx").on(
+      table.patientId,
+      table.kind,
+    ),
+    check(
+      "patient_calculations_kind_check",
+      sql`${table.kind} in ('bmi', 'protein', 'energy')`,
+    ),
+  ],
 );
 
 /**
