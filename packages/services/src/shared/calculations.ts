@@ -87,3 +87,63 @@ export const bmi = (weightKg: number, heightCm: number) => {
 export const bmiClass = (value: number): BmiClass =>
   bmiClasses.find((entry) => entry.below === null || value < entry.below) ??
   bmiClasses[bmiClasses.length - 1];
+
+/** The row titles of « Calculs » (story 6). */
+export const calculationKindLabels = {
+  bmi: { fr: "IMC", en: "BMI" },
+  protein: { fr: "Besoins protéiques", en: "Protein needs" },
+  energy: { fr: "Besoins énergétiques", en: "Energy needs" },
+} as const satisfies Record<CalculationKind, Readonly<Record<Locale, string>>>;
+
+/** A datum a calculation reads. The age comes from the birth date. */
+export type CalculationInput =
+  "sexForCalculation" | "age" | "heightCm" | "weightKg" | "activityLevel";
+
+/**
+ * What each calculation needs, in the order the missing data are named.
+ * Stories 7, 8 and 9: without one of them, REMI computes nothing and names
+ * the datum. The weight is always the current weight.
+ */
+export const calculationInputs = {
+  bmi: ["heightCm", "weightKg"],
+  protein: ["weightKg"],
+  energy: ["sexForCalculation", "age", "heightCm", "weightKg", "activityLevel"],
+} as const satisfies Record<CalculationKind, readonly CalculationInput[]>;
+
+/** Lower case: they follow « Non renseigné : ». */
+export const calculationInputLabels = {
+  sexForCalculation: {
+    fr: "sexe utilisé pour le calcul",
+    en: "sex used for the calculation",
+  },
+  age: { fr: "âge", en: "age" },
+  heightCm: { fr: "taille", en: "height" },
+  weightKg: { fr: "poids actuel", en: "current weight" },
+  activityLevel: {
+    fr: "niveau d'activité physique",
+    en: "physical activity level",
+  },
+} as const satisfies Record<CalculationInput, Readonly<Record<Locale, string>>>;
+
+/** The file's data a calculation reads. Null is « Non renseigné » (D-30). */
+export type CalculationData = {
+  sexForCalculation: string | null;
+  /** `YYYY-MM-DD`. The age is derived on the day, never stored. */
+  birthDate: string | null;
+  heightCm: number | null;
+  weightKg: number | null;
+  activityLevel: string | null;
+};
+
+/**
+ * The one missing-data helper of the three calculations: the inputs of
+ * `kind` that the file lacks, in the order of `calculationInputs`. Empty when
+ * the calculation may run.
+ */
+export const missingCalculationInputs = (
+  kind: CalculationKind,
+  data: CalculationData,
+): CalculationInput[] =>
+  calculationInputs[kind].filter((input) =>
+    input === "age" ? data.birthDate === null : data[input] === null,
+  );

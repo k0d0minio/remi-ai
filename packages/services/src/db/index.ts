@@ -169,6 +169,8 @@ export {
   setPatientSummary,
 } from "./services/patient-summaries";
 
+export { listPatientCalculations } from "./services/patient-calculations";
+
 export {
   addPatientSupplement,
   deletePatientSupplement,

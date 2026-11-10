@@ -26,6 +26,13 @@ export {
 } from "./i18n";
 export type { Locale } from "./i18n";
 export { auditActions } from "./audit";
+export {
+  calculationInputLabels,
+  calculationKindLabels,
+  calculationKinds,
+  missingCalculationInputs,
+} from "./calculations";
+export type { CalculationInput, CalculationKind } from "./calculations";
 export { fileClaimPurposes, fileTakeoverPath } from "./file-claim";
 export type { FileClaimPurpose } from "./file-claim";
 export { minPasswordLength, signupFields } from "./signup";
@@ -237,6 +244,7 @@ export type {
   PatientSex,
   PatientStatus,
   PatientSummary,
+  PatientCalculation,
   PersonalisationDimension,
   PersonalisationProfile,
   Person,

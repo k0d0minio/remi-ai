@@ -21,6 +21,7 @@ import {
   listArchivedPatientRecipes,
   listArchivedPatientRecommendations,
   listGoalCheckIns,
+  listPatientCalculations,
   listMealEntries,
   listPantryEssentials,
   listPastChallenges,
@@ -39,12 +40,16 @@ import {
 } from "@remi/services/server";
 import {
   appHref,
+  calculationKinds,
   canManageOperators,
   fileStatusLabels,
   formatDate,
+  missingCalculationInputs,
   missingOptionalFields,
   patientLinkPreviewParam,
   todayAtPractice,
+  type CalculationInput,
+  type CalculationKind,
 } from "@remi/services/shared";
 import {
   Badge,
@@ -58,6 +63,7 @@ import {
 import { AdminOpenForm } from "@/components/patients/admin-open-form";
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
+import { CalculationsSummary } from "@/components/patients/calculations-summary";
 import { ChallengeHistory } from "@/components/patients/challenge-history";
 import { ChallengeSection } from "@/components/patients/challenge-section";
 import { ConsultationDate } from "@/components/patients/consultation-date";
@@ -240,10 +246,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     consentsOf(actor, patient.id),
   ]);
   // The questionnaire half of the file (story 1): its answers for the form,
-  // what is still missing, and whether the genotype may be entered.
-  const [questionnaire, missing] = await Promise.all([
+  // what is still missing, and whether the genotype may be entered. Then the
+  // automatic calculations that read those answers (stories 7, 8 and 9).
+  const [questionnaire, missing, calculations] = await Promise.all([
     getPatientQuestionnaire(actor, patient.id),
     missingQuestionnaireFields(actor, patient.id),
+    listPatientCalculations(actor, patient.id),
   ]);
   if (!questionnaire.ok) {
     notFound();
@@ -269,6 +277,19 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     amy1a: answers.amy1a,
     genotypeOpen,
   });
+  const calculationData = {
+    sexForCalculation: answers.sexForCalculation,
+    birthDate: patient.birthDate,
+    heightCm: patient.heightCm,
+    weightKg: patient.weightKg,
+    activityLevel: answers.activityLevel,
+  };
+  const missingCalculation = Object.fromEntries(
+    calculationKinds.map((kind) => [
+      kind,
+      missingCalculationInputs(kind, calculationData),
+    ]),
+  ) as Record<CalculationKind, CalculationInput[]>;
   // The name the patient gave, else the one the practitioner typed, else the
   // working name: the pseudonym always exists.
   const name =
@@ -333,6 +354,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   // and the medium anchor row all read. Every rendered section, in DOM order.
   const sections: PatientSectionEntry[] = [
     { id: "patient-file", label: "Dossier patient", segment: "suivi" },
+    { id: "calculations", label: "Calculs", segment: "suivi" },
     { id: "summary", label: "Résumé vivant", segment: "suivi" },
     {
       id: "anamnesis",
@@ -514,6 +536,29 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 genotypeOpen={genotypeOpen}
                 missingMandatory={missingMandatory}
                 missingOptional={missingOptional}
+              />
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* « Calculs » — under the data, above the protocol (story 6). */}
+        <section
+          id="calculations"
+          data-segment="suivi"
+          className="scroll-mt-32"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Calculs</CardTitle>
+              <CardDescription>
+                Calculés à partir du dossier. Une valeur reste une estimation
+                tant que vous ne l&apos;avez pas validée.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CalculationsSummary
+                calculations={calculations}
+                missing={missingCalculation}
               />
             </CardContent>
           </Card>
