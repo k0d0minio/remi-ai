@@ -54,18 +54,6 @@ export const OffersSection = () => (
                 {offer.footnote}
               </Typography>
             ) : null}
-            <div className="bg-primary-subtle flex flex-col gap-1 rounded-lg px-3 py-2.5">
-              <p className="text-sm">
-                {OFFERS_SECTION.afterPilot.before}
-                <strong className="text-primary font-bold whitespace-nowrap">
-                  {OFFERS_SECTION.afterPilot.price}
-                </strong>
-                {OFFERS_SECTION.afterPilot.after}
-              </p>
-              <Typography size="xs" tone="muted">
-                {OFFERS_SECTION.afterPilot.note}
-              </Typography>
-            </div>
             <SelectOfferButton offer={offer.id} size="lg">
               {OFFERS_SECTION.cta}
             </SelectOfferButton>
@@ -79,9 +67,24 @@ export const OffersSection = () => (
         ))}
       </div>
 
-      <Typography size="sm" tone="muted" className="text-center">
-        {OFFERS_SECTION.note}
-      </Typography>
+      <div className="flex flex-col gap-5">
+        <aside className="bg-primary-subtle flex flex-col items-center gap-1.5 rounded-2xl px-5 py-4 text-center md:px-8 md:py-5">
+          <p className="text-sm text-balance md:text-base">
+            {OFFERS_SECTION.afterPilot.before}
+            <strong className="text-primary font-bold whitespace-nowrap">
+              {OFFERS_SECTION.afterPilot.price}
+            </strong>
+            {OFFERS_SECTION.afterPilot.after}
+          </p>
+          <Typography size="xs" tone="muted" balance>
+            {OFFERS_SECTION.afterPilot.note}
+          </Typography>
+        </aside>
+
+        <Typography size="sm" tone="muted" className="text-center">
+          {OFFERS_SECTION.note}
+        </Typography>
+      </div>
     </Container>
   </Section>
 );
