@@ -34,6 +34,7 @@ import type {
   PatientProfile,
 } from "../../models/patient-profile";
 import { refreshBmiEstimate } from "../patient-calculations";
+import { recordPatientChanges, type WatchedValues } from "../patient-changes";
 import { consentInForce } from "../patient-consents/in-force";
 import type { AccessMode, Actor } from "../../models/actor";
 import {
@@ -803,9 +804,40 @@ const unscopedUpdatePatientProfileByPatient = async (
   }
   patch.patientEditedAt = edits;
   const patient = await patients().update(id, patch);
+  if (patient) {
+    await recordPatientChanges(
+      current,
+      linkWatchedValues(current, changed),
+      linkWatchedValues(patient, changed),
+    );
+  }
   return patient
     ? ok({ patient, changed })
     : err("not_found", "no such patient");
+};
+
+/**
+ * The link's fields that raise a change signal, under the questionnaire's
+ * keys (story 21). The link is retired by D-26. Until then it is a patient
+ * write like the questionnaire.
+ */
+const linkWatchedFields = {
+  dietaryRegime: "diet",
+  allergies: "allergies",
+  intolerances: "intolerances",
+} as const satisfies Partial<Record<PatientEditableProfileField, string>>;
+
+const linkWatchedValues = (
+  row: PatientProfile,
+  changed: readonly PatientEditableProfileField[],
+): WatchedValues => {
+  const values: WatchedValues = {};
+  for (const [field, key] of Object.entries(linkWatchedFields)) {
+    if (changed.includes(field as PatientEditableProfileField)) {
+      values[key] = row[field as keyof typeof linkWatchedFields];
+    }
+  }
+  return values;
 };
 
 /**

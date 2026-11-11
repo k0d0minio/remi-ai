@@ -26,6 +26,11 @@ export {
 } from "./i18n";
 export type { Locale } from "./i18n";
 export { auditActions } from "./audit";
+export { isWatchedPatientField, watchedPatientFields } from "./patient-changes";
+export type {
+  PatientChangeValue,
+  WatchedPatientField,
+} from "./patient-changes";
 export {
   bmiClass,
   bmiIndicator,
@@ -255,6 +260,7 @@ export type {
   PatientStatus,
   PatientSummary,
   PatientCalculation,
+  PatientChange,
   PersonalisationDimension,
   PersonalisationProfile,
   Person,

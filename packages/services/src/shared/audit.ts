@@ -51,6 +51,12 @@ export const auditActions = [
    * cleared. The detail names the old and the new value (`appointment-date`).
    */
   "patient.consultation_date_changed",
+  /**
+   * A patient changed a watched field on a file whose care is active (story
+   * 21, D-32). The detail names the field keys. `patient_changes` holds the
+   * old and the new values.
+   */
+  "patient.changed",
   "patient.deleted",
   /**
    * The inactivity sweep sent the notice of deletion (`inactive-account-

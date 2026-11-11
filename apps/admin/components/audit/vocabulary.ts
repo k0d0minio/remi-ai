@@ -20,6 +20,7 @@ export const actionLabels: Record<AuditActionName, string> = {
   "patient.updated": "profil modifié",
   "patient.file_status_changed": "statut du dossier changé",
   "patient.consultation_date_changed": "date de consultation changée",
+  "patient.changed": "modifié par le patient",
   "patient.deleted": "profil supprimé",
   "patient.inactivity_notice_sent":
     "avis de suppression pour inactivité envoyé",
@@ -151,6 +152,7 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "patient.updated": "neutral",
   "patient.file_status_changed": "neutral",
   "patient.consultation_date_changed": "neutral",
+  "patient.changed": "info",
   "patient.deleted": "error",
   "patient.inactivity_notice_sent": "warning",
   "patient.admin_opened": "warning",
