@@ -60,6 +60,8 @@ export const HERO = {
 export const OFFERS_SECTION = {
   title: "Choisissez l’accompagnement qui vous correspond.",
   lead: "Deux formules de 8 semaines, à prix unique. Dans les deux, REMI fonctionne de la même façon : seul le point de départ change.",
+  pilot:
+    "Profitez d’un tarif préférentiel en participant à notre programme pilote. En échange, nous vous demanderons de partager régulièrement votre expérience à travers de courts questionnaires pendant les 8 semaines.",
   note: "Aucun paiement à ce stade : l’inscription est une simple manifestation d’intérêt.",
   priceUnit: `prix pilote · ${SITE.pilotDurationWeeks} semaines`,
   cta: "Je suis intéressé(e)",
