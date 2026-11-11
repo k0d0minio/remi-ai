@@ -22,4 +22,7 @@ Set the pilot prices to 349 € and 119 €. Change « 4 objectifs » to « 3 ob
 - [ ] The same card shows « Prix commercial : 149 € » in smaller muted text, not struck through.
 - [ ] Each card shows « Tarif réservé aux 30 premiers participants pilotes » under the prices.
 - [ ] The card « REMI + consultation nutritionnelle » lists « 3 objectifs nutritionnels personnalisés ».
+- [ ] The commercial price and the pilot note are small, light and compact under the pilot price.
+- [ ] On desktop, the two buttons sit at the foot of their cards, on one line.
+- [ ] The docs brief `apps/docs/app/business/brief-landing/page.mdx` says 349 €, 119 € and 3 goals.
 - [ ] The includes, the buttons and the other sections keep their design. The layout holds on desktop and on mobile.
