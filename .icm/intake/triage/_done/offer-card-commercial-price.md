@@ -12,7 +12,7 @@ The cards live in `apps/marketing/components/sections/offers-section.tsx`. The c
 
 ## Proposed change
 
-Set the pilot prices to 349 € and 119 €. Add the commercial price (399 € and 149 €) in smaller text, not struck through. Add the pilot-tariff note under the prices.
+Set the pilot prices to 349 € and 119 €. Change « 4 objectifs » to « 3 objectifs » on the consultation card. Add the commercial price (399 € and 149 €) in smaller text, not struck through. Add the pilot-tariff note under the prices.
 
 ## Acceptance criteria
 
@@ -21,4 +21,5 @@ Set the pilot prices to 349 € and 119 €. Add the commercial price (399 € a
 - [ ] The card « REMI + consultation nutritionnelle » shows 119 € large and blue, with « prix pilote · 8 semaines ».
 - [ ] The same card shows « Prix commercial : 149 € » in smaller muted text, not struck through.
 - [ ] Each card shows « Tarif réservé aux 30 premiers participants pilotes » under the prices.
+- [ ] The card « REMI + consultation nutritionnelle » lists « 3 objectifs nutritionnels personnalisés ».
 - [ ] The includes, the buttons and the other sections keep their design. The layout holds on desktop and on mobile.

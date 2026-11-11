@@ -95,7 +95,7 @@ export const OFFERS: Offer[] = [
     commercialPrice: 149,
     includes: [
       "Consultation d’une heure avec Morgane",
-      "4 objectifs nutritionnels personnalisés",
+      "3 objectifs nutritionnels personnalisés",
       "Consultation de suivi à mi-parcours",
       "8 semaines d’utilisation de REMI",
     ],
