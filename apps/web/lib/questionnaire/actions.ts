@@ -4,6 +4,7 @@ import {
   getPatient,
   markReadyWhenComplete,
   missingQuestionnaireFields,
+  recordConsent,
   savePatientProfileAnswers,
   savePatientQuestionnaire,
   setPatientAllergens,
@@ -16,6 +17,7 @@ import {
 } from "@remi/services/server";
 import {
   allergenKinds,
+  consentTextLocales,
   heightCmRange,
   weightKgRange,
   type Result,
@@ -24,6 +26,8 @@ import { currentPatient } from "@/lib/patient-auth/session";
 import {
   answerFields,
   type AnswerField,
+  type GeneticConsentDecision,
+  type GeneticConsentResult,
   type SaveError,
   type SaveResult,
 } from "./state";
@@ -38,12 +42,20 @@ import {
 
 const failed = (error: SaveError): SaveResult => ({ ok: false, error });
 
-const fromService = (result: Result<unknown>): SaveResult | null => {
+/**
+ * Null when the service wrote, the failure otherwise. A refusal for want of a
+ * consent reads as `consent` (the care consent) unless the caller names the
+ * genetic one.
+ */
+const fromService = (
+  result: Result<unknown>,
+  refusal: "consent" | "genetic_consent" = "consent",
+): SaveResult | null => {
   if (result.ok) {
     return null;
   }
   if (result.error === "not_permitted") {
-    return failed("consent");
+    return failed(refusal);
   }
   return failed(result.error === "invalid_input" ? "invalid" : "unavailable");
 };
@@ -74,6 +86,24 @@ const weightOf = (value: string): number | null | SaveError => {
   return kg >= weightKgRange.min && kg <= weightKgRange.max
     ? kg
     : "weight_range";
+};
+
+const genotypeFields = ["apoe", "dio2", "amy1a"] as const;
+
+const isGenotypeField = (
+  field: string,
+): field is (typeof genotypeFields)[number] =>
+  (genotypeFields as readonly string[]).includes(field);
+
+/**
+ * The patient as the audit trail names them: the pseudonym, never the name.
+ * Null when the file cannot be read: the trail never blocks a save.
+ */
+const auditActorOf = async (patientId: string) => {
+  const patient = await getPatient(patientActor(patientId), patientId);
+  return patient.ok
+    ? { kind: "patient" as const, id: patientId, name: patient.data.pseudonym }
+    : null;
 };
 
 const identityFields = ["firstName", "lastName", "birthDate", "phone"] as const;
@@ -150,8 +180,16 @@ const writeAnswer = async (
     field === "diet" && value !== "other"
       ? { diet: value as QuestionnaireInput["diet"], dietNote: null }
       : ({ [field]: value } as QuestionnaireInput);
+  // The service writes the audit events of this save (a genotype change, the
+  // consultation date) in the patient's name.
   return fromService(
-    await savePatientQuestionnaire(patientActor(patientId), patientId, input),
+    await savePatientQuestionnaire(
+      patientActor(patientId),
+      patientId,
+      input,
+      await auditActorOf(patientId),
+    ),
+    isGenotypeField(field) ? "genetic_consent" : "consent",
   );
 };
 
@@ -263,4 +301,44 @@ export const saveAllergensAction = async (
     await setPatientAllergens(patientActor(patientId), patientId, kind, parsed),
   );
   return refused ?? settle(patientId);
+};
+
+/**
+ * The patient's decision on the genetic consent screen (story 4,
+ * `genotype-section`). The page names the text it showed: the version and the
+ * language. `recordConsent` checks the pair against the text files and writes
+ * the row and its audit event. A refusal also empties the three genotype
+ * fields. Only the patient records this consent, so the actor is the patient.
+ */
+export const decideGeneticConsentAction = async (
+  decision: unknown,
+  version: unknown,
+  locale: unknown,
+): Promise<GeneticConsentResult> => {
+  const chosen: GeneticConsentDecision | null =
+    decision === "given" || decision === "refused" ? decision : null;
+  const textLocale = consentTextLocales.find((known) => known === locale);
+  if (!chosen || !textLocale || !shortText(version, 20)) {
+    return { ok: false, error: "unavailable" };
+  }
+  const account = await currentPatient();
+  if (!account) {
+    return { ok: false, error: "signed_out" };
+  }
+  const patientId = account.patientProfileId;
+  const actor = await auditActorOf(patientId);
+  if (!actor) {
+    return { ok: false, error: "unavailable" };
+  }
+  const recorded = await recordConsent(patientActor(patientId), {
+    patientId,
+    key: "genetic",
+    version,
+    locale: textLocale,
+    decision: chosen,
+    actor,
+  });
+  return recorded.ok
+    ? { ok: true, decision: chosen }
+    : { ok: false, error: "unavailable" };
 };

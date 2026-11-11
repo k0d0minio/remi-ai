@@ -306,6 +306,7 @@ export {
   checkAllergenAnswer,
   checkQuestionnaireInput,
   getPatientQuestionnaire,
+  macroProfileOf,
   markReadyWhenComplete,
   missingQuestionnaireFields,
   savePatientProfileAnswers,

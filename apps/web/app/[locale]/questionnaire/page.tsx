@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
+  consentsOf,
   getPatient,
   getPatientQuestionnaire,
   missingQuestionnaireFields,
@@ -11,6 +12,7 @@ import { Wordmark } from "@remi/ui/server";
 import { SignOutButton } from "@/components/patient-auth/sign-out-button";
 import { getContent } from "@/lib/content";
 import { requirePatient } from "@/lib/patient-auth/session";
+import { geneticConsentText } from "@/lib/questionnaire/genetic-consent";
 import {
   isQuestionnaireSection,
   resumeSection,
@@ -66,10 +68,11 @@ const QuestionnairePage = async ({
   }
   const account = await requirePatient(locale);
   const patientId = account.patientProfileId;
-  const [patient, questionnaire, missing] = await Promise.all([
+  const [patient, questionnaire, missing, consents] = await Promise.all([
     getPatient(patientActor(patientId), patientId),
     getPatientQuestionnaire(patientActor(patientId), patientId),
     missingQuestionnaireFields(patientActor(patientId), patientId),
+    consentsOf(patientActor(patientId), patientId),
   ]);
   if (!patient.ok || !questionnaire.ok || !missing.ok) {
     notFound();
@@ -99,6 +102,10 @@ const QuestionnairePage = async ({
     medications: profile.medications,
     supplements: profile.supplements,
     geneticTest: answers.geneticTest ?? "",
+    geneticConsent: consents.genetic?.decision ?? null,
+    apoe: answers.apoe ?? "",
+    dio2: answers.dio2 ?? "",
+    amy1a: answers.amy1a ?? "",
     noKnownAllergies: answers.noKnownAllergies,
     noKnownIntolerances: answers.noKnownIntolerances,
     allergens: questionnaire.data.allergens,
@@ -111,6 +118,7 @@ const QuestionnairePage = async ({
         locale={locale}
         text={content.questionnaire}
         values={values}
+        geneticConsent={geneticConsentText(locale)}
         initialStatus={profile.fileStatus}
         initialMissing={missing.data}
         initialSection={

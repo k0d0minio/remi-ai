@@ -626,7 +626,22 @@ export type Content = {
       celiacDisease: string;
       medications: string;
       supplements: string;
-      geneticComingSoon: string;
+    };
+    /** The genetic consent and the three genotype lists (`genotype-section`). */
+    genetic: {
+      consentTitle: string;
+      consentIntro: string;
+      /** `{version}` and `{date}` of the text shown. */
+      version: string;
+      accept: string;
+      refuse: string;
+      deciding: string;
+      /** After « Je refuse »: the text and « J'accepte » stay. */
+      refused: string;
+      /** Over the three lists. */
+      listsIntro: string;
+      /** A decision that did not save. */
+      decisionFailed: string;
     };
   };
   /**

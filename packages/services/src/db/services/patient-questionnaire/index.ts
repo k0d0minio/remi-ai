@@ -15,6 +15,7 @@ import {
   sexesForCalculation,
   type MandatoryQuestionnaireField,
 } from "../../../shared/questionnaire";
+import { macroProfile, type MacroProfile } from "../../../shared/macro-profile";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
@@ -43,6 +44,10 @@ import { byPatient, noSuchPatient, systemActor } from "../access";
  * data`). A genotype value is written only under a `given` genetic consent,
  * and every read returns it as null without one. The desired weight is
  * written only under a `given` care consent. A clear is always allowed.
+ *
+ * The genotype is in use only while the test question is « Oui » (story 4,
+ * `genotype-section`). Under « Non / Je ne sais pas » the values stay stored,
+ * and every read returns them as null. « Oui » again shows them back.
  */
 
 type QuestionnaireRow = { id: Id } & PatientQuestionnaire;
@@ -91,12 +96,25 @@ const readAnswers = (row: QuestionnaireRow): PatientQuestionnaire => {
 
 const genotypeFields = ["apoe", "dio2", "amy1a"] as const;
 
-/** The answers a reader may see: no genotype without the genetic consent. */
+/** How a genotype field reads in the audit detail. */
+const genotypeFieldNames = {
+  apoe: "APOE",
+  dio2: "DIO2",
+  amy1a: "AMY1A",
+} as const satisfies Record<(typeof genotypeFields)[number], string>;
+
+/**
+ * The answers a reader may see. No genotype without the genetic consent, and
+ * no genotype while the test question is not « Oui ».
+ */
 const visibleAnswers = async (
   row: QuestionnaireRow,
 ): Promise<PatientQuestionnaire> => {
   const answers = readAnswers(row);
-  if (await consentInForce(row.id, "genetic")) {
+  if (
+    answers.geneticTest === "yes" &&
+    (await consentInForce(row.id, "genetic"))
+  ) {
     return answers;
   }
   return { ...answers, apoe: null, dio2: null, amy1a: null };
@@ -370,8 +388,10 @@ const unscopedGetPatientQuestionnaire = async (
  *
  * A save that changes `consultationDate` writes one
  * `patient.consultation_date_changed` event with the old and the new value
- * (`appointment-date`). Every writer of the column passes here, so the console
- * and the patient's questionnaire get the same trail.
+ * (`appointment-date`). A save that changes a genotype result writes one
+ * `genotype.changed` event per field, with the field's name and no value
+ * (`genotype-section`). Every writer of the columns passes here, so the
+ * console and the patient's questionnaire get the same trail.
  */
 const unscopedSavePatientQuestionnaire = async (
   patientId: Id,
@@ -411,7 +431,33 @@ const unscopedSavePatientQuestionnaire = async (
     return err("not_found", "no such patient");
   }
   await recordConsultationDateChange(current, patch, actor);
+  await recordGenotypeChanges(current, patch, actor);
   return ok(await visibleAnswers(written));
+};
+
+/**
+ * One `genotype.changed` event per genotype field the save changes, a clear
+ * included. It compares with the stored value, also when a read hides it.
+ */
+const recordGenotypeChanges = async (
+  before: QuestionnaireRow & Partial<Pick<PatientProfile, "pseudonym">>,
+  patch: Partial<PatientQuestionnaire>,
+  actor: AuditActor | null,
+) => {
+  for (const field of genotypeFields) {
+    const next = patch[field];
+    if (next === undefined || (before[field] ?? null) === next) {
+      continue;
+    }
+    await recordAuditEvent({
+      actor,
+      action: "genotype.changed",
+      targetType: "patient",
+      targetId: before.id,
+      targetLabel: before.pseudonym ?? "",
+      detail: genotypeFieldNames[field],
+    });
+  }
 };
 
 /** One event when a save changes `consultationDate`. No event otherwise. */
@@ -595,6 +641,34 @@ const unscopedSetPatientAllergens = async (
   return ok(written.sort(byRank));
 };
 
+/**
+ * The patient's macronutrient profile (story 4, `genotype-section`). It reads
+ * the stored genotype and the genetic consent, then asks `macroProfile()`.
+ * DEFAULT 45/30/25 for every patient until the reference table and Morgane's
+ * validation of the laboratory mapping arrive.
+ */
+const unscopedMacroProfileOf = async (
+  patientId: Id,
+): Promise<Result<MacroProfile>> => {
+  if (!isValidId(patientId)) {
+    return err("not_found", "no such patient");
+  }
+  const row = await profiles().findById(patientId);
+  if (!row) {
+    return err("not_found", "no such patient");
+  }
+  const answers = readAnswers(row);
+  return ok(
+    macroProfile({
+      geneticTest: answers.geneticTest,
+      apoe: answers.apoe,
+      dio2: answers.dio2,
+      amy1a: answers.amy1a,
+      geneticConsentGiven: await consentInForce(patientId, "genetic"),
+    }),
+  );
+};
+
 type CompletenessRow = PatientProfile & PatientQuestionnaire;
 
 /**
@@ -689,6 +763,11 @@ export const savePatientProfileAnswers = byPatient(
 export const setPatientAllergens = byPatient(
   "write",
   unscopedSetPatientAllergens,
+  noSuchPatient,
+);
+export const macroProfileOf = byPatient(
+  "read",
+  unscopedMacroProfileOf,
   noSuchPatient,
 );
 export const missingQuestionnaireFields = byPatient(
