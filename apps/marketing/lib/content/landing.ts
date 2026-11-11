@@ -48,11 +48,19 @@ export const HEADER = {
 
 export const HERO = {
   badge: "Programme pilote · places limitées",
-  titleFirst: "Une alimentation qui vous ressemble.",
-  titleSecond: "Des conseils faciles à appliquer.",
-  lead: "REMI vous propose chaque jour des recettes adaptées à vos besoins et vous aide à améliorer vos repas, un petit changement à la fois.",
-  pilotBefore: "Rejoignez nos premiers patients pilotes dès le ",
-  pilotAfter: `. Profitez de ${SITE.pilotDurationWeeks} semaines avec REMI à tarif préférentiel et participez à son développement.`,
+  title: "REMI, votre application de nutrition personnalisée.",
+  subtitle:
+    "Transformez vos recommandations nutritionnelles en habitudes simples au quotidien.",
+  highlights: [
+    "Recettes 100 % sur mesure",
+    "Conseils pour améliorer vos repas",
+    "Accompagnement adapté à vos objectifs",
+  ],
+  pilotInfo: [
+    `Programme pilote dès le ${SITE.pilotStartLabel}`,
+    `${SITE.pilotDurationWeeks} semaines`,
+    "À partir de 129 €",
+  ],
   primary: "Je deviens patient pilote",
   secondary: "Découvrir les offres",
 };

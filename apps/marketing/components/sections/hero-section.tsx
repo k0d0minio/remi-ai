@@ -3,7 +3,6 @@ import Image from "next/image";
 import { Button } from "@remi/ui";
 import { Badge, Container, Typography } from "@remi/ui/server";
 import { HERO } from "@/lib/content/landing";
-import { SITE } from "@/lib/site";
 
 /**
  * The headline is in the server HTML: it is the LCP element whether or not
@@ -28,19 +27,30 @@ export const HeroSection = () => (
           balance
           className="md:text-5xl"
         >
-          <span className="block">{HERO.titleFirst}</span>
-          <span className="text-primary block">{HERO.titleSecond}</span>
+          {HERO.title}
         </Typography>
-        <Typography variant="lead" size="lg">
-          {HERO.lead}
+        <Typography size="xl" weight="medium" className="text-primary">
+          {HERO.subtitle}
         </Typography>
-        <Typography
-          size="sm"
-          className="border-warning bg-warning-subtle rounded-r-lg border-l-4 px-4 py-3"
-        >
-          {HERO.pilotBefore}
-          <strong>{SITE.pilotStartLabel}</strong>
-          {HERO.pilotAfter}
+        <ul className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:gap-x-2">
+          {HERO.highlights.map((item, index) => (
+            <li key={item} className="flex items-center gap-2">
+              {index > 0 && (
+                <span
+                  aria-hidden="true"
+                  className="text-muted-foreground hidden sm:inline"
+                >
+                  ·
+                </span>
+              )}
+              <Typography as="span" size="base" weight="medium">
+                {item}
+              </Typography>
+            </li>
+          ))}
+        </ul>
+        <Typography size="sm" weight="medium" tone="muted">
+          {HERO.pilotInfo.join(" · ")}
         </Typography>
         <div className="flex flex-wrap gap-3">
           <Button asChild size="xl">
