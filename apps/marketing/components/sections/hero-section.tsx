@@ -9,46 +9,50 @@ import { HERO } from "@/lib/content/landing";
  * JavaScript arrives. The photo is Morgane's (4 November 2026), a person with
  * a phone, cut out on the page's gradient. It is decorative: the headline
  * says what the page says, so `alt` is empty.
+ *
+ * Each highlight carries its separator in front, and the list sits one
+ * separator to the left inside a clipping box. A separator that wraps to the
+ * start of a line is clipped, so no line starts or ends on a lone "·".
  */
 export const HeroSection = () => (
   <section
     id="top"
-    className="from-primary-subtle/70 bg-linear-to-br via-background to-success-subtle/60 py-10 lg:py-20"
+    className="from-primary-subtle/70 bg-linear-to-br via-background to-success-subtle/60 py-8 lg:py-14"
   >
     <Container className="grid items-center gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-14">
-      <div className="flex max-w-2xl flex-col items-start gap-5">
+      <div className="flex max-w-2xl flex-col items-start gap-4">
         <Badge variant="warning" tone="subtle">
           {HERO.badge}
         </Badge>
         <Typography
           as="h1"
-          size="4xl"
+          size="3xl"
           weight="bold"
           balance
-          className="md:text-5xl"
+          className="md:text-4xl"
         >
           {HERO.title}
         </Typography>
-        <Typography size="xl" weight="medium" className="text-primary">
+        <Typography size="lg" weight="medium" className="text-primary">
           {HERO.subtitle}
         </Typography>
-        <ul className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:gap-x-2">
-          {HERO.highlights.map((item, index) => (
-            <li key={item} className="flex items-center gap-2">
-              {index > 0 && (
+        <div className="overflow-hidden">
+          <ul className="-ml-5 flex flex-wrap gap-y-1">
+            {HERO.highlights.map((item) => (
+              <li key={item} className="flex items-center whitespace-nowrap">
                 <span
                   aria-hidden="true"
-                  className="text-muted-foreground hidden sm:inline"
+                  className="text-muted-foreground w-5 text-center"
                 >
                   ·
                 </span>
-              )}
-              <Typography as="span" size="base" weight="medium">
-                {item}
-              </Typography>
-            </li>
-          ))}
-        </ul>
+                <Typography as="span" size="base" weight="medium">
+                  {item}
+                </Typography>
+              </li>
+            ))}
+          </ul>
+        </div>
         <Typography size="sm" weight="medium" tone="muted">
           {HERO.pilotInfo.join(" · ")}
         </Typography>
