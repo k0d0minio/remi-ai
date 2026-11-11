@@ -495,7 +495,8 @@ export const fr: Content = {
       firstName: "Ce prénom est trop long.",
       birthDate: "Cette date n'est pas valide.",
       email: "Cette adresse e-mail n'est pas valide.",
-      phone: "Ce numéro n'est pas valide. Utilisez 8 à 15 chiffres, avec un + au début si besoin.",
+      phone:
+        "Ce numéro n'est pas valide. Utilisez 8 à 15 chiffres, avec un + au début si besoin.",
       password: "Ce mot de passe est trop long.",
     },
     tooShort: "Le mot de passe compte au moins 8 caractères.",
@@ -520,8 +521,7 @@ export const fr: Content = {
         sent: "Si un dossier existe pour cette adresse, un lien vient d'y partir. Il sert une seule fois et expire dans 24 heures.",
         rate_limited:
           "Un lien est parti il y a moins de cinq minutes. Regardez dans votre boîte de réception, puis réessayez plus tard.",
-        unavailable:
-          "Le lien n'a pas pu partir. Réessayez dans un instant.",
+        unavailable: "Le lien n'a pas pu partir. Réessayez dans un instant.",
       },
     },
     submit: "Créer mon compte",
@@ -610,7 +610,8 @@ export const fr: Content = {
       otherText: "Précisez « Autre » pour l'enregistrer.",
       celiacDisease:
         "Cochez si un médecin l'a diagnostiquée. Le gluten est alors exclu strictement, contaminations croisées comprises.",
-      medications: "Ceux que vous prenez aujourd'hui, avec leur dose si vous la connaissez.",
+      medications:
+        "Ceux que vous prenez aujourd'hui, avec leur dose si vous la connaissez.",
       supplements: "Vitamines, minéraux, plantes…",
       geneticComingSoon: "La suite de cette section arrive bientôt.",
     },
@@ -644,8 +645,7 @@ export const fr: Content = {
       submit: "Recevoir un lien",
       submitting: "Envoi…",
       status: {
-        sent:
-          "Si cette adresse a un compte, un lien de connexion vient de partir. Ouvrez-le depuis votre boîte mail.",
+        sent: "Si cette adresse a un compte, un lien de connexion vient de partir. Ouvrez-le depuis votre boîte mail.",
         rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
         unavailable: "Le lien n'a pas pu partir. Réessayez dans un instant.",
       },
@@ -662,8 +662,7 @@ export const fr: Content = {
     submit: "Recevoir le lien",
     submitting: "Envoi…",
     status: {
-      sent:
-        "Si cette adresse a un compte, un lien vient de partir. Il est valable une heure et sert une seule fois.",
+      sent: "Si cette adresse a un compte, un lien vient de partir. Il est valable une heure et sert une seule fois.",
       rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
       unavailable: "Le lien n'a pas pu partir. Réessayez dans un instant.",
     },
@@ -710,8 +709,7 @@ export const fr: Content = {
       spent: "Ce lien n'est plus valide. Aucun compte n'a été créé.",
       has_account: "Vous avez déjà un compte.",
       rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
-      unavailable:
-        "Le compte n'a pas été créé. Réessayez dans un instant.",
+      unavailable: "Le compte n'a pas été créé. Réessayez dans un instant.",
     },
     signIn: "Connectez-vous.",
     spent:
@@ -720,9 +718,31 @@ export const fr: Content = {
   },
   patientHome: {
     metaTitle: "Accueil",
-    title: "Bienvenue",
+    title: "Accueil",
     comingSoon:
       "Votre espace arrive bientôt. Vous y trouverez vos recommandations et vos recettes.",
+  },
+  patientTabs: [
+    { href: "/accueil", icon: "home", label: "Accueil" },
+    { href: "/recettes", icon: "recipes", label: "Recettes" },
+    { href: "/profil", icon: "profile", label: "Profil" },
+  ],
+  patientShell: {
+    greeting: "Bonjour {name}",
+    greetingNoName: "Bonjour",
+    profileLink: "Profil",
+  },
+  patientRecipes: {
+    metaTitle: "Recettes",
+    title: "Recettes",
+    comingSoon:
+      "Vos propositions de recettes arrivent bientôt. Vous les trouverez ici, jour par jour.",
+  },
+  patientProfile: {
+    metaTitle: "Profil",
+    title: "Profil",
+    comingSoon:
+      "Vos recommandations, vos informations personnelles et les réglages de votre compte arrivent bientôt ici.",
   },
   signOut: "Se déconnecter",
 };

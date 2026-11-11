@@ -94,6 +94,21 @@ The same shape covers a callback the primitive should not own: take it as a prop
 reaching for the hook here, which would move the whole component to the client barrel and put it in
 every consuming page's bundle.
 
+## Patient screens
+
+Every screen behind the patient session follows these rules (story 31). `BottomNav` and the
+`(patient)` layout in `apps/web` carry the shared part. Each screen carries the rest:
+
+- One primary `Button` per screen. Every other action is `outline`, `ghost` or a link.
+- Every control has a visible, explicit label. An icon never stands alone.
+- No essential action sits in a hidden menu, a sheet or a swipe.
+- No carousel, and nothing that moves without the patient's action.
+- Touch targets are at least 48 × 48 px. Every control is reachable with the keyboard, in the
+  visual order, with a visible focus ring.
+- Text and controls meet WCAG AA: 4.5:1 for text, 3:1 for icons and indicators. The tokens pass.
+  A raw colour is not checked.
+- A screen asks only for what its flow needs.
+
 ## Tokens — two stylesheets, one source
 
 Colour, radius, type scale, fonts, containers, elevation and motion live in `src/tokens.css`

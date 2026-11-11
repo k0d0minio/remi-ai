@@ -712,6 +712,25 @@ export type Content = {
     title: string;
     comingSoon: string;
   };
+  /** The tabs of the patient's shell. The layout puts each href under the locale. */
+  patientTabs: NavItem[];
+  patientShell: {
+    /** `{name}` is the patient's first name. */
+    greeting: string;
+    /** The greeting when the patient's file has no first name. */
+    greetingNoName: string;
+    profileLink: string;
+  };
+  patientRecipes: {
+    metaTitle: string;
+    title: string;
+    comingSoon: string;
+  };
+  patientProfile: {
+    metaTitle: string;
+    title: string;
+    comingSoon: string;
+  };
   /** The sign-out button on the pages behind the patient session. */
   signOut: string;
 };

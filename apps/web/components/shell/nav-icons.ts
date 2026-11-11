@@ -1,5 +1,8 @@
 import {
+  ChefHat,
+  CircleUser,
   Footprints,
+  House,
   LayoutDashboard,
   NotebookPen,
   Stethoscope,
@@ -23,4 +26,7 @@ export const navIcons: Record<string, ComponentType<{ className?: string }>> = {
   today: Sun,
   steps: Footprints,
   plan: NotebookPen,
+  home: House,
+  recipes: ChefHat,
+  profile: CircleUser,
 };

@@ -27,6 +27,7 @@ export {
   alertVariants,
 } from "./server/alert";
 export { Badge, badgeVariants } from "./server/badge";
+export { BottomNav } from "./server/bottom-nav";
 export {
   Card,
   CardContent,

@@ -31,4 +31,4 @@ The « Profil » tab in three parts, in this order: 1 « Recommandations », a v
 
 ## Notes
 
-D-26, D-30. Replaces `apps/web/app/[locale]/p/[token]/profil/`. Files: `apps/web/app/[locale]/(app)/profil/`. Cross-epic: `patient-recommendations/recommendations-page`, `patient-change-signals/patient-change-table`, `patient-signup-account`.
+D-26, D-30. Replaces `apps/web/app/[locale]/p/[token]/profil/`. Files: `apps/web/app/[locale]/(patient)/profil/`. Cross-epic: `patient-recommendations/recommendations-page`, `patient-change-signals/patient-change-table`, `patient-signup-account`.
