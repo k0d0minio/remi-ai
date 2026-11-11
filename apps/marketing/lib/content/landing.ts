@@ -15,6 +15,8 @@ export type Offer = {
   hook: string;
   /** The pilot price in euros: one payment for 8 weeks, not a subscription. */
   price: number;
+  /** The commercial price in euros, after the pilot. Shown beside the pilot price, never struck through. */
+  commercialPrice: number;
   includes: string[];
   highlight?: string;
   footnote?: string;
@@ -62,6 +64,8 @@ export const OFFERS_SECTION = {
   lead: "Deux formules de 8 semaines, à prix unique. Dans les deux, REMI fonctionne de la même façon : seul le point de départ change.",
   note: "Aucun paiement à ce stade : l’inscription est une simple manifestation d’intérêt.",
   priceUnit: `prix pilote · ${SITE.pilotDurationWeeks} semaines`,
+  commercialPriceLabel: "Prix commercial :",
+  pilotPriceNote: "Tarif réservé aux 30 premiers participants pilotes",
   cta: "Je suis intéressé(e)",
 };
 
@@ -70,7 +74,8 @@ export const OFFERS: Offer[] = [
     id: "genetic",
     name: "REMI + analyse génétique",
     hook: "Un test ADN ciblé, un médecin spécialisé et REMI pour adapter votre alimentation à votre profil.",
-    price: 347,
+    price: 349,
+    commercialPrice: 399,
     includes: [
       "Test ADN ciblé",
       "Consultation d’une heure avec un médecin spécialisé",
@@ -86,7 +91,8 @@ export const OFFERS: Offer[] = [
     id: "consultation",
     name: "REMI + consultation nutritionnelle",
     hook: "Faites le point sur vos habitudes et avancez avec un accompagnement adapté à vos objectifs.",
-    price: 109,
+    price: 119,
+    commercialPrice: 149,
     includes: [
       "Consultation d’une heure avec Morgane",
       "4 objectifs nutritionnels personnalisés",

@@ -27,12 +27,20 @@ export const OffersSection = () => (
             <Typography size="sm" tone="muted">
               {offer.hook}
             </Typography>
-            <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-              <span className="text-primary text-4xl leading-none font-extrabold tracking-tight">
-                {formatPrice(offer.price)}
-              </span>
-              <span className="text-muted-foreground text-xs">{OFFERS_SECTION.priceUnit}</span>
-            </p>
+            <div className="flex flex-col gap-1.5">
+              <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                <span className="text-primary text-4xl leading-none font-extrabold tracking-tight">
+                  {formatPrice(offer.price)}
+                </span>
+                <span className="text-muted-foreground text-xs">{OFFERS_SECTION.priceUnit}</span>
+              </p>
+              <p className="text-muted-foreground text-sm">
+                {OFFERS_SECTION.commercialPriceLabel} {formatPrice(offer.commercialPrice)}
+              </p>
+              <Typography size="xs" tone="muted">
+                {OFFERS_SECTION.pilotPriceNote}
+              </Typography>
+            </div>
             <ul className="border-border flex flex-1 flex-col gap-2.5 border-t pt-4">
               {offer.includes.map((item) => (
                 <li key={item} className="flex items-start gap-2.5 text-sm font-medium">
