@@ -1,24 +1,20 @@
-# Stub: The Neon preview branch of a merged pull request is deleted with its git branch
+# Stub: The Neon integration keeps the preview branch after the git branch is deleted
 
 - lane: bug
-- found-by: `consent-and-data/data-access-scoping` · 2026-11-04
+- found-by: `patient-home-navigation/app-shell-and-nav` · 2026-11-11
 - complexity: research
 - priority: P1
 
 ## Problem
 
-`.icm/database/CONTEXT.md` says the Neon integration deletes `preview/<git branch>` when the git
-branch is deleted. On 2026-11-04 the Neon project `uat-remi-ai` held 9 preview branches. The git
-branches of 7 of them were already deleted after their merge (#173 to #179). The project is at 10
-branches, so a new git branch gets no database and its `admin` and `app` previews fail at build.
-The 7 branches were deleted by hand later on 2026-11-04. The cause remains.
+`.icm/database/CONTEXT.md` says the Neon integration deletes `preview/<git branch>` when the git branch is deleted. It does not. On 2026-11-11 the Neon project `uat-remi-ai` held `main` and 9 preview branches. 8 of them belong to merged pull requests (#180, #181, #183 to #188) whose git branches GitHub deleted. With 10 branches, the project is at its branch limit. The integration cannot cut a branch for a new git branch, so the `app` and `admin` previews of #190 and #191 fail before the build, with no build log.
 
 ## Proposed change
 
-Investigate why the integration keeps the branch. Then fix the setting, or add the delete to the
-merge path, and correct `.icm/database/CONTEXT.md`.
+Investigate why the integration does not delete the branch: its setting on the Vercel projects `app` and `admin`, or the plan. Then make the deletion reliable, or change the contract to name who deletes a preview branch and when.
 
 ## Acceptance criteria
 
-- [ ] The merge of a pull request removes its `preview/<git branch>` branch from `uat-remi-ai`
-- [ ] `.icm/database/CONTEXT.md` states what deletes a preview branch
+- [ ] A merged pull request's Neon branch `preview/<git branch>` is gone within one day of the merge.
+- [ ] `.icm/database/CONTEXT.md` names the act or the setting that deletes it.
+- [ ] A new pull request gets its `app` and `admin` previews when 8 or more pull requests merged before it.
