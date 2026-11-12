@@ -1,6 +1,6 @@
 import NextLink from "next/link";
 import { formatDate, type NutritionRule } from "@remi/services/shared";
-import { Badge, Typography } from "@remi/ui/server";
+import { Badge, markdownToText, Typography } from "@remi/ui/server";
 import {
   kindLabels,
   statusIntents,
@@ -49,7 +49,7 @@ export const RuleRows = ({ rules }: Props) => (
         </div>
 
         <Typography size="sm" tone="muted" className="line-clamp-2">
-          {rule.body}
+          {markdownToText(rule.body)}
         </Typography>
 
         <Typography size="xs" tone="muted">
