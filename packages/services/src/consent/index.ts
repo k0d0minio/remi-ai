@@ -6,6 +6,7 @@ import {
   type ShownConsent,
 } from "../shared/consent";
 import care1FrBe from "./texts/care/1.fr-BE.md";
+import care2FrBe from "./texts/care/2.fr-BE.md";
 import genetic1FrBe from "./texts/genetic/1.fr-BE.md";
 
 /**
@@ -46,6 +47,15 @@ const files: readonly Omit<ConsentText, "hash">[] = [
     locale: "fr-BE",
     date: "2026-11-01",
     body: care1FrBe,
+  },
+  // Version 1 with Jamie's answers of 2026-11-12 (triage/care-consent-v2):
+  // no draft mark, the paid pilot, the sub-processors the repo holds.
+  {
+    key: "care",
+    version: "2",
+    locale: "fr-BE",
+    date: "2026-11-12",
+    body: care2FrBe,
   },
   // A draft from sections 2 and 4 of the policy. Morgane validates it before
   // `genetic-consent-and-optional-data` ships. Her edit is version 2.

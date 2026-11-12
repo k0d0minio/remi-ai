@@ -20,6 +20,8 @@ import {
 const publishedHashes: Record<string, string> = {
   "care/1/fr-BE":
     "2e8d016d940197d462fdf9c87138a8741b952ab6316d7ee1b5c71f492afc2d1b",
+  "care/2/fr-BE":
+    "4ce7a5efa35ca4248a83a762d30fccc20d93255a1d2c7d5d473ae3d7cb10826b",
   "genetic/1/fr-BE":
     "f4fc3aa65bfc4081c77801a4ffc400c4bb29de30addc979707e7c8d252a4920b",
 };
@@ -60,6 +62,12 @@ describe("consent texts", () => {
     );
     expect(consentText("care", "legacy", "fr-BE")).toBeNull();
     expect(consentText("care", "1", "en")).toBeNull();
+  });
+
+  it("shows care version 2, with no draft mark and no free pilot", () => {
+    const care = currentConsentText("care", "fr-BE");
+    expect(care.version).toBe("2");
+    expect(care.body).not.toMatch(/À CONFIRMER|À VALIDER|À COMPLÉTER|gratuit/);
   });
 
   it("falls back to fr-BE when the language has no text yet", () => {
