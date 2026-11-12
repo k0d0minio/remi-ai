@@ -4,7 +4,6 @@
 - found-by: consent-and-data/consent-texts-and-records, pull request 159 · 2026-11-01
 - complexity: low
 - priority: P2
-- blocked: waits on `consent-and-data/consent-gate-at-signup`
 
 ## Problem
 

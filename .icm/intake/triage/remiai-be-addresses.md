@@ -34,3 +34,11 @@ Close `triage/neon-api-key-and-dead-domain` for its domain half.
 - [ ] `links.ts` uses `remiai.be` as its root domain.
 - [ ] `.icm/intake/README.md` records the marketing uat and how marketing production moves.
 - [ ] No file names `remi-ai.tech`, except in history.
+
+## Notes
+
+Carried from `triage/_done/move-addresses-to-remiai-be.md` (dropped 2026-11-12). These steps are not in the criteria above. Do them in this run, or park each one as its own stub:
+
+1. Set `APP_URL` and the `NEXT_PUBLIC_*` origin variables on production and uat of `app` and `admin` to the `remiai.be` addresses. Then redeploy, because the build inlines them.
+2. Set the Neon Auth trusted domains of both Neon projects to the `remiai.be` addresses.
+3. Verify `remiai.be` in Resend. Then set `EMAIL_FROM` to `REMI <no-reply@remiai.be>` on every target of `admin`.

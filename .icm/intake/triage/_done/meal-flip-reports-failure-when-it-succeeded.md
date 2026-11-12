@@ -1,3 +1,5 @@
+> Dropped: `patient-home-navigation/retire-token-link` removes the page that this stub fixes (« Je l'ai mangé »). D-19 puts the meal intent outside the stories, 2026-11-12.
+
 # Stub: pressing « Je l'ai mangé » twice says the meal is gone
 
 - lane: tweak

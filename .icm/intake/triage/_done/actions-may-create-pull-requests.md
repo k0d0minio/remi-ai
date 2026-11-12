@@ -1,3 +1,5 @@
+> Dropped: The work is done. The repository setting `can_approve_pull_request_reviews` is `true`, release-please opened #152 on 2026-10-29, and `ci` on `main` passes, 2026-11-12.
+
 # Stub: GitHub Actions may create the release pull request
 
 - lane: chore

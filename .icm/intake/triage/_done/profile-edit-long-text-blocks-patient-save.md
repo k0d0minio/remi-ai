@@ -1,3 +1,5 @@
+> Dropped: `patient-home-navigation/retire-token-link` removes the page that this stub fixes (« Mon profil »), 2026-11-12.
+
 # Stub: Practitioner text over 2 000 characters blocks every « Mon profil » save
 
 - lane: bug
