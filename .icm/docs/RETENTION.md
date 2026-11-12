@@ -14,33 +14,34 @@ this. One deletion is automatic: an account inactive for twelve months, after a 
 
 One row in `patient_profiles`, plus what hangs off it:
 
-| What                                                               | Where                     | Reaches the patient's link                         |
-| ------------------------------------------------------------------ | ------------------------- | -------------------------------------------------- |
-| Pseudonym, real name, email, language, status                      | `patient_profiles`        | the real name; the rest, no                        |
-| Birth date, sex, height, weight                                    | `patient_profiles`        | age, height and weight — the birth date itself, no |
-| Objective, constraints, preferences, medication, supplements       | `patient_profiles`        | yes                                                |
-| Diet, allergies, intolerances, likes cooking, time to cook, budget | `patient_profiles`        | yes — the patient edits them on « Mon profil »     |
-| When the patient last changed each of those fields                 | `patient_profiles`        | no                                                 |
-| Referral, anamnesis                                                | `patient_profiles`        | no — practitioner's working record                 |
-| Consent date and channel, recorded by hand before the consent rows | `patient_profiles`        | no                                                 |
-| Each consent decision, with the version and the hash of its text   | `patient_consents`        | no                                                 |
-| Questionnaire: sex for the calculation, activity, desired weight   | `patient_profiles`        | no — no page shows them yet                        |
-| Questionnaire: consultation reason and date, diet, pathologies     | `patient_profiles`        | no — no page shows them yet                        |
-| Questionnaire: celiac disease, the free question's answer          | `patient_profiles`        | no — no page shows them yet                        |
-| The genetic test answer, the APOE, DIO2 and AMY1A results          | `patient_profiles`        | no — stored, never interpreted (D-35)              |
-| Allergies and intolerances as checked boxes                        | `patient_allergens`       | no — no page shows them yet                        |
-| Whether the patient declared « no known » allergy or intolerance   | `patient_profiles`        | no — no page shows them yet                        |
-| The practitioner's « situation particulière » and its note         | `patient_profiles`        | no                                                 |
-| The automatic calculations: estimate, validated value, parameters  | `patient_calculations`    | no                                                 |
-| The share token, when the link was last opened, last written       | `patient_profiles`        | the token is the link                              |
-| The protocol, entry by entry                                       | `patient_recommendations` | yes, unless archived                               |
-| Consultation notes                                                 | `patient_notes`           | no                                                 |
-| Challenges — hers, and the patient's two answers to each           | `patient_challenges`      | the running one; closed ones, no                   |
-| Documents she put on their page — PDFs, images, links              | `patient_documents`       | the title and the day added; who added it, no      |
-| The files behind those documents                                   | the file store (below)    | through a five-minute signed link only             |
-| The general thread — the patient's messages and her replies        | `patient_messages`        | yes — the whole thread                             |
-| What the patient writes through the link                           | the table it belongs to   | yes — they wrote it                                |
-| One timestamp per accepted write through the link                  | `patient_link_writes`     | no                                                 |
+| What                                                                                        | Where                     | Reaches the patient's link                         |
+| ------------------------------------------------------------------------------------------- | ------------------------- | -------------------------------------------------- |
+| Pseudonym, real name, email, language, status                                               | `patient_profiles`        | the real name; the rest, no                        |
+| Birth date, sex, height, weight                                                             | `patient_profiles`        | age, height and weight — the birth date itself, no |
+| Objective, constraints, preferences, medication, supplements                                | `patient_profiles`        | yes                                                |
+| Diet, allergies, intolerances, likes cooking, time to cook, budget                          | `patient_profiles`        | yes — the patient edits them on « Mon profil »     |
+| When the patient last changed each of those fields                                          | `patient_profiles`        | no                                                 |
+| Referral, anamnesis                                                                         | `patient_profiles`        | no — practitioner's working record                 |
+| Consent date and channel, recorded by hand before the consent rows                          | `patient_profiles`        | no                                                 |
+| Each consent decision, with the version and the hash of its text                            | `patient_consents`        | no                                                 |
+| Questionnaire: sex for the calculation, activity, desired weight                            | `patient_profiles`        | no — no page shows them yet                        |
+| Questionnaire: consultation reason and date, diet, pathologies                              | `patient_profiles`        | no — no page shows them yet                        |
+| Questionnaire: celiac disease, the free question's answer                                   | `patient_profiles`        | no — no page shows them yet                        |
+| The genetic test answer, the APOE, DIO2 and AMY1A results                                   | `patient_profiles`        | no — stored, never interpreted (D-35)              |
+| Allergies and intolerances as checked boxes                                                 | `patient_allergens`       | no — no page shows them yet                        |
+| Whether the patient declared « no known » allergy or intolerance                            | `patient_profiles`        | no — no page shows them yet                        |
+| The practitioner's « situation particulière » and its note                                  | `patient_profiles`        | no                                                 |
+| The automatic calculations: estimate, validated value, parameters                           | `patient_calculations`    | no                                                 |
+| Each change the patient made after activation: field, old and new value, when, acknowledged | `patient_changes`         | no                                                 |
+| The share token, when the link was last opened, last written                                | `patient_profiles`        | the token is the link                              |
+| The protocol, entry by entry                                                                | `patient_recommendations` | yes, unless archived                               |
+| Consultation notes                                                                          | `patient_notes`           | no                                                 |
+| Challenges — hers, and the patient's two answers to each                                    | `patient_challenges`      | the running one; closed ones, no                   |
+| Documents she put on their page — PDFs, images, links                                       | `patient_documents`       | the title and the day added; who added it, no      |
+| The files behind those documents                                                            | the file store (below)    | through a five-minute signed link only             |
+| The general thread — the patient's messages and her replies                                 | `patient_messages`        | yes — the whole thread                             |
+| What the patient writes through the link                                                    | the table it belongs to   | yes — they wrote it                                |
+| One timestamp per accepted write through the link                                           | `patient_link_writes`     | no                                                 |
 
 The link records **when** it was last opened and **when** it was last written into, and nothing
 else — no page views, no device, no address. Those are two timestamps, not a tracking table: the
@@ -127,6 +128,8 @@ Deleting a patient from the console removes, permanently and in one operation:
 - every recommendation encoded for them, archived ones too;
 - every consultation note about them;
 - their questionnaire's allergy and intolerance boxes;
+- every change signal — each field the patient changed after activation, with its old and its new
+  value, acknowledged or not;
 - every challenge she gave them, running or closed, with the patient's answers on each;
 - the whole general thread — every message the patient sent and every reply to it;
 - everything the patient themselves wrote through the link — their meal entries and their

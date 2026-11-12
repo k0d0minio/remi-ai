@@ -130,6 +130,11 @@ export {
 export { listPatientCalculations } from "../db/services/patient-calculations";
 
 export {
+  countOpenPatientChanges,
+  listOpenPatientChanges,
+} from "../db/services/patient-changes";
+
+export {
   addPatientRecommendation,
   archivePatientRecommendation,
   deletePatientRecommendation,

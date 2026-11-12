@@ -951,9 +951,9 @@ describe("the genotype section", () => {
       .collection<{ id: string; apoe: string | null }>("patient_profiles")
       .findById(patient.id);
     expect(row?.apoe).toBe("E3/E3");
-    expect(
-      unwrapOk(await macroProfileOf(systemActor, patient.id)).reason,
-    ).toBe("no-test");
+    expect(unwrapOk(await macroProfileOf(systemActor, patient.id)).reason).toBe(
+      "no-test",
+    );
 
     // « Oui » again shows the stored values back.
     unwrapOk(
@@ -1028,9 +1028,9 @@ describe("the genotype section", () => {
         apoe: "E2/E2",
       }),
     );
-    expect(
-      unwrapOk(await macroProfileOf(systemActor, partial.id)).reason,
-    ).toBe("incomplete");
+    expect(unwrapOk(await macroProfileOf(systemActor, partial.id)).reason).toBe(
+      "incomplete",
+    );
   });
 
   it("answers DEFAULT without the genetic consent, even with stored values", async () => {
@@ -1043,8 +1043,8 @@ describe("the genotype section", () => {
         dio2: "A",
         amy1a: "A",
       });
-    expect(
-      unwrapOk(await macroProfileOf(systemActor, patient.id)).reason,
-    ).toBe("no-consent");
+    expect(unwrapOk(await macroProfileOf(systemActor, patient.id)).reason).toBe(
+      "no-consent",
+    );
   });
 });

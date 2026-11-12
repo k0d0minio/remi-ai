@@ -15,6 +15,10 @@ import {
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import {
+  watchedPatientFields,
+  type PatientChangeValue,
+} from "../shared/patient-changes";
 
 /**
  * The Drizzle schema — the single definition the checked-in migrations under
@@ -1327,6 +1331,59 @@ export const patientLinkWrites = pgTable("patient_link_writes", {
     .references(() => patientProfiles.id, { onDelete: "cascade" }),
   ...timestamps,
 });
+
+/**
+ * The changes a patient made to a watched field after activation — story 21,
+ * `patient-change-signals`. One row is one signal: the field, the value before
+ * the patient's first change, the value now, and when the patient last
+ * changed it. The practitioner acknowledges it on the file
+ * (`change-signals-in-console`), which sets the two `acknowledged_*` columns.
+ *
+ * A field has at most one open signal: a second change before the
+ * acknowledgement moves `new_value` and `changed_at` on the open row, and a
+ * change back to `old_value` deletes it. The audit trail keeps every write
+ * (`patient.changed`, D-32).
+ *
+ * The values are the stored values, never a label: the reader formats them.
+ * The field keys are `watchedPatientFields` in `shared/patient-changes.ts`.
+ */
+export const patientChanges = pgTable(
+  "patient_changes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    fieldKey: text("field_key").notNull(),
+    oldValue: jsonb("old_value").$type<PatientChangeValue>(),
+    newValue: jsonb("new_value").$type<PatientChangeValue>(),
+    changedAt: timestamp("changed_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+    acknowledgedAt: timestamp("acknowledged_at", {
+      withTimezone: true,
+      mode: "date",
+    }),
+    /** The operator who acknowledged. No foreign key, like `audit_events`. */
+    acknowledgedBy: uuid("acknowledged_by"),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("patient_changes_open_patient_field_idx")
+      .on(table.patientId, table.fieldKey)
+      .where(sql`${table.acknowledgedAt} is null`),
+    index("patient_changes_patient_changed_at_idx").on(
+      table.patientId,
+      table.changedAt,
+    ),
+    check(
+      "patient_changes_field_key_check",
+      sql`${table.fieldKey} in (${sql.raw(
+        watchedPatientFields.map((field) => `'${field}'`).join(", "),
+      )})`,
+    ),
+  ],
+);
 
 /**
  * Morgane's own nutrition knowledge, as text — decision #7's second half, and

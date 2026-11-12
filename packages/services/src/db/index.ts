@@ -173,6 +173,11 @@ export {
 export { listPatientCalculations } from "./services/patient-calculations";
 
 export {
+  countOpenPatientChanges,
+  listOpenPatientChanges,
+} from "./services/patient-changes";
+
+export {
   addPatientSupplement,
   deletePatientSupplement,
   listPatientSupplements,

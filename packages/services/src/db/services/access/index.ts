@@ -176,6 +176,21 @@ export const byPatient =
       ? service(patientId, ...rest)
       : refused();
 
+/**
+ * `byPatient` for a write that must know who made it. The service gets `true`
+ * as its second argument when the actor is the patient: a patient's write of a
+ * watched field raises a change signal, a practitioner's never does (story 21).
+ */
+export const byPatientWrite =
+  <A extends unknown[], R>(
+    service: (patientId: Id, byThePatient: boolean, ...rest: A) => Promise<R>,
+    refused: () => NoInfer<R>,
+  ) =>
+  async (actor: Actor, patientId: Id, ...rest: A): Promise<R> =>
+    (await mayAccessPatient(actor, patientId, "write"))
+      ? service(patientId, actor.kind === "patient", ...rest)
+      : refused();
+
 /** The same scope for a service whose first argument is the id of a row. */
 export const byRecord =
   <A extends unknown[], R>(

@@ -29,7 +29,13 @@ import { recordAuditEvent, type AuditActor } from "../audit";
 import { consentInForce } from "../patient-consents/in-force";
 import { refreshBmiEstimate } from "../patient-calculations";
 import { changesMeasures, setFileStatus } from "../patients";
-import { byPatient, noSuchPatient, systemActor } from "../access";
+import {
+  byPatient,
+  byPatientWrite,
+  noSuchPatient,
+  systemActor,
+} from "../access";
+import { recordPatientChanges, type WatchedValues } from "../patient-changes";
 
 /**
  * The preparatory questionnaire's storage — story 4, `questionnaire-fields`.
@@ -52,11 +58,38 @@ import { byPatient, noSuchPatient, systemActor } from "../access";
 
 type QuestionnaireRow = { id: Id } & PatientQuestionnaire;
 
+/** The same row, with the facts a change signal needs. */
+type FileRow = QuestionnaireRow &
+  Pick<PatientProfile, "pseudonym" | "fileStatus">;
+
 const profiles = (db: DatabaseClient = getDatabase()) =>
   db.collection<QuestionnaireRow>("patient_profiles");
 
 const allergenRows = (db: DatabaseClient = getDatabase()) =>
   db.collection<PatientAllergen>("patient_allergens");
+
+/** The values of the named fields in a row, for `recordPatientChanges`. */
+const valuesOf = (
+  row: Readonly<Record<string, unknown>>,
+  fields: readonly string[],
+): WatchedValues =>
+  Object.fromEntries(fields.map((field) => [field, row[field]]));
+
+/** The watched field of each list: `allergy` → `allergies`. */
+const watchedFieldOfKind = {
+  allergy: "allergies",
+  intolerance: "intolerances",
+} as const satisfies Record<AllergenKind, "allergies" | "intolerances">;
+
+/**
+ * A list's rows as one value: `key`, `key/subKey`, and the « Autre » text
+ * after a colon. `recordPatientChanges` sorts it.
+ */
+const listValue = (rows: readonly PatientAllergen[]): string[] =>
+  rows.map((row) => {
+    const name = row.subKey ? `${row.key}/${row.subKey}` : row.key;
+    return row.otherText ? `${name}: ${row.otherText}` : name;
+  });
 
 const uuidSchema = z.uuid();
 
@@ -395,6 +428,7 @@ const unscopedGetPatientQuestionnaire = async (
  */
 const unscopedSavePatientQuestionnaire = async (
   patientId: Id,
+  byThePatient: boolean,
   input: QuestionnaireInput,
   actor: AuditActor | null = null,
 ): Promise<Result<PatientQuestionnaire>> => {
@@ -411,7 +445,7 @@ const unscopedSavePatientQuestionnaire = async (
       (patch as Record<string, unknown>)[field] = value;
     }
   }
-  const current = await profiles().findById(patientId);
+  const current = (await profiles().findById(patientId)) as FileRow | null;
   if (!current) {
     return err("not_found", "no such patient");
   }
@@ -432,6 +466,14 @@ const unscopedSavePatientQuestionnaire = async (
   }
   await recordConsultationDateChange(current, patch, actor);
   await recordGenotypeChanges(current, patch, actor);
+  if (byThePatient) {
+    const fields = Object.keys(patch);
+    await recordPatientChanges(
+      current,
+      valuesOf(current, fields),
+      valuesOf(written, fields),
+    );
+  }
   return ok(await visibleAnswers(written));
 };
 
@@ -530,6 +572,7 @@ const careGatedProfileFields = ["medications", "supplements"] as const;
  */
 const unscopedSavePatientProfileAnswers = async (
   patientId: Id,
+  byThePatient: boolean,
   input: ProfileAnswerInput,
 ): Promise<Result<PatientProfile>> => {
   if (!isValidId(patientId)) {
@@ -568,6 +611,14 @@ const unscopedSavePatientProfileAnswers = async (
   if (written && changesMeasures(current, patch)) {
     await refreshBmiEstimate(patientId);
   }
+  if (written && byThePatient) {
+    const fields = Object.keys(patch);
+    await recordPatientChanges(
+      current,
+      valuesOf(current, fields),
+      valuesOf(written, fields),
+    );
+  }
   return written ? ok(written) : err("not_found", "no such patient");
 };
 
@@ -581,6 +632,7 @@ const unscopedSavePatientProfileAnswers = async (
  */
 const unscopedSetPatientAllergens = async (
   patientId: Id,
+  byThePatient: boolean,
   kind: string,
   answer: AllergenAnswer,
 ): Promise<Result<readonly PatientAllergen[]>> => {
@@ -600,7 +652,8 @@ const unscopedSetPatientAllergens = async (
     }
     selections = cleaned.data;
   }
-  if (!(await profiles().findById(patientId))) {
+  const file = (await profiles().findById(patientId)) as FileRow | null;
+  if (!file) {
     return err("not_found", "no such patient");
   }
 
@@ -615,11 +668,13 @@ const unscopedSetPatientAllergens = async (
       ? { noKnownAllergies: flag }
       : { noKnownIntolerances: flag };
 
+  let previous: readonly PatientAllergen[] = [];
   const written = await getDatabase().transaction(async (tx) => {
     const existing = await allergenRows(tx).findMany(
       { patientId, kind: listKind },
       { limit: 500 },
     );
+    previous = existing.items;
     for (const row of existing.items) {
       await allergenRows(tx).remove(row.id);
     }
@@ -638,6 +693,14 @@ const unscopedSetPatientAllergens = async (
     await profiles(tx).update(patientId, flagPatch);
     return inserted;
   });
+  if (byThePatient) {
+    const field = watchedFieldOfKind[listKind];
+    await recordPatientChanges(
+      file,
+      { [field]: listValue(previous) },
+      { [field]: listValue(written) },
+    );
+  }
   return ok(written.sort(byRank));
 };
 
@@ -750,18 +813,15 @@ export const getPatientQuestionnaire = byPatient(
   unscopedGetPatientQuestionnaire,
   noSuchPatient,
 );
-export const savePatientQuestionnaire = byPatient(
-  "write",
+export const savePatientQuestionnaire = byPatientWrite(
   unscopedSavePatientQuestionnaire,
   noSuchPatient,
 );
-export const savePatientProfileAnswers = byPatient(
-  "write",
+export const savePatientProfileAnswers = byPatientWrite(
   unscopedSavePatientProfileAnswers,
   noSuchPatient,
 );
-export const setPatientAllergens = byPatient(
-  "write",
+export const setPatientAllergens = byPatientWrite(
   unscopedSetPatientAllergens,
   noSuchPatient,
 );
