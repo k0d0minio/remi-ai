@@ -488,7 +488,8 @@ export const en: Content = {
       firstName: "This first name is too long.",
       birthDate: "This date is not valid.",
       email: "This e-mail address is not valid.",
-      phone: "This number is not valid. Use 8 to 15 digits, with a + at the start if needed.",
+      phone:
+        "This number is not valid. Use 8 to 15 digits, with a + at the start if needed.",
       password: "This password is too long.",
     },
     tooShort: "The password needs at least 8 characters.",
@@ -500,8 +501,7 @@ export const en: Content = {
       rate_limited: "Too many attempts. Try again in a few minutes.",
       unavailable:
         "The sign-up did not go through. Try again in a moment: your answers are kept.",
-      consent_missing:
-        "Tick each mandatory consent. No account was created.",
+      consent_missing: "Tick each mandatory consent. No account was created.",
       consent_stale:
         "The text changed after the page opened. Reload the page to read the current version. No account was created.",
     },
@@ -562,9 +562,12 @@ export const en: Content = {
       required: "This field cannot stay empty.",
       invalid: "This value is not valid.",
       height_range: "Enter a height from 100 to 250 cm, with no decimal.",
-      weight_range: "Enter a weight from 25 to 300 kg, with one decimal at most.",
+      weight_range:
+        "Enter a weight from 25 to 300 kg, with one decimal at most.",
       consent:
         "This information needs your consent to care. Talk to your practitioner about it.",
+      genetic_consent:
+        "Your genotypes need your genetic consent. Give it above to save them.",
       signed_out: "Your session has expired. Sign in again to continue.",
       unavailable: "The save failed. Check your connection and try again.",
     },
@@ -601,7 +604,21 @@ export const en: Content = {
         "Tick if a doctor diagnosed it. Gluten is then excluded strictly, cross-contamination included.",
       medications: "The ones you take today, with their dose if you know it.",
       supplements: "Vitamins, minerals, herbs…",
-      geneticComingSoon: "The rest of this section is coming soon.",
+    },
+    genetic: {
+      consentTitle: "Processing of your genetic data",
+      consentIntro:
+        "To save your genotypes, REMI needs your agreement. Read the text, then give or refuse your consent.",
+      version: "Version {version} of {date}",
+      accept: "I agree",
+      refuse: "I refuse",
+      deciding: "Saving…",
+      refused:
+        "You refused: REMI saves no genotype. You can change your mind at any time with “I agree”.",
+      listsIntro:
+        "Choose each result as it appears on the laboratory report. Leave a list empty if you do not know the result.",
+      decisionFailed:
+        "Your answer could not be saved. Check your connection and try again.",
     },
   },
   patientSignIn: {
@@ -632,8 +649,7 @@ export const en: Content = {
       submit: "Get a link",
       submitting: "Sending…",
       status: {
-        sent:
-          "If this address has an account, a sign-in link is on its way. Open it from your inbox.",
+        sent: "If this address has an account, a sign-in link is on its way. Open it from your inbox.",
         rate_limited: "Too many attempts. Try again in a few minutes.",
         unavailable: "The link could not be sent. Try again in a moment.",
       },
@@ -650,8 +666,7 @@ export const en: Content = {
     submit: "Get the link",
     submitting: "Sending…",
     status: {
-      sent:
-        "If this address has an account, a link is on its way. It is valid for one hour and works once.",
+      sent: "If this address has an account, a link is on its way. It is valid for one hour and works once.",
       rate_limited: "Too many attempts. Try again in a few minutes.",
       unavailable: "The link could not be sent. Try again in a moment.",
     },
@@ -688,8 +703,7 @@ export const en: Content = {
     submit: "Create my account",
     submitting: "Creating the account…",
     form: {
-      consent_missing:
-        "Tick each mandatory consent. No account was created.",
+      consent_missing: "Tick each mandatory consent. No account was created.",
       consent_stale:
         "The text changed since the page opened. Reload the page to read the current version. No account was created.",
       too_short: "The password needs at least 8 characters.",

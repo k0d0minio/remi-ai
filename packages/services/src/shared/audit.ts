@@ -196,6 +196,12 @@ export const auditActions = [
    * (`genetic-consent-and-optional-data`). The detail names the decision.
    */
   "genotype.cleared",
+  /**
+   * A genotype result changed (`genotype-section`). One event per field. The
+   * detail names the field, never the value: the trail holds no genetic data
+   * (Jamie, 2026-11-11).
+   */
+  "genotype.changed",
   "share_link.regenerated",
   "share_link.emailed",
   /**

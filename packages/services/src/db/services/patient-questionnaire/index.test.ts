@@ -20,6 +20,7 @@ import {
   checkAllergenAnswer,
   checkQuestionnaireInput,
   getPatientQuestionnaire,
+  macroProfileOf,
   markReadyWhenComplete,
   missingQuestionnaireFields,
   savePatientProfileAnswers,
@@ -906,5 +907,144 @@ describe("the profile columns the questionnaire asks", () => {
         ),
       ),
     ).toBe("not_found");
+  });
+});
+
+type GenotypeRow = {
+  id: string;
+  geneticTest: string | null;
+  apoe: string | null;
+  dio2: string | null;
+  amy1a: string | null;
+};
+
+describe("the genotype section", () => {
+  /** A patient with both consents, the answer « Oui » and a complete trio. */
+  const withTrio = async (pseudonym: string) => {
+    const patient = await newPatient(pseudonym);
+    await decide(patient, "care", "given");
+    await decide(patient, "genetic", "given");
+    unwrapOk(
+      await savePatientQuestionnaire(systemActor, patient.id, {
+        geneticTest: "yes",
+        apoe: "E3/E3",
+        dio2: "H",
+        amy1a: "M",
+      }),
+    );
+    return patient;
+  };
+
+  it("keeps the values stored and hides them under « Non / Je ne sais pas »", async () => {
+    const patient = await withTrio("Non sait pas");
+    unwrapOk(
+      await savePatientQuestionnaire(systemActor, patient.id, {
+        geneticTest: "no_or_unknown",
+      }),
+    );
+    let view = unwrapOk(await getPatientQuestionnaire(systemActor, patient.id));
+    expect(view.answers.geneticTest).toBe("no_or_unknown");
+    expect(view.answers.apoe).toBe(null);
+    expect(view.answers.dio2).toBe(null);
+    expect(view.answers.amy1a).toBe(null);
+    const row = await getDatabase()
+      .collection<{ id: string; apoe: string | null }>("patient_profiles")
+      .findById(patient.id);
+    expect(row?.apoe).toBe("E3/E3");
+    expect(unwrapOk(await macroProfileOf(systemActor, patient.id)).reason).toBe(
+      "no-test",
+    );
+
+    // « Oui » again shows the stored values back.
+    unwrapOk(
+      await savePatientQuestionnaire(systemActor, patient.id, {
+        geneticTest: "yes",
+      }),
+    );
+    view = unwrapOk(await getPatientQuestionnaire(systemActor, patient.id));
+    expect(view.answers.apoe).toBe("E3/E3");
+    expect(view.answers.amy1a).toBe("M");
+  });
+
+  it("writes one audit event per changed genotype field, with no value", async () => {
+    const patient = await withTrio("Trace");
+    let events = await listAuditEvents(systemActor, {
+      targetId: patient.id,
+      action: "genotype.changed",
+    });
+    expect(events.map((event) => event.detail).sort()).toEqual([
+      "AMY1A",
+      "APOE",
+      "DIO2",
+    ]);
+
+    // An equal value writes nothing. A change and a clear write one each.
+    unwrapOk(
+      await savePatientQuestionnaire(
+        systemActor,
+        patient.id,
+        { apoe: "E3/E3", dio2: "A", amy1a: "" },
+        { kind: "patient", id: patient.id, name: patient.pseudonym },
+      ),
+    );
+    events = await listAuditEvents(systemActor, {
+      targetId: patient.id,
+      action: "genotype.changed",
+    });
+    expect(events).toHaveLength(5);
+    const details = events.map((event) => event.detail);
+    expect(details.filter((detail) => detail === "APOE")).toHaveLength(1);
+    expect(details.filter((detail) => detail === "DIO2")).toHaveLength(2);
+    expect(details.filter((detail) => detail === "AMY1A")).toHaveLength(2);
+    for (const event of events) {
+      expect(event.detail).not.toMatch(/E\d|^[AHM]$/);
+    }
+  });
+
+  it("returns DEFAULT 45/30/25 from macroProfileOf for every patient today", async () => {
+    const complete = await withTrio("Trio complet");
+    expect(unwrapOk(await macroProfileOf(systemActor, complete.id))).toEqual({
+      source: "default",
+      carbohydrate: 45,
+      fat: 30,
+      protein: 25,
+      reason: "mapping-unvalidated",
+    });
+
+    const empty = await newPatient("Section vide");
+    expect(unwrapOk(await macroProfileOf(systemActor, empty.id))).toEqual({
+      source: "default",
+      carbohydrate: 45,
+      fat: 30,
+      protein: 25,
+      reason: "no-test",
+    });
+
+    const partial = await newPatient("Trio partiel");
+    await decide(partial, "genetic", "given");
+    unwrapOk(
+      await savePatientQuestionnaire(systemActor, partial.id, {
+        geneticTest: "yes",
+        apoe: "E2/E2",
+      }),
+    );
+    expect(unwrapOk(await macroProfileOf(systemActor, partial.id)).reason).toBe(
+      "incomplete",
+    );
+  });
+
+  it("answers DEFAULT without the genetic consent, even with stored values", async () => {
+    const patient = await newPatient("Valeurs sans accord");
+    await getDatabase()
+      .collection<GenotypeRow>("patient_profiles")
+      .update(patient.id, {
+        geneticTest: "yes",
+        apoe: "E4/E4",
+        dio2: "A",
+        amy1a: "A",
+      });
+    expect(unwrapOk(await macroProfileOf(systemActor, patient.id)).reason).toBe(
+      "no-consent",
+    );
   });
 });

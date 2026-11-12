@@ -46,6 +46,17 @@ export type {
   CalculationInput,
   CalculationKind,
 } from "./calculations";
+export {
+  defaultMacroSplit,
+  genotypeMappingValidated,
+  macroProfile,
+  macroProfileReasons,
+} from "./macro-profile";
+export type {
+  MacroProfile,
+  MacroProfileInput,
+  MacroProfileReason,
+} from "./macro-profile";
 export { fileClaimPurposes, fileTakeoverPath } from "./file-claim";
 export type { FileClaimPurpose } from "./file-claim";
 export { minPasswordLength, signupFields } from "./signup";

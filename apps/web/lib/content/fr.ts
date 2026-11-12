@@ -495,7 +495,8 @@ export const fr: Content = {
       firstName: "Ce prénom est trop long.",
       birthDate: "Cette date n'est pas valide.",
       email: "Cette adresse e-mail n'est pas valide.",
-      phone: "Ce numéro n'est pas valide. Utilisez 8 à 15 chiffres, avec un + au début si besoin.",
+      phone:
+        "Ce numéro n'est pas valide. Utilisez 8 à 15 chiffres, avec un + au début si besoin.",
       password: "Ce mot de passe est trop long.",
     },
     tooShort: "Le mot de passe compte au moins 8 caractères.",
@@ -520,8 +521,7 @@ export const fr: Content = {
         sent: "Si un dossier existe pour cette adresse, un lien vient d'y partir. Il sert une seule fois et expire dans 24 heures.",
         rate_limited:
           "Un lien est parti il y a moins de cinq minutes. Regardez dans votre boîte de réception, puis réessayez plus tard.",
-        unavailable:
-          "Le lien n'a pas pu partir. Réessayez dans un instant.",
+        unavailable: "Le lien n'a pas pu partir. Réessayez dans un instant.",
       },
     },
     submit: "Créer mon compte",
@@ -574,6 +574,8 @@ export const fr: Content = {
         "Indiquez un poids entre 25 et 300 kg, avec une décimale au plus.",
       consent:
         "Cette information demande votre consentement aux soins. Parlez-en à votre praticien.",
+      genetic_consent:
+        "Vos génotypes demandent votre consentement génétique. Donnez-le plus haut pour les enregistrer.",
       signed_out: "Votre session a expiré. Reconnectez-vous pour continuer.",
       unavailable:
         "L'enregistrement a échoué. Vérifiez votre connexion et réessayez.",
@@ -610,9 +612,24 @@ export const fr: Content = {
       otherText: "Précisez « Autre » pour l'enregistrer.",
       celiacDisease:
         "Cochez si un médecin l'a diagnostiquée. Le gluten est alors exclu strictement, contaminations croisées comprises.",
-      medications: "Ceux que vous prenez aujourd'hui, avec leur dose si vous la connaissez.",
+      medications:
+        "Ceux que vous prenez aujourd'hui, avec leur dose si vous la connaissez.",
       supplements: "Vitamines, minéraux, plantes…",
-      geneticComingSoon: "La suite de cette section arrive bientôt.",
+    },
+    genetic: {
+      consentTitle: "Traitement de vos données génétiques",
+      consentIntro:
+        "Pour enregistrer vos génotypes, REMI a besoin de votre accord. Lisez le texte, puis donnez ou refusez votre consentement.",
+      version: "Version {version} du {date}",
+      accept: "J'accepte",
+      refuse: "Je refuse",
+      deciding: "Enregistrement…",
+      refused:
+        "Vous avez refusé : REMI n'enregistre aucun génotype. Vous pouvez changer d'avis à tout moment avec « J'accepte ».",
+      listsIntro:
+        "Choisissez chaque résultat tel qu'il figure sur le rapport du laboratoire. Laissez une liste vide si vous ne connaissez pas le résultat.",
+      decisionFailed:
+        "Votre réponse n'a pas pu être enregistrée. Vérifiez votre connexion et réessayez.",
     },
   },
   patientSignIn: {
@@ -644,8 +661,7 @@ export const fr: Content = {
       submit: "Recevoir un lien",
       submitting: "Envoi…",
       status: {
-        sent:
-          "Si cette adresse a un compte, un lien de connexion vient de partir. Ouvrez-le depuis votre boîte mail.",
+        sent: "Si cette adresse a un compte, un lien de connexion vient de partir. Ouvrez-le depuis votre boîte mail.",
         rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
         unavailable: "Le lien n'a pas pu partir. Réessayez dans un instant.",
       },
@@ -662,8 +678,7 @@ export const fr: Content = {
     submit: "Recevoir le lien",
     submitting: "Envoi…",
     status: {
-      sent:
-        "Si cette adresse a un compte, un lien vient de partir. Il est valable une heure et sert une seule fois.",
+      sent: "Si cette adresse a un compte, un lien vient de partir. Il est valable une heure et sert une seule fois.",
       rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
       unavailable: "Le lien n'a pas pu partir. Réessayez dans un instant.",
     },
@@ -710,8 +725,7 @@ export const fr: Content = {
       spent: "Ce lien n'est plus valide. Aucun compte n'a été créé.",
       has_account: "Vous avez déjà un compte.",
       rate_limited: "Trop d'essais. Réessayez dans quelques minutes.",
-      unavailable:
-        "Le compte n'a pas été créé. Réessayez dans un instant.",
+      unavailable: "Le compte n'a pas été créé. Réessayez dans un instant.",
     },
     signIn: "Connectez-vous.",
     spent:

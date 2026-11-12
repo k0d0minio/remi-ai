@@ -28,6 +28,9 @@ export const answerFields = [
   "pathologies",
   "celiacDisease",
   "geneticTest",
+  "apoe",
+  "dio2",
+  "amy1a",
 ] as const;
 
 export type AnswerField = (typeof answerFields)[number];
@@ -38,6 +41,7 @@ export type SaveError =
   | "height_range"
   | "weight_range"
   | "consent"
+  | "genetic_consent"
   | "signed_out"
   | "unavailable";
 
@@ -45,6 +49,14 @@ export type SaveError =
  * A save's answer. On success it carries the file's status and the missing
  * mandatory fields after the write, so the header follows each change.
  */
+/** The patient's answer on the genetic consent screen. */
+export type GeneticConsentDecision = "given" | "refused";
+
+/** A consent decision's answer: the decision now in force, or why it failed. */
+export type GeneticConsentResult =
+  | { ok: true; decision: GeneticConsentDecision }
+  | { ok: false; error: "signed_out" | "unavailable" };
+
 export type SaveResult =
   | {
       ok: true;

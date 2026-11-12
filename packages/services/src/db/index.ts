@@ -85,6 +85,7 @@ export {
   checkAllergenAnswer,
   checkQuestionnaireInput,
   getPatientQuestionnaire,
+  macroProfileOf,
   markReadyWhenComplete,
   missingQuestionnaireFields,
   savePatientQuestionnaire,

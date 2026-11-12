@@ -220,9 +220,10 @@ export const QuestionnaireFile = ({
             ? geneticTestAnswerLabels[answers.geneticTest].fr
             : null,
         },
-        // Without the genetic consent the service returns the genotype as
-        // null. The rows are hidden: « Non renseigné » would be untrue.
-        ...(genotypeOpen
+        // Without the genetic consent, or under « Non / Je ne sais pas », the
+        // service returns the genotype as null. The rows are hidden:
+        // « Non renseigné » would be untrue.
+        ...(genotypeOpen && answers.geneticTest === "yes"
           ? (["apoe", "dio2", "amy1a"] as const).map((key) => ({
               key,
               label: optionalLabel(key),
@@ -230,9 +231,11 @@ export const QuestionnaireFile = ({
             }))
           : []),
       ],
-      note: genotypeOpen
-        ? undefined
-        : "Génotype masqué : le consentement génétique n'est pas donné.",
+      note: !genotypeOpen
+        ? "Génotype masqué : le consentement génétique n'est pas donné."
+        : answers.geneticTest === "no_or_unknown"
+          ? "Génotype non utilisé : la réponse au test génétique est « Non / Je ne sais pas »."
+          : undefined,
     },
     // The practitioner's own question joins with `practitioner-free-question`.
     // Its answer shows once the patient has given one.
