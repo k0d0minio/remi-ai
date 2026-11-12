@@ -1,5 +1,5 @@
 import type { OfferInterest } from "@remi/services/shared";
-import { SITE } from "@/lib/site";
+import { SITE, formatPrice } from "@/lib/site";
 
 /**
  * Morgane's copy for the landing page, as she wrote it on 2 November 2026.
@@ -58,11 +58,14 @@ export const HERO = {
     "Conseils pour améliorer vos repas",
     "Accompagnement adapté à vos objectifs",
   ],
-  pilotInfo: [
-    `Programme pilote dès le ${SITE.pilotStartLabel}`,
-    `${SITE.pilotDurationWeeks} semaines`,
-    "À partir de 129 €",
-  ],
+  /** A getter: OFFERS is declared below. The lowest pilot price comes from it, so the two never drift. */
+  get pilotInfo() {
+    return [
+      `Programme pilote dès le ${SITE.pilotStartLabel}`,
+      `${SITE.pilotDurationWeeks} semaines`,
+      `À partir de ${formatPrice(Math.min(...OFFERS.map((offer) => offer.price)))}`,
+    ];
+  },
   primary: "Je deviens patient pilote",
   secondary: "Découvrir les offres",
 };
