@@ -17,9 +17,17 @@ preview, and a migration at build that holds a lock.
 - **Neon makes each preview's database.** The Neon integration on Vercel cuts the branch
   `preview/<git branch>` from the default branch, with its data, when the first deployment of
   a git branch starts. It sets `DATABASE_URL` and `DATABASE_URL_UNPOOLED` on Preview for that
-  git branch. It deletes the branch when the git branch is deleted. No script and no workflow
-  of this build makes or deletes a branch (why: the integration makes the branch before the
-  build, so no build runs without its database · Jamie, 2026-10-28).
+  git branch. No script and no workflow of this build makes a branch (why: the integration
+  makes the branch before the build, so no build runs without its database · Jamie,
+  2026-10-28).
+- **`neon-preview-cleanup.yml` deletes each preview's branch.** The integration does not delete
+  the branch when the git branch is deleted. It deletes it only when Vercel deletes the preview
+  deployment, 180 days later on Pro. The workflow runs when a pull request closes, each day at
+  03:00 UTC, and on `workflow_dispatch`. It deletes `preview/<head branch>` of the closed pull
+  request, and each `preview/<name>` whose git branch is gone. It never deletes the default
+  branch, a protected branch, or a branch without the `preview/` prefix. It reads the secret
+  `NEON_API_KEY` (why: the Neon project has a limit of 10 branches, and the orphan branches
+  made the previews of new pull requests fail · Jamie, 2026-11-12).
 - **No `DATABASE_URL` on Preview for all branches.** A preview without its branch fails its
   build, and never reads or writes the UAT database (why: a shared preview database mixed the test rows
   of each pull request into the client's UAT data · Jamie, 2026-10-28).
@@ -76,8 +84,10 @@ word (`.icm/intake/CONTEXT.md` § The setup stub). The acts of this contract:
    from `<slug>`.
 3. `uat-database` (with UAT): `DATABASE_URL` and `DATABASE_URL_UNPOOLED` of `uat-<slug>` on
    the `uat` environment of each UAT project.
-4. `github-delete-head-branches`: GitHub deletes the head branch after a merge, so the
-   integration deletes its Neon branch.
+4. `github-delete-head-branches`: GitHub deletes the head branch after a merge, so the daily
+   run of `neon-preview-cleanup.yml` finds no git branch for a Neon branch that the close run missed.
+5. The secret `NEON_API_KEY` in GitHub Actions: an API key of the Neon organisation that holds
+   `uat-<slug>`. `neon-preview-cleanup.yml` reads it.
 
 The session's own setup: `package.json` names `db:migrate` with the lock and `db:verify`, and
 the `vercel-build` line above. In a monorepo, each app's `vercel.json` has the `buildCommand`.
