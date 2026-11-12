@@ -1,4 +1,8 @@
-import type { AuditActionName } from "@remi/services/shared";
+import {
+  fileStatusLabels,
+  isFileStatus,
+  type AuditActionName,
+} from "@remi/services/shared";
 import type { Intent } from "@remi/ui/server";
 
 /**
@@ -280,4 +284,33 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "operator.role_changed": "warning",
   "operator.removed": "error",
   "operator.signed_in": "neutral",
+};
+
+/**
+ * The French of each reason that the service records for a file status move.
+ * The service stores the reason in English (`setFileStatus`).
+ */
+const fileStatusReasons: Readonly<Record<string, string>> = {
+  "every mandatory field is filled":
+    "tous les champs obligatoires sont remplis",
+};
+
+/**
+ * The detail as the journal shows it. A file status move is stored as
+ * `to_complete → ready: <reason>` and reads with the French labels here. A
+ * reason with no French entry is left out, never shown in English. Every
+ * other detail shows as it is stored. No stored row changes.
+ */
+export const detailLabel = (action: AuditActionName, detail: string) => {
+  if (action !== "patient.file_status_changed") {
+    return detail;
+  }
+  const [, from, to, reason] =
+    /^(\w+) → (\w+)(?:: (.*))?$/.exec(detail) ?? [];
+  if (!isFileStatus(from) || !isFileStatus(to)) {
+    return detail;
+  }
+  const move = `${fileStatusLabels[from].fr} → ${fileStatusLabels[to].fr}`;
+  const french = reason === undefined ? undefined : fileStatusReasons[reason];
+  return french ? `${move} : ${french}` : move;
 };

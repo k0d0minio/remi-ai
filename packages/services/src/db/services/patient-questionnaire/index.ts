@@ -464,8 +464,15 @@ const unscopedSavePatientQuestionnaire = async (
   if (!written) {
     return err("not_found", "no such patient");
   }
-  await recordConsultationDateChange(current, patch, actor);
-  await recordGenotypeChanges(current, patch, actor);
+  // A patient's own save is the patient's act, also when the caller names no
+  // audit actor. A null actor reads as « compte supprimé » in the journal.
+  const trailActor: AuditActor | null =
+    actor ??
+    (byThePatient
+      ? { kind: "patient", id: current.id, name: current.pseudonym ?? "" }
+      : null);
+  await recordConsultationDateChange(current, patch, trailActor);
+  await recordGenotypeChanges(current, patch, trailActor);
   if (byThePatient) {
     const fields = Object.keys(patch);
     await recordPatientChanges(

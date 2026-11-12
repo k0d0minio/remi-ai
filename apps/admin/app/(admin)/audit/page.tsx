@@ -8,7 +8,11 @@ import {
 import { Badge, EmptyState, Typography } from "@remi/ui/server";
 import { ScrollText } from "lucide-react";
 import { AuditFilters } from "@/components/audit/audit-filters";
-import { actionIntents, actionLabels } from "@/components/audit/vocabulary";
+import {
+  actionIntents,
+  actionLabels,
+  detailLabel,
+} from "@/components/audit/vocabulary";
 import { requireActor, requireOperator } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 
@@ -96,7 +100,7 @@ const Audit = async ({ searchParams }: { searchParams: SearchParams }) => {
 
               {event.detail ? (
                 <Typography as="span" size="xs" tone="muted">
-                  {event.detail}
+                  {detailLabel(event.action, event.detail)}
                 </Typography>
               ) : null}
 
@@ -104,14 +108,18 @@ const Audit = async ({ searchParams }: { searchParams: SearchParams }) => {
                 <Typography as="span" size="xs" tone="muted">
                   {/* A patient has no account, so their name alone would read
                       exactly like an operator's. The kind is recorded rather
-                      than inferred; the journal says it out loud. */}
+                      than inferred; the journal says it out loud. A row with
+                      no actor id was recorded with no actor: it is not a
+                      deleted account. */}
                   {event.actorKind === "patient"
                     ? `${event.actorName || "patiente"} — depuis son lien`
                     : event.actorKind === "system"
                       ? "REMI — automatique"
                       : event.actorName ||
                         event.actorEmail ||
-                        "compte supprimé"}
+                        (event.actorId === null
+                          ? "auteur non enregistré"
+                          : "compte supprimé")}
                 </Typography>
                 <Typography
                   as="span"
