@@ -5,7 +5,8 @@ what is specific to this app.
 
 ## What this app is
 
-The public site: unauthenticated, indexable, content-led. It is the first thing a visitor sees, so
+The public site: unauthenticated, content-led, and indexable on production only (`isProduction` in
+`lib/metadata.ts`: uat and previews serve `Disallow: /` and `noindex`). It is the first thing a visitor sees, so
 it is measured differently from the product — on load time, on Core Web Vitals, and on whether the
 copy is true.
 

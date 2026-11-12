@@ -6,7 +6,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { META } from "@/lib/content/landing";
-import { siteName, siteUrl } from "@/lib/metadata";
+import { isProduction, siteName, siteUrl } from "@/lib/metadata";
 import { underConstruction } from "@/lib/under-construction";
 import "../globals.css";
 
@@ -48,6 +48,9 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: { card: "summary_large_image" },
+  /* robots.txt already says no outside production. The tag covers a page
+     reached by a link, which a crawler can still index without fetching it. */
+  ...(isProduction ? {} : { robots: { index: false, follow: false } }),
 };
 
 const RootLayout = async ({

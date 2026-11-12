@@ -14,6 +14,16 @@ import { BRAND_NAME } from "@remi/ui/server";
 export const siteUrl = appOrigin("marketing");
 
 /**
+ * Only the production deployment may be indexed. `uat` and every preview build
+ * the same code, and an indexed copy competes with production in search.
+ * `VERCEL_TARGET_ENV` names the Vercel environment, custom ones included
+ * (`uat`), at build and at runtime. `VERCEL_ENV` cannot tell them apart: it
+ * reads `preview` on a custom environment. Unset, as in local development,
+ * means not production.
+ */
+export const isProduction = process.env.VERCEL_TARGET_ENV === "production";
+
+/**
  * The product name, not the company — a search result and a browser tab are
  * copy, and copy says REMI. The company name appears in the footer's © line
  * and the legal pages only.
