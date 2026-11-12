@@ -1,3 +1,5 @@
+> Dropped: `patient-home-navigation/retire-token-link` removes the page that this stub fixes (the weekly card). D-19 puts the weekly score outside the stories, 2026-11-12.
+
 # Stub: A word written on an unrated goal is dropped without a message
 
 - lane: tweak

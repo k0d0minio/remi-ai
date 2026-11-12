@@ -1,3 +1,5 @@
+> Dropped: `patient-home-navigation/retire-token-link` removes the page that this stub fixes (the meal forms of the patient link), 2026-11-12.
+
 # Stub: the patient link's forms accept a double tap
 
 - lane: bug

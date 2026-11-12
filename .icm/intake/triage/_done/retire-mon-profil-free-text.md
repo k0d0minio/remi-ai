@@ -1,3 +1,5 @@
+> Dropped: `patient-home-navigation/retire-token-link` removes the page that this stub fixes (« Mon profil »). The plan ships that stub in phase 3 (2026-11-26), before the pilot starts on 2026-12-15. Question 1 of the pull request asks for an interim fix, 2026-11-12.
+
 # Stub: « Mon profil » on the token link stops editing the free-text diet, allergies and intolerances
 
 - lane: chore

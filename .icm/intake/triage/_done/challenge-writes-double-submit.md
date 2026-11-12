@@ -1,3 +1,5 @@
+> Dropped: `triage/remove-console-challenges` removes the challenge section that this stub fixes. D-19 puts challenges outside the stories, 2026-11-12.
+
 # Stub: Guard challenge close/start against a concurrent second submit
 
 - lane: bug

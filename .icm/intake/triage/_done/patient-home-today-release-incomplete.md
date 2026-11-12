@@ -1,3 +1,5 @@
+> Dropped: The need is gone. #135 removed `.icm/runs/` on 2026-10-22, and `patient-home-navigation/retire-token-link` removes the patient-link home that the missing changelog page would describe, 2026-11-12.
+
 # Stub: #106 merged without its close-out or its changelog page
 
 - lane: chore

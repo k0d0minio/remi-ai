@@ -1,3 +1,5 @@
+> Dropped: `patient-home-navigation/retire-token-link` removes the page that this stub fixes (the home meal card). D-19 puts the meal intent outside the stories, 2026-11-12.
+
 # Stub: « J'ai mangé » on the home lands on a form set to « Je vais manger »
 
 - lane: tweak

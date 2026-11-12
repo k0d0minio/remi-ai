@@ -1,3 +1,5 @@
+> Dropped: `triage/remove-console-challenges` removes the challenge section that this stub fixes. D-19 puts challenges outside the stories, 2026-11-12.
+
 # Stub: Starting a challenge closes the one open now, not the one she saw
 
 - lane: bug

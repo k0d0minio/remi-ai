@@ -7,11 +7,12 @@
 
 ## Problem
 
-`.icm/intake/triage/` holds 48 open stubs. The audit of 2026-11-12 found that about 15 of them are done, duplicates, or covered by another stub:
+`.icm/intake/triage/` holds 48 open stubs. The audit of 2026-11-12 found that 14 of them are done, duplicates, or covered by another stub:
 
 - `actions-may-create-pull-requests` is done. The setting is on, and release-please opened #152.
+- `patient-home-today-release-incomplete` is moot. `.icm/runs/` is gone since #135.
 - Two pairs are duplicates: the `remiai.be` addresses, and the Neon preview branches.
-- 10 stubs fix pages under `apps/web/app/[locale]/p/[token]`. `patient-home-navigation/retire-token-link` removes those pages.
+- 8 stubs fix the patient link under `apps/web/app/[locale]/p/[token]` or its console controls. `patient-home-navigation/retire-token-link` removes both.
 - Two stubs fix the console's challenge section. D-19 puts challenges outside the stories.
 - `drop-the-hand-recorded-consent-columns` waits on `consent-gate-at-signup`, which is done.
 

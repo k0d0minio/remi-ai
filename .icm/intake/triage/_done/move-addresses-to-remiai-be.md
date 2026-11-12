@@ -1,3 +1,5 @@
+> Dropped: `triage/remiai-be-addresses` covers the work. The registrar block is gone: `uat.remiai.be`, `uat-app.remiai.be` and `uat-admin.remiai.be` answer. Its Resend and Neon Auth steps moved to the Notes of `remiai-be-addresses`, 2026-11-12.
+
 # Stub: Move the client's addresses to remiai.be
 
 - lane: chore

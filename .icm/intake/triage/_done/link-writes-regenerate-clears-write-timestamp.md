@@ -1,3 +1,5 @@
+> Dropped: `patient-home-navigation/retire-token-link` removes the console controls that regenerate the patient link, 2026-11-12.
+
 # Stub: Rotating the share link says the patient has written nothing
 
 - lane: tweak

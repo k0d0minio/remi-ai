@@ -1,3 +1,5 @@
+> Dropped: `triage/neon-preview-branches-not-deleted` covers the same fault. Its two proposed fixes and its setup-stub criterion moved to the Notes of that stub, 2026-11-12.
+
 # Stub: A preview's Neon branch outlives its git branch
 
 - lane: chore
