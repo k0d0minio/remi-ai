@@ -13,8 +13,6 @@ import {
   dietLabels,
   diets,
   fileStatusLabels,
-  geneticTestAnswerLabels,
-  geneticTestAnswers,
   intoleranceLabels,
   intolerances,
   mandatoryQuestionnaireFieldLabels,
@@ -28,6 +26,7 @@ import {
 } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Badge, Field, Input, Typography } from "@remi/ui/server";
+import type { ConsentStepText } from "@/components/signup/consent-step";
 import type { Content } from "@/lib/content/types";
 import {
   isQuestionnaireSection,
@@ -39,6 +38,7 @@ import type { SaveResult } from "@/lib/questionnaire/state";
 import { AllergenAnswer } from "./allergen-answer";
 import { ChoiceAnswer } from "./choice-answer";
 import { FlagAnswer } from "./flag-answer";
+import { GeneticSection, type GeneticValues } from "./genetic-section";
 import {
   MandatoryLabel,
   OptionalLabel,
@@ -47,7 +47,7 @@ import {
 import { TextAnswer } from "./text-answer";
 
 /** The saved answers as the form shows them. `""` is « Non renseigné ». */
-export type QuestionnaireValues = {
+export type QuestionnaireValues = GeneticValues & {
   firstName: string;
   lastName: string;
   birthDate: string;
@@ -66,7 +66,6 @@ export type QuestionnaireValues = {
   celiacDisease: boolean | null;
   medications: string;
   supplements: string;
-  geneticTest: string;
   noKnownAllergies: boolean | null;
   noKnownIntolerances: boolean | null;
   allergens: readonly PatientAllergen[];
@@ -76,6 +75,8 @@ type Props = {
   locale: Locale;
   text: Content["questionnaire"];
   values: QuestionnaireValues;
+  /** The genetic consent text, rendered on the server. */
+  geneticConsent: ConsentStepText;
   initialStatus: FileStatus;
   initialMissing: readonly MandatoryQuestionnaireField[];
   /** Where the page opens when the URL names no section. */
@@ -116,6 +117,7 @@ export const QuestionnaireFlow = ({
   locale,
   text,
   values,
+  geneticConsent,
   initialStatus,
   initialMissing,
   initialSection,
@@ -423,10 +425,11 @@ export const QuestionnaireFlow = ({
           name="genetique"
           title={text.sections.genetique}
         >
-          <GeneticGate
+          <GeneticSection
             locale={locale}
             text={text}
-            initial={values.geneticTest}
+            values={values}
+            consent={geneticConsent}
           />
         </Section>
 
@@ -485,36 +488,3 @@ const Section = ({ current, name, title, children }: SectionProps) => (
     {children}
   </section>
 );
-
-type GeneticGateProps = {
-  locale: Locale;
-  text: Content["questionnaire"];
-  initial: string;
-};
-
-/**
- * The gate question only. The consent screen and the three genotype lists
- * come with `genotype-section`.
- */
-const GeneticGate = ({ locale, text, initial }: GeneticGateProps) => {
-  const [answer, setAnswer] = useState(initial);
-  return (
-    <>
-      <ChoiceAnswer
-        field="geneticTest"
-        legend={<OptionalLabel label={text.labels.geneticTest} />}
-        initial={initial}
-        onSelect={setAnswer}
-        options={geneticTestAnswers.map((value) => ({
-          value,
-          label: geneticTestAnswerLabels[value][locale],
-        }))}
-      />
-      {answer === "yes" ? (
-        <Typography as="p" size="sm" tone="muted">
-          {text.hints.geneticComingSoon}
-        </Typography>
-      ) : null}
-    </>
-  );
-};

@@ -115,6 +115,7 @@ export const actionLabels: Record<AuditActionName, string> = {
   "consent.refused": "consentement refusé",
   "consent.withdrawn": "consentement retiré",
   "genotype.cleared": "génotype effacé",
+  "genotype.changed": "génotype modifié",
   "share_link.regenerated": "lien patient régénéré",
   "share_link.emailed": "lien patient envoyé",
   "context.exported": "contexte copié",
@@ -251,6 +252,8 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "consent.withdrawn": "warning",
   // The genotype is gone from the file: the macronutrient split falls back.
   "genotype.cleared": "warning",
+  // A result entered or changed. The detail names the field, never the value.
+  "genotype.changed": "neutral",
   "share_link.regenerated": "warning",
   "share_link.emailed": "info",
   // Health data left the console, pseudonymous but real — worth the eye, not an

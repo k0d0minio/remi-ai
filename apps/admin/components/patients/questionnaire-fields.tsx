@@ -318,7 +318,7 @@ export const QuestionnaireFields = ({
           />
         </Field>
 
-        {genotypeOpen ? (
+        {genotypeOpen && answers?.geneticTest === "yes" ? (
           <>
             <Field id="apoe" label="APOE" optional>
               <ChoiceSelect
@@ -342,6 +342,12 @@ export const QuestionnaireFields = ({
               />
             </Field>
           </>
+        ) : genotypeOpen ? (
+          // Not rendered under « Non / Je ne sais pas »: the service hides the
+          // stored values there, and an empty select would post a clear.
+          <Typography size="sm" tone="muted" className="sm:col-span-2">
+            Le génotype s&apos;affiche quand le test génétique est « Oui ».
+          </Typography>
         ) : (
           // Not rendered at all: a disabled select still posts, and the
           // action refuses a genotype without the consent.

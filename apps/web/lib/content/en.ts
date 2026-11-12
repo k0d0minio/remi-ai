@@ -565,6 +565,8 @@ export const en: Content = {
       weight_range: "Enter a weight from 25 to 300 kg, with one decimal at most.",
       consent:
         "This information needs your consent to care. Talk to your practitioner about it.",
+      genetic_consent:
+        "Your genotypes need your genetic consent. Give it above to save them.",
       signed_out: "Your session has expired. Sign in again to continue.",
       unavailable: "The save failed. Check your connection and try again.",
     },
@@ -601,7 +603,21 @@ export const en: Content = {
         "Tick if a doctor diagnosed it. Gluten is then excluded strictly, cross-contamination included.",
       medications: "The ones you take today, with their dose if you know it.",
       supplements: "Vitamins, minerals, herbs…",
-      geneticComingSoon: "The rest of this section is coming soon.",
+    },
+    genetic: {
+      consentTitle: "Processing of your genetic data",
+      consentIntro:
+        "To save your genotypes, REMI needs your agreement. Read the text, then give or refuse your consent.",
+      version: "Version {version} of {date}",
+      accept: "I agree",
+      refuse: "I refuse",
+      deciding: "Saving…",
+      refused:
+        "You refused: REMI saves no genotype. You can change your mind at any time with “I agree”.",
+      listsIntro:
+        "Choose each result as it appears on the laboratory report. Leave a list empty if you do not know the result.",
+      decisionFailed:
+        "Your answer could not be saved. Check your connection and try again.",
     },
   },
   patientSignIn: {

@@ -574,6 +574,8 @@ export const fr: Content = {
         "Indiquez un poids entre 25 et 300 kg, avec une décimale au plus.",
       consent:
         "Cette information demande votre consentement aux soins. Parlez-en à votre praticien.",
+      genetic_consent:
+        "Vos génotypes demandent votre consentement génétique. Donnez-le plus haut pour les enregistrer.",
       signed_out: "Votre session a expiré. Reconnectez-vous pour continuer.",
       unavailable:
         "L'enregistrement a échoué. Vérifiez votre connexion et réessayez.",
@@ -612,7 +614,21 @@ export const fr: Content = {
         "Cochez si un médecin l'a diagnostiquée. Le gluten est alors exclu strictement, contaminations croisées comprises.",
       medications: "Ceux que vous prenez aujourd'hui, avec leur dose si vous la connaissez.",
       supplements: "Vitamines, minéraux, plantes…",
-      geneticComingSoon: "La suite de cette section arrive bientôt.",
+    },
+    genetic: {
+      consentTitle: "Traitement de vos données génétiques",
+      consentIntro:
+        "Pour enregistrer vos génotypes, REMI a besoin de votre accord. Lisez le texte, puis donnez ou refusez votre consentement.",
+      version: "Version {version} du {date}",
+      accept: "J'accepte",
+      refuse: "Je refuse",
+      deciding: "Enregistrement…",
+      refused:
+        "Vous avez refusé : REMI n'enregistre aucun génotype. Vous pouvez changer d'avis à tout moment avec « J'accepte ».",
+      listsIntro:
+        "Choisissez chaque résultat tel qu'il figure sur le rapport du laboratoire. Laissez une liste vide si vous ne connaissez pas le résultat.",
+      decisionFailed:
+        "Votre réponse n'a pas pu être enregistrée. Vérifiez votre connexion et réessayez.",
     },
   },
   patientSignIn: {

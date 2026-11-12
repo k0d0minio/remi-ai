@@ -44,3 +44,11 @@ values and restores DEFAULT.
 - D-30. cross-epic: `consent-and-data/genetic-consent-and-optional-data`, `genotype-macro-split/genotype-reference-table` (the table `macroProfile()` reads).
 - The 28 Aug rule stands: a doctor orders the test. REMI never suggests one.
 - The consent screen criterion moved here from `consent-and-data/genetic-consent-and-optional-data` (Jamie, 2026-11-03). That stub built the rules: `savePatientQuestionnaire` refuses a genotype value without a `given` genetic consent (`not_permitted`), and a refusal or a withdrawal clears the three fields.
+- Jamie accepted the defaults of the pull request's questions on 2026-11-11:
+  1. « Non / Je ne sais pas » keeps the three values stored. Every read hides them, the console included. « Oui » again shows them back.
+  2. The `genotype.changed` audit event names the field and holds no value.
+  3. After « Je refuse », the text and « J'accepte » stay visible.
+  4. The mapping flag is a code constant, `genotypeMappingValidated = false`. A pull request flips it after Morgane validates.
+  5. The `en` page shows the fr-BE genetic text until an `en` file exists.
+  6. Patients on UAT see the genetic text version 1. Production waits on the client's sign-off.
+  7. Withdrawal from the questionnaire stays with `consent-and-data/consent-withdrawal-in-app`.
