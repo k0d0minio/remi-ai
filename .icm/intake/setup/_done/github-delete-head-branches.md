@@ -8,8 +8,9 @@
 
 ## Why
 
-The integration deletes a preview's Neon branch when its git branch is deleted. A head branch
-that stays after the merge keeps its Neon branch, and the project fills up with branches.
+`neon-preview-cleanup.yml` deletes a preview's Neon branch when its pull request closes, and
+each day deletes each preview branch whose git branch is gone. A head branch that stays after
+the merge keeps its Neon branch until the pull request closes, so GitHub must delete it.
 
 ## Steps
 
@@ -19,4 +20,5 @@ that stays after the merge keeps its Neon branch, and the project fills up with 
 ## Done when
 
 - [ ] After a merge, the head branch is gone from GitHub.
-- [ ] Its Neon branch `preview/<git branch>` is gone from the Neon project.
+- [ ] Its Neon branch `preview/<git branch>` is gone from the Neon project. The run of
+      `neon-preview-cleanup.yml` on the close deletes it.
