@@ -1,0 +1,76 @@
+# neon-preview-cleanup: delete the Neon branch of a preview when its git branch is gone.
+#
+# The Vercel-managed Neon integration makes `preview/<git branch>` in `uat-remi-ai` for each
+# preview. It deletes that branch only when Vercel deletes the preview deployment (180 days on
+# Pro), not when the git branch is deleted. The project has a limit of 10 branches, so the
+# previews of new pull requests fail before the build. This workflow does the delete.
+#
+# It runs when a pull request closes, each day at 03:00 UTC, and on workflow_dispatch.
+# It deletes:
+#   - `preview/<head branch>` of the pull request that closed, and
+#   - each `preview/<name>` whose git branch `<name>` is not in the repository.
+# It never deletes a branch whose name does not start with `preview/`, the default branch, or a
+# protected branch. A delete is safe to repeat: the integration makes the branch again at the
+# next deployment of a git branch that still exists.
+#
+# Needs: the secret NEON_API_KEY (an API key of the Neon organisation `Remi AI`).
+name: neon-preview-cleanup
+
+on:
+  pull_request:
+    types: [closed]
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: neon-preview-cleanup
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+      # The Neon project `uat-remi-ai`. An id, not a secret.
+      NEON_PROJECT_ID: royal-math-79537105
+      CLOSED_HEAD: ${{ github.event_name == 'pull_request' && github.head_ref || '' }}
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Delete the preview branches of gone git branches
+        run: |
+          set -euo pipefail
+          [ -n "$NEON_API_KEY" ] || { echo "::error::the secret NEON_API_KEY is not set"; exit 1; }
+          api="https://console.neon.tech/api/v2/projects/${NEON_PROJECT_ID}/branches"
+          auth=(-H "Authorization: Bearer ${NEON_API_KEY}" -H "Accept: application/json")
+
+          git_branches="$(gh api --paginate "repos/${REPO}/branches?per_page=100" --jq '.[].name')"
+          neon="$(curl -fsS "${auth[@]}" "$api" \
+            | jq -r '.branches[] | select((.default | not) and (.protected | not) and (.name | startswith("preview/"))) | "\(.id) \(.name)"')"
+
+          deleted=0
+          while read -r id name; do
+            [ -n "$id" ] || continue
+            git_name="${name#preview/}"
+            if [ "$git_name" = "$CLOSED_HEAD" ]; then
+              reason="its pull request closed"
+            elif ! grep -qxF -- "$git_name" <<<"$git_branches"; then
+              reason="its git branch is gone"
+            else
+              echo "keep   $name"
+              continue
+            fi
+            curl -fsS -X DELETE "${auth[@]}" "$api/$id" >/dev/null
+            echo "delete $name ($reason)"
+            deleted=$((deleted + 1))
+          done <<<"$neon"
+          echo "deleted $deleted branch(es)"
