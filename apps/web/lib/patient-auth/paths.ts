@@ -12,6 +12,8 @@ export const NEW_PASSWORD_PATH = "/connexion/nouveau-mot-de-passe";
 export const MAGIC_LINK_PATH = "/connexion/lien";
 export const QUESTIONNAIRE_PATH = "/questionnaire";
 export const HOME_PATH = "/accueil";
+export const RECIPES_PATH = "/recettes";
+export const PROFILE_PATH = "/profil";
 
 /** The page a signed-in patient reaches first. */
 export const landingPaths: Record<PatientLanding, string> = {

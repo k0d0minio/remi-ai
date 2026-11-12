@@ -31,4 +31,4 @@ The « Accueil » page: first and before any other content, the block « Qu'as-t
 
 ## Notes
 
-D-30. Story 33 removed the photo on 2026-10-27. Files: `apps/web/app/[locale]/(app)/page.tsx`, `.icm/docs/ENV.md` for the restaurant flag. Cross-epic: `meal-improvement/suggest-from-meal`, `restaurant-menu`.
+D-30. Story 33 removed the photo on 2026-10-27. Files: `apps/web/app/[locale]/(patient)/accueil/page.tsx`, `.icm/docs/ENV.md` for the restaurant flag. Cross-epic: `meal-improvement/suggest-from-meal`, `restaurant-menu`.

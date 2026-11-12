@@ -14,13 +14,16 @@ would be visible to a customer, it lands here.
 app/[locale]/       every page ships in en and fr; `[locale]/layout.tsx` IS the
                     root layout — there is no app/layout.tsx
   page.tsx          the entry screen — the only route outside the auth boundary
-  (app)/            signed-in routes — the route group carries the auth boundary
+  (app)/            signed-in routes on the development session only — the route
+                    group carries that session's boundary
     (practitioner)/ the console: clients, practice, therapeutic frame
-    (patient)/      the daily surface: today, meals, steps, plan
+    (patient)/      the prototype's daily surface: today, steps, plan
+  (patient)/        the patient's shell after activation: the greeting, the tab
+                    bar, and the tabs accueil/, recettes/, profil/. Its layout
+                    is the patient session's boundary
   inscription/      the patient's sign-up from the practitioner's link
   connexion/        the patient's sign-in, the reset pages, the magic link's landing
   questionnaire/    behind the patient session: the page before activation
-  accueil/          behind the patient session: the page after activation
 app/api/            route handlers (webhooks, cron, uploads) — outside the locale
                     segment, because a machine surface has no language
 components/         composition only, grouped by feature — never primitives
@@ -38,8 +41,8 @@ lib/                queries, actions, types, app-local helpers
 proxy.ts            redirects bare paths to the visitor's language
 ```
 
-The two route groups add no URL segment, so the paths stay `/en/clients` and `/en/today`. Neither
-group may hold a root `page.tsx` — it would collide with the entry screen at `/[locale]`, which
+The route groups add no URL segment, so the paths stay `/en/clients`, `/en/today` and
+`/en/accueil`. No group may hold a root `page.tsx` — it would collide with the entry screen at `/[locale]`, which
 owns that path and redirects a visitor who already has a session to their role's landing route.
 
 `(app)/layout.tsx` redirects a null session to `/[locale]`. That target has to stay outside the

@@ -488,7 +488,8 @@ export const en: Content = {
       firstName: "This first name is too long.",
       birthDate: "This date is not valid.",
       email: "This e-mail address is not valid.",
-      phone: "This number is not valid. Use 8 to 15 digits, with a + at the start if needed.",
+      phone:
+        "This number is not valid. Use 8 to 15 digits, with a + at the start if needed.",
       password: "This password is too long.",
     },
     tooShort: "The password needs at least 8 characters.",
@@ -500,8 +501,7 @@ export const en: Content = {
       rate_limited: "Too many attempts. Try again in a few minutes.",
       unavailable:
         "The sign-up did not go through. Try again in a moment: your answers are kept.",
-      consent_missing:
-        "Tick each mandatory consent. No account was created.",
+      consent_missing: "Tick each mandatory consent. No account was created.",
       consent_stale:
         "The text changed after the page opened. Reload the page to read the current version. No account was created.",
     },
@@ -562,7 +562,8 @@ export const en: Content = {
       required: "This field cannot stay empty.",
       invalid: "This value is not valid.",
       height_range: "Enter a height from 100 to 250 cm, with no decimal.",
-      weight_range: "Enter a weight from 25 to 300 kg, with one decimal at most.",
+      weight_range:
+        "Enter a weight from 25 to 300 kg, with one decimal at most.",
       consent:
         "This information needs your consent to care. Talk to your practitioner about it.",
       genetic_consent:
@@ -648,8 +649,7 @@ export const en: Content = {
       submit: "Get a link",
       submitting: "Sending…",
       status: {
-        sent:
-          "If this address has an account, a sign-in link is on its way. Open it from your inbox.",
+        sent: "If this address has an account, a sign-in link is on its way. Open it from your inbox.",
         rate_limited: "Too many attempts. Try again in a few minutes.",
         unavailable: "The link could not be sent. Try again in a moment.",
       },
@@ -666,8 +666,7 @@ export const en: Content = {
     submit: "Get the link",
     submitting: "Sending…",
     status: {
-      sent:
-        "If this address has an account, a link is on its way. It is valid for one hour and works once.",
+      sent: "If this address has an account, a link is on its way. It is valid for one hour and works once.",
       rate_limited: "Too many attempts. Try again in a few minutes.",
       unavailable: "The link could not be sent. Try again in a moment.",
     },
@@ -704,8 +703,7 @@ export const en: Content = {
     submit: "Create my account",
     submitting: "Creating the account…",
     form: {
-      consent_missing:
-        "Tick each mandatory consent. No account was created.",
+      consent_missing: "Tick each mandatory consent. No account was created.",
       consent_stale:
         "The text changed since the page opened. Reload the page to read the current version. No account was created.",
       too_short: "The password needs at least 8 characters.",
@@ -722,9 +720,31 @@ export const en: Content = {
   },
   patientHome: {
     metaTitle: "Home",
-    title: "Welcome",
+    title: "Home",
     comingSoon:
       "Your space is coming soon. Your recommendations and recipes will be here.",
+  },
+  patientTabs: [
+    { href: "/accueil", icon: "home", label: "Home" },
+    { href: "/recettes", icon: "recipes", label: "Recipes" },
+    { href: "/profil", icon: "profile", label: "Profile" },
+  ],
+  patientShell: {
+    greeting: "Hello {name}",
+    greetingNoName: "Hello",
+    profileLink: "Profile",
+  },
+  patientRecipes: {
+    metaTitle: "Recipes",
+    title: "Recipes",
+    comingSoon:
+      "Your recipe suggestions are coming soon. You will find them here, day by day.",
+  },
+  patientProfile: {
+    metaTitle: "Profile",
+    title: "Profile",
+    comingSoon:
+      "Your recommendations, your personal information and your account settings are coming here soon.",
   },
   signOut: "Sign out",
 };

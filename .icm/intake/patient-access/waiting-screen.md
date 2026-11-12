@@ -30,4 +30,4 @@ In `apps/web`, the signed-in layout reads the file status (D-31). When the statu
 
 ## Notes
 
-D-26, D-31. Files: `apps/web/app/[locale]/(app)/layout.tsx` and a `waiting` route. Cross-epic: `patient-signup-account/sign-in`, `patient-list-and-status` (the status enum), `preparatory-questionnaire`.
+D-26, D-31. Files: `apps/web/app/[locale]/(patient)/layout.tsx` and a `waiting` route. Cross-epic: `patient-signup-account/sign-in`, `patient-list-and-status` (the status enum), `preparatory-questionnaire`.
