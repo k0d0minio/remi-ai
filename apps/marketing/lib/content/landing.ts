@@ -77,6 +77,13 @@ export const OFFERS_SECTION = {
   commercialPriceLabel: "Prix commercial :",
   pilotPriceNote: "Tarif réservé aux 30 premiers participants pilotes",
   cta: "Je suis intéressé(e)",
+  /** After the pilot: an optional subscription, information only. Nothing on the site bills it. */
+  afterPilot: {
+    before: `Après les ${SITE.pilotDurationWeeks} semaines incluses, continuez à profiter de REMI pour seulement `,
+    price: "7\u00a0€/mois",
+    after: " au lieu du prix commercial de 12\u00a0€/mois.",
+    note: "Tarif préférentiel réservé aux participants pilotes · Abonnement facultatif, sans engagement.",
+  },
 };
 
 export const OFFERS: Offer[] = [
