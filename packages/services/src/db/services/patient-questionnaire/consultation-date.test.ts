@@ -4,7 +4,7 @@ import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { listAuditEvents, type OperatorActor } from "../audit";
 import { createPatient } from "../patients";
 import { getPatientQuestionnaire, savePatientQuestionnaire } from "./index";
-import { systemActor } from "../../services/access";
+import { patientActor, systemActor } from "../../services/access";
 
 // `appointment-date`: the file's one consultation date, and its audit trail.
 
@@ -148,6 +148,40 @@ describe("the consultation date", () => {
     expect(events[0]).toMatchObject({
       actorId: null,
       detail: "∅ → 2026-12-03",
+    });
+  });
+
+  // The UAT audit, 2026-11-12: a patient's date read « compte supprimé ».
+  it("records a patient's own save in the patient's name when the caller names no actor", async () => {
+    await tick();
+    await savePatientQuestionnaire(patientActor(patientId), patientId, {
+      consultationDate: "2026-12-10",
+    });
+    const events = await dateEvents();
+    expect(events).toHaveLength(5);
+    expect(events[0]).toMatchObject({
+      actorKind: "patient",
+      actorId: patientId,
+      actorName: "Inès",
+      actorEmail: "",
+      detail: "2026-12-03 → 2026-12-10",
+    });
+  });
+
+  it("keeps the actor that the caller names on a patient's save", async () => {
+    await tick();
+    await savePatientQuestionnaire(
+      patientActor(patientId),
+      patientId,
+      { consultationDate: "2026-12-17" },
+      { kind: "patient", id: patientId, name: "Inès" },
+    );
+    const events = await dateEvents();
+    expect(events).toHaveLength(6);
+    expect(events[0]).toMatchObject({
+      actorKind: "patient",
+      actorId: patientId,
+      detail: "2026-12-10 → 2026-12-17",
     });
   });
 });
