@@ -281,7 +281,7 @@ unless a second analytics vendor arrives with a reader to go with it.
 | `VERCEL_TOKEN_REMI21`       | Vercel API token for the **remi21** team. Nothing reads it today                                                                                                      | local     | no      |
 | `VERCEL_TOKEN`              | Vercel token for the **remi21** team. `promote.yml` and `promote.sh` read it. No other workflow exists                                                                | both      | no      |
 | `VERCEL_TEAM`               | The Vercel team's slug, `remi21`. An Actions **variable**, not a secret                                                                                               | both      | no      |
-| `NEON_API_KEY`              | Neon API key of the organisation. No workflow reads it: the Neon integration makes the preview branches. Open item: delete it (triage `neon-api-key-and-dead-domain`) | both      | no      |
+| `NEON_API_KEY`              | Neon API key of the organisation `Remi AI`. `neon-preview-cleanup.yml` reads it to delete the preview branch of a gone git branch. Do not delete it | Actions   | no      |
 | `DATABASE_URL`              | Production's **direct** connection string. Read by the migration in `promote.yml` only                                                                                | Actions   | no      |
 
 The Slack app itself is described by [`slack-app-manifest.yaml`](slack-app-manifest.yaml) beside this

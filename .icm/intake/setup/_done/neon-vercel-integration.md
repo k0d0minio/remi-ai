@@ -9,7 +9,8 @@
 ## Why
 
 The integration makes each preview's database: a Neon branch `preview/<git branch>`, made
-before the build, and deleted with the git branch. No script of this build does it.
+before the build. No script of this build makes it. The integration does not delete it when
+the git branch is deleted: `neon-preview-cleanup.yml` does (`.icm/database/CONTEXT.md`).
 
 ## Steps
 
@@ -18,7 +19,8 @@ Do these steps on each Vercel project of the build that reads the database:
 1. Open Storage. Connect the Neon project `uat-remi-ai` to the project, for the
    environment Preview only.
 2. Turn on a database branch for each preview deployment.
-3. Turn on the deletion of the branch when its git branch is deleted.
+3. Leave the integration's own branch deletion as it is. It acts only when Vercel deletes
+   the preview deployment. `neon-preview-cleanup.yml` deletes the branch at the close.
 4. Connect the Neon project `remi-ai` to the project, for the environment Production
    only. Or set `DATABASE_URL` and `DATABASE_URL_UNPOOLED` of `remi-ai` on Production by
    hand.
