@@ -13,6 +13,9 @@ export const OffersSection = () => (
           {OFFERS_SECTION.title}
         </Typography>
         <Typography variant="lead">{OFFERS_SECTION.lead}</Typography>
+        <Typography size="sm" tone="muted">
+          {OFFERS_SECTION.pilot}
+        </Typography>
       </div>
 
       <div className="grid gap-5 md:grid-cols-2 md:gap-6">
