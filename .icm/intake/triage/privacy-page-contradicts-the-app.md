@@ -13,7 +13,6 @@
 2. It says the data is hosted in the European Union. The functions run in `iad1` until `vercel-function-regions-not-pinned` merges.
 3. It says genetic data goes to a laboratory and a specialist doctor. The care consent version 1 says only the patient and the practitioner see it.
 4. Its retention lines (12 months for the pilot sign-up, 24 months for interactions, 30 days after erasure for medical data) are not the rules in `.icm/docs/RETENTION.md`.
-5. Its data-protection contact is `info@remiai.be`. The care consent says `morgane@remiai.be`.
 
 ## Proposed change
 
@@ -23,4 +22,4 @@ Align `PRIVACY` with the published care consent and `.icm/docs/RETENTION.md`, af
 
 - [ ] The privacy page names Vercel Web Analytics, or no app renders it
 - [ ] The privacy page states the hosting place that the Vercel API and the Neon console show
-- [ ] The privacy page and the published care consent give the same contact, retention rules and recipients of genetic data
+- [ ] The privacy page and the published care consent give the same contact (`info@remiai.be`), retention rules and recipients of genetic data
