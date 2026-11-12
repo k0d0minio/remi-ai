@@ -43,7 +43,7 @@ export { Field } from "./server/field";
 export { IconTile } from "./server/icon-tile";
 export { Input } from "./server/input";
 export { Link, linkVariants } from "./server/link";
-export { Markdown } from "./server/markdown";
+export { Markdown, markdownToText } from "./server/markdown";
 export { LocaleSwitcher } from "./server/locale-switcher";
 export { Progress, progressBarVariants } from "./server/progress";
 export { ScoreStrip } from "./server/score-strip";

@@ -45,6 +45,45 @@ type Props = {
 
 const processor = unified().use(remarkParse).use(remarkGfm).use(remarkRehype);
 
+type MarkdownNode = {
+  type: string;
+  value?: string;
+  children?: readonly MarkdownNode[];
+};
+
+/** Nodes whose children run on one line — everything else is a block. */
+const inlineParents = new Set([
+  "paragraph",
+  "heading",
+  "emphasis",
+  "strong",
+  "delete",
+  "link",
+  "linkReference",
+  "tableCell",
+]);
+
+const textOf = (node: MarkdownNode): string => {
+  // Raw HTML is dropped here for the same reason `Markdown` drops it.
+  if (node.type === "html") {
+    return "";
+  }
+  if (typeof node.value === "string") {
+    return node.value;
+  }
+  const separator = inlineParents.has(node.type) ? "" : " ";
+  return (node.children ?? []).map(textOf).join(separator);
+};
+
+/**
+ * The same source as plain text, for a preview that cannot hold blocks — a
+ * clamped line in a list. It reads the tree `Markdown` renders from, so the
+ * two agree on what is syntax and what is text, and a `**` never leaks into a
+ * row while the detail page shows it bold.
+ */
+export const markdownToText = (source: string) =>
+  textOf(processor.parse(source)).replace(/\s+/g, " ").trim();
+
 export const Markdown = ({ children, className }: Props) => {
   const tree = processor.runSync(processor.parse(children));
 
