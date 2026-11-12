@@ -24,8 +24,8 @@ The copy is Morgane's, from her transmission of 2 November 2026, and it lives in
 `lib/content/landing.ts` and `lib/content/legal.ts`. A wording change is a change there, never in
 a component, and her text wins over any earlier copy. Sentence case everywhere — headings, buttons,
 labels, badges. Claims must be true and checkable: if the product cannot do it today, the page does
-not say it can. The pilot prices on the page are hers (347 € and 109 € for 8 weeks), and the CGV
-read them from the same list.
+not say it can. The pilot prices on the page are hers (349 € and 119 € for 8 weeks, beside the
+commercial prices of 399 € and 149 €), and the CGV read them from the same list.
 
 ## Imports
 
