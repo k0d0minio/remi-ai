@@ -100,7 +100,7 @@ Supabase leaning (REMI-007/013 ticket texts predate it). The adapter is
 (`@neondatabase/serverless`'s `Pool` with `drizzle-orm/neon-serverless`), so the storage seam's
 `transaction()` is a real `BEGIN` / `COMMIT` / `ROLLBACK`; checked-in migrations live in
 `packages/services/src/db/migrations/`. `db:migrate` applies them and `db:verify` checks the
-result. Where they run is `.icm/database/CONTEXT.md` § The migration rule, and D-36 in
+result. Where they run is `.icm/local/database.md` § The migration rule, and D-36 in
 `.icm/intake/README.md`.
 
 **The pooled driver needs no variable of its own.** Pool size and idle timeout are constants in

@@ -21,5 +21,5 @@ A monorepo has one row per environment and Vercel project. Copy the rows of each
 once for each app that deploys.
 Each setup stub in `.icm/intake/setup/` names the cells that it fills.
 A person fills each `<…>` cell that no setup stub fills, when the project or the domain exists.
-The UAT contract: `.icm/uat/CONTEXT.md`.
-The database contract: `.icm/database/CONTEXT.md`.
+The UAT contract: `.icm/_system/features/uat.md`.
+The database contract: `.icm/local/database.md`.

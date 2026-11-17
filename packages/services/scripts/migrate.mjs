@@ -5,9 +5,9 @@ import { fileURLToPath } from "node:url";
 /**
  * Applies the checked-in migrations (src/db/migrations/) with drizzle-kit.
  * `verify.mjs` (`db:verify`) then checks the database carries the schema they
- * describe. `.icm/scripts/vercel-build.sh` runs both at the front of the admin
+ * describe. `.icm/local/vercel-build.sh` runs both at the front of the admin
  * app's build, and `promote.yml` runs both against production before a
- * promotion. The rule is `.icm/database/CONTEXT.md` § The migration rule.
+ * promotion. The rule is `.icm/local/database.md` § The migration rule.
  * Without DATABASE_URL it skips loudly and succeeds — CI and a developer
  * without a database must still build.
  *
@@ -56,7 +56,7 @@ if (onVercel && !ownsDatabase) {
     "[db:migrate] On Vercel only the uat build and a preview build migrate. Each one owns its database.",
   );
   console.error(
-    "[db:migrate] Production migrates in promote.yml. See .icm/database/CONTEXT.md § The migration rule.",
+    "[db:migrate] Production migrates in promote.yml. See .icm/local/database.md § The migration rule.",
   );
   process.exit(1);
 }

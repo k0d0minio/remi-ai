@@ -1,11 +1,9 @@
 # Intake — this repo's backlog
 
-> The formats, the writing rules and the loop from stub to merge are in
-> [`CONTEXT.md`](CONTEXT.md), the blueprint's contract. `.icm/scripts/new-run.sh` starts a
-> ticket and moves its stub into `_done/`. `.icm/scripts/close-out.sh` moves a finished epic
-> into `_done/`. This file is what is true of **this** backlog: the stories, the epics cut from
-> them, the decisions of record that bind them, and the milestones. Identity is the path. No
-> ticket numbers. The desk reads this folder on `main`.
+> This file has the decisions and the epics of the build. Since 2026-11-17 the pipeline is the
+> BAXTER blueprint (`.icm/_system/ROUTER.md`), and a ticket is a Linear key of the team `REM`.
+> The markdown stubs of the epics and of `triage/` are the backlog of before that date:
+> `.icm/local/ROUTES.md` says how one becomes a ticket.
 
 ## The backlog
 

@@ -1,0 +1,10 @@
+{
+  "slug": "remi-ai",
+  "language": "fr",
+  "ticket_source": "linear",
+  "default_branch": "main",
+  "linear": {
+    "team_key": "REM",
+    "org": "remi-ai"
+  }
+}

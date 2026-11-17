@@ -27,7 +27,7 @@ Supabase leaning), queried with Drizzle against `src/db/schema.ts`. The schema i
 definition the checked-in migrations under `src/db/migrations/` are generated from
 (`pnpm db:generate`); `pnpm db:migrate` applies them and `pnpm db:verify` checks the result. The
 admin app's `uat` build runs both first, and `promote.yml` runs both against production
-(`.icm/database/CONTEXT.md` § The migration rule).
+(`.icm/local/database.md` § The migration rule).
 Never change the live schema any other way. Services under `src/db/services/` still speak only to
 the seam — the tests run them against an in-memory client (`src/db/test-helpers.ts`), which is the
 proof.
