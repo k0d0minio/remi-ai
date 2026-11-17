@@ -1,6 +1,6 @@
 6e3e6760a8a8f0677bc3ee7a577d65e6814974e7c8cf3667b29bb6cad96a4a60  .icm/_system/.gitignore
 9a899ac3d81c36addabb7974ac225725b078096b4848d26e084f5b1532fb825e  .icm/_system/ROUTER.md
-18759ef9a43a4315d1f267e4f7badb9c7f2e616fa095bc27036ee8b94d6afd71  .icm/_system/VERSION
+c553e88670fb0de13bdf091d0a138e25d256d205cffae56c7c4964dda633cca2  .icm/_system/VERSION
 793def352da3fa883d19efe3af616f00517e9005e9fc43961b287ce4a5ea53a3  .icm/_system/agents/review-shots/CONTEXT.md
 398fcb4e60772416e0d70e873c03e515011b40c989d0bad53e0fe7e2a6cfec9f  .icm/_system/ci/check.sh
 d1e5e4a4de2b85e4beeb11bce85fc810d8b1a3322e485ffe9b1fa45194b79920  .icm/_system/ci/code.sh
@@ -33,7 +33,7 @@ aa7e0d319d1270769e71b5752f3eddf154ffdda66f33d49847eefd404e0a2b6e  .icm/_system/s
 e5c7032167db744088dfd7a4ad4de92e54263d6daed2d54d03d08adf718efe0a  .icm/_system/scripts/new-run.sh
 0936221aa10861220d10671ded94297b82c88c466e5be00e40e6b9d411069745  .icm/_system/scripts/promote.sh
 31cfb2f78fb79e351bcadbd5714e364dd7bbe4328cd0b9d15df08815f8f1f54e  .icm/_system/scripts/questions.sh
-d8d7f921377ee2d944bc7c0fe578d740547ac3661cb3883735742c32ab18b18d  .icm/_system/scripts/release.sh
+99584218a635a022289ae45542841350ed31fe18f32f580208f858a1b3806214  .icm/_system/scripts/release.sh
 366f6272d659dbead51dda5efd22fb8558d004729557dd3453e62b3463916a4a  .icm/_system/scripts/resolve-run.sh
 e29a011ab2c33d16f7355aee0b33e88b3804875f093340abfd9d9751ffb8aa65  .icm/_system/scripts/rollback.sh
 ceeb9cfae82ba3f2434851741f8113008f793cefc61b1d4595be738362a8978c  .icm/_system/scripts/validate-spec.sh
