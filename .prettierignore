@@ -5,14 +5,9 @@ pnpm-lock.yaml
 **/public/
 .turbo/
 
-# The blueprint's files, byte-identical with legible-consulting/blueprint and reached by
-# copier update, never formatted here.
+# The files of the BAXTER blueprint, checked against a manifest and never formatted here.
 .claude/
-.icm/intake/CONTEXT.md
-.github/pull_request_template.md
-.icm/database/CONTEXT.md
-.icm/lanes/
-.icm/uat/CONTEXT.md
+.icm/_system/
 
 # The consent texts are records: a hash of each file's bytes sits on every consent row, so a
 # reformat would break the link between a row and the text it accepted.

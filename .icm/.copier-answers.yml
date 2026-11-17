@@ -1,0 +1,11 @@
+# Copier writes this file. Do not edit it. blueprint/bin/update-repo.sh reads it.
+code_ci: node
+database: none
+default_branch: main
+language: fr
+linear_org: remi-ai
+linear_states: false
+linear_team_key: REM
+slug: remi-ai
+ticket_source: linear
+uat: true
