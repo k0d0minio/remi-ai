@@ -208,6 +208,13 @@ Jamie's own decision, not a default.
     and its promote step fails, Jamie then promotes `admin` and `app` by hand, and a pull request
     with a migration gets no migrated preview. Jamie decided this on 2026-10-28
     (`triage/set-up-uat-environment`). It replaces D-25.
+37. **D-37 — `remiai.be` is the only domain, and `marketing` has `uat`.** Jamie retired
+    `remi-ai.tech` on 2026-11-03 and said on 2026-11-17 that it is discontinued. Each address
+    is under `remiai.be`: `.icm/environments.md` has the table. This amends D-36: `marketing`
+    has the custom environment `uat` at `https://uat.remiai.be`, and it follows `main`.
+    Production of `marketing` also follows `main`: each merge moves it, with no promotion.
+    `documentation` has no `uat` and follows `main`. The bare domain redirects to
+    `https://www.remiai.be`: `triage/marketing-canonical-www` chooses the primary address.
 
 ## Material beside the stories
 

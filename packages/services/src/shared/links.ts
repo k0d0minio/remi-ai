@@ -7,8 +7,8 @@ import { defaultLocale, localePath, type Locale } from "./i18n";
  * between them has to be built rather than routed — a `next/link` to "/contact"
  * resolves against the origin it was rendered on and 404s. That much was always
  * true; what makes this a single file is that the answer changes all at once.
- * The day the real domain is bought, four subdomains move together, and an origin
- * typed into one footer somewhere is the one that gets missed.
+ * When the domain changes, four subdomains move together, and an origin typed
+ * into one footer somewhere is the one that gets missed.
  *
  * Read straight from `process.env` rather than through `@remi/services/server`'s
  * `env()`: these are read from client components too, and a `NEXT_PUBLIC_*`
@@ -22,20 +22,19 @@ export type AppKey = "web" | "marketing" | "admin" | "docs";
 
 /**
  * The domain everything hangs off, and the label each app answers on. This is
- * the last resort, not the live answer: production origins come from the
- * `NEXT_PUBLIC_*_URL` overrides below, and `rootDomain` is a placeholder held
- * on a personal account. Retiring it is one edit here once the real domain is
- * settled (REMI-037, and decision D-6 in the audit); until then, nothing in
- * production should be reaching this line. Nothing else in the repo spells an
- * origin out.
+ * the last resort, not the live answer: each origin comes from the
+ * `NEXT_PUBLIC_*_URL` overrides below. `remiai.be` is the only domain since
+ * 2026-11-03 (D-37), so this table names the production addresses. The
+ * marketing site answers on `www`: the bare domain redirects to it. Nothing
+ * else in the repo spells an origin out.
  */
-const rootDomain = "jamienisbet.com";
+const rootDomain = "remiai.be";
 
 const subdomains: Record<AppKey, string> = {
-  web: "remi-app",
-  marketing: "remi",
-  admin: "remi-admin",
-  docs: "remi-docs",
+  web: "app",
+  marketing: "www",
+  admin: "admin",
+  docs: "docs",
 };
 
 /** The port each app's dev server binds to — the same numbers as its `package.json`. */
@@ -48,10 +47,11 @@ const devPorts: Record<AppKey, number> = {
 
 /**
  * Where each app actually answers, set per Vercel project. These win over the
- * table above, and in production they are what should be answering: the table's
- * `rootDomain` is a placeholder nobody owns, so a project missing its variable
- * does not fail — it quietly advertises the placeholder, which is how a live
- * operator invitation once went out pointing at the wrong domain.
+ * table above, and in production and uat they are what should be answering: a
+ * project missing its variable does not fail — it quietly advertises the
+ * production address of the table, which is wrong on uat. A placeholder domain
+ * in this table is how a live operator invitation once went out pointing at
+ * the wrong domain.
  *
  * Unset is still legitimate in two places: local development, where the dev
  * ports below answer, and a preview deployment happy to be described by the

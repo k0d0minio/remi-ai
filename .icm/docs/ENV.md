@@ -37,8 +37,8 @@ that app's project.
 | `UNDER_CONSTRUCTION`        | `1`: `apps/marketing` shows its under-construction page on every page | Vercel    | no      |
 
 Value per target: production takes the production address of each app, uat the uat address
-(`https://uat-app.remi-ai.tech`, `https://uat-admin.remi-ai.tech`; marketing and docs have no uat,
-so uat takes their production address), preview is unset today. The addresses live in
+(`https://uat-app.remiai.be`, `https://uat-admin.remiai.be`, `https://uat.remiai.be`; docs has no
+uat, so uat takes its production address), preview is unset today. The addresses live in
 `.icm/environments.md`.
 
 `UNDER_CONSTRUCTION` is `1` on the production target of the **marketing** project only, until the
@@ -59,10 +59,11 @@ otherwise a built-in table of subdomains under one root domain (dev ports when `
 `development`).
 
 **In production the variables are the answer, and the table is not.** Its `rootDomain` is
-`jamienisbet.com`, a placeholder on a personal account that REMI does not own. A project missing a
-variable therefore does not fail — it silently advertises the placeholder, which is exactly how an
-operator invitation went out pointing at `remi-admin.jamienisbet.com`. Treat an unset variable in a
-production project as a defect, not a default.
+`remiai.be` since 2026-11-17, so the table names the production addresses. Before that date it was
+a placeholder on a personal account, and an operator invitation went out pointing at that
+placeholder. A project missing a variable does not fail: on uat it silently advertises the
+production address. Treat an unset variable in a production or uat project as a defect, not a
+default.
 
 Two things to know before setting them:
 
