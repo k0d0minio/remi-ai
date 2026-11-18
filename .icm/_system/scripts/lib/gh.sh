@@ -8,6 +8,9 @@
 #   gh_pr <number>       the pull request, as JSON
 #   gh_open_pulls        the open pull requests, one JSON array, 100 at most
 #   gh_checks <sha>      one line for each check: name, tab, ok | pending | <failure>
+#   gh_ready_at <number> the time of the last change of the pull request to ready, or nothing
+#   gh_runs_since <workflow file> <sha> <time>  one line (the status) for each run of the
+#                        workflow for the commit that started at that time or later
 #   gate_state <anchor>  reads a pull request body on stdin. Prints yes | no | none
 
 gh_repo() {
@@ -57,6 +60,20 @@ gh_checks() {
     (.[1].statuses // [] | group_by(.context) | map(max_by(.id)) | .[] |
       [.context,
        (if .state == "success" then "ok" elif .state == "pending" then "pending" else .state end)] | @tsv)'
+}
+
+gh_ready_at() {
+  local repo
+  repo="$(gh_repo)" || return 1
+  gh api --paginate "repos/${repo}/issues/$1/timeline?per_page=100" \
+    | jq -rs 'add // [] | map(select(.event == "ready_for_review")) | last | .created_at // empty'
+}
+
+gh_runs_since() {
+  local repo
+  repo="$(gh_repo)" || return 1
+  gh api "repos/${repo}/actions/workflows/$1/runs?head_sha=$2&per_page=100" \
+    | jq -r --arg t "$3" '.workflow_runs[]? | select((.created_at // "") >= $t) | .status'
 }
 
 # The gate is the first checkbox line below its anchor. No anchor: none.

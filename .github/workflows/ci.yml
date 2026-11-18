@@ -6,16 +6,22 @@ on:
   push:
     branches: [main]
   pull_request:
+    # A draft runs no job: the checks start when the pull request is ready.
+    types: [opened, synchronize, reopened, ready_for_review]
 permissions:
   contents: read
 defaults:
   run:
     shell: bash
+# The Node version is the one of .nvmrc. A repo with no .nvmrc gets this one.
+env:
+  NODE_DEFAULT: "22"
 
 jobs:
   secrets:
     # gitleaks reads the full history. It is the binary, not the action: the action needs a
     # licence for an organisation.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     env:
       GITLEAKS_VERSION: 8.30.1
@@ -35,6 +41,7 @@ jobs:
         run: ./gitleaks git --redact --no-banner -v .
 
   workflows:
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     env:
       ACTIONLINT_VERSION: 1.7.12
@@ -53,6 +60,7 @@ jobs:
         run: ./actionlint -color
 
   code:
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     concurrency:
       group: code-${{ github.ref }}
@@ -69,7 +77,8 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         if: hashFiles('package.json') != ''
         with:
-          node-version: 22
+          node-version-file: ${{ hashFiles('.nvmrc') != '' && '.nvmrc' || '' }}
+          node-version: ${{ hashFiles('.nvmrc') == '' && env.NODE_DEFAULT || '' }}
       - run: bash .icm/_system/ci/code.sh
 
 
@@ -86,4 +95,3 @@ jobs:
       - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with:
           release-type: node
-

@@ -4,11 +4,12 @@
 #
 # Usage:
 #   Linear:    new-run.sh <KEY> --title "<title>" --branch "<gitBranchName>" --url "<url>"
-#                         [--lane bug|tweak|chore] [--summary "<one sentence>"]
+#                         [--lane <lane>] [--summary "<one sentence>"]
 #   Markdown:  new-run.sh <epic>/<slug> | triage/<slug>
-#                         [--lane bug|tweak|chore] [--summary "<one sentence>"]
+#                         [--lane <lane>] [--summary "<one sentence>"]
 #   Both:      new-run.sh <ticket> --refresh-body
 #
+# A lane is the name of a folder of .icm/_system/lanes/ that has a CONTEXT.md.
 # Without --lane the run is a spine run: .icm/runs/<id>/spec.md must exist (Define writes it).
 # On the default branch the script makes the run's branch from origin. On another branch
 # it keeps that branch. A markdown stub that is not committed goes onto the run's branch.
@@ -93,7 +94,10 @@ if [ "$refresh" -eq 1 ]; then
   exit 0
 fi
 
-case "$lane" in "" | bug | tweak | chore) ;; *) stop "the lane must be bug, tweak or chore" ;; esac
+if [ -n "$lane" ]; then
+  [[ "$lane" =~ ^[a-z][a-z0-9-]*$ ]] && [ "$lane" != spine ] && [ -f "$sys/lanes/$lane/CONTEXT.md" ] \
+    || stop "the lane must be a folder of $sys/lanes/: $(cd "$sys/lanes" && ls -d -- */ | tr -d / | paste -sd ' ')"
+fi
 LANE="${lane:-spine}"
 ticket_valid "$ticket" || stop "$ticket is not a ticket of this repo (wrong team, or no stub)"
 if [ -e "$run/run.md" ] || [ -e ".icm/archive/$ID" ]; then
@@ -160,7 +164,7 @@ git commit -q -m "chore(icm): record the pull request of $ID" -- "$run/run.md"
 git push -q
 # A question waits: show the question dialog on the BAXTER HUD now. The dialog must not
 # depend on a session that remembers to show it. No HUD on this computer: nothing happens.
-hud="${ICM_HUD:-$HOME/baxter_live/bin/baxter_gate.py}"
+hud="${ICM_HUD:-$HOME/baxter_live/system/bin/baxter_gate.py}"
 if [ -x "$hud" ] && grep -qE '^- answer: *(_waiting_)? *$' "$run/questions.md" 2>/dev/null; then
   if "$hud" questions "$repo" "$number" >/dev/null 2>&1; then
     echo "questions: the dialog is on the HUD"
