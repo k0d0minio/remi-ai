@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-15/mettre-a-jour-le-blueprint-baxter-100-rc14
 - branch: contact/rem-15-mettre-a-jour-le-blueprint-baxter-100-rc14
 - lane: chore
-- pr: pending
+- pr: #208
 - started: 2026-11-18
