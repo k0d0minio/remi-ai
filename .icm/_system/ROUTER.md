@@ -12,7 +12,7 @@ A command is a word and one ticket. A ticket is a Linear key: `REM-123`.
 |---|---|
 | `ticket` and what is wanted, or "write a ticket" | `.icm/_system/stages/ticket/CONTEXT.md` |
 | A start word and a ticket | `.icm/_system/stages/define/CONTEXT.md` |
-| `bug`, `tweak` or `chore` and a ticket | `.icm/_system/lanes/<lane>/CONTEXT.md` |
+| A lane and a ticket | `.icm/_system/lanes/<lane>/CONTEXT.md` |
 | `build` and a ticket | `.icm/_system/stages/build/CONTEXT.md` |
 | `release` and a ticket | `.icm/_system/stages/release/CONTEXT.md` |
 | `revise` and a ticket and a change | `.icm/_system/stages/define/CONTEXT.md`, section Revise |

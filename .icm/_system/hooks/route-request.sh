@@ -2,10 +2,11 @@
 # route-request.sh — UserPromptSubmit hook. Finds a command and a ticket in the prompt and
 # prints one line "[icm-router] Route: ...". It never blocks: each path ends with exit 0.
 #
-# A command is: a start word (rules/triggers.txt), or build, release, revise, bug, tweak
-# or chore as the first word, with a ticket. "ticket <what>" and "write a ticket" ask for
-# a new ticket and need no ticket. A prompt that ends with "?" is a question, not a
-# command. The hook prints nothing when it finds no command.
+# A command is: a start word (rules/triggers.txt), or build, release, revise or a lane word
+# as the first word, with a ticket. A lane word is the name of a folder of lanes/ that has
+# a CONTEXT.md. "ticket <what>" and "write a ticket" ask for a new ticket and need no
+# ticket. A prompt that ends with "?" is a question, not a command. The hook prints
+# nothing when it finds no command.
 input="$(cat)"
 root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 cd "$root" 2>/dev/null || exit 0
@@ -45,14 +46,12 @@ fi
 [ -n "$ticket" ] || exit 0
 
 # The command.
-verb=""
-case "$prompt" in
-  build\ *) verb=build ;;
-  release\ *) verb=release ;;
-  revise\ *) verb=revise ;;
-  bug\ *) verb=bug ;;
-  tweak\ *) verb=tweak ;;
-  chore\ *) verb=chore ;;
+verb="" lane="" first="${prompt%% *}"
+case "$first" in
+  build | release | revise) verb="$first" ;;
+  *) if [[ "$first" =~ ^[a-z][a-z0-9-]*$ ]] && [ "$first" != spine ] && [ -f "$sys/lanes/$first/CONTEXT.md" ]; then
+       verb=lane lane="$first"
+     fi ;;
 esac
 if [ -z "$verb" ]; then
   words="$(grep -vE '^[[:space:]]*(#|$)' "$sys/rules/triggers.txt" | sed -E 's/[^a-z0-9 '"'"']//g' | paste -sd '|')"
@@ -73,7 +72,7 @@ elif [ -f ".icm/runs/$id/run.md" ]; then
 else
   case "$verb" in
     start) say "start $ticket, if the operator means to start work on it now. Then read $sys/stages/define/CONTEXT.md and follow it. If the prompt only talks about the ticket, ignore this line." ;;
-    bug | tweak | chore) say "$verb lane for $ticket. Read $sys/lanes/$verb/CONTEXT.md and follow it." ;;
+    lane) say "$lane lane for $ticket. Read $sys/lanes/$lane/CONTEXT.md and follow it." ;;
     *) say "$verb $ticket, but no run is on this branch. Run $sys/scripts/resolve-run.sh $ticket and obey its RESULT line." ;;
   esac
 fi

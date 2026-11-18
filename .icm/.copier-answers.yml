@@ -6,6 +6,8 @@ language: fr
 linear_org: remi-ai
 linear_states: false
 linear_team_key: REM
+linear_writes: false
+release_config: false
 slug: remi-ai
 ticket_source: linear
 uat: true

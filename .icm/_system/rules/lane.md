@@ -1,8 +1,8 @@
 # The lane flow
 
-A lane is a fast path for a small ticket: `bug`, `tweak` or `chore`. A lane run has no
-spec and no Spec approved gate. It is one session, from the ticket to a green pull
-request. Each lane contract names what differs from this flow.
+A lane is a fast path for a small ticket. Each folder of `.icm/_system/lanes/` is one
+lane. A lane run has no spec and no Spec approved gate. It is one session, from the
+ticket to a green pull request. Each lane contract names what differs from this flow.
 
 ## Flow
 1. `resolve-run.sh <ticket>`. Continue only on `RESULT: NONE`. On `RESULT: OK` the run

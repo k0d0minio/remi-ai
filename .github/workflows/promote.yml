@@ -19,6 +19,9 @@ concurrency:
 defaults:
   run:
     shell: bash
+# The Node version is the one of .nvmrc. A repo with no .nvmrc gets this one.
+env:
+  NODE_DEFAULT: "22"
 
 jobs:
   verify:
