@@ -346,12 +346,26 @@
   --font-display: var(--font-family-display);
 
   /*
-   * Only the display end of the type scale is defined here. `--text-xs` through
-   * `--text-3xl` are left at Tailwind's defaults on purpose: `Typography`
-   * already emits them across four apps, and redefining them would be a silent
-   * visual change everywhere for no marketing benefit. Above 3xl is new
-   * territory, so it gets the tighter leading and negative tracking that large
-   * type needs and Tailwind's defaults do not supply.
+   * The type table of the charter (section 5), on the size names `Typography`
+   * emits. `--text-sm` (14 / 20 px) and `--text-base` (16 / 24 px) are
+   * Tailwind's defaults and are the charter's values already.
+   *   xs   microtext        13 / 18 px
+   *   lg   section title    18 / 24 px
+   *   2xl  screen title     32 / 38 px, letter-spacing -0.8 px
+   * The weights (800 for the titles) are in `Typography`.
+   */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.125rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.5rem;
+  --text-2xl: 2rem;
+  --text-2xl--line-height: 2.375rem;
+  --text-2xl--letter-spacing: -0.8px;
+
+  /*
+   * Above 3xl is the display end, for the public site. It gets the tighter
+   * leading and negative tracking that large type needs and Tailwind's
+   * defaults do not supply.
    */
   --text-4xl: 2.25rem;
   --text-4xl--line-height: 1.1;
