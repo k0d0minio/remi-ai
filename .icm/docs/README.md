@@ -1,5 +1,7 @@
 > **2026-09-26 (icm-board decision D47):** the client's documents that lived here — the founder's braindump (`braindump/`), the collaboration decks and documents (`collaboration/`), the correspondence, the call summary, the new-development-direction note, the call transcripts under `.icm/processed/` and their originals under `.icm/raw/_processed/` — now live in icm-board at `workspaces/deals/remi-ai/remi-partnership/raw/` (documents/, transcripts/, originals/) and are purged from this repository. What remains here is what sessions wrote: `ENV.md`, `RETENTION.md`, `history/`, the status report. `.icm/raw/` and `.icm/processed/` are ignored working folders.
 
+> **2026-11-19 — the brand charter is in this repository.** Morgane's charter of 16 November 2026 (« Charte de design UI / UX ») is at [`packages/ui/brand/charte-graphique.md`](../../packages/ui/brand/charte-graphique.md), on Jamie's word, so that each build session reads it. It is the one client document that lives here after D47. The charter wins on identity: the brand, the tone of voice, the logo, the colours, the typeface, the shapes and the look of the components. The user stories (row 0) win on function: features, rules, flows, screens and exact labels. The charter says so in its section 1.
+
 # `.icm/docs` — the project's source of truth
 
 Everything that decides **what REMI is** lives here. Code rules stay in

@@ -27,6 +27,11 @@ shows it (725 × 229). Where this file and the charter differ, the charter is th
 Some of the visuals may be AI-generated. Check the rights of use before one of them is served
 on a public page.
 
+The visuals are for communication only: the public site, e-mails, presentations and social
+networks. The charter (sections 7 and 9) says that the application uses no photo and no
+illustration in the MVP. Do not serve a file of `visuals/` or `portraits/` from `apps/web` or
+`apps/admin`. On 19 November 2026 these two apps serve no photo and no illustration.
+
 ## The palette and the typeface
 
 The charter is the one home of the values: [`charte-graphique.md`](charte-graphique.md), section 3
