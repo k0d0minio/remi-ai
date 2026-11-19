@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-183/ajouter-la-baseline-entre-recommandation-et-action
 - branch: contact/rem-183-ajouter-la-baseline-entre-recommandation-et
 - lane: tweak
-- pr: pending
+- pr: #215
 - started: 2026-11-19
