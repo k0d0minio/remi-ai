@@ -3,7 +3,7 @@ import type { ComponentProps } from "react";
 import { cn } from "../lib/utils";
 
 const input = cva(
-  "flex w-full min-w-0 rounded-md border border-input bg-background text-base transition-colors duration-[--duration-fast] ease-standard outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+  "flex w-full min-w-0 rounded-md border border-input bg-background text-base transition-colors duration-[--duration-fast] ease-standard outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
   {
     variants: {
       size: {

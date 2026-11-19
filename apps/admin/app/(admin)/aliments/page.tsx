@@ -86,7 +86,7 @@ const Aliments = async ({ searchParams }: { searchParams: SearchParams }) => {
             <li key={food.code}>
               <NextLink
                 href={`/aliments/${food.code}`}
-                className="hover:bg-accent focus-visible:ring-ring/40 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md px-2 py-2 transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
+                className="hover:bg-accent focus-visible:ring-ring flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md px-2 py-2 transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
               >
                 <Typography as="span" size="sm" weight="medium">
                   {food.nameFr}

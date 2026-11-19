@@ -41,7 +41,7 @@ export const AccordionTrigger = ({
     <AccordionPrimitive.Trigger
       data-slot="accordion-trigger"
       className={cn(
-        "ease-standard hover:text-primary focus-visible:ring-ring/40 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left font-medium outline-none transition-colors duration-[--duration-fast] focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180",
+        "ease-standard hover:text-primary focus-visible:ring-ring flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left font-medium outline-none transition-colors duration-[--duration-fast] focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180",
         className,
       )}
       {...props}

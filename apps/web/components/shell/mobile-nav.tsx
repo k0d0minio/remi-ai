@@ -27,7 +27,7 @@ export const MobileNav = ({ items, locale, content }: Props) => {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
         aria-label={content.shell.openNav}
-        className="focus-visible:ring-ring/40 hover:bg-accent rounded-md p-2 transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px] md:hidden"
+        className="focus-visible:ring-ring hover:bg-accent rounded-md p-2 transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px] md:hidden"
       >
         <Menu aria-hidden="true" className="size-5" />
       </SheetTrigger>
