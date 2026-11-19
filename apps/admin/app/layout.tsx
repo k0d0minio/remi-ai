@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
-import { BRAND_NAME, themeScript } from "@remi/ui/server";
+import { BRAND_NAME } from "@remi/ui/server";
 import "./globals.css";
 
 /**
@@ -25,16 +25,15 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+/**
+ * Light only (REM-175). The `.dark` tokens and `themeScript` stay in `@remi/ui`
+ * for later, but the console does not inject the script, so the `.dark` class
+ * never reaches <html>. A device in dark mode gets the light theme of the
+ * charter.
+ */
 const RootLayout = ({ children }: { children: ReactNode }) => (
-  <html lang="fr" className={jakarta.variable} suppressHydrationWarning>
+  <html lang="fr" className={jakarta.variable}>
     <body className="min-h-dvh antialiased">
-      {/*
-       * First child of <body> so it runs before the browser paints anything
-       * below it, which is what stops a dark-mode operator seeing a white
-       * flash. `suppressHydrationWarning` on <html> above is the other half:
-       * this script mutates the class React is about to reconcile.
-       */}
-      <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       {children}
       <Analytics />
     </body>

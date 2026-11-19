@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { isLocale, locales } from "@remi/services/shared";
-import { BRAND_NAME, themeScript } from "@remi/ui/server";
+import { BRAND_NAME } from "@remi/ui/server";
 import { getContent } from "@/lib/content";
 import "../globals.css";
 
@@ -58,15 +58,14 @@ const RootLayout = async ({
   }
 
   return (
-    <html lang={locale} className={jakarta.variable} suppressHydrationWarning>
+    /*
+     * Light only (REM-175). The `.dark` tokens and `themeScript` stay in
+     * `@remi/ui` for later, but the app does not inject the script, so the
+     * `.dark` class never reaches <html>. A device in dark mode gets the light
+     * theme of the charter.
+     */
+    <html lang={locale} className={jakarta.variable}>
       <body className="min-h-dvh antialiased">
-        {/*
-         * First child of <body> so it runs before the browser paints anything
-         * below it, which is what stops a dark-mode visitor seeing a white
-         * flash. `suppressHydrationWarning` on <html> above is the other half:
-         * this script mutates the class React is about to reconcile.
-         */}
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {children}
         <Analytics />
       </body>
