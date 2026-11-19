@@ -7,12 +7,13 @@ type Props = {
   priority?: boolean;
 };
 
-const RATIO = 560 / 193;
+const RATIO = 725 / 229;
 
 /**
  * Morgane's logo, the image under `public/brand/` (a copy of
- * `packages/ui/brand/logo/remi-logo.png`). The name is never typed as a
- * logo on this site. `alt` is empty: the parent link or heading names it.
+ * `packages/ui/brand/logo/remi-logo.png`, cut from the charter's logo). The
+ * name is never typed as a logo on this site. `alt` is empty: the parent link
+ * or heading names it.
  */
 export const Logo = ({ height = 30, className, priority }: Props) => (
   <Image
