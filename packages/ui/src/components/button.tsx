@@ -4,7 +4,7 @@ import type { ComponentProps } from "react";
 import { cn } from "../lib/utils";
 
 const button = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors duration-[--duration-fast] ease-standard outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors duration-[--duration-fast] ease-standard outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -15,21 +15,29 @@ const button = cva(
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         outline:
-          "border bg-background hover:bg-accent hover:text-accent-foreground",
+          "border bg-card hover:bg-accent hover:text-accent-foreground",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         error: "bg-error text-error-foreground hover:bg-error/90",
       },
+      // The heights of the charter (section 6): 44 px for a secondary button,
+      // 56 px for the primary button of a screen. No size is below 44 px, the
+      // touch target of the charter.
       size: {
-        sm: "h-8 gap-1.5 px-3",
-        md: "h-9 px-4 py-2",
-        lg: "h-10 px-6",
+        sm: "h-11 gap-1.5 px-4",
+        md: "h-11 px-5 py-2",
+        lg: "h-14 px-6 text-base",
         // Hero calls to action only — at this size the label carries the section,
         // so it takes the larger type with it.
-        xl: "h-12 px-8 text-base",
-        icon: "size-9",
+        xl: "h-14 px-8 text-base",
+        icon: "size-11",
       },
     },
+    // The primary button of a screen is 56 px high. `sm` stays at 44 px, for a
+    // primary action inside a dense row.
+    compoundVariants: [
+      { variant: "primary", size: "md", class: "h-14 px-6 text-base" },
+    ],
     defaultVariants: { variant: "primary", size: "md" },
   },
 );
