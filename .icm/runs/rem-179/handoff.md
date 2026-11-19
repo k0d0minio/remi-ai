@@ -2,11 +2,19 @@
 
 ## Next action
 
-<What the next session, or the operator, does first.>
+L'opérateur coche Ready to merge. Ensuite, Release fusionne.
 
 ## How to test
 
-<1 to 3 short sentences that can be said aloud: where to go on the preview, what to do, what the operator must see.>
+Ouvrez l'aperçu de l'application : chaque bouton est une pilule. Le bouton principal d'un écran fait 56 px de haut, en bleu avec un texte blanc. Les autres boutons font 44 px, et le bouton à bordure a un fond blanc.
+
+## What changed
+
+- `packages/ui/src/components/button.tsx` : forme en pilule pour tous les boutons. Les tailles font 44 px (`sm`, `md`, `icon`) ou 56 px (`lg`, `xl`). Le bouton principal de taille par défaut fait 56 px.
+- Le bouton `outline` a un fond blanc (surface.card) et une bordure légère : c'est le bouton secondaire de la charte.
+- Un bouton principal de taille `sm` reste à 44 px, pour une action dans une ligne dense de la console.
+- Aucun appel de `Button` ne change. La console devient moins dense : ses boutons passent de 32 ou 36 px à 44 px.
+- Cette branche et REM-173 changent la même ligne de `button.tsx`. À la seconde fusion, il faut fusionner `main` dans la branche et garder les deux changements.
 
 ## Blockers
 
