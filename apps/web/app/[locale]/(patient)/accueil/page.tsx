@@ -26,7 +26,12 @@ const PatientHomePage = async ({
 
   return (
     <div className="flex flex-col gap-4">
-      <Typography as="h1" size="2xl" weight="semibold">
+      <Typography
+        as="h1"
+        size="2xl"
+        weight="semibold"
+        className="text-[1.625rem] leading-8"
+      >
         {content.title}
       </Typography>
       <Typography tone="muted">{content.comingSoon}</Typography>
