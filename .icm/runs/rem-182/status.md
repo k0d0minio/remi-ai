@@ -1,5 +1,5 @@
 # Status rem-182
 
-- phase: build
-- blocked: no
+- phase: release
+- blocked: yes — preview Neon
 - updated: 2026-11-19
