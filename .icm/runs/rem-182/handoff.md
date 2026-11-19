@@ -16,7 +16,7 @@ Ouvrez la page de connexion de la console et l'accueil de l'app : le logo REMI e
 
 ## Blockers
 
-- Vercel `admin` et `app` : « Resource provisioning failed ». Le projet Neon `uat-remi-ai` a sa limite de 10 branches. La session attend la fusion d'une autre demande de la charte, puis pousse un commit du dossier du run.
+- none
 
 ## Do not touch
 
