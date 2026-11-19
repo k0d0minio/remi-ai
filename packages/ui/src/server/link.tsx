@@ -3,7 +3,7 @@ import type { ComponentProps, ElementType } from "react";
 import { cn } from "../lib/utils";
 
 const link = cva(
-  "rounded-sm underline-offset-4 transition-colors duration-[--duration-fast] ease-standard outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40",
+  "rounded-sm underline-offset-4 transition-colors duration-[--duration-fast] ease-standard outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
   {
     variants: {
       variant: {

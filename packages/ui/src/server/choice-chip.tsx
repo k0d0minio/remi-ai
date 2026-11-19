@@ -34,7 +34,7 @@ export const ChoiceChip = ({
       defaultChecked={defaultChecked}
       className="peer sr-only"
     />
-    <span className="border-border bg-card text-muted-foreground peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-foreground peer-focus-visible:ring-ring/40 inline-flex min-h-11 items-center rounded-full border px-4 text-sm transition-colors duration-[--duration-fast] peer-focus-visible:outline-none peer-focus-visible:ring-[3px]">
+    <span className="border-border bg-card text-muted-foreground peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-foreground peer-focus-visible:ring-ring inline-flex min-h-11 items-center rounded-full border px-4 text-sm transition-colors duration-[--duration-fast] peer-focus-visible:outline-none peer-focus-visible:ring-[3px]">
       {label}
     </span>
   </label>
