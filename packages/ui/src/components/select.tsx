@@ -7,13 +7,13 @@ import { cn } from "../lib/utils";
 // Deliberately the same shape as `Input`'s cva, so a select and a text field
 // sitting next to each other in a form line up and share a focus treatment.
 const trigger = cva(
-  "flex w-full min-w-0 items-center justify-between gap-2 rounded-md border border-input bg-background text-base transition-colors duration-[--duration-fast] ease-standard outline-none data-[placeholder]:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:opacity-60",
+  "flex w-full min-w-0 items-center justify-between gap-2 rounded-lg border border-input bg-card text-base transition-colors duration-[--duration-fast] ease-standard outline-none data-[placeholder]:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:opacity-60",
   {
     variants: {
       size: {
-        sm: "h-8 px-2.5 py-1",
-        md: "h-9 px-3 py-1",
-        lg: "h-10 px-3.5 py-2",
+        sm: "h-12 px-3.5 py-2",
+        md: "h-12 px-4 py-2",
+        lg: "h-14 px-4 py-2",
       },
       invalid: {
         true: "border-error-border focus-visible:border-error focus-visible:ring-error/30",
