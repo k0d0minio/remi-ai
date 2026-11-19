@@ -333,7 +333,7 @@ export const fr: Content = {
     profile: {
       title: "Mon profil",
       lead: "Ce que tu manges, ce que tu évites et le temps que tu as : garde-le à jour, ta praticienne et REMI s'en servent pour tes suggestions.",
-      dietaryRegimeLabel: "Régime alimentaire",
+      dietaryRegimeLabel: "Type d'alimentation",
       allergiesLabel: "Allergies",
       allergiesHint:
         "Les aliments à toujours éviter. Ta praticienne verra chaque changement.",
@@ -588,8 +588,8 @@ export const fr: Content = {
       phone: "Téléphone",
       desiredWeight: "Poids souhaité",
       consultationDate: "Date de consultation",
-      diet: "Régime / type d'alimentation",
-      dietNote: "Précise ton régime",
+      diet: "Type d'alimentation",
+      dietNote: "Précise ton type d'alimentation",
       pathologies: "Pathologies",
       celiacDisease: "Maladie cœliaque",
       medications: "Médicaments",
@@ -604,7 +604,7 @@ export const fr: Content = {
       weight: "En kg, de 25 à 300.",
       desiredWeight: "En kg, de 25 à 300. Laisse vide si tu n'en as pas.",
       dietDefault:
-        "« Aucun régime particulier » est proposé par défaut. Touche ta réponse pour l'enregistrer.",
+        "« Aucun type d'alimentation particulier » est proposé par défaut. Touche ta réponse pour l'enregistrer.",
       allergies:
         "Coche « Aucune allergie connue » ou chaque allergie. Une catégorie cochée sans précision est exclue en entier.",
       intolerances:

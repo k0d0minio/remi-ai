@@ -29,6 +29,11 @@ the charter.
 Some of the visuals may be AI-generated. Check the rights of use before one of them is served
 on a public page.
 
+The visuals are for communication only: the public site, e-mails, presentations and social
+networks. The charter (sections 7 and 9) says that the application uses no photo and no
+illustration in the MVP. Do not serve a file of `visuals/` or `portraits/` from `apps/web` or
+`apps/admin`. On 19 November 2026 these two apps serve no photo and no illustration.
+
 ## The palette the logo gives
 
 The wordmark is a gradient from blue to teal. The tokens follow it:

@@ -28,18 +28,19 @@ shadcn/ui over Radix, Nextra 4, tsup. Each app is one Vercel project in team `re
 The router has the commands, the stages and the lanes. A ticket is a Linear key of the team
 `REM`. The files below belong to this repo.
 
-| You are asked to                                                   | Go to                                                                                   |
-| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
-| write code                                                         | `CONVENTIONS.md` first. Then the subtree's `AGENTS.md` (`apps/<app>/AGENTS.md`, `packages/<package>/AGENTS.md`) |
-| know what Remi is for, and which account wins                      | `.icm/docs/README.md`: its `braindump/` is Morgane's own material and outranks every other account |
-| read product knowledge                                             | `apps/docs/app/technical/**` (architecture), `apps/docs/app/business/**` (direction). `.icm/docs/` still wins where they differ |
-| read a decision, the epics or the backlog of before 2026-11-17     | `.icm/intake/README.md`, and `.icm/local/ROUTES.md` for the markdown stubs               |
-| add or change an environment variable                              | `.icm/docs/ENV.md`, the one catalogue of names. Values never enter git                  |
-| read where the build runs                                          | `.icm/environments.md`, the one home of the addresses                                   |
-| read the UAT batch, record the client's sign-off, promote, roll back | `.icm/_system/features/uat.md`, then `.icm/_system/scripts/promote.sh`                |
-| change the database, or read where a preview's database comes from | `.icm/local/database.md`, then `.icm/local/vercel-build.sh`                              |
-| do a setup act in Vercel, GitHub or the database provider          | `.icm/setup/`: one file for each act. A person ticks its boxes                          |
-| change what CI checks or how a release is cut                      | The blueprint (`~/jarvis_workspace/blueprint/`). `ci.yml`, `promote.yml` and `icm.yml` come from it |
+| You are asked to                                                         | Go to                                                                                                                           |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| write code                                                               | `CONVENTIONS.md` first. Then the subtree's `AGENTS.md` (`apps/<app>/AGENTS.md`, `packages/<package>/AGENTS.md`)                 |
+| build or change a screen, a component, a token or text that a user reads | `packages/ui/brand/charte-graphique.md`: Morgane's charter. It wins on identity. The user stories win on function               |
+| know what Remi is for, and which account wins                            | `.icm/docs/README.md`: its `braindump/` is Morgane's own material and outranks every other account                              |
+| read product knowledge                                                   | `apps/docs/app/technical/**` (architecture), `apps/docs/app/business/**` (direction). `.icm/docs/` still wins where they differ |
+| read a decision, the epics or the backlog of before 2026-11-17           | `.icm/intake/README.md`, and `.icm/local/ROUTES.md` for the markdown stubs                                                      |
+| add or change an environment variable                                    | `.icm/docs/ENV.md`, the one catalogue of names. Values never enter git                                                          |
+| read where the build runs                                                | `.icm/environments.md`, the one home of the addresses                                                                           |
+| read the UAT batch, record the client's sign-off, promote, roll back     | `.icm/_system/features/uat.md`, then `.icm/_system/scripts/promote.sh`                                                          |
+| change the database, or read where a preview's database comes from       | `.icm/local/database.md`, then `.icm/local/vercel-build.sh`                                                                     |
+| do a setup act in Vercel, GitHub or the database provider                | `.icm/setup/`: one file for each act. A person ticks its boxes                                                                  |
+| change what CI checks or how a release is cut                            | The blueprint (`~/jarvis_workspace/blueprint/`). `ci.yml`, `promote.yml` and `icm.yml` come from it                             |
 
 ## Release
 
