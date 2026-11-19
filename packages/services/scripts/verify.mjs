@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { readFile } from "node:fs/promises";
 
+import { isConnectionError, waitForRetry } from "./connection-retry.mjs";
+
 /**
  * Checks the database actually looks like the migrations say it does. Runs
  * after `db:migrate`, in `.icm/local/vercel-build.sh` and in `promote.yml`.
@@ -18,6 +20,10 @@ import { readFile } from "node:fs/promises";
  * The expected tables come from the newest snapshot rather than from
  * `schema.ts`, so this needs no build of the package and no drift of its own:
  * the snapshot IS the migrations' record of the state they leave behind.
+ *
+ * A connection failure of the query gets a new attempt, with a backoff
+ * (`connection-retry.mjs`, REM-118). An error that the database answers, and
+ * a missing table, fail at the first attempt.
  *
  * The literal process.env read is the same carve-out as drizzle.config.ts.
  */
@@ -47,11 +53,21 @@ const expected = Object.values(snapshot.tables)
 // driver resolved.
 const { neon } = await import("@neondatabase/serverless");
 const sql = neon(process.env.DATABASE_URL);
-const present = new Set(
-  (
-    await sql`select table_name from information_schema.tables where table_schema = 'public'`
-  ).map((row) => row.table_name),
-);
+const readTables = async () => {
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      return await sql`select table_name from information_schema.tables where table_schema = 'public'`;
+    } catch (error) {
+      if (
+        !isConnectionError(error) ||
+        !(await waitForRetry("db:verify", attempt))
+      ) {
+        throw error;
+      }
+    }
+  }
+};
+const present = new Set((await readTables()).map((row) => row.table_name));
 const missing = expected.filter((name) => !present.has(name));
 
 if (missing.length > 0) {

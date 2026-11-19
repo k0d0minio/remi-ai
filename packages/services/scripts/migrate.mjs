@@ -1,6 +1,12 @@
 #!/usr/bin/env node
-import { spawnSync } from "node:child_process";
+import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
+
+import {
+  MAX_ATTEMPTS,
+  isConnectionFailure,
+  waitForRetry,
+} from "./connection-retry.mjs";
 
 /**
  * Applies the checked-in migrations (src/db/migrations/) with drizzle-kit.
@@ -26,6 +32,12 @@ import { fileURLToPath } from "node:url";
  *
  * It prints the database host (never the connection string) before it
  * migrates, so a build log shows which branch the migration reached.
+ *
+ * A connection failure of `drizzle-kit migrate` gets a new attempt, with a
+ * backoff (`connection-retry.mjs`, REM-118). Any other failure stops at the
+ * first attempt: the decision reads the output of drizzle-kit, not its exit
+ * code. A new attempt runs the same `drizzle-kit migrate` again, so drizzle
+ * reads its ledger again and the order of the journal holds.
  *
  * Vercel sets VERCEL_ENV and VERCEL_TARGET_ENV on every build, and turbo.json
  * passes both through. Either one present means "on Vercel". Off Vercel
@@ -72,9 +84,59 @@ console.log(
 );
 
 const packageDir = fileURLToPath(new URL("..", import.meta.url));
-const result = spawnSync("pnpm", ["exec", "drizzle-kit", "migrate"], {
-  cwd: packageDir,
-  stdio: "inherit",
-});
 
-process.exit(result.status ?? 1);
+/** The end of the output is enough to find the error, and it bounds the memory. */
+const OUTPUT_LIMIT = 64 * 1024;
+
+/**
+ * One run of `drizzle-kit migrate`. The output goes to the build log as it
+ * comes, and its end is kept to tell a connection failure from another one.
+ */
+const runMigrate = () =>
+  new Promise((resolve) => {
+    let output = "";
+    const keep = (chunk) => {
+      output = (output + chunk).slice(-OUTPUT_LIMIT);
+    };
+    const child = spawn("pnpm", ["exec", "drizzle-kit", "migrate"], {
+      cwd: packageDir,
+      stdio: ["inherit", "pipe", "pipe"],
+    });
+    child.stdout.on("data", (chunk) => {
+      process.stdout.write(chunk);
+      keep(chunk);
+    });
+    child.stderr.on("data", (chunk) => {
+      process.stderr.write(chunk);
+      keep(chunk);
+    });
+    // The command did not start (for example, pnpm is absent). No retry.
+    child.on("error", (error) => {
+      console.error(`[db:migrate] drizzle-kit did not start: ${error.message}`);
+      resolve({ status: 1, output: "" });
+    });
+    child.on("close", (status) => {
+      resolve({ status: status ?? 1, output });
+    });
+  });
+
+for (let attempt = 1; ; attempt += 1) {
+  const { status, output } = await runMigrate();
+  if (status === 0) {
+    if (attempt > 1) {
+      console.log(
+        `[db:migrate] attempt ${attempt} of ${MAX_ATTEMPTS}: the migrations are applied.`,
+      );
+    }
+    process.exit(0);
+  }
+  if (!isConnectionFailure(output)) {
+    console.error(
+      `[db:migrate] drizzle-kit migrate failed (exit ${status}). This is not a connection failure, so there is no new attempt.`,
+    );
+    process.exit(status);
+  }
+  if (!(await waitForRetry("db:migrate", attempt))) {
+    process.exit(status);
+  }
+}
