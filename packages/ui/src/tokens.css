@@ -178,21 +178,20 @@
   --shadow-color: 0.16 0.04 262;
 
   /*
-   * Fonts. The package cannot call `next/font` — it is a Next compiler transform
-   * and this package has no Next build — so each app declares its own families
-   * and exposes them as `--font-inter` / `--font-display` on <html>.
+   * Fonts. The charter gives one family: Plus Jakarta Sans, weights 400 to 800,
+   * with the fallback system-ui / sans-serif. The package cannot call
+   * `next/font` — it is a Next compiler transform and this package has no Next
+   * build — so each app declares the family and exposes it as `--font-jakarta`
+   * on <html>.
    *
-   * The fallback inside `var()` is what keeps the apps that declare nothing
-   * (web, admin) rendering exactly as they do today.
+   * `--font-family-display` is the same family: the charter has no display
+   * face, and a title differs by its weight (800), not by its typeface.
    *
    * These names deliberately differ from the `--font-*` theme keys below; a
    * theme key that referenced its own name would be a self-reference cycle.
    */
-  --font-family-sans:
-    var(--font-inter, ui-sans-serif), system-ui, -apple-system, "Segoe UI",
-    sans-serif;
-  --font-family-display:
-    var(--font-display, var(--font-inter, ui-serif)), Georgia, serif;
+  --font-family-sans: var(--font-jakarta, system-ui), system-ui, sans-serif;
+  --font-family-display: var(--font-family-sans);
 
   /* Motion. Durations stay raw vars — Tailwind 4 has no `--duration-*`
      namespace, so these are read by `var()` in CSS and mirrored as literals in
