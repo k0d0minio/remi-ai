@@ -1,6 +1,6 @@
 import NextLink from "next/link";
 import { localePath } from "@remi/services/shared";
-import { Container, Link, Typography } from "@remi/ui/server";
+import { BRAND_BASELINE, Container, Link, Typography } from "@remi/ui/server";
 import { Logo } from "@/components/logo";
 import { FOOTER, LEGAL_NAV } from "@/lib/content/landing";
 import { SITE } from "@/lib/site";
@@ -15,6 +15,9 @@ export const SiteFooter = () => (
           <span className="bg-background inline-flex rounded-lg px-2.5 py-1.5">
             <Logo height={28} />
           </span>
+          <Typography size="sm" weight="semibold" className="text-background">
+            {BRAND_BASELINE.fr}
+          </Typography>
           <Typography size="sm" className="text-background/80">
             {FOOTER.tagline}
           </Typography>

@@ -137,7 +137,8 @@ new token here, not a raw palette class in the app.
 ## Dark mode — one class, two halves
 
 `tokens.css` already carries a full `.dark` block, so switching theme is a single class on
-`<html>` and nothing else. Turning it on in an app is two imports, and both are needed:
+`<html>` and nothing else. The dark mode is hidden today (see the end of this section). Turning it
+on in an app is two imports, and both are needed:
 
 | Half          | Import            | Where it goes                          |
 | ------------- | ----------------- | -------------------------------------- |
@@ -150,8 +151,12 @@ string in the HTML and the other is React, so they can agree on constants but ne
 other. The layout's `<html>` also needs `suppressHydrationWarning`: the script mutates the class
 React is about to reconcile.
 
-Only `apps/web` and `apps/admin` opt in today. The public sites stay light because a brand page has
-one intended look, and a dark screenshot of it is not that look.
+No app opts in today (REM-175, 2026-11-19). The charter has one theme, the light one. Jamie chose
+to keep the dark mode hidden for later, not to remove it. So the `.dark` block, `themeScript`,
+`ThemeToggle` and their exports stay in this package, but no layout injects the script and no screen
+shows the toggle. A device in dark mode gets the light theme. In `apps/docs`, Nextra forces the
+light theme and hides its theme button (`darkMode={false}`). Do not opt an app in again without a
+ticket that changes the charter.
 
 An app that opts in must be token-clean first. A raw `bg-white` survives the class change untouched
 and produces white text on white — dark mode is what turns "use the semantic token" from a

@@ -356,7 +356,7 @@ describe("the sign-up with the e-mail of a practitioner-created file (path 2)", 
     expect(request.ok).toBe(true);
     expect(sent).toHaveLength(1);
     expect(sent[0].to).toBe("Marie.Dupont@Example.be");
-    expect(sent[0].subject).toBe("Reprenez votre dossier REMI");
+    expect(sent[0].subject).toBe("Reprends ton dossier REMI");
     const url = sent[0].text.split("\n").find((line) => line.startsWith("https://"));
     expect(url).toBeDefined();
     const events = await listAuditEvents(systemActor, { action: "patient.file_claim_sent" });

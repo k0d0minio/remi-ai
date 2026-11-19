@@ -179,10 +179,13 @@
      reach 3:1 on the page. */
   --ring: #2a82c5;
 
-  /* The lightness/chroma/hue triple the elevation ramp builds every shadow from.
-     Shadows are tinted toward the brand, never neutral black — black shadow over
-     a cool-grey surface reads as grime. Swapped wholesale in `.dark`. */
-  --shadow-color: 0.16 0.04 262;
+  /* The two shadows of the charter (section 4), tinted with `text.primary`
+     (#253348), never neutral black. `shadow.card` is for a card that needs
+     relief. `shadow.float` is for the floating navigation bar and for windows.
+     The charter has no other level. */
+  --shadow-card:
+    0 1px 3px rgb(37 51 72 / 0.04), 0 4px 12px rgb(37 51 72 / 0.025);
+  --shadow-float: 0 6px 20px rgb(37 51 72 / 0.1);
 
   /*
    * Fonts. The charter gives one family: Plus Jakarta Sans, weights 400 to 800,
@@ -273,10 +276,6 @@
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
   --ring: var(--brand-400);
-
-  /* Darker and more saturated than light mode: on a dark surface a shadow has
-     to go further to read as depth at all. */
-  --shadow-color: 0.08 0.025 262;
 }
 
 /* ── 3. the Tailwind theme ─────────────────────────────────────────────────── */
@@ -390,17 +389,15 @@
   --container-content: 72rem;
   --container-wide: 88rem;
 
-  --shadow-xs: 0 1px 2px 0 oklch(var(--shadow-color) / 0.05);
-  --shadow-sm:
-    0 1px 3px 0 oklch(var(--shadow-color) / 0.08),
-    0 1px 2px -1px oklch(var(--shadow-color) / 0.06);
-  --shadow-md:
-    0 4px 12px -2px oklch(var(--shadow-color) / 0.1),
-    0 2px 4px -2px oklch(var(--shadow-color) / 0.06);
-  --shadow-lg:
-    0 12px 28px -6px oklch(var(--shadow-color) / 0.14),
-    0 4px 8px -4px oklch(var(--shadow-color) / 0.08);
-  --shadow-xl: 0 24px 48px -12px oklch(var(--shadow-color) / 0.18);
+  /* The elevation utilities map onto the two shadows of the charter:
+     `shadow-xs` and `shadow-sm` are `shadow.card`, and `shadow-md`, `shadow-lg`
+     and `shadow-xl` are `shadow.float`. */
+  --shadow-xs: var(--shadow-card);
+  --shadow-sm: var(--shadow-card);
+  --shadow-md: var(--shadow-float);
+  --shadow-lg: var(--shadow-float);
+  --shadow-xl: var(--shadow-float);
+  --shadow-2xl: var(--shadow-float);
 
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-entrance: cubic-bezier(0.05, 0.7, 0.1, 1);

@@ -143,6 +143,10 @@ const RootLayout = async ({ children }: { children: ReactNode }) => (
         footer={<Footer>© {brandLegalName}</Footer>}
         pageMap={await getPageMap()}
         docsRepositoryBase="https://github.com/k0d0minio/remi-ai/tree/main/apps/docs"
+        // Light only (REM-175): no theme button, and a device in dark mode
+        // gets the light theme, so the logo never sits on a dark background.
+        darkMode={false}
+        nextThemes={{ defaultTheme: "light", forcedTheme: "light" }}
       >
         {children}
       </Layout>

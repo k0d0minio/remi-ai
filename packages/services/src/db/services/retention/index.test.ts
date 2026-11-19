@@ -157,7 +157,7 @@ describe("the notice at eleven months", () => {
       "claire@example.be",
       "morgane@example.be",
     ]);
-    expect(sent[0]?.subject).toMatch(/^Votre compte REMI sera supprimé le /);
+    expect(sent[0]?.subject).toMatch(/^Ton compte REMI sera supprimé le /);
     expect(sent[0]?.text).toContain("https://app.test/fr/connexion");
     expect(sent[1]?.text).toContain("Claire P.");
     expect(sent[1]?.text).not.toContain("claire@example.be");

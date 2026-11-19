@@ -26,7 +26,6 @@ import type {
   SignupField,
   StepStatus,
 } from "@remi/services/shared";
-import type { Theme } from "@remi/ui/server";
 import type { PatientWriteError } from "@/lib/patient-link/actions";
 import type { QuestionnaireSection } from "@/lib/questionnaire/sections";
 import type { SaveError } from "@/lib/questionnaire/state";
@@ -87,9 +86,6 @@ export type Content = {
     label: string;
     account: string;
     language: string;
-    /** The theme section's heading, and a label for each of the three states. */
-    appearance: string;
-    themes: Record<Theme, string>;
     /** Heading over the link that leaves for the docs app. */
     help: string;
     documentation: string;

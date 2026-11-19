@@ -55,13 +55,13 @@ type NoticeCopy = {
 
 const notice: Record<Locale, NoticeCopy> = {
   fr: {
-    subject: (day) => `Votre compte REMI sera supprimé le ${day}`,
+    subject: (day) => `Ton compte REMI sera supprimé le ${day}`,
     greeting: (name) => (name ? `Bonjour ${name},` : "Bonjour,"),
     lead: (day) =>
-      `Vous ne vous êtes pas connecté(e) à REMI depuis onze mois. Comme le prévoit notre politique de confidentialité, votre compte et vos données seront supprimés définitivement le ${day}.`,
-    keep: "Pour garder votre compte, il suffit de vous connecter avant cette date. La suppression est alors annulée.",
+      `Tu ne t'es pas connecté(e) à REMI depuis onze mois. Comme le prévoit notre politique de confidentialité, ton compte et tes données seront supprimés définitivement le ${day}.`,
+    keep: "Pour garder ton compte, il suffit de te connecter avant cette date. La suppression est alors annulée.",
     action: "Me connecter",
-    fallback: "Ou copiez ce lien :",
+    fallback: "Ou copie ce lien :",
     signature: "— REMI",
   },
   en: {

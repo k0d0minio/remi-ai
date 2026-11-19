@@ -21,8 +21,6 @@ export const en: Content = {
     label: "Account menu",
     account: "Account",
     language: "Language",
-    appearance: "Appearance",
-    themes: { system: "Match system", light: "Light", dark: "Dark" },
     help: "Help",
     documentation: "Documentation",
     signOut: "Sign out",

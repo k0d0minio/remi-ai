@@ -67,6 +67,7 @@ export { Wordmark } from "./server/wordmark";
 export { intents, type Intent } from "./lib/intent";
 
 export {
+  BRAND_BASELINE,
   BRAND_COLORS,
   BRAND_LEGAL_NAME,
   BRAND_LOGO,

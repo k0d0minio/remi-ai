@@ -12,7 +12,7 @@ const InvalidSignupLink = () => (
       Ce lien n&apos;est pas valide · This link is not valid
     </Typography>
     <Typography size="sm" tone="muted">
-      Vérifiez le lien reçu, ou demandez-en un nouveau à la personne qui vous
+      Vérifie le lien reçu, ou demandes-en un nouveau à la personne qui te
       suit. · Check the link you received, or ask your practitioner for a new
       one.
     </Typography>

@@ -99,7 +99,10 @@ export const diets = [
 ] as const;
 
 export const dietLabels = {
-  none: { fr: "Aucun régime particulier", en: "No particular diet" },
+  none: {
+    fr: "Aucun type d'alimentation particulier",
+    en: "No particular diet",
+  },
   omnivore: { fr: "Omnivore", en: "Omnivore" },
   flexitarian: { fr: "Flexitarien", en: "Flexitarian" },
   pescatarian: { fr: "Pescétarien", en: "Pescatarian" },
