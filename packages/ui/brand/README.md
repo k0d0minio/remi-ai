@@ -5,6 +5,13 @@ derived files the apps serve. `src/tokens.css` is the palette in code and `src/l
 holds the names and the hex values. This folder holds the pictures. Nothing here is imported
 by code: an app copies the file it serves into its own `public/` folder.
 
+[`charte-graphique.md`](charte-graphique.md) is Morgane's brand and design charter of
+16 November 2026, in her words. It is the reference for the colours, the typeface, the shapes,
+the components and the tone of voice. `logo/remi-logo-charte.png` is the logo as the charter
+shows it (725 × 229). Where this file and the charter differ, the charter is the newer statement.
+The palette table below and the sentence "Text is set in Inter" describe the code of today, not
+the charter.
+
 ## Files
 
 | File                            | Is                                                                                                   | Served by                                                      |

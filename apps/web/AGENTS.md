@@ -8,6 +8,14 @@ what is specific to this app.
 The product: the signed-in surface a customer uses. Real data, real side effects. If a change
 would be visible to a customer, it lands here.
 
+## Screens and text follow the charter
+
+Read [`packages/ui/brand/charte-graphique.md`](../../packages/ui/brand/charte-graphique.md)
+before you build or change a screen or its text. Its section 2 is the tone of voice: the patient
+is addressed as « tu », the practitioner in a neutral and professional tone, and REMI never
+diagnoses. The dictionaries in `lib/content/` do not follow it in all places yet: change a text
+only in the ticket that asks for it.
+
 ## Structure
 
 ```text

@@ -3,6 +3,13 @@
 The global rules in [`/CONVENTIONS.md`](../../CONVENTIONS.md) still apply. This file holds only
 what is specific to this package.
 
+## Read the charter first
+
+[`brand/charte-graphique.md`](brand/charte-graphique.md) is Morgane's brand and design charter
+(16 November 2026). Read it before you add or change a component or a token. It gives the
+colours, the typeface, the radii, the sizes and the look of each component. `src/tokens.css`
+does not follow it in all places yet: change a token only in the ticket that asks for it.
+
 ## What lives here
 
 The single source of truth for every primitive shared across apps. shadcn/ui **New York** style,

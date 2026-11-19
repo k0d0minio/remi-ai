@@ -116,6 +116,19 @@ The repo works in two languages, and the split is a rule, not a habit:
 
 ## The design system
 
+### The brand charter — read it before UI work
+
+[`packages/ui/brand/charte-graphique.md`](packages/ui/brand/charte-graphique.md) is Morgane's
+charter of 16 November 2026: brand, tone of voice, logo, colours, typography, shapes, components,
+communication and accessibility. Read it before you build or change a screen, a component, a
+token, or text that a patient or a practitioner reads.
+
+- The charter is her text. Quote it. Do not rewrite it.
+- The charter wins on identity: how REMI looks and how REMI speaks. The user stories win on
+  function: features, flows, screens and exact labels (the charter's section 1).
+- The code does not follow the charter in all places yet. A difference is a ticket, not a
+  licence: do not change a token, a font or a text to match the charter outside its ticket.
+
 ### `packages/ui` — the only home for primitives
 
 - Add components from the package: `pnpm --filter @remi/ui exec shadcn@latest add <component>`.
