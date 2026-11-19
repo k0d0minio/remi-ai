@@ -121,15 +121,21 @@
    *   -border       a quiet border on that subtle surface
    *   -text         the intent as TEXT on --background
    *
-   * `-text` is the one that is easy to miss. `--success` at L 0.72 is a fine
-   * fill, but as text on white it is ~2.3:1 and fails WCAG outright. A component
-   * that renders the intent as a word reaches for `-text`, never the bare token.
+   * `-text` is the one that is easy to miss. A colour can be a fine fill and
+   * fail WCAG as text on white (`--warning` does). A component that renders the
+   * intent as a word reaches for `-text`, never the bare token.
    */
-  --success: var(--vital-500);
-  --success-foreground: oklch(0.2 0.04 195);
-  --success-subtle: var(--vital-50);
-  --success-border: var(--vital-200);
-  --success-text: var(--vital-700);
+  /* `feedback.success` of the charter (#1f7a4d, hue 157). The teal is not the
+     success colour: it is `--brand-accent` below. */
+  --success: #1f7a4d;
+  --success-foreground: var(--grey-50);
+  --success-subtle: oklch(0.97 0.02 157);
+  --success-border: oklch(0.88 0.06 157);
+  --success-text: #1f7a4d;
+
+  /* `brand.accent` of the charter: a small teal accent, a dot or a rule. Never
+     text, and never the fill of a button. */
+  --brand-accent: var(--vital-500);
 
   /* The warm accent of the brand visuals (#ff8a5b): a « places limitées »
      badge, a draft banner, a step that asks for attention. Hue 42. */
@@ -295,6 +301,8 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+
+  --color-brand-accent: var(--brand-accent);
 
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
