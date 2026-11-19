@@ -31,14 +31,14 @@ type Copy = {
 
 const copy: Record<Locale, Copy> = {
   fr: {
-    subject: "Votre espace REMI",
+    subject: "Ton espace REMI",
     greeting: (name) => (name ? `Bonjour ${name},` : "Bonjour,"),
     lead: (practitioner) =>
-      `${practitioner} a préparé votre espace REMI : votre objectif et vos recommandations, réunis sur une page.`,
+      `${practitioner} a préparé ton espace REMI : ton objectif et tes recommandations, réunis sur une page.`,
     action: "Ouvrir mon espace",
-    fallback: "Ou copiez ce lien :",
+    fallback: "Ou copie ce lien :",
     privacy:
-      "Ce lien vous est personnel — gardez-le pour vous. Vous pouvez le rouvrir à tout moment ; la page est mise à jour au fil des consultations.",
+      "Ce lien t'est personnel — garde-le pour toi. Tu peux le rouvrir à tout moment ; la page est mise à jour au fil des consultations.",
     signature: "— REMI",
   },
   en: {

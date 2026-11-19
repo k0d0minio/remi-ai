@@ -7,7 +7,9 @@ import {
 } from "../shared/consent";
 import care1FrBe from "./texts/care/1.fr-BE.md";
 import care2FrBe from "./texts/care/2.fr-BE.md";
+import care3FrBe from "./texts/care/3.fr-BE.md";
 import genetic1FrBe from "./texts/genetic/1.fr-BE.md";
+import genetic2FrBe from "./texts/genetic/2.fr-BE.md";
 
 /**
  * The consent texts a patient reads — story 3, D-32. One markdown file per
@@ -57,14 +59,32 @@ const files: readonly Omit<ConsentText, "hash">[] = [
     date: "2026-11-12",
     body: care2FrBe,
   },
+  // Version 2 in « tu », as the charter addresses the patient (REM-180,
+  // Jamie, 2026-11-19). The content does not change.
+  {
+    key: "care",
+    version: "3",
+    locale: "fr-BE",
+    date: "2026-11-19",
+    body: care3FrBe,
+  },
   // A draft from sections 2 and 4 of the policy. Morgane validates it before
-  // `genetic-consent-and-optional-data` ships. Her edit is version 2.
+  // `genetic-consent-and-optional-data` ships. Her edit is the next version.
   {
     key: "genetic",
     version: "1",
     locale: "fr-BE",
     date: "2026-11-01",
     body: genetic1FrBe,
+  },
+  // Version 1 in « tu » (REM-180, Jamie, 2026-11-19). The content does not
+  // change.
+  {
+    key: "genetic",
+    version: "2",
+    locale: "fr-BE",
+    date: "2026-11-19",
+    body: genetic2FrBe,
   },
 ];
 

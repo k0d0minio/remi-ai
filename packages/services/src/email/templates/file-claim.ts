@@ -50,14 +50,14 @@ type Copy = {
 
 const copy: Record<Locale, Copy> = {
   fr: {
-    subject: "Reprenez votre dossier REMI",
+    subject: "Reprends ton dossier REMI",
     greeting: (name) => (name ? `Bonjour ${name},` : "Bonjour,"),
-    lead: "La personne qui vous suit a déjà ouvert un dossier REMI à votre adresse e-mail. Ce lien vous permet de le reprendre : vous retrouvez les informations déjà enregistrées.",
-    how: "Le lien vous demande d'abord votre accord sur le traitement de vos données, puis un mot de passe.",
+    lead: "La personne qui te suit a déjà ouvert un dossier REMI à ton adresse e-mail. Ce lien te permet de le reprendre : tu retrouves les informations déjà enregistrées.",
+    how: "Le lien te demande d'abord ton accord sur le traitement de tes données, puis un mot de passe.",
     action: "Reprendre mon dossier",
-    fallback: "Ou copiez ce lien :",
+    fallback: "Ou copie ce lien :",
     expiry: (moment) =>
-      `Ce lien est personnel. Il sert une seule fois et expire le ${moment}. Si vous n'avez rien demandé, ignorez ce message : sans le lien, aucun compte n'est créé.`,
+      `Ce lien est personnel. Il sert une seule fois et expire le ${moment}. Si tu n'as rien demandé, ignore ce message : sans le lien, aucun compte n'est créé.`,
     signature: "— REMI",
   },
   en: {
