@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-169
 - branch: contact/rem-169-ajouter-la-charte-graphique-remi-au-depot
 - lane: chore
-- pr: pending
+- pr: #210
 - started: 2026-11-19
