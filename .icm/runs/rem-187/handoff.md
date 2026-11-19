@@ -2,11 +2,17 @@
 
 ## Next action
 
-<What the next session, or the operator, does first.>
+L'opérateur coche Ready to merge. Ensuite, Release fusionne.
 
 ## How to test
 
-<1 to 3 short sentences that can be said aloud: where to go on the preview, what to do, what the operator must see.>
+Ouvrez `.icm/docs/README.md` dans la demande de fusion : sous la note du 26 septembre, une note du 19 novembre nomme la charte, son emplacement et le document qui gagne en cas de désaccord.
+
+## What changed, and why no user sees it
+
+- `.icm/docs/README.md` a une note de plus. Elle dit que la charte est dans `packages/ui/brand/`, que la charte fait foi pour l'identité et que les user stories font foi pour le fonctionnel.
+- Le tableau de préséance ne change pas.
+- Le ticket ne change qu'un document.
 
 ## Blockers
 
