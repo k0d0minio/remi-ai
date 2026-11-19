@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-187/nommer-la-charte-dans-la-note-sur-les-documents-du-client
 - branch: contact/rem-187-nommer-la-charte-dans-la-note-sur-les
 - lane: chore
-- pr: pending
+- pr: #228
 - started: 2026-11-19
