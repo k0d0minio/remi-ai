@@ -2,15 +2,15 @@
 
 ## Next action
 
-<What the next session, or the operator, does first.>
+L'opérateur répond aux questions de la demande de fusion. Ensuite, il dit `tweak REM-180`.
 
 ## How to test
 
-<1 to 3 short sentences that can be said aloud: where to go on the preview, what to do, what the operator must see.>
+Rien à tester : le changement attend les réponses.
 
 ## Blockers
 
-- none
+- L'opérateur répond aux questions sur la carte du HUD ou dans la demande de fusion.
 
 ## Do not touch
 
