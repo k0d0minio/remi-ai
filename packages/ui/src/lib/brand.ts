@@ -38,11 +38,11 @@ export const BRAND_TAGLINE = {
  */
 export const BRAND_COLORS = {
   /** `--brand-600`, the primary fill — the logo's R, and the brand on paper. */
-  brand600: "#045cc7",
+  brand600: "#3362ae",
   /** `--brand-300`, the brand lightened to stay legible on `ink`; `brand600` is not. */
-  brandOnDark: "#76beff",
+  brandOnDark: "#95baee",
   /** `--vital-500`, the logo's teal — the I of the wordmark. */
-  teal500: "#00a7a8",
+  teal500: "#00a6a9",
   /** `--grey-950`, the navy ink the social card sits on. */
   ink: "#050d1e",
   /** `--grey-50`, the near-white that reads on `ink`. */
