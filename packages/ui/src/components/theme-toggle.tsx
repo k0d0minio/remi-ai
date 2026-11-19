@@ -156,7 +156,7 @@ export const ThemeToggle = ({ label, optionLabels, className }: Props) => {
             title={optionLabels[option]}
             onClick={() => selectTheme(option)}
             className={cn(
-              "focus-visible:ring-ring/40 ease-standard inline-flex size-7 items-center justify-center rounded-sm outline-none transition-colors duration-[--duration-fast] focus-visible:ring-[3px]",
+              "focus-visible:ring-ring ease-standard inline-flex size-7 items-center justify-center rounded-sm outline-none transition-colors duration-[--duration-fast] focus-visible:ring-[3px]",
               selected
                 ? "bg-background text-foreground shadow-xs"
                 : "text-muted-foreground hover:text-foreground",

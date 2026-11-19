@@ -84,34 +84,37 @@
      `sm` and `md` are for small parts: a checkbox, a menu row, a tooltip. */
   --radius: 1rem;
 
-  --background: var(--grey-0);
-  --foreground: var(--grey-950);
+  /* The surfaces and the text of the charter (section 4): `surface.page`,
+     `surface.card`, `surface.soft`, `text.primary`, `text.secondary` and
+     `border.default`. */
+  --background: #f4f8fc;
+  --foreground: #253348;
 
   --card: var(--grey-0);
-  --card-foreground: var(--grey-950);
+  --card-foreground: #253348;
 
   --popover: var(--grey-0);
-  --popover-foreground: var(--grey-950);
+  --popover-foreground: #253348;
 
   --primary: var(--brand-600);
   --primary-foreground: var(--grey-50);
-  --primary-subtle: var(--brand-50);
+  --primary-subtle: #e4edf8;
   --primary-border: var(--brand-200);
   /* A real ramp step, not `bg-primary/90` — fading a saturated blue toward the
      page goes muddy, where the next step down stays the same colour. */
   --primary-hover: var(--brand-700);
 
-  --secondary: var(--grey-100);
-  --secondary-foreground: var(--grey-900);
+  --secondary: #e4edf8;
+  --secondary-foreground: #253348;
 
-  --muted: var(--grey-100);
-  --muted-foreground: var(--grey-600);
+  --muted: #e4edf8;
+  --muted-foreground: #566579;
 
   /* `--accent` is the neutral hover surface, not the brand accent — `Button`'s
      ghost and outline variants both hover onto it. The green enters the system
      as `--success`, never here. */
-  --accent: var(--grey-100);
-  --accent-foreground: var(--grey-900);
+  --accent: #e4edf8;
+  --accent-foreground: #253348;
 
   /*
    * The intent vocabulary. Every intent-bearing prop in @remi/ui uses these five
@@ -141,19 +144,20 @@
      text, and never the fill of a button. */
   --brand-accent: var(--vital-500);
 
-  /* The warm accent of the brand visuals (#ff8a5b): a « places limitées »
-     badge, a draft banner, a step that asks for attention. Hue 42. */
-  --warning: oklch(0.753 0.155 42);
-  --warning-foreground: oklch(0.22 0.05 42);
-  --warning-subtle: oklch(0.967 0.018 48);
-  --warning-border: oklch(0.88 0.08 45);
-  --warning-text: oklch(0.52 0.14 40);
+  /* `feedback.warning` of the charter (#925f12, hue 71): a draft banner, a
+     step that asks for attention. */
+  --warning: #925f12;
+  --warning-foreground: var(--grey-50);
+  --warning-subtle: oklch(0.97 0.02 75);
+  --warning-border: oklch(0.88 0.06 73);
+  --warning-text: #925f12;
 
-  --error: oklch(0.58 0.22 27);
+  /* `feedback.error` of the charter (#b42318, hue 29). */
+  --error: #b42318;
   --error-foreground: var(--grey-50);
-  --error-subtle: oklch(0.97 0.02 27);
-  --error-border: oklch(0.88 0.07 27);
-  --error-text: oklch(0.52 0.2 27);
+  --error-subtle: oklch(0.97 0.02 29);
+  --error-border: oklch(0.88 0.07 29);
+  --error-text: #b42318;
 
   /* `brand.secondary` of the charter (#2a82c5, the M of the logo): the colour
      of informative pictograms. Hue 246 against the primary's 260. */
@@ -169,9 +173,11 @@
   --neutral-border: var(--grey-200);
   --neutral-text: var(--grey-600);
 
-  --border: var(--grey-200);
-  --input: var(--grey-200);
-  --ring: var(--brand-500);
+  --border: #d9e2eb;
+  --input: #d9e2eb;
+  /* `focus.ring` of the charter. Use it at full opacity: a faded ring does not
+     reach 3:1 on the page. */
+  --ring: #2a82c5;
 
   /* The lightness/chroma/hue triple the elevation ramp builds every shadow from.
      Shadows are tinted toward the brand, never neutral black — black shadow over

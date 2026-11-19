@@ -32,7 +32,7 @@ export const RuleRows = ({ rules }: Props) => (
           </Badge>
           <NextLink
             href={`/knowledge/${rule.id}`}
-            className="focus-visible:ring-ring/40 rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
+            className="focus-visible:ring-ring rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
           >
             <Typography as="h3" size="sm" weight="medium">
               {rule.title}
