@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-173/appliquer-les-couleurs-de-texte-de-fond-de-bordure-et-de-focus-de-la
 - branch: contact/rem-173-appliquer-les-couleurs-de-texte-de-fond-de
 - lane: tweak
-- pr: pending
+- pr: #219
 - started: 2026-11-19
