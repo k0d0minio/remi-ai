@@ -228,7 +228,7 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
                 <li key={patient.id}>
                   <NextLink
                     href={`/patients/${patient.id}`}
-                    className="border-border bg-card hover:bg-accent focus-visible:ring-ring/40 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border px-4 py-3 transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
+                    className="border-border bg-card hover:bg-accent focus-visible:ring-ring flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border px-4 py-3 transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
                   >
                     <Typography as="span" size="sm" weight="medium">
                       {nom}

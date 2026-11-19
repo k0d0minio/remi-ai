@@ -3,7 +3,7 @@ import type { ComponentProps } from "react";
 import { cn } from "../lib/utils";
 
 const card = cva(
-  "flex flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground",
+  "flex flex-col gap-4 rounded-2xl border bg-card py-4 text-card-foreground",
   {
     variants: {
       // The shared intent vocabulary — same five names as Badge and Alert.
@@ -59,7 +59,7 @@ export const Card = ({
 export const CardHeader = ({ className, ...props }: ComponentProps<"div">) => (
   <div
     data-slot="card-header"
-    className={cn("flex flex-col gap-1.5 px-6", className)}
+    className={cn("flex flex-col gap-1.5 px-4", className)}
     {...props}
   />
 );
@@ -84,13 +84,13 @@ export const CardDescription = ({
 );
 
 export const CardContent = ({ className, ...props }: ComponentProps<"div">) => (
-  <div data-slot="card-content" className={cn("px-6", className)} {...props} />
+  <div data-slot="card-content" className={cn("px-4", className)} {...props} />
 );
 
 export const CardFooter = ({ className, ...props }: ComponentProps<"div">) => (
   <div
     data-slot="card-footer"
-    className={cn("flex items-center px-6", className)}
+    className={cn("flex items-center px-4", className)}
     {...props}
   />
 );
