@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-182/utiliser-le-logo-officiel-de-la-charte-dans-toutes-les-apps
 - branch: contact/rem-182-utiliser-le-logo-officiel-de-la-charte-dans
 - lane: tweak
-- pr: pending
+- pr: #214
 - started: 2026-11-19
