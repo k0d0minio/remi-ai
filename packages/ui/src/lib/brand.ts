@@ -28,6 +28,19 @@ export const BRAND_TAGLINE = {
 } as const;
 
 /**
+ * The baseline of the charter (`brand/charte-graphique.md`, section 2): the
+ * short line that goes with the logo where the brand presents itself. It does
+ * not replace `BRAND_TAGLINE`, which stays the description line for metadata
+ * and link previews (Jamie, 2026-11-19, REM-183).
+ *
+ * The French is Morgane's and is canonical. The English is its translation.
+ */
+export const BRAND_BASELINE = {
+  en: "Between recommendation and action",
+  fr: "Entre recommandation et action",
+} as const;
+
+/**
  * The brand as literal hex, for the two surfaces that cannot resolve a CSS
  * custom property: `next/og` renders through Satori, which has no browser and
  * no Tailwind pass, and `app/icon.svg` is a static file no stylesheet reaches.
