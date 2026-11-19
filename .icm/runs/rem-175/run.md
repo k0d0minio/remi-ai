@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-175/retirer-le-theme-sombre
 - branch: contact/rem-175-retirer-le-theme-sombre
 - lane: tweak
-- pr: pending
+- pr: #211
 - started: 2026-11-19
