@@ -9,8 +9,6 @@ by code: an app copies the file it serves into its own `public/` folder.
 16 November 2026, in her words. It is the reference for the colours, the typeface, the shapes,
 the components and the tone of voice. `logo/remi-logo-charte.png` is the logo as the charter
 shows it (725 × 229). Where this file and the charter differ, the charter is the newer statement.
-The palette table below and the sentence "Text is set in Inter" describe the code of today, not
-the charter.
 
 ## Files
 
@@ -29,20 +27,14 @@ the charter.
 Some of the visuals may be AI-generated. Check the rights of use before one of them is served
 on a public page.
 
-## The palette the logo gives
+## The palette and the typeface
 
-The wordmark is a gradient from blue to teal. The tokens follow it:
+The charter is the one home of the values: [`charte-graphique.md`](charte-graphique.md), section 3
+for the colours of the four letters of the logo, section 4 for the design tokens and section 5 for
+the typeface (Plus Jakarta Sans, weights 400 to 800). `src/tokens.css` holds the same values in
+code. This file repeats none of them.
 
-| Colour              | Hex       | Token                                     |
-| ------------------- | --------- | ----------------------------------------- |
-| Blue, the R         | `#045cc7` | `--brand-600`, the primary                |
-| Blue, the M         | `#0a7ad8` | the middle stop of `--gradient-brand`     |
-| Teal, the I         | `#00a7a8` | `--vital-500`, the success intent         |
-| Ink                 | `#0f1f3d` | the dark end of the grey ramp, hue 262    |
-| Warm accent         | `#ff8a5b` | `--warning`, the badge and banner accent  |
-
-The typeface of the wordmark is not a web font the estate loads. Text is set in Inter. The
-wordmark is always the image, never typed.
+The wordmark is always the image, never typed.
 
 ## Why a logo is a PNG here
 
