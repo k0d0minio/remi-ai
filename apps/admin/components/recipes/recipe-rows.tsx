@@ -22,7 +22,7 @@ export const RecipeRows = ({ recipes }: Props) => (
         <div className="flex flex-wrap items-center gap-2">
           <NextLink
             href={`/recipes/${recipe.id}`}
-            className="focus-visible:ring-ring/40 rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
+            className="focus-visible:ring-ring rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
           >
             <Typography as="h3" size="sm" weight="medium">
               {recipe.title}

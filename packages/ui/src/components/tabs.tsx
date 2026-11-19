@@ -14,7 +14,7 @@ const tabsList = cva("inline-flex items-center", {
 });
 
 const tabsTrigger = cva(
-  "inline-flex items-center justify-center gap-2 text-sm font-medium whitespace-nowrap transition-colors duration-[--duration-fast] ease-standard outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4",
+  "inline-flex items-center justify-center gap-2 text-sm font-medium whitespace-nowrap transition-colors duration-[--duration-fast] ease-standard outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4",
   {
     variants: {
       variant: {
@@ -67,7 +67,7 @@ export const TabsContent = ({
   <TabsPrimitive.Content
     data-slot="tabs-content"
     className={cn(
-      "focus-visible:ring-ring/40 outline-none focus-visible:ring-[3px]",
+      "focus-visible:ring-ring outline-none focus-visible:ring-[3px]",
       className,
     )}
     {...props}

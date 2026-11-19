@@ -42,7 +42,7 @@ export const DocumentList = ({
       href={hrefOf(document)}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-primary focus-visible:ring-ring/40 inline-flex min-h-11 items-center gap-2 rounded-sm font-medium underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-[3px]"
+      className="text-primary focus-visible:ring-ring inline-flex min-h-11 items-center gap-2 rounded-sm font-medium underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-[3px]"
     >
       {document.kind === "file" ? (
         <FileText aria-hidden="true" className="size-4 shrink-0" />
