@@ -4,7 +4,7 @@ import type { ComponentProps } from "react";
 import { cn } from "../lib/utils";
 
 const switchRoot = cva(
-  "peer inline-flex shrink-0 items-center rounded-full border border-transparent transition-colors duration-[--duration-fast] ease-standard outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
+  "peer inline-flex shrink-0 items-center rounded-full border border-transparent transition-colors duration-[--duration-fast] ease-standard outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
   {
     variants: {
       size: {

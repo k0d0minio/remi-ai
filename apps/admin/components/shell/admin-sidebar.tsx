@@ -19,7 +19,7 @@ export const AdminSidebar = ({ canManageOperators }: Props) => (
     <div className="flex items-center gap-2 px-2">
       <NextLink
         href="/"
-        className="focus-visible:ring-ring/40 rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
+        className="focus-visible:ring-ring rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
       >
         <Wordmark />
       </NextLink>

@@ -19,7 +19,7 @@ export const SiteHeader = () => (
       <NextLink
         href={`${home}#top`}
         aria-label={HEADER.logoLabel}
-        className="focus-visible:ring-ring/40 rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
+        className="focus-visible:ring-ring rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
       >
         <Logo height={30} priority />
       </NextLink>

@@ -52,7 +52,7 @@ const PatientLayout = async ({
     <div className="flex min-h-dvh flex-col">
       <a
         href="#content"
-        className="focus-visible:ring-ring/40 bg-background sr-only z-50 rounded-md px-3 py-2 text-sm font-medium outline-none focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus-visible:ring-[3px]"
+        className="focus-visible:ring-ring bg-background sr-only z-50 rounded-md px-3 py-2 text-sm font-medium outline-none focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus-visible:ring-[3px]"
       >
         {content.shell.skipToContent}
       </a>

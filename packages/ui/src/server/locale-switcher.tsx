@@ -42,7 +42,7 @@ export const LocaleSwitcher = ({
         hrefLang={locale}
         aria-current={locale === current ? "true" : undefined}
         className={cn(
-          "focus-visible:ring-ring/40 hover:bg-accent hover:text-accent-foreground ease-standard inline-flex h-8 items-center rounded-md px-2 text-sm font-medium uppercase outline-none transition-colors duration-[--duration-fast] focus-visible:ring-[3px]",
+          "focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground ease-standard inline-flex h-8 items-center rounded-md px-2 text-sm font-medium uppercase outline-none transition-colors duration-[--duration-fast] focus-visible:ring-[3px]",
           locale === current ? "text-foreground" : "text-muted-foreground",
         )}
       >

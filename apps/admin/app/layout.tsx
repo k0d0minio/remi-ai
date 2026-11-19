@@ -1,27 +1,19 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { BRAND_NAME, themeScript } from "@remi/ui/server";
 import "./globals.css";
 
 /**
- * The same two families, under the same variable names, as every other app —
- * `tokens.css` reads `--font-inter` and `--font-display`, so an app that skips
- * this silently falls back to system fonts and the wordmark loses its serif.
+ * The same family, under the same variable name, as every other app:
+ * `tokens.css` reads `--font-jakarta`, so an app that skips this silently
+ * falls back to system fonts.
  */
-const inter = Inter({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
-});
-
-const display = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  display: "swap",
-  variable: "--font-display",
+  variable: "--font-jakarta",
 });
 
 export const metadata: Metadata = {
@@ -34,11 +26,7 @@ export const metadata: Metadata = {
 };
 
 const RootLayout = ({ children }: { children: ReactNode }) => (
-  <html
-    lang="fr"
-    className={`${inter.variable} ${display.variable}`}
-    suppressHydrationWarning
-  >
+  <html lang="fr" className={jakarta.variable} suppressHydrationWarning>
     <body className="min-h-dvh antialiased">
       {/*
        * First child of <body> so it runs before the browser paints anything

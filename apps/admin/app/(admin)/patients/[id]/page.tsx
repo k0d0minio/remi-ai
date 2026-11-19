@@ -453,7 +453,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
                 ? `/patients/${patient.id}/consultation`
                 : "/patients"
             }
-            className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/40 inline-flex w-fit items-center gap-1.5 rounded-sm text-sm transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
+            className="text-muted-foreground hover:text-foreground focus-visible:ring-ring inline-flex w-fit items-center gap-1.5 rounded-sm text-sm transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
           >
             <ArrowLeft aria-hidden="true" className="size-4" />
             {fromConsultation ? "Retour à la consultation" : "Patients"}

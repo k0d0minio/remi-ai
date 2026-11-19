@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
@@ -10,21 +10,13 @@ import "../globals.css";
 
 /**
  * Declared here because a package cannot call `next/font`: the app owns the
- * fonts and exposes them as the CSS variables `tokens.css` reads. Without this
- * the display type scale falls back to Georgia.
+ * font and exposes it as the CSS variable `tokens.css` reads. The charter
+ * gives one family, Plus Jakarta Sans, weights 400 to 800 (a variable font).
  */
-const inter = Inter({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
-});
-
-const display = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  display: "swap",
-  variable: "--font-display",
+  variable: "--font-jakarta",
 });
 
 type Params = { locale: string };
@@ -66,11 +58,7 @@ const RootLayout = async ({
   }
 
   return (
-    <html
-      lang={locale}
-      className={`${inter.variable} ${display.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang={locale} className={jakarta.variable} suppressHydrationWarning>
       <body className="min-h-dvh antialiased">
         {/*
          * First child of <body> so it runs before the browser paints anything
