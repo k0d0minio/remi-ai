@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-174/reduire-les-ombres-aux-deux-ombres-de-la-charte
 - branch: contact/rem-174-reduire-les-ombres-aux-deux-ombres-de-la
 - lane: tweak
-- pr: pending
+- pr: #220
 - started: 2026-11-19
