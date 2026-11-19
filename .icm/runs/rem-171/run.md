@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-171/separer-le-turquoise-de-la-couleur-de-succes
 - branch: contact/rem-171-separer-le-turquoise-de-la-couleur-de-succes
 - lane: tweak
-- pr: pending
+- pr: #217
 - started: 2026-11-19
