@@ -18,6 +18,9 @@ A ticket is now a Linear key of the team `REM`. A stub is not a ticket.
 3. In the pull request of that ticket, move the stub into its `_done/` folder.
 4. Do not start a run from a stub path: the blueprint of this repo refuses it.
 
+Since 2026-11-19 each open stub has its Linear ticket. `.icm/intake/LINEAR.md` has the map and the
+limits of work in parallel. Thus step 1 is done for these stubs. Steps 2 to 4 stay.
+
 `.icm/intake/README.md` has the order of the epics and each decision (D-1 to D-37).
 
 ## The database

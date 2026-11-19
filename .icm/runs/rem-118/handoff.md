@@ -16,6 +16,7 @@ Ouvrez le journal de build de la préversion `admin` de la demande de fusion. La
 - `.icm/docs/ENV.md` dit que les autres noms de l'intégration Neon (`PGHOST`, `POSTGRES_URL`, ...) sont absents de `turbo.json` volontairement. `turbo.json` ne change pas.
 - `drizzle.config.ts` ne change pas : la nouvelle tentative est autour de la commande `drizzle-kit migrate`.
 - Le stub `triage/db-migrate-connection-retry.md` est dans `triage/_done/`.
+- Jamie a demandé que la carte du backlog soit dans cette demande de fusion : `.icm/intake/LINEAR.md` dit quel ticket Linear vient de quel stub, et `.icm/local/ROUTES.md` la nomme. Elle ne fait pas partie de REM-118.
 - Ces fichiers sont des scripts de build et des documents. Aucune page et aucune donnée ne changent.
 
 ## Not verified
