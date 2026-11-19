@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-181/remplacer-le-mot-regime-dans-les-textes-du-patient
 - branch: contact/rem-181-remplacer-le-mot-regime-dans-les-textes-du
 - lane: tweak
-- pr: pending
+- pr: #213
 - started: 2026-11-19
