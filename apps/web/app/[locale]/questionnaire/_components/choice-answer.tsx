@@ -74,7 +74,7 @@ export const ChoiceAnswer = ({
         {options.map((option) => (
           <label
             key={option.value}
-            className="border-border bg-card has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:focus-visible]:ring-ring/40 flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 has-[:focus-visible]:ring-[3px]"
+            className="border-border bg-card has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:focus-visible]:ring-ring flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 has-[:focus-visible]:ring-[3px]"
           >
             <input
               type="radio"

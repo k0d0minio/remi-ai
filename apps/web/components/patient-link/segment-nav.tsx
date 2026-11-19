@@ -49,7 +49,7 @@ export const SegmentNav = ({ locale, token, segments, content }: Props) => {
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "focus-visible:ring-ring/40 flex min-h-11 items-center rounded-md px-3 py-2 text-sm transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]",
+                  "focus-visible:ring-ring flex min-h-11 items-center rounded-md px-3 py-2 text-sm transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]",
                   active
                     ? "bg-primary-subtle text-primary font-medium"
                     : "text-muted-foreground hover:bg-accent hover:text-foreground",
