@@ -57,7 +57,7 @@ export const BottomNav = ({
               href={item.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "focus-visible:ring-ring/40 ease-standard relative flex min-h-16 flex-col items-center justify-center gap-1 px-2 py-2 text-sm outline-none transition-colors duration-[--duration-fast] focus-visible:ring-[3px] focus-visible:ring-inset [&_svg]:size-6",
+                "focus-visible:ring-ring ease-standard relative flex min-h-16 flex-col items-center justify-center gap-1 px-2 py-2 text-sm outline-none transition-colors duration-[--duration-fast] focus-visible:ring-[3px] focus-visible:ring-inset [&_svg]:size-6",
                 active
                   ? "text-primary font-semibold"
                   : "text-muted-foreground hover:text-foreground font-medium",

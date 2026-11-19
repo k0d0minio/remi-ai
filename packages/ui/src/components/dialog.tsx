@@ -47,7 +47,7 @@ export const DialogContent = ({
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="focus-visible:ring-ring/40 absolute right-4 top-4 rounded-sm opacity-70 transition-opacity duration-[--duration-fast] hover:opacity-100 focus-visible:outline-none focus-visible:ring-[3px]">
+      <DialogPrimitive.Close className="focus-visible:ring-ring absolute right-4 top-4 rounded-sm opacity-70 transition-opacity duration-[--duration-fast] hover:opacity-100 focus-visible:outline-none focus-visible:ring-[3px]">
         <X aria-hidden="true" className="size-5" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>

@@ -43,10 +43,10 @@ export const BRAND_COLORS = {
   brandOnDark: "#95baee",
   /** `--vital-500`, the logo's teal — the I of the wordmark. */
   teal500: "#00a6a9",
-  /** `--grey-950`, the navy ink the social card sits on. */
-  ink: "#050d1e",
-  /** `--grey-50`, the near-white that reads on `ink`. */
-  paper: "#f9fafc",
+  /** `--foreground`, the text colour of the charter (`text.primary`). */
+  ink: "#253348",
+  /** `--background`, the page colour of the charter (`surface.page`). */
+  paper: "#f4f8fc",
 } as const;
 
 /**
