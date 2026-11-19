@@ -131,19 +131,20 @@
   --success-border: var(--vital-200);
   --success-text: var(--vital-700);
 
-  /* The warm accent of the brand visuals (#ff8a5b): a « places limitées »
-     badge, a draft banner, a step that asks for attention. Hue 42. */
-  --warning: oklch(0.753 0.155 42);
-  --warning-foreground: oklch(0.22 0.05 42);
-  --warning-subtle: oklch(0.967 0.018 48);
-  --warning-border: oklch(0.88 0.08 45);
-  --warning-text: oklch(0.52 0.14 40);
+  /* `feedback.warning` of the charter (#925f12, hue 71): a draft banner, a
+     step that asks for attention. */
+  --warning: #925f12;
+  --warning-foreground: var(--grey-50);
+  --warning-subtle: oklch(0.97 0.02 75);
+  --warning-border: oklch(0.88 0.06 73);
+  --warning-text: #925f12;
 
-  --error: oklch(0.58 0.22 27);
+  /* `feedback.error` of the charter (#b42318, hue 29). */
+  --error: #b42318;
   --error-foreground: var(--grey-50);
-  --error-subtle: oklch(0.97 0.02 27);
-  --error-border: oklch(0.88 0.07 27);
-  --error-text: oklch(0.52 0.2 27);
+  --error-subtle: oklch(0.97 0.02 29);
+  --error-border: oklch(0.88 0.07 29);
+  --error-text: #b42318;
 
   /* Hue 235 against the brand's 255 — near enough to read as the same family,
      far enough that an info badge is never mistaken for a primary button. */
