@@ -25,8 +25,9 @@ type Props = {
  * The brand, rendered: Morgane's logo image, never the name typed in a font.
  * Every app's header, title block and sign-in screen goes through this.
  *
- * The image is not part of this package. Each app serves its own copy at
- * `BRAND_LOGO.src` (`public/brand/remi-logo.png`, cut from
+ * The image is not part of this package. Each app that renders this component
+ * (`apps/web`, `apps/admin`) serves its own copy at `BRAND_LOGO.src`
+ * (`public/brand/remi-logo.png`, cut from
  * `packages/ui/brand/logo/remi-logo-charte.png`).
  *
  * The image is `aria-hidden` and the accessible name comes from the hidden
