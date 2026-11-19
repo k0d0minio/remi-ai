@@ -3,13 +3,13 @@ import type { ComponentProps } from "react";
 import { cn } from "../lib/utils";
 
 const input = cva(
-  "flex w-full min-w-0 rounded-md border border-input bg-background text-base transition-colors duration-[--duration-fast] ease-standard outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+  "flex w-full min-w-0 rounded-lg border border-input bg-card text-base transition-colors duration-[--duration-fast] ease-standard outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
   {
     variants: {
       size: {
-        sm: "h-8 px-2.5 py-1",
-        md: "h-9 px-3 py-1",
-        lg: "h-10 px-3.5 py-2",
+        sm: "h-12 px-3.5 py-2",
+        md: "h-12 px-4 py-2",
+        lg: "h-14 px-4 py-2",
       },
       /**
        * Drives the ring and border only. The message that says *what* is wrong

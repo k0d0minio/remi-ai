@@ -78,7 +78,10 @@
 /* ── 2. the semantic layer ─────────────────────────────────────────────────── */
 
 :root {
-  --radius: 0.625rem;
+  /* The radii of the charter (section 6): fields and secondary cards 16 px
+     (`lg`), secondary cards up to 20 px (`xl`), the main card 24 px (`2xl`).
+     `sm` and `md` are for small parts: a checkbox, a menu row, a tooltip. */
+  --radius: 1rem;
 
   --background: var(--grey-0);
   --foreground: var(--grey-950);
@@ -333,11 +336,11 @@
   /* `bg-brand-gradient` — the one gradient utility, from the token above. */
   --background-image-brand-gradient: var(--gradient-brand);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 10px);
+  --radius-md: calc(var(--radius) - 8px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 12px);
+  --radius-2xl: calc(var(--radius) + 8px);
 
   --font-sans: var(--font-family-sans);
   --font-display: var(--font-family-display);
