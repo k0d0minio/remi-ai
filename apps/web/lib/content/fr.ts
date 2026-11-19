@@ -21,8 +21,6 @@ export const fr: Content = {
     label: "Menu du compte",
     account: "Compte",
     language: "Langue",
-    appearance: "Apparence",
-    themes: { system: "Selon le système", light: "Clair", dark: "Sombre" },
     help: "Aide",
     documentation: "Documentation",
     signOut: "Se déconnecter",

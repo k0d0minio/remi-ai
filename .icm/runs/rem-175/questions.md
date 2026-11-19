@@ -2,4 +2,5 @@
 - type: single
 - options: Le retirer | Le garder caché
 - default: Le retirer
-- answer: _waiting_
+- answer: Le garder caché
+- note: Jamie answered in the chat of the session, 2026-11-19.

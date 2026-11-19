@@ -1,5 +1,5 @@
 # Status rem-175
 
 - phase: build
-- blocked: yes — waits for answers
+- blocked: no
 - updated: 2026-11-19
