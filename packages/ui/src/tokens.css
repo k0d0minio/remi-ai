@@ -31,28 +31,29 @@
 /* ── 1. the raw ramps ──────────────────────────────────────────────────────── */
 
 :root {
-  /* The logo blue — #045cc7 sits at 600. Hue 258 at the dark end, drifting to
-     248 at the light end the way the logo's own gradient does from R to M. */
-  --brand-50: oklch(0.97 0.02 252);
-  --brand-100: oklch(0.94 0.045 252);
-  --brand-200: oklch(0.88 0.08 250);
-  --brand-300: oklch(0.78 0.12 248);
-  --brand-400: oklch(0.66 0.16 250);
-  --brand-500: oklch(0.58 0.18 255);
-  --brand-600: oklch(0.497 0.182 258);
-  --brand-700: oklch(0.43 0.165 258);
-  --brand-800: oklch(0.35 0.13 260);
-  --brand-900: oklch(0.27 0.09 260);
-  --brand-950: oklch(0.2 0.06 262);
+  /* The brand blue — #3362ae sits at 600: `brand.primary` of the charter
+     (packages/ui/brand/charte-graphique.md, section 4), the R of the logo.
+     Hue 260 at the dark end, drifting to 255 at the light end. */
+  --brand-50: oklch(0.97 0.014 255);
+  --brand-100: oklch(0.94 0.03 255);
+  --brand-200: oklch(0.88 0.055 256);
+  --brand-300: oklch(0.78 0.085 257);
+  --brand-400: oklch(0.66 0.11 258);
+  --brand-500: oklch(0.56 0.125 259);
+  --brand-600: #3362ae;
+  --brand-700: oklch(0.44 0.115 260);
+  --brand-800: oklch(0.36 0.095 260);
+  --brand-900: oklch(0.28 0.07 260);
+  --brand-950: oklch(0.2 0.05 262);
 
-  /* The logo teal — #00a7a8 sits at 500, the I of the wordmark. Progress,
-     things going right, and the second colour of the brand gradient. Hue 195. */
+  /* The brand teal — #00a6a9 sits at 500: `brand.accent` of the charter, the I
+     of the logo. Hue 195. */
   --vital-50: oklch(0.97 0.025 195);
   --vital-100: oklch(0.94 0.05 195);
   --vital-200: oklch(0.89 0.08 195);
   --vital-300: oklch(0.82 0.1 195);
   --vital-400: oklch(0.74 0.115 195);
-  --vital-500: oklch(0.66 0.113 195);
+  --vital-500: #00a6a9;
   --vital-600: oklch(0.58 0.1 195);
   --vital-700: oklch(0.52 0.09 196);
   --vital-800: oklch(0.43 0.075 196);
@@ -145,13 +146,13 @@
   --error-border: oklch(0.88 0.07 27);
   --error-text: oklch(0.52 0.2 27);
 
-  /* Hue 235 against the brand's 255 — near enough to read as the same family,
-     far enough that an info badge is never mistaken for a primary button. */
-  --info: oklch(0.62 0.13 235);
+  /* `brand.secondary` of the charter (#2a82c5, the M of the logo): the colour
+     of informative pictograms. Hue 246 against the primary's 260. */
+  --info: #2a82c5;
   --info-foreground: var(--grey-50);
-  --info-subtle: oklch(0.96 0.03 235);
-  --info-border: oklch(0.87 0.06 235);
-  --info-text: oklch(0.5 0.12 235);
+  --info-subtle: oklch(0.96 0.03 246);
+  --info-border: oklch(0.87 0.06 246);
+  --info-text: oklch(0.5 0.12 246);
 
   --neutral: var(--grey-100);
   --neutral-foreground: var(--grey-800);
@@ -162,15 +163,6 @@
   --border: var(--grey-200);
   --input: var(--grey-200);
   --ring: var(--brand-500);
-
-  /* The logo's own gradient, R to I. For a price, a badge or a rule that
-     should read as the mark does — never for body text. */
-  --gradient-brand: linear-gradient(
-    90deg,
-    var(--brand-600),
-    oklch(0.576 0.168 252),
-    var(--vital-500)
-  );
 
   /* The lightness/chroma/hue triple the elevation ramp builds every shadow from.
      Shadows are tinted toward the brand, never neutral black — black shadow over
@@ -329,9 +321,6 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-
-  /* `bg-brand-gradient` — the one gradient utility, from the token above. */
-  --background-image-brand-gradient: var(--gradient-brand);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
