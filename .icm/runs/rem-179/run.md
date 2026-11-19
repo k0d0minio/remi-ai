@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-179/donner-aux-boutons-la-forme-en-pilule-de-la-charte
 - branch: contact/rem-179-donner-aux-boutons-la-forme-en-pilule-de-la
 - lane: tweak
-- pr: pending
+- pr: #224
 - started: 2026-11-19
