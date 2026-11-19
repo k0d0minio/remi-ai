@@ -18,7 +18,7 @@ Ouvrez l'aperçu de l'application : le fond de page est bleu très clair (`#F4F8
 
 ## Blockers
 
-- Les aperçus Vercel de `admin` et `app` échouent : « Resource provisioning failed ». Le projet Neon `uat-remi-ai` a 10 branches, sa limite. L'opérateur libère des branches Neon ou monte la limite. Ensuite, une session relance les aperçus.
+- none
 
 ## Do not touch
 
