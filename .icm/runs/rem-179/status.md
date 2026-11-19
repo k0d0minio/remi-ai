@@ -1,5 +1,5 @@
 # Status rem-179
 
 - phase: release
-- blocked: no
+- blocked: yes — the Neon branch limit stops the Vercel previews
 - updated: 2026-11-19
