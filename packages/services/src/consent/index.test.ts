@@ -22,8 +22,12 @@ const publishedHashes: Record<string, string> = {
     "2e8d016d940197d462fdf9c87138a8741b952ab6316d7ee1b5c71f492afc2d1b",
   "care/2/fr-BE":
     "4ce7a5efa35ca4248a83a762d30fccc20d93255a1d2c7d5d473ae3d7cb10826b",
+  "care/3/fr-BE":
+    "72e07a6e66692deafeff9d969e203f4d00d8cf3a6aa351926a3d9ccc0255e12d",
   "genetic/1/fr-BE":
     "f4fc3aa65bfc4081c77801a4ffc400c4bb29de30addc979707e7c8d252a4920b",
+  "genetic/2/fr-BE":
+    "c22213ee66e298c34fc91ba77cbede7078746eb7183fc96bd9061e747bae0d5a",
 };
 
 const idOf = (text: { key: string; version: string; locale: string }) =>
@@ -64,16 +68,16 @@ describe("consent texts", () => {
     expect(consentText("care", "1", "en")).toBeNull();
   });
 
-  it("shows care version 2, with no draft mark and no free pilot", () => {
+  it("shows care version 3, with no draft mark and no free pilot", () => {
     const care = currentConsentText("care", "fr-BE");
-    expect(care.version).toBe("2");
+    expect(care.version).toBe("3");
     expect(care.body).not.toMatch(/À CONFIRMER|À VALIDER|À COMPLÉTER|gratuit/);
   });
 
   it("falls back to fr-BE when the language has no text yet", () => {
     const text = currentConsentText("genetic", "en");
     expect(text.locale).toBe("fr-BE");
-    expect(text.version).toBe("1");
+    expect(text.version).toBe("2");
   });
 });
 
