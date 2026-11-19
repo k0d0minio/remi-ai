@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
@@ -12,14 +12,13 @@ import "../globals.css";
 
 /**
  * One family, self-hosted by `next/font`: no third-party request on the
- * critical path and no layout shift while a webfont arrives. Inter carries
- * everything for now (Jamie, 2026-11-03). With no `--font-display` set, the
- * design system's display face falls back to Inter too.
+ * critical path and no layout shift while a webfont arrives. Plus Jakarta
+ * Sans is the typeface of the charter, weights 400 to 800.
  */
-const inter = Inter({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-jakarta",
 });
 
 type Params = { locale: string };
@@ -66,7 +65,7 @@ const RootLayout = async ({
   }
 
   return (
-    <html lang="fr" className={inter.variable} suppressHydrationWarning>
+    <html lang="fr" className={jakarta.variable} suppressHydrationWarning>
       <body className="flex min-h-dvh flex-col antialiased">
         {underConstruction ? null : <SiteHeader />}
         <main className="flex-1">{children}</main>

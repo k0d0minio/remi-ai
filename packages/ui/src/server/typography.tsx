@@ -6,12 +6,11 @@ const typography = cva("", {
   variants: {
     /**
      * The role the text plays, which is a different question from how big it is.
-     * `display` is the only variant that switches typeface — the serif is for
-     * headlines and nothing else, because it stops reading as authoritative the
-     * moment it appears in body copy.
+     * `display` is a headline. The charter has one typeface: a headline differs
+     * by its weight (800), which the compound variants below set.
      */
     variant: {
-      display: "font-display font-normal",
+      display: "font-display",
       lead: "text-muted-foreground",
       body: "",
       eyebrow: "text-xs font-medium tracking-[0.12em] uppercase",
@@ -58,6 +57,21 @@ const typography = cva("", {
       false: "",
     },
   },
+  /**
+   * The type table of the charter (packages/ui/brand/charte-graphique.md,
+   * section 5). The sizes are in `tokens.css`. The weights are here, after the
+   * `weight` variant, so that they win:
+   *   - screen title: size `2xl` (32 / 38 px), weight 800
+   *   - section title: size `lg` (18 / 24 px) with a strong weight, weight 800
+   *   - card title: size `base` with a strong weight, 16 / 22 px
+   *   - headline: variant `display`, weight 800
+   */
+  compoundVariants: [
+    { size: "2xl", class: "font-extrabold" },
+    { size: "lg", weight: ["semibold", "bold"], class: "font-extrabold" },
+    { size: "base", weight: ["semibold", "bold"], class: "leading-[1.375rem]" },
+    { variant: "display", class: "font-extrabold" },
+  ],
   defaultVariants: {
     variant: "body",
     size: "base",
