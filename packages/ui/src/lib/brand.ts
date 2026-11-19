@@ -41,13 +41,13 @@ export const BRAND_BASELINE = {
 } as const;
 
 /**
- * The brand as literal hex, for the two surfaces that cannot resolve a CSS
- * custom property: `next/og` renders through Satori, which has no browser and
- * no Tailwind pass, and `app/icon.svg` is a static file no stylesheet reaches.
+ * The brand as literal hex, for the surfaces that cannot resolve a CSS custom
+ * property: `next/og` renders through Satori, which has no browser and no
+ * Tailwind pass.
  *
  * Each value tracks a token in `tokens.css` by hand. Move a token there and
- * move it here in the same change, or the social card and the favicon drift
- * away from the site they belong to.
+ * move it here in the same change, or the social card drifts away from the
+ * site it belongs to.
  */
 export const BRAND_COLORS = {
   /** `--brand-600`, the primary fill — the logo's R, and the brand on paper. */
@@ -63,26 +63,15 @@ export const BRAND_COLORS = {
 } as const;
 
 /**
- * The brand's mark is the logo image in `packages/ui/brand/logo/` — the
- * gradient wordmark Morgane delivered on 2 November 2026 — and the public site
- * renders that file. The glyph below is the earlier serif R, kept only for the
- * favicons of the product, the console and the docs until those take the logo
- * mark too (`triage/logo-mark-in-every-app`).
- *
- * The glyph: a serif R as outline, drawn on a 100-unit cap height and spanning
- * x 8…90. Outline plus counter in one path, so it needs `fill-rule="evenodd"`.
- *
- * A path rather than a `<text>` element because the icon has to render where no
- * font is loaded — `next/og` rasterises through resvg, which draws paths and
- * cannot be relied on for type. It is the same reason `Wordmark` and this are
- * separate things: one is text, the other is a shape that looks like text.
- *
- * Each app's `app/icon.svg` carries a copy — a static metadata file is served
- * verbatim and cannot import. Change the glyph here and in those five files
- * together; nothing else can enforce it.
+ * The logo: Morgane's image, as the charter of 16 November 2026 shows it.
+ * The source is `packages/ui/brand/logo/remi-logo-charte.png`. The served file
+ * is the same letters with a transparent background. Each app copies it to
+ * `public/brand/remi-logo.png`, because a package cannot serve a file. The
+ * favicons are images too: each app has its own `app/icon.png` and
+ * `app/apple-icon.png`, cut from the same source.
  */
-export const BRAND_GLYPH_PATH =
-  "M12 0 L48 0 C66 0 76 10 76 26 C76 42 66 50 50 52 L60 54 L76 92 L90 92 L90 100 L56 100 L56 92 L64 92 L46 56 L34 56 L34 92 L46 92 L46 100 L8 100 L8 92 L20 92 L20 8 L12 8 Z M34 11 L46 11 C54 11 60 16 60 26 C60 36 54 41 46 41 L34 41 Z";
-
-/** The glyph's own box, for an `<svg viewBox>` that crops to the mark exactly. */
-export const BRAND_GLYPH_VIEW_BOX = "8 0 82 100";
+export const BRAND_LOGO = {
+  src: "/brand/remi-logo.png",
+  width: 725,
+  height: 229,
+} as const;

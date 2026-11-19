@@ -12,17 +12,20 @@ shows it (725 × 229). Where this file and the charter differ, the charter is th
 
 ## Files
 
-| File                            | Is                                                                                                   | Served by                                                      |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `logo/remi-logo-1024.png`       | The logo as delivered: 1024 × 1024, near-white background. The only original.                        | —                                                              |
-| `logo/remi-logo.png`            | The wordmark cropped from the original, background made transparent. 693 × 240.                      | `apps/marketing/public/brand/`, `apps/docs/public/` (at 560 px) |
-| `logo/remi-mark.png`            | The R of the wordmark alone, on a transparent square. The favicon.                                   | `apps/marketing/app/icon.png` and `apple-icon.png`             |
-| `portraits/morgane-paquet.jpg`  | Portrait, 800 × 800.                                                                                 | `apps/marketing/public/team/` (at 640 px)                      |
-| `portraits/arnaud-ruelle.png`   | Portrait, 800 × 800.                                                                                 | `apps/marketing/public/team/` (at 640 px, JPEG)                |
-| `portraits/jamie-nisbet.jpg`    | Portrait, 454 × 454.                                                                                 | `apps/marketing/public/team/`                                  |
-| `visuals/hero.png`              | The hero visual: a woman with a phone inside a blue ring, with food and activity icons. 1386 × 780.  | nothing yet                                                    |
-| `visuals/phone-mockup.png`      | A phone mockup of the app. 1362 × 1362. The screens in it are fictional.                             | nothing yet                                                    |
-| `visuals/woman-with-phone.png`  | The woman of the hero visual alone, transparent background. 2476 × 1651.                             | nothing yet                                                    |
+| File                           | Is                                                                                                  | Served by                                                       |
+| ------------------------------ | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `logo/remi-logo-1024.png`      | The logo as delivered on 2 November: 1024 × 1024, near-white background, a gradient.                | —                                                               |
+| `logo/remi-logo-charte.png`    | The logo as the charter shows it: 725 × 229, white background, flat colours. The reference.         | —                                                               |
+| `logo/remi-logo.png`           | The charter logo with a transparent background. 725 × 229.                                          | `apps/{web,admin,marketing}/public/brand/`, `apps/docs/public/` |
+| `logo/remi-mark.png`           | The R of the charter logo alone, on a transparent square. 230 × 230.                                | —                                                               |
+| `logo/remi-icon.png`           | The R on a white rounded square. 256 × 256. The favicon.                                            | `app/icon.png` of the four apps                                 |
+| `logo/remi-apple-icon.png`     | The R on a white square with no radius. 180 × 180.                                                  | `app/apple-icon.png` of the four apps                           |
+| `portraits/morgane-paquet.jpg` | Portrait, 800 × 800.                                                                                | `apps/marketing/public/team/` (at 640 px)                       |
+| `portraits/arnaud-ruelle.png`  | Portrait, 800 × 800.                                                                                | `apps/marketing/public/team/` (at 640 px, JPEG)                 |
+| `portraits/jamie-nisbet.jpg`   | Portrait, 454 × 454.                                                                                | `apps/marketing/public/team/`                                   |
+| `visuals/hero.png`             | The hero visual: a woman with a phone inside a blue ring, with food and activity icons. 1386 × 780. | nothing yet                                                     |
+| `visuals/phone-mockup.png`     | A phone mockup of the app. 1362 × 1362. The screens in it are fictional.                            | nothing yet                                                     |
+| `visuals/woman-with-phone.png` | The woman of the hero visual alone, transparent background. 2476 × 1651.                            | nothing yet                                                     |
 
 Some of the visuals may be AI-generated. Check the rights of use before one of them is served
 on a public page.
@@ -43,6 +46,9 @@ The wordmark is always the image, never typed.
 
 ## Why a logo is a PNG here
 
-No vector file exists. A vector or a higher-definition export would replace `remi-logo-1024.png`
-and the derived files would be cut again from it. The derived files were cut with Pillow: a
-colour-to-alpha pass against the original's background, then a crop to the letters.
+No vector file exists (Jamie, 19 November 2026). `logo/remi-logo-charte.png` is the reference:
+its letters have flat colours and clean edges, and the November original has a gradient and
+rougher edges. A vector or a higher-definition export of the charter logo would replace it, and
+the derived files would be cut again. They were cut with Pillow: each letter is one flat colour on
+white, so the alpha of a pixel is its distance from white divided by the letter's distance from
+white, and the colour stays the letter's colour. The letters are not redrawn or moved.

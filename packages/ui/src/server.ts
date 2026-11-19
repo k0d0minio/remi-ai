@@ -69,9 +69,8 @@ export { intents, type Intent } from "./lib/intent";
 export {
   BRAND_BASELINE,
   BRAND_COLORS,
-  BRAND_GLYPH_PATH,
-  BRAND_GLYPH_VIEW_BOX,
   BRAND_LEGAL_NAME,
+  BRAND_LOGO,
   BRAND_NAME,
   BRAND_TAGLINE,
 } from "./lib/brand";

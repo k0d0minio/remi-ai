@@ -21,7 +21,7 @@ export const SiteHeader = () => (
         aria-label={HEADER.logoLabel}
         className="focus-visible:ring-ring rounded-sm focus-visible:outline-none focus-visible:ring-[3px]"
       >
-        <Logo height={30} priority />
+        <Logo height={32} priority />
       </NextLink>
 
       <nav aria-label="Navigation principale" className="hidden items-center gap-6 lg:flex">

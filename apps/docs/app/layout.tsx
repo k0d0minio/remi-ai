@@ -12,7 +12,8 @@ import "nextra-theme-docs/style.css";
  * purpose — it is reference material, not product surface — and taking a
  * dependency on it for two string constants would undo that for no gain. The
  * names still have to match `BRAND_NAME` / `BRAND_LEGAL_NAME`. The logo image
- * under `public/` is a copy of `packages/ui/brand/logo/remi-logo.png`.
+ * under `public/` is a copy of `packages/ui/brand/logo/remi-logo.png`, the
+ * charter's logo with a transparent background.
  *
  * The origins below are the opposite case, and that is why `@remi/services` is
  * the one workspace dependency this app does take: an origin spelled out here
@@ -41,18 +42,20 @@ export const metadata: Metadata = {
  * The logo. Morgane's image is the brand mark (`packages/ui/brand/logo/`), so
  * the navbar shows the image and types nothing: a typed name would be a second
  * logo this repo would then have to keep in step. The copy under `public/` is
- * the 560 px export; the navbar shows it at 26 px high.
+ * 725 × 229 px; the navbar shows it at 32 px high, about 101 px wide, which is
+ * in the charter's 96 to 120 px for a phone.
  *
  * "docs" stays in the theme's own sans at a lower weight and opacity: it is the
  * qualifier, not part of the brand.
  *
  * The visible image is `aria-hidden` and the accessible name comes from the
  * hidden label, so a screen reader hears the product name once, as a word.
- * The dark theme lifts the image's brightness: the mark is set for paper.
+ * The charter forbids the logo on a dark background and forbids changed
+ * colours. The dark theme therefore puts the image on a white plate.
  */
 const logoImageStyle: CSSProperties = {
   display: "block",
-  height: "1.625rem",
+  height: "2rem",
   width: "auto",
 };
 
@@ -82,7 +85,8 @@ const logoStyle: CSSProperties = {
   gap: "0.5em",
 };
 
-const darkLogoCss = "html.dark .remi-logo { filter: brightness(1.7); }";
+const darkLogoCss =
+  "html.dark .remi-logo { box-sizing: content-box; padding: 0.25rem 0.5rem; border-radius: 0.5rem; background: #ffffff; }";
 
 const Logo = () => (
   <span style={logoStyle}>
@@ -94,8 +98,8 @@ const Logo = () => (
       aria-hidden="true"
       className="remi-logo"
       style={logoImageStyle}
-      width={560}
-      height={193}
+      width={725}
+      height={229}
     />
     <span aria-hidden="true" style={qualifierStyle}>
       docs
