@@ -52,7 +52,7 @@ export const UserMenu = ({ name, initials, role, locale, content }: Props) => {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={content.userMenu.label}
-        className="focus-visible:ring-ring/40 hover:bg-accent flex items-center gap-2 rounded-md p-1 pr-2 transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
+        className="focus-visible:ring-ring hover:bg-accent flex items-center gap-2 rounded-md p-1 pr-2 transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
       >
         <Avatar size="sm">
           <AvatarFallback>{initials}</AvatarFallback>
