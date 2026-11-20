@@ -111,8 +111,9 @@ The repo works in two languages, and the split is a rule, not a habit:
   guillemets for quotes.
 - **French is the language of the conversation with them** — Slack, email, meeting notes —
   whoever starts the thread.
-- **Product copy is out of scope here.** UI strings follow each app's locale system (`marketing`
-  ships English and French); this section governs working documents, not the product.
+- **Product copy is French only** (Jamie, 2026-11-20). Every page, message and e-mail that a user
+  reads is in French (`fr-BE`): no English text and no second locale in an app. The `[locale]`
+  segment of `apps/web` and `apps/marketing` stays, with `fr` as its one value.
 
 ## The design system
 

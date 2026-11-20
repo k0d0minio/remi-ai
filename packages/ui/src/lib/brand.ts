@@ -15,15 +15,14 @@ export const BRAND_NAME = "REMI";
 export const BRAND_LEGAL_NAME = "Remi AI";
 
 /**
- * The canonical one-liner, in both languages the estate ships in. Marketing
- * copy quotes it; nothing paraphrases it.
+ * The canonical one-liner. Marketing copy quotes it; nothing paraphrases
+ * it. The estate is French only (Jamie, 2026-11-20), so the table has one
+ * entry, keyed by locale.
  *
- * The French is the line Morgane wrote for the public site's footer
- * (2 November 2026) and is the one that is canonical. The English is a
- * translation of it for the product's English surfaces, not a second tagline.
+ * It is the line Morgane wrote for the public site's footer (2 November
+ * 2026).
  */
 export const BRAND_TAGLINE = {
-  en: "Personalised nutrition recommendations, easy to apply every day.",
   fr: "Des recommandations nutritionnelles personnalisées, faciles à appliquer au quotidien.",
 } as const;
 
@@ -33,10 +32,9 @@ export const BRAND_TAGLINE = {
  * not replace `BRAND_TAGLINE`, which stays the description line for metadata
  * and link previews (Jamie, 2026-11-19, REM-183).
  *
- * The French is Morgane's and is canonical. The English is its translation.
+ * The line is Morgane's.
  */
 export const BRAND_BASELINE = {
-  en: "Between recommendation and action",
   fr: "Entre recommandation et action",
 } as const;
 

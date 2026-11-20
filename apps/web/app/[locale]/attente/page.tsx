@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import NextLink from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getPatientWaitingView, patientActor } from "@remi/services/server";
-import { isLocale, localePath, type Locale } from "@remi/services/shared";
+import {
+  defaultLocale,
+  isLocale,
+  localePath,
+} from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Card, CardContent, Typography, Wordmark } from "@remi/ui/server";
 import { SignOutButton } from "@/components/patient-auth/sign-out-button";
@@ -22,7 +26,7 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const { locale } = await params;
   return {
-    title: getContent(isLocale(locale) ? locale : "en").patientWaiting
+    title: getContent(isLocale(locale) ? locale : defaultLocale).patientWaiting
       .metaTitle,
   };
 };
@@ -31,8 +35,8 @@ export const generateMetadata = async ({
  * A `YYYY-MM-DD` day in words. The day has no timezone, so it is read and
  * written in UTC: the server's clock cannot move it to the day before.
  */
-const dayInWords = (day: string, locale: Locale) =>
-  new Intl.DateTimeFormat(locale === "fr" ? "fr-BE" : "en-GB", {
+const dayInWords = (day: string) =>
+  new Intl.DateTimeFormat("fr-BE", {
     dateStyle: "long",
     timeZone: "UTC",
   }).format(new Date(`${day}T00:00:00Z`));
@@ -100,7 +104,7 @@ const WaitingPage = async ({ params }: { params: Promise<Params> }) => {
                     {text.appointmentLabel}
                   </Typography>
                   <Typography as="dd" size="base" weight="semibold">
-                    {dayInWords(appointmentDate, locale)}
+                    {dayInWords(appointmentDate)}
                   </Typography>
                 </div>
               ) : null}

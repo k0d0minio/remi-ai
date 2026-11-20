@@ -66,7 +66,7 @@ export const Field = ({
       >
         {label}
         {optional ? (
-          <span className="text-muted-foreground font-normal">(optional)</span>
+          <span className="text-muted-foreground font-normal">(facultatif)</span>
         ) : null}
       </label>
 

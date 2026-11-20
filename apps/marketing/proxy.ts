@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { isLocale } from "@remi/services/shared";
+import { defaultLocalePath } from "@remi/services/shared";
 import {
   underConstruction,
   underConstructionSegment,
@@ -31,13 +31,10 @@ const proxy = (request: NextRequest) => {
     return NextResponse.next();
   }
 
+  // A first segment of two letters is a language that is not served (`/en`):
+  // `defaultLocalePath` replaces it. A path with no language gets the prefix.
   const url = request.nextUrl.clone();
-  const rest = isLocale(first)
-    ? pathname.slice(first.length + 1)
-    : pathname === "/"
-      ? ""
-      : pathname;
-  url.pathname = `/fr${rest}`;
+  url.pathname = defaultLocalePath(pathname);
   return NextResponse.redirect(url);
 };
 

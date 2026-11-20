@@ -57,7 +57,7 @@ const Aliments = async ({ searchParams }: { searchParams: SearchParams }) => {
         </Typography>
         <Typography size="sm" tone="muted">
           {imported
-            ? `${formatNumber(imported.foodCount, "fr-FR")} aliments — ${imported.edition}, table de composition nutritionnelle de l'ANSES.`
+            ? `${formatNumber(imported.foodCount)} aliments — ${imported.edition}, table de composition nutritionnelle de l'ANSES.`
             : "Aucun import pour le moment — la table est vide tant que le script d'import n'a pas tourné."}
         </Typography>
       </div>

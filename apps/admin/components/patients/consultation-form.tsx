@@ -10,7 +10,7 @@ import {
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import type { PatientGoal, PatientGoalCheckIn } from "@remi/services/shared";
-import { goalDirections } from "@remi/services/shared";
+import { formatDate, goalDirections } from "@remi/services/shared";
 import {
   Button,
   Select,
@@ -348,7 +348,7 @@ export const ConsultationForm = ({
                     </Typography>
                     <Typography size="sm" tone="muted">
                       {last
-                        ? `Dernier point : ${last.checkedOn}${
+                        ? `Dernier point : ${formatDate(last.checkedOn)}${
                             last.measure ? ` · ${last.measure}` : ""
                           }${
                             last.direction

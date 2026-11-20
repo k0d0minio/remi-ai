@@ -59,44 +59,34 @@ export type ProteinAdaptation =
 /** The text of each adaptation. The reference-weight note is Morgane's wording. */
 export const proteinAdaptationLabels = {
   age_65_plus: {
-    fr: "65 ans ou plus : coefficient de 1 à 1,2 g/kg/jour proposé, non appliqué sans votre confirmation",
-    en: "65 and over: a coefficient of 1 to 1.2 g/kg/day is proposed, not applied without your confirmation",
+    fr: "65 ans ou plus : coefficient de 1 à 1,2 g/kg/jour proposé, non appliqué sans votre confirmation"
   },
   pregnancy_1: {
-    fr: "Grossesse, 1er trimestre : + 1 g/jour, ajouté à l'estimation",
-    en: "Pregnancy, 1st trimester: + 1 g/day, added to the estimate",
+    fr: "Grossesse, 1er trimestre : + 1 g/jour, ajouté à l'estimation"
   },
   pregnancy_2: {
-    fr: "Grossesse, 2e trimestre : + 9 g/jour, ajouté à l'estimation",
-    en: "Pregnancy, 2nd trimester: + 9 g/day, added to the estimate",
+    fr: "Grossesse, 2e trimestre : + 9 g/jour, ajouté à l'estimation"
   },
   pregnancy_3: {
-    fr: "Grossesse, 3e trimestre : + 28 g/jour, ajouté à l'estimation",
-    en: "Pregnancy, 3rd trimester: + 28 g/day, added to the estimate",
+    fr: "Grossesse, 3e trimestre : + 28 g/jour, ajouté à l'estimation"
   },
   lactation_first_6_months: {
-    fr: "Allaitement, 6 premiers mois : + 19 g/jour, ajouté à l'estimation",
-    en: "Lactation, first 6 months: + 19 g/day, added to the estimate",
+    fr: "Allaitement, 6 premiers mois : + 19 g/jour, ajouté à l'estimation"
   },
   lactation_after_6_months: {
-    fr: "Allaitement, après 6 mois : + 13 g/jour, ajouté à l'estimation",
-    en: "Lactation, after 6 months: + 13 g/day, added to the estimate",
+    fr: "Allaitement, après 6 mois : + 13 g/jour, ajouté à l'estimation"
   },
   pathology: {
-    fr: "Pathologie : validation obligatoire",
-    en: "Pathology: validation is mandatory",
+    fr: "Pathologie : validation obligatoire"
   },
   malnutrition: {
-    fr: "Dénutrition : validation obligatoire",
-    en: "Malnutrition: validation is mandatory",
+    fr: "Dénutrition : validation obligatoire"
   },
   other: {
-    fr: "Situation particulière : validation obligatoire",
-    en: "Special situation: validation is mandatory",
+    fr: "Situation particulière : validation obligatoire"
   },
   reference_weight_review: {
-    fr: "Un poids de référence protéique différent peut devoir être évalué",
-    en: "A different protein reference weight may need to be evaluated",
+    fr: "Un poids de référence protéique différent peut devoir être évalué"
   },
 } as const satisfies Record<
   ProteinAdaptation,

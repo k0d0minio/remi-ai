@@ -91,10 +91,10 @@ describe("the lists of the safety block", () => {
     ).toEqual({ state: "listed", items: ["mystery — odd"] });
   });
 
-  it("answers in English on request", () => {
+  it("answers in French when the locale is named", () => {
     expect(
-      safetyList("allergy", false, [box("allergy", "tree_nuts", "all")], "en"),
-    ).toEqual({ state: "listed", items: ["Tree nuts — all"] });
+      safetyList("allergy", false, [box("allergy", "tree_nuts", "all")], "fr"),
+    ).toEqual({ state: "listed", items: ["Fruits à coque — tous"] });
   });
 });
 
@@ -102,6 +102,5 @@ describe("the strict gluten line", () => {
   it("names the strict exclusion and the cross-contamination", () => {
     expect(strictGlutenLabel.fr).toContain("exclusion stricte");
     expect(strictGlutenLabel.fr).toContain("contaminations croisées");
-    expect(strictGlutenLabel.en).toContain("cross-contamination");
   });
 });

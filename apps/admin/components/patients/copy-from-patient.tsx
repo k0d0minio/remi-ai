@@ -2,7 +2,7 @@
 
 import { ArrowLeft, Users } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
-import type { ProtocolCopyKindName } from "@remi/services/shared";
+import { formatDate, type ProtocolCopyKindName } from "@remi/services/shared";
 import { Button, Checkbox } from "@remi/ui";
 import { Input, Typography } from "@remi/ui/server";
 import {
@@ -225,7 +225,9 @@ const SourceList = ({
           >
             <Typography size="sm">{source.pseudonym}</Typography>
             <Typography size="sm" tone="muted">
-              {source.lastConsultationOn ?? "aucune consultation"}
+              {source.lastConsultationOn
+                ? formatDate(source.lastConsultationOn)
+                : "aucune consultation"}
             </Typography>
           </button>
         ))}

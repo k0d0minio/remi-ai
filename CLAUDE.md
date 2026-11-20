@@ -54,7 +54,9 @@ the production database moves to Postgres 18 at the next promotion (Jamie, 2026-
 
 ## Rules
 
-- Client-facing text in `fr-BE` and `en`. Code, commits and notes in English.
+- Text that a user reads is French only (`fr-BE`), on every page, message and e-mail of the four
+  apps (Jamie, 2026-11-20). Add no English text and no second locale. Code, commits and notes in
+  English.
 - Technical text (pull request bodies, commits, questions) in Simplified Technical English:
   short active sentences, one instruction each, no semicolons. A question for Jamie is numbered
   and carries a default answer.

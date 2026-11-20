@@ -8,7 +8,7 @@ import { Skeleton, VisuallyHidden } from "@remi/ui/server";
  */
 const Loading = () => (
   <div role="status" aria-live="polite" className="flex flex-col gap-6">
-    <VisuallyHidden>Loading · Chargement</VisuallyHidden>
+    <VisuallyHidden>Chargement</VisuallyHidden>
     <div className="flex flex-col gap-2">
       <Skeleton className="h-8 w-48" />
       <Skeleton className="h-5 w-full max-w-lg" />

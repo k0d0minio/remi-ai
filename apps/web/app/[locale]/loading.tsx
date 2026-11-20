@@ -4,7 +4,7 @@ import { Skeleton, VisuallyHidden } from "@remi/ui/server";
  * The entry screen's split, in grey. It mirrors the real layout closely enough
  * that nothing moves when the page arrives.
  *
- * One string in both languages because a loading boundary receives no params —
+ * The string is written here because a loading boundary receives no params:
  * there is no locale here to pick a dictionary with.
  */
 const Loading = () => (
@@ -13,7 +13,7 @@ const Loading = () => (
     aria-live="polite"
     className="grid min-h-dvh lg:grid-cols-2"
   >
-    <VisuallyHidden>Loading · Chargement</VisuallyHidden>
+    <VisuallyHidden>Chargement</VisuallyHidden>
 
     <div className="bg-primary-subtle hidden flex-col justify-center gap-10 border-r p-12 lg:flex xl:p-16">
       <Skeleton className="h-8 w-28" />

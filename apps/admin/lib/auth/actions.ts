@@ -8,6 +8,7 @@ import {
   hasOperator,
   verifyOperator,
 } from "@remi/services/server";
+import { userMessage } from "@remi/services/shared";
 import { audit } from "@/lib/audit";
 import { ensureDatabase } from "@/lib/database";
 import { setSessionCookie } from "./cookie";
@@ -24,7 +25,7 @@ export const signInAction = async (
   const password = String(formData.get("password") ?? "");
   const result = await verifyOperator(email, password);
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(result.data, "operator.signed_in");
   await setSessionCookie(result.data.id);
@@ -71,7 +72,7 @@ export const bootstrapAction = async (
     role: "admin",
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(result.data, "operator.joined", {
     type: "operator",

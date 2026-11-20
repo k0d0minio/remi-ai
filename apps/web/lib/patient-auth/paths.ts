@@ -3,7 +3,7 @@ import type { PatientLanding } from "@remi/services/shared";
 /**
  * The patient's routes, as paths under the locale. One home for them: the
  * sign-up, the sign-in and the pages behind the patient session all link here.
- * The same French paths serve both locales, as `/inscription` does.
+ * The paths are French, as `/inscription` is.
  */
 export const SIGN_IN_PATH = "/connexion";
 export const FORGOT_PASSWORD_PATH = "/connexion/mot-de-passe-oublie";

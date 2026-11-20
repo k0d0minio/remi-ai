@@ -20,7 +20,6 @@ import {
   cookingTimes,
   foodBudgets,
   formatDate,
-  locales,
   mandatoryQuestionnaireFieldLabels,
   missingBySection,
   missingMandatoryFields,
@@ -68,7 +67,6 @@ import {
   cookingAffinityLabels,
   cookingTimeLabels,
   foodBudgetLabels,
-  localeLabels,
   patientSexLabels,
   patientStatusLabels,
 } from "@/components/patients/vocabulary";
@@ -306,18 +304,6 @@ export const PatientForm = ({
                   defaultValue={patient?.pseudonym ?? ""}
                 />
               </Field>
-
-              <ChoiceCards
-                name="locale"
-                legend="Langue"
-                hint="La langue dans laquelle s'affiche le lien patient."
-                clearable={false}
-                initial={patient?.locale ?? "fr"}
-                options={locales.map((locale) => ({
-                  value: locale,
-                  label: localeLabels[locale],
-                }))}
-              />
 
               <ChoiceCards
                 name="sex"

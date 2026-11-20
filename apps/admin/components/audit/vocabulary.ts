@@ -303,14 +303,34 @@ const fileStatusReasons: Readonly<Record<string, string>> = {
 };
 
 /**
+ * The French of the details that a service stores as an English word or
+ * phrase. The stored row does not change: the journal reads it through this
+ * table. A detail that is a name, a date, a count or a technical key shows as
+ * it is stored.
+ */
+const storedDetails: Readonly<Record<string, string>> = {
+  "consent given": "consentement donné",
+  "consent refused": "consentement refusé",
+  "consent withdrawn": "consentement retiré",
+  inactivity: "inactivité",
+  "patient not identified": "patient non identifié",
+  link: "lien",
+  file: "fichier",
+  acquired: "acquis",
+  not_acquired: "non acquis",
+  abandoned: "abandonné",
+};
+
+/**
  * The detail as the journal shows it. A file status move is stored as
  * `to_complete → ready: <reason>` and reads with the French labels here. A
- * reason with no French entry is left out, never shown in English. Every
- * other detail shows as it is stored. No stored row changes.
+ * reason with no French entry is left out, never shown in English. A detail of
+ * `storedDetails` reads in French. Every other detail shows as it is stored.
+ * No stored row changes.
  */
 export const detailLabel = (action: AuditActionName, detail: string) => {
   if (action !== "patient.file_status_changed") {
-    return detail;
+    return storedDetails[detail] ?? detail;
   }
   const [, from, to, reason] =
     /^(\w+) → (\w+)(?:: (.*))?$/.exec(detail) ?? [];

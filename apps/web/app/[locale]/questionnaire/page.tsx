@@ -8,7 +8,7 @@ import {
   missingQuestionnaireFields,
   patientActor,
 } from "@remi/services/server";
-import { isLocale, type Locale } from "@remi/services/shared";
+import { defaultLocale, isLocale } from "@remi/services/shared";
 import { Wordmark } from "@remi/ui/server";
 import { SignOutButton } from "@/components/patient-auth/sign-out-button";
 import { getContent } from "@/lib/content";
@@ -34,18 +34,14 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const { locale } = await params;
   return {
-    title: getContent(isLocale(locale) ? locale : "en").questionnaire.metaTitle,
+    title: getContent(isLocale(locale) ? locale : defaultLocale).questionnaire
+      .metaTitle,
   };
 };
 
-/** A kilogram value as the patient types it: a comma in French. */
-const kilograms = (value: number | null, locale: Locale) => {
-  if (value === null) {
-    return "";
-  }
-  const typed = String(value);
-  return locale === "fr" ? typed.replace(".", ",") : typed;
-};
+/** A kilogram value as the patient types it: with a comma. */
+const kilograms = (value: number | null) =>
+  value === null ? "" : String(value).replace(".", ",");
 
 /**
  * The preparatory questionnaire (story 4), where a new patient lands after
@@ -89,9 +85,9 @@ const QuestionnairePage = async ({
     phone: profile.phone ?? "",
     sexForCalculation: answers.sexForCalculation ?? "",
     heightCm: profile.heightCm === null ? "" : String(profile.heightCm),
-    weightKg: kilograms(profile.weightKg, locale),
+    weightKg: kilograms(profile.weightKg),
     activityLevel: answers.activityLevel ?? "",
-    desiredWeightKg: kilograms(answers.desiredWeightKg, locale),
+    desiredWeightKg: kilograms(answers.desiredWeightKg),
     consultationReason: answers.consultationReason ?? "",
     consultationDate: answers.consultationDate ?? "",
     diet: answers.diet ?? "",

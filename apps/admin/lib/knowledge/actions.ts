@@ -8,6 +8,7 @@ import {
   updateNutritionRule,
   validateNutritionRule,
 } from "@remi/services/server";
+import { userMessage } from "@remi/services/shared";
 import { audit } from "@/lib/audit";
 import { requireOperator } from "@/lib/auth/session";
 
@@ -58,7 +59,7 @@ export const createRuleAction = async (
     kind: field(formData, "kind"),
   });
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   await audit(operator, "nutrition_rule.created", {
     type: "nutrition_rule",
@@ -88,7 +89,7 @@ export const updateRuleAction = async (
     kind: field(formData, "kind"),
   });
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   const { rule, revised } = result.data;
   await audit(
