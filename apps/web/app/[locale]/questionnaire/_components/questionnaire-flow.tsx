@@ -5,16 +5,8 @@ import { useSearchParams } from "next/navigation";
 import {
   activityLevelDetails,
   activityLevels,
-  allergenLabels,
-  allergens,
-  allergenSubLabels,
-  allergenSubLists,
-  allSubKeyLabel,
   dietLabels,
   diets,
-  intoleranceLabels,
-  intolerances,
-  noneKnownLabels,
   sexesForCalculation,
   sexForCalculationLabels,
   type Locale,
@@ -44,7 +36,6 @@ import { AllergenAnswer } from "./allergen-answer";
 import { ChoiceAnswer } from "./choice-answer";
 import { DateAnswer } from "./date-answer";
 import { DietAnswer } from "./diet-answer";
-import { FlagAnswer } from "./flag-answer";
 import { GeneticSection, type GeneticValues } from "./genetic-section";
 import { IdentitySection, type IdentityValues } from "./identity-section";
 import {
@@ -69,7 +60,6 @@ export type QuestionnaireValues = GeneticValues &
   diet: string;
   dietNote: string;
   pathologies: string;
-  celiacDisease: boolean | null;
   medications: string;
   supplements: string;
   noKnownAllergies: boolean | null;
@@ -92,23 +82,6 @@ type Props = {
 
 /** One year. The cookie holds a step key only, never an answer. */
 const STEP_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
-
-/** The allergy sub-lists in the patient's language, each in the story's order. */
-const subListsOf = (locale: Locale) =>
-  Object.fromEntries(
-    Object.entries(allergenSubLists).map(([key, subKeys]) => {
-      const labels = allergenSubLabels[
-        key as keyof typeof allergenSubLabels
-      ] as Record<string, Record<Locale, string>>;
-      return [
-        key,
-        subKeys.map((subKey) => ({
-          key: subKey,
-          label: labels[subKey][locale],
-        })),
-      ];
-    }),
-  );
 
 /**
  * The preparatory questionnaire (story 4), as a guided journey (REM-156): a
@@ -355,15 +328,8 @@ export const QuestionnaireFlow = ({
           />
           <AllergenAnswer
             kind="allergy"
-            legend={<MandatoryLabel label={label("allergies")} />}
-            hint={text.hints.allergies}
-            noneKnownLabel={noneKnownLabels.allergy[locale]}
-            options={allergens.map((key) => ({
-              key,
-              label: allergenLabels[key][locale],
-            }))}
-            subLists={subListsOf(locale)}
-            allLabel={allSubKeyLabel[locale]}
+            legend={<MandatoryLabel label={text.food.allergiesQuestion} />}
+            hint={text.food.allergiesHint}
             initialNoneKnown={values.noKnownAllergies}
             initialRows={values.allergens.filter(
               (row) => row.kind === "allergy",
@@ -373,12 +339,6 @@ export const QuestionnaireFlow = ({
             kind="intolerance"
             legend={<MandatoryLabel label={label("intolerances")} />}
             hint={text.hints.intolerances}
-            noneKnownLabel={noneKnownLabels.intolerance[locale]}
-            options={intolerances.map((key) => ({
-              key,
-              label: intoleranceLabels[key][locale],
-            }))}
-            allLabel={allSubKeyLabel[locale]}
             initialNoneKnown={values.noKnownIntolerances}
             initialRows={values.allergens.filter(
               (row) => row.kind === "intolerance",
@@ -387,30 +347,27 @@ export const QuestionnaireFlow = ({
         </Section>
 
         <Section current={section} name="sante" title={text.sections.sante}>
-          <FlagAnswer
-            field="celiacDisease"
-            label={text.labels.celiacDisease}
-            hint={text.hints.celiacDisease}
-            initial={values.celiacDisease}
-          />
+          {/* Three questions (REM-165). Coeliac disease goes in the first
+              one, and the practitioner confirms it in the console. */}
           <TextAnswer
             field="pathologies"
             multiline
-            label={text.labels.pathologies}
+            label={text.health.pathologies}
+            placeholder={text.health.pathologiesPlaceholder}
             initial={values.pathologies}
           />
           <TextAnswer
             field="medications"
             multiline
-            label={<OptionalLabel label={text.labels.medications} />}
-            hint={text.hints.medications}
+            label={<OptionalLabel label={text.health.medications} />}
+            placeholder={text.health.medicationsPlaceholder}
             initial={values.medications}
           />
           <TextAnswer
             field="supplements"
             multiline
-            label={<OptionalLabel label={text.labels.supplements} />}
-            hint={text.hints.supplements}
+            label={<OptionalLabel label={text.health.supplements} />}
+            placeholder={text.health.supplementsPlaceholder}
             initial={values.supplements}
           />
         </Section>

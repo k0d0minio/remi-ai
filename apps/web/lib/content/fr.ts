@@ -261,213 +261,6 @@ export const fr: Content = {
       body: "Tes étapes apparaîtront ici une fois que ton praticien aura publié un plan.",
     },
   },
-  patientLink: {
-    greeting: "Bonjour",
-    lead: "Ton espace REMI : ce qui a été convenu avec ta praticienne, au même endroit.",
-    navLabel: "Tes pages",
-    nav: {
-      home: "Aujourd'hui",
-      recommandations: "Recommandations",
-      complements: "Compléments",
-      "placard-frigo": "Placard & frigo",
-      recettes: "Recettes",
-      documents: "Documents",
-      repas: "Repas",
-      progression: "Ma progression",
-      messages: "Messages",
-      profil: "Mon profil",
-    },
-    todayTitle: "Aujourd'hui / cette semaine",
-    challenge: {
-      title: "Le challenge du moment",
-      since: "depuis le",
-      acquired: "Challenge acquis",
-      readyForNext: "Prêt(e) pour le prochain",
-      empty:
-        "Pas de challenge en cours pour l'instant — ta praticienne t'en proposera un.",
-      errors: {
-        invalid_input: "Cela n'a pas pu être enregistré. Recharge la page.",
-        rate_limited:
-          "Tu as écrit beaucoup de choses d'un coup — réessaie dans un instant.",
-        not_found: "Ce challenge a changé entre-temps. Recharge la page.",
-        unknown: "Cela n'a pas fonctionné. Réessaie dans un instant.",
-      },
-    },
-    weeklyCheckIn: {
-      title: "Ta semaine",
-      lead: "Un chiffre par objectif, de 0 à 5 — ta praticienne le verra.",
-      question: "Cette semaine, comment ça s'est passé pour :",
-      scaleLow: "0 — pas bien du tout",
-      scaleHigh: "5 — très bien",
-      noteLabel: "Un mot (facultatif)",
-      submit: "Envoyer",
-      answeredOn: "Merci ! Réponse envoyée le",
-      nextOn: "Prochaine question le",
-      errors: {
-        invalid_input: "Choisis au moins un chiffre avant d'envoyer.",
-        rate_limited:
-          "Tu as écrit beaucoup de choses d'un coup — réessaie dans un instant.",
-        not_found: "Tu as déjà répondu cette semaine. Recharge la page.",
-        unknown: "Cela n'a pas fonctionné. Réessaie dans un instant.",
-      },
-    },
-    progression: {
-      title: "Ma progression",
-      lead: "Tes réponses de chaque semaine, objectif par objectif.",
-      stripLabel: "tes chiffres de la semaine, de 0 à 5",
-      noScores:
-        "Pas encore de chiffre — la première question t'attend sur l'accueil.",
-      instructionTitle: "La consigne du moment",
-      mealsLabel: "Repas notés ces 7 derniers jours :",
-      pastChallengesTitle: "Mes challenges passés",
-      challengeUntil: "→",
-      outcomes: {
-        acquired: "Acquis",
-        not_acquired: "Non acquis",
-        abandoned: "Abandonné",
-      },
-    },
-    profile: {
-      title: "Mon profil",
-      lead: "Ce que tu manges, ce que tu évites et le temps que tu as : garde-le à jour, ta praticienne et REMI s'en servent pour tes suggestions.",
-      dietaryRegimeLabel: "Type d'alimentation",
-      allergiesLabel: "Allergies",
-      allergiesHint:
-        "Les aliments à toujours éviter. Ta praticienne verra chaque changement.",
-      intolerancesLabel: "Intolérances",
-      preferencesLabel: "Aliments aimés / non aimés",
-      preferencesHint: "Ce que tu aimes, ce que tu n'aimes pas.",
-      likesCookingLabel: "Aimes-tu cuisiner ?",
-      cookingTimeLabel: "Temps disponible pour cuisiner",
-      foodBudgetLabel: "Budget alimentaire",
-      unset: "Pas renseigné",
-      likesCooking: { yes: "Oui", somewhat: "Un peu", no: "Non" },
-      cookingTime: { low: "Faible", medium: "Moyen", high: "Important" },
-      foodBudget: {
-        economical: "Économique",
-        standard: "Standard",
-        comfort: "Confort",
-      },
-      save: "Enregistrer",
-      saved: "Enregistré. Ta praticienne verra ce qui a changé.",
-      errors: {
-        invalid_input:
-          "Ce profil n'a pas pu être enregistré : un champ dépasse 2000 caractères.",
-        rate_limited:
-          "Tu as écrit beaucoup de choses d'un coup — réessaie dans un instant.",
-        not_found:
-          "Ce lien n'est plus valable. Demandes-en un nouveau à ta praticienne.",
-        unknown: "Cela n'a pas fonctionné. Réessaie dans un instant.",
-      },
-      recordTitle: "Ce que ta praticienne a noté",
-      recordLead: "Pour le modifier, parles-en à ta praticienne.",
-      nameLabel: "Nom",
-      ageLabel: "Âge",
-      ageValue: "{age} ans",
-      heightLabel: "Taille",
-      weightLabel: "Poids",
-      notRecorded: "Pas encore noté",
-    },
-    messages: {
-      title: "Ton accompagnement",
-      prompt:
-        "Comment se passe ton accompagnement cette semaine ? Tu peux aussi dire ici ce que tu as pensé des recettes, des challenges ou des recommandations proposées.",
-      bodyLabel: "Ton message",
-      send: "Envoyer",
-      lastSent: "Dernier message envoyé le",
-      you: "Toi",
-      practitioner: "Ta praticienne",
-      seeThread: "Voir tes messages",
-      threadTitle: "Tes échanges",
-      empty:
-        "Tu n'as encore rien écrit. Ton premier message apparaîtra ici.",
-      errors: {
-        invalid_input:
-          "Ce message n'a pas pu être envoyé : il est vide ou dépasse 2000 caractères.",
-        rate_limited:
-          "Tu as écrit beaucoup de choses d'un coup — réessaie dans un instant.",
-        not_found:
-          "Ce lien n'est plus valable. Demandes-en un nouveau à ta praticienne.",
-        unknown: "Cela n'a pas fonctionné. Réessaie dans un instant.",
-      },
-    },
-    weekConsigneTitle: "La consigne de la semaine",
-    goalsTitle: "Ce sur quoi tu travailles",
-    baselineLabel: "Point de départ",
-    seeAllLabel: "Tout voir",
-    mealEntry: {
-      title: "Un repas ?",
-      lead: "Dis-le à REMI, avant ou après — ta praticienne le verra.",
-      formTitle: "Dis ce que tu manges",
-      formLead:
-        "Avant ou après, comme cela t'arrange. Ta praticienne le voit et te répond ici.",
-      descriptionLabel: "Ton repas",
-      placeholder: "Spaghetti sauce tomate",
-      slotLabel: "Moment",
-      slotNone: "Aucun",
-      actions: {
-        planned: "Je vais manger",
-        eaten: "J'ai mangé",
-      },
-      states: {
-        planned: "Prévu",
-        eaten: "Mangé",
-      },
-      markEaten: "Je l'ai mangé",
-      awaitingResponse: "Ta praticienne te répondra ici.",
-      empty:
-        "Tu n'as encore rien noté. Écris ton premier repas ci-dessus.",
-      errors: {
-        invalid_input:
-          "Ce repas n'a pas pu être enregistré : vérifie le texte.",
-        rate_limited:
-          "Tu as écrit beaucoup de choses d'un coup — réessaie dans un instant.",
-        not_found: "Ce repas n'existe plus. Recharge la page.",
-        unknown: "Cela n'a pas fonctionné. Réessaie dans un instant.",
-      },
-    },
-    summaryTitle: "Où tu en es",
-    recommendationsTitle: "Tes recommandations",
-    categories: {
-      nutrition: "Nutrition",
-      habit: "Habitude",
-      supplement: "Complément",
-      activity: "Activité",
-      monitoring: "Suivi",
-    },
-    complementsTitle: "Tes compléments",
-    doseLabel: "Dose",
-    timingLabel: "Quand",
-    reasonLabel: "Pourquoi",
-    pantryTitle: "Placard & frigo",
-    whyLabel: "Pourquoi pour toi",
-    recipesTitle: "Tes recettes",
-    recipeNoteLabel: "Pourquoi pour toi",
-    documentsTitle: "Tes documents",
-    documentAddedLabel: "Ajouté le",
-    attachedDocumentsLabel: "À lire",
-    recipeDocumentsTitle: "Tes recettes en document",
-    mealsTitle: "Tes repas",
-    mealSlots: {
-      petit_dejeuner: "Petit-déjeuner",
-      dejeuner: "Déjeuner",
-      diner: "Dîner",
-      collation: "Collation",
-    },
-    mealCommentLabel: "Ce que tu as dit",
-    mealFeedbackLabel: "Le mot de ta praticienne",
-    empty: "Cela apparaîtra ici une fois que ta praticienne l'aura encodé.",
-    disclaimer: {
-      title: "Ta praticienne reste la référence",
-      body: "Cette page reflète ce qui a été convenu en consultation. Elle ne pose pas de diagnostic et ne remplace pas un avis médical.",
-    },
-    privacy: {
-      title: "Tes données et ce lien",
-      body: "Cette page montre ce que ta praticienne a enregistré pour toi, et ce que tu y écris toi-même. Ce que tu écris est conservé, rattaché à ton lien et lu par ta praticienne — c'est ce qui lui permet de te suivre entre deux consultations. La page n'apparaît pas dans les moteurs de recherche, mais elle s'ouvre sans mot de passe : toute personne qui possède le lien peut la lire et y écrire à ta place, ne le transmets donc qu'aux personnes de ton choix. Pour consulter, corriger ou faire supprimer tes données, ou pour obtenir un nouveau lien, écris à ta praticienne : personne d'autre n'y a accès.",
-    },
-    betaNote:
-      "REMI est en bêta — tes retours sont les bienvenus, dis-nous ce qui manque ou ce qui gêne.",
-  },
   signupLink: {
     metaTitle: "Inscription",
     title: "Inscription chez {name}",
@@ -555,7 +348,7 @@ export const fr: Content = {
       consultation: "Consultation",
       alimentation: "Alimentation",
       sante: "Santé",
-      genetique: "Génétique",
+      genetique: "Tes informations génétiques",
     },
     previous: "Précédent",
     next: "Continuer",
@@ -608,12 +401,10 @@ export const fr: Content = {
       consultationDate: "Date de consultation",
       diet: "Quel type d'alimentation suis-tu ?",
       dietNote: "Précise ton type d'alimentation",
-      pathologies: "Pathologies",
-      celiacDisease: "Maladie cœliaque",
       medications: "Médicaments",
       supplements: "Compléments alimentaires",
       geneticTest:
-        "As-tu réalisé un test génétique permettant de connaître tes génotypes APOE, DIO2 et AMY1A ?",
+        "As-tu déjà réalisé un test génétique donnant tes résultats APOE, DIO2 et AMY1A ?",
       otherText: "Précise",
     },
     hints: {
@@ -627,8 +418,6 @@ export const fr: Content = {
       intolerances:
         "Coche « Aucune intolérance connue » ou chaque intolérance.",
       otherText: "Précise « Autre » pour l'enregistrer.",
-      celiacDisease:
-        "Coche si un médecin l'a diagnostiquée. Le gluten est alors exclu strictement, contaminations croisées comprises.",
       medications:
         "Ceux que tu prends aujourd'hui, avec leur dose si tu la connais.",
       supplements: "Vitamines, minéraux, plantes…",
@@ -645,6 +434,8 @@ export const fr: Content = {
       noteRequired: "Précise ton type d'alimentation pour enregistrer « Autre ».",
     },
     genetic: {
+      intro:
+        "Certains résultats génétiques peuvent être pris en compte pour personnaliser ton alimentation, avec ton praticien. Cette étape est facultative.",
       consentTitle: "Traitement de tes données génétiques",
       consentIntro:
         "Pour enregistrer tes génotypes, REMI a besoin de ton accord. Lis le texte, puis donne ou refuse ton consentement.",
@@ -654,10 +445,28 @@ export const fr: Content = {
       deciding: "Enregistrement…",
       refused:
         "Tu as refusé : REMI n'enregistre aucun génotype. Tu peux changer d'avis à tout moment avec « J'accepte ».",
-      listsIntro:
-        "Choisis chaque résultat tel qu'il figure sur le rapport du laboratoire. Laisse une liste vide si tu ne connais pas le résultat.",
+      noResult: "Non renseigné",
+      listsNote: "Tu peux laisser un résultat vide si tu ne le connais pas.",
       decisionFailed:
         "Ta réponse n'a pas pu être enregistrée. Vérifie ta connexion et réessaie.",
+    },
+    food: {
+      allergiesQuestion: "As-tu des allergies alimentaires ?",
+      allergiesHint:
+        "Sélectionne les aliments concernés. Si tu n'as aucune allergie connue, indique-le également.",
+      familyRule: "Sans précision, toute la famille est exclue.",
+      alsoDeclared: "Tu as aussi déclaré :",
+    },
+    health: {
+      pathologies:
+        "As-tu des problèmes de santé ou des pathologies diagnostiquées ?",
+      pathologiesPlaceholder:
+        "Ex. : hypothyroïdie, maladie cœliaque, diabète…",
+      medications: "Prends-tu actuellement des médicaments ?",
+      medicationsPlaceholder:
+        "Nom des médicaments et dosage si tu le connais…",
+      supplements: "Prends-tu des compléments alimentaires ?",
+      supplementsPlaceholder: "Vitamines, minéraux, plantes…",
     },
   },
   dateEntry: {
@@ -867,8 +676,6 @@ export const fr: Content = {
       "Alimentation, allergies, intolérances, activité, poids souhaité, médicaments et compléments.",
     accountTitle: "Mon compte",
     consentTitle: "Mes consentements",
-    consentNotYet:
-      "Tu ne peux pas encore consulter ni modifier tes consentements ici.",
     dataPage: {
       metaTitle: "Mes données de suivi",
       title: "Mes données de suivi",
@@ -960,6 +767,103 @@ export const fr: Content = {
           closing: "Merci pour ton retour. Bon appétit.",
         },
       },
+    },
+  },
+  tokenLinkMoved: {
+    metaTitle: "Ton espace REMI a déménagé",
+    title: "Ton espace REMI a déménagé",
+    body: "Ce lien n'ouvre plus ton espace. Tes recommandations sont maintenant dans ton compte REMI, protégé par ton mot de passe.",
+    signIn: "Me connecter",
+    noAccount:
+      "Tu n'as pas encore de compte ? Demande une invitation à ton praticien : son lien te permet de créer ton compte.",
+  },
+  patientRecipeCard: {
+    metaTitle: "Recette",
+    back: "Retour aux recettes",
+    proposedByRemi: "Proposé par REMI",
+    chosenByPractitioner: "Choisie par ton praticien",
+    justificationTitle: "Pourquoi cette recette pour toi",
+    prep: "Préparation",
+    cook: "Cuisson",
+    portions: "Portions",
+    notEntered: "Non renseigné",
+    ingredientsTitle: "Ingrédients",
+    ingredientsForOne: "Pour 1 portion",
+    ingredientsForMany: "Pour {count} portions",
+    stepsTitle: "Étapes",
+    withheldTitle: "Cette recette ne s'affiche pas",
+    withheld:
+      "REMI n'a pas pu confirmer que cette recette convient à tes allergies, à tes intolérances et aux aliments que tu évites. Elle ne s'affiche donc pas. Si tu as une question, parles-en à ton praticien.",
+    unavailable:
+      "Cette recette n'est pas disponible pour le moment. Réessaie dans un instant.",
+    list: {
+      totalTime: "{time} au total",
+      withheldOne:
+        "Une recette ne s'affiche pas : REMI n'a pas pu confirmer qu'elle convient à tes allergies, à tes intolérances et aux aliments que tu évites.",
+      withheldMany:
+        "{count} recettes ne s'affichent pas : REMI n'a pas pu confirmer qu'elles conviennent à tes allergies, à tes intolérances et aux aliments que tu évites.",
+      unavailable:
+        "Tes recettes ne sont pas disponibles pour le moment. Réessaie dans un instant.",
+    },
+  },
+  patientConsents: {
+    intro:
+      "Tu peux relire chaque texte et retirer ton consentement à tout moment. Le retrait prend effet tout de suite.",
+    states: {
+      given: "Consentement donné le {date}",
+      refused: "Consentement refusé le {date}",
+      withdrawn: "Consentement retiré le {date}",
+      none: "Ce consentement ne t'a pas encore été demandé.",
+    },
+    version: "Version {version} du texte",
+    legacyVersion:
+      "Ton praticien a recueilli ce consentement avant ton inscription. Le texte n'est pas enregistré dans REMI.",
+    reread: "Relire",
+    rereadLabel: "Relire : {name}",
+    withdraw: "Retirer mon consentement",
+    withdrawLabel: "Retirer mon consentement : {name}",
+    confirmTitle: "Retirer ce consentement ?",
+    consequences: {
+      care: "REMI arrête tout de suite ses suggestions et ses recettes pour toi, ton espace se met en pause et ton praticien voit que tu as retiré ton consentement.",
+      genetic:
+        "REMI efface tout de suite tes trois résultats génétiques et n'en tient plus compte pour ton suivi.",
+    },
+    past: "Ce retrait ne change rien à ce qui a été fait avant.",
+    confirm: "Oui, retirer mon consentement",
+    withdrawing: "Retrait en cours…",
+    cancel: "Annuler",
+    give: "Donner à nouveau mon consentement",
+    giveLabel: "Donner à nouveau mon consentement : {name}",
+    giveIntro: "Relis le texte ci-dessus, puis confirme ton choix.",
+    giveConfirm: "J'ai lu le texte et je donne mon consentement",
+    giving: "Enregistrement…",
+    errors: {
+      signed_out: "Ta session a expiré. Reconnecte-toi, puis réessaie.",
+      stale: "Le texte a changé. Recharge la page, puis relis-le.",
+      unavailable:
+        "Ton choix n'a pas pu être enregistré. Réessaie dans un instant.",
+    },
+    deletion:
+      "Pour supprimer ton compte, envoie un e-mail à info@remiai.be.",
+    pause: {
+      metaTitle: "Ton espace est en pause",
+      title: "Ton espace REMI est en pause",
+      withdrawn:
+        "Tu as retiré ton consentement au traitement de tes données le {date}. Ton praticien le voit sur ton dossier.",
+      missing:
+        "REMI a besoin de ton consentement au traitement de tes données pour t'accompagner.",
+      stopsTitle: "Ce qui s'arrête",
+      stops: [
+        "REMI ne te propose plus de suggestion ni de recette.",
+        "Tu ne peux plus enregistrer de repas ni ouvrir tes recommandations et tes données de suivi.",
+      ],
+      staysTitle: "Ce qui ne change pas",
+      stays:
+        "Ce qui a été fait avant reste valable, et tes données ne sont pas supprimées.",
+      againTitle: "Pour reprendre ton accompagnement",
+      again:
+        "Relis le texte ci-dessous et donne à nouveau ton consentement. Ton espace s'ouvre à nouveau tout de suite.",
+      consentsTitle: "Mes consentements",
     },
   },
 };

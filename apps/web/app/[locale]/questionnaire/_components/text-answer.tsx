@@ -16,6 +16,8 @@ type Props = {
   field: AnswerField;
   label: ReactNode;
   hint?: ReactNode;
+  /** An example in the empty field (REM-165). Never a value. */
+  placeholder?: string;
   /** The saved value, `""` when « Non renseigné ». */
   initial: string;
   multiline?: boolean;
@@ -38,6 +40,7 @@ export const TextAnswer = ({
   field,
   label,
   hint,
+  placeholder,
   initial,
   multiline,
   type = "text",
@@ -76,6 +79,7 @@ export const TextAnswer = ({
             id={id}
             value={value}
             invalid={invalid}
+            placeholder={placeholder}
             onChange={(event) => onChange(event.target.value)}
             onBlur={onBlur}
           />
@@ -86,6 +90,7 @@ export const TextAnswer = ({
             size="lg"
             value={value}
             invalid={invalid}
+            placeholder={placeholder}
             inputMode={
               numeric === "integer"
                 ? "numeric"

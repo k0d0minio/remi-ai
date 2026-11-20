@@ -42,7 +42,6 @@ import {
   missingQuestionnaireFields,
 } from "@remi/services/server";
 import {
-  appHref,
   bmiIndicator,
   calculationKinds,
   canManageOperators,
@@ -50,7 +49,6 @@ import {
   missingCalculationInputs,
   missingOptionalFields,
   patientFileLayout,
-  patientLinkPreviewParam,
   todayAtPractice,
   type CalculationInput,
   type CalculationKind,
@@ -59,6 +57,11 @@ import { Typography } from "@remi/ui/server";
 import { AdminOpenForm } from "@/components/patients/admin-open-form";
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { CalculationsSummary } from "@/components/patients/calculations-summary";
+import {
+  ConsentsSection,
+  ConsentWithdrawnNotice,
+  consentsSummaryLine,
+} from "@/components/patients/consents-section";
 import { CopyContextCard } from "@/components/patients/copy-context-card";
 import {
   DocumentSection,
@@ -99,7 +102,6 @@ import {
 import { QuestionnaireFile } from "@/components/patients/questionnaire-file";
 import { QuickActions } from "@/components/patients/quick-actions";
 import { SafetyBlock } from "@/components/patients/safety-block";
-import { ShareLinkCard } from "@/components/patients/share-link-card";
 import { SummaryBlock } from "@/components/patients/summary-block";
 import {
   consentChannelLabels,
@@ -314,10 +316,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     patient.consentDate && patient.consentChannel
       ? `Recueilli le ${formatDate(patient.consentDate)} · ${consentChannelLabels[patient.consentChannel]}`
       : null;
-  const shareUrl = appHref("web", `/p/${patient.shareToken}`, patient.locale);
-  // « Voir comme la patiente » — the same link, marked so her look is not
-  // recorded as the patient opening it.
-  const previewUrl = `${shareUrl}?${patientLinkPreviewParam}=1`;
   // What a document can hang from: this patient's goals and recipes, archived
   // ones included so an edit never silently drops an existing attachment.
   const attachments: AttachmentOption[] = [
@@ -760,24 +758,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
         />
       ),
     },
-    "patient-link": {
-      title: "Lien patient",
-      description:
-        "Leur vue du profil et des recommandations — pour la personne suivie, et pour les consultantes et consultants qui testent l'interface.",
-      summary: patient.linkLastOpenedAt
-        ? `Dernière ouverture le ${formatDate(patient.linkLastOpenedAt)}`
-        : "Le lien n'a pas encore été ouvert",
-      empty: false,
-      body: (
-        <ShareLinkCard
-          patientId={patient.id}
-          url={shareUrl}
-          email={patient.email}
-          lastOpenedAt={patient.linkLastOpenedAt}
-          lastWroteAt={patient.linkLastWroteAt}
-        />
-      ),
-    },
     profile: {
       title: "Profil",
       description:
@@ -809,6 +789,19 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
           readOnly={readOnly}
         />
       ),
+    },
+    consents: {
+      title: "Consentements",
+      description:
+        "Ce que le patient a accepté, refusé ou retiré dans son espace, avec la date et la version du texte.",
+      summary: consentsSummaryLine(consents),
+      empty: false,
+      // Above the row, folded or not: the practitioner must see it.
+      lead:
+        consents.care?.decision === "withdrawn" ? (
+          <ConsentWithdrawnNotice withdrawnAt={consents.care.decidedAt} />
+        ) : undefined,
+      body: <ConsentsSection latest={consents} />,
     },
   };
 
@@ -910,7 +903,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
             <Suspense fallback={null}>
               <QuickActions
                 patientId={patient.id}
-                previewUrl={previewUrl}
                 withConsultation={layout.action !== "prepare"}
               />
             </Suspense>

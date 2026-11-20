@@ -15,6 +15,7 @@ import type { PatientProfile } from "../../models/patient-profile";
 import { byPatient, noSuchPatient, systemActor } from "../access";
 import type { OperatorActor } from "../audit";
 import { markPatientAccountActivated } from "../patient-accounts";
+import { listPatientCalculations } from "../patient-calculations";
 import { getPatientQuestionnaire } from "../patient-questionnaire";
 import { setFileStatus } from "../patients";
 import { getValidatedProtocol } from "../protocol-versions";
@@ -39,11 +40,13 @@ const profiles = (db: DatabaseClient = getDatabase()) =>
   db.collection<PatientProfile>("patient_profiles");
 
 const recapOf = async (patientId: Id): Promise<Result<ActivationRecap>> => {
-  const [validated, questionnaire, directives] = await Promise.all([
-    getValidatedProtocol(systemActor, patientId),
-    getPatientQuestionnaire(systemActor, patientId),
-    listActivationDirectives(patientId),
-  ]);
+  const [validated, questionnaire, directives, calculations] =
+    await Promise.all([
+      getValidatedProtocol(systemActor, patientId),
+      getPatientQuestionnaire(systemActor, patientId),
+      listActivationDirectives(patientId),
+      listPatientCalculations(systemActor, patientId),
+    ]);
   if (!validated.ok) {
     return validated;
   }
@@ -63,6 +66,15 @@ const recapOf = async (patientId: Id): Promise<Result<ActivationRecap>> => {
           allergens,
         ).state,
       },
+      // The live rows, not the snapshot: the mark comes after the validation.
+      staleCalculations: calculations
+        .filter(
+          (row) =>
+            row.validatedValue !== null &&
+            row.validatedValue !== undefined &&
+            row.needsRevalidation,
+        )
+        .map((row) => row.kind),
       evictions: directives.evictions,
       unrecognised: directives.unrecognised,
     }),

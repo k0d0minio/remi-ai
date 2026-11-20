@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
-import type { ValidatedRecommendationsView } from "@remi/services/shared";
+import {
+  hasFoodRecommendations,
+  type ValidatedRecommendationsView,
+} from "@remi/services/shared";
 import { Typography } from "@remi/ui/server";
 import { AdviceList } from "@/components/patient-recommendations/advice-list";
 import { FoodRecommendations } from "@/components/patient-recommendations/food-recommendations";
@@ -33,11 +36,7 @@ const Category = ({ title, children }: CategoryProps) => (
 export const RecommendationsView = ({ view, content }: Props) => {
   const hasSupplements =
     view.supplements.length > 0 || view.supplementAdvice.length > 0;
-  const hasFood =
-    view.evictions.length > 0 ||
-    view.favour.length > 0 ||
-    view.limit.length > 0 ||
-    view.foodAdvice.length > 0;
+  const hasFood = hasFoodRecommendations(view);
 
   return (
     <div className="flex flex-col gap-8">

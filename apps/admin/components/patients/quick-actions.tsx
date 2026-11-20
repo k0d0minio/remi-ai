@@ -1,6 +1,5 @@
 "use client";
 
-import { Eye } from "lucide-react";
 import NextLink from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@remi/ui";
@@ -27,8 +26,6 @@ const ACTIONS: readonly Action[] = [
 
 type Props = {
   patientId: string;
-  /** The patient's own link, marked as her preview — built server-side. */
-  previewUrl: string;
   /**
    * False when the action card already carries « Nouvelle consultation » as
    * its dominant button: the page shows the link one time.
@@ -37,9 +34,8 @@ type Props = {
 };
 
 /**
- * The working view's quick actions — five, plus « Voir comme la patiente »
- * (her 14 Sept § 7), which opens the patient's own link in a new tab: the page
- * they see, from their token, without recording it as their visit.
+ * The working view's quick actions. « Voir comme la patiente » went with the
+ * token link (REM-86).
  *
  * « Nouvelle consultation » is the one that leaves the page: it opens the
  * write-up screen, where the note, the check-ins, the consigne, the résumé and
@@ -52,11 +48,7 @@ type Props = {
  * They sit in the action card and are all secondary buttons: the card has the
  * one dominant button of the page (charter, section 8).
  */
-export const QuickActions = ({
-  patientId,
-  previewUrl,
-  withConsultation,
-}: Props) => {
+export const QuickActions = ({ patientId, withConsultation }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -100,12 +92,6 @@ export const QuickActions = ({
           {action.label}
         </Button>
       ))}
-      <Button size="sm" variant="outline" asChild>
-        <a href={previewUrl} target="_blank" rel="noopener noreferrer">
-          <Eye aria-hidden="true" />
-          Voir comme la patiente
-        </a>
-      </Button>
     </div>
   );
 };

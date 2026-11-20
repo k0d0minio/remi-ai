@@ -25,7 +25,6 @@ export const answerFields = [
   "consultationReason",
   "consultationDate",
   "pathologies",
-  "celiacDisease",
   "geneticTest",
   "apoe",
   "dio2",

@@ -74,6 +74,8 @@ const blockerLine = (blocker: ActivationBlocker): ReactNode => {
           , ou « Aucune intolérance connue ».
         </>
       );
+    case "calculation_to_revalidate":
+      return `Le calcul « ${calculationKindLabels[blocker.calculation].fr} » est une estimation à revalider : une donnée a changé depuis sa validation. Dans « Calculs », vérifiez la valeur, puis validez-la de nouveau.`;
     case "eviction_without_period":
       return `L'éviction « ${blocker.label} » n'a ni période ni statut durable. Donnez-lui une période, ou le statut durable.`;
   }
@@ -85,6 +87,8 @@ const blockerKey = (blocker: ActivationBlocker) => {
       return blocker.kind;
     case "safety_answer_missing":
       return `${blocker.kind}-${blocker.field}`;
+    case "calculation_to_revalidate":
+      return `${blocker.kind}-${blocker.calculation}`;
     case "eviction_without_period":
       return `${blocker.kind}-${blocker.label}`;
   }

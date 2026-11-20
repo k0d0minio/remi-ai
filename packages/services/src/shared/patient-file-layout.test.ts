@@ -79,7 +79,7 @@ describe("the layout of the patient file", () => {
     for (const status of fileStatuses) {
       expect(patientFileLayout(status).rows.at(-1)).toEqual({
         group: "profile",
-        sections: ["profile"],
+        sections: ["profile", "consents"],
       });
     }
   });

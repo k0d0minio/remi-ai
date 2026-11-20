@@ -54,7 +54,10 @@ export {
   protocolSnapshotSchema,
 } from "./protocol-snapshot";
 export type { ProtocolSnapshot } from "./protocol-snapshot";
-export { validatedRecommendationsView } from "./validated-recommendations";
+export {
+  hasFoodRecommendations,
+  validatedRecommendationsView,
+} from "./validated-recommendations";
 export type {
   LifestyleAdviceCategory,
   ValidatedAdvice,
@@ -198,9 +201,11 @@ export type {
 } from "./signup";
 export type { AuditActionName } from "./audit";
 export {
+  careConsentGiven,
   consentDecisions,
   consentKeys,
   consentRecordChannels,
+  consentSummaries,
   consentTextLocaleFor,
   consentTextLocales,
   legacyConsentVersion,
@@ -212,7 +217,10 @@ export type {
   ConsentDecision,
   ConsentKey,
   ConsentRecordChannel,
+  ConsentState,
+  ConsentSummary,
   ConsentTextLocale,
+  LatestConsent,
   ShownConsent,
 } from "./consent";
 export {
@@ -314,6 +322,7 @@ export {
   dio2Categories,
   geneticTestAnswerLabels,
   geneticTestAnswers,
+  intoleranceDescriptions,
   intoleranceLabels,
   intolerances,
   mandatoryQuestionnaireFieldLabels,
@@ -339,6 +348,14 @@ export type {
   QuestionnaireSection,
 } from "./questionnaire";
 export { safetyList, strictGlutenLabel } from "./safety-highlights";
+export {
+  allergenOptionOfRow,
+  allergenOptions,
+  allergenRowLabel,
+  uncategorisedAllergenRows,
+} from "./allergen-options";
+export type { AllergenOption } from "./allergen-options";
+export { mentionsCeliacDisease } from "./celiac-mention";
 export {
   dateEntryFromIso,
   isCalendarDay,
@@ -377,6 +394,16 @@ export type {
   RecipeUnit,
   StructuredRecipe,
 } from "./structured-recipe";
+export {
+  recipeIngredientAmount,
+  recipeStepDetails,
+  recipeSummaryOf,
+} from "./recipe-card";
+export type {
+  PatientRecipeCard,
+  PatientRecipeSource,
+  PatientRecipeSummary,
+} from "./recipe-card";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
 export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";

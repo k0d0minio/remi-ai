@@ -41,6 +41,12 @@ for (const value of Object.values(schema)) {
 const DEFAULT_PAGE_LIMIT = 50;
 
 /**
+ * The waits before each new try of a read that failed on a closed connection:
+ * three more tries in about three seconds.
+ */
+const READ_RETRY_WAITS_MS = [200, 800, 2000];
+
+/**
  * What a collection issues its queries against: the pooled database, or a
  * transaction opened on it. `PgTransaction` extends `PgDatabase` with the same
  * result type, so naming the base class here is what lets one `makeCollection`
@@ -182,15 +188,20 @@ export const createNeonDatabase = (): DatabaseClient => {
     ...args: unknown[]
   ) => Promise<unknown>;
   const queryWithRetry = async (...args: unknown[]): Promise<unknown> => {
-    try {
-      return await sendQuery(...args);
-    } catch (error) {
-      if (!isRetryableRead(args[0], error)) {
-        throw error;
+    // A suspended compute takes some seconds to wake, and the pool can hold
+    // more than one dead socket. Thus one second try is not always enough.
+    for (const waitMs of READ_RETRY_WAITS_MS) {
+      try {
+        return await sendQuery(...args);
+      } catch (error) {
+        if (!isRetryableRead(args[0], error)) {
+          throw error;
+        }
+        console.error("[database] read failed on a closed connection, sent again");
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
       }
-      console.error("[database] read failed on a closed connection, sent again");
-      return sendQuery(...args);
     }
+    return sendQuery(...args);
   };
   pool.query = queryWithRetry as typeof pool.query;
 

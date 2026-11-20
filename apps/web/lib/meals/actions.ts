@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import {
   isSessionReadError,
   issueMealRetryTicket,
@@ -12,11 +13,17 @@ import {
 import {
   checkPlannedMealText,
   isLocale,
+  localePath,
   type Locale,
   type MealSuggestion,
 } from "@remi/services/shared";
 import { aiReady } from "@/lib/ai";
-import { patientLanding, requirePatient } from "@/lib/patient-auth/session";
+import { CARE_CONSENT_PATH } from "@/lib/patient-auth/paths";
+import {
+  careConsentHeld,
+  patientLanding,
+  requirePatient,
+} from "@/lib/patient-auth/session";
 import type {
   AnotherSuggestionState,
   PlanMealError,
@@ -102,6 +109,11 @@ export const planMealAction = async (
   if ((await patientLanding(account)) !== "home") {
     return failed("unavailable");
   }
+  // No meal and no suggestion without the care consent (REM-43). The patient
+  // goes to the screen that says what stops and how to give it again.
+  if (!(await careConsentHeld(account))) {
+    redirect(localePath(locale, CARE_CONSENT_PATH));
+  }
 
   const checked = checkPlannedMealText(formData.get("meal"));
   if (!checked.ok) {
@@ -149,6 +161,12 @@ export const anotherSuggestionAction = async (
   }
   const account = await patientOrUnavailable(locale);
   if (!account || (await patientLanding(account)) !== "home") {
+    return { status: "none" };
+  }
+  // No suggestion without the care consent (REM-43). The page calls this
+  // action from a handler, so it answers and sends no redirect. The next
+  // page of the space sends the patient to the consent screen.
+  if (!(await careConsentHeld(account))) {
     return { status: "none" };
   }
   const patientId = account.patientProfileId;

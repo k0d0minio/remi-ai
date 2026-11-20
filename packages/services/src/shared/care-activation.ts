@@ -7,9 +7,10 @@
  * the activation. The console shows it, and the service runs it again on the
  * server before it activates.
  *
- * The three blockers of this version:
+ * The four blockers of this version:
  * - the file has no validated version,
  * - a mandatory safety answer is missing (allergies or intolerances),
+ * - a validated calculation is marked « estimation à revalider » (REM-79),
  * - an eviction has no period and no durable status.
  *
  * An element that is not recognised never blocks. The recap lists it, and it
@@ -18,7 +19,7 @@
  * Isomorphic: no I/O and no clock.
  */
 
-import type { CalculationKind } from "./calculations";
+import { calculationKinds, type CalculationKind } from "./calculations";
 import type { ProtocolSnapshot } from "./protocol-snapshot";
 import type { SafetyList } from "./safety-highlights";
 
@@ -49,6 +50,11 @@ export type ActivationInput = {
     allergies: SafetyList["state"];
     intolerances: SafetyList["state"];
   };
+  /**
+   * The calculations with a validated value that a later change of the
+   * patient marked « estimation à revalider » (`needsRevalidation`).
+   */
+  staleCalculations: readonly CalculationKind[];
   evictions: readonly ActivationEviction[];
   /** The elements of the directives that REMI did not recognise. */
   unrecognised: readonly string[];
@@ -57,6 +63,7 @@ export type ActivationInput = {
 export type ActivationBlocker =
   | { kind: "no_validated_version" }
   | { kind: "safety_answer_missing"; field: "allergies" | "intolerances" }
+  | { kind: "calculation_to_revalidate"; calculation: CalculationKind }
   | { kind: "eviction_without_period"; label: string };
 
 /** The validated values, one entry for each topic of the protocol. */
@@ -109,7 +116,8 @@ const valuesOf = (validated: ActivationVersion): ActivationValues => ({
 
 /**
  * The recap and the blockers, from the facts alone. The blockers come in a
- * fixed order: the version, the safety answers, then the evictions in the
+ * fixed order: the version, the safety answers, the calculations to
+ * revalidate in the order of `calculationKinds`, then the evictions in the
  * order of the input.
  */
 export const activationRecap = (input: ActivationInput): ActivationRecap => {
@@ -133,6 +141,11 @@ export const activationRecap = (input: ActivationInput): ActivationRecap => {
   }
   if (input.safety.intolerances === "not_entered") {
     blockers.push({ kind: "safety_answer_missing", field: "intolerances" });
+  }
+  for (const calculation of calculationKinds) {
+    if (input.staleCalculations.includes(calculation)) {
+      blockers.push({ kind: "calculation_to_revalidate", calculation });
+    }
   }
   for (const eviction of evictions) {
     if (!eviction.resolved) {

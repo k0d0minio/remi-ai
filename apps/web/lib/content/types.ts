@@ -13,26 +13,21 @@
  */
 
 import type {
-  ChallengeOutcome,
+  ConsentDecision,
   ConsentKey,
-  CookingAffinity,
-  CookingTime,
-  FoodBudget,
   FoodLimitLevel,
   LifestyleAdviceCategory,
   MandatoryQuestionnaireField,
   MealAlert,
   MealImprovementKind,
-  MealIntent,
-  MealSlot,
   PersonalisationDimension,
   RecommendationCategory,
   SignalKind,
   SignupField,
   StepStatus,
 } from "@remi/services/shared";
+import type { ConsentActionError } from "@/lib/consents/state";
 import type { PlanMealError } from "@/lib/meals/state";
-import type { PatientWriteError } from "@/lib/patient-link/actions";
 import type { QuestionnaireSection } from "@/lib/questionnaire/sections";
 import type { SaveError } from "@/lib/questionnaire/state";
 import type { SignInNotice } from "@/lib/patient-auth/paths";
@@ -288,236 +283,6 @@ export type Content = {
     empty: PlaceholderContent;
   };
   /**
-   * The shareable patient view at `/p/[token]` — the one public page in this
-   * app, reached by link rather than sign-in. Its own copy, not `plan`'s: that
-   * section belongs to the parked practitioner world and can go with it.
-   */
-  patientLink: {
-    /** Precedes the patient's name: "Bonjour Claire". */
-    greeting: string;
-    lead: string;
-    /**
-     * The segment navigation. One label per route, so a segment cannot be
-     * added without the dictionary naming it.
-     */
-    /** Accessible name for the segment nav element. */
-    navLabel: string;
-    nav: {
-      home: string;
-      recommandations: string;
-      complements: string;
-      "placard-frigo": string;
-      recettes: string;
-      documents: string;
-      repas: string;
-      progression: string;
-      messages: string;
-      profil: string;
-    };
-    /**
-     * Home, in her § 6 order: today and this week, the prioritised
-     * recommendations, the recipes, the essentials, the way in to a meal, and
-     * the living summary last.
-     */
-    todayTitle: string;
-    /**
-     * The challenge she is running with the patient — first inside
-     * « Aujourd'hui », with the patient's two taps. Always rendered: with none
-     * running, `empty` says so rather than the slot disappearing.
-     */
-    challenge: {
-      title: string;
-      /** Precedes the start date: "depuis le 12 sept.". */
-      since: string;
-      acquired: string;
-      readyForNext: string;
-      empty: string;
-      /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
-      errors: Record<PatientWriteError, string>;
-    };
-    /**
-     * The weekly question on the home (D-30, D-31): every active goal scored
-     * 0–5 on one card, with an optional word each. `question` precedes the
-     * goal's title. Once answered, the card gives way to `answeredOn` and
-     * `nextOn`, each followed by a date.
-     */
-    weeklyCheckIn: {
-      title: string;
-      lead: string;
-      question: string;
-      scaleLow: string;
-      scaleHigh: string;
-      noteLabel: string;
-      submit: string;
-      answeredOn: string;
-      nextOn: string;
-      /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
-      errors: Record<PatientWriteError, string>;
-    };
-    /**
-     * « Ma progression »: each goal's weekly scores as a strip, the current
-     * consigne, the meals logged in the last seven days and the challenges
-     * behind the patient with how each ended.
-     */
-    progression: {
-      title: string;
-      lead: string;
-      /** The strip's accessible name, after the goal's title. */
-      stripLabel: string;
-      noScores: string;
-      instructionTitle: string;
-      mealsLabel: string;
-      pastChallengesTitle: string;
-      /** Between a challenge's start and end dates: "12 sept. → 26 sept.". */
-      challengeUntil: string;
-      outcomes: Record<ChallengeOutcome, string>;
-    };
-    /** Heads the week's consigne, when she has written one to the patient. */
-    weekConsigneTitle: string;
-    /** Sits above the goals inside « Aujourd'hui ». */
-    goalsTitle: string;
-    /** Precedes a goal's starting point: "Point de départ : ...". */
-    baselineLabel: string;
-    /** Follows each home section into its full segment. */
-    seeAllLabel: string;
-    /**
-     * Everything the meal loop says, in one block — the home's invitation and
-     * the form on Repas both, because « Je vais manger » is one string however
-     * many places it appears.
-     *
-     * `actions` are the two buttons that write an entry; `states` are how one
-     * already written reads back. They are separate because the verb and the
-     * state are different words — « Je vais manger » writes
-     * a meal that reads « Prévu ».
-     */
-    mealEntry: {
-      /** The home's invitation card, which links through to Repas. */
-      title: string;
-      lead: string;
-      /** The form on Repas, where the writing actually happens. */
-      formTitle: string;
-      formLead: string;
-      descriptionLabel: string;
-      placeholder: string;
-      slotLabel: string;
-      slotNone: string;
-      actions: Record<MealIntent, string>;
-      states: Record<MealIntent, string>;
-      markEaten: string;
-      /** Stands in for the answer until Morgane — or, later, REMI — writes one. */
-      awaitingResponse: string;
-      /** The journal before the patient has written anything into it. */
-      empty: string;
-      /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
-      errors: Record<PatientWriteError, string>;
-    };
-    /**
-     * The general thread — her § 6: one place for how the week went. The home
-     * card and the Messages segment share every string, the prompt above all:
-     * D-35 fixes it as her own two sentences.
-     */
-    /**
-     * « Mon profil » — the seven fields the patient keeps true themselves
-     * (`patient-profile-edit`), then what is on record about them, read-only.
-     * The three-level labels are D-25's: the old version's own words.
-     */
-    profile: {
-      title: string;
-      lead: string;
-      dietaryRegimeLabel: string;
-      allergiesLabel: string;
-      allergiesHint: string;
-      intolerancesLabel: string;
-      preferencesLabel: string;
-      preferencesHint: string;
-      likesCookingLabel: string;
-      cookingTimeLabel: string;
-      foodBudgetLabel: string;
-      /** The « not answered yet » choice of each three-level field. */
-      unset: string;
-      likesCooking: Record<CookingAffinity, string>;
-      cookingTime: Record<CookingTime, string>;
-      foodBudget: Record<FoodBudget, string>;
-      save: string;
-      saved: string;
-      /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
-      errors: Record<PatientWriteError, string>;
-      recordTitle: string;
-      recordLead: string;
-      nameLabel: string;
-      ageLabel: string;
-      /** « {age} ans » */
-      ageValue: string;
-      heightLabel: string;
-      weightLabel: string;
-      notRecorded: string;
-    };
-    messages: {
-      title: string;
-      /** Her § 6 question, verbatim in French. */
-      prompt: string;
-      bodyLabel: string;
-      send: string;
-      /** Precedes the date of the patient's last message. */
-      lastSent: string;
-      /** How the patient's own messages are signed in the thread. */
-      you: string;
-      /** A reply whose author's account no longer exists. */
-      practitioner: string;
-      /** The home card's way through to the whole thread. */
-      seeThread: string;
-      threadTitle: string;
-      empty: string;
-      /** Keyed by `PatientWriteError`, so a new failure cannot go unworded. */
-      errors: Record<PatientWriteError, string>;
-    };
-    summaryTitle: string;
-    recommendationsTitle: string;
-    categories: Record<RecommendationCategory, string>;
-    /** Compléments: the validated protocol, never the profile free text. */
-    complementsTitle: string;
-    doseLabel: string;
-    timingLabel: string;
-    reasonLabel: string;
-    /**
-     * Placard & frigo. The why is the point of the list rather than a
-     * decoration — § H is justification logic, so an item renders with its
-     * reason attached rather than in a bare checklist.
-     */
-    pantryTitle: string;
-    whyLabel: string;
-    /** Recettes: her per-patient « pourquoi pour toi » note. */
-    recipesTitle: string;
-    recipeNoteLabel: string;
-    /**
-     * Documents: what she put on the page — her PDFs, images and links, newest
-     * first, each with the day she added it. Those she classed as a recipe are
-     * listed under Recettes too, and one attached to a goal or a recipe also
-     * sits beside it.
-     */
-    documentsTitle: string;
-    documentAddedLabel: string;
-    /** Above the documents a goal or a recipe carries. */
-    attachedDocumentsLabel: string;
-    /** Under Recettes, above the recipe documents that hang from no recipe. */
-    recipeDocumentsTitle: string;
-    /** Repas: the journal, with her feedback beneath an entry when written. */
-    mealsTitle: string;
-    mealSlots: Record<MealSlot, string>;
-    mealCommentLabel: string;
-    mealFeedbackLabel: string;
-    empty: string;
-    disclaimer: PlaceholderContent;
-    /**
-     * What this page is, who can open it, and who to ask about the data.
-     * Sits in the disclaimer card because a patient reading one is reading
-     * the other: both answer "what am I looking at, and who is behind it".
-     */
-    privacy: PlaceholderContent;
-    /** The beta framing consultants read before giving UX feedback. */
-    betaNote: string;
-  };
-  /**
    * The page a practitioner's permanent sign-up link opens, at
    * `/inscription/[token]` (stories 1 and 2): the sign-up form. The
    * invalid-link copy lives in the route's `not-found.tsx`: a not-found
@@ -628,8 +393,6 @@ export type Content = {
       diet: string;
       /** Shown after « Autre », where it is mandatory. */
       dietNote: string;
-      pathologies: string;
-      celiacDisease: string;
       medications: string;
       supplements: string;
       geneticTest: string;
@@ -644,7 +407,6 @@ export type Content = {
       allergies: string;
       intolerances: string;
       otherText: string;
-      celiacDisease: string;
       medications: string;
       supplements: string;
     };
@@ -669,6 +431,8 @@ export type Content = {
     };
     /** The genetic consent and the three genotype lists (`genotype-section`). */
     genetic: {
+      /** Over the question (REM-166): the step is optional. */
+      intro: string;
       consentTitle: string;
       consentIntro: string;
       /** `{version}` and `{date}` of the text shown. */
@@ -678,10 +442,30 @@ export type Content = {
       deciding: string;
       /** After « Je refuse »: the text and « J'accepte » stay. */
       refused: string;
-      /** Over the three lists. */
-      listsIntro: string;
+      /** The first line of a result's list: it empties the result. */
+      noResult: string;
+      /** Under the three lists. */
+      listsNote: string;
       /** A decision that did not save. */
       decisionFailed: string;
+    };
+    /** The allergy question of the questionnaire (REM-163). */
+    food: {
+      allergiesQuestion: string;
+      allergiesHint: string;
+      /** In an open sub-list: no sub-choice excludes the whole family. */
+      familyRule: string;
+      /** Over the stored rows that no box of the list holds. */
+      alsoDeclared: string;
+    };
+    /** The three questions of « Santé » and their examples (REM-165). */
+    health: {
+      pathologies: string;
+      pathologiesPlaceholder: string;
+      medications: string;
+      medicationsPlaceholder: string;
+      supplements: string;
+      supplementsPlaceholder: string;
     };
   };
   /**
@@ -876,8 +660,6 @@ export type Content = {
     dataLinkHint: string;
     accountTitle: string;
     consentTitle: string;
-    /** The consent settings are not built yet. */
-    consentNotYet: string;
     dataPage: {
       metaTitle: string;
       title: string;
@@ -963,6 +745,108 @@ export type Content = {
           closing: string;
         };
       };
+    };
+  };
+  /**
+   * The one page of an old token link `/p/[token]` (story 31, REM-86): the
+   * space moved to the account. No patient data.
+   */
+  tokenLinkMoved: {
+    metaTitle: string;
+    title: string;
+    body: string;
+    /** The link to the sign-in page. */
+    signIn: string;
+    /** For a patient with no account: the practitioner's invitation. */
+    noAccount: string;
+  };
+  /**
+   * The recipe page of the patient and the list that opens it (REM-94, story
+   * 25). The recipe itself is not in this dictionary.
+   */
+  patientRecipeCard: {
+    metaTitle: string;
+    back: string;
+    /** The label of a recipe that REMI generated for the patient. */
+    proposedByRemi: string;
+    /** The label of a recipe of the library that the practitioner gave. */
+    chosenByPractitioner: string;
+    justificationTitle: string;
+    prep: string;
+    cook: string;
+    portions: string;
+    /** A time that the recipe does not give: no value is invented (D-30). */
+    notEntered: string;
+    ingredientsTitle: string;
+    ingredientsForOne: string;
+    /** `{count}` is the number of portions, 2 or more. */
+    ingredientsForMany: string;
+    stepsTitle: string;
+    /** The recipe is the patient's, and the compatibility gate refuses it. */
+    withheldTitle: string;
+    withheld: string;
+    /** The safety data could not be read: no recipe shows. */
+    unavailable: string;
+    list: {
+      /** `{time}` is the preparation and the cooking together. */
+      totalTime: string;
+      withheldOne: string;
+      /** `{count}` is the number of recipes that do not show, 2 or more. */
+      withheldMany: string;
+      unavailable: string;
+    };
+  };
+  /**
+   * « Mes consentements » on the Profil tab, and the consent screen at
+   * `/consentement` (REM-43). The names of the consents and the line of a
+   * text's version are those of `signupLink.consent`.
+   */
+  patientConsents: {
+    intro: string;
+    /** `{date}` is the day of the decision. `none`: no decision recorded. */
+    states: Record<ConsentDecision, string> & { none: string };
+    /** `{version}` is the version of the text of the decision. */
+    version: string;
+    /** A consent that the practitioner recorded: no text is stored. */
+    legacyVersion: string;
+    reread: string;
+    /** For a screen reader. Holds `{name}`: the consent's name. */
+    rereadLabel: string;
+    withdraw: string;
+    /** For a screen reader. Holds `{name}`. */
+    withdrawLabel: string;
+    confirmTitle: string;
+    /** The consequence of a withdrawal, in one sentence. */
+    consequences: Record<ConsentKey, string>;
+    /** The withdrawal does not change what was done before. */
+    past: string;
+    confirm: string;
+    withdrawing: string;
+    cancel: string;
+    give: string;
+    /** For a screen reader. Holds `{name}`. */
+    giveLabel: string;
+    giveIntro: string;
+    giveConfirm: string;
+    giving: string;
+    errors: Record<ConsentActionError, string>;
+    /** The deletion of the account stays a request by e-mail. */
+    deletion: string;
+    /** The screen of a patient whose care consent is not in force. */
+    pause: {
+      metaTitle: string;
+      title: string;
+      /** `{date}` is the day of the withdrawal. */
+      withdrawn: string;
+      /** No care consent was recorded, or it was refused. */
+      missing: string;
+      stopsTitle: string;
+      stops: readonly string[];
+      staysTitle: string;
+      stays: string;
+      againTitle: string;
+      again: string;
+      consentsTitle: string;
     };
   };
 };

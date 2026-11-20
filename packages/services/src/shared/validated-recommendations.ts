@@ -174,3 +174,19 @@ export const validatedRecommendationsView = (
       goals.length === 0,
   };
 };
+
+/**
+ * True when category 3 « Recommandations alimentaires » holds an item. The
+ * page and the Profil tab both ask, so the two cannot disagree on when the
+ * food block shows.
+ */
+export const hasFoodRecommendations = (
+  view: Pick<
+    ValidatedRecommendationsView,
+    "evictions" | "favour" | "limit" | "foodAdvice"
+  >,
+): boolean =>
+  view.evictions.length > 0 ||
+  view.favour.length > 0 ||
+  view.limit.length > 0 ||
+  view.foodAdvice.length > 0;

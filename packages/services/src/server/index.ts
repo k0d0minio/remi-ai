@@ -261,6 +261,20 @@ export {
 export type { GeneratedRecipeInput } from "../db/services/generated-recipes";
 export type { GeneratedRecipe } from "../db/models/generated-recipe";
 
+/*
+ * The recipes that a patient can read (REM-94). Each read passes the recipe
+ * through the compatibility gate for that patient: a page shows no recipe
+ * that did not come from here.
+ */
+export {
+  getPatientRecipeCard,
+  listPatientRecipeCards,
+} from "./recipes/patient-recipes";
+export type {
+  PatientRecipeList,
+  PatientRecipeRead,
+} from "./recipes/patient-recipes";
+
 export {
   NUTRITION_RULE_RETRIEVAL_LIMIT,
   archiveNutritionRule,
@@ -516,13 +530,16 @@ export {
 } from "../consent";
 export type { ConsentText, SignupConsentCheck } from "../consent";
 export {
+  careConsentInForce,
   consentsOf,
   insertConsent,
   recordConsent,
+  withdrawConsent,
 } from "../db/services/patient-consents";
 export type {
   ConsentInput,
   ConsentWrite,
+  WithdrawalInput,
 } from "../db/services/patient-consents";
 export type { PatientConsent } from "../db/models/patient-consent";
 
