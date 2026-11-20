@@ -151,7 +151,10 @@ export type {
   ActivationEmailStatus,
 } from "../db/services/care-activation/email";
 
+export { countMissingMandatoryFields } from "../db/services/patient-questionnaire/missing-counts";
+
 export {
+  acknowledgePatientChanges,
   countOpenPatientChanges,
   listOpenPatientChanges,
 } from "../db/services/patient-changes";

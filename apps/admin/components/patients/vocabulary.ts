@@ -226,6 +226,18 @@ export const messagesAwaitingLabel = (count: number) =>
     : `${count} messages attendent une réponse`;
 
 /**
+ * The roster's mark of a file with an open patient change (stories 5 and 21):
+ * a change that the patient made after the validation, not yet taken into
+ * account.
+ */
+export const patientChangedLabel = (count: number) =>
+  count === 1 ? "Modifié par le patient" : `Modifié par le patient (${count})`;
+
+/** The roster's mark of a file with missing mandatory answers (story 5). */
+export const missingInformationLabel = (count: number) =>
+  `Informations manquantes (${count})`;
+
+/**
  * The groups of the patient file (`patientFileLayout`), as Morgane reads them
  * above their rows: by her work, never by table.
  */

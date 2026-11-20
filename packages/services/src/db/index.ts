@@ -182,7 +182,10 @@ export {
   getCareActivationDate,
 } from "./services/care-activation";
 
+export { countMissingMandatoryFields } from "./services/patient-questionnaire/missing-counts";
+
 export {
+  acknowledgePatientChanges,
   countOpenPatientChanges,
   listOpenPatientChanges,
 } from "./services/patient-changes";

@@ -2,8 +2,8 @@
  * The patient's changes after activation — story 21, `patient-change-signals`.
  *
  * This module is the one home of the fields that raise a change signal. A
- * patient write that changes one of them, on a file whose care is active,
- * leaves one `patient_changes` row: the field, the old value, the new value
+ * patient write that changes one of them, on a file with a validated version
+ * or whose care is active, leaves one `patient_changes` row: the field, the old value, the new value
  * and the time. The practitioner acknowledges it on the file.
  *
  * The list is the health fields (breakdown question 1, the default, accepted

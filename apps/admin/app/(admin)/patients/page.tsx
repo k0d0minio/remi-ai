@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { Plus, Users } from "lucide-react";
+import { CircleAlert, Plus, UserPen, Users } from "lucide-react";
 import NextLink from "next/link";
 import {
+  countMissingMandatoryFields,
+  countOpenPatientChanges,
   listChallengeSignals,
   listOperators,
   listUnreadMessageCounts,
@@ -24,8 +26,14 @@ import {
 import { Button } from "@remi/ui";
 import { Badge, EmptyState, Typography, type Intent } from "@remi/ui/server";
 import { SignupLink } from "@/components/operators/signup-link";
+import { MISSING_INFORMATION_ANCHOR } from "@/components/patients/file/missing-information";
+import { PATIENT_CHANGES_ANCHOR } from "@/components/patients/file/patient-changes";
 import { RosterFilters } from "@/components/patients/roster-filters";
-import { messagesAwaitingLabel } from "@/components/patients/vocabulary";
+import {
+  messagesAwaitingLabel,
+  missingInformationLabel,
+  patientChangedLabel,
+} from "@/components/patients/vocabulary";
 import { requireActor, requireOperator } from "@/lib/auth/session";
 import { ensureDatabase } from "@/lib/database";
 
@@ -77,6 +85,13 @@ const fileStatusIntents: Record<FileStatus, Intent> = {
 };
 
 /**
+ * A mark of the row that is a link of its own. It sits above the cover of the
+ * row's main link. On a phone its touch target is 44 px high.
+ */
+const markLinkClass =
+  "focus-visible:ring-ring relative z-10 inline-flex items-center rounded-md focus-visible:outline-none focus-visible:ring-[3px] max-sm:min-h-11";
+
+/**
  * The patient roster — real rows from the database. Rows rather than a table:
  * they survive a phone screen, which is where Morgane opens this between
  * consultations.
@@ -103,8 +118,14 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
     ? operator.patientListSort
     : defaultPatientListSort;
 
-  const [patients, challengeSignals, unreadMessages, operators] =
-    await Promise.all([
+  const [
+    patients,
+    challengeSignals,
+    unreadMessages,
+    openChanges,
+    missingMandatory,
+    operators,
+  ] = await Promise.all([
       patientListOf(actor, {
         search,
         status,
@@ -113,6 +134,9 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
       }),
       listChallengeSignals(actor),
       listUnreadMessageCounts(actor),
+      // Stories 5 and 21: one pass for each mark, never one read for each row.
+      countOpenPatientChanges(actor),
+      countMissingMandatoryFields(actor),
       all ? listOperators() : Promise.resolve<readonly Operator[]>([]),
     ]);
   const practitionerNames = new Map(
@@ -223,26 +247,35 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
                 ? challengeSignalBadges[signal]
                 : null;
               const unread = unreadMessages.get(patient.id) ?? 0;
+              const changed = openChanges.get(patient.id) ?? 0;
+              const missing = missingMandatory.get(patient.id) ?? 0;
 
+              // The row opens the file: the link of the name covers the row
+              // (`after:inset-0`). The two marks are links of their own, above
+              // that cover, because a link cannot hold another link.
               return (
-                <li key={patient.id}>
-                  <NextLink
-                    href={`/patients/${patient.id}`}
-                    className="border-border bg-card hover:bg-accent focus-visible:ring-ring flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border px-4 py-3 transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
-                  >
-                    <Typography as="span" size="sm" weight="medium">
-                      {nom}
-                    </Typography>
-                    {prenom ? (
-                      <Typography as="span" size="sm">
-                        {prenom}
+                <li
+                  key={patient.id}
+                  className="border-border bg-card hover:bg-accent has-[a:focus-visible]:ring-ring relative flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border px-4 py-3 transition-colors duration-[--duration-fast] has-[a:focus-visible]:ring-[3px]"
+                >
+                    <NextLink
+                      href={`/patients/${patient.id}`}
+                      className="flex flex-wrap items-baseline gap-x-3 gap-y-1 after:absolute after:inset-0 after:rounded-lg focus-visible:outline-none"
+                    >
+                      <Typography as="span" size="sm" weight="medium">
+                        {nom}
                       </Typography>
-                    ) : null}
-                    {patient.pseudonym !== nom ? (
-                      <Typography as="span" size="xs" tone="muted">
-                        {patient.pseudonym}
-                      </Typography>
-                    ) : null}
+                      {prenom ? (
+                        <Typography as="span" size="sm">
+                          {prenom}
+                        </Typography>
+                      ) : null}
+                      {patient.pseudonym !== nom ? (
+                        <Typography as="span" size="xs" tone="muted">
+                          {patient.pseudonym}
+                        </Typography>
+                      ) : null}
+                    </NextLink>
                     {all ? (
                       <Typography as="span" size="xs" tone="muted">
                         {patient.practitionerId === operator.id
@@ -250,7 +283,36 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
                           : `· suivi par ${practitionerNames.get(patient.practitionerId) ?? "un compte supprimé"}`}
                       </Typography>
                     ) : null}
-                    <span className="ml-auto flex items-center gap-3">
+                    <span className="ml-auto flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
+                      {/* A patient change after the validation (story 21). It
+                          opens the file at the list of the changes. */}
+                      {changed > 0 ? (
+                        <NextLink
+                          href={`/patients/${patient.id}#${PATIENT_CHANGES_ANCHOR}`}
+                          className={markLinkClass}
+                        >
+                          <Badge variant="warning" tone="solid" size="sm">
+                            <UserPen aria-hidden="true" className="size-3.5" />
+                            {patientChangedLabel(changed)}
+                          </Badge>
+                        </NextLink>
+                      ) : null}
+                      {/* The missing mandatory answers (story 5). It opens
+                          the file at « Informations manquantes ». */}
+                      {missing > 0 ? (
+                        <NextLink
+                          href={`/patients/${patient.id}#${MISSING_INFORMATION_ANCHOR}`}
+                          className={markLinkClass}
+                        >
+                          <Badge variant="warning" tone="subtle" size="sm">
+                            <CircleAlert
+                              aria-hidden="true"
+                              className="size-3.5"
+                            />
+                            {missingInformationLabel(missing)}
+                          </Badge>
+                        </NextLink>
+                      ) : null}
                       {challengeBadge ? (
                         <Badge
                           variant={challengeBadge.intent}
@@ -280,7 +342,6 @@ const Patients = async ({ searchParams }: { searchParams: SearchParams }) => {
                         {fileStatusLabels[patient.fileStatus].fr}
                       </Badge>
                     </span>
-                  </NextLink>
                 </li>
               );
             })}

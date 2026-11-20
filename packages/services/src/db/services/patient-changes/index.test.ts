@@ -3,7 +3,9 @@ import { watchedPatientFields } from "../../../shared/patient-changes";
 import { getDatabase, registerDatabase } from "../../client";
 import type { AuditEvent } from "../../models/audit-event";
 import type { PatientChange } from "../../models/patient-change";
+import type { Actor } from "../../models/actor";
 import type { PatientProfile } from "../../models/patient-profile";
+import type { ProtocolVersion } from "../../models/protocol-version";
 import {
   createMemoryDatabase,
   practitionerActor,
@@ -18,6 +20,7 @@ import {
 } from "../patient-questionnaire";
 import { createPatient, updatePatientProfileByPatient } from "../patients";
 import {
+  acknowledgePatientChanges,
   countOpenPatientChanges,
   listOpenPatientChanges,
   recordPatientChanges,
@@ -270,5 +273,229 @@ describe("countOpenPatientChanges", () => {
     expect(await openOf(patient.id)).toEqual([]);
     const counts = await countOpenPatientChanges(practitionerActor());
     expect(counts.has(patient.id)).toBe(false);
+  });
+});
+
+const rows = () => getDatabase().collection<PatientChange>("patient_changes");
+
+const versions = () =>
+  getDatabase().collection<ProtocolVersion>("protocol_versions");
+
+/** A validated version of the file. These tests never read the snapshot. */
+const validateVersion = (patientId: string) =>
+  versions().insert({
+    patientId,
+    versionNumber: 1,
+    validatedAt: new Date(),
+    validatedBy: testPractitionerId,
+    snapshot: {} as ProtocolVersion["snapshot"],
+  });
+
+const morgane = {
+  id: testPractitionerId,
+  email: "morgane@example.test",
+  name: "Morgane",
+};
+
+const otherPractitionerId = "00000000-0000-4000-8000-000000000002";
+
+const acknowledgeEvents = async (patientId: string) =>
+  (
+    await getDatabase()
+      .collection<AuditEvent>("audit_events")
+      .findMany({ action: "patient.change_acknowledged", targetId: patientId })
+  ).items;
+
+/** A file with two open signals: the weight and the allergies. */
+const patientWithTwoChanges = async (pseudonym: string) => {
+  const patient = await newPatient(pseudonym);
+  await savePatientProfileAnswers(patientActor(patient.id), patient.id, {
+    weightKg: 70,
+  });
+  await setPatientAllergens(patientActor(patient.id), patient.id, "allergy", {
+    state: "declared",
+    items: [{ key: "peanuts" }],
+  });
+  return patient;
+};
+
+describe("a validated version arms the signal", () => {
+  it("records a change before the activation, after the validation", async () => {
+    const patient = await newPatient("Olga", "to_validate");
+    await validateVersion(patient.id);
+    await savePatientProfileAnswers(patientActor(patient.id), patient.id, {
+      weightKg: 70,
+    });
+    const open = await openOf(patient.id);
+    expect(open.map((row) => row.fieldKey)).toEqual(["weightKg"]);
+  });
+
+  it("records nothing at the same status with no version", async () => {
+    const patient = await newPatient("Petra", "to_validate");
+    await savePatientProfileAnswers(patientActor(patient.id), patient.id, {
+      weightKg: 70,
+    });
+    expect(await openOf(patient.id)).toEqual([]);
+  });
+});
+
+describe("acknowledgePatientChanges", () => {
+  it("closes the named signal and leaves the other one open", async () => {
+    const patient = await patientWithTwoChanges("Rita");
+    const weight = (await openOf(patient.id)).find(
+      (row) => row.fieldKey === "weightKg",
+    );
+    if (!weight) {
+      throw new Error("no weight signal");
+    }
+    const result = await acknowledgePatientChanges(
+      practitionerActor(),
+      patient.id,
+      morgane,
+      [weight.id],
+    );
+    expect(result.ok && result.data.map((row) => row.fieldKey)).toEqual([
+      "weightKg",
+    ]);
+    expect((await openOf(patient.id)).map((row) => row.fieldKey)).toEqual([
+      "allergies",
+    ]);
+    const counts = await countOpenPatientChanges(practitionerActor());
+    expect(counts.get(patient.id)).toBe(1);
+  });
+
+  it("keeps the row in the data, with who and when", async () => {
+    const patient = await patientWithTwoChanges("Sara");
+    await acknowledgePatientChanges(
+      practitionerActor(),
+      patient.id,
+      morgane,
+      "all",
+    );
+    const kept = (await rows().findMany({ patientId: patient.id })).items;
+    expect(kept).toHaveLength(2);
+    expect(kept.every((row) => row.acknowledgedAt instanceof Date)).toBe(true);
+    expect(kept.every((row) => row.acknowledgedBy === morgane.id)).toBe(true);
+    expect(kept.find((row) => row.fieldKey === "weightKg")?.newValue).toBe(70);
+  });
+
+  it("closes each open signal with « all », and the file leaves the count", async () => {
+    const patient = await patientWithTwoChanges("Tess");
+    const result = await acknowledgePatientChanges(
+      practitionerActor(),
+      patient.id,
+      morgane,
+      "all",
+    );
+    expect(result.ok && result.data).toHaveLength(2);
+    expect(await openOf(patient.id)).toEqual([]);
+    const counts = await countOpenPatientChanges(practitionerActor());
+    expect(counts.has(patient.id)).toBe(false);
+  });
+
+  it("writes one audit event with the field keys and no value", async () => {
+    const patient = await patientWithTwoChanges("Uma");
+    await acknowledgePatientChanges(
+      practitionerActor(),
+      patient.id,
+      morgane,
+      "all",
+    );
+    const events = await acknowledgeEvents(patient.id);
+    expect(events).toHaveLength(1);
+    const [event] = events;
+    expect(event?.actorId).toBe(morgane.id);
+    expect(event?.detail.split(", ").sort()).toEqual(["allergies", "weightKg"]);
+    expect(event?.detail).not.toContain("70");
+    expect(event?.detail).not.toContain("peanuts");
+  });
+
+  it("changes nothing on a second call, and writes no second event", async () => {
+    const patient = await patientWithTwoChanges("Vera");
+    const [first] = await openOf(patient.id);
+    if (!first) {
+      throw new Error("no signal");
+    }
+    await acknowledgePatientChanges(practitionerActor(), patient.id, morgane, [
+      first.id,
+    ]);
+    const before = await rows().findById(first.id);
+    const again = await acknowledgePatientChanges(
+      practitionerActor(),
+      patient.id,
+      morgane,
+      [first.id],
+    );
+    expect(again).toEqual({ ok: true, data: [] });
+    expect((await rows().findById(first.id))?.acknowledgedAt).toEqual(
+      before?.acknowledgedAt,
+    );
+    expect(await acknowledgeEvents(patient.id)).toHaveLength(1);
+  });
+
+  it("ignores the id of a signal of another file", async () => {
+    const patient = await patientWithTwoChanges("Wanda");
+    const other = await patientWithTwoChanges("Xenia");
+    const [foreign] = await openOf(other.id);
+    if (!foreign) {
+      throw new Error("no signal");
+    }
+    const result = await acknowledgePatientChanges(
+      practitionerActor(),
+      patient.id,
+      morgane,
+      [foreign.id],
+    );
+    expect(result).toEqual({ ok: true, data: [] });
+    expect(await openOf(other.id)).toHaveLength(2);
+  });
+
+  it("refuses another practitioner, as a missing file", async () => {
+    const patient = await patientWithTwoChanges("Yara");
+    const result = await acknowledgePatientChanges(
+      practitionerActor(otherPractitionerId),
+      patient.id,
+      { ...morgane, id: otherPractitionerId },
+      "all",
+    );
+    expect(result.ok).toBe(false);
+    expect(!result.ok && result.error).toBe("not_found");
+    expect(await openOf(patient.id)).toHaveLength(2);
+    expect(await acknowledgeEvents(patient.id)).toHaveLength(0);
+  });
+
+  it("lets an admin's read-only open read the signals, and refuses its acknowledge", async () => {
+    const patient = await patientWithTwoChanges("Zoe");
+    const admin: Actor = {
+      kind: "operator",
+      id: otherPractitionerId,
+      role: "admin",
+      openedPatientIds: [patient.id],
+    };
+    const read = await listOpenPatientChanges(admin, patient.id);
+    expect(read.ok && read.data).toHaveLength(2);
+    const result = await acknowledgePatientChanges(
+      admin,
+      patient.id,
+      { ...morgane, id: otherPractitionerId },
+      "all",
+    );
+    expect(result.ok).toBe(false);
+    expect(await openOf(patient.id)).toHaveLength(2);
+  });
+
+  it("leaves the validated version as it was", async () => {
+    const patient = await patientWithTwoChanges("Alba");
+    const version = await validateVersion(patient.id);
+    await acknowledgePatientChanges(
+      practitionerActor(),
+      patient.id,
+      morgane,
+      "all",
+    );
+    expect(await versions().findMany({ patientId: patient.id })).toEqual({
+      items: [version],
+      nextCursor: null,
+    });
   });
 });
