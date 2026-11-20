@@ -36,6 +36,7 @@ One row in `patient_profiles`, plus what hangs off it:
 | Each validated version of the protocol: number, date, who validated, a copy of the content | `protocol_versions`       | no — no page reads them yet                        |
 | Each food directive: kind, the term as typed, limit level, eviction period or durable status, when disabled| `patient_food_directives` | no — no patient page shows them yet                |
 | The meal configuration: for each meal, whether the patient eats it and its orientation, and the intermittent fasting option | `patient_meal_configurations` | no — no patient page shows it yet |
+| Each recipe that REMI generated for the patient: the title, the ingredients with quantity and unit, the steps, the times, the portions, the day and the meal it is planned for, the library recipe it started from, when it was made | `patient_recipes` | no — no patient page shows them yet |
 | The share token, when the link was last opened, last written                                | `patient_profiles`        | the token is the link                              |
 | The protocol, entry by entry                                                                | `patient_recommendations` | yes, unless archived                               |
 | Consultation notes                                                                          | `patient_notes`           | no                                                 |
@@ -135,6 +136,8 @@ Deleting a patient from the console removes, permanently and in one operation:
   value, acknowledged or not;
 - every validated version of their protocol. A version is never changed and never deleted while
   the patient's file exists: it goes only with the patient;
+- every recipe that REMI generated for them, with the day and the meal it was planned for. The
+  library recipe that it started from stays: the library belongs to no patient;
 - every challenge she gave them, running or closed, with the patient's answers on each;
 - the whole general thread — every message the patient sent and every reply to it;
 - everything the patient themselves wrote through the link — their meal entries and their
@@ -179,6 +182,19 @@ is: generating recipes from a hand-typed profile is Morgane's practice **today**
 with the patient's real name typed in by hand. The export carries the pseudonym and never the
 name, the email or the share link, so what it changes about the exposure is that it reduces it —
 and that there is now a line in the trail saying it happened. REMI itself calls no model here.
+
+## The recipe library and a patient's recipes
+
+The recipe library (`recipes`) belongs to no patient and holds no patient data. A library recipe
+carries who marked it « vérifiée » and when: the account id and the name of a practitioner. That
+record stays when the account is removed. Each change of the mark is a line of the audit trail
+(`recipe.verified`, `recipe.verification_removed`) with the recipe title.
+
+A recipe that REMI generated for a patient (`patient_recipes`) is patient data. It holds the
+recipe, the day, the meal and the id of the library recipe it started from. It holds no reason
+and no health value. A new recipe for the same day and meal replaces the old one: the old one is
+not kept. The rows are deleted with the patient (`on delete cascade`). No audit line is written
+for a stored recipe.
 
 ## How long an ended patient is kept
 

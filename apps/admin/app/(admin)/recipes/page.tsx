@@ -52,6 +52,9 @@ const Recipes = async ({ searchParams }: { searchParams: SearchParams }) => {
     listRecipeTags(),
   ]);
   const filtered = search !== "" || tag !== "all";
+  const verifiedCount = recipes.filter(
+    (recipe) => recipe.verifiedAt !== null,
+  ).length;
 
   return (
     <div className="flex flex-col gap-6">
@@ -63,6 +66,17 @@ const Recipes = async ({ searchParams }: { searchParams: SearchParams }) => {
           La bibliothèque partagée : une recette s&apos;écrit ici une fois, et
           s&apos;attribue ensuite depuis la fiche de chaque personne.
         </Typography>
+        {recipes.length > 0 ? (
+          <Typography size="sm" tone="muted">
+            {verifiedCount === 0
+              ? "Aucune recette vérifiée dans cette liste."
+              : verifiedCount === 1
+                ? "1 recette vérifiée dans cette liste."
+                : `${verifiedCount} recettes vérifiées dans cette liste.`}{" "}
+            REMI génère les recettes d&apos;une personne à partir des recettes
+            vérifiées seulement.
+          </Typography>
+        ) : null}
       </div>
 
       <LibraryFilters search={search} tag={tag} tags={tags} />
@@ -74,7 +88,7 @@ const Recipes = async ({ searchParams }: { searchParams: SearchParams }) => {
           body={
             filtered
               ? "Essayez une autre étiquette, ou videz la recherche."
-              : "Écrivez votre première recette ci-dessous — titre et texte libre, comme dans un message."
+              : "Écrivez votre première recette ci-dessous : une ligne par ingrédient, une ligne par étape."
           }
         />
       ) : (
@@ -85,7 +99,8 @@ const Recipes = async ({ searchParams }: { searchParams: SearchParams }) => {
         <CardHeader>
           <CardTitle>Nouvelle recette</CardTitle>
           <CardDescription>
-            Elle rejoint la bibliothèque, sans être attribuée à personne.
+            Elle rejoint la bibliothèque, sans être attribuée à personne, et
+            sans la marque « vérifiée » : vous la vérifiez ensuite sur sa page.
           </CardDescription>
         </CardHeader>
         <CardContent>

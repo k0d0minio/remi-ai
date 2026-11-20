@@ -26,8 +26,10 @@ import type {
 import type {
   MealFasting,
   MealOrientation,
+  MealSlot,
 } from "../shared/meal-configuration";
 import type { ProtocolSnapshot } from "../shared/protocol-snapshot";
+import type { StructuredRecipe } from "../shared/structured-recipe";
 
 /**
  * The Drizzle schema — the single definition the checked-in migrations under
@@ -869,10 +871,13 @@ export const patientPantryEssentials = pgTable("patient_pantry_essentials", {
  * have her retyping the same recipe five times and leave five versions of it to
  * fix when one changes.
  *
- * `body` is prose, one field, no structure imposed: she writes ingredients and
- * steps as a paragraph in chat today, and § 7 bans the dozen-field form that
- * would replace it. There is no `minutes`, `servings`, `ingredients[]` or
- * `method[]` here — those were v1's fields, and their absence is the spec.
+ * `body` is prose, one field: the form of the recipes of before REM-90. Since
+ * REM-90 (stories 24 and 25) a recipe also has `content`, the structured
+ * recipe that the recipe page, the shopping list and the weekly plan read. A
+ * recipe of the old form keeps its body and has `content` null.
+ *
+ * The library is the template base of the generation (D-34). Only a row with
+ * `verified_at` set feeds the generation.
  */
 export const recipes = pgTable("recipes", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -904,8 +909,71 @@ export const recipes = pgTable("recipes", {
   variantOfId: uuid("variant_of_id").references((): AnyPgColumn => recipes.id, {
     onDelete: "restrict",
   }),
+  /**
+   * The structured recipe (`shared/structured-recipe.ts`), or null for a
+   * recipe of the old prose form. The zod schema is the one definition of the
+   * shape: a reader parses the value and never trusts it.
+   */
+  content: jsonb("content").$type<StructuredRecipe>(),
+  /**
+   * When a practitioner marked the recipe « vérifiée », or null. Only an
+   * explicit act sets it, and an edit of the recipe sets it back to null.
+   */
+  verifiedAt: timestamp("verified_at", { withTimezone: true, mode: "date" }),
+  /**
+   * Who verified. No foreign key, as on `app_settings`: the record of who
+   * verified stays when the account is removed. The name is beside it for the
+   * same reason.
+   */
+  verifiedById: uuid("verified_by_id"),
+  verifiedByName: text("verified_by_name").notNull().default(""),
   ...timestamps,
 });
+
+/**
+ * One recipe that REMI generated for one patient — REM-90, story 24.
+ *
+ * The row is patient data: it goes with the patient. It names the verified
+ * template of the library that it started from (D-34). The template cannot be
+ * deleted: the library archives.
+ *
+ * The day and the meal are the weekly plan. A patient has one recipe at most
+ * for one day and one meal, and there is no separate plan table (Jamie,
+ * 2026-11-20).
+ */
+export const patientRecipes = pgTable(
+  "patient_recipes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    templateId: uuid("template_id")
+      .notNull()
+      .references(() => recipes.id, { onDelete: "restrict" }),
+    title: text("title").notNull(),
+    content: jsonb("content").$type<StructuredRecipe>().notNull(),
+    /** The day in Europe/Brussels, as a calendar date. */
+    plannedOn: date("planned_on", { mode: "string" }).notNull(),
+    /** `breakfast`, `lunch`, `snack` or `dinner`. */
+    meal: text("meal").$type<MealSlot>().notNull(),
+    generatedAt: timestamp("generated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("patient_recipes_patient_day_meal_idx").on(
+      table.patientId,
+      table.plannedOn,
+      table.meal,
+    ),
+    check(
+      "patient_recipes_meal_check",
+      sql`${table.meal} in ('breakfast', 'lunch', 'snack', 'dinner')`,
+    ),
+  ],
+);
 
 /**
  * One recipe given to one patient — the half of § I that is personal.

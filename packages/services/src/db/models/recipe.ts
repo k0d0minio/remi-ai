@@ -1,21 +1,40 @@
+import type { StructuredRecipe } from "../../shared/structured-recipe";
 import type { Entity, Id } from "../../types";
 
 /**
  * One entry in the shared recipe library — brainstorm § I.
  *
- * Light on purpose. § 7 bans the dozen-field recipe form outright, so a recipe
- * is a title and a body of prose: the ingredients and the steps as Morgane
- * already writes them in chat, in one field, with no structure imposed on her.
+ * A recipe has two forms. The old form is a title and a body of prose. The
+ * structured form (REM-90, stories 24 and 25) is `content`: ingredients with
+ * a quantity and a unit, ordered steps, the times, the portions and the meals.
+ * A recipe of the old form has `content` null. It stays readable, and it can
+ * never be verified.
  *
- * The v1 model this replaces carried `minutes`, `servings`, `Ingredient[]`,
- * `method[]` and `honours[]`. It belonged to the rigid weekly meal plan that
- * V2 deliberately replaced, and it is gone rather than renamed — two things
- * called `Recipe` is how a vocabulary rots.
+ * The library is the template base of the generation (D-34). Only a recipe
+ * with `verifiedAt` set is a template that feeds the generation.
  */
 export type Recipe = Entity & {
   title: string;
-  /** Ingredients and steps as prose. One field, no structure imposed. */
+  /**
+   * The recipe as prose. For a recipe of the old form, it is what the
+   * practitioner typed. For a structured recipe, the service writes it from
+   * `content`, so that each screen that shows a body stays readable.
+   */
   body: string;
+  /**
+   * The structured recipe, or null for a recipe of the old form. Read it with
+   * `structuredRecipeOf`: the column is jsonb.
+   */
+  content: StructuredRecipe | null;
+  /**
+   * When a practitioner marked the recipe « vérifiée », or null. Only an
+   * explicit act sets it. An edit of the recipe sets it back to null.
+   */
+  verifiedAt: Date | null;
+  /** The account that verified. No foreign key: the fact stays. */
+  verifiedById: Id | null;
+  /** The name of that account at the time, or `""`. */
+  verifiedByName: string;
   /**
    * Free text, normalised to lowercase and de-duplicated on write. No
    * taxonomy is defined anywhere: the library filters on the tags that exist,

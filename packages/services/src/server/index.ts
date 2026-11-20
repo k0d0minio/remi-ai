@@ -232,9 +232,22 @@ export {
   listArchivedRecipes,
   listRecipeTags,
   listRecipes,
+  listVerifiedTemplates,
+  setRecipeVerified,
   updateRecipe,
 } from "../db/services/recipes";
-export type { RecipeInput } from "../db/services/recipes";
+export type {
+  RecipeInput,
+  VerifiedTemplate,
+} from "../db/services/recipes";
+export {
+  GENERATED_RECIPES_MAX_DAYS,
+  getGeneratedRecipe,
+  listGeneratedRecipes,
+  writeGeneratedRecipes,
+} from "../db/services/generated-recipes";
+export type { GeneratedRecipeInput } from "../db/services/generated-recipes";
+export type { GeneratedRecipe } from "../db/models/generated-recipe";
 
 export {
   NUTRITION_RULE_RETRIEVAL_LIMIT,

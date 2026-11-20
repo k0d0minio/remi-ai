@@ -121,6 +121,13 @@ export const auditActions = [
   "recipe.assigned",
   "recipe.created_and_assigned",
   "recipe.duplicated_as_variant",
+  /**
+   * A practitioner marked a recipe of the library « vérifiée », or the mark
+   * left (REM-90, D-34, D-32). The detail of a removal is `explicit` for the
+   * practitioner's act and `edit` for an edit of the verified recipe.
+   */
+  "recipe.verified",
+  "recipe.verification_removed",
   "recipe.assigned_bulk",
   "recipe.assignment_updated",
   "recipe.assignment_archived",
