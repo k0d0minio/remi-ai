@@ -202,6 +202,8 @@ export type {
   QuestionnaireCompleteness,
   QuestionnaireLabel,
 } from "./questionnaire";
+export { safetyList, strictGlutenLabel } from "./safety-highlights";
+export type { SafetyBox, SafetyList } from "./safety-highlights";
 export {
   componentsForRecommendation,
   normaliseNutritionText,
