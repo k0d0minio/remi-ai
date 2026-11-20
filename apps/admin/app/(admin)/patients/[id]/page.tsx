@@ -105,6 +105,7 @@ import { RecipeAssignments } from "@/components/patients/recipe-assignments";
 import { RecommendationAddForm } from "@/components/patients/recommendation-add-form";
 import { RecommendationGroups } from "@/components/patients/recommendation-groups";
 import { RecommendationSection } from "@/components/patients/recommendation-section";
+import { SafetyBlock } from "@/components/patients/safety-block";
 import { SectionFold } from "@/components/patients/section-fold";
 import { ShareLinkCard } from "@/components/patients/share-link-card";
 import { SummaryBlock } from "@/components/patients/summary-block";
@@ -514,6 +515,8 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
             </a>
           ))}
         </nav>
+
+        <SafetyBlock questionnaire={questionnaire.data} medications={patient.medications} />
 
         {/* The patient file — the landing state (story 6). */}
         <section
