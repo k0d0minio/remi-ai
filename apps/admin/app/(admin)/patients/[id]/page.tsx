@@ -516,7 +516,10 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
           ))}
         </nav>
 
-        <SafetyBlock questionnaire={questionnaire.data} medications={patient.medications} />
+        <SafetyBlock
+          questionnaire={questionnaire.data}
+          medications={patient.medications}
+        />
 
         {/* The patient file — the landing state (story 6). */}
         <section
