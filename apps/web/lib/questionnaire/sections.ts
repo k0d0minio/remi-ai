@@ -1,34 +1,21 @@
 import {
   mandatoryQuestionnaireFields,
+  questionnaireSections,
+  sectionOfMandatoryField,
   type MandatoryQuestionnaireField,
+  type QuestionnaireSection,
 } from "@remi/services/shared";
 
 /**
- * The questionnaire's sections, in the order the patient meets them (story 4).
- * The key is the URL's `?section=` value. « Question du praticien » joins with
+ * The sections and the place of each mandatory field have one home,
+ * `shared/questionnaire.ts`: the console's form reads the same list. The key
+ * is the URL's `?section=` value. « Question du praticien » joins with
  * `practitioner-free-question`.
  */
-export const questionnaireSections = [
-  "identite",
-  "profil",
-  "consultation",
-  "alimentation",
-  "sante",
-  "genetique",
-] as const;
-
-export type QuestionnaireSection = (typeof questionnaireSections)[number];
+export { questionnaireSections, type QuestionnaireSection };
 
 /** Where each mandatory field is asked. */
-export const sectionOfField = {
-  sexForCalculation: "profil",
-  heightCm: "profil",
-  weightKg: "profil",
-  activityLevel: "profil",
-  consultationReason: "consultation",
-  allergies: "alimentation",
-  intolerances: "alimentation",
-} as const satisfies Record<MandatoryQuestionnaireField, QuestionnaireSection>;
+export const sectionOfField = sectionOfMandatoryField;
 
 export const isQuestionnaireSection = (
   value: unknown,

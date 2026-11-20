@@ -9,6 +9,8 @@
  * and `QuestionnaireInput` by structure, and the action passes them on as is.
  */
 
+import type { QuestionnaireCompleteness } from "@remi/services/shared";
+
 /** One checked box. The service's `AllergenSelection`. */
 export type AllergenSelection = {
   key: string;
@@ -24,14 +26,6 @@ export type AllergenAnswer =
 
 /** The answers a form posted, before the service checks them. */
 export type QuestionnaireFormInput = Record<string, unknown>;
-
-/**
- * The « Non renseigné » choice of a select. A select item cannot carry `""`,
- * so it posts this word, which no vocabulary contains. The parser turns it
- * into `""`, and `""` clears the column.
- */
-export const UNSET = "unset";
-export const UNSET_LABEL = "Non renseigné";
 
 /** The three answers to one allergen list, as the form's radio posts them. */
 export const allergenStates = ["unanswered", "none_known", "declared"] as const;
@@ -50,17 +44,17 @@ export const allergenNames = (kind: Kind) => ({
   other: (key: string) => `${kind}Other:${key}`,
 });
 
-/** The three genotype selects. Locked without the genetic consent. */
+/** The three genotype choices. Locked without the genetic consent. */
 export const genotypeFields = ["apoe", "dio2", "amy1a"] as const;
 
 const text = (formData: FormData, name: string) =>
   formData.has(name) ? String(formData.get(name) ?? "") : undefined;
 
-/** A select: `UNSET` and `""` clear the column, anything else goes as is. */
-const choice = (formData: FormData, name: string) => {
-  const value = text(formData, name);
-  return value === undefined ? undefined : value === UNSET ? "" : value;
-};
+/**
+ * A choice among a few. The form posts `""` for an unanswered question, and
+ * `""` clears the column. Anything else goes as is.
+ */
+const choice = text;
 
 /** `""` clears the number. Anything else goes to the service as a number. */
 const amount = (formData: FormData, name: string) => {
@@ -152,4 +146,43 @@ export const allergenAnswerFrom = (
       return { key, subKey: subKey ?? null, otherText };
     });
   return { state: "declared", items };
+};
+
+/** A number field as the completeness check reads it. Empty or no number is null. */
+const filledNumber = (formData: FormData, name: string) => {
+  const value = (text(formData, name) ?? "").trim().replace(",", ".");
+  const parsed = Number(value);
+  return value !== "" && Number.isFinite(parsed) ? parsed : null;
+};
+
+/**
+ * What the form holds now, as `missingMandatoryFields` reads it. The form uses
+ * it to show the missing mandatory answers before and after a save. The
+ * service decides again on the stored file: this is the form's view only.
+ */
+export const completenessFrom = (
+  formData: FormData,
+): QuestionnaireCompleteness => {
+  const list = (kind: Kind) => {
+    const names = allergenNames(kind);
+    const state = text(formData, names.state);
+    return {
+      noneKnown:
+        state === "none_known" ? true : state === "declared" ? false : null,
+      count: state === "declared" ? formData.getAll(names.item).length : 0,
+    };
+  };
+  const allergy = list("allergy");
+  const intolerance = list("intolerance");
+  return {
+    sexForCalculation: text(formData, "sexForCalculation") || null,
+    heightCm: filledNumber(formData, "heightCm"),
+    weightKg: filledNumber(formData, "weightKg"),
+    activityLevel: text(formData, "activityLevel") || null,
+    consultationReason: text(formData, "consultationReason") ?? null,
+    noKnownAllergies: allergy.noneKnown,
+    noKnownIntolerances: intolerance.noneKnown,
+    allergyCount: allergy.count,
+    intoleranceCount: intolerance.count,
+  };
 };

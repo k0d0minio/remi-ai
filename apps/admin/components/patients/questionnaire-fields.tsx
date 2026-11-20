@@ -1,9 +1,10 @@
 "use client";
 
-import type { ReactNode } from "react";
 import type {
   PatientAllergen,
+  PatientProfile,
   PatientQuestionnaire,
+  QuestionnaireSection,
 } from "@remi/services/shared";
 import {
   activityLevelDetails,
@@ -15,136 +16,159 @@ import {
   dio2Categories,
   geneticTestAnswerLabels,
   geneticTestAnswers,
+  mandatoryQuestionnaireFieldLabels,
   sexesForCalculation,
   sexForCalculationLabels,
 } from "@remi/services/shared";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@remi/ui";
 import { Field, Input, Textarea, Typography } from "@remi/ui/server";
 import { AllergenField } from "@/components/patients/allergen-field";
-import { UNSET, UNSET_LABEL } from "@/lib/patients/questionnaire-form";
+import {
+  ChoiceCards,
+  type ChoiceOption,
+} from "@/components/patients/choice-cards";
+import {
+  FormGroup,
+  MandatoryLabel,
+} from "@/components/patients/form-groups";
+
+/** `""` reads « Non renseigné » in an empty text field (story 6). */
+export const EMPTY = "Non renseigné";
+
+/**
+ * A disabled field posts nothing, so the action leaves the stored value as it
+ * is. The patient gives the care consent in REMI, never the console.
+ */
+const CARE_CONSENT_REQUIRED =
+  "Consentement requis : enregistré une fois que la personne a donné son consentement aux soins dans REMI.";
 
 type Props = {
+  /** Present when editing. Absent on « Nouveau patient ». */
+  patient?: PatientProfile;
   /** The stored answers. Absent on « Nouveau patient »: every field is empty. */
   answers?: PatientQuestionnaire;
   allergens?: readonly PatientAllergen[];
-  /** Taille and poids live on the profile. The questionnaire asks them here. */
-  heightCm: number | null;
-  weightKg: number | null;
   /** The patient gave the genetic consent. Locked without it. */
   genotypeOpen: boolean;
   /**
-   * The patient gave the care consent. The desired weight is optional data
-   * and stays locked without it (story 3): the service refuses it.
+   * The patient gave the care consent. The desired weight, the treatments and
+   * the supplements stay locked without it (story 3): the service refuses them.
    */
   careConsentGiven: boolean;
+  /** How many mandatory answers each section still misses, from the form. */
+  missing: Readonly<Record<QuestionnaireSection, number>>;
 };
 
-/** The hint of a field of `mandatoryQuestionnaireFields`. */
-const MANDATORY = "Obligatoire pour « Prêt pour consultation ».";
-
-type Option = { value: string; label: string };
-
-/** A select with « Non renseigné » first. `UNSET` posts as a cleared field. */
-const ChoiceSelect = ({
-  id,
-  value,
-  options,
-}: {
-  id: string;
-  value: string | null | undefined;
-  options: readonly Option[];
-}) => (
-  <Select name={id} defaultValue={value ?? UNSET}>
-    <SelectTrigger id={id}>
-      <SelectValue placeholder={UNSET_LABEL} />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value={UNSET}>{UNSET_LABEL}</SelectItem>
-      {options.map((option) => (
-        <SelectItem key={option.value} value={option.value}>
-          {option.label}
-        </SelectItem>
-      ))}
-    </SelectContent>
-  </Select>
-);
-
-const plain = (values: readonly string[]): Option[] =>
+const plain = (values: readonly string[]): ChoiceOption[] =>
   values.map((value) => ({ value, label: value }));
 
-const Section = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) => (
-  <div className="flex flex-col gap-4">
-    <Typography as="h3" variant="eyebrow" tone="muted">
-      {title}
-    </Typography>
-    {children}
-  </div>
-);
+const mandatory = mandatoryQuestionnaireFieldLabels;
 
 /**
- * Every field of the preparatory questionnaire, in the questionnaire's order
- * (story 4): Profil, Consultation, Alimentation, Santé, Génétique, Question du
- * praticien. The labels and keys come from `shared/questionnaire.ts`, so the
- * console and the patient's pages offer the same choices (story 1: « exactement
- * comme si le patient s'était inscrit lui-même »).
+ * The six groups of the preparatory questionnaire, in the patient's order
+ * (story 4): Identité, Profil, Consultation, Alimentation, Santé, Génétique.
+ * The sections, the keys and the options come from `shared/questionnaire.ts`,
+ * so the console and the patient's pages ask the same questions (story 1:
+ * « exactement comme si le patient s'était inscrit lui-même »). The labels are
+ * the console's own, in a neutral tone.
  *
- * Nothing here is `required`: the file saves with missing fields, and the file
- * page lists them.
+ * Nothing here is `required`: the file saves with missing answers, and each
+ * group says how many mandatory ones it misses.
  */
 export const QuestionnaireFields = ({
+  patient,
   answers,
   allergens = [],
-  heightCm,
-  weightKg,
   genotypeOpen,
   careConsentGiven,
+  missing,
 }: Props) => (
-  <div className="flex flex-col gap-6">
-    <Section title="Profil">
-      <div className="grid gap-4 sm:grid-cols-2">
+  <>
+    <FormGroup group="identite" missing={null}>
+      <div className="@xl:grid-cols-2 grid gap-4">
         <Field
-          id="sexForCalculation"
-          label="Sexe utilisé pour le calcul"
-          hint={MANDATORY}
+          id="firstName"
+          label="Prénom"
+          hint={
+            patient?.fullName && !patient.firstName && !patient.lastName
+              ? `Nom actuel : ${patient.fullName}. Vide, il reste tel quel.`
+              : "Identité réelle — ne quitte jamais cette console et le lien patient."
+          }
         >
-          <ChoiceSelect
-            id="sexForCalculation"
-            value={answers?.sexForCalculation}
-            options={sexesForCalculation.map((sex) => ({
-              value: sex,
-              label: sexForCalculationLabels[sex].fr,
-            }))}
+          <Input
+            id="firstName"
+            name="firstName"
+            placeholder={EMPTY}
+            defaultValue={patient?.firstName ?? ""}
+          />
+        </Field>
+
+        <Field id="lastName" label="Nom">
+          <Input
+            id="lastName"
+            name="lastName"
+            placeholder={EMPTY}
+            defaultValue={patient?.lastName ?? ""}
           />
         </Field>
 
         <Field
-          id="activityLevel"
-          label="Niveau d'activité physique"
-          hint={MANDATORY}
+          id="birthDate"
+          label="Date de naissance"
+          hint="L'âge en est déduit ; il n'est jamais stocké."
         >
-          <ChoiceSelect
-            id="activityLevel"
-            value={answers?.activityLevel}
-            options={activityLevels.map((level) => ({
-              value: level,
-              label: activityLevelDetails[level].label.fr,
-            }))}
+          <Input
+            id="birthDate"
+            name="birthDate"
+            type="date"
+            defaultValue={patient?.birthDate ?? ""}
           />
         </Field>
 
-        <Field id="heightCm" label="Taille (cm)" hint={MANDATORY}>
+        <Field
+          id="email"
+          label="Adresse email"
+          hint="Aucun email ne part à la création. Une adresse déjà sur un de vos dossiers ouvre ce dossier."
+        >
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            placeholder={EMPTY}
+            defaultValue={patient?.email ?? ""}
+          />
+        </Field>
+
+        <Field id="phone" label="Téléphone">
+          <Input
+            id="phone"
+            name="phone"
+            type="tel"
+            inputMode="tel"
+            placeholder={EMPTY}
+            defaultValue={patient?.phone ?? ""}
+          />
+        </Field>
+      </div>
+    </FormGroup>
+
+    <FormGroup group="profil" missing={missing.profil}>
+      <ChoiceCards
+        name="sexForCalculation"
+        legend={
+          <MandatoryLabel>{mandatory.sexForCalculation.fr}</MandatoryLabel>
+        }
+        initial={answers?.sexForCalculation}
+        options={sexesForCalculation.map((sex) => ({
+          value: sex,
+          label: sexForCalculationLabels[sex].fr,
+        }))}
+      />
+
+      <div className="@xl:grid-cols-2 grid gap-4">
+        <Field
+          id="heightCm"
+          label={<MandatoryLabel>Taille (cm)</MandatoryLabel>}
+        >
           <Input
             id="heightCm"
             name="heightCm"
@@ -152,11 +176,15 @@ export const QuestionnaireFields = ({
             inputMode="numeric"
             min={1}
             max={280}
-            defaultValue={heightCm ?? ""}
+            placeholder={EMPTY}
+            defaultValue={patient?.heightCm ?? ""}
           />
         </Field>
 
-        <Field id="weightKg" label="Poids actuel (kg)" hint={MANDATORY}>
+        <Field
+          id="weightKg"
+          label={<MandatoryLabel>Poids actuel (kg)</MandatoryLabel>}
+        >
           <Input
             id="weightKg"
             name="weightKg"
@@ -165,213 +193,238 @@ export const QuestionnaireFields = ({
             step="0.1"
             min={1}
             max={500}
-            defaultValue={weightKg ?? ""}
+            placeholder={EMPTY}
+            defaultValue={patient?.weightKg ?? ""}
           />
         </Field>
+      </div>
 
-        {/* Disabled posts nothing, so the stored value stays as it is. */}
-        <Field
+      <ChoiceCards
+        name="activityLevel"
+        legend={<MandatoryLabel>{mandatory.activityLevel.fr}</MandatoryLabel>}
+        layout="two"
+        initial={answers?.activityLevel}
+        options={activityLevels.map((level) => ({
+          value: level,
+          label: activityLevelDetails[level].label.fr,
+          description: activityLevelDetails[level].description.fr,
+        }))}
+      />
+
+      {/* Disabled posts nothing, so the stored value stays as it is. */}
+      <Field
+        id="desiredWeightKg"
+        label="Poids souhaité (kg)"
+        hint={
+          careConsentGiven
+            ? undefined
+            : "Verrouillé jusqu'au consentement aux soins du patient."
+        }
+        className="@xl:max-w-[calc(50%-0.5rem)]"
+      >
+        <Input
           id="desiredWeightKg"
-          label="Poids souhaité (kg)"
-          optional
-          hint={
-            careConsentGiven
-              ? undefined
-              : "Verrouillé jusqu'au consentement aux soins du patient."
-          }
-        >
-          <Input
-            id="desiredWeightKg"
-            name="desiredWeightKg"
-            type="number"
-            inputMode="decimal"
-            step="0.1"
-            min={1}
-            max={500}
-            disabled={!careConsentGiven}
-            defaultValue={answers?.desiredWeightKg ?? ""}
-          />
-        </Field>
-      </div>
-    </Section>
+          name="desiredWeightKg"
+          type="number"
+          inputMode="decimal"
+          step="0.1"
+          min={1}
+          max={500}
+          placeholder={careConsentGiven ? EMPTY : undefined}
+          disabled={!careConsentGiven}
+          defaultValue={answers?.desiredWeightKg ?? ""}
+        />
+      </Field>
+    </FormGroup>
 
-    <Section title="Consultation">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field
+    <FormGroup group="consultation" missing={missing.consultation}>
+      <Field
+        id="consultationReason"
+        label={
+          <MandatoryLabel>{mandatory.consultationReason.fr}</MandatoryLabel>
+        }
+      >
+        <Textarea
           id="consultationReason"
-          label="Motif de consultation"
-          hint={MANDATORY}
-          className="sm:col-span-2"
-        >
-          <Textarea
-            id="consultationReason"
-            name="consultationReason"
-            rows={3}
-            defaultValue={answers?.consultationReason ?? ""}
-          />
-        </Field>
+          name="consultationReason"
+          rows={3}
+          placeholder={EMPTY}
+          defaultValue={answers?.consultationReason ?? ""}
+        />
+      </Field>
 
-        <Field id="consultationDate" label="Date de consultation" optional>
-          <Input
-            id="consultationDate"
-            name="consultationDate"
-            type="date"
-            defaultValue={answers?.consultationDate ?? ""}
-          />
-        </Field>
-      </div>
-    </Section>
+      <Field
+        id="consultationDate"
+        label="Date de consultation"
+        className="@xl:max-w-[calc(50%-0.5rem)]"
+      >
+        <Input
+          id="consultationDate"
+          name="consultationDate"
+          type="date"
+          defaultValue={answers?.consultationDate ?? ""}
+        />
+      </Field>
+    </FormGroup>
 
-    <Section title="Alimentation">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field id="diet" label="Régime alimentaire" optional>
-          <ChoiceSelect
-            id="diet"
-            value={answers?.diet}
-            options={diets.map((diet) => ({
-              value: diet,
-              label: dietLabels[diet].fr,
-            }))}
-          />
-        </Field>
+    <FormGroup group="alimentation" missing={missing.alimentation}>
+      <ChoiceCards
+        name="diet"
+        legend="Régime alimentaire"
+        initial={answers?.diet}
+        options={diets.map((diet) => ({
+          value: diet,
+          label: dietLabels[diet].fr,
+        }))}
+      />
 
-        <Field
+      <Field
+        id="dietNote"
+        label="Précision sur le régime"
+        hint="Pour « Autre », ou une nuance du régime choisi."
+      >
+        <Input
           id="dietNote"
-          label="Précision sur le régime"
-          optional
-          hint="Pour « Autre », ou une nuance du régime choisi."
-        >
-          <Input
-            id="dietNote"
-            name="dietNote"
-            defaultValue={answers?.dietNote ?? ""}
-          />
-        </Field>
-      </div>
+          name="dietNote"
+          placeholder={EMPTY}
+          defaultValue={answers?.dietNote ?? ""}
+        />
+      </Field>
 
       <AllergenField
         kind="allergy"
+        legend={mandatory.allergies.fr}
         noneKnown={answers?.noKnownAllergies ?? null}
         rows={allergens.filter((row) => row.kind === "allergy")}
       />
       <AllergenField
         kind="intolerance"
+        legend={mandatory.intolerances.fr}
         noneKnown={answers?.noKnownIntolerances ?? null}
         rows={allergens.filter((row) => row.kind === "intolerance")}
       />
       <Typography size="sm" tone="muted">
-        {MANDATORY} Une réponse explicite par liste : « Aucune … connue » ou au
-        moins une case.
+        Les deux listes sont obligatoires pour « Prêt pour consultation » : une
+        réponse explicite par liste, « Aucune … connue » ou au moins une case.
       </Typography>
-    </Section>
+    </FormGroup>
 
-    <Section title="Santé">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field
-          id="pathologies"
-          label="Pathologies"
-          optional
-          className="sm:col-span-2"
-        >
-          <Textarea
-            id="pathologies"
-            name="pathologies"
-            rows={3}
-            defaultValue={answers?.pathologies ?? ""}
-          />
-        </Field>
+    <FormGroup group="sante" missing={null}>
+      <ChoiceCards
+        name="celiacDisease"
+        legend="Maladie cœliaque"
+        initial={
+          answers?.celiacDisease === true
+            ? "yes"
+            : answers?.celiacDisease === false
+              ? "no"
+              : null
+        }
+        options={[
+          { value: "yes", label: "Oui" },
+          { value: "no", label: "Non" },
+        ]}
+      />
 
-        <Field id="celiacDisease" label="Maladie cœliaque" optional>
-          <ChoiceSelect
-            id="celiacDisease"
-            value={
-              answers?.celiacDisease === true
-                ? "yes"
-                : answers?.celiacDisease === false
-                  ? "no"
-                  : null
-            }
-            options={[
-              { value: "yes", label: "Oui" },
-              { value: "no", label: "Non" },
-            ]}
-          />
-        </Field>
-      </div>
-    </Section>
-
-    <Section title="Génétique">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field
-          id="geneticTest"
-          label="Test génétique APOE, DIO2 et AMY1A réalisé"
-          optional
-          className="sm:col-span-2"
-        >
-          <ChoiceSelect
-            id="geneticTest"
-            value={answers?.geneticTest}
-            options={geneticTestAnswers.map((answer) => ({
-              value: answer,
-              label: geneticTestAnswerLabels[answer].fr,
-            }))}
-          />
-        </Field>
-
-        {genotypeOpen && answers?.geneticTest === "yes" ? (
-          <>
-            <Field id="apoe" label="APOE" optional>
-              <ChoiceSelect
-                id="apoe"
-                value={answers?.apoe}
-                options={plain(apoeGenotypes)}
-              />
-            </Field>
-            <Field id="dio2" label="DIO2" optional>
-              <ChoiceSelect
-                id="dio2"
-                value={answers?.dio2}
-                options={plain(dio2Categories)}
-              />
-            </Field>
-            <Field id="amy1a" label="AMY1A" optional>
-              <ChoiceSelect
-                id="amy1a"
-                value={answers?.amy1a}
-                options={plain(amy1aCategories)}
-              />
-            </Field>
-          </>
-        ) : genotypeOpen ? (
-          // Not rendered under « Non / Je ne sais pas »: the service hides the
-          // stored values there, and an empty select would post a clear.
-          <Typography size="sm" tone="muted" className="sm:col-span-2">
-            Le génotype s&apos;affiche quand le test génétique est « Oui ».
-          </Typography>
-        ) : (
-          // Not rendered at all: a disabled select still posts, and the
-          // action refuses a genotype without the consent.
-          <Typography size="sm" tone="muted" className="sm:col-span-2">
-            APOE, DIO2 et AMY1A restent verrouillés jusqu&apos;au consentement
-            génétique du patient.
-          </Typography>
-        )}
-      </div>
-    </Section>
-
-    <Section title="Question du praticien">
-      <Field
-        id="practitionerQuestionAnswer"
-        label="Réponse du patient"
-        optional
-      >
+      <Field id="pathologies" label="Pathologies">
         <Textarea
-          id="practitionerQuestionAnswer"
-          name="practitionerQuestionAnswer"
+          id="pathologies"
+          name="pathologies"
           rows={3}
-          defaultValue={answers?.practitionerQuestionAnswer ?? ""}
+          placeholder={EMPTY}
+          defaultValue={answers?.pathologies ?? ""}
         />
       </Field>
-    </Section>
-  </div>
+
+      <div className="@xl:grid-cols-2 grid gap-4">
+        <Field
+          id="medications"
+          label="Traitements en cours"
+          hint={
+            careConsentGiven
+              ? "Séparés des contraintes pour rester lisibles d'un coup d'œil."
+              : CARE_CONSENT_REQUIRED
+          }
+        >
+          <Textarea
+            id="medications"
+            name="medications"
+            rows={3}
+            placeholder={careConsentGiven ? EMPTY : undefined}
+            disabled={!careConsentGiven}
+            defaultValue={patient?.medications ?? ""}
+          />
+        </Field>
+
+        <Field
+          id="supplements"
+          label="Compléments déjà pris, hors protocole"
+          hint={
+            careConsentGiven
+              ? "Ce que la personne prend déjà d'elle-même — le protocole prescrit se tient plus haut."
+              : CARE_CONSENT_REQUIRED
+          }
+        >
+          <Textarea
+            id="supplements"
+            name="supplements"
+            rows={3}
+            placeholder={careConsentGiven ? EMPTY : undefined}
+            disabled={!careConsentGiven}
+            defaultValue={patient?.supplements ?? ""}
+          />
+        </Field>
+      </div>
+    </FormGroup>
+
+    <FormGroup group="genetique" missing={null}>
+      <ChoiceCards
+        name="geneticTest"
+        legend="Test génétique APOE, DIO2 et AMY1A réalisé"
+        initial={answers?.geneticTest}
+        options={geneticTestAnswers.map((answer) => ({
+          value: answer,
+          label: geneticTestAnswerLabels[answer].fr,
+        }))}
+      />
+
+      {genotypeOpen && answers?.geneticTest === "yes" ? (
+        <>
+          <ChoiceCards
+            name="apoe"
+            legend="APOE"
+            initial={answers.apoe}
+            options={plain(apoeGenotypes)}
+          />
+          <ChoiceCards
+            name="dio2"
+            legend="DIO2"
+            initial={answers.dio2}
+            options={plain(dio2Categories)}
+          />
+          <ChoiceCards
+            name="amy1a"
+            legend="AMY1A"
+            initial={answers.amy1a}
+            options={plain(amy1aCategories)}
+          />
+        </>
+      ) : genotypeOpen ? (
+        // Not rendered until the stored answer is « Oui »: the service hides
+        // the stored values under any other answer, and an empty group would
+        // post a clear.
+        <Typography size="sm" tone="muted">
+          Le génotype s&apos;affiche quand le test génétique est « Oui » et
+          enregistré.
+        </Typography>
+      ) : (
+        // Not rendered at all: a group that renders posts its name, and the
+        // action refuses a genotype without the consent.
+        <Typography size="sm" tone="muted">
+          APOE, DIO2 et AMY1A restent verrouillés jusqu&apos;au consentement
+          génétique du patient.
+        </Typography>
+      )}
+    </FormGroup>
+  </>
 );

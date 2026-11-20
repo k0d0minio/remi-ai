@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Typography } from "@remi/ui/server";
+import { RadioCard, Typography } from "@remi/ui/server";
 import { saveAnswerAction } from "@/lib/questionnaire/actions";
 import type { AnswerField } from "@/lib/questionnaire/state";
 import {
@@ -74,30 +74,16 @@ export const ChoiceAnswer = ({
       ) : null}
       <div className="flex flex-col gap-2">
         {options.map((option) => (
-          <label
+          <RadioCard
             key={option.value}
-            className="border-border bg-card has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:focus-visible]:ring-ring flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 has-[:focus-visible]:ring-[3px]"
-          >
-            <input
-              type="radio"
-              name={name}
-              value={option.value}
-              checked={selected === option.value}
-              onChange={() => void choose(option.value)}
-              onClick={() => void choose(option.value)}
-              className="accent-primary mt-0.5 size-4 shrink-0"
-            />
-            <span className="flex flex-col gap-0.5">
-              <Typography as="span" size="sm" weight="medium">
-                {option.label}
-              </Typography>
-              {option.description ? (
-                <Typography as="span" size="sm" tone="muted">
-                  {option.description}
-                </Typography>
-              ) : null}
-            </span>
-          </label>
+            name={name}
+            value={option.value}
+            label={option.label}
+            description={option.description}
+            checked={selected === option.value}
+            onChange={() => void choose(option.value)}
+            onClick={() => void choose(option.value)}
+          />
         ))}
       </div>
       {refusal ? (
