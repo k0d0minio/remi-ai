@@ -6,6 +6,9 @@ import {
   proteinEstimateParameters,
   proteinNeed,
   proteinProposal,
+  proteinTarget,
+  proteinTargetBounds,
+  proteinTargetDefaults,
   proteinValidationSituations,
   seniorProteinCoefficientRange,
   type ProteinProfile,
@@ -241,5 +244,254 @@ describe("the parameters of a stored protein estimate", () => {
     expect(
       proteinEstimateParameters({ adaptations: "pathology" }).adaptations,
     ).toEqual([]);
+  });
+});
+
+describe("the protein target", () => {
+  const input = {
+    referenceWeightKg: 75,
+    coefficient: 1.2,
+    additionGramsPerDay: 0,
+    directValue: null,
+  };
+
+  it("gives 90 g/day for 75 kg at 1.2 g/kg/day, story 8's control", () => {
+    expect(proteinTarget(input)).toEqual({
+      state: "computed",
+      value: 90,
+      proposedValue: 90,
+      referenceWeightKg: 75,
+      coefficient: 1.2,
+      additionGramsPerDay: 0,
+      direct: false,
+    });
+  });
+
+  it("adds the grams of the situation to the proposed value", () => {
+    const target = proteinTarget({ ...input, additionGramsPerDay: 9 });
+    expect(target).toMatchObject({ value: 99, proposedValue: 99 });
+  });
+
+  it("reads an addition that is negative or not a number as zero", () => {
+    expect(
+      proteinTarget({ ...input, additionGramsPerDay: -3 }),
+    ).toMatchObject({ value: 90, additionGramsPerDay: 0 });
+    expect(
+      proteinTarget({ ...input, additionGramsPerDay: Number.NaN }),
+    ).toMatchObject({ value: 90, additionGramsPerDay: 0 });
+  });
+
+  it("keeps a typed final value as typed, and still gives the proposal", () => {
+    expect(proteinTarget({ ...input, directValue: 80 })).toMatchObject({
+      state: "computed",
+      value: 80,
+      proposedValue: 90,
+      direct: true,
+    });
+  });
+
+  it("does not call a typed value direct when it is the proposed one", () => {
+    expect(proteinTarget({ ...input, directValue: 90 })).toMatchObject({
+      value: 90,
+      direct: false,
+    });
+  });
+
+  it("names each field that is empty", () => {
+    expect(
+      proteinTarget({ ...input, referenceWeightKg: null, coefficient: null }),
+    ).toEqual({
+      state: "invalid",
+      fields: ["referenceWeightKg", "coefficient"],
+    });
+  });
+
+  it("names a field that is out of its limits", () => {
+    const { referenceWeightKg, coefficient, value } = proteinTargetBounds;
+    expect(
+      proteinTarget({ ...input, referenceWeightKg: referenceWeightKg.min - 1 }),
+    ).toEqual({ state: "invalid", fields: ["referenceWeightKg"] });
+    expect(
+      proteinTarget({ ...input, referenceWeightKg: referenceWeightKg.max + 1 }),
+    ).toEqual({ state: "invalid", fields: ["referenceWeightKg"] });
+    expect(proteinTarget({ ...input, coefficient: 0 })).toEqual({
+      state: "invalid",
+      fields: ["coefficient"],
+    });
+    expect(
+      proteinTarget({ ...input, coefficient: coefficient.max + 0.1 }),
+    ).toEqual({ state: "invalid", fields: ["coefficient"] });
+    expect(proteinTarget({ ...input, directValue: 0 })).toEqual({
+      state: "invalid",
+      fields: ["value"],
+    });
+    expect(proteinTarget({ ...input, directValue: value.max + 1 })).toEqual({
+      state: "invalid",
+      fields: ["value"],
+    });
+  });
+
+  it("accepts each limit", () => {
+    const { referenceWeightKg, coefficient } = proteinTargetBounds;
+    expect(
+      proteinTarget({
+        ...input,
+        referenceWeightKg: referenceWeightKg.min,
+        coefficient: coefficient.min,
+      }),
+    ).toMatchObject({ state: "computed", value: 3 });
+    expect(
+      proteinTarget({
+        ...input,
+        referenceWeightKg: referenceWeightKg.max,
+        coefficient: coefficient.max,
+      }),
+    ).toMatchObject({ state: "computed", value: 1500 });
+  });
+
+  it("refuses a typed value that is not a whole number of grams", () => {
+    expect(proteinTarget({ ...input, directValue: 80.5 })).toEqual({
+      state: "invalid",
+      fields: ["value"],
+    });
+  });
+
+  it("refuses a value that is not a number", () => {
+    expect(
+      proteinTarget({
+        ...input,
+        referenceWeightKg: Number.NaN,
+        coefficient: Number.POSITIVE_INFINITY,
+      }),
+    ).toEqual({
+      state: "invalid",
+      fields: ["referenceWeightKg", "coefficient"],
+    });
+  });
+
+  it("refuses a proposed value over the limit that the addition makes", () => {
+    expect(
+      proteinTarget({
+        referenceWeightKg: 300,
+        coefficient: 5,
+        additionGramsPerDay: 28,
+        directValue: null,
+      }),
+    ).toEqual({ state: "invalid", fields: ["value"] });
+  });
+});
+
+describe("the defaults of the protein target", () => {
+  const estimated = {
+    estimatedValue: 83,
+    estimateParameters: {
+      referenceWeightKg: 100,
+      coefficient: 0.83,
+      additionGramsPerDay: 0,
+      adaptations: [],
+    },
+    validatedValue: null,
+    validationParameters: null,
+  };
+
+  it("give no number with no row, or with a row that has no value", () => {
+    expect(proteinTargetDefaults(null)).toBeNull();
+    expect(
+      proteinTargetDefaults({
+        estimatedValue: null,
+        estimateParameters: null,
+        validatedValue: null,
+        validationParameters: null,
+      }),
+    ).toBeNull();
+  });
+
+  it("give no number for an estimate that kept no parameters", () => {
+    expect(
+      proteinTargetDefaults({ ...estimated, estimateParameters: null }),
+    ).toBeNull();
+  });
+
+  it("open with the estimate while nothing is validated", () => {
+    expect(proteinTargetDefaults(estimated)).toEqual({
+      referenceWeightKg: 100,
+      coefficient: 0.83,
+      additionGramsPerDay: 0,
+      value: 83,
+      direct: false,
+    });
+  });
+
+  it("open with the validated value and its own parameters", () => {
+    expect(
+      proteinTargetDefaults({
+        ...estimated,
+        validatedValue: 90,
+        validationParameters: {
+          referenceWeightKg: 75,
+          coefficient: 1.2,
+          additionGramsPerDay: 0,
+          direct: false,
+        },
+      }),
+    ).toEqual({
+      referenceWeightKg: 75,
+      coefficient: 1.2,
+      additionGramsPerDay: 0,
+      value: 90,
+      direct: false,
+    });
+  });
+
+  it("keep the mark of a typed value, and the addition of the estimate", () => {
+    expect(
+      proteinTargetDefaults({
+        estimatedValue: 92,
+        estimateParameters: {
+          referenceWeightKg: 100,
+          coefficient: 0.83,
+          additionGramsPerDay: 9,
+        },
+        validatedValue: 80,
+        validationParameters: {
+          referenceWeightKg: 75,
+          coefficient: 1.2,
+          additionGramsPerDay: 1,
+          direct: true,
+        },
+      }),
+    ).toEqual({
+      referenceWeightKg: 75,
+      coefficient: 1.2,
+      additionGramsPerDay: 9,
+      value: 80,
+      direct: true,
+    });
+  });
+
+  it("open with the validated parameters when the estimate is cleared", () => {
+    expect(
+      proteinTargetDefaults({
+        estimatedValue: null,
+        estimateParameters: null,
+        validatedValue: 99,
+        validationParameters: {
+          referenceWeightKg: 75,
+          coefficient: 1.2,
+          additionGramsPerDay: 9,
+          direct: false,
+        },
+      }),
+    ).toMatchObject({ additionGramsPerDay: 9, value: 99 });
+  });
+
+  it("fall back on the estimate when the validation kept no parameters", () => {
+    expect(
+      proteinTargetDefaults({
+        ...estimated,
+        validatedValue: 90,
+        validationParameters: {},
+      }),
+    ).toMatchObject({ referenceWeightKg: 100, value: 83, direct: false });
   });
 });

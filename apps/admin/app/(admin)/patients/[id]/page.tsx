@@ -413,6 +413,8 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
       empty: false,
       body: (
         <CalculationsSummary
+          patientId={patient.id}
+          readOnly={readOnly}
           calculations={calculations}
           missing={missingCalculation}
           bmi={bmiIndicator(calculationData)}

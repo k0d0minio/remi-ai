@@ -126,7 +126,10 @@ export {
   setPatientSummary,
 } from "../db/services/patient-summaries";
 
-export { listPatientCalculations } from "../db/services/patient-calculations";
+export {
+  listPatientCalculations,
+  validateProteinTarget,
+} from "../db/services/patient-calculations";
 
 export {
   getValidatedProtocol,
