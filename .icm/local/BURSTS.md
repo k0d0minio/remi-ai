@@ -37,10 +37,14 @@ about six. One ticket is one local branch. No ticket branch goes to GitHub.
 5. Only the ticket that your brief names as the migration ticket adds a migration. Never number
    or edit a migration file by hand.
 6. Keep your change out of the files that many tickets touch:
-   - Put a new section of the patient file in a new component file, and its server actions in a
-     new actions file. Add only one import and one line to
-     `apps/admin/app/(admin)/patients/[id]/page.tsx` and none to
-     `apps/admin/lib/patients/actions.ts`, unless your brief says otherwise.
+   - The practitioner's patient page is built from a list (`apps/admin/AGENTS.md`, section
+     Interface). To add a section: add one line to `patientFileSections` in
+     `packages/services/src/shared/patient-file-layout.ts`, put the body in its own file under
+     `apps/admin/components/patients/`, and add its entry to `views` in
+     `apps/admin/app/(admin)/patients/[id]/page.tsx`. Put its server actions in a new actions
+     file, not in `apps/admin/lib/patients/actions.ts`, unless your brief says otherwise.
+   - Only the ticket that your brief names changes the action card
+     (`apps/admin/components/patients/file/next-step.tsx`).
    - Put new patient texts in one new block of `apps/web/lib/content/fr.ts`, `en.ts` and
      `types.ts`. Do not change a line that exists, unless your ticket is about that text.
 7. If the ticket has a stub in `.icm/intake/`, move the stub to the `_done/` folder of its epic in
@@ -67,4 +71,5 @@ at in the browser.
 The coordinating session merges the ticket branches into `bursts` in a fixed order. It then runs
 one check on `bursts`: the migration order, the migration on the Neon branch `local/bursts`,
 typecheck, lint, the unit tests, and a look at the features in the browser on local dev.
-`bursts` is then pushed once.
+`bursts` is not pushed after a burst. Jamie decided on 2026-11-20 that all the bursts go to
+`main` together, at the end, by one pull request.
