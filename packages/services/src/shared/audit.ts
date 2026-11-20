@@ -83,6 +83,11 @@ export const auditActions = [
    */
   "calculation.validated",
   /**
+   * A change by the patient touched a datum of a validated calculation
+   * (story 21, REM-79, D-32). The detail names the kinds, and never a value.
+   */
+  "calculation.revalidation_needed",
+  /**
    * The practitioner validated the protocol into its next version (story 20,
    * D-32). The detail is JSON: the version number and the count of each part.
    */

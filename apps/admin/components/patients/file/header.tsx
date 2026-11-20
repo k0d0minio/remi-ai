@@ -7,6 +7,7 @@ import {
   type PatientProfile,
 } from "@remi/services/shared";
 import { Badge, StepPath, Typography } from "@remi/ui/server";
+import { PatientChangesCount } from "@/components/patients/file/patient-changes-count";
 import { SafetyStrip } from "@/components/patients/file/safety-strip";
 import { NOT_ENTERED } from "@/components/patients/file/value";
 import type { QuestionnaireView } from "@/components/patients/questionnaire-answers";
@@ -18,7 +19,7 @@ import {
 type Props = {
   patient: Pick<
     PatientProfile,
-    "pseudonym" | "fileStatus" | "status" | "medications"
+    "id" | "pseudonym" | "fileStatus" | "status" | "medications"
   >;
   /** The name the page shows: the patient's, else the practitioner's, else the pseudonym. */
   name: string;
@@ -37,7 +38,8 @@ const statusSteps = fileStatuses.map((status) => ({
 /**
  * The header of the patient file. It stays in view while the page scrolls and
  * answers « Où en est-on ? »: the name, the appointment, the four statuses as
- * a path with the present one marked, and the safety items in short form.
+ * a path with the present one marked, the count of the patient's changes to
+ * take into account, and the safety items in short form.
  * The way back is above it and does not stay in view.
  */
 export const PatientHeader = ({
@@ -79,6 +81,7 @@ export const PatientHeader = ({
               Lecture seule
             </Badge>
           ) : null}
+          <PatientChangesCount patient={patient} />
         </div>
         <Typography size="sm" tone="muted">
           {`Rendez-vous : ${

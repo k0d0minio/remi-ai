@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   bmiIndicator,
   calculationKinds,
+  calculationsReadingFields,
   type CalculationKind,
 } from "../../../shared/calculations";
 import { energyProposal, energyTarget } from "../../../shared/energy";
@@ -184,6 +185,65 @@ const unscopedValidateCalculation = async (
     }),
   });
   return ok(updated);
+};
+
+/** The patient whose change marks the calculations. The caller read the row. */
+export type CalculationsPatient = { id: Id; pseudonym?: string | null };
+
+/**
+ * Mark « estimation à revalider » (story 21, REM-79). The patient changed
+ * `fields`. Each calculation that reads one of them, and that has a validated
+ * value, gets `needsRevalidation`. A calculation with no validated value has
+ * nothing to revalidate and gets no mark.
+ *
+ * Only the mark is written: the validated value, its parameters and its date
+ * stay as they are. Only `validateCalculation` clears the mark. « Pris en
+ * compte » on the change signal does not come here.
+ *
+ * One `calculation.revalidation_needed` event names the kinds that this call
+ * marked (D-32). The result is those kinds. Unscoped: `recordPatientChanges`
+ * calls it after the patient's own write, which had its actor checked.
+ */
+export const markCalculationsForRevalidation = async (
+  patient: CalculationsPatient,
+  fields: readonly string[],
+  db?: DatabaseClient,
+): Promise<CalculationKind[]> => {
+  const kinds = calculationsReadingFields(fields);
+  if (kinds.length === 0 || !uuidSchema.safeParse(patient.id).success) {
+    return [];
+  }
+  const rows = await calculations(db).findMany({ patientId: patient.id });
+  const marked: CalculationKind[] = [];
+  for (const kind of kinds) {
+    const row = rows.items.find((entry) => entry.kind === kind);
+    if (
+      !row ||
+      row.validatedValue === null ||
+      row.validatedValue === undefined ||
+      row.needsRevalidation
+    ) {
+      continue;
+    }
+    const updated = await calculations(db).update(row.id, {
+      needsRevalidation: true,
+    });
+    if (updated) {
+      marked.push(kind);
+    }
+  }
+  if (marked.length > 0) {
+    const name = patient.pseudonym ?? "";
+    await recordAuditEvent({
+      actor: { kind: "patient", id: patient.id, name },
+      action: "calculation.revalidation_needed",
+      targetType: "patient",
+      targetId: patient.id,
+      targetLabel: name,
+      detail: marked.join(", "),
+    });
+  }
+  return marked;
 };
 
 /** What the practitioner gives for the protein target. Null is an empty field. */

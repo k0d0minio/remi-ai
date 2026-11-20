@@ -128,6 +128,34 @@ export const calculationInputs = {
   energy: ["sexForCalculation", "age", "heightCm", "weightKg", "activityLevel"],
 } as const satisfies Record<CalculationKind, readonly CalculationInput[]>;
 
+/**
+ * The answers of the patient that each calculation reads (story 21, REM-79).
+ * The keys are the questionnaire's field keys, as `patient_changes` stores
+ * them. The protein proposal reads the height for its reference weight. The
+ * sex used for the calculation and the birth date are not here: the patient
+ * does not change them after the validation.
+ */
+export const calculationPatientFields = {
+  bmi: ["heightCm", "weightKg"],
+  protein: ["heightCm", "weightKg"],
+  energy: ["heightCm", "weightKg", "activityLevel"],
+} as const satisfies Record<CalculationKind, readonly string[]>;
+
+/**
+ * The calculations that read one of the changed fields, in the order of
+ * `calculationKinds`. A change of the weight or of the height gives the
+ * three. A change of the activity level gives the energy need only. A field
+ * that no calculation reads gives none.
+ */
+export const calculationsReadingFields = (
+  fields: readonly string[],
+): CalculationKind[] =>
+  calculationKinds.filter((kind) =>
+    (calculationPatientFields[kind] as readonly string[]).some((field) =>
+      fields.includes(field),
+    ),
+  );
+
 /** Lower case: they follow « Non renseigné : ». */
 export const calculationInputLabels = {
   sexForCalculation: {

@@ -120,7 +120,7 @@ const ValidationState = ({
 }) =>
   row?.needsRevalidation ? (
     <Badge variant="warning" tone="subtle" size="sm">
-      À revalider
+      Estimation à revalider
     </Badge>
   ) : (
     <ValidatedMark

@@ -68,6 +68,7 @@ const input = (patch: Partial<ActivationInput> = {}): ActivationInput => ({
   validated,
   safety: { allergies: "none_known", intolerances: "listed" },
   evictions: [],
+  staleCalculations: [],
   unrecognised: [],
   ...patch,
 });
@@ -171,6 +172,37 @@ describe("the recap of an activation", () => {
     expect(recap.blockers.map((blocker) => blocker.kind)).toEqual([
       "no_validated_version",
       "safety_answer_missing",
+      "eviction_without_period",
+    ]);
+  });
+
+  it("blocks on each calculation to revalidate, in the order of the kinds", () => {
+    const recap = activationRecap(
+      input({ staleCalculations: ["energy", "protein"] }),
+    );
+    expect(recap.blockers).toEqual([
+      { kind: "calculation_to_revalidate", calculation: "protein" },
+      { kind: "calculation_to_revalidate", calculation: "energy" },
+    ]);
+    expect(canActivate(recap)).toBe(false);
+  });
+
+  it("keeps the validated values of a calculation to revalidate", () => {
+    const stale = activationRecap(input({ staleCalculations: ["protein"] }));
+    expect(stale.values).toEqual(activationRecap(input()).values);
+  });
+
+  it("puts a calculation to revalidate before the evictions", () => {
+    const recap = activationRecap(
+      input({
+        staleCalculations: ["energy"],
+        evictions: [
+          { label: "gluten", periodStart: null, periodEnd: null, durable: false },
+        ],
+      }),
+    );
+    expect(recap.blockers.map((blocker) => blocker.kind)).toEqual([
+      "calculation_to_revalidate",
       "eviction_without_period",
     ]);
   });

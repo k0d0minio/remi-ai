@@ -12,6 +12,10 @@ import {
   testPractitionerId,
 } from "../../test-helpers";
 import { patientActor, systemActor } from "../access";
+import {
+  listPatientCalculations,
+  validateCalculation,
+} from "../patient-calculations";
 import { recordConsent } from "../patient-consents";
 import {
   savePatientProfileAnswers,
@@ -497,5 +501,179 @@ describe("acknowledgePatientChanges", () => {
       items: [version],
       nextCursor: null,
     });
+  });
+});
+
+describe("a patient change of a datum of a validated calculation (REM-79)", () => {
+  const validator = {
+    id: testPractitionerId,
+    email: "morgane@example.test",
+    name: "Morgane",
+  };
+
+  /** A file with its measures, and the named calculations validated. */
+  const withValidated = async (
+    pseudonym: string,
+    kinds: readonly ("protein" | "energy")[],
+    fileStatus: PatientProfile["fileStatus"] = "active",
+  ) => {
+    const patient = await newPatient(pseudonym, fileStatus);
+    await savePatientProfileAnswers(practitionerActor(), patient.id, {
+      weightKg: 70,
+      heightCm: 170,
+    });
+    for (const kind of kinds) {
+      const validated = await validateCalculation(
+        systemActor,
+        patient.id,
+        kind,
+        { value: kind === "protein" ? 84 : 2100, parameters: { source: kind } },
+        validator,
+      );
+      if (!validated.ok) {
+        throw new Error(validated.message);
+      }
+    }
+    return patient;
+  };
+
+  const staleKinds = async (patientId: string) =>
+    (await listPatientCalculations(systemActor, patientId))
+      .filter((row) => row.needsRevalidation)
+      .map((row) => row.kind);
+
+  const markEvents = async (patientId: string) =>
+    (
+      await getDatabase()
+        .collection<AuditEvent>("audit_events")
+        .findMany({
+          action: "calculation.revalidation_needed",
+          targetId: patientId,
+        })
+    ).items;
+
+  it("marks the protein and the energy needs on a change of the weight", async () => {
+    const patient = await withValidated("Rev-weight", ["protein", "energy"]);
+    expect(await staleKinds(patient.id)).toEqual([]);
+    await savePatientProfileAnswers(patientActor(patient.id), patient.id, {
+      weightKg: 74,
+    });
+    expect(await staleKinds(patient.id)).toEqual(["protein", "energy"]);
+    const events = await markEvents(patient.id);
+    expect(events).toHaveLength(1);
+    expect(events[0]?.detail).toBe("protein, energy");
+  });
+
+  it("marks them on a change of the height", async () => {
+    const patient = await withValidated("Rev-height", ["protein", "energy"]);
+    await savePatientProfileAnswers(patientActor(patient.id), patient.id, {
+      heightCm: 172,
+    });
+    expect(await staleKinds(patient.id)).toEqual(["protein", "energy"]);
+  });
+
+  it("marks the energy need only on a change of the activity level", async () => {
+    const patient = await withValidated("Rev-activity", ["protein", "energy"]);
+    await savePatientQuestionnaire(patientActor(patient.id), patient.id, {
+      activityLevel: "high",
+    });
+    expect(await staleKinds(patient.id)).toEqual(["energy"]);
+  });
+
+  it("keeps the validated value, its parameters and its date", async () => {
+    const patient = await withValidated("Rev-value", ["protein"]);
+    const [before] = (
+      await listPatientCalculations(systemActor, patient.id)
+    ).filter((row) => row.kind === "protein");
+    await savePatientProfileAnswers(patientActor(patient.id), patient.id, {
+      weightKg: 80,
+    });
+    const [after] = (
+      await listPatientCalculations(systemActor, patient.id)
+    ).filter((row) => row.kind === "protein");
+    expect(after?.needsRevalidation).toBe(true);
+    expect(after?.validatedValue).toBe(84);
+    expect(after?.validationParameters).toEqual({ source: "protein" });
+    expect(after?.validatedAt).toEqual(before?.validatedAt);
+    expect(after?.validatedBy).toBe(validator.id);
+  });
+
+  it("marks nothing that has no validated value", async () => {
+    const patient = await withValidated("Rev-none", []);
+    await savePatientProfileAnswers(patientActor(patient.id), patient.id, {
+      weightKg: 75,
+    });
+    expect(await staleKinds(patient.id)).toEqual([]);
+    expect(await markEvents(patient.id)).toEqual([]);
+  });
+
+  it("marks nothing on a change of a field that no calculation reads", async () => {
+    const patient = await withValidated("Rev-other", ["protein", "energy"]);
+    await savePatientQuestionnaire(patientActor(patient.id), patient.id, {
+      desiredWeightKg: 65,
+    });
+    expect(await staleKinds(patient.id)).toEqual([]);
+  });
+
+  it("marks nothing on a write of the practitioner", async () => {
+    const patient = await withValidated("Rev-pract", ["protein", "energy"]);
+    await savePatientProfileAnswers(practitionerActor(), patient.id, {
+      weightKg: 76,
+    });
+    expect(await staleKinds(patient.id)).toEqual([]);
+  });
+
+  it("marks on a file whose change signal is not armed", async () => {
+    const patient = await withValidated("Rev-early", ["protein"], "ready");
+    await savePatientProfileAnswers(patientActor(patient.id), patient.id, {
+      weightKg: 73,
+    });
+    expect(await openOf(patient.id)).toEqual([]);
+    expect(await staleKinds(patient.id)).toEqual(["protein"]);
+  });
+
+  it("stays marked after « Pris en compte »", async () => {
+    const patient = await withValidated("Rev-ack", ["protein", "energy"]);
+    await savePatientProfileAnswers(patientActor(patient.id), patient.id, {
+      weightKg: 77,
+    });
+    const closed = await acknowledgePatientChanges(
+      practitionerActor(),
+      patient.id,
+      validator,
+      "all",
+    );
+    expect(closed.ok && closed.data.length).toBe(1);
+    expect(await openOf(patient.id)).toEqual([]);
+    expect(await staleKinds(patient.id)).toEqual(["protein", "energy"]);
+  });
+
+  it("stays marked when the patient puts the old value back", async () => {
+    const patient = await withValidated("Rev-revert", ["protein"]);
+    await savePatientProfileAnswers(patientActor(patient.id), patient.id, {
+      weightKg: 78,
+    });
+    await savePatientProfileAnswers(patientActor(patient.id), patient.id, {
+      weightKg: 70,
+    });
+    expect(await openOf(patient.id)).toEqual([]);
+    expect(await staleKinds(patient.id)).toEqual(["protein"]);
+    expect(await markEvents(patient.id)).toHaveLength(1);
+  });
+
+  it("clears on a new validation of that calculation only", async () => {
+    const patient = await withValidated("Rev-clear", ["protein", "energy"]);
+    await savePatientProfileAnswers(patientActor(patient.id), patient.id, {
+      weightKg: 79,
+    });
+    const again = await validateCalculation(
+      systemActor,
+      patient.id,
+      "protein",
+      { value: 95, parameters: {} },
+      validator,
+    );
+    expect(again.ok).toBe(true);
+    expect(await staleKinds(patient.id)).toEqual(["energy"]);
   });
 });
