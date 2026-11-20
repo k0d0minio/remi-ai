@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import {
+  careConsentInForce,
   getPatient,
   patientActor,
   patientLandingFor,
@@ -13,7 +14,7 @@ import {
 } from "@remi/services/shared";
 import { ensureAuthProvider } from "@/lib/auth/provider";
 import { ensureDatabase } from "@/lib/database";
-import { landingPaths, SIGN_IN_PATH } from "./paths";
+import { CARE_CONSENT_PATH, landingPaths, SIGN_IN_PATH } from "./paths";
 
 /**
  * The signed-in patient's account, or `null`. With the auth variables unset,
@@ -60,11 +61,25 @@ export const patientLanding = async (
 };
 
 /**
+ * True when the care consent of this patient is in force now (REM-43). It
+ * reads the table at each call, as the patient, so a withdrawal applies at the
+ * next request.
+ */
+export const careConsentHeld = async (
+  account: PatientAccount,
+): Promise<boolean> => {
+  const patientId = account.patientProfileId;
+  return careConsentInForce(patientActor(patientId), patientId);
+};
+
+/**
  * The guard of the patient space (stories 19 and 22): `requirePatient`, then
- * the activation. A patient whose care is not active goes to their own page,
- * the questionnaire or the waiting screen. The layout of the space calls it,
- * and so does each page of the space, because a page renders alongside its
- * layout.
+ * the activation, then the care consent (REM-43). A patient whose care is not
+ * active goes to their own page, the questionnaire or the waiting screen. A
+ * patient whose care consent is not in force goes to the consent screen,
+ * which says what stops and how to give the consent again. The layout of the
+ * space calls it, and so does each page of the space, because a page renders
+ * alongside its layout.
  */
 export const requireActivePatient = async (
   locale: Locale,
@@ -73,6 +88,9 @@ export const requireActivePatient = async (
   const landing = await patientLanding(account);
   if (landing !== "home") {
     redirect(localePath(locale, landingPaths[landing]));
+  }
+  if (!(await careConsentHeld(account))) {
+    redirect(localePath(locale, CARE_CONSENT_PATH));
   }
   return account;
 };

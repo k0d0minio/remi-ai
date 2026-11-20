@@ -22,8 +22,10 @@ import {
 } from "@remi/services/shared";
 import { Link, Typography } from "@remi/ui/server";
 import { SignOutButton } from "@/components/patient-auth/sign-out-button";
+import { ConsentList } from "@/components/patient-consents/consent-list";
 import { EditableField } from "@/components/patient-profile/editable-field";
 import { FoodRecommendations } from "@/components/patient-recommendations/food-recommendations";
+import { consentEntries } from "@/lib/consents/entries";
 import { getContent } from "@/lib/content";
 import { fill } from "@/lib/content/fill";
 import { resolveLocale, type LocaleParams } from "@/lib/locale-params";
@@ -113,8 +115,9 @@ const Row = ({ label, value, empty, hint }: RowProps) => (
  * 3. The data that the patient keeps up to date (story 21): the weight is
  *    changed in place, the others on `/profil/mes-donnees`.
  *
- * Then the account: the sign-out, visible and never in a menu, and the place
- * of the consent settings.
+ * Then the account: « Mes consentements » (REM-43), where the patient reads
+ * each consent again and withdraws it, and the sign-out, visible and never in
+ * a menu.
  *
  * The patient's id comes from the session, never from the address (D-26).
  */
@@ -127,12 +130,13 @@ const PatientProfilePage = async ({
   // The space opens at the activation (story 19).
   const account = await requireActivePatient(locale);
   const patientId = account.patientProfileId;
-  const [patient, questionnaire, validated] = await Promise.all([
+  const [patient, questionnaire, validated, consents] = await Promise.all([
     getPatient(patientActor(patientId), patientId),
     getPatientQuestionnaire(patientActor(patientId), patientId),
     // The validated version only: a change that the practitioner has not
     // validated is in no version (stories 19 and 20).
     getValidatedProtocol(patientActor(patientId), patientId),
+    consentEntries(patientId, locale),
   ]);
   const content = getContent(locale);
   const text = content.patientPersonalData;
@@ -338,12 +342,24 @@ const PatientProfilePage = async ({
         <Typography as="h2" id="profile-account" size="lg" weight="semibold">
           {text.accountTitle}
         </Typography>
-        <div className="flex flex-col gap-1">
-          <Typography as="h3" size="base" weight="medium">
-            {text.consentTitle}
-          </Typography>
+        <div className="flex flex-col gap-3 self-stretch">
+          <div className="flex flex-col gap-1">
+            <Typography as="h3" size="base" weight="medium">
+              {text.consentTitle}
+            </Typography>
+            <Typography size="sm" tone="muted">
+              {content.patientConsents.intro}
+            </Typography>
+          </div>
+          <ConsentList
+            locale={locale}
+            entries={consents}
+            names={content.signupLink.consent.names}
+            textLine={content.signupLink.consent.version}
+            text={content.patientConsents}
+          />
           <Typography size="sm" tone="muted">
-            {text.consentNotYet}
+            {content.patientConsents.deletion}
           </Typography>
         </div>
         <SignOutButton locale={locale} label={content.signOut} />

@@ -57,6 +57,11 @@ import { Typography } from "@remi/ui/server";
 import { AdminOpenForm } from "@/components/patients/admin-open-form";
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
 import { CalculationsSummary } from "@/components/patients/calculations-summary";
+import {
+  ConsentsSection,
+  ConsentWithdrawnNotice,
+  consentsSummaryLine,
+} from "@/components/patients/consents-section";
 import { CopyContextCard } from "@/components/patients/copy-context-card";
 import {
   DocumentSection,
@@ -784,6 +789,19 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
           readOnly={readOnly}
         />
       ),
+    },
+    consents: {
+      title: "Consentements",
+      description:
+        "Ce que le patient a accepté, refusé ou retiré dans son espace, avec la date et la version du texte.",
+      summary: consentsSummaryLine(consents),
+      empty: false,
+      // Above the row, folded or not: the practitioner must see it.
+      lead:
+        consents.care?.decision === "withdrawn" ? (
+          <ConsentWithdrawnNotice withdrawnAt={consents.care.decidedAt} />
+        ) : undefined,
+      body: <ConsentsSection latest={consents} />,
     },
   };
 

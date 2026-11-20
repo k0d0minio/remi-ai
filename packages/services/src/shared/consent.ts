@@ -89,3 +89,66 @@ export const parseShownConsent = (value: unknown): ShownConsent | null => {
   }
   return { key, version, locale };
 };
+
+/** A patient's answer for one key now. `none`: no decision was recorded. */
+export type ConsentState = ConsentDecision | "none";
+
+/** The latest decision of one key, as a settings screen needs it. */
+export type LatestConsent = {
+  decision: ConsentDecision;
+  decidedAt: Date;
+  textVersion: string;
+  textLocale: ConsentTextLocale | null;
+};
+
+/**
+ * One line of « Mes consentements » (REM-43) and of the practitioner's
+ * consent section: the state of one key, and what the patient may do with it.
+ */
+export type ConsentSummary = {
+  key: ConsentKey;
+  state: ConsentState;
+  decidedAt: Date | null;
+  textVersion: string | null;
+  textLocale: ConsentTextLocale | null;
+  /** Only a consent in force can be withdrawn. */
+  withdrawable: boolean;
+  /**
+   * The settings offer a new consent after a withdrawal. They offer it too for
+   * a mandatory consent that is not in force, because the service stops
+   * without it. An optional consent that was never asked, or that was
+   * refused, has its own screen.
+   */
+  canGive: boolean;
+};
+
+/**
+ * Every key of the vocabulary, in its order, with the patient's answer. A key
+ * with no row is in the list too: the screen says that it was not asked.
+ */
+export const consentSummaries = (
+  latest: Partial<Record<ConsentKey, LatestConsent>>,
+): ConsentSummary[] =>
+  consentKeys.map((key) => {
+    const row = latest[key];
+    return {
+      key,
+      state: row?.decision ?? "none",
+      decidedAt: row?.decidedAt ?? null,
+      textVersion: row?.textVersion ?? null,
+      textLocale: row?.textLocale ?? null,
+      withdrawable: row?.decision === "given",
+      canGive:
+        row?.decision === "withdrawn" ||
+        (mandatoryConsentKeys.includes(key) && row?.decision !== "given"),
+    };
+  });
+
+/**
+ * True when the consent that the service needs is in force (REM-43). The care
+ * consent is mandatory: with no `given` decision, no generation and no
+ * suggestion runs, and the patient's space shows the consent screen.
+ */
+export const careConsentGiven = (
+  latest: Partial<Record<ConsentKey, { decision: ConsentDecision }>>,
+): boolean => latest.care?.decision === "given";

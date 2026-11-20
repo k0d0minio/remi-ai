@@ -676,8 +676,6 @@ export const fr: Content = {
       "Alimentation, allergies, intolérances, activité, poids souhaité, médicaments et compléments.",
     accountTitle: "Mon compte",
     consentTitle: "Mes consentements",
-    consentNotYet:
-      "Tu ne peux pas encore consulter ni modifier tes consentements ici.",
     dataPage: {
       metaTitle: "Mes données de suivi",
       title: "Mes données de suivi",
@@ -806,6 +804,66 @@ export const fr: Content = {
         "{count} recettes ne s'affichent pas : REMI n'a pas pu confirmer qu'elles conviennent à tes allergies, à tes intolérances et aux aliments que tu évites.",
       unavailable:
         "Tes recettes ne sont pas disponibles pour le moment. Réessaie dans un instant.",
+    },
+  },
+  patientConsents: {
+    intro:
+      "Tu peux relire chaque texte et retirer ton consentement à tout moment. Le retrait prend effet tout de suite.",
+    states: {
+      given: "Consentement donné le {date}",
+      refused: "Consentement refusé le {date}",
+      withdrawn: "Consentement retiré le {date}",
+      none: "Ce consentement ne t'a pas encore été demandé.",
+    },
+    version: "Version {version} du texte",
+    legacyVersion:
+      "Ton praticien a recueilli ce consentement avant ton inscription. Le texte n'est pas enregistré dans REMI.",
+    reread: "Relire",
+    rereadLabel: "Relire : {name}",
+    withdraw: "Retirer mon consentement",
+    withdrawLabel: "Retirer mon consentement : {name}",
+    confirmTitle: "Retirer ce consentement ?",
+    consequences: {
+      care: "REMI arrête tout de suite ses suggestions et ses recettes pour toi, ton espace se met en pause et ton praticien voit que tu as retiré ton consentement.",
+      genetic:
+        "REMI efface tout de suite tes trois résultats génétiques et n'en tient plus compte pour ton suivi.",
+    },
+    past: "Ce retrait ne change rien à ce qui a été fait avant.",
+    confirm: "Oui, retirer mon consentement",
+    withdrawing: "Retrait en cours…",
+    cancel: "Annuler",
+    give: "Donner à nouveau mon consentement",
+    giveLabel: "Donner à nouveau mon consentement : {name}",
+    giveIntro: "Relis le texte ci-dessus, puis confirme ton choix.",
+    giveConfirm: "J'ai lu le texte et je donne mon consentement",
+    giving: "Enregistrement…",
+    errors: {
+      signed_out: "Ta session a expiré. Reconnecte-toi, puis réessaie.",
+      stale: "Le texte a changé. Recharge la page, puis relis-le.",
+      unavailable:
+        "Ton choix n'a pas pu être enregistré. Réessaie dans un instant.",
+    },
+    deletion:
+      "Pour supprimer ton compte, envoie un e-mail à info@remiai.be.",
+    pause: {
+      metaTitle: "Ton espace est en pause",
+      title: "Ton espace REMI est en pause",
+      withdrawn:
+        "Tu as retiré ton consentement au traitement de tes données le {date}. Ton praticien le voit sur ton dossier.",
+      missing:
+        "REMI a besoin de ton consentement au traitement de tes données pour t'accompagner.",
+      stopsTitle: "Ce qui s'arrête",
+      stops: [
+        "REMI ne te propose plus de suggestion ni de recette.",
+        "Tu ne peux plus enregistrer de repas ni ouvrir tes recommandations et tes données de suivi.",
+      ],
+      staysTitle: "Ce qui ne change pas",
+      stays:
+        "Ce qui a été fait avant reste valable, et tes données ne sont pas supprimées.",
+      againTitle: "Pour reprendre ton accompagnement",
+      again:
+        "Relis le texte ci-dessous et donne à nouveau ton consentement. Ton espace s'ouvre à nouveau tout de suite.",
+      consentsTitle: "Mes consentements",
     },
   },
 };

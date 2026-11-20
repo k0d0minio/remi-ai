@@ -50,6 +50,7 @@ import {
 import type { Actor } from "../../db/models/actor";
 import type { MealEntry } from "../../db/models/meal-entry";
 import { claimMealRetry } from "../../db/services/meal-entries";
+import { careConsentInForce } from "../../db/services/patient-consents";
 import { getValidatedProtocol } from "../../db/services/protocol-versions";
 import { todayAtPractice } from "../../shared/format";
 import type {
@@ -622,6 +623,10 @@ export const suggestPlannedMeal = async (
   meal: string,
   at: Date = new Date(),
 ): Promise<Result<MealSuggestion>> => {
+  // Before any other read: a withdrawal stops the suggestions at once (REM-43).
+  if (!(await careConsentInForce(actor, patientId))) {
+    return err("not_permitted", "the care consent is not in force");
+  }
   const input = await loadMealInput(actor, patientId, meal, at);
   return input.ok ? ok(await buildMealSuggestion(input.data)) : input;
 };
@@ -680,6 +685,10 @@ export const suggestAnotherMeal = async (
   ticket: unknown,
   at: Date = new Date(),
 ): Promise<Result<MealSuggestion>> => {
+  // Before the claim: a refused call must not use the ticket (REM-43).
+  if (!(await careConsentInForce(actor, patientId))) {
+    return err("not_permitted", "the care consent is not in force");
+  }
   const secret = env().NEON_AUTH_COOKIE_SECRET;
   const claim = secret ? readMealRetry(ticket, secret, at.getTime()) : null;
   if (claim === null || claim.patientId !== patientId) {

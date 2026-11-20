@@ -13,6 +13,7 @@
  */
 
 import type {
+  ConsentDecision,
   ConsentKey,
   FoodLimitLevel,
   LifestyleAdviceCategory,
@@ -25,6 +26,7 @@ import type {
   SignupField,
   StepStatus,
 } from "@remi/services/shared";
+import type { ConsentActionError } from "@/lib/consents/state";
 import type { PlanMealError } from "@/lib/meals/state";
 import type { QuestionnaireSection } from "@/lib/questionnaire/sections";
 import type { SaveError } from "@/lib/questionnaire/state";
@@ -658,8 +660,6 @@ export type Content = {
     dataLinkHint: string;
     accountTitle: string;
     consentTitle: string;
-    /** The consent settings are not built yet. */
-    consentNotYet: string;
     dataPage: {
       metaTitle: string;
       title: string;
@@ -794,6 +794,59 @@ export type Content = {
       /** `{count}` is the number of recipes that do not show, 2 or more. */
       withheldMany: string;
       unavailable: string;
+    };
+  };
+  /**
+   * « Mes consentements » on the Profil tab, and the consent screen at
+   * `/consentement` (REM-43). The names of the consents and the line of a
+   * text's version are those of `signupLink.consent`.
+   */
+  patientConsents: {
+    intro: string;
+    /** `{date}` is the day of the decision. `none`: no decision recorded. */
+    states: Record<ConsentDecision, string> & { none: string };
+    /** `{version}` is the version of the text of the decision. */
+    version: string;
+    /** A consent that the practitioner recorded: no text is stored. */
+    legacyVersion: string;
+    reread: string;
+    /** For a screen reader. Holds `{name}`: the consent's name. */
+    rereadLabel: string;
+    withdraw: string;
+    /** For a screen reader. Holds `{name}`. */
+    withdrawLabel: string;
+    confirmTitle: string;
+    /** The consequence of a withdrawal, in one sentence. */
+    consequences: Record<ConsentKey, string>;
+    /** The withdrawal does not change what was done before. */
+    past: string;
+    confirm: string;
+    withdrawing: string;
+    cancel: string;
+    give: string;
+    /** For a screen reader. Holds `{name}`. */
+    giveLabel: string;
+    giveIntro: string;
+    giveConfirm: string;
+    giving: string;
+    errors: Record<ConsentActionError, string>;
+    /** The deletion of the account stays a request by e-mail. */
+    deletion: string;
+    /** The screen of a patient whose care consent is not in force. */
+    pause: {
+      metaTitle: string;
+      title: string;
+      /** `{date}` is the day of the withdrawal. */
+      withdrawn: string;
+      /** No care consent was recorded, or it was refused. */
+      missing: string;
+      stopsTitle: string;
+      stops: readonly string[];
+      staysTitle: string;
+      stays: string;
+      againTitle: string;
+      again: string;
+      consentsTitle: string;
     };
   };
 };

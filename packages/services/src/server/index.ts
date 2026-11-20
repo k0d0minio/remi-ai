@@ -530,13 +530,16 @@ export {
 } from "../consent";
 export type { ConsentText, SignupConsentCheck } from "../consent";
 export {
+  careConsentInForce,
   consentsOf,
   insertConsent,
   recordConsent,
+  withdrawConsent,
 } from "../db/services/patient-consents";
 export type {
   ConsentInput,
   ConsentWrite,
+  WithdrawalInput,
 } from "../db/services/patient-consents";
 export type { PatientConsent } from "../db/models/patient-consent";
 

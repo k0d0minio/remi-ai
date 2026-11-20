@@ -201,6 +201,12 @@ const sentences: Readonly<Record<string, string>> = {
   // not_permitted
   "a practitioner creates files for itself only":
     "Un praticien crée des dossiers pour lui-même uniquement.",
+  "only the patient withdraws a consent":
+    "Seule la personne concernée retire un consentement.",
+  "the care consent is not in force":
+    "Le consentement au traitement des données n'est pas en vigueur.",
+  "a withdrawal needs a patient and a consent key":
+    "Ce retrait est incomplet.",
   "only the patient records the genetic consent":
     "Seule la personne concernée enregistre le consentement génétique.",
   "that email and password do not match": WRONG_CREDENTIALS,

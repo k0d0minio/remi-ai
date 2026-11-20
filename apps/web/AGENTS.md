@@ -34,6 +34,9 @@ app/[locale]/       `fr` only (Jamie, 2026-11-20); `[locale]/layout.tsx` IS the
   questionnaire/    behind the patient session: the page before activation
   attente/          behind the patient session: the waiting screen, from a
                     complete questionnaire to the activation
+  consentement/     behind the patient session: the screen of an active patient
+                    whose care consent is not in force (REM-43). The guard
+                    `requireActivePatient()` sends the patient there
 app/api/            route handlers (webhooks, cron, uploads) — outside the locale
                     segment, because a machine surface has no language
 components/         composition only, grouped by feature — never primitives

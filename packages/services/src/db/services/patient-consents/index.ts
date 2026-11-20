@@ -13,7 +13,7 @@ import type { PatientConsent } from "../../models/patient-consent";
 import type { PatientQuestionnaire } from "../../models/patient-questionnaire";
 import { recordAuditEvent, type AuditActor, type AuditRecord } from "../audit";
 import { getPatient } from "../patients";
-import { consentRows, historyOf } from "./in-force";
+import { consentInForce, consentRows, historyOf } from "./in-force";
 import type { Actor } from "../../models/actor";
 import {
   byPatient,
@@ -201,9 +201,125 @@ export const recordConsent = async (
   return ok(written.data.row);
 };
 
+const withdrawalInput = z.object({
+  patientId: z.uuid(),
+  key: z.enum(consentKeys),
+});
+
+export type WithdrawalInput = z.input<typeof withdrawalInput> & {
+  actor: AuditActor;
+};
+
+/**
+ * Writes the withdrawal of the consent in force on `db`, and writes no audit
+ * event: the caller writes `audits` after its transaction commits.
+ *
+ * The row names the text that the patient accepted: the version, the language
+ * and the hash come from the row in force, never from the caller. Thus a
+ * `legacy` consent, which has no text file, can be withdrawn too. No earlier
+ * row changes.
+ */
+const insertWithdrawal = async (
+  input: WithdrawalInput,
+  db: DatabaseClient,
+): Promise<Result<ConsentWrite>> => {
+  const parsed = withdrawalInput.safeParse(input);
+  if (!parsed.success) {
+    return err("invalid_input", "a withdrawal needs a patient and a consent key");
+  }
+  const { patientId, key } = parsed.data;
+  const actor = input.actor;
+  // A withdrawal is the patient's own act (REM-43). An operator and a job
+  // cannot take a consent back for them.
+  if (!("kind" in actor) || actor.kind !== "patient") {
+    return err("not_permitted", "only the patient withdraws a consent");
+  }
+  const patient = await getPatient(systemActor, patientId, db);
+  if (!patient.ok) {
+    return err("not_found", "no such patient");
+  }
+  const current = (await historyOf(patientId, db)).find(
+    (row) => row.consentKey === key,
+  );
+  if (current?.decision !== "given") {
+    return err("conflict", "no consent in force to withdraw");
+  }
+
+  const row = await consentRows(db).insert({
+    patientProfileId: patientId,
+    consentKey: key,
+    textVersion: current.textVersion,
+    textLocale: current.textLocale,
+    textHash: current.textHash,
+    decision: "withdrawn",
+    channel: "app",
+    decidedAt: new Date(),
+    actorKind: actor.kind,
+  });
+  const target = {
+    targetType: "patient",
+    targetId: patientId,
+    targetLabel: patient.data.pseudonym,
+  };
+  const text = [key, `v${current.textVersion}`, current.textLocale]
+    .filter((part) => part !== null)
+    .join(" ");
+  const audits: AuditRecord[] = [
+    { actor, action: "consent.withdrawn", ...target, detail: text },
+  ];
+  if (key === "genetic" && (await clearGenotype(patientId, db))) {
+    audits.push({
+      actor,
+      action: "genotype.cleared",
+      ...target,
+      detail: "consent withdrawn",
+    });
+  }
+  return ok({ row, audits });
+};
+
+/**
+ * The patient withdraws a consent from the settings (REM-43). One row
+ * `withdrawn`, and for `genetic` the three genotype fields emptied, commit
+ * together. The audit events follow the commit (D-32).
+ *
+ * The consequence is immediate because each dependent read asks the table at
+ * the time of the read: `consentInForce` for the genotype and the optional
+ * data, `careConsentInForce` for the generation of a suggestion.
+ */
+export const withdrawConsent = async (
+  actor: Actor,
+  input: WithdrawalInput,
+): Promise<Result<PatientConsent>> => {
+  if (!(await mayAccessPatient(actor, input.patientId, "write"))) {
+    return noSuchPatient();
+  }
+  const written = await getDatabase().transaction((tx) =>
+    insertWithdrawal(input, tx),
+  );
+  if (!written.ok) {
+    return written;
+  }
+  for (const audit of written.data.audits) {
+    await recordAuditEvent(audit);
+  }
+  return ok(written.data.row);
+};
+
 /**
  * The scoped surface (story 3, D-27). Each service takes the actor first, and
  * `db/services/access` checks it before the body runs. A refused call answers
  * as a missing file.
  */
 export const consentsOf = byPatient("read", unscopedConsentsOf, () => ({}));
+
+/**
+ * True when the care consent is in force now (REM-43). Each generation and
+ * each suggestion for a patient asks it before any other read. A refused
+ * actor reads `false`: no consent that it can see.
+ */
+export const careConsentInForce = byPatient(
+  "read",
+  (patientId: Id) => consentInForce(patientId, "care"),
+  () => false,
+);
