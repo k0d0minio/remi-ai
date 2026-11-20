@@ -20,6 +20,7 @@ import {
   listConfirmedCookableFoods,
   listFoodRecords,
   listFoodRecordsToConfirm,
+  recipeFoodsByCode,
   storeFoodProposal,
   type FoodRecordProposal,
 } from "./index";
@@ -562,5 +563,54 @@ describe("the foods that a generation can use (D-30)", () => {
       role: null,
     });
     expect((await gate(noExclusion, RICE, PASTA)).status).toBe("uncertain");
+  });
+});
+
+describe("recipeFoodsByCode", () => {
+  it("reads nothing for a recipe with no CIQUAL code", async () => {
+    const foods = await recipeFoodsByCode([]);
+    expect(foods.gate.size).toBe(0);
+    expect(foods.units.size).toBe(0);
+  });
+
+  it("gives the gate food of each code, and the units that a person confirmed", async () => {
+    // The egg: a confirmed record, and confirmed units.
+    await storeFoodProposal(operator, await foodOf(EGG), proposal());
+    await confirmFoodRecord(operator, EGG, {
+      cookable: true,
+      containsTags: ["eggs"],
+      mayContainTags: [],
+      role: "protein",
+    });
+    await confirmFoodUnits(operator, EGG, {
+      densityGPerMl: null,
+      units: [{ one: "œuf", many: "œufs", grams: 55 }],
+    });
+    // The pasta: a proposal of REMI that no person confirmed.
+    await storeFoodProposal(
+      operator,
+      await foodOf(PASTA),
+      proposal({ containsTags: ["gluten"], role: "starch" }),
+    );
+
+    const foods = await recipeFoodsByCode([EGG, PASTA, RICE, EGG, "0"]);
+
+    expect(foods.gate.get(EGG)).toMatchObject({
+      status: "confirmed",
+      cookable: true,
+      contains: ["eggs"],
+    });
+    expect(foods.gate.get(PASTA)?.status).toBe("proposed");
+    expect(foods.gate.get(RICE)?.status).toBe("none");
+    // A code that CIQUAL does not have.
+    expect(foods.gate.get("0")?.status).toBe("none");
+
+    expect(foods.units.get(EGG)).toEqual({
+      densityGPerMl: null,
+      units: [{ one: "œuf", many: "œufs", grams: 55 }],
+    });
+    // Proposed units are not read: the food shows in grams.
+    expect(foods.units.has(PASTA)).toBe(false);
+    expect(foods.units.has(RICE)).toBe(false);
   });
 });

@@ -6,6 +6,7 @@ import {
   countRecipeAssignments,
   estimateRecipeNutrients,
   getRecipe,
+  ingredientFoodsByCode,
 } from "@remi/services/server";
 import { structuredRecipeOf } from "@remi/services/shared";
 import { Button } from "@remi/ui";
@@ -54,13 +55,19 @@ const RecipeDetail = async ({ params }: { params: Promise<Params> }) => {
   }
   const recipe = result.data;
   const content = structuredRecipeOf(recipe.content);
-  const [holders, origin, estimate] = await Promise.all([
+  const [holders, origin, estimate, linkedFoods] = await Promise.all([
     countRecipeAssignments(recipe.id),
     // A variant whose origin has gone renders as an ordinary recipe rather
     // than as a broken link — the same tolerance the patient card applies.
     recipe.variantOfId ? getRecipe(recipe.variantOfId) : null,
     // A recipe of the old form has no structured ingredient to count.
     content ? estimateRecipeNutrients(content) : null,
+    // The name and the kitchen units of each CIQUAL food that the recipe names.
+    ingredientFoodsByCode(
+      (content?.ingredients ?? []).flatMap(({ foodCode }) =>
+        foodCode === null ? [] : [foodCode],
+      ),
+    ),
   ]);
   const archived = recipe.archivedAt !== null;
 
@@ -114,7 +121,7 @@ const RecipeDetail = async ({ params }: { params: Promise<Params> }) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <RecipeForm recipe={recipe} />
+          <RecipeForm recipe={recipe} linkedFoods={linkedFoods} />
         </CardContent>
       </Card>
 
@@ -122,10 +129,10 @@ const RecipeDetail = async ({ params }: { params: Promise<Params> }) => {
         <CardHeader>
           <CardTitle>Valeurs nutritionnelles — estimation</CardTitle>
           <CardDescription>
-            Une estimation que REMI calcule à partir de la table CIQUAL, pour
-            la recette enregistrée. Chaque quantité est comptée dans la forme,
-            crue ou cuite, que nomme l&apos;aliment CIQUAL. La cuisson
-            n&apos;est pas prise en compte.
+            Une estimation que REMI calcule à partir de la table CIQUAL, pour la
+            recette enregistrée. Chaque quantité est comptée dans la forme, crue
+            ou cuite, que nomme l&apos;aliment CIQUAL. La cuisson n&apos;est pas
+            prise en compte.
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -399,12 +399,19 @@ export {
 export type { NutrientComponent, NutrientDirection } from "./nutrition";
 export { variantTitle, VARIANT_SUFFIX } from "./recipe";
 export {
+  carryRecipeData,
   formatIngredientLine,
   formatRecipeMinutes,
   formatRecipeQuantity,
+  linkIngredientFoods,
+  parseIngredientLinks,
   parseIngredientLines,
   parseStepLines,
+  recipeEquipment,
+  recipeEquipmentLabels,
   recipeGateItem,
+  recipeLevelLabels,
+  recipeLevels,
   recipeSeasonLabels,
   recipeSeasons,
   recipeTotalMinutes,
@@ -414,17 +421,14 @@ export {
   structuredRecipeText,
 } from "./structured-recipe";
 export type {
+  RecipeEquipment,
   RecipeIngredient,
   RecipeSeason,
   RecipeStep,
   RecipeUnit,
   StructuredRecipe,
 } from "./structured-recipe";
-export {
-  recipeIngredientAmount,
-  recipeStepDetails,
-  recipeSummaryOf,
-} from "./recipe-card";
+export { recipeStepDetails, recipeSummaryOf } from "./recipe-card";
 export type {
   PatientRecipeCard,
   PatientRecipeSource,
@@ -436,6 +440,12 @@ export {
   recipeNutrientSources,
 } from "./recipe-nutrients";
 export type { RecipeNutrientKey, RecipeNutrients } from "./recipe-nutrients";
+export {
+  defaultIngredientEntry,
+  ingredientLinkOf,
+  ingredientUnitOptions,
+} from "./recipe-quantities";
+export type { IngredientEntry, IngredientFood } from "./recipe-quantities";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
 export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";

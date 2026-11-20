@@ -1,6 +1,5 @@
 import {
   formatRecipeMinutes,
-  recipeIngredientAmount,
   recipeStepDetails,
   type PatientRecipeCard,
 } from "@remi/services/shared";
@@ -29,7 +28,9 @@ const Fact = ({ label, value }: FactProps) => (
 /**
  * The recipe as the patient cooks it (REM-94, story 25): the name, the
  * description, the times, the portions, the ingredients with a quantity and a
- * unit for each line, and the numbered steps.
+ * unit for each line, and the numbered steps. The quantity of a line is
+ * `card.amounts`: a weight in grams shows in the kitchen units of its food
+ * (« 2 œufs », « 1 c. à soupe »), or in grams (REM-190, REM-192).
  *
  * It renders from its props only, and only a card that the compatibility gate
  * confirmed (`getPatientRecipeCard`). A value that the recipe does not give
@@ -58,7 +59,12 @@ export const RecipeCard = ({ card, content }: Props) => {
             ? content.proposedByRemi
             : content.chosenByPractitioner}
         </Badge>
-        <Typography as="h1" size="2xl" weight="semibold" className="break-words">
+        <Typography
+          as="h1"
+          size="2xl"
+          weight="semibold"
+          className="break-words"
+        >
           {card.title}
         </Typography>
         {recipe.description !== "" ? (
@@ -104,7 +110,7 @@ export const RecipeCard = ({ card, content }: Props) => {
                 weight="semibold"
                 className="w-24 shrink-0 tabular-nums"
               >
-                {recipeIngredientAmount(ingredient) ?? ""}
+                {card.amounts[index] ?? ""}
               </Typography>
               <Typography as="span" className="min-w-0 break-words">
                 {ingredient.name}

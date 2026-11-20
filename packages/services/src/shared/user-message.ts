@@ -86,8 +86,7 @@ const sentences: Readonly<Record<string, string>> = {
     "Les besoins énergétiques n'ont pas encore d'estimation. Complétez d'abord le dossier.",
   "the protein need has no estimate yet":
     "Les besoins protéiques n'ont pas encore d'estimation. Complétez d'abord le dossier.",
-  "this auth user already has an account":
-    "Cette identité a déjà un compte.",
+  "this auth user already has an account": "Cette identité a déjà un compte.",
   "this e-mail already has an account": EMAIL_HAS_ACCOUNT,
   "this file already has an account": "Ce dossier a déjà un compte.",
   "the care of this file is not active":
@@ -124,8 +123,7 @@ const sentences: Readonly<Record<string, string>> = {
     "Ce compte patient est incomplet.",
   "a pilot lead needs a first name": "Indiquez un prénom.",
   "a practitioner lead needs a profession": "Indiquez une profession.",
-  "a template needs at least one row":
-    "Un modèle demande au moins une ligne.",
+  "a template needs at least one row": "Un modèle demande au moins une ligne.",
   "another template already uses that name":
     "Un autre modèle porte déjà ce nom.",
   "a new advice is not valid": "Un nouveau conseil n'est pas valide.",
@@ -219,8 +217,7 @@ const sentences: Readonly<Record<string, string>> = {
   "the file of this link is gone": "Le dossier de ce lien n'existe plus.",
   "this identity has no patient account":
     "Cette identité n'a pas de compte patient.",
-  "this invitation link is not valid":
-    "Ce lien d'invitation n'est pas valide.",
+  "this invitation link is not valid": "Ce lien d'invitation n'est pas valide.",
   "this link is not valid": LINK_NOT_VALID,
 
   // not_permitted
@@ -230,15 +227,13 @@ const sentences: Readonly<Record<string, string>> = {
     "Seule la personne concernée retire un consentement.",
   "the care consent is not in force":
     "Le consentement au traitement des données n'est pas en vigueur.",
-  "a withdrawal needs a patient and a consent key":
-    "Ce retrait est incomplet.",
+  "a withdrawal needs a patient and a consent key": "Ce retrait est incomplet.",
   "only the patient records the genetic consent":
     "Seule la personne concernée enregistre le consentement génétique.",
   "that email and password do not match": WRONG_CREDENTIALS,
   "that file does not belong to this patient":
     "Ce fichier n'appartient pas à ce dossier.",
-  "that is not the current password":
-    "Ce n'est pas le mot de passe actuel.",
+  "that is not the current password": "Ce n'est pas le mot de passe actuel.",
   "the desired weight needs the care consent":
     "Le poids souhaité demande le consentement au traitement des données.",
   "the genotype needs the genetic consent":
@@ -330,6 +325,8 @@ const sentences: Readonly<Record<string, string>> = {
   "a step needs a text": "Chaque étape demande un texte.",
   "that recipe text is too long": "Un texte de la recette est trop long.",
   "that recipe is not valid": "Cette recette n'est pas valide.",
+  "a step names an ingredient that the recipe does not have":
+    "Une étape nomme un ingrédient que la recette n'a pas.",
   "only a structured recipe can be verified":
     "Seule une recette structurée peut être vérifiée. Ajoutez ses ingrédients et ses étapes ligne par ligne.",
   "an archived recipe cannot be verified":
@@ -356,8 +353,7 @@ const sentences: Readonly<Record<string, string>> = {
   "that learning is too long": "Cet apprentissage est trop long.",
   "that message is too long": "Ce message est trop long.",
   "that observation is too long": "Cette observation est trop longue.",
-  "that phone number is not valid":
-    "Ce numéro de téléphone n'est pas valide.",
+  "that phone number is not valid": "Ce numéro de téléphone n'est pas valide.",
   "that value is out of range": "Cette valeur est hors limites.",
   "the password needs at least 12 characters": PASSWORD_12,
 };
@@ -396,10 +392,7 @@ const patterns: readonly Pattern[] = [
     /^a file cannot move from \w+ to \w+$/,
     () => "Le dossier ne peut pas passer à ce statut.",
   ],
-  [
-    /^"(.+)" is checked twice$/,
-    (item) => `« ${item} » est coché deux fois.`,
-  ],
+  [/^"(.+)" is checked twice$/, (item) => `« ${item} » est coché deux fois.`],
   [
     /^"(.+)" is not in the (?:\w+ list|sub-list of ".+")$/,
     (item) => `« ${item} » n'est pas dans la liste.`,
@@ -434,8 +427,7 @@ const sentenceOf = (message: string): string | null => {
 };
 
 /** Whether a static message of a service has its French sentence. */
-export const hasUserMessage = (message: string) =>
-  sentenceOf(message) !== null;
+export const hasUserMessage = (message: string) => sentenceOf(message) !== null;
 
 export const userMessage = ({ error, message }: ServiceFailure): string => {
   const general = byCode[error] ?? FALLBACK;
@@ -449,6 +441,8 @@ export const userMessage = ({ error, message }: ServiceFailure): string => {
   // code, so only the sentence shows.
   const field = /^\w+: (.*)$/.exec(message);
   return (
-    sentenceOf(message) ?? (field ? sentenceOf(field[1] ?? "") : null) ?? general
+    sentenceOf(message) ??
+    (field ? sentenceOf(field[1] ?? "") : null) ??
+    general
   );
 };
