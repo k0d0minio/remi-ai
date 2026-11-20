@@ -3,8 +3,14 @@
 import {
   patientActor,
   planPatientMeal,
+  suggestPlannedMeal,
 } from "@remi/services/server";
-import { checkPlannedMealText, isLocale } from "@remi/services/shared";
+import {
+  checkPlannedMealText,
+  isLocale,
+  type MealSuggestion,
+} from "@remi/services/shared";
+import { aiReady } from "@/lib/ai";
 import { patientLanding, requirePatient } from "@/lib/patient-auth/session";
 import type { PlanMealError, PlanMealState } from "./state";
 
@@ -14,14 +20,42 @@ import type { PlanMealError, PlanMealState } from "./state";
  * the session, never from the page. The typed text is patient data: no line of
  * this file logs it.
  *
- * The suggestion plugs in here: `meal-improvement/meal-suggestion` reads the
- * saved entry after `planPatientMeal` and adds its answer to the state.
+ * REMI's answer follows the save (REM-102). The meal is recorded first: a
+ * failed answer never removes it.
  */
 
 const failed = (error: PlanMealError): PlanMealState => ({
   status: "error",
   error,
 });
+
+/**
+ * REMI's answer, or null. With no key, `aiReady()` registers no adapter and
+ * the service answers `unavailable`, with the alerts of the gate.
+ */
+const suggestionFor = async (
+  patientId: string,
+  meal: string,
+): Promise<MealSuggestion | null> => {
+  try {
+    aiReady();
+    const suggested = await suggestPlannedMeal(
+      patientActor(patientId),
+      patientId,
+      meal,
+    );
+    if (suggested.ok) {
+      return suggested.data;
+    }
+    console.error("[meals] no suggestion", { error: suggested.error });
+  } catch (error) {
+    // The name only: a message can quote the meal.
+    console.error("[meals] the suggestion failed", {
+      name: error instanceof Error ? error.name : "UnknownError",
+    });
+  }
+  return null;
+};
 
 export const planMealAction = async (
   _previous: PlanMealState,
@@ -60,5 +94,6 @@ export const planMealAction = async (
   return {
     status: "saved",
     meal: { id: result.data.id, description: result.data.description },
+    suggestion: await suggestionFor(patientId, result.data.description),
   };
 };

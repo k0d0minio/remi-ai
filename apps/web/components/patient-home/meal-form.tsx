@@ -46,7 +46,11 @@ export const MealForm = ({ locale, labelledBy, content }: Props) => {
   if (state.status === "saved" && state.meal.id !== closedMealId) {
     return (
       <div role="status" className="flex flex-col gap-4">
-        <MealResult meal={state.meal} content={content.saved} />
+        <MealResult
+          meal={state.meal}
+          suggestion={state.suggestion}
+          content={content.saved}
+        />
         <Button
           type="button"
           variant="outline"
