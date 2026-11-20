@@ -79,6 +79,7 @@ export type {
 } from "./patient-calculation";
 export type { PatientSummary } from "./patient-summary";
 export type { PatientChange } from "./patient-change";
+export type { ProtocolVersion, ValidatedProtocol } from "./protocol-version";
 export type { PatientSupplement } from "./patient-supplement";
 export type {
   GenotypeMarker,

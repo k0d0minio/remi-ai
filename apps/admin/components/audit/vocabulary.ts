@@ -32,6 +32,7 @@ export const actionLabels: Record<AuditActionName, string> = {
   "patient.retention_hold_set": "conservation posée",
   "patient.retention_hold_cleared": "conservation levée",
   "calculation.validated": "calcul validé",
+  "protocol.validated": "recommandations validées",
   "recommendation.added": "recommandation ajoutée",
   "recommendation.updated": "recommandation modifiée",
   "recommendation.archived": "recommandation archivée",
@@ -164,6 +165,7 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "patient.retention_hold_set": "info",
   "patient.retention_hold_cleared": "warning",
   "calculation.validated": "neutral",
+  "protocol.validated": "success",
   "recommendation.added": "neutral",
   "recommendation.updated": "neutral",
   "recommendation.archived": "neutral",
@@ -293,6 +295,8 @@ export const actionIntents: Record<AuditActionName, Intent> = {
 const fileStatusReasons: Readonly<Record<string, string>> = {
   "every mandatory field is filled":
     "tous les champs obligatoires sont remplis",
+  "a first recommendation is saved":
+    "une première recommandation est enregistrée",
 };
 
 /**

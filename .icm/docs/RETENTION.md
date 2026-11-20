@@ -33,6 +33,7 @@ One row in `patient_profiles`, plus what hangs off it:
 | The practitioner's « situation particulière » and its note                                  | `patient_profiles`        | no                                                 |
 | The automatic calculations: estimate, validated value, parameters                           | `patient_calculations`    | no                                                 |
 | Each change the patient made after activation: field, old and new value, when, acknowledged | `patient_changes`         | no                                                 |
+| Each validated version of the protocol: number, date, who validated, a copy of the content | `protocol_versions`       | no — no page reads them yet                        |
 | The share token, when the link was last opened, last written                                | `patient_profiles`        | the token is the link                              |
 | The protocol, entry by entry                                                                | `patient_recommendations` | yes, unless archived                               |
 | Consultation notes                                                                          | `patient_notes`           | no                                                 |
@@ -130,6 +131,8 @@ Deleting a patient from the console removes, permanently and in one operation:
 - their questionnaire's allergy and intolerance boxes;
 - every change signal — each field the patient changed after activation, with its old and its new
   value, acknowledged or not;
+- every validated version of their protocol. A version is never changed and never deleted while
+  the patient's file exists: it goes only with the patient;
 - every challenge she gave them, running or closed, with the patient's answers on each;
 - the whole general thread — every message the patient sent and every reply to it;
 - everything the patient themselves wrote through the link — their meal entries and their

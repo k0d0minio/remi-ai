@@ -173,6 +173,11 @@ export {
 export { listPatientCalculations } from "./services/patient-calculations";
 
 export {
+  getValidatedProtocol,
+  validateProtocol,
+} from "./services/protocol-versions";
+
+export {
   countOpenPatientChanges,
   listOpenPatientChanges,
 } from "./services/patient-changes";

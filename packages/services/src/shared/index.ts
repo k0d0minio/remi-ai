@@ -27,6 +27,12 @@ export {
 export type { Locale } from "./i18n";
 export { auditActions } from "./audit";
 export { isWatchedPatientField, watchedPatientFields } from "./patient-changes";
+export {
+  PROTOCOL_SNAPSHOT_SCHEMA_VERSION,
+  isEmptyProtocolSnapshot,
+  protocolSnapshotSchema,
+} from "./protocol-snapshot";
+export type { ProtocolSnapshot } from "./protocol-snapshot";
 export type {
   PatientChangeValue,
   WatchedPatientField,
@@ -283,6 +289,7 @@ export type {
   ProtocolTemplate,
   ProtocolTemplateKind,
   ProtocolTemplateView,
+  ProtocolVersion,
   PsychologyProfile,
   Recipe,
   RecipeAssignment,
@@ -295,6 +302,7 @@ export type {
   Step,
   StepStatus,
   TherapeuticFrame,
+  ValidatedProtocol,
 } from "../db/models";
 
 /**

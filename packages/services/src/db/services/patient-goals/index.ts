@@ -14,6 +14,7 @@ import type { PatientGoal } from "../../models/patient-goal";
 import type { WrittenBy } from "../../models/meal-entry";
 import type { PatientGoalCheckIn } from "../../models/patient-goal-check-in";
 import { touchPatient } from "../patients";
+import { moveToValidateAfterSave } from "../first-recommendation";
 import { byPatient, byRecord, noSuchPatient } from "../access";
 
 /**
@@ -148,6 +149,7 @@ const unscopedAddPatientGoal = async (
     archivedAt: null,
   });
   await touchPatient(patientId);
+  await moveToValidateAfterSave(patientId);
   return ok(created);
 };
 
