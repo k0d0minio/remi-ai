@@ -109,8 +109,9 @@ passé depuis la dernière fois ? Que dois-je faire maintenant ? ». It has four
    (`file/safety-strip.tsx`). « Non renseigné » and « Aucune … connue » are two different states.
 2. **The action card** (`file/next-step.tsx`) is the only place with a dominant button. Its content
    follows the status: the missing information, then the appointment and the preparation note, then
-   what the validation will hold with « Valider les recommandations », then the validated version
-   and the count of the patient's open changes. The quick actions are in this card, as secondary
+   what the validation will hold with « Valider les recommandations » and the recap of the
+   activation with « Activer l'accompagnement » (`file/activation.tsx`), then the validated
+   version, the date of the activation and the count of the patient's open changes. The quick actions are in this card, as secondary
    buttons.
 3. **The work column** holds the open blocks. Before the consultation (« Dossier à compléter »,
    « Prêt pour consultation »): « Sécurité », every questionnaire answer, then the calculations.

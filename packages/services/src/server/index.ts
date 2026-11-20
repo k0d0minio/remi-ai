@@ -135,6 +135,12 @@ export {
 } from "../db/services/protocol-versions";
 
 export {
+  activateCare,
+  getActivationRecap,
+  getCareActivationDate,
+} from "../db/services/care-activation";
+
+export {
   countOpenPatientChanges,
   listOpenPatientChanges,
 } from "../db/services/patient-changes";

@@ -33,6 +33,8 @@ export {
   protocolSnapshotSchema,
 } from "./protocol-snapshot";
 export type { ProtocolSnapshot } from "./protocol-snapshot";
+export { canActivate } from "./care-activation";
+export type { ActivationBlocker, ActivationRecap } from "./care-activation";
 export type {
   PatientChangeValue,
   WatchedPatientField,

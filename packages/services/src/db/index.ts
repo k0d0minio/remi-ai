@@ -178,6 +178,12 @@ export {
 } from "./services/protocol-versions";
 
 export {
+  activateCare,
+  getActivationRecap,
+  getCareActivationDate,
+} from "./services/care-activation";
+
+export {
   countOpenPatientChanges,
   listOpenPatientChanges,
 } from "./services/patient-changes";
