@@ -32,8 +32,8 @@ const improvementText = (improvement: MealImprovement, texts: Texts) => {
   switch (improvement.status) {
     case "aligned":
       return texts.aligned;
-    case "withheld":
     // Only a second suggestion can repeat, and the page then shows `noOther`.
+    case "withheld":
     case "repeated":
       return texts.withheld;
     case "no_protocol":

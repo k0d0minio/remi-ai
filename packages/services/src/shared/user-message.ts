@@ -231,6 +231,12 @@ const sentences: Readonly<Record<string, string>> = {
     "Un lien de reprise est parti il y a moins de cinq minutes.",
   "the limit of meals for this day is reached":
     "La limite de repas pour ce jour est atteinte.",
+  "the second suggestion of this meal is used":
+    "Une autre suggestion a déjà été donnée pour ce repas.",
+  "the claim on this meal was not written":
+    "L'autre suggestion n'a pas pu être préparée. Réessayez dans un instant.",
+  "no valid ticket for a second suggestion":
+    "Une autre suggestion n'est pas possible pour ce repas.",
   "too many changes at once — try again shortly":
     "Trop de modifications à la fois. Réessayez dans un instant.",
   "too many changes today — try again tomorrow":

@@ -114,7 +114,7 @@ describe("the protocol snapshot schema", () => {
     expect(
       protocolSnapshotSchema.safeParse({
         ...full,
-        recommendations: [{ ...full.recommendations[0], category: "sleep" }],
+        recommendations: [{ ...full.recommendations[0], category: "not_a_category" }],
       }).success,
     ).toBe(false);
     expect(
