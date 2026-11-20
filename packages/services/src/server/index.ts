@@ -327,6 +327,12 @@ export {
   searchFoods,
 } from "../db/services/foods";
 export type { FoodSearch, RankQuery, RankedFood } from "../db/services/foods";
+/** The energy and the macronutrients of a recipe, from CIQUAL (REM-191). */
+export { estimateRecipeNutrients } from "../db/services/foods/recipe-nutrients";
+export type {
+  RecipeNutrientEstimate,
+  RecipeNutrientLine,
+} from "../db/services/foods/recipe-nutrients";
 export type {
   CiqualImport,
   ConfidenceCode,

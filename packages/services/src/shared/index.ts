@@ -404,6 +404,12 @@ export type {
   PatientRecipeSource,
   PatientRecipeSummary,
 } from "./recipe-card";
+export {
+  formatRecipeNutrient,
+  recipeNutrientKeys,
+  recipeNutrientSources,
+} from "./recipe-nutrients";
+export type { RecipeNutrientKey, RecipeNutrients } from "./recipe-nutrients";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
 export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";
