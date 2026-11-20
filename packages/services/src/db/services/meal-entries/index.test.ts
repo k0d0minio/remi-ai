@@ -13,9 +13,10 @@ import {
   listMealEntries,
   markMealEntryEaten,
   mealEntryOwner,
+  planPatientMeal,
   updateMealEntry,
 } from "./index";
-import { systemActor } from "../../services/access";
+import { patientActor, systemActor } from "../../services/access";
 
 let patientId: string;
 
@@ -381,5 +382,96 @@ describe("meal entries", () => {
 
     expect(await mealEntryOwner(entry.id)).toBe(patientId);
     expect(await mealEntryOwner("not-a-uuid")).toBeNull();
+  });
+
+  describe("a meal the patient plans", () => {
+    // 23:30 on 2 September in UTC is 01:30 on 3 September in Brussels.
+    const lateEvening = new Date("2026-09-02T23:30:00Z");
+
+    it("records the text as a planned meal of today, written by the patient", async () => {
+      const result = await planPatientMeal(
+        patientActor(patientId),
+        patientId,
+        "  Spaghetti tomate, parmesan  ",
+        lateEvening,
+      );
+      const entry = unwrapEntry(result);
+
+      expect(entry.patientId).toBe(patientId);
+      expect(entry.description).toBe("Spaghetti tomate, parmesan");
+      expect(entry.eatenOn).toBe("2026-09-03");
+      expect(entry.intent).toBe("planned");
+      expect(entry.writtenBy).toBe("patient");
+      expect(entry.slot).toBeNull();
+      expect(entry.feedback).toBe("");
+      expect(entry.feedbackWrittenAt).toBeNull();
+    });
+
+    it("refuses an empty text and a text above 500 characters", async () => {
+      const empty = await planPatientMeal(systemActor, patientId, "   ");
+      const long = await planPatientMeal(
+        systemActor,
+        patientId,
+        "a".repeat(501),
+      );
+
+      expect(empty.ok ? null : empty.error).toBe("invalid_input");
+      expect(long.ok ? null : long.error).toBe("invalid_input");
+      expect(await listMealEntries(systemActor, patientId)).toHaveLength(0);
+    });
+
+    it("refuses a patient who writes in the file of another patient", async () => {
+      const other = await createPatient(systemActor, {
+        practitionerId: testPractitionerId,
+        pseudonym: "Louis",
+      });
+      if (!other.ok) {
+        throw new Error("test patient not created");
+      }
+
+      const result = await planPatientMeal(
+        patientActor(other.data.id),
+        patientId,
+        "Une soupe",
+      );
+
+      expect(result.ok ? null : result.error).toBe("not_found");
+      expect(await listMealEntries(systemActor, patientId)).toHaveLength(0);
+    });
+
+    it("refuses the 21st meal of a day, and accepts a meal the next day", async () => {
+      const day = new Date("2026-09-01T10:00:00Z");
+      for (let count = 0; count < 20; count += 1) {
+        unwrapEntry(
+          await planPatientMeal(systemActor, patientId, `Repas ${count}`, day),
+        );
+      }
+
+      const over = await planPatientMeal(systemActor, patientId, "Repas", day);
+      const nextDay = await planPatientMeal(
+        systemActor,
+        patientId,
+        "Repas",
+        new Date("2026-09-02T10:00:00Z"),
+      );
+
+      expect(over.ok ? null : over.error).toBe("rate_limited");
+      expect(nextDay.ok).toBe(true);
+    });
+
+    it("does not count the practitioner's entries of the day in the limit", async () => {
+      for (let count = 0; count < 20; count += 1) {
+        await log({ eatenOn: "2026-09-01", description: `Repas ${count}` });
+      }
+
+      const result = await planPatientMeal(
+        systemActor,
+        patientId,
+        "Une soupe",
+        new Date("2026-09-01T10:00:00Z"),
+      );
+
+      expect(result.ok).toBe(true);
+    });
   });
 });

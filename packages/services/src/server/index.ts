@@ -279,6 +279,7 @@ export {
   listMealEntries,
   markMealEntryEaten,
   mealEntryOwner,
+  planPatientMeal,
   updateMealEntry,
 } from "../db/services/meal-entries";
 export type { MealEntryInput } from "../db/services/meal-entries";

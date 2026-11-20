@@ -26,6 +26,12 @@ export {
 } from "./i18n";
 export type { Locale } from "./i18n";
 export { auditActions } from "./audit";
+export {
+  checkPlannedMealText,
+  PLANNED_MEAL_MAX_LENGTH,
+  PLANNED_MEALS_PER_DAY,
+} from "./planned-meal";
+export type { PlannedMealTextError } from "./planned-meal";
 export { isWatchedPatientField, watchedPatientFields } from "./patient-changes";
 export {
   PROTOCOL_SNAPSHOT_SCHEMA_VERSION,

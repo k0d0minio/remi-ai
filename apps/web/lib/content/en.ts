@@ -755,4 +755,25 @@ export const en: Content = {
       "Your recommendations, your personal information and your account settings are coming here soon.",
   },
   signOut: "Sign out",
+  patientMeal: {
+    question: "What do you plan to eat?",
+    hint: "Write the dish and, if you know them, its ingredients.",
+    placeholder: "For example: spaghetti with tomato sauce, parmesan, green salad",
+    submit: "Improve my meal",
+    submitting: "Saving…",
+    remaining: "Characters left: {count}",
+    errors: {
+      empty: "First write what you plan to eat.",
+      too_long: "Your text is too long: 500 characters at most.",
+      daily_limit:
+        "You have saved 20 meals today, the maximum for one day. You can add more tomorrow.",
+      unavailable: "Your meal could not be saved. Try again in a moment.",
+    },
+    saved: {
+      title: "Your meal is saved",
+      soon: "REMI's suggestion is not available yet. It is coming soon, here.",
+      mealLabel: "Your meal",
+      another: "Enter another meal",
+    },
+  },
 };

@@ -768,4 +768,26 @@ export const fr: Content = {
       "Tes recommandations, tes informations personnelles et les réglages de ton compte arrivent bientôt ici.",
   },
   signOut: "Se déconnecter",
+  patientMeal: {
+    question: "Qu'as-tu prévu de manger ?",
+    hint: "Écris le plat et, si tu les connais, ses ingrédients.",
+    placeholder: "Par exemple : spaghetti sauce tomate, parmesan, salade verte",
+    submit: "Améliorer mon repas",
+    submitting: "Enregistrement…",
+    remaining: "Caractères restants : {count}",
+    errors: {
+      empty: "Écris d'abord ce que tu as prévu de manger.",
+      too_long: "Ton texte est trop long : 500 caractères au maximum.",
+      daily_limit:
+        "Tu as enregistré 20 repas aujourd'hui, le maximum pour une journée. Tu pourras en ajouter demain.",
+      unavailable:
+        "Ton repas n'a pas pu être enregistré. Réessaie dans un instant.",
+    },
+    saved: {
+      title: "Ton repas est enregistré",
+      soon: "La suggestion de REMI n'est pas encore disponible. Elle arrive bientôt, ici.",
+      mealLabel: "Ton repas",
+      another: "Saisir un autre repas",
+    },
+  },
 };
