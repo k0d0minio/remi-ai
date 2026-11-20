@@ -28,6 +28,12 @@ import type {
   MealOrientation,
   MealSlot,
 } from "../shared/meal-configuration";
+import type {
+  DishRole,
+  FoodRecordSource,
+  FoodRecordStatus,
+} from "../shared/food-record";
+import type { FoodUnit } from "../shared/kitchen-units";
 import type { ProtocolSnapshot } from "../shared/protocol-snapshot";
 import type { StructuredRecipe } from "../shared/structured-recipe";
 
@@ -1384,6 +1390,87 @@ export const ciqualImports = pgTable("ciqual_imports", {
   sourceChecksums: text("source_checksums").notNull().default(""),
   ...timestamps,
 });
+
+/**
+ * The record of one CIQUAL food — REM-189 and REM-190. One row for each food
+ * that REMI proposed or that a person entered. A food with no row has no
+ * record.
+ *
+ * Reference data as the three CIQUAL tables are: no patient data. The key is
+ * CIQUAL's `alim_code`. It has no foreign key to `foods.code`, as
+ * `food_nutrients.food_code` has none: the importer works in CIQUAL's keys.
+ *
+ * Two parts, each with its own status and its own confirmation: the record
+ * (« cuisinable », allergen tags, role) and the kitchen units (density, own
+ * units). `confirmed_by_id` is a plain id with no foreign key, as
+ * `audit_events.actor_id` is: the fact stays when the account is removed.
+ */
+export const foodRecords = pgTable(
+  "food_records",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    foodCode: text("food_code").notNull(),
+    cookable: boolean("cookable").notNull().default(false),
+    /** Tags of the compatibility gate: `milk`, `gluten:wheat`, `meat:pork`. */
+    containsTags: text("contains_tags").array().notNull().default([]),
+    mayContainTags: text("may_contain_tags").array().notNull().default([]),
+    role: text("role").$type<DishRole>(),
+    status: text("status").$type<FoodRecordStatus>().notNull(),
+    source: text("source").$type<FoodRecordSource>().notNull(),
+    proposedModel: text("proposed_model").notNull().default(""),
+    /** The id of the lexicon row of the gate that names this food. */
+    lexiconId: text("lexicon_id"),
+    confirmedAt: timestamp("confirmed_at", { withTimezone: true, mode: "date" }),
+    confirmedById: uuid("confirmed_by_id"),
+    confirmedByName: text("confirmed_by_name").notNull().default(""),
+    /** Grams for one millilitre. Null: the food has no generic unit. */
+    densityGPerMl: doublePrecision("density_g_per_ml"),
+    /** `[{ one, many, grams }]`: the food's own units with a weight. */
+    units: jsonb("units").$type<FoodUnit[]>().notNull().default([]),
+    unitsStatus: text("units_status").$type<FoodRecordStatus>(),
+    unitsConfirmedAt: timestamp("units_confirmed_at", {
+      withTimezone: true,
+      mode: "date",
+    }),
+    unitsConfirmedById: uuid("units_confirmed_by_id"),
+    unitsConfirmedByName: text("units_confirmed_by_name").notNull().default(""),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("food_records_food_code_idx").on(table.foodCode),
+    // The queue « À confirmer » and the list of the confirmed foods.
+    index("food_records_status_idx").on(table.status),
+    check(
+      "food_records_status_check",
+      sql`${table.status} in ('proposed', 'confirmed')`,
+    ),
+    check(
+      "food_records_units_status_check",
+      sql`${table.unitsStatus} is null or ${table.unitsStatus} in ('proposed', 'confirmed')`,
+    ),
+    check(
+      "food_records_source_check",
+      sql`${table.source} in ('remi', 'person')`,
+    ),
+    check(
+      "food_records_role_check",
+      sql`${table.role} is null or ${table.role} in ('protein', 'starch', 'vegetable', 'fat', 'acid', 'aromatic', 'herb_spice', 'liquid')`,
+    ),
+    // A confirmed part names its date. A proposed part names none.
+    check(
+      "food_records_confirmed_check",
+      sql`(${table.status} = 'confirmed') = (${table.confirmedAt} is not null)`,
+    ),
+    check(
+      "food_records_units_confirmed_check",
+      sql`(${table.unitsStatus} is not distinct from 'confirmed') = (${table.unitsConfirmedAt} is not null)`,
+    ),
+    check(
+      "food_records_density_check",
+      sql`${table.densityGPerMl} is null or ${table.densityGPerMl} > 0`,
+    ),
+  ],
+);
 
 /**
  * One row per write accepted through a patient link — the ledger the per-token

@@ -7,9 +7,11 @@
  * the activation. The console shows it, and the service runs it again on the
  * server before it activates.
  *
- * The four blockers of this version:
+ * The five blockers of this version:
  * - the file has no validated version,
  * - a mandatory safety answer is missing (allergies or intolerances),
+ * - the patient names a coeliac disease and the practitioner has answered
+ *   neither « Oui » nor « Non » (REM-165),
  * - a validated calculation is marked « estimation à revalider » (REM-79),
  * - an eviction has no period and no durable status.
  *
@@ -51,6 +53,11 @@ export type ActivationInput = {
     intolerances: SafetyList["state"];
   };
   /**
+   * The patient's pathologies name a coeliac disease and the practitioner has
+   * not answered (`celiacToConfirm`).
+   */
+  celiacToConfirm: boolean;
+  /**
    * The calculations with a validated value that a later change of the
    * patient marked « estimation à revalider » (`needsRevalidation`).
    */
@@ -63,6 +70,7 @@ export type ActivationInput = {
 export type ActivationBlocker =
   | { kind: "no_validated_version" }
   | { kind: "safety_answer_missing"; field: "allergies" | "intolerances" }
+  | { kind: "celiac_to_confirm" }
   | { kind: "calculation_to_revalidate"; calculation: CalculationKind }
   | { kind: "eviction_without_period"; label: string };
 
@@ -116,7 +124,8 @@ const valuesOf = (validated: ActivationVersion): ActivationValues => ({
 
 /**
  * The recap and the blockers, from the facts alone. The blockers come in a
- * fixed order: the version, the safety answers, the calculations to
+ * fixed order: the version, the safety answers, the coeliac disease to
+ * confirm, the calculations to
  * revalidate in the order of `calculationKinds`, then the evictions in the
  * order of the input.
  */
@@ -141,6 +150,9 @@ export const activationRecap = (input: ActivationInput): ActivationRecap => {
   }
   if (input.safety.intolerances === "not_entered") {
     blockers.push({ kind: "safety_answer_missing", field: "intolerances" });
+  }
+  if (input.celiacToConfirm) {
+    blockers.push({ kind: "celiac_to_confirm" });
   }
   for (const calculation of calculationKinds) {
     if (input.staleCalculations.includes(calculation)) {

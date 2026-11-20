@@ -5,11 +5,13 @@ import {
   protocolSnapshotSchema,
   type ProtocolSnapshot,
 } from "../../../shared/protocol-snapshot";
+import { celiacToConfirm } from "../../../shared/celiac-mention";
 import { initialFileStatus } from "../../../shared/file-status";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientProfile } from "../../models/patient-profile";
+import type { PatientQuestionnaire } from "../../models/patient-questionnaire";
 import type {
   ProtocolVersion,
   ValidatedProtocol,
@@ -187,11 +189,14 @@ const auditDetailOf = (versionNumber: number, snapshot: ProtocolSnapshot) =>
  *
  * 1. The file must be at « Recommandations à valider » or at « Accompagnement
  *    actif ». Another status is a `conflict`.
- * 2. An empty protocol is a `conflict`: there is nothing to validate.
- * 3. A snapshot that fails the schema is refused as `invalid_input`, and
+ * 2. A coeliac disease that the patient names and that the practitioner has
+ *    not confirmed (`celiacToConfirm`, REM-165) is a `conflict`: the
+ *    practitioner answers « Oui » or « Non » first.
+ * 3. An empty protocol is a `conflict`: there is nothing to validate.
+ * 4. A snapshot that fails the schema is refused as `invalid_input`, and
  *    nothing is written.
- * 4. The version number is the latest number plus 1, from 1.
- * 5. One `protocol.validated` event names the version and the counts (D-32).
+ * 5. The version number is the latest number plus 1, from 1.
+ * 6. One `protocol.validated` event names the version and the counts (D-32).
  *
  * The validation changes no status and deletes no row: the activation
  * (`care-activation/activation-action`) calls it and then moves the status.
@@ -216,6 +221,12 @@ const unscopedValidateProtocol = async (
       "conflict",
       `a file at ${status} has no recommendations to validate`,
     );
+  }
+  // The questionnaire answers are columns of the same row.
+  const answers = file as PatientProfile &
+    Partial<Pick<PatientQuestionnaire, "celiacDisease" | "pathologies">>;
+  if (celiacToConfirm(answers)) {
+    return err("conflict", "a coeliac disease is not confirmed");
   }
   const parsed = protocolSnapshotSchema.safeParse(
     await snapshotOfLiveProtocol(patientId),

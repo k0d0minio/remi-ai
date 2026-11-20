@@ -115,6 +115,11 @@ export default defineConfig(
     languageOptions: { globals: { ...globals.node } },
   },
   {
+    // @remi/agent is pure text and pure functions. Its tests read the folders.
+    files: ["packages/agent/**/*.{js,jsx,mjs,cjs,ts,tsx}"],
+    languageOptions: { globals: { ...globals.node } },
+  },
+  {
     // …except the deliberately isomorphic surface.
     files: ["packages/services/src/shared/**/*.{ts,tsx}"],
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
@@ -193,6 +198,38 @@ export default defineConfig(
         "error",
         {
           patterns: [
+            {
+              group: [
+                "@remi/web",
+                "@remi/admin",
+                "@remi/marketing",
+                "@remi/docs",
+              ],
+              message:
+                "A package must not import an app — the dependency only ever points app → package.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // @remi/agent is the lowest package: @remi/services reads it, and it reads no
+    // package of the repo. An import the other way is a cycle.
+    //
+    // This block replaces the packages/** rule above for these files rather than
+    // merging with it, so the app-boundary patterns are repeated here.
+    files: ["packages/agent/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@remi/services", "@remi/services/*", "@remi/ui", "@remi/ui/*"],
+              message:
+                "@remi/agent imports no package of the repo. The dependency is app → @remi/services → @remi/agent — see packages/agent/AGENTS.md.",
+            },
             {
               group: [
                 "@remi/web",

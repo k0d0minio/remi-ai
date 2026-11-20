@@ -52,6 +52,13 @@ export const auditActions = [
    */
   "patient.consultation_date_changed",
   /**
+   * The answer to « Maladie cœliaque confirmée » changed: « Oui », « Non » or
+   * cleared (REM-165). The answer starts or lifts the strict gluten
+   * exclusion. The detail names the field, never the value: the trail holds
+   * no health data.
+   */
+  "patient.celiac_answer_changed",
+  /**
    * A patient changed a watched field on a file whose care is active (story
    * 21, D-32). The detail names the field keys. `patient_changes` holds the
    * old and the new values.
@@ -164,6 +171,23 @@ export const auditActions = [
    */
   "ai_model.set",
   "ai_model.reset",
+  /**
+   * The record of a CIQUAL food (REM-189, REM-190, D-32). `proposed`: REMI's
+   * model proposed a record, at the request of the account. `confirmed`: a
+   * person confirmed or corrected the record. `units_confirmed`: a person
+   * confirmed the kitchen units. The detail is JSON: the code and the values.
+   * A food record holds no patient data.
+   */
+  "food_record.proposed",
+  "food_record.confirmed",
+  "food_record.units_confirmed",
+  /**
+   * A console account corrected the table of the meal shares, or removed the
+   * setting so that the code default applies again (REM-197, D-32). The
+   * detail is JSON: each cell that changed, with its value before and after.
+   */
+  "meal_shares.set",
+  "meal_shares.reset",
   "meal.logged",
   "meal.updated",
   "meal.feedback_written",

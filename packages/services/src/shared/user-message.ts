@@ -42,6 +42,29 @@ const sentences: Readonly<Record<string, string>> = {
     "Ce modèle ne produit pas de sortie structurée. REMI en a besoin pour lire la réponse.",
   "the providers of this model may train on the data":
     "Ce modèle est refusé : ses fournisseurs peuvent utiliser les données envoyées pour entraîner leurs modèles. Les demandes de REMI contiennent des données de santé.",
+  // the food records (`db/services/food-records`, `server/foods/propose`)
+  "this food already has a record":
+    "Cet aliment a déjà une fiche. Une proposition ne remplace jamais une fiche.",
+  "this food has no record yet":
+    "Cet aliment n'a pas encore de fiche. Confirmez d'abord sa fiche.",
+  "the compatibility gate does not know this tag":
+    "Une étiquette d'allergène n'est pas reconnue par le contrôle de compatibilité.",
+  "this role in a dish does not exist": "Ce rôle dans un plat n'existe pas.",
+  "a cookable food needs a role in a dish":
+    "Choisissez le rôle de l'aliment dans un plat : un aliment cuisinable en a un.",
+  "the kitchen units are not valid":
+    "Les unités de cuisine ne sont pas valides. Vérifiez les noms, les poids et la densité.",
+  "the food proposal is not available":
+    "REMI n'a pas pu proposer de fiche. Réessayez dans un instant.",
+  // the table of the meal shares (`server/meal-shares`)
+  "only a console account reads or changes the meal shares":
+    "Seul un compte de la console peut lire ou corriger les parts des repas.",
+  "each column of the reference day must give 100":
+    "Sur la journée de référence, la somme de chaque colonne doit être de 100 %.",
+  "each meal share is a whole number from 1 to 100":
+    "Chaque part est un nombre entier de 1 à 100.",
+  "the meal share table is not complete":
+    "La table est incomplète. Rechargez la page, puis réessayez.",
   // conflict
   "a challenge is already running — pick its outcome to replace it":
     "Un challenge est déjà en cours. Choisissez son issue pour le remplacer.",
@@ -57,6 +80,8 @@ const sentences: Readonly<Record<string, string>> = {
     "Aucun consentement en vigueur ne peut être retiré.",
   "that address already has an account": EMAIL_HAS_ACCOUNT,
   "the protocol is empty": "Le protocole est vide.",
+  "a coeliac disease is not confirmed":
+    "La personne cite une maladie cœliaque dans ses pathologies. Répondez d'abord « Oui » ou « Non » à « Maladie cœliaque confirmée » dans le profil.",
   "the energy need has no estimate yet":
     "Les besoins énergétiques n'ont pas encore d'estimation. Complétez d'abord le dossier.",
   "the protein need has no estimate yet":

@@ -2,6 +2,7 @@ import type { PatientSafetyData } from "../ai/compatibility";
 import type { Actor } from "../db/models/actor";
 import { listPatientEvictions } from "../db/services/patient-food-directives";
 import { getPatientQuestionnaire } from "../db/services/patient-questionnaire";
+import { strictGlutenApplies } from "../shared/celiac-mention";
 import { ok, type Result } from "../shared/result";
 import type { Id } from "../types";
 
@@ -19,6 +20,11 @@ export type LoadedPatientSafety = {
  * The allergies, the intolerances, the coeliac flag and the diet are the
  * patient's own declaration and apply at once (D-30). The evictions are the
  * ones in force on the file.
+ *
+ * The coeliac flag is the practitioner's confirmation (REM-165). A patient who
+ * names the disease in the pathologies, with no answer of the practitioner
+ * yet, is read as coeliac: the strict gluten exclusion applies until the
+ * practitioner answers « Non » (`strictGlutenApplies`).
  */
 export const loadPatientSafety = async (
   actor: Actor,
@@ -43,7 +49,9 @@ export const loadPatientSafety = async (
       })),
       noKnownAllergies: answers.noKnownAllergies,
       noKnownIntolerances: answers.noKnownIntolerances,
-      celiacDisease: answers.celiacDisease,
+      celiacDisease: strictGlutenApplies(answers)
+        ? true
+        : answers.celiacDisease,
       diet: answers.diet,
       evictions: evictions.data,
     },

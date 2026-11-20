@@ -382,3 +382,45 @@ describe("registration without the key", () => {
     expect(seam.isTextProviderRegistered()).toBe(false);
   });
 });
+
+describe("the step name in the log line (REM-188)", () => {
+  it("writes the step of the call, and does not send it to the provider", async () => {
+    const seam = await loadSeam();
+    const seen: ProviderRequest[] = [];
+    seam.registerTextProvider(
+      fakeProvider({ text: '{"title":"Omelette","proteinGrams":24}' }, seen),
+    );
+
+    await seam.generateJson(PROMPT, meal, { step: "meal/01-suggest" });
+
+    expect(JSON.parse(lines(info)[0] ?? "")).toMatchObject({
+      event: "ai.generation",
+      step: "meal/01-suggest",
+      outcome: "ok",
+    });
+    expect("step" in (seen[0] ?? {})).toBe(false);
+  });
+
+  it("writes the step of a failed call too", async () => {
+    const seam = await loadSeam();
+    seam.registerTextProvider(fakeProvider(new Error("network")));
+
+    await seam.generateJson(PROMPT, meal, { step: "meal/01-suggest" });
+
+    expect(JSON.parse(lines(error)[0] ?? "")).toMatchObject({
+      step: "meal/01-suggest",
+      outcome: "error",
+    });
+  });
+
+  it("has no step field for a call that no step made", async () => {
+    const seam = await loadSeam();
+    seam.registerTextProvider(
+      fakeProvider({ text: '{"title":"Omelette","proteinGrams":24}' }),
+    );
+
+    await seam.generateJson(PROMPT, meal);
+
+    expect("step" in JSON.parse(lines(info)[0] ?? "{}")).toBe(false);
+  });
+});

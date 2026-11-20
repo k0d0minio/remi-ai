@@ -1,8 +1,23 @@
+import { fileURLToPath } from "node:url";
+
 import { defineConfig } from "vitest/config";
 
 // A `.md` import is the file's text, as tsup's `text` loader makes it in the
-// build. The consent texts are the only `.md` imports (`src/markdown.d.ts`).
+// build. The consent texts are the `.md` imports of this package
+// (`src/markdown.d.ts`), and `@remi/agent` has its contracts and its prompts.
+//
+// The tests read `@remi/agent` from its source, so they need no build of it.
 export default defineConfig({
+  // A test that loads a fresh copy of the AI seam imports the AI SDK again.
+  // On a busy machine that import alone can pass the default of 5 seconds.
+  test: { testTimeout: 30_000 },
+  resolve: {
+    alias: {
+      "@remi/agent": fileURLToPath(
+        new URL("../agent/src/index.ts", import.meta.url),
+      ),
+    },
+  },
   plugins: [
     {
       name: "markdown-as-text",

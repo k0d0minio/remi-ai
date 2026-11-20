@@ -15,6 +15,7 @@ export type {
   FoodNutrient,
   NutrientMarker,
 } from "./food";
+export type { FoodRecord } from "./food-record";
 export type { Operator, OperatorRole } from "./operator";
 export type { OperatorInvitation } from "./operator-invitation";
 export type { Lead } from "./lead";

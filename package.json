@@ -30,8 +30,8 @@
     "ui:build": "turbo run build --filter=@remi/ui",
     "services:dev": "turbo run dev --filter=@remi/services",
     "services:build": "turbo run build --filter=@remi/services",
-    "packages:dev": "turbo run dev --filter=@remi/ui --filter=@remi/services",
-    "packages:build": "turbo run build --filter=@remi/ui --filter=@remi/services",
+    "packages:dev": "turbo run dev --filter=@remi/ui --filter=@remi/services --filter=@remi/agent",
+    "packages:build": "turbo run build --filter=@remi/ui --filter=@remi/services --filter=@remi/agent",
     "ciqual:import": "pnpm --filter @remi/services exec node scripts/ciqual-import.mjs",
     "ciqual:fixture": "pnpm --filter @remi/services exec node scripts/ciqual-fixture.mjs"
   },

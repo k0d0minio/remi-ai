@@ -24,6 +24,8 @@ export const actionLabels: Record<AuditActionName, string> = {
   "patient.updated": "profil modifié",
   "patient.file_status_changed": "statut du dossier changé",
   "patient.consultation_date_changed": "date de consultation changée",
+  "patient.celiac_answer_changed":
+    "réponse « Maladie cœliaque confirmée » changée",
   "patient.changed": "modifié par le patient",
   "patient.change_acknowledged": "modification du patient prise en compte",
   "patient.deleted": "profil supprimé",
@@ -84,6 +86,11 @@ export const actionLabels: Record<AuditActionName, string> = {
   "nutrition_rule.restored": "règle réactivée",
   "ai_model.set": "modèle d'IA modifié",
   "ai_model.reset": "modèle d'IA remis à la valeur par défaut",
+  "food_record.proposed": "fiche d'aliment proposée par REMI",
+  "food_record.confirmed": "fiche d'aliment confirmée",
+  "food_record.units_confirmed": "unités de cuisine d'un aliment confirmées",
+  "meal_shares.set": "parts des repas corrigées",
+  "meal_shares.reset": "parts des repas remises aux valeurs par défaut",
   "meal.logged": "repas ajouté",
   "meal.updated": "repas modifié",
   "meal.feedback_written": "retour écrit",
@@ -172,6 +179,8 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "patient.updated": "neutral",
   "patient.file_status_changed": "neutral",
   "patient.consultation_date_changed": "neutral",
+  // The answer starts or lifts the strict gluten exclusion.
+  "patient.celiac_answer_changed": "info",
   "patient.changed": "info",
   "patient.change_acknowledged": "success",
   "patient.deleted": "error",
@@ -234,6 +243,13 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   // A change of the model that reads patient data: it must stand out.
   "ai_model.set": "warning",
   "ai_model.reset": "info",
+  "food_record.proposed": "neutral",
+  // A confirmation makes a food usable in a recipe: it must stand out.
+  "food_record.confirmed": "info",
+  "food_record.units_confirmed": "info",
+  // A change of the table moves the meal targets of each file.
+  "meal_shares.set": "warning",
+  "meal_shares.reset": "info",
   "meal.logged": "neutral",
   "meal.updated": "neutral",
   "meal.feedback_written": "neutral",

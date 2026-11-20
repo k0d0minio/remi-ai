@@ -1,6 +1,6 @@
 # Remi AI
 
-A Turborepo monorepo: four Next.js apps over two shared packages. Work flows through tickets in
+A Turborepo monorepo: four Next.js apps over three shared packages. Work flows through tickets in
 `.icm/intake/` and one pull request per ticket.
 
 ## Layout
@@ -14,6 +14,7 @@ apps/
 packages/
   ui/           @remi/ui — the design system; the only home for primitives
   services/     @remi/services — storage, email, AI, env; seams, not integrations
+  agent/        @remi/agent — REMI's prompts: one folder, one contract and one prompt for each step
 .icm/           the work layer — the tickets, the two scripts, the docs
 ```
 
@@ -24,7 +25,7 @@ importing an app is a lint error.
 
 ```bash
 pnpm install
-pnpm packages:build   # @remi/ui and @remi/services must exist before an app can compile
+pnpm packages:build   # @remi/ui, @remi/services and @remi/agent must exist before an app can compile
 pnpm web:dev          # or admin:dev / marketing:dev / docs:dev
 ```
 

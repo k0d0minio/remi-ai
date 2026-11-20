@@ -28,6 +28,10 @@ export type { Locale } from "./i18n";
 export { userMessage } from "./user-message";
 export type { ServiceFailure } from "./user-message";
 export { auditActions } from "./audit";
+export { dishRoleLabels, dishRoles } from "./food-record";
+export type { FoodRecordStatus } from "./food-record";
+export { FOOD_UNITS_MAX, kitchenQuantityText } from "./kitchen-units";
+export type { FoodUnit } from "./kitchen-units";
 export {
   checkPlannedMealText,
   PLANNED_MEAL_MAX_LENGTH,
@@ -117,6 +121,24 @@ export type {
   MealSlot as MealConfigurationSlot,
   MealSlotState,
 } from "./meal-configuration";
+export {
+  defaultMealShareTable,
+  MEAL_SHARE_MAX,
+  MEAL_SHARE_MIN,
+  mealShareNutrients,
+  mealTargets,
+  parseMealShareTable,
+  referenceDayOrientations,
+  referenceDayTotal,
+} from "./meal-shares";
+export type {
+  DayTargets,
+  MealShareNutrient,
+  MealShareTable,
+  MealTarget,
+  MealTargets,
+  MealTargetStatus,
+} from "./meal-shares";
 export { canActivate } from "./care-activation";
 export {
   activationEmailDecision,
@@ -355,7 +377,11 @@ export {
   uncategorisedAllergenRows,
 } from "./allergen-options";
 export type { AllergenOption } from "./allergen-options";
-export { mentionsCeliacDisease } from "./celiac-mention";
+export {
+  celiacToConfirm,
+  mentionsCeliacDisease,
+  strictGlutenApplies,
+} from "./celiac-mention";
 export {
   dateEntryFromIso,
   isCalendarDay,
@@ -404,6 +430,12 @@ export type {
   PatientRecipeSource,
   PatientRecipeSummary,
 } from "./recipe-card";
+export {
+  formatRecipeNutrient,
+  recipeNutrientKeys,
+  recipeNutrientSources,
+} from "./recipe-nutrients";
+export type { RecipeNutrientKey, RecipeNutrients } from "./recipe-nutrients";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
 export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";
