@@ -19,6 +19,7 @@ import {
   listArchivedPatientRecipes,
   listArchivedPatientRecommendations,
   listGoalCheckIns,
+  computePatientEstimates,
   listPatientCalculations,
   listMealEntries,
   listPantryEssentials,
@@ -238,11 +239,13 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   // The questionnaire half of the file (story 1): its answers for the form,
   // what is still missing, and whether the genotype may be entered. Then the
   // automatic calculations that read those answers (stories 7, 8 and 9).
-  const [questionnaire, missing, calculations] = await Promise.all([
-    getPatientQuestionnaire(actor, patient.id),
-    missingQuestionnaireFields(actor, patient.id),
-    listPatientCalculations(actor, patient.id),
-  ]);
+  const [questionnaire, missing, calculations, computedEstimates] =
+    await Promise.all([
+      getPatientQuestionnaire(actor, patient.id),
+      missingQuestionnaireFields(actor, patient.id),
+      listPatientCalculations(actor, patient.id),
+      computePatientEstimates(actor, patient.id),
+    ]);
   if (!questionnaire.ok) {
     notFound();
   }
@@ -420,6 +423,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
           calculations={calculations}
           missing={missingCalculation}
           bmi={bmiIndicator(calculationData)}
+          computed={computedEstimates}
         />
       ),
     },

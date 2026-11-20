@@ -127,7 +127,9 @@ export {
 } from "../db/services/patient-summaries";
 
 export {
+  computePatientEstimates,
   listPatientCalculations,
+  validateEnergyTarget,
   validateProteinTarget,
 } from "../db/services/patient-calculations";
 

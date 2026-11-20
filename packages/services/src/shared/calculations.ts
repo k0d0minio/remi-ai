@@ -39,6 +39,23 @@ export const specialSituations = [
 
 export type SpecialSituation = (typeof specialSituations)[number];
 
+/** The text of each situation, as the practitioner reads it in a list. */
+export const specialSituationLabels = {
+  none: { fr: "Aucune" },
+  pregnancy_1: { fr: "Grossesse, 1er trimestre" },
+  pregnancy_2: { fr: "Grossesse, 2e trimestre" },
+  pregnancy_3: { fr: "Grossesse, 3e trimestre" },
+  lactation_first_6_months: { fr: "Allaitement, 6 premiers mois" },
+  lactation_after_6_months: { fr: "Allaitement, après 6 mois" },
+  pathology: { fr: "Pathologie" },
+  malnutrition: { fr: "Dénutrition" },
+  other: { fr: "Autre situation" },
+} as const satisfies Record<SpecialSituation, Readonly<Record<Locale, string>>>;
+
+export const isSpecialSituation = (value: unknown): value is SpecialSituation =>
+  typeof value === "string" &&
+  (specialSituations as readonly string[]).includes(value);
+
 /**
  * The four WHO classes, lowest first. A class holds every BMI under its
  * `below` bound and at or above the bound of the class before it. Obesity has
