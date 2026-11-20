@@ -243,6 +243,20 @@ export const saveAnswerAction = async (
   return refused ?? settle(patientId);
 };
 
+/**
+ * The end screen's check (REM-168): reads the file again after the last save.
+ * It writes no answer. The file moves to « Prêt pour consultation » only when
+ * nothing mandatory is missing (`markReadyWhenComplete`), and the screen shows
+ * the answer of this read, never its own count.
+ */
+export const checkCompletionAction = async (): Promise<SaveResult> => {
+  const account = await currentPatient();
+  if (!account) {
+    return failed("signed_out");
+  }
+  return settle(account.patientProfileId);
+};
+
 const isKind = (kind: unknown): kind is (typeof allergenKinds)[number] =>
   typeof kind === "string" &&
   (allergenKinds as readonly string[]).includes(kind);

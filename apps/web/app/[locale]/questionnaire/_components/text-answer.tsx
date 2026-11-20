@@ -5,6 +5,7 @@ import { Field, Input, Textarea } from "@remi/ui/server";
 import { saveAnswerAction } from "@/lib/questionnaire/actions";
 import type { AnswerField } from "@/lib/questionnaire/state";
 import {
+  refusalOf,
   SaveStatus,
   useAutosave,
   useQuestionnaire,
@@ -38,12 +39,13 @@ export const TextAnswer = ({
 }: Props) => {
   const { text } = useQuestionnaire();
   const [value, setValue] = useState(initial);
-  const { state, commit, schedule } = useAutosave(
+  const { state, commit, schedule, retry } = useAutosave(
     (next) => saveAnswerAction(field, next),
     initial,
   );
   const id = `questionnaire-${field}`;
-  const invalid = state.kind === "error";
+  const refusal = refusalOf(state, text);
+  const invalid = refusal !== undefined;
   const onChange = (next: string) => {
     setValue(next);
     schedule(next);
@@ -58,7 +60,7 @@ export const TextAnswer = ({
         id={id}
         label={label}
         hint={hint}
-        error={invalid ? text.errors[state.error] : undefined}
+        error={refusal}
       >
         {multiline ? (
           <Textarea
@@ -82,7 +84,7 @@ export const TextAnswer = ({
           />
         )}
       </Field>
-      <SaveStatus state={state} />
+      <SaveStatus state={state} onRetry={() => void retry()} />
     </div>
   );
 };

@@ -542,16 +542,14 @@ export const fr: Content = {
   },
   questionnaire: {
     metaTitle: "Questionnaire",
-    title: "Questionnaire préparatoire",
+    title: "Préparons ta consultation",
     intro:
-      "Remplis-le avant ta consultation. Chaque réponse est enregistrée dès que tu la modifies. Tu peux partir et revenir quand tu veux.",
-    statusLabel: "Statut du dossier :",
-    missingTitle: "Champs obligatoires à remplir :",
-    complete: "Tous les champs obligatoires sont remplis.",
+      "Quelques informations pour mieux te connaître et préparer ton accompagnement. Tu peux compléter ce questionnaire à ton rythme.",
+    progressLabel: "Progression du questionnaire",
+    step: "Étape {current} sur {total}",
     mandatoryLegend: "* Champ obligatoire",
     mandatory: "obligatoire",
     optional: "(facultatif)",
-    sectionsLabel: "Sections du questionnaire",
     sections: {
       identite: "Identité",
       profil: "Profil",
@@ -561,9 +559,21 @@ export const fr: Content = {
       genetique: "Génétique",
     },
     previous: "Précédent",
-    next: "Suivant",
+    next: "Continuer",
     saving: "Enregistrement…",
     saved: "Enregistré",
+    retry: "Réessayer",
+    end: {
+      readyTitle: "Ton questionnaire est prêt !",
+      readyBody:
+        "Tes réponses ont bien été enregistrées et permettront à ton praticien de préparer votre consultation.",
+      finish: "Terminer",
+      edit: "Modifier mes réponses",
+      incompleteTitle: "Il reste quelques informations à compléter.",
+      incompleteBody:
+        "Complète les questions ci-dessous pour finaliser ton questionnaire.",
+      back: "Revenir au questionnaire",
+    },
     errors: {
       required: "Ce champ ne peut pas rester vide.",
       invalid: "Cette valeur n'est pas valide.",
@@ -575,8 +585,7 @@ export const fr: Content = {
       genetic_consent:
         "Tes génotypes demandent ton consentement génétique. Donne-le plus haut pour les enregistrer.",
       signed_out: "Ta session a expiré. Reconnecte-toi pour continuer.",
-      unavailable:
-        "L'enregistrement n'a pas abouti. Vérifie ta connexion et réessaie.",
+      unavailable: "Impossible d'enregistrer.",
     },
     labels: {
       firstName: "Prénom",
