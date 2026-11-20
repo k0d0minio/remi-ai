@@ -24,10 +24,13 @@ export type ModelRole = "fast" | "balanced" | "deep";
  * so upgrading a tier does not touch a single call site.
  *
  * The ids are AI Gateway ids, `creator/model` (D-16). `fast` is the cheapest
- * model of the catalogue that has structured output. `balanced` accepts images.
+ * model of the catalogue that has structured output and whose providers do not
+ * train on the data (Jamie, 2026-11-20: the cheapest for the time being).
+ * Free models are excluded for that reason: the prompt has health data.
+ * `balanced` accepts images.
  */
 export const MODELS: Record<ModelRole, string> = {
-  fast: "anthropic/claude-haiku-5.5",
+  fast: "mistral/mistral-nemo",
   balanced: "anthropic/claude-sonnet-5.5",
   deep: "anthropic/claude-opus-5.5",
 };
