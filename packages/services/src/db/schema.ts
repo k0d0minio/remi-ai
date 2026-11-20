@@ -1631,3 +1631,28 @@ export const patientMealConfigurations = pgTable(
     ),
   ],
 );
+
+/**
+ * Settings of the application that an admin changes in the console. One row
+ * for each key. The first keys are the model of each AI role (`ai.model.fast`,
+ * `ai.model.balanced`, `ai.model.deep`): with no row, the code default applies.
+ *
+ * It holds no secret and no patient data. A key of a vendor stays an
+ * environment variable.
+ *
+ * `updated_by_id` is a plain id with no foreign key, as `audit_events.actor_id`
+ * is: the record of who set a value must stay when the account is removed. The
+ * name is kept beside it for the same reason.
+ */
+export const appSettings = pgTable(
+  "app_settings",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    key: text("key").notNull(),
+    value: text("value").notNull(),
+    updatedById: uuid("updated_by_id"),
+    updatedByName: text("updated_by_name").notNull().default(""),
+    ...timestamps,
+  },
+  (table) => [uniqueIndex("app_settings_key_idx").on(table.key)],
+);

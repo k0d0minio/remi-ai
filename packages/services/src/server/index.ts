@@ -537,6 +537,7 @@ export {
 export {
   DEFAULTS as AI_DEFAULTS,
   MODELS,
+  failedChecks,
   gatewayTextProviderFromEnv,
   generateJson,
   generateText,
@@ -594,6 +595,18 @@ export type {
  * entrypoint: register the provider through `/server` (`apps/web/lib/ai.ts`).
  */
 export { suggestPlannedMeal } from "./meals/suggest";
+
+/*
+ * The model of each AI role, as a setting of the console. It calls the seam of
+ * this entrypoint, as the meal suggestion does.
+ */
+export {
+  listCatalogueModels,
+  listRoleModels,
+  resetRoleModel,
+  setRoleModel,
+  testRoleModel,
+} from "./ai-models";
 
 export { env, requireEnv } from "./env";
 export type { ServerEnv } from "./env";

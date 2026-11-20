@@ -309,6 +309,13 @@
       "when": 1795162615487,
       "tag": "0043_patient_meal_configurations",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1795164063142,
+      "tag": "0044_app_settings",
+      "breakpoints": true
     }
   ]
 }

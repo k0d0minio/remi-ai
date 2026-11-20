@@ -109,7 +109,10 @@ src/
   types/       the storage-agnostic vocabulary everything else is written against
   shared/      isomorphic — no fs, no driver, no secret
   server/      the Node barrel + env · meals/suggest.ts (REMI's answer to a planned meal:
-               the database reads, the model call, then the gate in code)
+               the database reads, the model call, then the gate in code) ·
+               ai-models/ (the model of each AI role as a console setting: the service
+               that calls the seam reads it with `roleModel()` and gives it in
+               `options.model`, because `ai/` reads no database)
   auth/        the auth seam (provider.ts, session.ts) · adapters/ · the operator console's
                password hashing + session tokens, vendor-free, `node:crypto` only
   db/          client.ts (the seam) · schema.ts (Drizzle) · adapters/ · models/ · services/ · migrations/

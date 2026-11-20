@@ -228,6 +228,125 @@ describe("generateText", () => {
   });
 });
 
+describe("the model of a call", () => {
+  it("uses the model that the caller resolved, and logs that model", async () => {
+    const seam = await loadSeam();
+    const seen: ProviderRequest[] = [];
+    seam.registerTextProvider(
+      fakeProvider({ text: '{"title":"Omelette","proteinGrams":24}' }, seen),
+    );
+
+    await seam.generateJson(PROMPT, meal, {
+      role: "fast",
+      model: "acme/small",
+    });
+
+    expect(seen[0]?.model).toBe("acme/small");
+    expect(JSON.parse(lines(info)[0] ?? "")).toMatchObject({
+      role: "fast",
+      model: "acme/small",
+      outcome: "ok",
+    });
+  });
+
+  it("logs the model that ran when the call fails", async () => {
+    const seam = await loadSeam();
+    seam.registerTextProvider(fakeProvider(new Error("network")));
+
+    await seam.generateText(PROMPT, { role: "deep", model: "acme/large" });
+
+    expect(JSON.parse(lines(error)[0] ?? "")).toMatchObject({
+      role: "deep",
+      model: "acme/large",
+      outcome: "error",
+    });
+  });
+
+  it("uses the code default of the role for an empty model", async () => {
+    const seam = await loadSeam();
+    const seen: ProviderRequest[] = [];
+    seam.registerTextProvider(fakeProvider({ text: "Bonjour." }, seen));
+
+    await seam.generateText(PROMPT, { role: "balanced", model: "  " });
+
+    expect(seen[0]?.model).toBe(seam.MODELS.balanced);
+  });
+});
+
+describe("a refusal that the adapter names", () => {
+  it.each(["no_access", "unknown_model"] as const)(
+    "returns %s, and logs it with no message",
+    async (reason) => {
+      const seam = await loadSeam();
+      seam.registerTextProvider(
+        fakeProvider(new seam.ProviderCallError(reason)),
+      );
+
+      const result = await seam.generateJson(PROMPT, meal, {
+        model: "acme/small",
+      });
+
+      expect(result).toMatchObject({ ok: false, error: reason });
+      expect(JSON.parse(lines(error)[0] ?? "")).toMatchObject({
+        model: "acme/small",
+        outcome: reason,
+        errorName: "ProviderCallError",
+      });
+    },
+  );
+});
+
+describe("listProviderModels", () => {
+  const catalogue = [
+    {
+      id: "acme/small",
+      name: "Acme Small",
+      type: "language",
+      tags: ["structured-output"],
+      noTraining: "all",
+      zdr: "none",
+    },
+  ];
+
+  it("gives the catalogue of the provider", async () => {
+    const seam = await loadSeam();
+    seam.registerTextProvider({
+      ...fakeProvider({ text: "" }),
+      listModels: async () => catalogue,
+    });
+
+    expect(await seam.listProviderModels()).toEqual(catalogue);
+  });
+
+  it("gives null with no provider, and with a provider that has no list", async () => {
+    const seam = await loadSeam();
+    expect(await seam.listProviderModels()).toBeNull();
+
+    seam.registerTextProvider(fakeProvider({ text: "" }));
+    expect(await seam.listProviderModels()).toBeNull();
+  });
+
+  it("gives null when the list cannot be read, and logs the error name only", async () => {
+    const seam = await loadSeam();
+    seam.registerTextProvider({
+      ...fakeProvider({ text: "" }),
+      listModels: async () => {
+        throw new TypeError("fetch failed: SECRET-DETAIL");
+      },
+    });
+
+    expect(await seam.listProviderModels()).toBeNull();
+    const logged = lines(error);
+    expect(logged).toHaveLength(1);
+    expect(JSON.parse(logged[0] ?? "")).toMatchObject({
+      event: "ai.catalogue",
+      outcome: "error",
+      errorName: "TypeError",
+    });
+    expect(logged[0]).not.toContain("SECRET-DETAIL");
+  });
+});
+
 describe("the model roles", () => {
   it("are AI Gateway ids of the form creator/model", async () => {
     const seam = await loadSeam();

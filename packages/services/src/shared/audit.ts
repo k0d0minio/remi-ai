@@ -132,6 +132,13 @@ export const auditActions = [
   "nutrition_rule.validated",
   "nutrition_rule.archived",
   "nutrition_rule.restored",
+  /**
+   * An admin set the model of an AI role, or removed the setting so that the
+   * code default applies again (D-32). The detail is JSON: the role, the
+   * model before and the model after.
+   */
+  "ai_model.set",
+  "ai_model.reset",
   "meal.logged",
   "meal.updated",
   "meal.feedback_written",

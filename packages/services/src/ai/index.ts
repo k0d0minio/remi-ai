@@ -14,10 +14,15 @@
 
 import type { ZodType } from "zod";
 
+import type { AiModelRole } from "../shared/ai-models";
 import { err, ok } from "../shared/result";
 import type { Result } from "../shared/result";
+import { ProviderCallError } from "./provider-error";
 
-export type ModelRole = "fast" | "balanced" | "deep";
+export { ProviderCallError } from "./provider-error";
+export type { ProviderCallReason } from "./provider-error";
+
+export type ModelRole = AiModelRole;
 
 /**
  * The three tiers callers choose between. They ask for a role, never a model id,
@@ -28,6 +33,10 @@ export type ModelRole = "fast" | "balanced" | "deep";
  * train on the data (Jamie, 2026-11-20: the cheapest for the time being).
  * Free models are excluded for that reason: the prompt has health data.
  * `balanced` accepts images.
+ *
+ * These are the code defaults. An admin can set another model for a role in
+ * the console (`server/ai-models`). The service that calls then gives that
+ * model in `options.model`.
  */
 export const MODELS: Record<ModelRole, string> = {
   fast: "mistral/mistral-nemo",
@@ -37,6 +46,13 @@ export const MODELS: Record<ModelRole, string> = {
 
 export type GenerateOptions = {
   role?: ModelRole;
+  /**
+   * The model of the role, when the service that calls already read it from
+   * the settings (`server/ai-models`: an admin sets it in the console). Unset:
+   * the code default of the role, `MODELS[role]`. This file does not read the
+   * database. A caller still asks for a role, and never writes a model id.
+   */
+  model?: string;
   system?: string;
   maxTokens?: number;
   /** Sent only when the caller sets it. Not every model accepts it. */
@@ -77,17 +93,39 @@ export type ProviderReply = {
   refused?: boolean;
 };
 
+/**
+ * One model of the provider's catalogue, with the fields that the rules of
+ * `model-checks.ts` read. A field that the provider did not send is `null` or
+ * an empty list, and a rule never reads a missing field as a pass.
+ */
+export type CatalogueModel = {
+  id: string;
+  name: string;
+  /** `language` for a text model. */
+  type: string | null;
+  tags: readonly string[];
+  /** `all`, `some` or `none`: how many of the model's providers do not train on the data. */
+  noTraining: string | null;
+  /** `all`, `some` or `none`: how many of the model's providers keep no data. */
+  zdr: string | null;
+};
+
 export type TextProvider = {
   readonly name: string;
   generateText: (request: ProviderRequest) => Promise<ProviderReply>;
+  /** The provider's catalogue. It throws when the list cannot be read. */
+  listModels?: () => Promise<CatalogueModel[]>;
 };
 
 /**
  * - `schema_fail`: the reply is not JSON, or does not satisfy the schema.
  * - `refused`: the model or a content filter refused.
+ * - `no_access`: the account has no access to the model.
+ * - `unknown_model`: the provider does not know the model id.
  * - `error`: no provider is registered, or the call failed.
  */
-export type GenerationError = "schema_fail" | "refused" | "error";
+export type GenerationError =
+  "schema_fail" | "refused" | "no_access" | "unknown_model" | "error";
 
 export type GenerationResult<T> = Result<T, GenerationError>;
 
@@ -109,6 +147,32 @@ export const getTextProvider = (): TextProvider => {
 };
 
 export const resolveModel = (role: ModelRole = DEFAULTS.role) => MODELS[role];
+
+/**
+ * The provider's catalogue, or `null` when it is not available: no provider,
+ * a provider with no list, or a failed read. The log gets the class name of
+ * the error only.
+ */
+export const listProviderModels = async (): Promise<
+  CatalogueModel[] | null
+> => {
+  if (!provider?.listModels) {
+    return null;
+  }
+  try {
+    return await provider.listModels();
+  } catch (error) {
+    console.error(
+      JSON.stringify({
+        event: "ai.catalogue",
+        provider: provider.name,
+        outcome: "error",
+        errorName: error instanceof Error ? error.name : "UnknownError",
+      }),
+    );
+    return null;
+  }
+};
 
 type GenerationKind = "text" | "json";
 
@@ -145,6 +209,8 @@ const logGeneration = (line: GenerationLog) => {
 const MESSAGES: Record<GenerationError, string> = {
   schema_fail: "the model reply does not satisfy the schema",
   refused: "the model refused to answer",
+  no_access: "the account has no access to this model",
+  unknown_model: "the provider does not know this model",
   error: "the model call failed",
 };
 
@@ -165,7 +231,8 @@ const run = async <T>(
   parse: (text: string) => Parsed<T>,
 ): Promise<GenerationResult<T>> => {
   const role = options.role ?? DEFAULTS.role;
-  const model = resolveModel(role);
+  // The model that runs: the log line below names this one.
+  const model = options.model?.trim() || resolveModel(role);
   const started = Date.now();
   const finish = (
     outcome: GenerationOutcome,
@@ -212,7 +279,7 @@ const run = async <T>(
     });
   } catch (error) {
     return failure(
-      "error",
+      error instanceof ProviderCallError ? error.reason : "error",
       null,
       error instanceof Error ? error.name : "UnknownError",
     );
@@ -272,6 +339,10 @@ export const generateJson = <T>(
  * registers it from its own `lib/ai.ts`, and only when the key is set.
  */
 export { gatewayTextProviderFromEnv } from "./adapters/gateway";
+
+/** The rules that a model must pass before an admin sets it for a role. */
+export { checkModelForRole, failedChecks } from "./model-checks";
+export type { ModelCheck } from "./model-checks";
 
 /**
  * The patient context block — the plain-French text every prompt here opens
