@@ -50,11 +50,9 @@ import {
   movePatientGoal,
   movePatientRecommendation,
   movePatientSupplement,
-  patientLinkEmail,
   patientOf,
   patientOfRecord,
   recordConsultation,
-  regenerateShareToken,
   removePatientDocument,
   replyToPatient,
   removeRecipeAssignment,
@@ -62,7 +60,6 @@ import {
   savePatientQuestionnaire,
   savePatientRecommendations,
   savePatientSupplements,
-  sendEmail,
   setPatientAllergens,
   setPatientAnamnesis,
   setPatientInstruction,
@@ -91,7 +88,6 @@ import {
   type Actor,
 } from "@remi/services/server";
 import {
-  appHref,
   challengeOutcomes,
   contextBlocks,
   cookingAffinities,
@@ -119,7 +115,6 @@ import {
 import { audit } from "@/lib/audit";
 import { requireActor, requireOperator } from "@/lib/auth/session";
 import { fileStoreReady } from "@/lib/files";
-import { mailerReady } from "@/lib/mailer";
 import {
   allergenAnswerFrom,
   postsGenotype,
@@ -164,7 +159,6 @@ export type MessageFormState = { error: string | null; saved: boolean };
 export type SummaryFormState = { error: string | null; saved: boolean };
 export type PrepFormState = { error: string | null; saved: boolean };
 export type ConsultationFormState = { error: string | null; saved: boolean };
-export type ShareFormState = { error: string | null; sent: boolean };
 export type DocumentFormState = { error: string | null; saved: boolean };
 export type DeletePatientState = { error: string | null };
 
@@ -575,87 +569,6 @@ export const deletePatientAction = async (
   revalidatePath("/patients");
   revalidatePath("/");
   redirect("/patients");
-};
-
-export const regenerateShareTokenAction = async (formData: FormData) => {
-  const operator = await requireOperator();
-  const actor = await requireActor();
-  if (!(await holdsPatient(actor, field(formData, "id")))) {
-    return;
-  }
-  const id = field(formData, "id");
-  const result = await regenerateShareToken(actor, id);
-  if (result.ok) {
-    await audit(operator, "share_link.regenerated", {
-      type: "patient",
-      id,
-      label: result.data.pseudonym,
-    });
-  }
-  revalidatePatient(id);
-};
-
-/**
- * Emails the patient their own link. Refuses rather than pretending when the
- * deployment cannot send: `consoleMailer` returns a success it did not earn,
- * and repeating that to Morgane is how a patient never gets their link and
- * nobody finds out.
- */
-export const emailShareLinkAction = async (
-  _previous: ShareFormState,
-  formData: FormData,
-): Promise<ShareFormState> => {
-  const operator = await requireOperator();
-  const actor = await requireActor();
-  const id = field(formData, "id");
-  const found = await patientOf(actor, id);
-  if (!found.ok) {
-    return { error: NO_SUCH_FILE, sent: false };
-  }
-  const patient = found.data;
-  if (!patient.email) {
-    return {
-      error: "ce profil n'a pas d'adresse email — ajoutez-la d'abord",
-      sent: false,
-    };
-  }
-  if (!mailerReady()) {
-    return {
-      error:
-        "l'envoi d'emails n'est pas configuré sur ce déploiement — copiez le lien et transmettez-le",
-      sent: false,
-    };
-  }
-
-  const url = appHref("web", `/p/${patient.shareToken}`, patient.locale);
-  try {
-    await sendEmail({
-      to: patient.email,
-      ...patientLinkEmail({
-        name: patient.fullName ?? patient.pseudonym,
-        practitionerName: operator.name,
-        url,
-        locale: patient.locale,
-      }),
-    });
-  } catch (cause) {
-    console.error(
-      "[share-link] the patient link email could not be sent",
-      cause,
-    );
-    return {
-      error: "l'email n'a pas pu être envoyé — réessayez ou copiez le lien",
-      sent: false,
-    };
-  }
-
-  await audit(operator, "share_link.emailed", {
-    type: "patient",
-    id,
-    label: patient.pseudonym,
-    detail: patient.email,
-  });
-  return { error: null, sent: true };
 };
 
 export const addRecommendationAction = async (

@@ -7,8 +7,7 @@ import {
 
 /**
  * This app's registration point for the storage seam — the one place in the
- * web app that names a database vendor. Only the patient-link route reads the
- * database today; every signed-in screen stays on fixtures until REMI-013.
+ * web app that names a database vendor.
  *
  * Called lazily from the code that reads, not from an `instrumentation.ts`
  * hook, for the same reason as the marketing app's mailer: a route that
@@ -16,8 +15,7 @@ import {
  * graph, and re-checking a boolean per request costs nothing.
  *
  * With `DATABASE_URL` unset nothing is registered: the log names the variable
- * to go and set, and the patient link still fails loudly rather than
- * rendering fiction.
+ * to go and set, and a read still fails loudly rather than rendering fiction.
  */
 export const ensureDatabase = () => {
   if (isDatabaseRegistered()) {

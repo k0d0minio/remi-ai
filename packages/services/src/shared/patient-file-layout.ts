@@ -62,7 +62,6 @@ export const patientFileSections = [
   { id: "copy-context", group: "preparation" },
   { id: "recipes", group: "resources" },
   { id: "documents", group: "resources" },
-  { id: "patient-link", group: "resources" },
   { id: "profile", group: "profile" },
 ] as const satisfies readonly { id: string; group: PatientFileGroup }[];
 
