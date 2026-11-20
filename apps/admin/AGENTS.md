@@ -12,8 +12,11 @@ table — which is here because it is what the recipe step will query and she ne
 able to check it by hand. CIQUAL itself is read-only. On top of it, a person keeps the food
 records (REM-189, REM-190): « cuisinable », the allergen tags, the role in a dish and the kitchen
 units of a food. REMI proposes a record, a person confirms it, and the queue « À confirmer »
-lists what waits. Only a confirmed record counts (D-30). One page is for the REMI team only: « Modèles d'IA » (`/ai-models`), the
-model of each AI role. It answers not-found to a practitioner. Nothing else lives here.
+lists what waits. Only a confirmed record counts (D-30). One page is for the REMI team only:
+« Modèles d'IA » (`/ai-models`), the model of each AI role. It answers not-found to a
+practitioner. One table belongs to no patient: « Parts des repas » (`/meal-shares`, REM-197), the
+part of the day's energy and protein that each meal carries. Each console account reads it and
+corrects it. Nothing else lives here.
 
 It is a **separate deployment** from `apps/web` on purpose — its own URL, its own environment
 variables, its own access control. A `/admin` route group inside the product app would put every

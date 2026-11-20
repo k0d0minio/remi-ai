@@ -39,6 +39,7 @@ import {
   listPatientLifestyleAdvices,
   listPatientSupplements,
   listRecipes,
+  mealShareTable,
   missingQuestionnaireFields,
 } from "@remi/services/server";
 import {
@@ -71,6 +72,7 @@ import { ChallengesSection } from "@/components/patients/file/challenges";
 import { countLabel } from "@/components/patients/file/count-label";
 import { FoodDirectivesSection } from "@/components/patients/file/food-directives";
 import { MealStructureSection } from "@/components/patients/file/meal-structure";
+import { MealTargetsBlock } from "@/components/patients/file/meal-targets";
 import { GoalsSection } from "@/components/patients/file/goals";
 import { PatientHeader } from "@/components/patients/file/header";
 import { LearningsSection } from "@/components/patients/file/learnings";
@@ -375,6 +377,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     actor,
     patient.id,
   );
+  // The target of each meal (REM-197): from the validated values only. A
+  // value that needs a new validation is not a target (D-30).
+  const validatedValueOf = (kind: "energy" | "protein") =>
+    calculations.find((row) => row.kind === kind && !row.needsRevalidation)
+      ?.validatedValue ?? null;
+  const mealShares = await mealShareTable();
 
   // Each section of the page: its words, its one line for a folded row, and
   // its body. `patientFileLayout` places them. To add a section, add its id in
@@ -498,10 +506,20 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
       summary: mealConfigurationSummary(mealConfiguration),
       empty: mealConfiguration === null,
       body: (
-        <MealStructureSection
-          patientId={patient.id}
-          configuration={mealConfiguration}
-        />
+        <>
+          <MealStructureSection
+            patientId={patient.id}
+            configuration={mealConfiguration}
+          />
+          <MealTargetsBlock
+            configuration={mealConfiguration}
+            day={{
+              energyKcal: validatedValueOf("energy"),
+              proteinG: validatedValueOf("protein"),
+            }}
+            table={mealShares}
+          />
+        </>
       ),
     },
     supplements: {

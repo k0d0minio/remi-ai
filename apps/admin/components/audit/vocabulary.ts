@@ -87,6 +87,8 @@ export const actionLabels: Record<AuditActionName, string> = {
   "food_record.proposed": "fiche d'aliment proposée par REMI",
   "food_record.confirmed": "fiche d'aliment confirmée",
   "food_record.units_confirmed": "unités de cuisine d'un aliment confirmées",
+  "meal_shares.set": "parts des repas corrigées",
+  "meal_shares.reset": "parts des repas remises aux valeurs par défaut",
   "meal.logged": "repas ajouté",
   "meal.updated": "repas modifié",
   "meal.feedback_written": "retour écrit",
@@ -241,6 +243,9 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   // A confirmation makes a food usable in a recipe: it must stand out.
   "food_record.confirmed": "info",
   "food_record.units_confirmed": "info",
+  // A change of the table moves the meal targets of each file.
+  "meal_shares.set": "warning",
+  "meal_shares.reset": "info",
   "meal.logged": "neutral",
   "meal.updated": "neutral",
   "meal.feedback_written": "neutral",

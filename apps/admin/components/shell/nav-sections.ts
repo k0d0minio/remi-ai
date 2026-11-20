@@ -5,6 +5,7 @@ import {
   Cpu,
   Home,
   Inbox,
+  Scale,
   ScrollText,
   Users,
   UsersRound,
@@ -49,6 +50,9 @@ export const navSections: readonly NavSection[] = [
       // Reference data rather than a patient's: the CIQUAL table, read-only,
       // so a number the recipe step will use can be checked by hand.
       { href: "/aliments", label: "Aliments", icon: Carrot },
+      // The part of the day that each meal carries (REM-197). It belongs to
+      // no patient: one table for each file.
+      { href: "/meal-shares", label: "Parts des repas", icon: Scale },
       // Beside them for the same reason: the nutrition corpus belongs to no
       // patient either. It is what REMI knows, not what anyone was told.
       { href: "/knowledge", label: "Connaissances", icon: BookOpen },

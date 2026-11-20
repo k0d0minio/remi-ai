@@ -692,5 +692,16 @@ export {
   testRoleModel,
 } from "./ai-models";
 
+/*
+ * The table of the meal shares, as a setting of the console (REM-197).
+ * `mealShareTable` is the read of a product call.
+ */
+export {
+  getMealShareSetting,
+  mealShareTable,
+  resetMealShareTable,
+  setMealShareTable,
+} from "./meal-shares";
+
 export { env, requireEnv } from "./env";
 export type { ServerEnv } from "./env";
