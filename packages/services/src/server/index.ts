@@ -179,6 +179,10 @@ export {
   listPatientFoodDirectives,
   savePatientFoodDirectives,
 } from "../db/services/patient-food-directives";
+export {
+  getPatientMealConfiguration,
+  updatePatientMealConfiguration,
+} from "../db/services/patient-meal-configuration";
 
 export {
   addPantryEssential,

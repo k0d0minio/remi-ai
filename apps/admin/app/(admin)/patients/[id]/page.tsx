@@ -9,6 +9,7 @@ import {
   getCurrentChallenge,
   patientOf,
   getPatientInstruction,
+  getPatientMealConfiguration,
   getPatientQuestionnaire,
   getPatientSummary,
   listArchivedMealEntries,
@@ -64,6 +65,7 @@ import {
 import { ChallengesSection } from "@/components/patients/file/challenges";
 import { countLabel } from "@/components/patients/file/count-label";
 import { FoodDirectivesSection } from "@/components/patients/file/food-directives";
+import { MealStructureSection } from "@/components/patients/file/meal-structure";
 import { GoalsSection } from "@/components/patients/file/goals";
 import { PatientHeader } from "@/components/patients/file/header";
 import { LearningsSection } from "@/components/patients/file/learnings";
@@ -85,6 +87,7 @@ import {
 } from "@/components/patients/file/sections";
 import { SupplementsSection } from "@/components/patients/file/supplements";
 import { NOT_ENTERED } from "@/components/patients/file/value";
+import { mealConfigurationSummary } from "@/components/patients/meal-configuration-labels";
 import { NoteTimeline } from "@/components/patients/note-timeline";
 import {
   PatientNavigation,
@@ -364,6 +367,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     listDisabledPatientFoodDirectives(actor, patient.id),
   ]);
 
+  // The meals and the fasting option (REM-68, REM-70). Null: not entered.
+  const mealConfiguration = await getPatientMealConfiguration(
+    actor,
+    patient.id,
+  );
+
   // Each section of the page: its words, its one line for a folded row, and
   // its body. `patientFileLayout` places them. To add a section, add its id in
   // `patient-file-layout.ts` and its entry here.
@@ -473,6 +482,19 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
           directives={foodDirectives}
           disabled={disabledFoodDirectives}
           today={today}
+        />
+      ),
+    },
+    "meal-structure": {
+      title: "Repas",
+      description:
+        "Les repas que la personne prend, l'orientation de chacun et le jeûne intermittent. Chaque choix est enregistré aussitôt.",
+      summary: mealConfigurationSummary(mealConfiguration),
+      empty: mealConfiguration === null,
+      body: (
+        <MealStructureSection
+          patientId={patient.id}
+          configuration={mealConfiguration}
         />
       ),
     },

@@ -20,12 +20,19 @@ import {
   foodDirectiveKinds,
   foodLimitLevels,
 } from "./food-directives";
+import {
+  isMealConfigurationEmpty,
+  mealFastingOptions,
+  mealOrientations,
+} from "./meal-configuration";
 import { recommendationCategories } from "./patient";
 
 /**
  * Raise it when the shape changes, and keep a reader of each older shape.
  * `foodDirectives` (REM-54) did not raise it: a snapshot written before the
  * directives existed has none, and it reads with an empty list.
+ * `mealConfiguration` (REM-68) did not raise it: the key is optional, and a
+ * snapshot from before it reads as a file with no meal configuration.
  */
 export const PROTOCOL_SNAPSHOT_SCHEMA_VERSION = 1;
 
@@ -95,6 +102,29 @@ const snapshotFoodDirective = z
     { message: "an eviction has an end date or the durable status" },
   );
 
+const snapshotMealSlot = z.object({
+  /** Null: the practitioner had not set the switch. */
+  enabled: z.boolean().nullable(),
+  /** Null: no orientation was chosen. */
+  orientation: z.enum(mealOrientations).nullable(),
+});
+
+/**
+ * The meal configuration at the validation (REM-68, REM-70): the switch and
+ * the orientation of each meal, and the fasting option. It holds what the
+ * practitioner entered. A reader uses `mealSlotState` for what a meal is: a
+ * meal that the fasting removes is removed, whatever its switch says.
+ */
+const snapshotMealConfiguration = z.object({
+  meals: z.object({
+    breakfast: snapshotMealSlot,
+    lunch: snapshotMealSlot,
+    snack: snapshotMealSlot,
+    dinner: snapshotMealSlot,
+  }),
+  fasting: z.enum(mealFastingOptions).nullable(),
+});
+
 export const protocolSnapshotSchema = z.object({
   schemaVersion: z.literal(PROTOCOL_SNAPSHOT_SCHEMA_VERSION),
   /** In the order of the categories, then by position. */
@@ -111,6 +141,11 @@ export const protocolSnapshotSchema = z.object({
    * then by position. Absent in a snapshot from before REM-54: read as empty.
    */
   foodDirectives: z.array(snapshotFoodDirective).default([]),
+  /**
+   * Absent when the file had no meal configuration, and in a snapshot from
+   * before REM-68. Absent is « Non renseigné »: it is not Morgane's table.
+   */
+  mealConfiguration: snapshotMealConfiguration.optional(),
 });
 
 export type ProtocolSnapshot = z.infer<typeof protocolSnapshotSchema>;
@@ -122,4 +157,6 @@ export const isEmptyProtocolSnapshot = (snapshot: ProtocolSnapshot) =>
   snapshot.supplements.length === 0 &&
   snapshot.instruction === null &&
   snapshot.calculations.length === 0 &&
-  snapshot.foodDirectives.length === 0;
+  snapshot.foodDirectives.length === 0 &&
+  (snapshot.mealConfiguration === undefined ||
+    isMealConfigurationEmpty(snapshot.mealConfiguration));

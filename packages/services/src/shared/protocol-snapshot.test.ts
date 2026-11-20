@@ -150,6 +150,55 @@ describe("the protocol snapshot schema", () => {
   });
 });
 
+describe("the meal configuration of a snapshot", () => {
+  const mealConfiguration = {
+    meals: {
+      breakfast: { enabled: true, orientation: "protein_fat" },
+      lunch: { enabled: true, orientation: "complete_balanced" },
+      snack: { enabled: false, orientation: null },
+      dinner: { enabled: null, orientation: null },
+    },
+    fasting: "skip_dinner",
+  } as const;
+
+  it("reads a snapshot from before REM-68 with no meal configuration", () => {
+    const parsed = protocolSnapshotSchema.parse(full);
+    expect(parsed.mealConfiguration).toBeUndefined();
+  });
+
+  it("keeps the values as entered, the absent ones too", () => {
+    const parsed = protocolSnapshotSchema.parse({ ...full, mealConfiguration });
+    expect(parsed.mealConfiguration).toEqual(mealConfiguration);
+  });
+
+  it("refuses an orientation and a fasting option that do not exist", () => {
+    expect(
+      protocolSnapshotSchema.safeParse({
+        ...full,
+        mealConfiguration: { ...mealConfiguration, fasting: "skip_lunch" },
+      }).success,
+    ).toBe(false);
+    expect(
+      protocolSnapshotSchema.safeParse({
+        ...full,
+        mealConfiguration: {
+          ...mealConfiguration,
+          meals: {
+            ...mealConfiguration.meals,
+            snack: { enabled: true, orientation: "keto" },
+          },
+        },
+      }).success,
+    ).toBe(false);
+  });
+
+  it("makes a snapshot with only a meal configuration not empty", () => {
+    expect(isEmptyProtocolSnapshot({ ...empty, mealConfiguration })).toBe(
+      false,
+    );
+  });
+});
+
 describe("isEmptyProtocolSnapshot", () => {
   it("is true only when no section has content", () => {
     expect(isEmptyProtocolSnapshot(empty)).toBe(true);

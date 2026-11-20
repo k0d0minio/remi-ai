@@ -57,6 +57,24 @@ export type {
   FoodDirectiveKind,
   FoodLimitLevel,
 } from "./food-directives";
+export {
+  activeMealSlots,
+  defaultMealConfiguration,
+  emptyMealConfiguration,
+  mealFastingOptions,
+  mealOrientations,
+  mealRemovedByFasting,
+  mealSlotState,
+  mealSlots,
+} from "./meal-configuration";
+export type {
+  MealConfiguration,
+  MealConfigurationChange,
+  MealFasting,
+  MealOrientation,
+  MealSlot,
+  MealSlotState,
+} from "./meal-configuration";
 export { canActivate } from "./care-activation";
 export type { ActivationBlocker, ActivationRecap } from "./care-activation";
 export type {

@@ -19,6 +19,7 @@ import { recordAuditEvent, type OperatorActor } from "../audit";
 import { listPatientCalculations } from "../patient-calculations";
 import { listPatientFoodDirectives } from "../patient-food-directives";
 import { listPatientGoals } from "../patient-goals";
+import { getPatientMealConfiguration } from "../patient-meal-configuration";
 import { getPatientInstruction } from "../patient-instructions";
 import { listPatientRecommendations } from "../patient-recommendations";
 import { listPatientSupplements } from "../patient-supplements";
@@ -27,7 +28,7 @@ import { listPatientSupplements } from "../patient-supplements";
  * The validated versions of a protocol — story 20, D-30.
  *
  * The live tables (recommendations, goals, supplements, instruction,
- * calculations, food directives) are the practitioner's working copy. `validateProtocol` copies
+ * calculations, food directives, meal configuration) are the practitioner's working copy. `validateProtocol` copies
  * them into the next row of `protocol_versions`. `getValidatedProtocol`
  * returns the latest row. A reader of validated content (the patient space,
  * the generation) calls only `getValidatedProtocol`: a change in the working
@@ -83,6 +84,7 @@ const snapshotOfLiveProtocol = async (patientId: Id): Promise<unknown> => {
     instruction,
     calculations,
     foodDirectives,
+    mealConfiguration,
   ] = await Promise.all([
     listPatientRecommendations(systemActor, patientId),
     listPatientGoals(systemActor, patientId),
@@ -90,6 +92,7 @@ const snapshotOfLiveProtocol = async (patientId: Id): Promise<unknown> => {
     getPatientInstruction(systemActor, patientId),
     listPatientCalculations(systemActor, patientId),
     listPatientFoodDirectives(systemActor, patientId),
+    getPatientMealConfiguration(systemActor, patientId),
   ]);
   return {
     schemaVersion: PROTOCOL_SNAPSHOT_SCHEMA_VERSION,
@@ -152,6 +155,9 @@ const snapshotOfLiveProtocol = async (patientId: Id): Promise<unknown> => {
       durable: row.durable,
       position: row.position,
     })),
+    // What the practitioner entered, with no value added. No key when the
+    // file has no meal configuration.
+    ...(mealConfiguration ? { mealConfiguration } : {}),
   };
 };
 
@@ -165,6 +171,7 @@ const auditDetailOf = (versionNumber: number, snapshot: ProtocolSnapshot) =>
     instruction: snapshot.instruction !== null,
     calculations: snapshot.calculations.map((row) => row.kind),
     foodDirectives: snapshot.foodDirectives.length,
+    mealConfiguration: snapshot.mealConfiguration !== undefined,
   });
 
 /**

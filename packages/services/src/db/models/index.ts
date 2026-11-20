@@ -82,6 +82,7 @@ export type { PatientChange } from "./patient-change";
 export type { ProtocolVersion, ValidatedProtocol } from "./protocol-version";
 export type { PatientSupplement } from "./patient-supplement";
 export type { PatientFoodDirective } from "./patient-food-directive";
+export type { PatientMealConfiguration } from "./patient-meal-configuration";
 export type {
   GenotypeMarker,
   HabitsProfile,
