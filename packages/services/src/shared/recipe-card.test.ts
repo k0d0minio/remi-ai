@@ -65,9 +65,14 @@ describe("recipeSummaryOf", () => {
         { quantity: 3, unit: null, name: "carottes", note: "", foodCode: null },
       ],
       steps: [
-        { text: "Râpe les carottes.", temperatureC: null, durationMinutes: null },
+        {
+          text: "Râpe les carottes.",
+          temperatureC: null,
+          durationMinutes: null,
+        },
       ],
     },
+    amounts: [null],
   };
 
   it("keeps the id, the source, the title and the description", () => {
