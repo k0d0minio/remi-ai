@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   activityLevelDetails,
@@ -12,27 +12,33 @@ import {
   allSubKeyLabel,
   dietLabels,
   diets,
-  fileStatusLabels,
   intoleranceLabels,
   intolerances,
   mandatoryQuestionnaireFieldLabels,
   noneKnownLabels,
   sexesForCalculation,
   sexForCalculationLabels,
-  type FileStatus,
   type Locale,
   type MandatoryQuestionnaireField,
   type PatientAllergen,
 } from "@remi/services/shared";
 import { Button } from "@remi/ui";
-import { Badge, Field, Input, Typography } from "@remi/ui/server";
+import { Field, Input, Progress, Typography } from "@remi/ui/server";
 import type { ConsentStepText } from "@/components/signup/consent-step";
+import { fill } from "@/lib/content/fill";
 import type { Content } from "@/lib/content/types";
+import { checkCompletionAction } from "@/lib/questionnaire/actions";
 import {
-  isQuestionnaireSection,
+  anchorOfField,
+  END_STEP,
+  hasMandatoryField,
+  isQuestionnaireStep,
   questionnaireSections,
+  resumeSection,
   sectionOfField,
+  STEP_COOKIE,
   type QuestionnaireSection,
+  type QuestionnaireStep,
 } from "@/lib/questionnaire/sections";
 import type { SaveResult } from "@/lib/questionnaire/state";
 import { AllergenAnswer } from "./allergen-answer";
@@ -43,7 +49,9 @@ import {
   MandatoryLabel,
   OptionalLabel,
   QuestionnaireProvider,
+  type Saver,
 } from "./questionnaire-context";
+import { QuestionnaireEnd, type EndState } from "./questionnaire-end";
 import { TextAnswer } from "./text-answer";
 
 /** The saved answers as the form shows them. `""` is « Non renseigné ». */
@@ -77,11 +85,13 @@ type Props = {
   values: QuestionnaireValues;
   /** The genetic consent text, rendered on the server. */
   geneticConsent: ConsentStepText;
-  initialStatus: FileStatus;
   initialMissing: readonly MandatoryQuestionnaireField[];
-  /** Where the page opens when the URL names no section. */
-  initialSection: QuestionnaireSection;
+  /** Where the page opens when the URL names no step. */
+  initialStep: QuestionnaireStep;
 };
+
+/** One year. The cookie holds a step key only, never an answer. */
+const STEP_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 /** The allergy sub-lists in the patient's language, each in the story's order. */
 const subListsOf = (locale: Locale) =>
@@ -100,33 +110,29 @@ const subListsOf = (locale: Locale) =>
     }),
   );
 
-const statusIntent = {
-  to_complete: "warning",
-  ready: "success",
-  to_validate: "info",
-  active: "info",
-} as const satisfies Record<FileStatus, "warning" | "success" | "info">;
-
 /**
- * The preparatory questionnaire (story 4). One section shows at a time and the
- * URL names it, but every section stays mounted: what the patient typed stays
- * on screen when they move between sections. Each answer saves on its own, and
- * the header follows the file's status after each save.
+ * The preparatory questionnaire (story 4), as a guided journey (REM-156): a
+ * progress bar, « Étape X sur 6 », one step at a time, and « Précédent » and
+ * « Continuer » under each step. The URL names the step, but every step stays
+ * mounted: what the patient typed stays on screen when they move. No step
+ * blocks the next one. The mandatory fields count only on the end screen
+ * (REM-168), which the last « Continuer » opens.
  */
 export const QuestionnaireFlow = ({
   locale,
   text,
   values,
   geneticConsent,
-  initialStatus,
   initialMissing,
-  initialSection,
+  initialStep,
 }: Props) => {
   const searchParams = useSearchParams();
   const fromUrl = searchParams.get("section");
-  const section = isQuestionnaireSection(fromUrl) ? fromUrl : initialSection;
-  const [status, setStatus] = useState(initialStatus);
+  const step = isQuestionnaireStep(fromUrl) ? fromUrl : initialStep;
   const [missing, setMissing] = useState(initialMissing);
+  // The page read `initialMissing` on the server, so a first render on the end
+  // screen is already checked.
+  const [end, setEnd] = useState<EndState>("checked");
   const [diet, setDiet] = useState(values.diet || "none");
   // A diet other than « Autre » clears the saved note: a note shown again
   // starts empty.
@@ -138,92 +144,137 @@ export const QuestionnaireFlow = ({
     }
   };
 
+  const savers = useRef(new Map<string, Saver>());
+  const register = (id: string, saver: Saver) => {
+    savers.current.set(id, saver);
+    return () => {
+      savers.current.delete(id);
+    };
+  };
   const onSettled = (result: SaveResult) => {
     if (result.ok) {
-      setStatus(result.status);
       setMissing(result.missing);
+      return;
+    }
+    // A save that did not reach the server ends any earlier confirmation.
+    if (result.error === "unavailable" || result.error === "signed_out") {
+      setEnd("failed");
     }
   };
-  // The App Router follows `pushState`: the back button returns to the
-  // previous section, and `useSearchParams` reads the new one.
-  const open = (next: QuestionnaireSection) => {
-    window.history.pushState(null, "", `?section=${next}`);
+
+  // The question to show after the step changes, or null for the page's top.
+  const target = useRef<string | null>(null);
+  const shown = useRef(step);
+  useEffect(() => {
+    if (shown.current === step) {
+      return;
+    }
+    shown.current = step;
+    const element = target.current
+      ? document.getElementById(target.current)
+      : null;
+    target.current = null;
+    if (element) {
+      element.scrollIntoView({ block: "start" });
+      element.focus({ preventScroll: true });
+      return;
+    }
     window.scrollTo({ top: 0 });
+  }, [step]);
+
+  // The App Router follows `pushState`: the back button returns to the
+  // previous step, and `useSearchParams` reads the new one. The cookie keeps
+  // the step for the next visit.
+  const open = (next: QuestionnaireStep, anchor: string | null = null) => {
+    target.current = anchor;
+    document.cookie = `${STEP_COOKIE}=${next}; path=/; max-age=${STEP_COOKIE_MAX_AGE}; samesite=lax`;
+    window.history.pushState(null, "", `?section=${next}`);
   };
-  const index = questionnaireSections.indexOf(section);
-  const previous = questionnaireSections[index - 1];
-  const next = questionnaireSections[index + 1];
+
+  /**
+   * Sends each failed save again, waits for every save, then reads the file
+   * again on the server. The end screen shows a conclusion only when no save
+   * failed and the read answered.
+   */
+  const check = async () => {
+    setEnd("checking");
+    await Promise.all(
+      [...savers.current.values()].map(async (saver) => {
+        await saver.retry();
+        await saver.flush();
+      }),
+    );
+    if ([...savers.current.values()].some((saver) => saver.failed())) {
+      setEnd("failed");
+      return;
+    }
+    let result: SaveResult;
+    try {
+      result = await checkCompletionAction();
+    } catch {
+      result = { ok: false, error: "unavailable" };
+    }
+    if (!result.ok) {
+      setEnd("failed");
+      return;
+    }
+    setMissing(result.missing);
+    setEnd("checked");
+  };
+  const finish = () => {
+    open(END_STEP);
+    void check();
+  };
+
   const label = (field: MandatoryQuestionnaireField) =>
     mandatoryQuestionnaireFieldLabels[field][locale];
 
-  return (
-    <QuestionnaireProvider value={{ locale, text, onSettled }}>
-      <div className="flex flex-col gap-6">
-        <header className="flex flex-col gap-3">
-          <Typography as="h1" size="2xl" weight="semibold">
-            {text.title}
-          </Typography>
-          <Typography as="p" size="sm" tone="muted">
-            {text.intro}
-          </Typography>
-          <div className="flex flex-wrap items-center gap-2">
-            <Typography as="span" size="sm" weight="medium">
-              {text.statusLabel}
-            </Typography>
-            <Badge variant={statusIntent[status]} tone="subtle">
-              {fileStatusLabels[status][locale]}
-            </Badge>
-          </div>
-          <div aria-live="polite" className="flex flex-col gap-1">
-            {missing.length === 0 ? (
-              <Typography as="p" size="sm">
-                {text.complete}
-              </Typography>
-            ) : (
-              <>
-                <Typography as="p" size="sm" weight="medium">
-                  {text.missingTitle}
-                </Typography>
-                <ul className="flex flex-wrap gap-x-3 gap-y-1">
-                  {missing.map((field) => (
-                    <li key={field}>
-                      <Button
-                        type="button"
-                        variant="link"
-                        size="sm"
-                        className="h-auto min-h-11 px-0"
-                        onClick={() => open(sectionOfField[field])}
-                      >
-                        {label(field)}
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-          </div>
-          <Typography as="p" size="xs" tone="muted">
-            {text.mandatoryLegend}
-          </Typography>
-        </header>
+  // Null on the end screen. The six steps stay mounted there, hidden: a
+  // patient who returns to a step finds what they typed.
+  const section = step === END_STEP ? null : step;
+  const index = section ? questionnaireSections.indexOf(section) : -1;
+  const total = questionnaireSections.length;
+  const previous = questionnaireSections[index - 1];
+  const next = questionnaireSections[index + 1];
+  const stepLabel = fill(text.step, { current: index + 1, total });
 
-        <nav aria-label={text.sectionsLabel}>
-          <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-            {questionnaireSections.map((key) => (
-              <li key={key} className="shrink-0">
-                <Button
-                  type="button"
-                  variant={key === section ? "primary" : "outline"}
-                  className="min-h-11"
-                  aria-current={key === section ? "step" : undefined}
-                  onClick={() => open(key)}
-                >
-                  {text.sections[key]}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </nav>
+  return (
+    <QuestionnaireProvider value={{ locale, text, onSettled, register }}>
+      <div className="flex flex-col gap-6">
+        {section ? (
+          <header className="flex flex-col gap-4">
+            <Typography as="h1" size="2xl" weight="semibold">
+              {text.title}
+            </Typography>
+            {index === 0 ? (
+              <Typography as="p" size="base" tone="muted">
+                {text.intro}
+              </Typography>
+            ) : null}
+            <div className="flex flex-col gap-2">
+              <Progress
+                value={((index + 1) / total) * 100}
+                label={text.progressLabel}
+                aria-valuetext={stepLabel}
+              />
+              <Typography as="p" size="sm" tone="muted">
+                {stepLabel}
+              </Typography>
+            </div>
+          </header>
+        ) : (
+          <QuestionnaireEnd
+            locale={locale}
+            text={text}
+            state={end}
+            missing={missing}
+            onRetry={() => void check()}
+            onOpenField={(field) =>
+              open(sectionOfField[field], anchorOfField[field])
+            }
+            onBack={() => open(resumeSection(missing))}
+          />
+        )}
 
         <Section
           current={section}
@@ -433,38 +484,43 @@ export const QuestionnaireFlow = ({
           />
         </Section>
 
-        <div className="flex justify-between gap-3">
-          {previous ? (
+        {section && hasMandatoryField(section) ? (
+          <Typography as="p" size="xs" tone="muted">
+            {text.mandatoryLegend}
+          </Typography>
+        ) : null}
+
+        {section ? (
+          <div className="flex justify-between gap-3">
+            {previous ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                onClick={() => open(previous)}
+              >
+                {text.previous}
+              </Button>
+            ) : (
+              <span />
+            )}
             <Button
               type="button"
-              variant="outline"
               size="lg"
-              className="min-h-11"
-              onClick={() => open(previous)}
-            >
-              {text.previous}
-            </Button>
-          ) : (
-            <span />
-          )}
-          {next ? (
-            <Button
-              type="button"
-              size="lg"
-              className="min-h-11"
-              onClick={() => open(next)}
+              onClick={next ? () => open(next) : finish}
             >
               {text.next}
             </Button>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
       </div>
     </QuestionnaireProvider>
   );
 };
 
 type SectionProps = {
-  current: QuestionnaireSection;
+  /** Null on the end screen: every step is hidden. */
+  current: QuestionnaireSection | null;
   name: QuestionnaireSection;
   title: string;
   children: ReactNode;

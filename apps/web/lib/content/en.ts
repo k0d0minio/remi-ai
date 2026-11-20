@@ -534,16 +534,14 @@ export const en: Content = {
   },
   questionnaire: {
     metaTitle: "Questionnaire",
-    title: "Preparatory questionnaire",
+    title: "Let's prepare your consultation",
     intro:
-      "Fill it in before your consultation. Each answer is saved as soon as you change it. You can leave and come back at any time.",
-    statusLabel: "File status:",
-    missingTitle: "Mandatory fields to fill in:",
-    complete: "Every mandatory field is filled in.",
+      "A few details to get to know you better and prepare your support. You can complete this questionnaire at your own pace.",
+    progressLabel: "Questionnaire progress",
+    step: "Step {current} of {total}",
     mandatoryLegend: "* Mandatory field",
     mandatory: "mandatory",
     optional: "(optional)",
-    sectionsLabel: "Questionnaire sections",
     sections: {
       identite: "Identity",
       profil: "Profile",
@@ -553,9 +551,21 @@ export const en: Content = {
       genetique: "Genetics",
     },
     previous: "Previous",
-    next: "Next",
+    next: "Continue",
     saving: "Saving…",
     saved: "Saved",
+    retry: "Try again",
+    end: {
+      readyTitle: "Your questionnaire is ready!",
+      readyBody:
+        "Your answers are saved. Your practitioner will use them to prepare your consultation.",
+      finish: "Finish",
+      edit: "Change my answers",
+      incompleteTitle: "A few details are still missing.",
+      incompleteBody:
+        "Answer the questions below to complete your questionnaire.",
+      back: "Back to the questionnaire",
+    },
     errors: {
       required: "This field cannot stay empty.",
       invalid: "This value is not valid.",
@@ -567,7 +577,7 @@ export const en: Content = {
       genetic_consent:
         "Your genotypes need your genetic consent. Give it above to save them.",
       signed_out: "Your session has expired. Sign in again to continue.",
-      unavailable: "The save failed. Check your connection and try again.",
+      unavailable: "Unable to save.",
     },
     labels: {
       firstName: "First name",

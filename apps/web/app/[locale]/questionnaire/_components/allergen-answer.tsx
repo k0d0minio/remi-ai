@@ -10,6 +10,7 @@ import { Checkbox } from "@remi/ui";
 import { Field, Input, Typography } from "@remi/ui/server";
 import { saveAllergensAction } from "@/lib/questionnaire/actions";
 import {
+  refusalOf,
   SaveStatus,
   useAutosave,
   useQuestionnaire,
@@ -180,10 +181,11 @@ export const AllergenAnswer = ({
   );
   const serialise = (next: Draft) =>
     JSON.stringify(answerOf(next, options, subLists));
-  const { state, commit, schedule } = useAutosave(
+  const { state, commit, schedule, retry } = useAutosave(
     (next) => saveAllergensAction(kind, JSON.parse(next)),
     serialise(draftOf(initialNoneKnown, initialRows, subLists)),
   );
+  const refusal = refusalOf(state, text);
   const apply = (next: Draft) => {
     setDraft(next);
     void commit(serialise(next));
@@ -284,7 +286,7 @@ export const AllergenAnswer = ({
   };
 
   return (
-    <fieldset className="flex flex-col gap-2">
+    <fieldset id={id} tabIndex={-1} className="flex flex-col gap-2">
       <Typography as="legend" size="sm" weight="medium" className="mb-2">
         {legend}
       </Typography>
@@ -319,12 +321,12 @@ export const AllergenAnswer = ({
       {draft.checked.includes(OTHER)
         ? otherField(TOP_OTHER, `${id}-other-text`)
         : null}
-      {state.kind === "error" ? (
+      {refusal ? (
         <Typography as="p" size="sm" className="text-error-text">
-          {text.errors[state.error]}
+          {refusal}
         </Typography>
       ) : null}
-      <SaveStatus state={state} />
+      <SaveStatus state={state} onRetry={() => void retry()} />
     </fieldset>
   );
 };

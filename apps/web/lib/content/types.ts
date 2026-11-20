@@ -576,21 +576,36 @@ export type Content = {
   questionnaire: {
     metaTitle: string;
     title: string;
+    /** Shown on the first step only (REM-157). */
     intro: string;
-    statusLabel: string;
-    missingTitle: string;
-    complete: string;
-    /** Under the header: what the mandatory mark means. */
+    /** The accessible name of the progress bar. */
+    progressLabel: string;
+    /** Holds `{current}` and `{total}`: « Étape 2 sur 6 ». */
+    step: string;
+    /** Under a step that has a mandatory field: what the mark means. */
     mandatoryLegend: string;
     /** Read by a screen reader in place of the mark. */
     mandatory: string;
     optional: string;
-    sectionsLabel: string;
     sections: Record<QuestionnaireSection, string>;
     previous: string;
     next: string;
     saving: string;
+    /** Shown only after the server confirmed the save (REM-167). */
     saved: string;
+    /** The action beside `errors.unavailable`: it sends the value again. */
+    retry: string;
+    /** The end screen (REM-168): ready, or the mandatory questions left. */
+    end: {
+      readyTitle: string;
+      readyBody: string;
+      finish: string;
+      /** On the ready screen: returns to the questions. */
+      edit: string;
+      incompleteTitle: string;
+      incompleteBody: string;
+      back: string;
+    };
     errors: Record<SaveError, string>;
     labels: {
       firstName: string;

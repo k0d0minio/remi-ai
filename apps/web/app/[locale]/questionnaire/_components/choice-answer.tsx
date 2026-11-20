@@ -5,6 +5,7 @@ import { Typography } from "@remi/ui/server";
 import { saveAnswerAction } from "@/lib/questionnaire/actions";
 import type { AnswerField } from "@/lib/questionnaire/state";
 import {
+  refusalOf,
   SaveStatus,
   useAutosave,
   useQuestionnaire,
@@ -47,10 +48,11 @@ export const ChoiceAnswer = ({
 }: Props) => {
   const { text } = useQuestionnaire();
   const [selected, setSelected] = useState(initial || shownByDefault || "");
-  const { state, commit } = useAutosave(
+  const { state, commit, retry } = useAutosave(
     (next) => saveAnswerAction(field, next),
     initial,
   );
+  const refusal = refusalOf(state, text);
   const choose = async (value: string) => {
     setSelected(value);
     onSelect?.(value);
@@ -61,7 +63,7 @@ export const ChoiceAnswer = ({
   const name = `questionnaire-${field}`;
 
   return (
-    <fieldset className="flex flex-col gap-2">
+    <fieldset id={name} tabIndex={-1} className="flex flex-col gap-2">
       <Typography as="legend" size="sm" weight="medium" className="mb-2">
         {legend}
       </Typography>
@@ -98,12 +100,12 @@ export const ChoiceAnswer = ({
           </label>
         ))}
       </div>
-      {state.kind === "error" ? (
+      {refusal ? (
         <Typography as="p" size="sm" className="text-error-text">
-          {text.errors[state.error]}
+          {refusal}
         </Typography>
       ) : null}
-      <SaveStatus state={state} />
+      <SaveStatus state={state} onRetry={() => void retry()} />
     </fieldset>
   );
 };
