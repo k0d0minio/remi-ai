@@ -41,6 +41,15 @@ export {
   protocolSnapshotSchema,
 } from "./protocol-snapshot";
 export type { ProtocolSnapshot } from "./protocol-snapshot";
+export { validatedRecommendationsView } from "./validated-recommendations";
+export type {
+  LifestyleAdviceCategory,
+  ValidatedAdvice,
+  ValidatedEviction,
+  ValidatedFoodLimit,
+  ValidatedRecommendationsView,
+  ValidatedSupplement,
+} from "./validated-recommendations";
 export {
   evictionsOfDirectives,
   foodDirectiveFaults,

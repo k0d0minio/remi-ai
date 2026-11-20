@@ -18,6 +18,8 @@ import type {
   CookingAffinity,
   CookingTime,
   FoodBudget,
+  FoodLimitLevel,
+  LifestyleAdviceCategory,
   MandatoryQuestionnaireField,
   MealIntent,
   MealSlot,
@@ -793,6 +795,44 @@ export type Content = {
     metaTitle: string;
     title: string;
     comingSoon: string;
+  };
+  /**
+   * « Mes recommandations » at `/profil/recommandations` (story 23). The
+   * headings are Morgane's. The recommendations themselves are the
+   * practitioner's text and are not in this dictionary.
+   */
+  patientRecommendations: {
+    metaTitle: string;
+    title: string;
+    /** The entry on the Profil tab, and the line below it. */
+    profileEntry: string;
+    profileEntryHint: string;
+    backToProfile: string;
+    /** `{date}` is the day of the validated version. */
+    updatedOn: string;
+    /** No version is validated yet, or the version shows nothing. */
+    empty: string;
+    /** The validated version cannot be read. */
+    unavailable: string;
+    supplementsTitle: string;
+    doseLabel: string;
+    timingLabel: string;
+    reasonLabel: string;
+    lifestyleTitle: string;
+    lifestyleCategories: Record<LifestyleAdviceCategory, string>;
+    foodTitle: string;
+    evictionsTitle: string;
+    /** `{date}` is the last day of the eviction. */
+    evictionUntil: string;
+    /** `{date}` is the first day of an eviction that has not started. */
+    evictionFrom: string;
+    evictionDurable: string;
+    favourTitle: string;
+    limitTitle: string;
+    limitLevels: Record<FoodLimitLevel, string>;
+    /** Above the practitioner's recommendations of the category nutrition. */
+    foodAdviceTitle: string;
+    goalsTitle: string;
   };
   /** The sign-out button on the pages behind the patient session. */
   signOut: string;
