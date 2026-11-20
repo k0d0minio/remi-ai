@@ -6,9 +6,35 @@ happens if I ask you to delete it?_ It is written so Morgane can read it out lou
 file is wrong and gets fixed.
 
 Scope: the beta as it stands — Morgane accompanying 10–15 patients, the admin console as her tool,
-the share link as their view. No consent-management vendor and no legal review sit behind any of
+the patient's account as their view (the share link is closed, see the next section). No consent-management vendor and no legal review sit behind any of
 this. One deletion is automatic: an account inactive for twelve months, after a notice
 (§ Inactive accounts).
+
+## The token link is closed
+
+Since REM-86 (2026-11-20), the share link `/p/<token>` shows no patient data. Each address below
+`/p/<token>` shows one message: the space moved, sign in, or ask the practitioner for an
+invitation. The page reads no token and no table. The console has no control that shows, copies,
+sends or replaces a link.
+
+What became of the data of the link:
+
+- The table `patient_link_writes` stays. No code path adds a row to it now, because the one
+  caller was the link's pages. Its rows held a patient id and a time only. No job deletes the rows
+  that were there on the day of the change. A row goes when its patient is deleted.
+- The columns `share_token`, `link_last_opened_at` and `link_last_wrote_at` of `patient_profiles`
+  stay. A new file still gets a token, because the column is mandatory. The token opens nothing.
+  The two dates do not change now.
+- The rows that a patient wrote through the link (meals, check-ins, messages, challenge answers,
+  profile fields) stay in their tables, with `written_by` set to `patient`. The practitioner reads
+  them in the console as before.
+- The audit events `share_link.regenerated` and `share_link.emailed` stay in the audit trail. No
+  new event of these two kinds is written.
+- No table and no column was deleted. A deletion is a separate decision and a separate migration.
+
+The sections below that describe the link (the documents that the link opens, « What the patient
+writes », the regeneration of the link) describe the product before this change. They stay as the
+record of how the kept rows were made.
 
 ## What is held about a patient
 
@@ -37,7 +63,7 @@ One row in `patient_profiles`, plus what hangs off it:
 | Each food directive: kind, the term as typed, limit level, eviction period or durable status, when disabled| `patient_food_directives` | no — no patient page shows them yet                |
 | The meal configuration: for each meal, whether the patient eats it and its orientation, and the intermittent fasting option | `patient_meal_configurations` | no — no patient page shows it yet |
 | Each recipe that REMI generated for the patient: the title, the ingredients with quantity and unit, the steps, the times, the portions, the day and the meal it is planned for, the library recipe it started from, when it was made | `patient_recipes` | no — no patient page shows them yet |
-| The share token, when the link was last opened, last written                                | `patient_profiles`        | the token is the link                              |
+| The share token, when the link was last opened, last written                                | `patient_profiles`        | no — the link is closed (REM-86)                   |
 | The protocol, entry by entry                                                                | `patient_recommendations` | yes, unless archived                               |
 | Consultation notes                                                                          | `patient_notes`           | no                                                 |
 | Challenges — hers, and the patient's two answers to each                                    | `patient_challenges`      | the running one; closed ones, no                   |
