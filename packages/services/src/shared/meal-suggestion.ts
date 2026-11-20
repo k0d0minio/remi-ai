@@ -31,7 +31,11 @@ export type MealImprovement =
       food: string;
       /** The food of the meal that `food` replaces. Null for add and remove. */
       replaces: string | null;
-      explanation: string;
+      /**
+       * The reason, in REMI's words. Null when the model's sentence names the
+       * proposed food: it then says the improvement a second time (REM-103).
+       */
+      explanation: string | null;
       /** The validated recommendation, directive, parameter or goal, as written. */
       basis: string;
     }
@@ -39,10 +43,23 @@ export type MealImprovement =
   | { status: "aligned" }
   /** REMI has no improvement that the compatibility gate confirms. */
   | { status: "withheld" }
+  /** The second proposal names the food that the patient refused (REM-103). */
+  | { status: "repeated" }
   /** No validated version: REMI says nothing that looks like a recommendation. */
   | { status: "no_protocol" }
   /** The meal has an alert, and the alert is the thing to change first. */
   | { status: "address_alert" };
+
+/**
+ * The improvement that the patient refused with « Pas pour moi » (REM-103).
+ * The second generation gets it, and the code refuses a reply that names the
+ * same food.
+ */
+export type RefusedImprovement = {
+  kind: MealImprovementKind;
+  food: string;
+  replaces: string | null;
+};
 
 export type MealAnswer =
   /** No adapter, a failed call, a refusal, a reply outside the schema, a timeout. */
@@ -51,7 +68,11 @@ export type MealAnswer =
   | { status: "unclear" }
   | {
       status: "answered";
-      /** Foods that the model thinks can hold an exclusion. Never shown as certain. */
+      /**
+       * Foods that the model named and that the compatibility gate flags too,
+       * when no alert and no trace shows them already. A food that the gate
+       * does not flag is never here (REM-103). Never shown as certain.
+       */
       toCheck: string[];
       /** Zero to three points. */
       goodPoints: string[];

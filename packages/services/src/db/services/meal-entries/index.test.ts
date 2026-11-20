@@ -6,6 +6,7 @@ import { createPatient } from "../patients";
 import {
   addMealEntry,
   archiveMealEntry,
+  claimMealRetry,
   countMealEntriesAwaitingFeedback,
   deleteMealEntry,
   getMealEntry,
@@ -472,6 +473,87 @@ describe("meal entries", () => {
       );
 
       expect(result.ok).toBe(true);
+    });
+  });
+  describe("the one second suggestion of a planned meal (REM-103)", () => {
+    const plan = async () =>
+      unwrapEntry(await planPatientMeal(systemActor, patientId, "Poulet, riz"));
+
+    it("holds one time, and refuses the same version the second time", async () => {
+      const meal = await plan();
+      const version = meal.updatedAt.getTime();
+
+      const first = await claimMealRetry(
+        patientActor(patientId),
+        patientId,
+        meal.id,
+        version,
+      );
+      const second = await claimMealRetry(
+        patientActor(patientId),
+        patientId,
+        meal.id,
+        version,
+      );
+
+      expect(first.ok).toBe(true);
+      expect(first.ok ? first.data.updatedAt.getTime() : version).not.toBe(
+        version,
+      );
+      expect(second.ok ? null : second.error).toBe("conflict");
+    });
+
+    it("refuses a version that the server did not sign", async () => {
+      const meal = await plan();
+
+      const result = await claimMealRetry(
+        systemActor,
+        patientId,
+        meal.id,
+        meal.updatedAt.getTime() + 1,
+      );
+
+      expect(result.ok ? null : result.error).toBe("conflict");
+    });
+
+    it("refuses the meal of another patient", async () => {
+      const meal = await plan();
+      const other = await createPatient(systemActor, {
+        practitionerId: testPractitionerId,
+        pseudonym: "Louis",
+      });
+      if (!other.ok) {
+        throw new Error("test patient not created");
+      }
+
+      const asOther = await claimMealRetry(
+        patientActor(other.data.id),
+        other.data.id,
+        meal.id,
+        meal.updatedAt.getTime(),
+      );
+      const acrossFiles = await claimMealRetry(
+        patientActor(other.data.id),
+        patientId,
+        meal.id,
+        meal.updatedAt.getTime(),
+      );
+
+      expect(asOther.ok ? null : asOther.error).toBe("not_found");
+      expect(acrossFiles.ok).toBe(false);
+    });
+
+    it("refuses a meal that the practitioner wrote", async () => {
+      const entry = await log({ eatenOn: "2026-09-01", description: "Un plat" });
+
+      const result = await claimMealRetry(
+        systemActor,
+        patientId,
+        entry.id,
+        entry.updatedAt.getTime(),
+      );
+
+      expect(result.ok ? null : result.error).toBe("not_found");
     });
   });
 });

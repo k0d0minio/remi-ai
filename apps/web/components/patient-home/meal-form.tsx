@@ -8,7 +8,7 @@ import { fill } from "@/lib/content/fill";
 import type { Content } from "@/lib/content/types";
 import { planMealAction } from "@/lib/meals/actions";
 import { initialPlanMealState, type PlanMealState } from "@/lib/meals/state";
-import { MealResult } from "./meal-result";
+import { MealExchange } from "./meal-exchange";
 
 type Props = {
   locale: Locale;
@@ -46,9 +46,12 @@ export const MealForm = ({ locale, labelledBy, content }: Props) => {
   if (state.status === "saved" && state.meal.id !== closedMealId) {
     return (
       <div role="status" className="flex flex-col gap-4">
-        <MealResult
+        <MealExchange
+          key={state.meal.id}
+          locale={locale}
           meal={state.meal}
           suggestion={state.suggestion}
+          retry={state.retry}
           content={content.saved}
         />
         <Button

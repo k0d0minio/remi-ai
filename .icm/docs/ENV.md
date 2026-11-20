@@ -186,7 +186,8 @@ Value per target: `NEON_AUTH_BASE_URL` comes from the integration: production fr
 from the main branch of `uat-remi-ai`, preview from the branch `preview/<git branch>` of
 `uat-remi-ai`. `NEON_AUTH_COOKIE_SECRET` is one value per target, made with
 `openssl rand -base64 32`. uat never reuses production's. With either unset, `/api/auth` answers
-503 and the log names the variable.
+503 and the log names the variable. `NEON_AUTH_COOKIE_SECRET` also signs the ticket of the second
+meal suggestion (REM-103). With it unset, the patient gets no second suggestion.
 
 ## Email
 

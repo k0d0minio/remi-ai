@@ -19,6 +19,13 @@ type Props = {
   /** Null when the patient's safety data could not be read. */
   suggestion: MealSuggestion | null;
   content: Content["patientMeal"]["saved"];
+  /**
+   * True for the answer of the second generation (REM-103). With no other
+   * improvement to show, the page says so and nothing more.
+   */
+  second?: boolean;
+  /** The patient's answer to the suggestion, under REMI's two blocks. */
+  children?: ReactNode;
 };
 
 const improvementText = (improvement: MealImprovement, texts: Texts) => {
@@ -26,6 +33,8 @@ const improvementText = (improvement: MealImprovement, texts: Texts) => {
     case "aligned":
       return texts.aligned;
     case "withheld":
+    // Only a second suggestion can repeat, and the page then shows `noOther`.
+    case "repeated":
       return texts.withheld;
     case "no_protocol":
       return texts.noProtocol;
@@ -56,9 +65,16 @@ const Block = ({ title, children }: BlockProps) => (
 type AnswerProps = {
   answer: MealSuggestion["answer"];
   texts: Texts;
+  second: boolean;
 };
 
-const Answer = ({ answer, texts }: AnswerProps) => {
+const Answer = ({ answer, texts, second }: AnswerProps) => {
+  if (
+    second &&
+    (answer.status !== "answered" || answer.improvement.status !== "shown")
+  ) {
+    return <Typography>{texts.feedback.noOther}</Typography>;
+  }
   if (answer.status === "unavailable") {
     return <Typography tone="muted">{texts.unavailable}</Typography>;
   }
@@ -90,7 +106,9 @@ const Answer = ({ answer, texts }: AnswerProps) => {
         </Typography>
         {improvement.status === "shown" ? (
           <>
-            <Typography>{improvement.explanation}</Typography>
+            {improvement.explanation ? (
+              <Typography>{improvement.explanation}</Typography>
+            ) : null}
             <Typography size="sm" tone="muted">
               {fill(texts.basis, { basis: improvement.basis })}
             </Typography>
@@ -104,10 +122,16 @@ const Answer = ({ answer, texts }: AnswerProps) => {
 /**
  * What the home page shows after a meal is saved (REM-102, story 28): the
  * alerts of the compatibility gate first, before any praise (D-30), then
- * REMI's two blocks, then the meal as recorded. The buttons « Ça me convient »
- * and « Pas pour moi » are REM-103.
+ * REMI's two blocks, then the patient's answer (`children`, REM-103), then the
+ * meal as recorded.
  */
-export const MealResult = ({ meal, suggestion, content }: Props) => {
+export const MealResult = ({
+  meal,
+  suggestion,
+  content,
+  second = false,
+  children,
+}: Props) => {
   const texts = content.suggestion;
   const alerts = suggestion?.alerts ?? [];
   const traces = suggestion?.traces ?? [];
@@ -136,10 +160,11 @@ export const MealResult = ({ meal, suggestion, content }: Props) => {
           </Alert>
         ) : null}
         {suggestion ? (
-          <Answer answer={suggestion.answer} texts={texts} />
+          <Answer answer={suggestion.answer} texts={texts} second={second} />
         ) : (
           <Typography tone="muted">{texts.unavailable}</Typography>
         )}
+        {children}
         {checkIngredients ? (
           <Typography size="sm" tone="muted">
             {texts.checkIngredients}

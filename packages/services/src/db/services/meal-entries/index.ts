@@ -284,6 +284,71 @@ const unscopedPlanPatientMeal = async (
   return ok(created);
 };
 
+/** A moment between two writes of a row, so that `updatedAt` moves. */
+const nextMillisecond = () =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, 2);
+  });
+
+/** How many times the claim writes the row to move its `updatedAt`. */
+const CLAIM_WRITES_MAX = 4;
+
+/**
+ * Uses the one second suggestion of a meal that the patient typed (REM-103,
+ * story 28: two suggestions for a meal, never three).
+ *
+ * No table holds a suggestion yet, and no column of this table is free for a
+ * mark: the console and the patient's old link show each one. Thus the row's
+ * `updatedAt` is the state. `version` is the `updatedAt` that the server signed
+ * into the ticket at the first answer (`server/meals/retry-ticket.ts`). The
+ * claim holds only while the row still has that value, and the claim writes the
+ * row, which moves `updatedAt`. The same ticket is then refused, and no code
+ * path signs a second ticket for a meal.
+ *
+ * It fails closed: each other write of the row (an edit or an archive in the
+ * console) moves `updatedAt` too, and the second suggestion is then refused.
+ *
+ * The seam has no conditional update. Two requests that arrive in the same few
+ * milliseconds can both read the old value. The debt is recorded with the
+ * ticket: a `meal_suggestions` table with one row for each attempt closes it.
+ */
+const unscopedClaimMealRetry = async (
+  patientId: Id,
+  mealId: Id,
+  version: number,
+): Promise<Result<MealEntry>> => {
+  if (!uuidSchema.safeParse(mealId).success) {
+    return err("not_found", "no such meal entry");
+  }
+  return getDatabase().transaction(async (tx) => {
+    const rows = tx.collection<MealEntry>("patient_meal_entries");
+    const entry = await rows.findById(mealId);
+    if (
+      !entry ||
+      entry.patientId !== patientId ||
+      entry.writtenBy !== "patient" ||
+      entry.archivedAt !== null
+    ) {
+      return err("not_found", "no such meal entry");
+    }
+    if (entry.updatedAt.getTime() !== version) {
+      return err("conflict", "the second suggestion of this meal is used");
+    }
+    for (let write = 0; write < CLAIM_WRITES_MAX; write += 1) {
+      const touched = await rows.update(mealId, {});
+      if (!touched) {
+        return err("not_found", "no such meal entry");
+      }
+      if (touched.updatedAt.getTime() !== version) {
+        return ok(touched);
+      }
+      // The write fell in the millisecond of `version`: the claim is not held.
+      await nextMillisecond();
+    }
+    return err("conflict", "the claim on this meal was not written");
+  });
+};
+
 /**
  * « Je vais manger » becomes « J'ai mangé », on the row that already exists.
  *
@@ -397,6 +462,11 @@ export const addMealEntry = byPatient(
 export const planPatientMeal = byPatient(
   "write",
   unscopedPlanPatientMeal,
+  noSuchPatient,
+);
+export const claimMealRetry = byPatient(
+  "write",
+  unscopedClaimMealRetry,
   noSuchPatient,
 );
 export const updateMealEntry = byRecord(

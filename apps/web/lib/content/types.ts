@@ -947,6 +947,21 @@ export type Content = {
         addressAlert: string;
         unclear: string;
         unavailable: string;
+        /**
+         * The patient's answer to a suggestion (REM-103, story 28). The only
+         * feedback of the patient space (story 30).
+         */
+        feedback: {
+          accept: string;
+          decline: string;
+          /** After « Pas pour moi » on the first suggestion. */
+          declined: string;
+          another: string;
+          anotherPending: string;
+          /** The second generation showed no other improvement. */
+          noOther: string;
+          closing: string;
+        };
       };
     };
   };
