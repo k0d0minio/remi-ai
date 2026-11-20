@@ -8,8 +8,11 @@ what is specific to this app.
 **Morgane's patient tool.** She creates and maintains a profile per patient, encodes each one's
 protocol as recommendations, writes up her consultations, and shares a link the patient reads. Plus
 the accounts that reach it, and one reference surface — `/aliments`, the CIQUAL food-composition
-table, read-only — which is here because it is what the recipe step will query and she needs to be
-able to check it by hand. One page is for the REMI team only: « Modèles d'IA » (`/ai-models`), the
+table — which is here because it is what the recipe step will query and she needs to be
+able to check it by hand. CIQUAL itself is read-only. On top of it, a person keeps the food
+records (REM-189, REM-190): « cuisinable », the allergen tags, the role in a dish and the kitchen
+units of a food. REMI proposes a record, a person confirms it, and the queue « À confirmer »
+lists what waits. Only a confirmed record counts (D-30). One page is for the REMI team only: « Modèles d'IA » (`/ai-models`), the
 model of each AI role. It answers not-found to a practitioner. Nothing else lives here.
 
 It is a **separate deployment** from `apps/web` on purpose — its own URL, its own environment

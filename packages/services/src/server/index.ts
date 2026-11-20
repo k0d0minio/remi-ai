@@ -327,6 +327,30 @@ export {
   searchFoods,
 } from "../db/services/foods";
 export type { FoodSearch, RankQuery, RankedFood } from "../db/services/foods";
+
+/*
+ * The food records (REM-189, REM-190): the record of a CIQUAL food and its
+ * kitchen units. `listConfirmedCookableFoods` is the one list of the foods
+ * that a generation can use, and `gateFoodsByCode` gives the gate a food by
+ * its CIQUAL code. A record that no person confirmed is in neither as usable.
+ */
+export {
+  confirmFoodRecord,
+  confirmFoodUnits,
+  confirmedKitchenUnits,
+  gateFoodsByCode,
+  getFoodRecord,
+  listConfirmedCookableFoods,
+  listFoodRecords,
+  listFoodRecordsToConfirm,
+} from "../db/services/food-records";
+export type { ConfirmedCookableFood } from "../db/services/food-records";
+export type { FoodRecord } from "../db/models/food-record";
+/*
+ * REMI proposes a food record. It calls `generateJson` of this entrypoint:
+ * register the provider through `/server` (`apps/admin/lib/ai.ts`).
+ */
+export { proposeFirstLot, proposeFoodRecord } from "./foods/propose";
 export type {
   CiqualImport,
   ConfidenceCode,
@@ -622,8 +646,13 @@ export type {
  * The compatibility gate (REM-57). From the file and not from `../ai`: the gate
  * imports no seam.
  */
-export { checkCompatibility, mayBeShown } from "../ai/compatibility";
+export {
+  checkCompatibility,
+  gateTags,
+  mayBeShown,
+} from "../ai/compatibility";
 export type {
+  GateFood,
   CompatibilityItem,
   CompatibilityReason,
   CompatibilityResult,
