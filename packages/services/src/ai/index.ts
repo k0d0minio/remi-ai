@@ -57,6 +57,11 @@ export type GenerateOptions = {
   maxTokens?: number;
   /** Sent only when the caller sets it. Not every model accepts it. */
   temperature?: number;
+  /**
+   * The id of the step of `@remi/agent` that makes this call, for example
+   * `meal/01-suggest`. It goes in the log line, and not to the provider.
+   */
+  step?: string;
 };
 
 /** `fast` is the default of a product call: cheapest capable model first (D-16). */
@@ -193,6 +198,8 @@ type GenerationLog = {
   inputTokens: number | null;
   outputTokens: number | null;
   outcome: GenerationOutcome;
+  /** The step of `@remi/agent`, when a step made the call. */
+  step?: string;
   /** The class name of a thrown error, for example `APICallError`. */
   errorName?: string;
 };
@@ -249,6 +256,7 @@ const run = async <T>(
       inputTokens: reply?.inputTokens ?? null,
       outputTokens: reply?.outputTokens ?? null,
       outcome,
+      ...(options.step ? { step: options.step } : {}),
       ...(errorName ? { errorName } : {}),
     });
   };

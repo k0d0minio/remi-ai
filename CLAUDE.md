@@ -2,7 +2,7 @@
 
 Remi AI's product, with Jamie as the company's CTO. The work pipeline is the BAXTER blueprint
 (`.icm/_system/`, version in `.icm/_system/VERSION`, answers in `.icm/.copier-answers.yml`). A
-Turborepo monorepo: four Next.js apps over two shared packages. The services package defines
+Turborepo monorepo: four Next.js apps over three shared packages. The services package defines
 seams, not integrations: storage, email and AI each have an interface and one adapter. This
 file is identity and routing only. The rules live once, in the files it points at.
 
@@ -16,8 +16,10 @@ file is identity and routing only. The rules live once, in the files it points a
 | `apps/docs/`         | the reference site, Nextra (:3003)                                                          | Vercel `documentation` |
 | `packages/ui/`       | `@remi/ui`, the design system, the only home for primitives                                 | —                      |
 | `packages/services/` | `@remi/services`: storage (Neon Postgres, Drizzle), email (Resend), AI (no vendor yet), env | —                      |
+| `packages/agent/`    | `@remi/agent`: REMI's prompts. One folder, one contract and one prompt for each step        | —                      |
 
-The dependency arrow points app → package, only ever. No app imports another app. Stack:
+The dependency arrow points app → package, only ever. No app imports another app.
+`@remi/services` reads `@remi/agent`, never the other way. Stack:
 Turborepo 2, pnpm 10, Node 22, Next.js 16, React 19, TypeScript 5 strict, Tailwind CSS 4,
 shadcn/ui over Radix, Nextra 4, tsup. Each app is one Vercel project in team `remi21`.
 

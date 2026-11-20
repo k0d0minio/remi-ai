@@ -18,7 +18,12 @@
  *   validated version, no improvement is shown: REMI gives no recommendation
  *   of its own.
  *
- * The seam writes the log line of the call (role, model, duration, outcome).
+ * The prompt is the step `meal/01-suggest` of `@remi/agent` (REM-188): its
+ * folder has the contract, the system text and the shape of the reply. This
+ * file gives the step its named inputs, and does the checks.
+ *
+ * The seam writes the log line of the call (step, role, model, duration,
+ * outcome).
  * This file writes one more line with the statuses only. No line holds the
  * meal, the prompt or the reply.
  *
@@ -32,7 +37,15 @@
  * a record of the patient's answer, and the clarifying question.
  */
 
-import { generateJson } from "../../ai";
+import {
+  mealSuggestion,
+  mealSuggestionBasis,
+  type MealPromptContext,
+  type MealPromptItem,
+  type MealPromptProtocol,
+  type MealSuggestionReply,
+} from "@remi/agent";
+
 import {
   checkCompatibility,
   mayBeShown,
@@ -40,13 +53,6 @@ import {
   type CompatibilitySource,
   type PatientSafetyData,
 } from "../../ai/compatibility";
-import {
-  mealSuggestionPrompt,
-  mealSuggestionSchema,
-  type MealPromptItem,
-  type MealPromptProtocol,
-  type MealSuggestionReply,
-} from "../../ai/prompts/meal";
 import type { Actor } from "../../db/models/actor";
 import type { MealEntry } from "../../db/models/meal-entry";
 import { claimMealRetry } from "../../db/services/meal-entries";
@@ -63,7 +69,7 @@ import type {
 import type { ProtocolSnapshot } from "../../shared/protocol-snapshot";
 import { dietLabels } from "../../shared/questionnaire";
 import { err, ok, type Result } from "../../shared/result";
-import { roleModel } from "../ai-models";
+import { startFlow, stepModel } from "../agent/runner";
 import { env } from "../env";
 import { loadPatientSafety } from "../patient-safety";
 import {
@@ -524,22 +530,23 @@ export const buildMealSuggestion = async (
   const { meal, safety, today } = input;
   const { alerts, traces, rules } = mealAlerts(safety, meal, today);
   const exclusions = exclusionLines(safety);
-  const { system, prompt, basis } = mealSuggestionPrompt({
+  // The inputs that the contract of the step names, and no other.
+  const inputs: MealPromptContext = {
     meal,
     exclusions: exclusions.lines,
     safetyUnanswered: exclusions.unanswered,
     diet: dietLine(safety.diet, input.dietNote),
     protocol: input.protocol ? promptProtocol(input.protocol) : null,
     refused: input.refused ?? null,
-  });
+  };
+  const basis = mealSuggestionBasis(inputs);
 
   const generated = await within(
-    generateJson(prompt, mealSuggestionSchema, {
-      role: "fast",
-      ...(input.model === undefined ? {} : { model: input.model }),
-      system,
-      maxTokens: 1024,
-    }),
+    startFlow("meal").run(
+      mealSuggestion,
+      inputs,
+      input.model === undefined ? {} : { model: input.model },
+    ),
     input.timeoutMs ?? MEAL_SUGGESTION_TIMEOUT_MS,
   );
 
@@ -603,8 +610,9 @@ const loadMealInput = async (
     return validated;
   }
 
-  // One read of the setting for this call. The seam reads no database.
-  const model = await roleModel("fast");
+  // One read of the setting for this call. The seam reads no database. The
+  // role is the one that the contract of the step names.
+  const model = await stepModel(mealSuggestion);
 
   return ok({
     meal,
