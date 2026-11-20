@@ -57,7 +57,7 @@ export const PatientHeader = ({
         <ArrowLeft aria-hidden="true" className="size-4" />
         {back.label}
       </NextLink>
-      <header className="bg-background border-border sticky top-14 z-20 -mt-4 flex flex-col gap-2 border-b pb-3 pt-2">
+      <header className="bg-background border-border z-20 -mt-4 [@media(min-height:720px)]:sticky [@media(min-height:720px)]:top-14 flex flex-col gap-2 border-b pb-3 pt-2">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <Typography
             as="h1"

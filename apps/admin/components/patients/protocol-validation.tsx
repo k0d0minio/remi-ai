@@ -57,7 +57,18 @@ export const ProtocolValidation = async ({ patient, readOnly }: Props) => {
         </Typography>
       )}
       {canValidate ? (
-        <Button type="submit" size="sm">
+        <Button
+          type="submit"
+          size="sm"
+          // One dominant button in the card (the charter): once a version is
+          // validated and the file waits for its activation, « Activer
+          // l'accompagnement » is the next act and this one steps back.
+          variant={
+            version && patient.fileStatus === "to_validate"
+              ? "outline"
+              : "primary"
+          }
+        >
           <BadgeCheck aria-hidden="true" />
           Valider les recommandations
         </Button>
