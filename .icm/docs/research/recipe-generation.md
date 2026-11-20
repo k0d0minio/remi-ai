@@ -842,3 +842,63 @@ Each question has a default. The default applies if no answer comes.
 - **J9.** Is a request to Nubel for the terms of its table worth making now? Default: no.
   CIQUAL is enough for the first version.
 
+
+---
+
+## 9. Decisions of Jamie, 2026-11-20
+
+Jamie answered the questions of section 8 himself. Morgane sees the built result and gives her
+feedback then. Where a decision differs from section 7, the decision wins.
+
+**The catalogue (changes 7.1).** There is no second food table. CIQUAL is the one identity of a
+food. A CIQUAL food can be marked « cuisinable », and a marked food has its allergen tags, its
+role and its kitchen units. The list is not made by one large import. REMI's agent proposes a
+record for a food that it meets in tests, and a person confirms it on the page « Aliments ». A
+food with no confirmed record is never used and never shown as safe (D-30).
+
+**Quantities.** Each quantity is stored in grams. A display layer writes it in a kitchen unit
+(« 2 œufs », « 1 c. à soupe ») from the unit weights of the food, with one rounding rule.
+
+**The agent.** REMI's prompts live in `packages/agent`, built on the ICM method: one identity
+file, one folder for each step, one contract and one prompt in each folder. A thin runner reads
+the folder order and the contracts. It has no other logic.
+
+**Cost.** In the test period each step uses the `fast` role. The role stays a console setting.
+
+**No code fallback (changes J4).** When the provider fails or a recipe is refused twice, the
+patient reads « Désolé pour ce désagrément. Réessaie dans un petit moment. »
+
+**Other answers.**
+
+- M1, J7: a model drafts the skeletons. They are marked « non vérifié » until Morgane verifies
+  them. On UAT an unverified skeleton serves fictitious patients only.
+- M3: the default cuisines. The patient's preference is a quiet setting of the patient, not a
+  prominent feature.
+- M4: protein at or above the validated value, energy within 10 %, judged on the day.
+- M5: a table gives each meal its share of the day for each orientation. Build it.
+- M6 to M11: yes.
+- J1, J2 (with CIQUAL as the identity), J5, J6: yes.
+- J8: the golden set runs only when a person starts it.
+- J9: no request to Nubel.
+
+**Tickets.** REM-188 to REM-204 in Linear, and REM-91 rewritten on this base.
+
+| Ticket | Is |
+| --- | --- |
+| REM-188 | `packages/agent`: REMI's agent as an ICM folder |
+| REM-189 | CIQUAL foods marked « cuisinable », with allergen tags that REMI proposes and a person confirms |
+| REM-190 | Quantities in grams, shown in kitchen units |
+| REM-191 | Recipe nutrients from CIQUAL |
+| REM-192 | The extended recipe structure (the migration of the batch) |
+| REM-193 | Dish skeletons, flavour profiles, the technique table |
+| REM-194 | The assembler |
+| REM-195 | The checks of a generated recipe |
+| REM-196 | The patient's allowed foods for a day |
+| REM-197 | The share of the day of each meal |
+| REM-198 | The model chooses and writes |
+| REM-199 | Skill, equipment and tastes in the patient's settings |
+| REM-200 | The meal suggestion chooses from the allowed foods |
+| REM-201 | The golden set, started by hand |
+| REM-202 | The practitioner scores generated recipes |
+| REM-203 | The patient replaces a recipe and marks one as cooked |
+| REM-204 | Reuse of an accepted recipe for another patient |
