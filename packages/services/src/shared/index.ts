@@ -314,6 +314,7 @@ export {
   dio2Categories,
   geneticTestAnswerLabels,
   geneticTestAnswers,
+  intoleranceDescriptions,
   intoleranceLabels,
   intolerances,
   mandatoryQuestionnaireFieldLabels,
@@ -339,6 +340,14 @@ export type {
   QuestionnaireSection,
 } from "./questionnaire";
 export { safetyList, strictGlutenLabel } from "./safety-highlights";
+export {
+  allergenOptionOfRow,
+  allergenOptions,
+  allergenRowLabel,
+  uncategorisedAllergenRows,
+} from "./allergen-options";
+export type { AllergenOption } from "./allergen-options";
+export { mentionsCeliacDisease } from "./celiac-mention";
 export {
   dateEntryFromIso,
   isCalendarDay,

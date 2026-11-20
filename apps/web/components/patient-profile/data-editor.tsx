@@ -4,16 +4,8 @@ import { useState } from "react";
 import {
   activityLevelDetails,
   activityLevels,
-  allergenLabels,
-  allergens,
-  allergenSubLabels,
-  allergenSubLists,
-  allSubKeyLabel,
   dietLabels,
   diets,
-  intoleranceLabels,
-  intolerances,
-  noneKnownLabels,
   type Locale,
   type PatientAllergen,
 } from "@remi/services/shared";
@@ -49,23 +41,6 @@ type Props = {
   text: Content["patientPersonalData"]["dataPage"];
   values: ProfileDataValues;
 };
-
-/** The allergy sub-lists in the patient's language, each in the story's order. */
-const subListsOf = (locale: Locale) =>
-  Object.fromEntries(
-    Object.entries(allergenSubLists).map(([key, subKeys]) => {
-      const labels = allergenSubLabels[
-        key as keyof typeof allergenSubLabels
-      ] as Record<string, Record<Locale, string>>;
-      return [
-        key,
-        subKeys.map((subKey) => ({
-          key: subKey,
-          label: labels[subKey][locale],
-        })),
-      ];
-    }),
-  );
 
 const nothing = () => undefined;
 
@@ -129,13 +104,6 @@ export const ProfileDataEditor = ({
             kind="allergy"
             legend={labels.mandatory.allergies}
             hint={questionnaire.hints.allergies}
-            noneKnownLabel={noneKnownLabels.allergy[locale]}
-            options={allergens.map((key) => ({
-              key,
-              label: allergenLabels[key][locale],
-            }))}
-            subLists={subListsOf(locale)}
-            allLabel={allSubKeyLabel[locale]}
             initialNoneKnown={values.noKnownAllergies}
             initialRows={values.allergens.filter(
               (row) => row.kind === "allergy",
@@ -145,12 +113,6 @@ export const ProfileDataEditor = ({
             kind="intolerance"
             legend={labels.mandatory.intolerances}
             hint={questionnaire.hints.intolerances}
-            noneKnownLabel={noneKnownLabels.intolerance[locale]}
-            options={intolerances.map((key) => ({
-              key,
-              label: intoleranceLabels[key][locale],
-            }))}
-            allLabel={allSubKeyLabel[locale]}
             initialNoneKnown={values.noKnownIntolerances}
             initialRows={values.allergens.filter(
               (row) => row.kind === "intolerance",

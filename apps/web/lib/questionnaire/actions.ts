@@ -169,17 +169,6 @@ const writeAnswer = async (
       } as ProfileAnswerInput),
     );
   }
-  // « Maladie cœliaque » is a tick or an untick. An untouched box sends nothing.
-  if (field === "celiacDisease") {
-    if (value !== "true" && value !== "false") {
-      return failed("invalid");
-    }
-    return fromService(
-      await savePatientQuestionnaire(patientActor(patientId), patientId, {
-        celiacDisease: value === "true",
-      }),
-    );
-  }
   // The service's floor takes `2026-02-31`. A day that no calendar has is
   // refused here (REM-159). A future consultation date is a valid answer.
   if (field === "consultationDate" && value !== "" && !isCalendarDay(value)) {

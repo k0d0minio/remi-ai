@@ -122,7 +122,12 @@ export const weightKgRange = { min: 25, max: 300 } as const;
 /** The two kinds of row in `patient_allergens`. */
 export const allergenKinds = ["allergy", "intolerance"] as const;
 
-/** « Allergies », several choices, in the story's order. */
+/**
+ * « Allergies », several choices, in the story's order. `gluten` is the family
+ * of the cereals that contain gluten. Its members are separate allergens
+ * (REM-164): the forms show « Blé », « Seigle » and the others as boxes of
+ * their own (`allergen-options.ts`), and a row is still `gluten/<cereal>`.
+ */
 export const allergens = [
   "gluten",
   "crustaceans",
@@ -142,7 +147,7 @@ export const allergens = [
 ] as const;
 
 export const allergenLabels = {
-  gluten: { fr: "Gluten"},
+  gluten: { fr: "Céréales contenant du gluten"},
   crustaceans: { fr: "Crustacés"},
   eggs: { fr: "Œufs"},
   fish: { fr: "Poissons"},
@@ -287,6 +292,24 @@ export const intoleranceLabels = {
   other: { fr: "Autre"},
 } as const satisfies Record<(typeof intolerances)[number], QuestionnaireLabel>;
 
+/**
+ * Morgane's short explanations of the terms that a patient knows less
+ * (REM-164). They address no one, so the two sides show the same text.
+ */
+export const intoleranceDescriptions = {
+  polyols: {
+    fr: "Famille de glucides comprenant notamment le sorbitol.",
+  },
+  histamine: {
+    fr: "Sensibilité rapportée à certains aliments contenant de l'histamine.",
+  },
+  fodmap: {
+    fr: "Glucides fermentescibles pouvant provoquer des troubles digestifs chez certaines personnes.",
+  },
+} as const satisfies Partial<
+  Record<(typeof intolerances)[number], QuestionnaireLabel>
+>;
+
 /** « Aucune allergie connue » and « Aucune intolérance connue ». */
 export const noneKnownLabels = {
   allergy: { fr: "Aucune allergie connue"},
@@ -296,8 +319,9 @@ export const noneKnownLabels = {
 /**
  * The gate question: « Avez-vous réalisé un test génétique permettant de
  * connaître vos génotypes APOE, DIO2 et AMY1A ? ». Optional: null is no answer.
+ * « Non / Je ne sais pas » comes first (REM-166).
  */
-export const geneticTestAnswers = ["yes", "no_or_unknown"] as const;
+export const geneticTestAnswers = ["no_or_unknown", "yes"] as const;
 
 export const geneticTestAnswerLabels = {
   yes: { fr: "Oui"},

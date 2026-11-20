@@ -555,7 +555,7 @@ export const fr: Content = {
       consultation: "Consultation",
       alimentation: "Alimentation",
       sante: "Santé",
-      genetique: "Génétique",
+      genetique: "Tes informations génétiques",
     },
     previous: "Précédent",
     next: "Continuer",
@@ -608,12 +608,10 @@ export const fr: Content = {
       consultationDate: "Date de consultation",
       diet: "Quel type d'alimentation suis-tu ?",
       dietNote: "Précise ton type d'alimentation",
-      pathologies: "Pathologies",
-      celiacDisease: "Maladie cœliaque",
       medications: "Médicaments",
       supplements: "Compléments alimentaires",
       geneticTest:
-        "As-tu réalisé un test génétique permettant de connaître tes génotypes APOE, DIO2 et AMY1A ?",
+        "As-tu déjà réalisé un test génétique donnant tes résultats APOE, DIO2 et AMY1A ?",
       otherText: "Précise",
     },
     hints: {
@@ -627,8 +625,6 @@ export const fr: Content = {
       intolerances:
         "Coche « Aucune intolérance connue » ou chaque intolérance.",
       otherText: "Précise « Autre » pour l'enregistrer.",
-      celiacDisease:
-        "Coche si un médecin l'a diagnostiquée. Le gluten est alors exclu strictement, contaminations croisées comprises.",
       medications:
         "Ceux que tu prends aujourd'hui, avec leur dose si tu la connais.",
       supplements: "Vitamines, minéraux, plantes…",
@@ -645,6 +641,8 @@ export const fr: Content = {
       noteRequired: "Précise ton type d'alimentation pour enregistrer « Autre ».",
     },
     genetic: {
+      intro:
+        "Certains résultats génétiques peuvent être pris en compte pour personnaliser ton alimentation, avec ton praticien. Cette étape est facultative.",
       consentTitle: "Traitement de tes données génétiques",
       consentIntro:
         "Pour enregistrer tes génotypes, REMI a besoin de ton accord. Lis le texte, puis donne ou refuse ton consentement.",
@@ -654,10 +652,28 @@ export const fr: Content = {
       deciding: "Enregistrement…",
       refused:
         "Tu as refusé : REMI n'enregistre aucun génotype. Tu peux changer d'avis à tout moment avec « J'accepte ».",
-      listsIntro:
-        "Choisis chaque résultat tel qu'il figure sur le rapport du laboratoire. Laisse une liste vide si tu ne connais pas le résultat.",
+      noResult: "Non renseigné",
+      listsNote: "Tu peux laisser un résultat vide si tu ne le connais pas.",
       decisionFailed:
         "Ta réponse n'a pas pu être enregistrée. Vérifie ta connexion et réessaie.",
+    },
+    food: {
+      allergiesQuestion: "As-tu des allergies alimentaires ?",
+      allergiesHint:
+        "Sélectionne les aliments concernés. Si tu n'as aucune allergie connue, indique-le également.",
+      familyRule: "Sans précision, toute la famille est exclue.",
+      alsoDeclared: "Tu as aussi déclaré :",
+    },
+    health: {
+      pathologies:
+        "As-tu des problèmes de santé ou des pathologies diagnostiquées ?",
+      pathologiesPlaceholder:
+        "Ex. : hypothyroïdie, maladie cœliaque, diabète…",
+      medications: "Prends-tu actuellement des médicaments ?",
+      medicationsPlaceholder:
+        "Nom des médicaments et dosage si tu le connais…",
+      supplements: "Prends-tu des compléments alimentaires ?",
+      supplementsPlaceholder: "Vitamines, minéraux, plantes…",
     },
   },
   dateEntry: {

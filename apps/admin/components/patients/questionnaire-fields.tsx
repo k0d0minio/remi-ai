@@ -310,9 +310,12 @@ export const QuestionnaireFields = ({
     </FormGroup>
 
     <FormGroup group="sante" missing={null}>
+      {/* The patient has no box for it (REM-165): they name it in their
+          pathologies, and the practitioner confirms it here. */}
       <ChoiceCards
         name="celiacDisease"
-        legend="Maladie cœliaque"
+        legend="Maladie cœliaque confirmée"
+        hint="La personne ne coche plus cette case : elle cite ses pathologies en texte libre. Confirmez ici un diagnostic. « Oui » exclut strictement le gluten, contaminations croisées comprises."
         initial={
           answers?.celiacDisease === true
             ? "yes"
@@ -326,7 +329,10 @@ export const QuestionnaireFields = ({
         ]}
       />
 
-      <Field id="pathologies" label="Pathologies">
+      <Field
+        id="pathologies"
+        label="Problèmes de santé et pathologies diagnostiquées"
+      >
         <Textarea
           id="pathologies"
           name="pathologies"

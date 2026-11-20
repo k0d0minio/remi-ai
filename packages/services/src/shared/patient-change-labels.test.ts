@@ -64,7 +64,7 @@ describe("patientChangeValueLabel", () => {
       patientChangeValueLabel("allergies", ["fish/cod", "peanuts"]),
     ).toBe("Poissons (Cabillaud), Arachides");
     expect(patientChangeValueLabel("allergies", ["gluten/wheat"])).toBe(
-      "Gluten (Blé)",
+      "Céréales contenant du gluten (Blé)",
     );
     expect(patientChangeValueLabel("allergies", ["fish/all"])).toBe(
       "Poissons (tous)",
