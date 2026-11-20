@@ -20,6 +20,11 @@ A ticket is now a Linear key of the team `REM`. A stub is not a ticket.
 
 `.icm/intake/README.md` has the order of the epics and each decision (D-1 to D-37).
 
+## Burst mode
+
+While the branch `bursts` exists, read `.icm/local/BURSTS.md` first. It suspends the pipeline
+commands for a ticket session, and it has the rules of that session.
+
 ## The database
 
 `.icm/local/database.md` has the rule for the databases of today: one Neon branch for each
