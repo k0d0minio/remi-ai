@@ -5,15 +5,18 @@ import type {
   PatientCalculation,
 } from "@remi/services/shared";
 import {
+  activityLevelDetails,
   bmiClass,
   bmiInputRanges,
   bmiNeedsReview,
   calculationInputLabels,
   calculationKindLabels,
   calculationKinds,
+  energyEstimateParameters,
   formatNumber,
   proteinAdaptationLabels,
   proteinEstimateParameters,
+  sexForCalculationLabels,
 } from "@remi/services/shared";
 import { Badge, Typography } from "@remi/ui/server";
 import { ValidatedMark } from "@/components/patients/file/value";
@@ -201,31 +204,95 @@ const ProteinValue = ({
   );
 };
 
-/** A row the other epics fill: the validated value, else the estimate. */
-const CalculationValue = ({
-  kind,
+/** « 1 345 kcal/jour »: the kcal is rounded here, and nowhere before. */
+const kcalPerDay = (value: number) =>
+  `${formatNumber(value, "fr-BE", 0)}${units.energy}`;
+
+/**
+ * The energy row (story 9): the resting metabolism and the estimated daily
+ * need, each with the badge « estimation » (D-30), then the data that gave
+ * them. The need is on the current weight: the protein reference weight
+ * changes nothing here. With a datum missing or out of range the row gives no
+ * number and names the datum.
+ *
+ * The practitioner's calorie target is a second value, kept apart from the
+ * estimate (REM-52). When the row holds one, it shows above the estimate
+ * with the mark « validé », and the estimate stays as it is.
+ */
+const EnergyValue = ({
   missing,
+  indicator,
   row,
 }: {
-  kind: CalculationKind;
   missing: readonly CalculationInput[];
+  indicator: BmiIndicator;
   row: PatientCalculation | undefined;
 }) => {
   if (missing.length > 0) {
     return <NotCalculated reason={missingLine(missing)} />;
   }
-  const validated = row?.validatedValue ?? null;
-  const value = validated ?? row?.estimatedValue ?? null;
+  if (indicator.state === "out_of_range") {
+    return <NotCalculated reason={outOfRangeLine(indicator.inputs)} />;
+  }
+  const value = row?.estimatedValue ?? null;
   if (value === null) {
     return <NotCalculated reason={NOT_AVAILABLE} />;
   }
+  const validated = row?.validatedValue ?? null;
+  const {
+    restingMetabolism,
+    sexForCalculation,
+    ageYears,
+    heightCm,
+    weightKg,
+    activityLevel,
+    nap,
+  } = energyEstimateParameters(row?.estimateParameters ?? null);
+  const inputs = [
+    sexForCalculation === null
+      ? null
+      : sexForCalculationLabels[sexForCalculation].fr,
+    ageYears === null ? null : `${formatNumber(ageYears, "fr-BE")} ans`,
+    heightCm === null ? null : `${formatNumber(heightCm, "fr-BE")} cm`,
+    weightKg === null
+      ? null
+      : `poids actuel ${formatNumber(weightKg, "fr-BE")} kg`,
+  ].filter((part) => part !== null);
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <Typography size="sm" weight="medium">
-        {`${formatNumber(value, "fr-BE")}${units[kind]}`}
-      </Typography>
-      {validated === null ? <EstimateBadge /> : <ValidationState row={row} />}
-    </div>
+    <>
+      {validated !== null ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <Typography size="sm" weight="medium">
+            {`Objectif calorique : ${kcalPerDay(validated)}`}
+          </Typography>
+          <ValidationState row={row} />
+        </div>
+      ) : null}
+      {restingMetabolism !== null ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <Typography size="sm" weight="medium">
+            {`Métabolisme de repos : ${kcalPerDay(restingMetabolism)}`}
+          </Typography>
+          <EstimateBadge />
+        </div>
+      ) : null}
+      <div className="flex flex-wrap items-center gap-2">
+        <Typography size="sm" weight="medium">
+          {`Besoins énergétiques estimés : ${kcalPerDay(value)}`}
+        </Typography>
+        <EstimateBadge />
+      </div>
+      {inputs.length > 0 ? (
+        <Typography size="xs" tone="muted">
+          {`Mifflin-St Jeor : ${inputs.join(", ")}`}
+        </Typography>
+      ) : null}
+      {activityLevel !== null && nap !== null ? (
+        <Typography size="xs" tone="muted">
+          {`Niveau d'activité physique : ${activityLevelDetails[activityLevel].label.fr}, coefficient ${formatNumber(nap, "fr-BE", 1)}`}
+        </Typography>
+      ) : null}
+    </>
   );
 };
 
@@ -233,7 +300,7 @@ const CalculationValue = ({
  * « Calculs » (story 6): one row per calculation, under the questionnaire
  * data. A row shows the validated value with the mark « validé », else the
  * estimate with the badge « estimation » (D-30). With no value it reads « Non calculé » and names
- * the missing data. The calculation epics fill the rows. This slot is the
+ * the missing data. Each kind has its own value component. This slot is the
  * only one.
  */
 export const CalculationsSummary = ({ calculations, missing, bmi }: Props) => (
@@ -255,7 +322,7 @@ export const CalculationsSummary = ({ calculations, missing, bmi }: Props) => (
               <ProteinValue missing={missing[kind]} row={row} />
             ) : null}
             {kind === "energy" ? (
-              <CalculationValue kind={kind} missing={missing[kind]} row={row} />
+              <EnergyValue missing={missing[kind]} indicator={bmi} row={row} />
             ) : null}
           </dd>
         </div>

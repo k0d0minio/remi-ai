@@ -35,6 +35,7 @@ import type {
 } from "../../models/patient-profile";
 import {
   refreshBmiEstimate,
+  refreshEnergyEstimate,
   refreshProteinEstimate,
 } from "../patient-calculations";
 import { recordPatientChanges, type WatchedValues } from "../patient-changes";
@@ -676,6 +677,8 @@ const unscopedUpdatePatient = async (
   }
   if (patient && changesProteinInputs(current, patch)) {
     await refreshProteinEstimate(id);
+    // The same data, with the sex and the activity level of the file.
+    await refreshEnergyEstimate(id);
   }
   return patient ? ok(patient) : err("not_found", "no such patient");
 };
