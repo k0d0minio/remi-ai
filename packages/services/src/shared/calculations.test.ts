@@ -9,6 +9,7 @@ import {
   calculationInputs,
   calculationKindLabels,
   calculationKinds,
+  calculationsReadingFields,
   missingCalculationInputs,
   type CalculationData,
 } from "./calculations";
@@ -169,5 +170,38 @@ describe("the BMI indicator", () => {
     expect(bmiIndicator({ heightCm: 250, weightKg: 300 }).state).toBe(
       "computed",
     );
+  });
+});
+
+describe("the calculations that read a changed field", () => {
+  it("are the three for the weight", () => {
+    expect(calculationsReadingFields(["weightKg"])).toEqual([
+      "bmi",
+      "protein",
+      "energy",
+    ]);
+  });
+
+  it("are the three for the height", () => {
+    expect(calculationsReadingFields(["heightCm"])).toEqual([
+      "bmi",
+      "protein",
+      "energy",
+    ]);
+  });
+
+  it("are the energy need only for the activity level", () => {
+    expect(calculationsReadingFields(["activityLevel"])).toEqual(["energy"]);
+  });
+
+  it("are none for a field that no calculation reads", () => {
+    expect(calculationsReadingFields(["diet", "allergies"])).toEqual([]);
+    expect(calculationsReadingFields([])).toEqual([]);
+  });
+
+  it("name each calculation once for several fields", () => {
+    expect(
+      calculationsReadingFields(["activityLevel", "weightKg", "diet"]),
+    ).toEqual(["bmi", "protein", "energy"]);
   });
 });

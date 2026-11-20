@@ -14,6 +14,10 @@ import {
   createPatientAccount,
   getPatientAccountByProfile,
 } from "../patient-accounts";
+import {
+  markCalculationsForRevalidation,
+  validateCalculation,
+} from "../patient-calculations";
 import { addPatientRecommendation } from "../patient-recommendations";
 import { createPatient } from "../patients";
 import { validateProtocol } from "../protocol-versions";
@@ -111,6 +115,51 @@ describe("the recap of an activation", () => {
       expect(recap.data.values?.versionNumber).toBe(1);
       expect(recap.data.values?.recommendations).toBe(1);
     }
+  });
+
+  it("blocks on a validated calculation to revalidate, until a new validation", async () => {
+    const patientId = await newPatient("Rita", safe);
+    const first = await validateCalculation(
+      systemActor,
+      patientId,
+      "energy",
+      { value: 2100, parameters: {} },
+      practitioner,
+    );
+    expect(first.ok).toBe(true);
+    await validate(patientId);
+    expect(
+      await markCalculationsForRevalidation({ id: patientId }, [
+        "activityLevel",
+      ]),
+    ).toEqual(["energy"]);
+
+    const blocked = await getActivationRecap(holder, patientId);
+    expect(blocked.ok).toBe(true);
+    if (blocked.ok) {
+      expect(blocked.data.blockers).toEqual([
+        { kind: "calculation_to_revalidate", calculation: "energy" },
+      ]);
+    }
+    const refused = await activateCare(holder, patientId, practitioner);
+    expect(refused.ok).toBe(false);
+    if (!refused.ok) {
+      expect(refused.error).toBe("conflict");
+    }
+    expect((await profiles().findById(patientId))?.fileStatus).toBe(
+      "to_validate",
+    );
+
+    const again = await validateCalculation(
+      systemActor,
+      patientId,
+      "energy",
+      { value: 2200, parameters: {} },
+      practitioner,
+    );
+    expect(again.ok).toBe(true);
+    const free = await getActivationRecap(holder, patientId);
+    expect(free.ok && free.data.blockers).toEqual([]);
   });
 
   it("reads as a missing file for another practitioner", async () => {

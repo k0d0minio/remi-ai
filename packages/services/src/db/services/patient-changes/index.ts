@@ -13,6 +13,7 @@ import type { ProtocolVersion } from "../../models/protocol-version";
 import type { Actor } from "../../models/actor";
 import { recordAuditEvent, type OperatorActor } from "../audit";
 import { byPatient, listablePatientIds, noSuchPatient } from "../access";
+import { markCalculationsForRevalidation } from "../patient-calculations";
 
 /**
  * The patient's change signals — story 21, `patient-change-signals`.
@@ -137,6 +138,12 @@ const isOpen = (row: PatientChange) =>
  *
  * Then one `patient.changed` audit event names the fields (D-32). The result
  * holds the open signals the write left: inserted or moved.
+ *
+ * Before the signals, each validated calculation that reads a changed field
+ * gets « estimation à revalider » (REM-79). The mark does not wait for the
+ * signal to be armed: a validated value that no longer matches its data is
+ * never shown as valid (D-30). A patient who puts the old value back removes
+ * the signal, and the mark stays until the practitioner validates again.
  */
 export const recordPatientChanges = async (
   patient: ChangedPatient,
@@ -163,6 +170,7 @@ export const recordPatientChanges = async (
   }
 
   try {
+    await markCalculationsForRevalidation(patient, changed, db);
     if (!(await changeSignalArmed(patient, db))) {
       return ok([]);
     }
