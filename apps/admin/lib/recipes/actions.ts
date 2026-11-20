@@ -6,9 +6,15 @@ import {
   archiveRecipe,
   createRecipe,
   duplicateRecipe,
+  getRecipe,
+  setRecipeVerified,
   updateRecipe,
 } from "@remi/services/server";
-import { userMessage } from "@remi/services/shared";
+import {
+  parseIngredientLines,
+  parseStepLines,
+  userMessage,
+} from "@remi/services/shared";
 import { audit } from "@/lib/audit";
 import { requireOperator } from "@/lib/auth/session";
 
@@ -39,6 +45,34 @@ const tagsFrom = (formData: FormData) =>
     .map((tag) => tag.trim())
     .filter((tag) => tag !== "");
 
+/** An empty box is « Non renseigné ». A text that is not a number is refused. */
+const minutesFrom = (formData: FormData, name: string) => {
+  const raw = field(formData, name).trim();
+  return raw === "" ? null : Number(raw.replace(",", "."));
+};
+
+/** True when the practitioner typed an ingredient line or a step line. */
+const hasStructuredLines = (formData: FormData) =>
+  field(formData, "ingredients").trim() !== "" ||
+  field(formData, "steps").trim() !== "";
+
+/**
+ * The structured recipe as the form posts it (REM-90). The two text boxes
+ * hold one ingredient and one step for each line: the parsers of
+ * `@remi/services/shared` read them, the same ones that draw the preview of
+ * the form. The service checks the result with the schema.
+ */
+const contentFrom = (formData: FormData) => ({
+  description: field(formData, "description"),
+  prepMinutes: minutesFrom(formData, "prepMinutes"),
+  cookMinutes: minutesFrom(formData, "cookMinutes"),
+  portions: Number(field(formData, "portions").trim() || "NaN"),
+  meals: formData.getAll("meals").map(String),
+  seasons: formData.getAll("seasons").map(String),
+  ingredients: parseIngredientLines(field(formData, "ingredients")),
+  steps: parseStepLines(field(formData, "steps")),
+});
+
 const revalidateLibrary = (id?: string) => {
   revalidatePath("/recipes");
   if (id) {
@@ -56,8 +90,8 @@ export const createRecipeAction = async (
   const operator = await requireOperator();
   const result = await createRecipe({
     title: field(formData, "title"),
-    body: field(formData, "body"),
     tags: tagsFrom(formData),
+    content: contentFrom(formData),
   });
   if (!result.ok) {
     return { error: userMessage(result), saved: false };
@@ -77,11 +111,25 @@ export const updateRecipeAction = async (
 ): Promise<RecipeFormState> => {
   const operator = await requireOperator();
   const id = field(formData, "id");
-  const result = await updateRecipe(id, {
-    title: field(formData, "title"),
-    body: field(formData, "body"),
-    tags: tagsFrom(formData),
-  });
+  const existing = await getRecipe(id);
+  if (!existing.ok) {
+    return { error: userMessage(existing), saved: false };
+  }
+  // A recipe of the old prose form stays a prose recipe until the
+  // practitioner types its lines. A structured recipe stays structured.
+  const structured =
+    existing.data.content !== null || hasStructuredLines(formData);
+  const result = await updateRecipe(
+    id,
+    {
+      title: field(formData, "title"),
+      body: field(formData, "body"),
+      tags: tagsFrom(formData),
+      ...(structured ? { content: contentFrom(formData) } : {}),
+    },
+    // An edit of a verified recipe removes the mark: the event names who.
+    { id: operator.id, email: operator.email, name: operator.name },
+  );
   if (!result.ok) {
     return { error: userMessage(result), saved: false };
   }
@@ -128,4 +176,36 @@ export const duplicateRecipeAction = async (formData: FormData) => {
   });
   revalidateLibrary(result.data.id);
   redirect(`/recipes/${result.data.id}`);
+};
+
+export type VerifyRecipeState = { error: string | null };
+
+/**
+ * The one act that marks a recipe « vérifiée », and the act that removes the
+ * mark (D-34). The service checks the recipe and writes the audit event with
+ * the account: this action writes no second event.
+ */
+export const setRecipeVerifiedAction = async (
+  _previous: VerifyRecipeState,
+  formData: FormData,
+): Promise<VerifyRecipeState> => {
+  const operator = await requireOperator();
+  const id = field(formData, "id");
+  const verified = field(formData, "verified") === "true";
+  // The tick is the deliberate part of the act. A post without it is refused.
+  if (verified && field(formData, "reviewed") !== "true") {
+    return {
+      error: "Cochez la case pour confirmer que vous avez relu la recette.",
+    };
+  }
+  const result = await setRecipeVerified(
+    id,
+    { id: operator.id, email: operator.email, name: operator.name },
+    verified,
+  );
+  if (!result.ok) {
+    return { error: userMessage(result) };
+  }
+  revalidateLibrary(id);
+  return { error: null };
 };

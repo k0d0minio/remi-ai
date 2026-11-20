@@ -1,10 +1,18 @@
 import { z } from "zod";
+import type { MealSlot } from "../../../shared/meal-configuration";
 import { variantTitle } from "../../../shared/recipe";
 import { err, ok, type Result } from "../../../shared/result";
+import {
+  structuredRecipeOf,
+  structuredRecipeSchema,
+  structuredRecipeText,
+  type StructuredRecipe,
+} from "../../../shared/structured-recipe";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { Recipe } from "../../models/recipe";
 import type { RecipeAssignment } from "../../models/recipe-assignment";
+import { recordAuditEvent, type OperatorActor } from "../audit";
 
 /**
  * The shared recipe library — brainstorm § I, the half that belongs to nobody.
@@ -19,6 +27,13 @@ import type { RecipeAssignment } from "../../models/recipe-assignment";
  * so "Hiver" and "hiver" are one tag rather than two, and then left alone:
  * which tags matter is Morgane's to answer by using them, and `listRecipeTags`
  * reports what she actually used.
+ *
+ * Since REM-90 a recipe can carry `content`, the structured recipe, and the
+ * mark « vérifiée » (D-34). Three rules, and no caller can go around them:
+ * - Only `setRecipeVerified` sets the mark. No create and no edit sets it.
+ * - An edit that changes a verified recipe removes the mark.
+ * - Only `listVerifiedTemplates` gives the generation its templates.
+ * Each change of the mark writes an audit event (D-32).
  */
 
 /**
@@ -68,7 +83,41 @@ export type RecipeInput = {
   title?: string;
   body?: string;
   tags?: readonly string[];
+  /**
+   * The structured recipe, as `structuredRecipeSchema` reads it. Absent: the
+   * write does not touch the structured form. A write cannot remove it.
+   */
+  content?: unknown;
 };
+
+const NOT_VERIFIED = {
+  verifiedAt: null,
+  verifiedById: null,
+  verifiedByName: "",
+} as const;
+
+type ParsedContent =
+  | { ok: true; content: StructuredRecipe | undefined }
+  | { ok: false; message: string };
+
+const parseContent = (value: unknown): ParsedContent => {
+  if (value === undefined) {
+    return { ok: true, content: undefined };
+  }
+  const parsed = structuredRecipeSchema.safeParse(value);
+  return parsed.success
+    ? { ok: true, content: parsed.data }
+    : {
+        ok: false,
+        message: parsed.error.issues[0]?.message ?? "that recipe is not valid",
+      };
+};
+
+/** A blank body is no body: the schema then does not see it. */
+const withoutBlankBody = (input: RecipeInput): RecipeInput =>
+  input.body === undefined || input.body.trim() === ""
+    ? { ...input, body: undefined }
+    : input;
 
 /** Most recently changed first — she edits what she is about to hand out. */
 const byRecency = (a: Recipe, b: Recipe) =>
@@ -131,17 +180,31 @@ export const createRecipe = async (
   input: RecipeInput,
   db?: DatabaseClient,
 ): Promise<Result<Recipe>> => {
-  const parsed = recipeFields.partial({ tags: true }).safeParse(input);
+  const structured = parseContent(input.content);
+  if (!structured.ok) {
+    return err("invalid_input", structured.message);
+  }
+  const { content } = structured;
+  // A structured recipe needs no typed body: the service writes it.
+  const parsed = content
+    ? recipeFields
+        .partial({ tags: true, body: true })
+        .safeParse(withoutBlankBody(input))
+    : recipeFields.partial({ tags: true }).safeParse(input);
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
   }
   return ok(
     await library(db).insert({
       title: parsed.data.title,
-      body: parsed.data.body,
+      body:
+        parsed.data.body ?? (content ? structuredRecipeText(content) : ""),
       tags: parsed.data.tags ?? [],
       archivedAt: null,
       variantOfId: null,
+      content: content ?? null,
+      // A new recipe is never verified: only `setRecipeVerified` sets the mark.
+      ...NOT_VERIFIED,
     }),
   );
 };
@@ -173,15 +236,23 @@ export const duplicateRecipe = async (
   }
   const parsed = recipeFields.partial().safeParse({
     title: overrides?.title ?? variantTitle(origin.title),
-    body: overrides?.body ?? origin.body,
+    // The body of the origin is not checked again: only a typed body is.
+    body: overrides?.body,
   });
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
   }
+  const body = parsed.data.body ?? origin.body;
   return ok(
     await library(db).insert({
       title: parsed.data.title ?? variantTitle(origin.title),
-      body: parsed.data.body ?? origin.body,
+      body,
+      // A variant with the body of its origin keeps the structured form. A
+      // variant that the practitioner adapted as prose is a prose recipe: the
+      // structured form of the origin does not describe it.
+      content: body === origin.body ? origin.content : null,
+      // A variant is a new recipe. It is never verified by its origin.
+      ...NOT_VERIFIED,
       // Tags come from the origin and are not editable in the gesture: a
       // variant of a winter recipe is still a winter recipe.
       tags: [...origin.tags],
@@ -199,21 +270,183 @@ export const duplicateRecipe = async (
  * "duplicate to variant" escape hatch is hers to answer, and until she does the
  * console states the holder count beside this form rather than guessing for
  * her.
+ *
+ * The structured form (REM-90):
+ * 1. `content` absent: the edit does not touch the structured form.
+ * 2. `content` present: the service checks it and stores it. The body then
+ *    follows it, unless the body is prose that the practitioner typed: that
+ *    prose stays as it is.
+ * 3. An edit that changes the title, the body, the tags or the content of a
+ *    verified recipe removes the mark, and writes `recipe.verification_removed`
+ *    with the detail `edit`. A save that changes nothing keeps the mark.
  */
 export const updateRecipe = async (
   id: Id,
   input: RecipeInput,
+  /** Who edits. The audit event of a removed mark names this account. */
+  operator: OperatorActor | null = null,
 ): Promise<Result<Recipe>> => {
   if (!uuidSchema.safeParse(id).success) {
     return err("not_found", "no such recipe");
   }
-  const parsed = recipeFields.partial().safeParse(input);
+  const existing = await library().findById(id);
+  if (!existing) {
+    return err("not_found", "no such recipe");
+  }
+  const structured = parseContent(input.content);
+  if (!structured.ok) {
+    return err("invalid_input", structured.message);
+  }
+  const { content } = structured;
+  const stored = structuredRecipeOf(existing.content);
+  const storedText = stored ? structuredRecipeText(stored) : null;
+
+  // The body that the service wrote from the old content is not prose that
+  // the practitioner typed: it follows the new content.
+  const typedBody = input.body?.trim() ?? "";
+  const keepsProse = typedBody !== "" && typedBody !== storedText;
+  const parsed = recipeFields
+    .partial()
+    .safeParse(content && !keepsProse ? { ...input, body: undefined } : input);
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
   }
-  const updated = await library().update(id, { ...parsed.data });
-  return updated ? ok(updated) : err("not_found", "no such recipe");
+
+  const next = {
+    title: parsed.data.title ?? existing.title,
+    body:
+      content && !keepsProse
+        ? structuredRecipeText(content)
+        : (parsed.data.body ?? existing.body),
+    tags: parsed.data.tags ?? existing.tags,
+    content: content ?? existing.content,
+  };
+  const changed =
+    next.title !== existing.title ||
+    next.body !== existing.body ||
+    JSON.stringify(next.tags) !== JSON.stringify(existing.tags) ||
+    (content !== undefined &&
+      JSON.stringify(content) !== JSON.stringify(stored));
+  const losesMark = existing.verifiedAt !== null && changed;
+
+  const updated = await library().update(id, {
+    ...next,
+    ...(losesMark ? NOT_VERIFIED : {}),
+  });
+  if (!updated) {
+    return err("not_found", "no such recipe");
+  }
+  if (losesMark) {
+    await recordAuditEvent({
+      actor: operator,
+      action: "recipe.verification_removed",
+      targetType: "recipe",
+      targetId: id,
+      targetLabel: updated.title,
+      detail: "edit",
+    });
+  }
+  return ok(updated);
 };
+
+/**
+ * Set or remove the mark « vérifiée » (D-34). This is the only function that
+ * sets it, and the practitioner calls it with one explicit act.
+ *
+ * 1. Only a structured recipe that the schema accepts can be verified. A
+ *    recipe of the old prose form is refused.
+ * 2. An archived recipe is refused.
+ * 3. Each change of the mark writes one audit event with the account (D-32).
+ *    A call that changes nothing writes no event.
+ */
+export const setRecipeVerified = async (
+  id: Id,
+  operator: OperatorActor,
+  verified: boolean,
+): Promise<Result<Recipe>> => {
+  if (!uuidSchema.safeParse(id).success) {
+    return err("not_found", "no such recipe");
+  }
+  const existing = await library().findById(id);
+  if (!existing) {
+    return err("not_found", "no such recipe");
+  }
+  if (verified === (existing.verifiedAt !== null)) {
+    return ok(existing);
+  }
+  if (verified) {
+    if (existing.archivedAt !== null) {
+      return err("conflict", "an archived recipe cannot be verified");
+    }
+    if (structuredRecipeOf(existing.content) === null) {
+      return err("invalid_input", "only a structured recipe can be verified");
+    }
+  }
+  const updated = await library().update(
+    id,
+    verified
+      ? {
+          verifiedAt: new Date(),
+          verifiedById: operator.id,
+          verifiedByName: operator.name,
+        }
+      : NOT_VERIFIED,
+  );
+  if (!updated) {
+    return err("not_found", "no such recipe");
+  }
+  await recordAuditEvent({
+    actor: operator,
+    action: verified ? "recipe.verified" : "recipe.verification_removed",
+    targetType: "recipe",
+    targetId: id,
+    targetLabel: updated.title,
+    detail: verified ? "" : "explicit",
+  });
+  return ok(updated);
+};
+
+/** A template that the generation can start from (D-34). */
+export type VerifiedTemplate = {
+  id: Id;
+  title: string;
+  tags: readonly string[];
+  content: StructuredRecipe;
+  verifiedAt: Date;
+};
+
+/**
+ * The verified templates of the library, by title. This is the only source of
+ * templates for the generation: a recipe that is not verified, that is
+ * archived, or whose stored content the schema refuses is never in the list.
+ * `meal` keeps the templates that suit that meal.
+ */
+export const listVerifiedTemplates = async (filter?: {
+  meal?: MealSlot;
+}): Promise<readonly VerifiedTemplate[]> =>
+  (await all())
+    .flatMap((recipe): VerifiedTemplate[] => {
+      const content = structuredRecipeOf(recipe.content);
+      return recipe.verifiedAt !== null &&
+        recipe.archivedAt === null &&
+        content !== null
+        ? [
+            {
+              id: recipe.id,
+              title: recipe.title,
+              tags: recipe.tags,
+              content,
+              verifiedAt: recipe.verifiedAt,
+            },
+          ]
+        : [];
+    })
+    .filter(
+      (template) =>
+        filter?.meal === undefined ||
+        template.content.meals.includes(filter.meal),
+    )
+    .sort((a, b) => a.title.localeCompare(b.title, "fr"));
 
 /**
  * Out of the library and out of the picker, without touching the assignments

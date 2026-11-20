@@ -265,6 +265,35 @@ const sentences: Readonly<Record<string, string>> = {
   "a reason is required": "Indiquez un motif.",
   "a recipe needs its ingredients and steps":
     "Une recette demande ses ingrédients et ses étapes.",
+  // the structured recipe (`shared/structured-recipe`, REM-90)
+  "a recipe needs at least one ingredient":
+    "Une recette demande au moins un ingrédient.",
+  "a recipe needs at least one step": "Une recette demande au moins une étape.",
+  "a recipe has 40 ingredients at most":
+    "Une recette compte 40 ingrédients au maximum.",
+  "a recipe has 30 steps at most": "Une recette compte 30 étapes au maximum.",
+  "choose at least one meal for this recipe":
+    "Choisissez au moins un repas pour cette recette.",
+  "the number of portions runs from 1 to 50":
+    "Le nombre de portions va de 1 à 50.",
+  "a time runs from 0 to 1440 minutes":
+    "Un temps s'écrit en minutes, de 0 à 1440.",
+  "that quantity is not valid": "Cette quantité n'est pas valide.",
+  "an ingredient needs a food name": "Chaque ingrédient demande un aliment.",
+  "a unit needs a quantity": "Une unité demande une quantité.",
+  "a step needs a text": "Chaque étape demande un texte.",
+  "that recipe text is too long": "Un texte de la recette est trop long.",
+  "that recipe is not valid": "Cette recette n'est pas valide.",
+  "only a structured recipe can be verified":
+    "Seule une recette structurée peut être vérifiée. Ajoutez ses ingrédients et ses étapes ligne par ligne.",
+  "an archived recipe cannot be verified":
+    "Une recette archivée ne peut pas être vérifiée. Remettez-la d'abord dans la bibliothèque.",
+  "only a recipe that the gate confirmed is stored":
+    "Seule une recette dont la compatibilité est confirmée peut être enregistrée.",
+  "a generated recipe starts from a verified template":
+    "Une recette générée part d'une recette vérifiée de la bibliothèque.",
+  "one recipe for each day and meal":
+    "Une seule recette par jour et par repas.",
   "a rule needs a body — this is the text a prompt will quote":
     "Une règle demande un texte : c'est lui que l'IA citera.",
   "a score runs from 0 to 5": "Une note va de 0 à 5.",

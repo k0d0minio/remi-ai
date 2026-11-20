@@ -316,6 +316,13 @@
       "when": 1795164063142,
       "tag": "0044_app_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1795166914658,
+      "tag": "0045_recipe_structure",
+      "breakpoints": true
     }
   ]
 }

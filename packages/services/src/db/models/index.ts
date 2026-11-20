@@ -100,6 +100,7 @@ export type {
   SignalKind,
   SignalSeverity,
 } from "./progress-signal";
+export type { GeneratedRecipe } from "./generated-recipe";
 export type { Recipe } from "./recipe";
 export type { AssignedRecipe, RecipeAssignment } from "./recipe-assignment";
 export type { Recommendation, RecommendationCategory } from "./recommendation";

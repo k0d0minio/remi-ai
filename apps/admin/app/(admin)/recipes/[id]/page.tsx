@@ -15,6 +15,8 @@ import {
 } from "@remi/ui/server";
 import { ArchiveRecipe } from "@/components/recipes/archive-recipe";
 import { RecipeForm } from "@/components/recipes/recipe-form";
+import { VerifiedBadge } from "@/components/recipes/verified-badge";
+import { VerifyRecipe } from "@/components/recipes/verify-recipe";
 import { ensureDatabase } from "@/lib/database";
 import { duplicateRecipeAction } from "@/lib/recipes/actions";
 
@@ -67,6 +69,7 @@ const RecipeDetail = async ({ params }: { params: Promise<Params> }) => {
           <Typography as="h1" size="2xl" weight="semibold">
             {recipe.title}
           </Typography>
+          <VerifiedBadge recipe={recipe} />
           {archived ? (
             <Badge variant="neutral" tone="subtle" size="sm">
               archivée
@@ -103,6 +106,24 @@ const RecipeDetail = async ({ params }: { params: Promise<Params> }) => {
         </CardHeader>
         <CardContent>
           <RecipeForm recipe={recipe} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Vérification</CardTitle>
+          <CardDescription>
+            REMI génère les recettes d&apos;une personne à partir des recettes
+            vérifiées, et d&apos;elles seulement. Une modification de la recette
+            retire la marque.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {/* The key resets the tick each time the mark changes. */}
+          <VerifyRecipe
+            key={recipe.verifiedAt === null ? "open" : "verified"}
+            recipe={recipe}
+          />
         </CardContent>
       </Card>
 

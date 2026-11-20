@@ -2,6 +2,7 @@ import NextLink from "next/link";
 import { formatDate, type Recipe } from "@remi/services/shared";
 import { Badge, Typography } from "@remi/ui/server";
 import { ArchiveRecipe } from "@/components/recipes/archive-recipe";
+import { VerifiedBadge } from "@/components/recipes/verified-badge";
 
 type Props = {
   recipes: readonly Recipe[];
@@ -28,6 +29,12 @@ export const RecipeRows = ({ recipes }: Props) => (
               {recipe.title}
             </Typography>
           </NextLink>
+          <VerifiedBadge recipe={recipe} />
+          {recipe.content === null ? (
+            <Badge variant="outline" size="sm">
+              texte libre
+            </Badge>
+          ) : null}
           {recipe.tags.map((tag) => (
             <Badge key={tag} variant="neutral" tone="subtle" size="sm">
               {tag}
