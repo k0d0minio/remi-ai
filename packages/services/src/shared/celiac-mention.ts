@@ -38,16 +38,19 @@ export const mentionsCeliacDisease = (text: string | null | undefined) => {
 /** The two answers that the confirmation reads. */
 export type CeliacAnswers = {
   /** The practitioner's answer: « Oui », « Non », or none. */
-  celiacDisease: boolean | null | undefined;
+  celiacDisease?: boolean | null | undefined;
   /** The patient's free text. */
-  pathologies: string | null | undefined;
+  pathologies?: string | null | undefined;
 };
 
 /**
  * True while the patient names the disease and the practitioner has answered
  * neither « Oui » nor « Non ».
  */
-export const celiacToConfirm = ({ celiacDisease, pathologies }: CeliacAnswers) =>
+export const celiacToConfirm = ({
+  celiacDisease,
+  pathologies,
+}: CeliacAnswers) =>
   (celiacDisease ?? null) === null && mentionsCeliacDisease(pathologies);
 
 /**

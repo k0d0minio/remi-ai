@@ -8,6 +8,9 @@ import { defineConfig } from "vitest/config";
 //
 // The tests read `@remi/agent` from its source, so they need no build of it.
 export default defineConfig({
+  // A test that loads a fresh copy of the AI seam imports the AI SDK again.
+  // On a busy machine that import alone can pass the default of 5 seconds.
+  test: { testTimeout: 30_000 },
   resolve: {
     alias: {
       "@remi/agent": fileURLToPath(

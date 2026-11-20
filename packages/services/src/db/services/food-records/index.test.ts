@@ -73,6 +73,9 @@ const proposal = (
 });
 
 let client: DatabaseClient;
+const registered = new Proxy({} as DatabaseClient, {
+  get: (_target, key) => client[key as keyof DatabaseClient],
+});
 
 const foodOf = async (code: string): Promise<Food> => {
   const food = await getFood(code);
@@ -103,8 +106,10 @@ const gate = async (patient: PatientSafetyData, ...codes: string[]) =>
   );
 
 beforeEach(async () => {
+  // The registry accepts one adapter only. Thus the registered adapter is one
+  // stable object that reads the fresh database of the test.
   client = createMemoryDatabase();
-  registerDatabase(client);
+  registerDatabase(registered);
   await loadCiqualFixture(client);
   refreshFoodCatalogue();
 });
@@ -205,12 +210,22 @@ describe("confirmFoodRecord", () => {
   it.each([
     [
       "a tag that the gate does not know",
-      { cookable: true, containsTags: ["dairy"], mayContainTags: [], role: "fat" },
+      {
+        cookable: true,
+        containsTags: ["dairy"],
+        mayContainTags: [],
+        role: "fat",
+      },
       "the compatibility gate does not know this tag",
     ],
     [
       "an unknown tag among the traces",
-      { cookable: true, containsTags: [], mayContainTags: ["nuts"], role: "fat" },
+      {
+        cookable: true,
+        containsTags: [],
+        mayContainTags: ["nuts"],
+        role: "fat",
+      },
       "the compatibility gate does not know this tag",
     ],
     [
@@ -250,7 +265,10 @@ describe("storeFoodProposal", () => {
     const result = await storeFoodProposal(
       operator,
       await foodOf(EGG),
-      proposal({ containsTags: ["eggs", "not-a-tag"], mayContainTags: ["eggs"] }),
+      proposal({
+        containsTags: ["eggs", "not-a-tag"],
+        mayContainTags: ["eggs"],
+      }),
     );
     expect(result).toMatchObject({
       ok: true,

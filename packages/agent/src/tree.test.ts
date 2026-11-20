@@ -48,7 +48,7 @@ const isStep = (value: unknown): value is AnyStep =>
   "contract" in value &&
   "render" in value;
 
-const exported = Object.values(agent).filter(isStep);
+const exported = (Object.values(agent) as unknown[]).filter(isStep);
 
 describe("the folder tree", () => {
   it("has a step", () => {
