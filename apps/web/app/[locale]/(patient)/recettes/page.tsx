@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Typography } from "@remi/ui/server";
 import { getContent } from "@/lib/content";
 import { resolveLocale, type LocaleParams } from "@/lib/locale-params";
+import { requireActivePatient } from "@/lib/patient-auth/session";
 
 export const generateMetadata = async ({
   params,
@@ -18,7 +19,10 @@ const PatientRecipesPage = async ({
 }: {
   params: Promise<LocaleParams>;
 }) => {
-  const content = getContent(await resolveLocale(params)).patientRecipes;
+  const locale = await resolveLocale(params);
+  // No recipe before the activation (story 19).
+  await requireActivePatient(locale);
+  const content = getContent(locale).patientRecipes;
 
   return (
     <div className="flex flex-col gap-4">

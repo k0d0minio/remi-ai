@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { patientLandingFor } from "@remi/services/server";
 import { isLocale, localePath } from "@remi/services/shared";
 import { Alert, AlertDescription, Typography, Wordmark } from "@remi/ui/server";
 import { PatientSignInForm } from "@/components/patient-auth/patient-sign-in-form";
 import { getContent } from "@/lib/content";
 import { isSignInNotice, landingPaths } from "@/lib/patient-auth/paths";
-import { currentPatient } from "@/lib/patient-auth/session";
+import { currentPatient, patientLanding } from "@/lib/patient-auth/session";
 
 /** Reads the session on every hit — never prerendered. */
 export const dynamic = "force-dynamic";
@@ -26,8 +25,9 @@ export const generateMetadata = async ({
 
 /**
  * The patient's sign-in (story 2). A patient who is signed in already goes
- * straight to their current page: the questionnaire before activation, the
- * home after it. A `notice` in the query opens the page with one message.
+ * straight to their current page: the questionnaire or the waiting screen
+ * before activation, the home after it. A `notice` in the query opens the
+ * page with one message.
  */
 const SignInPage = async ({
   params,
@@ -42,7 +42,7 @@ const SignInPage = async ({
   }
   const account = await currentPatient();
   if (account) {
-    redirect(localePath(locale, landingPaths[patientLandingFor(account)]));
+    redirect(localePath(locale, landingPaths[await patientLanding(account)]));
   }
   const { notice } = await searchParams;
   const content = getContent(locale).patientSignIn;

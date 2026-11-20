@@ -426,6 +426,8 @@ export {
   resetPatientPassword,
   signInPatient,
 } from "../auth/patient-sign-in";
+export { getPatientWaitingView } from "../db/services/patient-waiting";
+export type { PatientWaitingView } from "../db/services/patient-waiting";
 export { signUpPatient, validateSignup } from "../auth/patient-signup";
 export type {
   PatientSignupInput,

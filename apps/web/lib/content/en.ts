@@ -755,4 +755,14 @@ export const en: Content = {
       "Your recommendations, your personal information and your account settings are coming here soon.",
   },
   signOut: "Sign out",
+  patientWaiting: {
+    metaTitle: "Your care is being prepared",
+    title: "Your practitioner is preparing your care",
+    body:
+      "Your answers have arrived. As soon as your care is ready, your REMI space opens here, with the same account.",
+    practitionerLabel: "Your practitioner",
+    appointmentLabel: "Your appointment",
+    questionnaireHint: "You can still adjust your answers, at your own pace.",
+    questionnaireLink: "Review my questionnaire",
+  },
 };

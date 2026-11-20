@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { DatabaseClient } from "../db/client";
 import type { PatientAccount } from "../db/models/patient-account";
+import type { PatientProfile } from "../db/models/patient-profile";
 import { recordAuditEvent, type AuditActor } from "../db/services/audit";
 import {
   getPatientAccountByEmail,
@@ -16,21 +17,50 @@ import { systemActor } from "../db/services/access";
 /**
  * A patient comes back to the account they created at sign-up (story 2, D-26).
  * One account serves the preparation and, after activation, the care. So the
- * sign-in only decides where the patient lands: the questionnaire before
- * activation, the home after it.
+ * sign-in only decides where the patient lands: the questionnaire or the
+ * waiting screen before activation, the home after it.
  *
  * Every refusal a visitor can provoke reads the same, whatever the cause: an
  * unknown e-mail and a wrong password are one `not_permitted`. The page must
  * not tell which e-mails hold an account.
  */
 
+/**
+ * The one rule of where a signed-in patient lands, from the file status
+ * (D-31). The status `active` is the fact that opens the patient space
+ * (stories 19 and 22). `patient_accounts.activated_at` records when the
+ * activation happened. It opens nothing: an account made after the activation
+ * of its file has no date and must open the space all the same.
+ *
+ * Before the activation, a file « Dossier à compléter » lands on the
+ * questionnaire. The two statuses after it land on the waiting screen.
+ */
 export const patientLandingFor = (
-  account: Pick<PatientAccount, "activatedAt">,
+  file: Pick<PatientProfile, "fileStatus">,
 ): PatientLanding => {
-  if (account.activatedAt) {
-    return "home";
+  switch (file.fileStatus) {
+    case "active":
+      return "home";
+    case "ready":
+    case "to_validate":
+      return "waiting";
+    default:
+      // « Dossier à compléter », and a row that has no status yet.
+      return "questionnaire";
   }
-  return "questionnaire";
+};
+
+/**
+ * The landing of one account: it reads the file status at each call, so an
+ * activation shows at the next request. A file that cannot be read lands on
+ * the questionnaire, never on the patient space.
+ */
+export const patientLandingOf = async (
+  account: Pick<PatientAccount, "patientProfileId">,
+  db?: DatabaseClient,
+): Promise<PatientLanding> => {
+  const patient = await getPatient(systemActor, account.patientProfileId, db);
+  return patient.ok ? patientLandingFor(patient.data) : "questionnaire";
 };
 
 /** How the patient proved who they are. The audit row's detail keeps it. */
@@ -102,7 +132,7 @@ export const completePatientSignIn = async (
   // The inactivity clock starts again at each sign-in (`inactive-account-
   // deletion`). It never fails the sign-in.
   const seen = await recordPatientAccountSeen(account, { everyTime: true }, db);
-  return ok({ account: seen, landing: patientLandingFor(seen) });
+  return ok({ account: seen, landing: await patientLandingOf(seen, db) });
 };
 
 const emailSchema = z.string().trim().toLowerCase().pipe(z.email());

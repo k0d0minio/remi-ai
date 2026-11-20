@@ -11,6 +11,8 @@ export const NEW_PASSWORD_PATH = "/connexion/nouveau-mot-de-passe";
 /** Where the magic link lands. A route handler: it completes the sign-in. */
 export const MAGIC_LINK_PATH = "/connexion/lien";
 export const QUESTIONNAIRE_PATH = "/questionnaire";
+/** The waiting screen: the questionnaire is complete, the care is not active. */
+export const WAITING_PATH = "/attente";
 export const HOME_PATH = "/accueil";
 export const RECIPES_PATH = "/recettes";
 export const PROFILE_PATH = "/profil";
@@ -18,6 +20,7 @@ export const PROFILE_PATH = "/profil";
 /** The page a signed-in patient reaches first. */
 export const landingPaths: Record<PatientLanding, string> = {
   questionnaire: QUESTIONNAIRE_PATH,
+  waiting: WAITING_PATH,
   home: HOME_PATH,
 };
 
