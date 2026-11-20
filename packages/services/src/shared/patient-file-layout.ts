@@ -64,6 +64,7 @@ export const patientFileSections = [
   { id: "documents", group: "resources" },
   { id: "patient-link", group: "resources" },
   { id: "profile", group: "profile" },
+  { id: "consents", group: "profile" },
 ] as const satisfies readonly { id: string; group: PatientFileGroup }[];
 
 export type PatientFileSectionId = (typeof patientFileSections)[number]["id"];

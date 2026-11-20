@@ -25,6 +25,12 @@ export const RECOMMENDATIONS_PATH = "/profil/recommandations";
 /** The patient's own follow-up data, below the Profil tab (REM-85). */
 export const PROFILE_DATA_PATH = "/profil/mes-donnees";
 
+/**
+ * The screen of a patient whose care consent is not in force (REM-43). It is
+ * outside the patient space: the space does not open without that consent.
+ */
+export const CARE_CONSENT_PATH = "/consentement";
+
 /** The page a signed-in patient reaches first. */
 export const landingPaths: Record<PatientLanding, string> = {
   questionnaire: QUESTIONNAIRE_PATH,

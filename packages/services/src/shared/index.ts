@@ -198,9 +198,11 @@ export type {
 } from "./signup";
 export type { AuditActionName } from "./audit";
 export {
+  careConsentGiven,
   consentDecisions,
   consentKeys,
   consentRecordChannels,
+  consentSummaries,
   consentTextLocaleFor,
   consentTextLocales,
   legacyConsentVersion,
@@ -212,7 +214,10 @@ export type {
   ConsentDecision,
   ConsentKey,
   ConsentRecordChannel,
+  ConsentState,
+  ConsentSummary,
   ConsentTextLocale,
+  LatestConsent,
   ShownConsent,
 } from "./consent";
 export {
