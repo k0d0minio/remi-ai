@@ -369,6 +369,22 @@ type Checks = {
   refused: RefusedImprovement | null;
 };
 
+/**
+ * A withheld improvement, with the reason in the server log. The reason is a
+ * code: no food name and no text of the patient or of the model.
+ */
+type WithheldReason =
+  | "flagged_with_no_proposal"
+  | "basis_not_in_prompt"
+  | "text_missing_or_too_long"
+  | "gate_refused_food"
+  | "sentence_names_other_exclusion";
+
+const withheld = (reason: WithheldReason): MealImprovement => {
+  console.info(JSON.stringify({ event: "meal.suggestion.withheld", reason }));
+  return { status: "withheld" };
+};
+
 const checkedImprovement = (
   reply: MealSuggestionReply,
   flagged: boolean,
@@ -385,7 +401,9 @@ const checkedImprovement = (
     if (basis.size === 0) {
       return { status: "no_protocol" };
     }
-    return flagged ? { status: "withheld" } : { status: "aligned" };
+    return flagged
+      ? withheld("flagged_with_no_proposal")
+      : { status: "aligned" };
   }
   // No validated item, or an item that the prompt did not hold: REMI would
   // speak in its own name. Nothing is shown.
@@ -393,11 +411,10 @@ const checkedImprovement = (
     return hasAlert ? { status: "address_alert" } : { status: "no_protocol" };
   }
   const served = basis.get(proposal.basis.replace(/[[\]\s]/g, ""));
-  const fallback: MealImprovement = hasAlert
-    ? { status: "address_alert" }
-    : { status: "withheld" };
   if (served === undefined) {
-    return fallback;
+    return hasAlert
+      ? { status: "address_alert" }
+      : withheld("basis_not_in_prompt");
   }
   // The excluded food comes first (D-30, level 1): one more food does not
   // answer it.
@@ -415,7 +432,9 @@ const checkedImprovement = (
     explanation === null ||
     (proposal.kind === "replace" && replaces === null)
   ) {
-    return fallback;
+    return hasAlert
+      ? { status: "address_alert" }
+      : withheld("text_missing_or_too_long");
   }
   // The gate on the proposed food. `uncertain` is hidden as `incompatible` is.
   if (proposal.kind !== "remove") {
@@ -425,7 +444,7 @@ const checkedImprovement = (
       today,
     );
     if (!mayBeShown(verdict)) {
-      return { status: "withheld" };
+      return withheld("gate_refused_food");
     }
   }
   // The sentence can name an excluded food of the patient's own meal
@@ -434,7 +453,7 @@ const checkedImprovement = (
     (reason) => !mealRules.has(ruleKey(reason)),
   );
   if (introduced) {
-    return { status: "withheld" };
+    return withheld("sentence_names_other_exclusion");
   }
   // After the gate: a safety status comes before this one.
   if (checks.refused !== null && sameFood(food, checks.refused.food)) {
