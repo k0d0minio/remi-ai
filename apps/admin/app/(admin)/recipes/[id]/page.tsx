@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import { ArrowLeft, Copy } from "lucide-react";
 import NextLink from "next/link";
 import { notFound } from "next/navigation";
-import { countRecipeAssignments, getRecipe } from "@remi/services/server";
+import {
+  countRecipeAssignments,
+  estimateRecipeNutrients,
+  getRecipe,
+} from "@remi/services/server";
+import { structuredRecipeOf } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import {
   Badge,
@@ -15,6 +20,7 @@ import {
 } from "@remi/ui/server";
 import { ArchiveRecipe } from "@/components/recipes/archive-recipe";
 import { RecipeForm } from "@/components/recipes/recipe-form";
+import { RecipeNutrients } from "@/components/recipes/recipe-nutrients";
 import { VerifiedBadge } from "@/components/recipes/verified-badge";
 import { VerifyRecipe } from "@/components/recipes/verify-recipe";
 import { ensureDatabase } from "@/lib/database";
@@ -47,11 +53,14 @@ const RecipeDetail = async ({ params }: { params: Promise<Params> }) => {
     notFound();
   }
   const recipe = result.data;
-  const [holders, origin] = await Promise.all([
+  const content = structuredRecipeOf(recipe.content);
+  const [holders, origin, estimate] = await Promise.all([
     countRecipeAssignments(recipe.id),
     // A variant whose origin has gone renders as an ordinary recipe rather
     // than as a broken link — the same tolerance the patient card applies.
     recipe.variantOfId ? getRecipe(recipe.variantOfId) : null,
+    // A recipe of the old form has no structured ingredient to count.
+    content ? estimateRecipeNutrients(content) : null,
   ]);
   const archived = recipe.archivedAt !== null;
 
@@ -106,6 +115,21 @@ const RecipeDetail = async ({ params }: { params: Promise<Params> }) => {
         </CardHeader>
         <CardContent>
           <RecipeForm recipe={recipe} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Valeurs nutritionnelles — estimation</CardTitle>
+          <CardDescription>
+            Une estimation que REMI calcule à partir de la table CIQUAL, pour
+            la recette enregistrée. Chaque quantité est comptée dans la forme,
+            crue ou cuite, que nomme l&apos;aliment CIQUAL. La cuisson
+            n&apos;est pas prise en compte.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <RecipeNutrients estimate={estimate} />
         </CardContent>
       </Card>
 

@@ -351,6 +351,12 @@ export type { FoodRecord } from "../db/models/food-record";
  * register the provider through `/server` (`apps/admin/lib/ai.ts`).
  */
 export { proposeFirstLot, proposeFoodRecord } from "./foods/propose";
+/** The energy and the macronutrients of a recipe, from CIQUAL (REM-191). */
+export { estimateRecipeNutrients } from "../db/services/foods/recipe-nutrients";
+export type {
+  RecipeNutrientEstimate,
+  RecipeNutrientLine,
+} from "../db/services/foods/recipe-nutrients";
 export type {
   CiqualImport,
   ConfidenceCode,
