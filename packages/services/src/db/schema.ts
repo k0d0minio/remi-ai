@@ -23,6 +23,10 @@ import type {
   FoodDirectiveKind,
   FoodLimitLevel,
 } from "../shared/food-directives";
+import type {
+  MealFasting,
+  MealOrientation,
+} from "../shared/meal-configuration";
 import type { ProtocolSnapshot } from "../shared/protocol-snapshot";
 
 /**
@@ -1570,6 +1574,60 @@ export const patientFoodDirectives = pgTable(
     check(
       "patient_food_directives_period_order_check",
       sql`${table.startsOn} is null or ${table.endsOn} is null or ${table.endsOn} >= ${table.startsOn}`,
+    ),
+  ],
+);
+
+/**
+ * The meal configuration of a patient file — REM-68 and REM-70, stories 11
+ * and 12. One row for each patient: for each of the four meals, whether the
+ * patient eats it and its orientation, then the intermittent fasting option.
+ *
+ * The fasting option is one fact for each patient, so the table has one row
+ * for each patient and not one row for each meal. Each value is nullable:
+ * null means that the practitioner has not entered it. REMI enters no value.
+ * The row goes with the patient.
+ */
+export const patientMealConfigurations = pgTable(
+  "patient_meal_configurations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    breakfastEnabled: boolean("breakfast_enabled"),
+    breakfastOrientation: text("breakfast_orientation").$type<MealOrientation>(),
+    lunchEnabled: boolean("lunch_enabled"),
+    lunchOrientation: text("lunch_orientation").$type<MealOrientation>(),
+    snackEnabled: boolean("snack_enabled"),
+    snackOrientation: text("snack_orientation").$type<MealOrientation>(),
+    dinnerEnabled: boolean("dinner_enabled"),
+    dinnerOrientation: text("dinner_orientation").$type<MealOrientation>(),
+    /** `none`, `skip_breakfast` or `skip_dinner`. */
+    fasting: text("fasting").$type<MealFasting>(),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("patient_meal_configurations_patient_idx").on(table.patientId),
+    check(
+      "patient_meal_configurations_breakfast_orientation_check",
+      sql`${table.breakfastOrientation} is null or ${table.breakfastOrientation} in ('protein_fat', 'complete_balanced', 'light_plant', 'carb_leaning', 'free')`,
+    ),
+    check(
+      "patient_meal_configurations_lunch_orientation_check",
+      sql`${table.lunchOrientation} is null or ${table.lunchOrientation} in ('protein_fat', 'complete_balanced', 'light_plant', 'carb_leaning', 'free')`,
+    ),
+    check(
+      "patient_meal_configurations_snack_orientation_check",
+      sql`${table.snackOrientation} is null or ${table.snackOrientation} in ('protein_fat', 'complete_balanced', 'light_plant', 'carb_leaning', 'free')`,
+    ),
+    check(
+      "patient_meal_configurations_dinner_orientation_check",
+      sql`${table.dinnerOrientation} is null or ${table.dinnerOrientation} in ('protein_fat', 'complete_balanced', 'light_plant', 'carb_leaning', 'free')`,
+    ),
+    check(
+      "patient_meal_configurations_fasting_check",
+      sql`${table.fasting} is null or ${table.fasting} in ('none', 'skip_breakfast', 'skip_dinner')`,
     ),
   ],
 );

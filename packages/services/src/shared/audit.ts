@@ -101,6 +101,12 @@ export const auditActions = [
    * totale » (REM-54, D-32). The detail is JSON: the counts, and no term.
    */
   "food_directive.batch_saved",
+  /**
+   * The practitioner changed the switch of a meal, the orientation of a meal
+   * or the fasting option (REM-68, REM-70, D-32). The detail is JSON: each
+   * value that moved, with its old and its new value.
+   */
+  "meal_configuration.updated",
   "pantry.added",
   "pantry.updated",
   "pantry.archived",

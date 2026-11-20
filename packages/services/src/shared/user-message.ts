@@ -36,6 +36,8 @@ const sentences: Readonly<Record<string, string>> = {
     "Le challenge suivant est possible une fois celui-ci acquis.",
   "an operator with that email already exists":
     "Un compte existe déjà avec cette adresse e-mail.",
+  "another change of the meals ran at the same time":
+    "Un autre changement des repas a eu lieu au même moment. Rechargez la page.",
   "another validation ran at the same time":
     "Une autre validation a eu lieu au même moment. Rechargez la page.",
   "no consent in force to withdraw":
@@ -58,6 +60,8 @@ const sentences: Readonly<Record<string, string>> = {
     "Ce dossier ou son adresse e-mail a déjà un compte.",
 
   // invalid_input
+  "this is not a change of the meal configuration":
+    "Ce changement des repas n'est pas valide. Rechargez la page.",
   "a check-in needs a direction, a measure or a note":
     "Un point de suivi demande une tendance, une mesure ou une note.",
   "a consent needs a patient, a key, a version, a locale and a decision":

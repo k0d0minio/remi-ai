@@ -302,6 +302,13 @@
       "when": 1795144798349,
       "tag": "0042_patient_food_directives",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1795162615487,
+      "tag": "0043_patient_meal_configurations",
+      "breakpoints": true
     }
   ]
 }
