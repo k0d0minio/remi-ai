@@ -446,7 +446,9 @@ export { hashPassword, verifyPassword } from "../auth/password";
 export {
   getAuthProvider,
   isAuthProviderRegistered,
+  isSessionReadError,
   registerAuthProvider,
+  SessionReadError,
 } from "../auth/provider";
 export type {
   AuthIdentity,
@@ -458,6 +460,7 @@ export type {
   PasswordResetRequestInput,
   PasswordSignInInput,
   PasswordSignUpInput,
+  SessionRenewal,
 } from "../auth/provider";
 export { readPatientAccount, readSession } from "../auth/session";
 export {

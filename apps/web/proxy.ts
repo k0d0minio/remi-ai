@@ -1,23 +1,26 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { defaultLocalePath, isLocale } from "@remi/services/shared";
+import { continueWithSession } from "@/lib/patient-auth/renew";
 import { previewRedirect } from "@/lib/patient-link/preview";
 
 /**
  * Every page lives under /fr. The app is French only (Jamie, 2026-11-20), so
  * a bare path and an /en path both go to the same page under /fr, whatever the
  * browser's language. It also starts a « voir comme la patiente » preview of a patient link
- * (`lib/patient-link/preview.ts`).
+ * (`lib/patient-link/preview.ts`), and it renews the cached session of a
+ * signed-in patient (`lib/patient-auth/renew.ts`): a page render cannot write
+ * a cookie, and the proxy can.
  *
  * A 307, not a 308, because the answer depends on a request header and must not
  * be cached as permanent. Route handlers are excluded by the matcher — /api is
  * a machine surface and has no language.
  */
-const proxy = (request: NextRequest) => {
+const proxy = async (request: NextRequest) => {
   const { pathname } = request.nextUrl;
   const first = pathname.split("/")[1];
 
   if (isLocale(first)) {
-    return previewRedirect(request) ?? NextResponse.next();
+    return previewRedirect(request) ?? (await continueWithSession(request));
   }
 
   const url = request.nextUrl.clone();

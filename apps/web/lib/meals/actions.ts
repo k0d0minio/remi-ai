@@ -1,15 +1,18 @@
 "use server";
 
 import {
+  isSessionReadError,
   issueMealRetryTicket,
   patientActor,
   planPatientMeal,
   suggestAnotherMeal,
   suggestPlannedMeal,
+  type PatientAccount,
 } from "@remi/services/server";
 import {
   checkPlannedMealText,
   isLocale,
+  type Locale,
   type MealSuggestion,
 } from "@remi/services/shared";
 import { aiReady } from "@/lib/ai";
@@ -34,6 +37,25 @@ const failed = (error: PlanMealError): PlanMealState => ({
   status: "error",
   error,
 });
+
+/**
+ * The patient of the session, or `null` when the session read failed. The
+ * form then says that the service is not available, and the patient keeps
+ * their session. With no session, `requirePatient` sends the
+ * visitor to the sign-in page, as before: that redirect passes through here.
+ */
+const patientOrUnavailable = async (
+  locale: Locale,
+): Promise<PatientAccount | null> => {
+  try {
+    return await requirePatient(locale);
+  } catch (cause) {
+    if (isSessionReadError(cause)) {
+      return null;
+    }
+    throw cause;
+  }
+};
 
 /**
  * REMI's answer, or null. With no key, `aiReady()` registers no adapter and
@@ -71,7 +93,10 @@ export const planMealAction = async (
   if (typeof locale !== "string" || !isLocale(locale)) {
     return failed("unavailable");
   }
-  const account = await requirePatient(locale);
+  const account = await patientOrUnavailable(locale);
+  if (!account) {
+    return failed("unavailable");
+  }
   // The layout stops a patient before activation. An action is reachable
   // without the layout, so it checks again (story 31, criterion 7).
   if ((await patientLanding(account)) !== "home") {
@@ -122,8 +147,8 @@ export const anotherSuggestionAction = async (
   if (typeof locale !== "string" || !isLocale(locale)) {
     return { status: "none" };
   }
-  const account = await requirePatient(locale);
-  if ((await patientLanding(account)) !== "home") {
+  const account = await patientOrUnavailable(locale);
+  if (!account || (await patientLanding(account)) !== "home") {
     return { status: "none" };
   }
   const patientId = account.patientProfileId;
