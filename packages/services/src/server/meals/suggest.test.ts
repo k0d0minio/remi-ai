@@ -396,6 +396,31 @@ describe("buildMealSuggestion — a generation that fails", () => {
   });
 });
 
+describe("buildMealSuggestion — the model of the role", () => {
+  const modelsOf = () =>
+    logged()
+      .filter((line) => line.includes('"event":"ai.generation"'))
+      .map((line) => (JSON.parse(line) as { model: string }).model);
+
+  it("runs the model that the caller read from the settings", async () => {
+    const { seam, buildMealSuggestion } = await load();
+    seam.registerTextProvider(fakeProvider(reply()));
+
+    await buildMealSuggestion(input({ model: "acme/small" }));
+
+    expect(modelsOf()).toEqual(["acme/small"]);
+  });
+
+  it("runs the code default of the role fast with no setting", async () => {
+    const { seam, buildMealSuggestion } = await load();
+    seam.registerTextProvider(fakeProvider(reply()));
+
+    await buildMealSuggestion(input());
+
+    expect(modelsOf()).toEqual([seam.MODELS.fast]);
+  });
+});
+
 describe("buildMealSuggestion — the log", () => {
   it("writes no line with the meal, the prompt or the reply", async () => {
     const { seam, buildMealSuggestion } = await load();

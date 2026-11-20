@@ -267,9 +267,13 @@ and all other functions of the apps work as before. The unit tests need no key.
 Each generation writes one JSON line in the server log (`"event":"ai.generation"`): role, model,
 duration, token counts, outcome. The line never holds the prompt or the reply.
 
-Model ids are **not** environment variables — they live in `packages/services/src/ai/index.ts`
-behind three role names (`fast` / `balanced` / `deep`), so an upgrade is one edit rather than a
-config change in five places.
+Model ids are **not** environment variables. Callers ask for one of three roles (`fast` /
+`balanced` / `deep`). The code default of each role is in `packages/services/src/ai/index.ts`. An
+admin can set another model for a role in the console, on the page « Modèles d'IA »
+(`/ai-models`): the value is a row of the table `app_settings`, and it applies to the next call.
+A save is refused unless the gateway lists the model, the model has the tag `structured-output`,
+and its `no_training` is `all`. The list comes from `GET https://ai-gateway.vercel.sh/v1/models`,
+which needs no key.
 
 ## Analytics
 

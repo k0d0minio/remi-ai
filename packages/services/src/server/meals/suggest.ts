@@ -55,6 +55,7 @@ import type {
 import type { ProtocolSnapshot } from "../../shared/protocol-snapshot";
 import { dietLabels } from "../../shared/questionnaire";
 import { ok, type Result } from "../../shared/result";
+import { roleModel } from "../ai-models";
 import { safetyList, strictGlutenLabel } from "../../shared/safety-highlights";
 import type { Id } from "../../types";
 
@@ -77,6 +78,11 @@ export type MealSuggestionInput = {
   protocol: ProtocolSnapshot | null;
   /** `YYYY-MM-DD` at the practice. */
   today: string;
+  /**
+   * The model of the role `fast`, as `suggestPlannedMeal` read it from the
+   * settings. Unset: the seam uses the code default of the role.
+   */
+  model?: string;
   timeoutMs?: number;
 };
 
@@ -419,6 +425,7 @@ export const buildMealSuggestion = async (
   const generated = await within(
     generateJson(prompt, mealSuggestionSchema, {
       role: "fast",
+      ...(input.model === undefined ? {} : { model: input.model }),
       system,
       maxTokens: 1024,
     }),
@@ -486,6 +493,9 @@ export const suggestPlannedMeal = async (
     return validated;
   }
 
+  // One read of the setting for this call. The seam reads no database.
+  const model = await roleModel("fast");
+
   const { answers, allergens } = questionnaire.data;
   return ok(
     await buildMealSuggestion({
@@ -506,6 +516,7 @@ export const suggestPlannedMeal = async (
       dietNote: answers.dietNote,
       protocol: validated.data?.snapshot ?? null,
       today: todayAtPractice(at),
+      model,
     }),
   );
 };

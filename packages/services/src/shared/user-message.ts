@@ -29,6 +29,19 @@ const EMAIL_HAS_ACCOUNT = "Cette adresse e-mail a déjà un compte.";
 const WRONG_CREDENTIALS = "L'adresse e-mail ou le mot de passe est incorrect.";
 
 const sentences: Readonly<Record<string, string>> = {
+  // the model of an AI role (`server/ai-models`)
+  "only an admin reads or changes the model of an AI role":
+    "Seul un compte d'administration peut modifier les modèles d'IA.",
+  "this AI role does not exist": "Ce rôle d'IA n'existe pas.",
+  "a model id is required": "Indiquez l'identifiant d'un modèle.",
+  "the model list is not available":
+    "La liste des modèles n'est pas disponible. L'enregistrement est refusé tant que la passerelle ne répond pas.",
+  "the gateway does not list this model":
+    "La passerelle ne propose pas ce modèle. Vérifiez l'identifiant.",
+  "this model has no structured output":
+    "Ce modèle ne produit pas de sortie structurée. REMI en a besoin pour lire la réponse.",
+  "the providers of this model may train on the data":
+    "Ce modèle est refusé : ses fournisseurs peuvent utiliser les données envoyées pour entraîner leurs modèles. Les demandes de REMI contiennent des données de santé.",
   // conflict
   "a challenge is already running — pick its outcome to replace it":
     "Un challenge est déjà en cours. Choisissez son issue pour le remplacer.",

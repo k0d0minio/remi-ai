@@ -189,6 +189,7 @@ export {
   isPatientFileKey,
   MAX_DOCUMENT_FILE_BYTES,
 } from "./files";
+export type { AiModelRole, ModelCheck, ModelTestOutcome } from "./ai-models";
 export { nutritionRuleKinds, nutritionRuleStatuses } from "./nutrition-rules";
 export type { NutritionRuleKind, NutritionRuleStatus } from "./nutrition-rules";
 export {
