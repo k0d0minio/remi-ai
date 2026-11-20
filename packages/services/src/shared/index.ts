@@ -54,7 +54,10 @@ export {
   protocolSnapshotSchema,
 } from "./protocol-snapshot";
 export type { ProtocolSnapshot } from "./protocol-snapshot";
-export { validatedRecommendationsView } from "./validated-recommendations";
+export {
+  hasFoodRecommendations,
+  validatedRecommendationsView,
+} from "./validated-recommendations";
 export type {
   LifestyleAdviceCategory,
   ValidatedAdvice,

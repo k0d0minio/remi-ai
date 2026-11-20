@@ -3,7 +3,10 @@ import {
   PROTOCOL_SNAPSHOT_SCHEMA_VERSION,
   type ProtocolSnapshot,
 } from "./protocol-snapshot";
-import { validatedRecommendationsView } from "./validated-recommendations";
+import {
+  hasFoodRecommendations,
+  validatedRecommendationsView,
+} from "./validated-recommendations";
 
 const id = (n: number) =>
   `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
@@ -263,5 +266,69 @@ describe("validatedRecommendationsView", () => {
       { id: id(1), title: "Énergie" },
       { id: id(2), title: "Sommeil" },
     ]);
+  });
+});
+
+describe("hasFoodRecommendations", () => {
+  const rec = (
+    n: number,
+    category: ProtocolSnapshot["recommendations"][number]["category"],
+  ) => ({ id: id(n), category, title: "Conseil", detail: "", position: n });
+
+  it("is false for a snapshot with no food item", () => {
+    expect(hasFoodRecommendations(viewOf(empty))).toBe(false);
+  });
+
+  it("is false when only the other categories hold an item", () => {
+    const view = viewOf({
+      ...empty,
+      recommendations: [rec(1, "supplement")],
+      goals: [
+        {
+          id: id(2),
+          title: "Mieux dormir",
+          baseline: "",
+          position: 0,
+        },
+      ],
+    });
+    expect(view.isEmpty).toBe(false);
+    expect(hasFoodRecommendations(view)).toBe(false);
+  });
+
+  it("is true for each of the four lists of the food block", () => {
+    expect(
+      hasFoodRecommendations(
+        viewOf({
+          ...empty,
+          foodDirectives: [directive(1, "exclude", "Gluten", { durable: true })],
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      hasFoodRecommendations(
+        viewOf({ ...empty, foodDirectives: [directive(1, "favour", "Lentilles")] }),
+      ),
+    ).toBe(true);
+    expect(
+      hasFoodRecommendations(
+        viewOf({ ...empty, foodDirectives: [directive(1, "limit", "Sucre")] }),
+      ),
+    ).toBe(true);
+    expect(
+      hasFoodRecommendations(
+        viewOf({ ...empty, recommendations: [rec(1, "nutrition")] }),
+      ),
+    ).toBe(true);
+  });
+
+  it("is false when the one eviction is over", () => {
+    const view = viewOf({
+      ...empty,
+      foodDirectives: [
+        directive(1, "exclude", "Lactose", { endsOn: "2026-11-19" }),
+      ],
+    });
+    expect(hasFoodRecommendations(view)).toBe(false);
   });
 });
