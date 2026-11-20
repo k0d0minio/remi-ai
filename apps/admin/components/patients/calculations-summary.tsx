@@ -12,6 +12,8 @@ import {
   calculationKindLabels,
   calculationKinds,
   formatNumber,
+  proteinAdaptationLabels,
+  proteinEstimateParameters,
 } from "@remi/services/shared";
 import { Badge, Typography } from "@remi/ui/server";
 
@@ -107,6 +109,80 @@ const BmiValue = ({
   );
 };
 
+/**
+ * The protein row (story 8): the estimate in g/jour with the badge
+ * « estimation » (D-30), the reference weight and the coefficient used, then
+ * the adaptations that REMI proposes and the practitioner confirms. A
+ * pathology, a malnutrition or a special situation adds « Validation
+ * obligatoire ». A validated value shows alone: its row belongs to REM-50.
+ */
+const ProteinValue = ({
+  missing,
+  row,
+}: {
+  missing: readonly CalculationInput[];
+  row: PatientCalculation | undefined;
+}) => {
+  if (missing.length > 0) {
+    return <NotCalculated reason={missingLine(missing)} />;
+  }
+  const validated = row?.validatedValue ?? null;
+  if (validated !== null) {
+    return (
+      <Typography size="sm" weight="medium">
+        {`${formatNumber(validated, "fr-BE")}${units.protein}`}
+      </Typography>
+    );
+  }
+  const value = row?.estimatedValue ?? null;
+  if (value === null) {
+    return <NotCalculated reason={NOT_AVAILABLE} />;
+  }
+  const {
+    referenceWeightKg,
+    coefficient,
+    additionGramsPerDay,
+    adaptations,
+    validationRequired,
+  } = proteinEstimateParameters(row?.estimateParameters ?? null);
+  const addition =
+    additionGramsPerDay > 0
+      ? ` + ${formatNumber(additionGramsPerDay, "fr-BE")} g/jour`
+      : "";
+  return (
+    <>
+      <div className="flex flex-wrap items-center gap-2">
+        <Typography size="sm" weight="medium">
+          {`${formatNumber(value, "fr-BE")}${units.protein}`}
+        </Typography>
+        <EstimateBadge />
+        {validationRequired ? (
+          <Badge variant="warning" tone="subtle" size="sm">
+            Validation obligatoire
+          </Badge>
+        ) : null}
+      </div>
+      {referenceWeightKg !== null && coefficient !== null ? (
+        <Typography size="xs" tone="muted">
+          {`Poids de référence ${formatNumber(referenceWeightKg, "fr-BE")} kg × ${formatNumber(coefficient, "fr-BE")} g/kg/jour${addition}`}
+        </Typography>
+      ) : null}
+      {adaptations.length > 0 ? (
+        <div className="flex flex-col gap-1">
+          <Typography size="xs" weight="medium">
+            Adaptations proposées, à confirmer
+          </Typography>
+          {adaptations.map((adaptation) => (
+            <Typography key={adaptation} size="xs" tone="muted">
+              {proteinAdaptationLabels[adaptation].fr}
+            </Typography>
+          ))}
+        </div>
+      ) : null}
+    </>
+  );
+};
+
 /** A row the other epics fill: the validated value, else the estimate. */
 const CalculationValue = ({
   kind,
@@ -156,9 +232,13 @@ export const CalculationsSummary = ({ calculations, missing, bmi }: Props) => (
           <dd className="flex flex-col items-start gap-1">
             {kind === "bmi" ? (
               <BmiValue indicator={bmi} row={row} />
-            ) : (
+            ) : null}
+            {kind === "protein" ? (
+              <ProteinValue missing={missing[kind]} row={row} />
+            ) : null}
+            {kind === "energy" ? (
               <CalculationValue kind={kind} missing={missing[kind]} row={row} />
-            )}
+            ) : null}
           </dd>
         </div>
       );

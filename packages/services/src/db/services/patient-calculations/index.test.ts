@@ -7,6 +7,7 @@ import { savePatientProfileAnswers } from "../patient-questionnaire";
 import { createPatient, updatePatient } from "../patients";
 import {
   listPatientCalculations,
+  refreshProteinEstimate,
   setCalculationEstimate,
   validateCalculation,
 } from "./index";
@@ -275,5 +276,119 @@ describe("the BMI estimate", () => {
       heightCm: 260,
     });
     expect((await bmiRow())?.estimatedValue).toBeNull();
+  });
+});
+
+describe("the protein estimate", () => {
+  let weighedId: string;
+
+  const proteinRow = async () =>
+    (await listPatientCalculations(systemActor, weighedId)).find(
+      (row) => row.kind === "protein",
+    );
+
+  const setSpecialSituation = async (specialSituation: string | null) => {
+    await getDatabase()
+      .collection<{ id: string; specialSituation: string | null }>(
+        "patient_profiles",
+      )
+      .update(weighedId, { specialSituation });
+    await refreshProteinEstimate(weighedId);
+  };
+
+  beforeAll(async () => {
+    const created = await createPatient(systemActor, {
+      practitionerId: testPractitionerId,
+      pseudonym: "Jeanne",
+      heightCm: 165,
+      weightKg: 65,
+    });
+    if (!created.ok) {
+      throw new Error("test patient not created");
+    }
+    weighedId = created.data.id;
+  });
+
+  it("is written with its parameters when a file starts with a weight", async () => {
+    const row = await proteinRow();
+    expect(row?.estimatedValue).toBe(54);
+    expect(row?.estimateParameters).toEqual({
+      referenceWeightKg: 65,
+      coefficient: 0.83,
+      additionGramsPerDay: 0,
+      adaptations: [],
+    });
+    expect(row?.validatedValue).toBeNull();
+  });
+
+  it("is computed again on a save of the weight, with the BMI note", async () => {
+    const saved = await updatePatient(systemActor, weighedId, {
+      weightKg: 72,
+    });
+    expect(saved.ok).toBe(true);
+    const row = await proteinRow();
+    expect(row?.estimatedValue).toBe(60);
+    expect(row?.estimateParameters).toMatchObject({
+      referenceWeightKg: 72,
+      adaptations: ["reference_weight_review"],
+    });
+  });
+
+  it("stays as it is on a save of any other field", async () => {
+    const before = await proteinRow();
+    const saved = await updatePatient(systemActor, weighedId, {
+      objective: "Retrouver de l'énergie",
+      weightKg: 72,
+    });
+    expect(saved.ok).toBe(true);
+    expect((await proteinRow())?.updatedAt).toEqual(before?.updatedAt);
+  });
+
+  it("proposes the range from 65 on a save of the birth date", async () => {
+    const saved = await updatePatient(systemActor, weighedId, {
+      birthDate: "1950-01-01",
+    });
+    expect(saved.ok).toBe(true);
+    const row = await proteinRow();
+    expect(row?.estimatedValue).toBe(60);
+    expect(row?.estimateParameters).toMatchObject({
+      coefficient: 0.83,
+      adaptations: ["age_65_plus", "reference_weight_review"],
+    });
+  });
+
+  it("adds the grams of the special situation", async () => {
+    await setSpecialSituation("pregnancy_2");
+    const row = await proteinRow();
+    expect(row?.estimatedValue).toBe(69);
+    expect(row?.estimateParameters).toMatchObject({
+      additionGramsPerDay: 9,
+      adaptations: ["age_65_plus", "pregnancy_2", "reference_weight_review"],
+    });
+    await setSpecialSituation(null);
+    expect((await proteinRow())?.estimatedValue).toBe(60);
+  });
+
+  it("is cleared when the weight goes, on the patient's save", async () => {
+    const saved = await savePatientProfileAnswers(systemActor, weighedId, {
+      weightKg: null,
+    });
+    expect(saved.ok).toBe(true);
+    const row = await proteinRow();
+    expect(row?.estimatedValue).toBeNull();
+    expect(row?.estimateParameters).toBeNull();
+  });
+
+  it("is not written for a file with no weight", async () => {
+    const bare = await createPatient(systemActor, {
+      practitionerId: testPractitionerId,
+      pseudonym: "Odile",
+      heightCm: 170,
+    });
+    if (!bare.ok) {
+      throw new Error("test patient not created");
+    }
+    const rows = await listPatientCalculations(systemActor, bare.data.id);
+    expect(rows.find((row) => row.kind === "protein")).toBeUndefined();
   });
 });
