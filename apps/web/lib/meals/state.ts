@@ -1,9 +1,11 @@
-import type { PlannedMealTextError } from "@remi/services/shared";
+import type {
+  MealSuggestion,
+  PlannedMealTextError,
+} from "@remi/services/shared";
 
 /**
- * The meal as the home page shows it after a save. The suggestion of the next
- * ticket (`meal-improvement/meal-suggestion`) joins this type. Kept out of
- * `actions.ts`: a "use server" file exports only actions.
+ * The meal as the home page shows it after a save. Kept out of `actions.ts`:
+ * a "use server" file exports only actions.
  */
 export type PlannedMeal = {
   id: string;
@@ -18,7 +20,15 @@ export type PlanMealError =
 
 export type PlanMealState =
   | { status: "idle" }
-  | { status: "saved"; meal: PlannedMeal }
+  | {
+      status: "saved";
+      meal: PlannedMeal;
+      /**
+       * REMI's answer (REM-102). Null when the patient's safety data could not
+       * be read: the page then shows no answer, and the meal stays recorded.
+       */
+      suggestion: MealSuggestion | null;
+    }
   | { status: "error"; error: PlanMealError };
 
 export const initialPlanMealState: PlanMealState = { status: "idle" };

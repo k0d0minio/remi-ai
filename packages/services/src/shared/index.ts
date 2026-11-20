@@ -34,6 +34,13 @@ export {
   PLANNED_MEALS_PER_DAY,
 } from "./planned-meal";
 export type { PlannedMealTextError } from "./planned-meal";
+export type {
+  MealAlert,
+  MealAnswer,
+  MealImprovement,
+  MealImprovementKind,
+  MealSuggestion,
+} from "./meal-suggestion";
 export { isWatchedPatientField, watchedPatientFields } from "./patient-changes";
 export {
   PROTOCOL_SNAPSHOT_SCHEMA_VERSION,

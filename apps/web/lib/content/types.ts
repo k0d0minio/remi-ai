@@ -21,6 +21,8 @@ import type {
   FoodLimitLevel,
   LifestyleAdviceCategory,
   MandatoryQuestionnaireField,
+  MealAlert,
+  MealImprovementKind,
   MealIntent,
   MealSlot,
   PersonalisationDimension,
@@ -866,12 +868,34 @@ export type Content = {
     /** `{count}` is the number of characters left. Shown near the limit only. */
     remaining: string;
     errors: Record<PlanMealError, string>;
-    /** After a save. The suggestion is the next ticket: no text promises one now. */
+    /** After a save: the record, then REMI's answer (REM-102). */
     saved: {
       title: string;
-      soon: string;
       mealLabel: string;
       another: string;
+      suggestion: {
+        alertTitle: string;
+        /** `{food}` is the part of the meal, in the patient's own words. */
+        alerts: Record<MealAlert["source"], string>;
+        /** `{food}` is a part of the meal that can hold an excluded food. */
+        trace: string;
+        /** `{foods}` is a list of foods that the model named. Never a certainty. */
+        toCheck: string;
+        checkIngredients: string;
+        goodTitle: string;
+        improveTitle: string;
+        /** `{food}`, and `{replaces}` for a replacement. */
+        kinds: Record<MealImprovementKind, string>;
+        /** `{basis}` is the validated item, in the practitioner's words. */
+        basis: string;
+        aligned: string;
+        /** The safety message: REMI has no improvement that the gate confirms. */
+        withheld: string;
+        noProtocol: string;
+        addressAlert: string;
+        unclear: string;
+        unavailable: string;
+      };
     };
   };
 };

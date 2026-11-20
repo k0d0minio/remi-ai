@@ -108,13 +108,15 @@ malformed environment. That split is what lets a route handler stay free of `try
 src/
   types/       the storage-agnostic vocabulary everything else is written against
   shared/      isomorphic — no fs, no driver, no secret
-  server/      the Node barrel + env
+  server/      the Node barrel + env · meals/suggest.ts (REMI's answer to a planned meal:
+               the database reads, the model call, then the gate in code)
   auth/        the auth seam (provider.ts, session.ts) · adapters/ · the operator console's
                password hashing + session tokens, vendor-free, `node:crypto` only
   db/          client.ts (the seam) · schema.ts (Drizzle) · adapters/ · models/ · services/ · migrations/
   email/       the mailer seam + templates
   files/       the files seam · adapters/ (the server adapter and its browser half) · client.ts
-  ai/          model roles · the provider seam · context.ts (the prompt's context block)
+  ai/          model roles · the provider seam · context.ts (the prompt's context block) ·
+               prompts/ (one pure module for each prompt, pseudonymous by type)
 ```
 
 `db/models/` files are **types only**. That is what lets `shared/` re-export the domain vocabulary

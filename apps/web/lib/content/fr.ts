@@ -727,7 +727,7 @@ export const fr: Content = {
     passwordLabel: "Nouveau mot de passe",
     passwordHint: "Au moins 8 caractères.",
     submit: "Enregistrer et me connecter",
-    submitting: "Enregistrement…",
+    submitting: "REMI regarde ton repas…",
     form: {
       too_short: "Le mot de passe compte au moins 8 caractères.",
       too_long: "Ce mot de passe est trop long.",
@@ -846,7 +846,7 @@ export const fr: Content = {
     hint: "Écris le plat et, si tu les connais, ses ingrédients.",
     placeholder: "Par exemple : spaghetti sauce tomate, parmesan, salade verte",
     submit: "Améliorer mon repas",
-    submitting: "Enregistrement…",
+    submitting: "REMI regarde ton repas…",
     remaining: "Caractères restants : {count}",
     errors: {
       empty: "Écris d'abord ce que tu as prévu de manger.",
@@ -858,9 +858,48 @@ export const fr: Content = {
     },
     saved: {
       title: "Ton repas est enregistré",
-      soon: "La suggestion de REMI n'est pas encore disponible. Elle arrive bientôt, ici.",
       mealLabel: "Ton repas",
       another: "Saisir un autre repas",
+      suggestion: {
+        alertTitle: "À regarder avant tout",
+        alerts: {
+          allergy:
+            "« {food} » ne convient pas avec une allergie que tu as déclarée.",
+          intolerance:
+            "« {food} » ne convient pas avec une intolérance que tu as déclarée.",
+          coeliac:
+            "« {food} » contient du gluten, à écarter avec la maladie cœliaque.",
+          eviction:
+            "« {food} » fait partie des aliments que ton praticien t'a demandé d'écarter.",
+          diet: "« {food} » ne correspond pas au type d'alimentation que tu as déclaré.",
+        },
+        trace:
+          "« {food} » peut contenir un aliment à écarter pour toi. Vérifie ses ingrédients.",
+        toCheck:
+          "REMI pense que ces aliments peuvent contenir un aliment à écarter pour toi : {foods}. Vérifie leurs ingrédients.",
+        checkIngredients:
+          "REMI ne connaît pas la composition exacte de ton repas. Vérifie toujours les ingrédients.",
+        goodTitle: "Ce qui est déjà bien",
+        improveTitle: "Ce que tu pourrais améliorer",
+        kinds: {
+          add: "Tu peux essayer d'ajouter : {food}",
+          replace: "Tu peux essayer de remplacer {replaces} par : {food}",
+          remove: "Tu peux essayer de retirer : {food}",
+        },
+        basis: "En lien avec : {basis}",
+        aligned:
+          "Ton repas est déjà en accord avec tes recommandations. Bon appétit !",
+        withheld:
+          "REMI n'a pas trouvé d'amélioration sûre à te proposer pour ce repas. Vérifie les ingrédients de ton repas.",
+        noProtocol:
+          "Ton praticien n'a pas encore validé tes recommandations. REMI ne propose donc pas d'amélioration pour le moment.",
+        addressAlert:
+          "Une piste : remplace ou retire d'abord l'aliment signalé plus haut.",
+        unclear:
+          "REMI n'a pas compris ton repas. Écris le plat et ses ingrédients dans un nouveau repas.",
+        unavailable:
+          "La suggestion de REMI n'est pas disponible pour le moment. Ton repas est bien enregistré.",
+      },
     },
   },
 };
