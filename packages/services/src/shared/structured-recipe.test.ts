@@ -2,12 +2,17 @@ import { describe, expect, it } from "vitest";
 import {
   checkCompatibility,
   type CompatibilityItem,
+  type GateFood,
+  type PatientSafetyData,
 } from "../ai/compatibility";
 import {
+  carryRecipeData,
   formatIngredientLine,
   formatRecipeMinutes,
   formatRecipeQuantity,
+  linkIngredientFoods,
   parseIngredientLine,
+  parseIngredientLinks,
   parseIngredientLines,
   parseStepLine,
   parseStepLines,
@@ -39,8 +44,16 @@ const recipe: StructuredRecipe = {
     { quantity: null, unit: null, name: "sel", note: "", foodCode: null },
   ],
   steps: [
-    { text: "Cuire le quinoa 15 min.", temperatureC: null, durationMinutes: 15 },
-    { text: "Ajouter les œufs et servir.", temperatureC: null, durationMinutes: null },
+    {
+      text: "Cuire le quinoa 15 min.",
+      temperatureC: null,
+      durationMinutes: 15,
+    },
+    {
+      text: "Ajouter les œufs et servir.",
+      temperatureC: null,
+      durationMinutes: null,
+    },
   ],
 };
 
@@ -201,7 +214,12 @@ describe("parseIngredientLine", () => {
       "",
     ]);
     expect(line("1 c. à c. de curcuma")).toEqual([1, "tsp", "curcuma", ""]);
-    expect(line("2 cuillères à café de cumin")).toEqual([2, "tsp", "cumin", ""]);
+    expect(line("2 cuillères à café de cumin")).toEqual([
+      2,
+      "tsp",
+      "cumin",
+      "",
+    ]);
   });
 
   it("reads a count with no unit", () => {
@@ -234,12 +252,22 @@ describe("parseIngredientLine", () => {
       "pain complet",
       "",
     ]);
-    expect(line("1 poignée d'épinards")).toEqual([1, "handful", "épinards", ""]);
+    expect(line("1 poignée d'épinards")).toEqual([
+      1,
+      "handful",
+      "épinards",
+      "",
+    ]);
   });
 
   it("keeps a line with no quantity as the food", () => {
     expect(line("sel")).toEqual([null, null, "sel", ""]);
-    expect(line("poivre du moulin")).toEqual([null, null, "poivre du moulin", ""]);
+    expect(line("poivre du moulin")).toEqual([
+      null,
+      null,
+      "poivre du moulin",
+      "",
+    ]);
   });
 
   it("puts the preparation in the note, not in the food", () => {
@@ -287,7 +315,12 @@ describe("formatIngredientLine", () => {
   });
 
   it("puts the unit in the plural from 2", () => {
-    const pinch = { unit: "pinch", name: "sel", note: "", foodCode: null } as const;
+    const pinch = {
+      unit: "pinch",
+      name: "sel",
+      note: "",
+      foodCode: null,
+    } as const;
     expect(formatIngredientLine({ ...pinch, quantity: 1 })).toBe(
       "1 pincée de sel",
     );
@@ -317,7 +350,9 @@ describe("formatIngredientLine", () => {
       expect(parsed).not.toBeNull();
       if (parsed) {
         expect(formatIngredientLine(parsed)).toBe(text);
-        expect(parseIngredientLine(formatIngredientLine(parsed))).toEqual(parsed);
+        expect(parseIngredientLine(formatIngredientLine(parsed))).toEqual(
+          parsed,
+        );
       }
     }
   });
@@ -325,7 +360,9 @@ describe("formatIngredientLine", () => {
 
 describe("parseStepLine", () => {
   it("drops the number of the step", () => {
-    expect(parseStepLine("1. Rincer le quinoa.")?.text).toBe("Rincer le quinoa.");
+    expect(parseStepLine("1. Rincer le quinoa.")?.text).toBe(
+      "Rincer le quinoa.",
+    );
     expect(parseStepLine("2) Égoutter.")?.text).toBe("Égoutter.");
     expect(parseStepLine("- Servir.")?.text).toBe("Servir.");
     expect(parseStepLine("  ")).toBeNull();
@@ -345,8 +382,12 @@ describe("parseStepLine", () => {
     });
     expect(parseStepLine("Cuire 1 h 30 à feu doux.")?.durationMinutes).toBe(90);
     expect(parseStepLine("Laisser mijoter 1h30.")?.durationMinutes).toBe(90);
-    expect(parseStepLine("Laisser reposer 2 heures.")?.durationMinutes).toBe(120);
-    expect(parseStepLine("Préchauffer le four à 200°C.")?.temperatureC).toBe(200);
+    expect(parseStepLine("Laisser reposer 2 heures.")?.durationMinutes).toBe(
+      120,
+    );
+    expect(parseStepLine("Préchauffer le four à 200°C.")?.temperatureC).toBe(
+      200,
+    );
   });
 
   it("gives no duration when the text has two", () => {
@@ -362,7 +403,9 @@ describe("parseStepLine", () => {
 
   it("reads a paste of several steps in order", () => {
     expect(
-      parseStepLines("1. Cuire le quinoa 15 min.\n\n2. Ajouter les œufs et servir."),
+      parseStepLines(
+        "1. Cuire le quinoa 15 min.\n\n2. Ajouter les œufs et servir.",
+      ),
     ).toEqual(recipe.steps);
   });
 });
@@ -397,5 +440,363 @@ describe("structuredRecipeText", () => {
       portions: 1,
     });
     expect(text.startsWith("Ingrédients (1 portion)\n")).toBe(true);
+  });
+});
+
+/* ───────────────────────── REM-192: the extended structure ───────────────────────── */
+
+/** The recipe of the top of this file, with each field of REM-192. */
+const extended: StructuredRecipe = {
+  ...recipe,
+  ingredients: [
+    {
+      quantity: 200,
+      unit: "g",
+      name: "quinoa",
+      note: "",
+      foodCode: "9340",
+      grams: 200,
+    },
+    {
+      quantity: 1,
+      unit: "tbsp",
+      name: "huile d'olive",
+      note: "",
+      foodCode: "17270",
+      grams: 13.8,
+    },
+    {
+      quantity: 2,
+      unit: null,
+      name: "œufs",
+      note: "",
+      foodCode: "22000",
+      grams: 110,
+    },
+    { quantity: null, unit: null, name: "sel", note: "", foodCode: null },
+  ],
+  steps: [
+    {
+      text: "Cuire le quinoa 15 min.",
+      temperatureC: null,
+      durationMinutes: 15,
+      technique: "boil",
+      uses: [0, 3],
+    },
+    {
+      text: "Ajouter les œufs et servir.",
+      temperatureC: null,
+      durationMinutes: null,
+      uses: [1, 2],
+    },
+  ],
+  skeleton: "poelee-cereale",
+  level: 2,
+  equipment: ["hob"],
+};
+
+describe("the structure of REM-192", () => {
+  it("reads a recipe of before REM-192 to the same value, with no new key", () => {
+    // The stored document of an old recipe, as the jsonb column gives it.
+    const stored: unknown = JSON.parse(JSON.stringify(recipe));
+    const read = structuredRecipeOf(stored);
+    expect(read).toEqual(recipe);
+    // A save writes the same document: the same keys in the same order.
+    expect(JSON.stringify(read)).toBe(JSON.stringify(recipe));
+    for (const ingredient of read?.ingredients ?? []) {
+      expect(Object.keys(ingredient)).toEqual([
+        "quantity",
+        "unit",
+        "name",
+        "note",
+        "foodCode",
+      ]);
+    }
+    for (const step of read?.steps ?? []) {
+      expect(Object.keys(step)).toEqual([
+        "text",
+        "temperatureC",
+        "durationMinutes",
+      ]);
+    }
+    expect(Object.keys(read ?? {})).toEqual(Object.keys(recipe));
+  });
+
+  it("writes the same text for an old recipe as before", () => {
+    expect(structuredRecipeText(structuredRecipeOf(recipe) ?? extended)).toBe(
+      structuredRecipeText(recipe),
+    );
+  });
+
+  it("reads a recipe of the new structure back with no loss", () => {
+    const stored: unknown = JSON.parse(JSON.stringify(extended));
+    expect(structuredRecipeOf(stored)).toEqual(extended);
+    expect(JSON.stringify(structuredRecipeOf(stored))).toBe(
+      JSON.stringify(structuredRecipeSchema.parse(extended)),
+    );
+  });
+
+  it("puts the equipment and the ingredients of a step in one order", () => {
+    const parsed = structuredRecipeSchema.parse({
+      ...extended,
+      equipment: ["hob", "oven", "hob"],
+      steps: [{ ...extended.steps[0], uses: [3, 0, 3] }],
+    });
+    expect(parsed.equipment).toEqual(["oven", "hob"]);
+    expect(parsed.steps[0]?.uses).toEqual([0, 3]);
+  });
+
+  it("refuses a weight, a level and a step ingredient that are not valid", () => {
+    const [first] = extended.ingredients;
+    expect(
+      firstMessage({ ...extended, ingredients: [{ ...first, grams: 0 }] }),
+    ).toBe("that quantity is not valid");
+    expect(firstMessage({ ...extended, level: 4 })).toBe(
+      "that recipe is not valid",
+    );
+    expect(firstMessage({ ...extended, equipment: ["wok"] })).not.toBeNull();
+    expect(
+      firstMessage({
+        ...extended,
+        steps: [{ ...extended.steps[0], uses: [4] }],
+      }),
+    ).toBe("a step names an ingredient that the recipe does not have");
+  });
+});
+
+describe("recipeGateItem with the food records of the CIQUAL codes", () => {
+  const TODAY = "2026-11-20";
+
+  const noExclusion: PatientSafetyData = {
+    allergens: [],
+    noKnownAllergies: true,
+    noKnownIntolerances: true,
+    celiacDisease: false,
+    diet: "none",
+    evictions: [],
+  };
+
+  const mustardAllergy: PatientSafetyData = {
+    ...noExclusion,
+    noKnownAllergies: false,
+    allergens: [
+      { kind: "allergy", key: "mustard", subKey: null, otherText: null },
+    ],
+  };
+
+  const CODE = "20009";
+
+  const record = (overrides: Partial<GateFood> = {}): GateFood => ({
+    code: CODE,
+    name: "Carotte, crue",
+    status: "confirmed",
+    cookable: true,
+    contains: [],
+    mayContain: [],
+    lexiconId: null,
+    ...overrides,
+  });
+
+  const withFood = (name: string) => ({
+    ingredients: [
+      { quantity: 100, unit: "g" as const, name, note: "", foodCode: CODE },
+    ],
+  });
+
+  const foods = (food: GateFood) => new Map([[CODE, food]]);
+
+  const verdict = (patient: PatientSafetyData, name: string, food: GateFood) =>
+    checkCompatibility(
+      patient,
+      recipeGateItem(withFood(name), foods(food)),
+      TODAY,
+    ).status;
+
+  it("gives the name, and the confirmed record of the code beside it", () => {
+    const food = record();
+    expect(recipeGateItem(withFood("carotte"), foods(food))).toEqual({
+      kind: "recipe",
+      ingredients: [{ name: "carotte" }, { name: "carotte", food }],
+    });
+  });
+
+  it("gives the name alone for a code with no confirmed record", () => {
+    const nameOnly = { kind: "recipe", ingredients: [{ name: "carotte" }] };
+    for (const food of [
+      record({ status: "proposed" }),
+      record({ status: "none" }),
+      record({ cookable: false }),
+    ]) {
+      expect(recipeGateItem(withFood("carotte"), foods(food))).toEqual(
+        nameOnly,
+      );
+    }
+    // A code that has no entry in the map.
+    expect(recipeGateItem(withFood("carotte"))).toEqual(nameOnly);
+  });
+
+  it("keeps an unknown name uncertain when the record of its code is not confirmed", () => {
+    expect(verdict(noExclusion, "zzqxv", record({ status: "proposed" }))).toBe(
+      "uncertain",
+    );
+    expect(verdict(noExclusion, "zzqxv", record({ status: "none" }))).toBe(
+      "uncertain",
+    );
+  });
+
+  it("keeps an unknown name uncertain with a confirmed record too", () => {
+    // The patient reads the name. A code is never a proof that it is safe.
+    expect(verdict(noExclusion, "zzqxv", record())).toBe("uncertain");
+  });
+
+  it("still refuses a name that the patient excludes, whatever the record says", () => {
+    expect(verdict(mustardAllergy, "moutarde de Dijon", record())).toBe(
+      "incompatible",
+    );
+    expect(
+      verdict(
+        mustardAllergy,
+        "moutarde de Dijon",
+        record({ status: "proposed" }),
+      ),
+    ).toBe("incompatible");
+  });
+
+  it("refuses a safe name whose confirmed record has an excluded tag", () => {
+    expect(
+      verdict(mustardAllergy, "carotte", record({ contains: ["mustard"] })),
+    ).toBe("incompatible");
+    // The same record, not confirmed, is not read: the name decides, as before.
+    expect(
+      verdict(
+        mustardAllergy,
+        "carotte",
+        record({ contains: ["mustard"], status: "proposed" }),
+      ),
+    ).toBe("compatible");
+  });
+
+  it("confirms a known name with a confirmed record that has no excluded tag", () => {
+    expect(verdict(mustardAllergy, "carotte", record())).toBe("compatible");
+  });
+});
+
+describe("parseIngredientLinks", () => {
+  it("reads the list that the form posts", () => {
+    expect(
+      parseIngredientLinks(
+        JSON.stringify([{ foodCode: "9340", grams: 200 }, null]),
+      ),
+    ).toEqual([{ foodCode: "9340", grams: 200 }, null]);
+  });
+
+  it("gives an empty list for a text that is not such a list", () => {
+    expect(parseIngredientLinks("")).toEqual([]);
+    expect(parseIngredientLinks("{")).toEqual([]);
+    expect(parseIngredientLinks('{"foodCode":"9340"}')).toEqual([]);
+    expect(parseIngredientLinks('[{"foodCode":9340,"grams":"x"}]')).toEqual([]);
+  });
+});
+
+describe("linkIngredientFoods", () => {
+  const lines = parseIngredientLines("200 g de quinoa\n2 œufs\nsel");
+
+  it("leaves the lines as they are with no link", () => {
+    expect(linkIngredientFoods(lines, [])).toEqual(lines);
+    expect(linkIngredientFoods(lines, [null, null, null])).toEqual(lines);
+    expect(JSON.stringify(linkIngredientFoods(lines, []))).toBe(
+      JSON.stringify(lines),
+    );
+  });
+
+  it("gives a line its food and its weight, by place", () => {
+    const linked = linkIngredientFoods(lines, [
+      { foodCode: "9340", grams: 200 },
+      { foodCode: "22000", grams: 110 },
+    ]);
+    expect(linked[0]).toEqual({ ...lines[0], foodCode: "9340", grams: 200 });
+    expect(linked[1]).toEqual({ ...lines[1], foodCode: "22000", grams: 110 });
+    expect(linked[2]).toEqual(lines[2]);
+  });
+
+  it("keeps a food with no weight, and stores no weight that is not valid", () => {
+    const linked = linkIngredientFoods(lines, [
+      { foodCode: "9340", grams: null },
+      { foodCode: "22000", grams: 0 },
+      { foodCode: "11058", grams: Number.NaN },
+    ]);
+    for (const line of linked) {
+      expect("grams" in line).toBe(false);
+    }
+    expect(linked.map((line) => line.foodCode)).toEqual([
+      "9340",
+      "22000",
+      "11058",
+    ]);
+  });
+
+  it("stores no weight for a line with no food", () => {
+    const linked = linkIngredientFoods(lines, [
+      { foodCode: null, grams: 200 },
+      { foodCode: "  ", grams: 110 },
+    ]);
+    expect(linked).toEqual(lines);
+  });
+});
+
+describe("carryRecipeData", () => {
+  const posted = {
+    ingredients: extended.ingredients,
+    steps: extended.steps.map(({ text, temperatureC, durationMinutes }) => ({
+      text,
+      temperatureC,
+      durationMinutes,
+    })),
+  };
+
+  it("gives the posted steps back when nothing is stored", () => {
+    expect(carryRecipeData(null, posted)).toEqual({ steps: posted.steps });
+  });
+
+  it("adds no key to a recipe of before REM-192", () => {
+    const old = { ingredients: recipe.ingredients, steps: recipe.steps };
+    expect(JSON.stringify({ ...old, ...carryRecipeData(recipe, old) })).toBe(
+      JSON.stringify(old),
+    );
+  });
+
+  it("keeps the skeleton, the techniques and the ingredients of the steps", () => {
+    const carried = carryRecipeData(extended, posted);
+    expect(carried.skeleton).toBe("poelee-cereale");
+    expect(carried.steps).toEqual(extended.steps);
+  });
+
+  it("drops the technique of a step whose text changed", () => {
+    const carried = carryRecipeData(extended, {
+      ...posted,
+      steps: [
+        {
+          text: "Cuire le quinoa 20 min.",
+          temperatureC: null,
+          durationMinutes: 20,
+        },
+        ...posted.steps.slice(1),
+      ],
+    });
+    expect(carried.steps[0]).toEqual({
+      text: "Cuire le quinoa 20 min.",
+      temperatureC: null,
+      durationMinutes: 20,
+    });
+    expect(carried.steps[1]?.uses).toEqual([1, 2]);
+  });
+
+  it("drops the ingredients of the steps when the ingredient list changed", () => {
+    const carried = carryRecipeData(extended, {
+      ...posted,
+      ingredients: posted.ingredients.slice(1),
+    });
+    expect(carried.steps[0]?.technique).toBe("boil");
+    expect(carried.steps.every((step) => !("uses" in step))).toBe(true);
   });
 });

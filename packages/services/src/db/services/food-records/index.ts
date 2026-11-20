@@ -145,7 +145,10 @@ const checkedValues = (values: FoodRecordValues): Result<CheckedValues> => {
     (tag) => !containsTags.includes(tag),
   );
   if (![...containsTags, ...mayContainTags].every(isGateTag)) {
-    return err("invalid_input", "the compatibility gate does not know this tag");
+    return err(
+      "invalid_input",
+      "the compatibility gate does not know this tag",
+    );
   }
   const role = values.role === null || values.role === "" ? null : values.role;
   if (role !== null && !isDishRole(role)) {
@@ -396,7 +399,9 @@ export const listConfirmedCookableFoods = async (): Promise<
     { limit: RECORDS_LIMIT },
   );
   const confirmed = page.items.filter(usable);
-  const foods = await getFoodsByCode(confirmed.map((record) => record.foodCode));
+  const foods = await getFoodsByCode(
+    confirmed.map((record) => record.foodCode),
+  );
   return confirmed
     .flatMap((record) => {
       const food = foods.get(record.foodCode);
@@ -430,4 +435,47 @@ export const gateFoodsByCode = async (
     listFoodRecords(),
   ]);
   return codes.map((code) => gateFoodOf(code, foods.get(code), all.get(code)));
+};
+
+/** What a recipe reads of the foods that its ingredients name by a code. */
+export type RecipeFoods = {
+  /** What the gate reads for each code. `status` is `none` with no record. */
+  gate: ReadonlyMap<string, GateFood>;
+  /** The kitchen units of each code that has units that a person confirmed. */
+  units: ReadonlyMap<string, FoodKitchenUnits>;
+};
+
+/**
+ * The food record data of the CIQUAL codes of a recipe, in one read: what the
+ * gate reads (`recipeGateItem`) and the confirmed kitchen units
+ * (`ingredientAmountText`). A code that CIQUAL does not have has no units and
+ * the gate status `none`. With no code, nothing is read.
+ */
+export const recipeFoodsByCode = async (
+  codes: readonly string[],
+): Promise<RecipeFoods> => {
+  const unique = [...new Set(codes)];
+  if (unique.length === 0) {
+    return { gate: new Map(), units: new Map() };
+  }
+  const [foods, all] = await Promise.all([
+    getFoodsByCode(unique),
+    listFoodRecords(),
+  ]);
+  return {
+    gate: new Map(
+      unique.map((code) => [
+        code,
+        gateFoodOf(code, foods.get(code), all.get(code)),
+      ]),
+    ),
+    units: new Map(
+      unique.flatMap((code) => {
+        const units = foods.has(code)
+          ? confirmedKitchenUnits(all.get(code) ?? null)
+          : null;
+        return units === null ? [] : [[code, units] as const];
+      }),
+    ),
+  };
 };

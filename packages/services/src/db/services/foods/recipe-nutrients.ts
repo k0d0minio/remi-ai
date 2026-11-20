@@ -5,7 +5,9 @@ import {
   type FoodNutrientValues,
   type RecipeNutrients,
 } from "../../../shared/recipe-nutrients";
+import { ingredientAmountText } from "../../../shared/recipe-quantities";
 import type { StructuredRecipe } from "../../../shared/structured-recipe";
+import { recipeFoodsByCode } from "../food-records";
 import { getFood, getFoodNutrients } from "./index";
 
 /**
@@ -29,6 +31,12 @@ export type RecipeNutrientLine = {
    * when the line has no code, or when CIQUAL has no food with that code.
    */
   foodName: string | null;
+  /**
+   * The quantity as the patient reads it: in the confirmed kitchen units of
+   * the food (« 2 œufs »), or in grams, or the text of the line when the line
+   * has no stored weight. Null for a line with no quantity.
+   */
+  shown: string | null;
 };
 
 export type RecipeNutrientEstimate = {
@@ -52,6 +60,8 @@ export const estimateRecipeNutrients = async (
       ),
     ),
   ];
+
+  const { units } = await recipeFoodsByCode(codes);
 
   const foods = await Promise.all(
     codes.map(async (code) => {
@@ -88,6 +98,10 @@ export const estimateRecipeNutrients = async (
         grams: ingredients[index]?.grams ?? null,
         foodCode,
         foodName: foodCode === null ? null : (names.get(foodCode) ?? null),
+        shown: ingredientAmountText(
+          ingredient,
+          foodCode === null ? null : (units.get(foodCode) ?? null),
+        ),
       };
     }),
   };

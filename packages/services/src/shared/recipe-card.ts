@@ -33,6 +33,12 @@ export type PatientRecipeCard = {
   source: PatientRecipeSource;
   title: string;
   content: StructuredRecipe;
+  /**
+   * The quantity of each ingredient line as the patient reads it, in the
+   * order of `content.ingredients` (`ingredientAmountText`): « 2 œufs »,
+   * « 150 g ». Null for a line with no quantity.
+   */
+  amounts: readonly (string | null)[];
   /** Why this recipe for this patient. Empty when the recipe has none. */
   justification: string;
 };

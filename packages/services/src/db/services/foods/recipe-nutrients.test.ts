@@ -80,12 +80,14 @@ describe("estimateRecipeNutrients", () => {
         grams: 250,
         foodCode: first.code,
         foodName: first.nameFr,
+        shown: "250 g",
       },
       {
         name: second.nameFr,
         grams: 100,
         foodCode: second.code,
         foodName: second.nameFr,
+        shown: "0,1 kg",
       },
     ]);
   });
@@ -103,6 +105,7 @@ describe("estimateRecipeNutrients", () => {
       grams: 5,
       foodCode: null,
       foodName: null,
+      shown: "5 g",
     });
   });
 

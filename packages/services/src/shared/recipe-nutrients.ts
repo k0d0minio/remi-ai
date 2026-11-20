@@ -159,11 +159,7 @@ export const computeRecipeNutrients = ({
   values,
   portions,
 }: RecipeNutrientsInput): RecipeNutrients => {
-  if (
-    ingredients.length === 0 ||
-    !Number.isFinite(portions) ||
-    portions <= 0
-  ) {
+  if (ingredients.length === 0 || !Number.isFinite(portions) || portions <= 0) {
     return NOT_COMPUTED;
   }
   const amountOf = (key: RecipeNutrientKey): NutrientAmount | null => {
@@ -230,15 +226,13 @@ export const foodNutrientValuesOf = (
   };
 };
 
-/* ───────────────────────── today's recipe ───────────────────────── */
+/* ───────────────────────── the structured recipe ───────────────────────── */
 
 /**
- * The weight in grams of an ingredient line of today's structure, or null.
+ * The weight in grams that the text of an ingredient line gives, or null.
  *
  * Only « g » and « kg » are a weight. A volume, a count and a kitchen unit
- * (« c. à s. », « gousse », « 2 œufs ») have no weight here, thus such a line
- * makes the result « Non calculé ». REM-190 stores each quantity in grams:
- * that ticket changes this one function, and nothing else in the module.
+ * (« c. à s. », « gousse », « 2 œufs ») have no weight in the text alone.
  */
 export const recipeIngredientGrams = ({
   quantity,
@@ -253,13 +247,22 @@ export const recipeIngredientGrams = ({
   return unit === "kg" ? quantity * 1000 : null;
 };
 
-/** The ingredients of today's structured recipe as the calculation reads them. */
+/**
+ * The weight of an ingredient line, or null. The stored weight in grams
+ * (REM-190, REM-192) wins. A line with no stored weight, of before REM-192,
+ * gives the weight of its text when the text is in « g » or « kg ».
+ */
+export const ingredientGrams = (
+  ingredient: Pick<RecipeIngredient, "quantity" | "unit" | "grams">,
+): number | null => ingredient.grams ?? recipeIngredientGrams(ingredient);
+
+/** The ingredients of a structured recipe as the calculation reads them. */
 export const nutrientIngredientsOf = (
   recipe: Pick<StructuredRecipe, "ingredients">,
 ): NutrientIngredient[] =>
   recipe.ingredients.map((ingredient) => ({
     foodCode: ingredient.foodCode,
-    grams: recipeIngredientGrams(ingredient),
+    grams: ingredientGrams(ingredient),
   }));
 
 /* ───────────────────────── text ───────────────────────── */

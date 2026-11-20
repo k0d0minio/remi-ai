@@ -2,6 +2,7 @@ import type { RecipeNutrientEstimate } from "@remi/services/server";
 import {
   formatNumber,
   formatRecipeNutrient,
+  kitchenQuantityText,
   recipeNutrientKeys,
   recipeNutrientSources,
 } from "@remi/services/shared";
@@ -33,7 +34,8 @@ type Props = {
  * (REM-191). Each value is an estimate that code computed from CIQUAL. A value
  * that the code cannot compute reads « Non calculé »: the table never shows a
  * partial total. The lines below the table say what was counted, with the
- * CIQUAL name of each food, which states its raw or cooked form.
+ * CIQUAL name of each food, which states its raw or cooked form, and with the
+ * quantity as the patient reads it in the kitchen units of the food.
  */
 export const RecipeNutrients = ({ estimate }: Props) => {
   if (estimate === null) {
@@ -91,28 +93,31 @@ export const RecipeNutrients = ({ estimate }: Props) => {
 
       {blocked ? (
         <Typography size="sm" tone="muted">
-          REMI ne donne jamais un total partiel. Chaque ingrédient doit avoir
-          un code CIQUAL et une quantité en grammes.
+          REMI ne donne jamais un total partiel. Chaque ingrédient doit avoir un
+          aliment CIQUAL et une quantité en grammes : choisissez-les sous les
+          ingrédients de la recette, puis enregistrez.
         </Typography>
       ) : null}
 
       <div
         role="table"
         aria-label="Ingrédients comptés dans l'estimation"
-        className="border-border grid grid-cols-[1fr_5rem_1.5fr] gap-x-3 gap-y-1.5 rounded-lg border p-3"
+        className="border-border grid grid-cols-[1fr_6.5rem_1.5fr] gap-x-3 gap-y-1.5 rounded-lg border p-3"
       >
         <div role="row" className="contents">
-          {["Ingrédient", "Grammes", "Aliment CIQUAL compté"].map((heading) => (
-            <Typography
-              key={heading}
-              role="columnheader"
-              size="xs"
-              tone="muted"
-              weight="medium"
-            >
-              {heading}
-            </Typography>
-          ))}
+          {["Ingrédient", "Quantité", "Aliment CIQUAL compté"].map(
+            (heading) => (
+              <Typography
+                key={heading}
+                role="columnheader"
+                size="xs"
+                tone="muted"
+                weight="medium"
+              >
+                {heading}
+              </Typography>
+            ),
+          )}
         </div>
         {lines.map((line, index) => {
           const block = blockOf(line);
@@ -126,6 +131,20 @@ export const RecipeNutrients = ({ estimate }: Props) => {
                 {line.grams === null
                   ? NO_VALUE
                   : `${formatNumber(line.grams)} g`}
+                {/* What the patient reads, when it is not the grams. */}
+                {line.shown !== null &&
+                line.shown !== kitchenQuantityText(line.grams ?? 0, null) ? (
+                  <Typography
+                    as="span"
+                    size="xs"
+                    tone="muted"
+                    className="block"
+                  >
+                    {line.grams === null
+                      ? line.shown
+                      : `affiché : ${line.shown}`}
+                  </Typography>
+                ) : null}
               </Typography>
               <Typography role="cell" size="sm">
                 {line.foodName ?? NO_VALUE}

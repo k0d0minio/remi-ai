@@ -7,18 +7,32 @@ import {
   mealConfigurationSlots,
   parseIngredientLines,
   parseStepLines,
+  recipeEquipment,
+  recipeEquipmentLabels,
+  recipeLevelLabels,
+  recipeLevels,
   recipeSeasonLabels,
   recipeSeasons,
   structuredRecipeOf,
   structuredRecipeText,
+  type IngredientFood,
   type MealConfigurationSlot,
   type Recipe,
+  type RecipeEquipment,
   type RecipeSeason,
+  type StructuredRecipe,
 } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Field, Input, Textarea, Typography } from "@remi/ui/server";
 import { mealSlotLabels } from "@/components/patients/meal-configuration-labels";
 import { ChoiceToggle } from "@/components/recipes/choice-toggle";
+import {
+  foodKeyOf,
+  IngredientFoods,
+  lineKeyOf,
+  type EntriesByLine,
+  type FoodsByName,
+} from "@/components/recipes/ingredient-foods";
 import {
   IngredientPreview,
   StepPreview,
@@ -34,6 +48,12 @@ const initial: RecipeFormState = { error: null, saved: false };
 type Props = {
   /** Present when editing; absent on the library's create form. */
   recipe?: Recipe;
+  /**
+   * The CIQUAL foods that the stored recipe names, with their name and their
+   * confirmed kitchen units (`ingredientFoodsByCode`). Absent on the create
+   * form.
+   */
+  linkedFoods?: readonly IngredientFood[];
 };
 
 type Values = {
@@ -46,6 +66,9 @@ type Values = {
   cookMinutes: string;
   ingredients: string;
   steps: string;
+  /** `""` for « Non renseigné », else « 1 », « 2 » or « 3 ». */
+  level: string;
+  equipment: readonly RecipeEquipment[];
   tags: string;
   body: string;
 };
@@ -82,10 +105,52 @@ const valuesOf = (recipe: Recipe | undefined): Values => {
       ? content.ingredients.map(formatIngredientLine).join("\n")
       : "",
     steps: content ? content.steps.map((step) => step.text).join("\n") : "",
+    level: content?.level === undefined ? "" : String(content.level),
+    equipment: content?.equipment ?? [],
     tags: recipe?.tags.join(", ") ?? "",
     body: typedProse(recipe),
   };
 };
+
+/**
+ * The food of each stored line that names a CIQUAL code. A code that CIQUAL
+ * does not have any more keeps its place, so that a save does not drop it
+ * without a word.
+ */
+const foodsOf = (
+  content: StructuredRecipe | null,
+  linkedFoods: readonly IngredientFood[],
+): FoodsByName =>
+  Object.fromEntries(
+    (content?.ingredients ?? []).flatMap((ingredient) => {
+      const code = ingredient.foodCode;
+      if (code === null) {
+        return [];
+      }
+      const food = linkedFoods.find((entry) => entry.code === code) ?? {
+        code,
+        name: `Code CIQUAL ${code} (introuvable dans la table)`,
+        cookable: false,
+        units: null,
+      };
+      return [[foodKeyOf(ingredient), food] as const];
+    }),
+  );
+
+/** The stored weight of each line, as a quantity in grams. */
+const entriesOf = (content: StructuredRecipe | null): EntriesByLine =>
+  Object.fromEntries(
+    (content?.ingredients ?? []).flatMap((ingredient) =>
+      ingredient.grams === undefined
+        ? []
+        : [
+            [
+              lineKeyOf(ingredient),
+              { count: String(ingredient.grams).replace(".", ","), unit: "g" },
+            ] as const,
+          ],
+    ),
+  );
 
 const toggled = <T,>(list: readonly T[], value: T): T[] =>
   list.includes(value)
@@ -99,14 +164,24 @@ const toggled = <T,>(list: readonly T[], value: T): T[] =>
  * paste of several lines works as it is. Under each box, the form shows what
  * REMI reads in the lines: the quantity, the unit and the food apart.
  *
+ * Below the ingredient lines, she chooses the CIQUAL food of each line and
+ * gives its quantity (REM-192): the form stores grams. The level and the
+ * equipment are optional.
+ *
  * Each field is held in state. A refused save thus keeps what she typed.
  */
-export const RecipeForm = ({ recipe }: Props) => {
+export const RecipeForm = ({ recipe, linkedFoods = [] }: Props) => {
   const [state, action, pending] = useActionState(
     recipe ? updateRecipeAction : createRecipeAction,
     initial,
   );
   const [values, setValues] = useState(() => valuesOf(recipe));
+  const [foods, setFoods] = useState<FoodsByName>(() =>
+    foodsOf(structuredRecipeOf(recipe?.content ?? null), linkedFoods),
+  );
+  const [entries, setEntries] = useState<EntriesByLine>(() =>
+    entriesOf(structuredRecipeOf(recipe?.content ?? null)),
+  );
   const set = <K extends keyof Values>(key: K, value: Values[K]) =>
     setValues((current) => ({ ...current, [key]: value }));
 
@@ -233,7 +308,9 @@ export const RecipeForm = ({ recipe }: Props) => {
           rows={8}
           value={values.ingredients}
           onChange={(event) => set("ingredients", event.target.value)}
-          placeholder={"200 g de quinoa\n1 c. à s. d'huile d'olive\n2 œufs\nsel"}
+          placeholder={
+            "200 g de quinoa\n1 c. à s. d'huile d'olive\n2 œufs\nsel"
+          }
         />
       </Field>
       {ingredients.length > 0 ? (
@@ -243,6 +320,13 @@ export const RecipeForm = ({ recipe }: Props) => {
             corrigez son texte ci-dessus.
           </Typography>
           <IngredientPreview ingredients={ingredients} />
+          <IngredientFoods
+            ingredients={ingredients}
+            foods={foods}
+            entries={entries}
+            onFoods={setFoods}
+            onEntries={setEntries}
+          />
         </div>
       ) : null}
 
@@ -283,6 +367,53 @@ export const RecipeForm = ({ recipe }: Props) => {
         </div>
         <Typography size="xs" tone="muted">
           Aucune saison choisie : la recette convient toute l&apos;année.
+        </Typography>
+      </fieldset>
+
+      <fieldset className="flex flex-col gap-2">
+        <Typography as="legend" size="sm" weight="medium">
+          Niveau de difficulté
+        </Typography>
+        <div className="flex flex-wrap gap-2">
+          {recipeLevels.map((level) => (
+            <ChoiceToggle
+              key={level}
+              name="level"
+              value={String(level)}
+              label={recipeLevelLabels[level]}
+              on={values.level === String(level)}
+              onToggle={() =>
+                set(
+                  "level",
+                  values.level === String(level) ? "" : String(level),
+                )
+              }
+            />
+          ))}
+        </div>
+        <Typography size="xs" tone="muted">
+          Facultatif. Aucun niveau choisi : « Non renseigné ».
+        </Typography>
+      </fieldset>
+
+      <fieldset className="flex flex-col gap-2">
+        <Typography as="legend" size="sm" weight="medium">
+          Équipement nécessaire
+        </Typography>
+        <div className="flex flex-wrap gap-2">
+          {recipeEquipment.map((item) => (
+            <ChoiceToggle
+              key={item}
+              name="equipment"
+              value={item}
+              label={recipeEquipmentLabels[item]}
+              on={values.equipment.includes(item)}
+              onToggle={() => set("equipment", toggled(values.equipment, item))}
+            />
+          ))}
+        </div>
+        <Typography size="xs" tone="muted">
+          Facultatif. Aucun équipement choisi : « Non renseigné ».
         </Typography>
       </fieldset>
 
