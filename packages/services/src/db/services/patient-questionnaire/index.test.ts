@@ -1045,3 +1045,57 @@ describe("the genotype section", () => {
     );
   });
 });
+
+describe("the answer to « Maladie cœliaque confirmée » (REM-165)", () => {
+  it("writes one audit event for each change, with no value", async () => {
+    const patient = await newPatient("Gluten");
+    const operator = {
+      id: testPractitionerId,
+      email: "morgane@example.test",
+      name: "Morgane",
+    };
+    const events = () =>
+      listAuditEvents(systemActor, {
+        targetId: patient.id,
+        action: "patient.celiac_answer_changed",
+      });
+
+    // A save that does not name the answer writes nothing.
+    unwrapOk(
+      await savePatientQuestionnaire(
+        systemActor,
+        patient.id,
+        { pathologies: "Maladie cœliaque" },
+        operator,
+      ),
+    );
+    expect(await events()).toHaveLength(0);
+
+    unwrapOk(
+      await savePatientQuestionnaire(
+        systemActor,
+        patient.id,
+        { celiacDisease: true },
+        operator,
+      ),
+    );
+    expect(await events()).toHaveLength(1);
+
+    // An equal answer writes nothing. « Non » and a clear write one each.
+    for (const celiacDisease of [true, false, null]) {
+      unwrapOk(
+        await savePatientQuestionnaire(
+          systemActor,
+          patient.id,
+          { celiacDisease },
+          operator,
+        ),
+      );
+    }
+    const all = await events();
+    expect(all).toHaveLength(3);
+    for (const event of all) {
+      expect(event.detail).toBe("celiacDisease");
+    }
+  });
+});

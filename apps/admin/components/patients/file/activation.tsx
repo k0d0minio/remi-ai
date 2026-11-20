@@ -74,6 +74,18 @@ const blockerLine = (blocker: ActivationBlocker): ReactNode => {
           , ou « Aucune intolérance connue ».
         </>
       );
+    case "celiac_to_confirm":
+      return (
+        <>
+          La personne cite une maladie cœliaque dans ses pathologies et la
+          question « Maladie cœliaque confirmée » n&apos;a pas de réponse. Par
+          précaution, le gluten est exclu strictement en attendant.{" "}
+          <a href={`#${fieldAnchor("celiacDisease")}`} className="underline">
+            Répondez « Oui » ou « Non » dans le profil
+          </a>
+          .
+        </>
+      );
     case "calculation_to_revalidate":
       return `Le calcul « ${calculationKindLabels[blocker.calculation].fr} » est une estimation à revalider : une donnée a changé depuis sa validation. Dans « Calculs », vérifiez la valeur, puis validez-la de nouveau.`;
     case "eviction_without_period":
@@ -87,6 +99,8 @@ const blockerKey = (blocker: ActivationBlocker) => {
       return blocker.kind;
     case "safety_answer_missing":
       return `${blocker.kind}-${blocker.field}`;
+    case "celiac_to_confirm":
+      return blocker.kind;
     case "calculation_to_revalidate":
       return `${blocker.kind}-${blocker.calculation}`;
     case "eviction_without_period":

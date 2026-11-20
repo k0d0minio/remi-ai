@@ -57,6 +57,8 @@ const sentences: Readonly<Record<string, string>> = {
     "Aucun consentement en vigueur ne peut être retiré.",
   "that address already has an account": EMAIL_HAS_ACCOUNT,
   "the protocol is empty": "Le protocole est vide.",
+  "a coeliac disease is not confirmed":
+    "La personne cite une maladie cœliaque dans ses pathologies. Répondez d'abord « Oui » ou « Non » à « Maladie cœliaque confirmée » dans le profil.",
   "the energy need has no estimate yet":
     "Les besoins énergétiques n'ont pas encore d'estimation. Complétez d'abord le dossier.",
   "the protein need has no estimate yet":

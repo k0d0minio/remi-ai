@@ -24,6 +24,8 @@ export const actionLabels: Record<AuditActionName, string> = {
   "patient.updated": "profil modifié",
   "patient.file_status_changed": "statut du dossier changé",
   "patient.consultation_date_changed": "date de consultation changée",
+  "patient.celiac_answer_changed":
+    "réponse « Maladie cœliaque confirmée » changée",
   "patient.changed": "modifié par le patient",
   "patient.change_acknowledged": "modification du patient prise en compte",
   "patient.deleted": "profil supprimé",
@@ -172,6 +174,8 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "patient.updated": "neutral",
   "patient.file_status_changed": "neutral",
   "patient.consultation_date_changed": "neutral",
+  // The answer starts or lifts the strict gluten exclusion.
+  "patient.celiac_answer_changed": "info",
   "patient.changed": "info",
   "patient.change_acknowledged": "success",
   "patient.deleted": "error",

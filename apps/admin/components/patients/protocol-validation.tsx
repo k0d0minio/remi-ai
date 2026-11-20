@@ -1,8 +1,16 @@
 import { BadgeCheck } from "lucide-react";
-import { getValidatedProtocol } from "@remi/services/server";
-import { formatDate, type PatientProfile } from "@remi/services/shared";
+import {
+  getPatientQuestionnaire,
+  getValidatedProtocol,
+} from "@remi/services/server";
+import {
+  celiacToConfirm,
+  formatDate,
+  type PatientProfile,
+} from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Typography } from "@remi/ui/server";
+import { fieldAnchor } from "@/components/patients/file/missing-information";
 import { ValidatedMark } from "@/components/patients/file/value";
 import { requireActor } from "@/lib/auth/session";
 import { validateProtocolAction } from "@/lib/patients/protocol-validation";
@@ -18,12 +26,20 @@ type Props = {
  * version, and the button « Valider les recommandations ». The button shows
  * from « Recommandations à valider » on, and the service refuses it before.
  * The component reads the validated version itself, so the page has one line.
+ *
+ * While the patient names a coeliac disease and the practitioner has answered
+ * neither « Oui » nor « Non » (REM-165), the button is off and a line names
+ * the correction. The service refuses the validation too.
  */
 export const ProtocolValidation = async ({ patient, readOnly }: Props) => {
-  const validated = await getValidatedProtocol(
-    await requireActor(),
-    patient.id,
-  );
+  const actor = await requireActor();
+  const [validated, questionnaire] = await Promise.all([
+    getValidatedProtocol(actor, patient.id),
+    getPatientQuestionnaire(actor, patient.id),
+  ]);
+  // A failed read does not hide the button: the service decides.
+  const blocked =
+    questionnaire.ok && celiacToConfirm(questionnaire.data.answers);
   const version = validated.ok ? validated.data : null;
   const canValidate =
     !readOnly &&
@@ -31,7 +47,7 @@ export const ProtocolValidation = async ({ patient, readOnly }: Props) => {
   if (validated.ok && !version && !canValidate) {
     return null;
   }
-  return (
+  const form = (
     <form
       action={validateProtocolAction}
       className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
@@ -60,6 +76,7 @@ export const ProtocolValidation = async ({ patient, readOnly }: Props) => {
         <Button
           type="submit"
           size="sm"
+          disabled={blocked}
           // One dominant button in the card (the charter): once a version is
           // validated and the file waits for its activation, « Activer
           // l'accompagnement » is the next act and this one steps back.
@@ -74,5 +91,21 @@ export const ProtocolValidation = async ({ patient, readOnly }: Props) => {
         </Button>
       ) : null}
     </form>
+  );
+  return (
+    <div className="flex flex-col gap-2">
+      {form}
+      {canValidate && blocked ? (
+        <Typography size="sm" role="status" className="text-warning-text">
+          La validation est bloquée : la personne cite une maladie cœliaque
+          dans ses pathologies.{" "}
+          <a href={`#${fieldAnchor("celiacDisease")}`} className="underline">
+            Répondez « Oui » ou « Non » à « Maladie cœliaque confirmée » dans
+            le profil
+          </a>
+          .
+        </Typography>
+      ) : null}
+    </div>
   );
 };

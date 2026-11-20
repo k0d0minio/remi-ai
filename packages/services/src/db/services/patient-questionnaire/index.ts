@@ -431,7 +431,8 @@ const unscopedGetPatientQuestionnaire = async (
  * `patient.consultation_date_changed` event with the old and the new value
  * (`appointment-date`). A save that changes a genotype result writes one
  * `genotype.changed` event per field, with the field's name and no value
- * (`genotype-section`). Every writer of the columns passes here, so the
+ * (`genotype-section`). A save that changes `celiacDisease` writes one
+ * `patient.celiac_answer_changed` event, with no value (REM-165). Every writer of the columns passes here, so the
  * console and the patient's questionnaire get the same trail.
  */
 const unscopedSavePatientQuestionnaire = async (
@@ -489,6 +490,7 @@ const unscopedSavePatientQuestionnaire = async (
   }
   await recordConsultationDateChange(current, patch, trailActor);
   await recordGenotypeChanges(current, patch, trailActor);
+  await recordCeliacAnswerChange(current, patch, trailActor);
   if (byThePatient) {
     const fields = Object.keys(patch);
     await recordPatientChanges(
@@ -523,6 +525,30 @@ const recordGenotypeChanges = async (
       detail: genotypeFieldNames[field],
     });
   }
+};
+
+/**
+ * One event when a save changes the answer to « Maladie cœliaque confirmée »
+ * (REM-165, D-32): the answer starts or lifts the strict gluten exclusion.
+ * The detail names the field and no value, as for a genotype.
+ */
+const recordCeliacAnswerChange = async (
+  before: QuestionnaireRow & Partial<Pick<PatientProfile, "pseudonym">>,
+  patch: Partial<PatientQuestionnaire>,
+  actor: AuditActor | null,
+) => {
+  const next = patch.celiacDisease;
+  if (next === undefined || (before.celiacDisease ?? null) === next) {
+    return;
+  }
+  await recordAuditEvent({
+    actor,
+    action: "patient.celiac_answer_changed",
+    targetType: "patient",
+    targetId: before.id,
+    targetLabel: before.pseudonym ?? "",
+    detail: "celiacDisease",
+  });
 };
 
 /** One event when a save changes `consultationDate`. No event otherwise. */
