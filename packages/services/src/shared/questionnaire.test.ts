@@ -2,10 +2,13 @@ import { describe, expect, it } from "vitest";
 import {
   mandatoryQuestionnaireFieldLabels,
   mandatoryQuestionnaireFields,
+  missingBySection,
   missingMandatoryFields,
   missingOptionalFields,
   optionalQuestionnaireFieldLabels,
   optionalQuestionnaireFields,
+  questionnaireSections,
+  sectionOfMandatoryField,
   type OptionalQuestionnaireAnswers,
   type QuestionnaireCompleteness,
 } from "./questionnaire";
@@ -150,5 +153,33 @@ describe("the optional questionnaire fields", () => {
     });
     expect(missing).not.toContain("celiacDisease");
     expect(missing).toContain("pathologies");
+  });
+});
+
+describe("the questionnaire sections", () => {
+  it("gives each mandatory field a section of the list", () => {
+    for (const field of mandatoryQuestionnaireFields) {
+      expect(questionnaireSections).toContain(sectionOfMandatoryField[field]);
+    }
+  });
+
+  it("groups the missing fields by section, in the list's order", () => {
+    expect(
+      missingBySection(["intolerances", "weightKg", "sexForCalculation"]),
+    ).toEqual({
+      identite: [],
+      profil: ["sexForCalculation", "weightKg"],
+      consultation: [],
+      alimentation: ["intolerances"],
+      sante: [],
+      genetique: [],
+    });
+  });
+
+  it("gives every section an empty list when nothing is missing", () => {
+    const bySection = missingBySection([]);
+    for (const section of questionnaireSections) {
+      expect(bySection[section]).toEqual([]);
+    }
   });
 });

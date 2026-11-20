@@ -372,6 +372,58 @@ export const mandatoryQuestionnaireFieldLabels = {
   intolerances: { fr: "Intolérances", en: "Intolerances" },
 } as const satisfies Record<MandatoryQuestionnaireField, QuestionnaireLabel>;
 
+/**
+ * The questionnaire's sections, in the order the patient meets them (story 4).
+ * One list for both sides: the patient's steps and the groups of the console's
+ * form read it, so the two keep the same structure. Each side writes its own
+ * titles.
+ */
+export const questionnaireSections = [
+  "identite",
+  "profil",
+  "consultation",
+  "alimentation",
+  "sante",
+  "genetique",
+] as const;
+
+export type QuestionnaireSection = (typeof questionnaireSections)[number];
+
+/** The section that asks each mandatory field. */
+export const sectionOfMandatoryField = {
+  sexForCalculation: "profil",
+  heightCm: "profil",
+  weightKg: "profil",
+  activityLevel: "profil",
+  consultationReason: "consultation",
+  allergies: "alimentation",
+  intolerances: "alimentation",
+} as const satisfies Record<MandatoryQuestionnaireField, QuestionnaireSection>;
+
+/**
+ * The missing mandatory fields of each section, in the list's order. A section
+ * with an empty list is complete, or asks nothing mandatory.
+ */
+export const missingBySection = (
+  missing: readonly MandatoryQuestionnaireField[],
+): Record<QuestionnaireSection, MandatoryQuestionnaireField[]> => {
+  const bySection: Record<QuestionnaireSection, MandatoryQuestionnaireField[]> =
+    {
+      identite: [],
+      profil: [],
+      consultation: [],
+      alimentation: [],
+      sante: [],
+      genetique: [],
+    };
+  for (const field of mandatoryQuestionnaireFields) {
+    if (missing.includes(field)) {
+      bySection[sectionOfMandatoryField[field]].push(field);
+    }
+  }
+  return bySection;
+};
+
 /** What the completeness check reads. Null is « Non renseigné » (D-30). */
 export type QuestionnaireCompleteness = {
   sexForCalculation: string | null;

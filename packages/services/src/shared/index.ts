@@ -187,11 +187,14 @@ export {
   intolerances,
   mandatoryQuestionnaireFieldLabels,
   mandatoryQuestionnaireFields,
+  missingBySection,
   missingMandatoryFields,
   heightCmRange,
   missingOptionalFields,
   noneKnownLabels,
   optionalQuestionnaireFieldLabels,
+  questionnaireSections,
+  sectionOfMandatoryField,
   sexesForCalculation,
   sexForCalculationLabels,
   weightKgRange,
@@ -202,6 +205,7 @@ export type {
   OptionalQuestionnaireField,
   QuestionnaireCompleteness,
   QuestionnaireLabel,
+  QuestionnaireSection,
 } from "./questionnaire";
 export { safetyList, strictGlutenLabel } from "./safety-highlights";
 export type { SafetyBox, SafetyList } from "./safety-highlights";
