@@ -119,6 +119,19 @@ environment. `DATABASE_URL` remains the whole of the storage configuration.
 With `DATABASE_URL` unset nothing is registered and any screen that needs the database fails loudly
 with "no database adapter registered" — a deploy without a database never quietly renders nothing.
 
+**The other names of the Neon integration are unused on purpose.** The Neon integration of Vercel
+sets more names on the projects than this table has, for example `PGHOST` and `POSTGRES_URL`. No
+code reads them: the scripts and the apps read `DATABASE_URL`, and `vercel-build.sh` reads
+`DATABASE_URL_UNPOOLED`. Thus `turbo.json` `globalEnv` does not name them, turbo does not pass them
+to a task, and the build log warns that they are set on the project and absent from `turbo.json`.
+That warning is expected (REM-118). When code starts to read one of them, add its name to this
+table and to `globalEnv` in the same pull request.
+
+**A connection failure at the migration gets a new attempt.** `db:migrate` and `db:verify` make 4
+attempts at most when the connection to Neon fails, with a wait of 2 s, 4 s and 8 s
+(`packages/services/scripts/connection-retry.mjs`). No variable sets these values. A migration
+that fails to apply stops the build at the first attempt.
+
 **Who migrates.** Only three runs write the schema, and each one owns its database:
 
 1. The admin `uat` build migrates the UAT base, at every merge to `main`.

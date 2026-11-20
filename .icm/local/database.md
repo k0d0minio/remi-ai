@@ -62,6 +62,10 @@ that `copier update` changes, so a new tag reaches every build · Jamie, 2026-10
   migrates before turbo starts, so `turbo.json` names no variable for it (why: turbo's strict
   mode removes `DATABASE_URL` from a task that `turbo.json` does not name, and a cache hit
   skips the task · 2026-10-28). A package one level below the root calls `../.icm/scripts/`.
+- `db:migrate` and `db:verify` make a new attempt after a connection failure: 4 attempts at
+  most, with a wait of 2 s, 4 s and 8 s. A failure that is not a connection failure stops the
+  build at the first attempt (why: a Neon compute that wakes can drop the first connection, and
+  one drop failed the admin deploy of PR #95 · REM-118).
 - A migration at build runs while the previous deployment still serves. So a migration must be
   forward-compatible with the code it replaces.
 
