@@ -261,6 +261,20 @@ export {
 export type { GeneratedRecipeInput } from "../db/services/generated-recipes";
 export type { GeneratedRecipe } from "../db/models/generated-recipe";
 
+/*
+ * The recipes that a patient can read (REM-94). Each read passes the recipe
+ * through the compatibility gate for that patient: a page shows no recipe
+ * that did not come from here.
+ */
+export {
+  getPatientRecipeCard,
+  listPatientRecipeCards,
+} from "./recipes/patient-recipes";
+export type {
+  PatientRecipeList,
+  PatientRecipeRead,
+} from "./recipes/patient-recipes";
+
 export {
   NUTRITION_RULE_RETRIEVAL_LIMIT,
   archiveNutritionRule,

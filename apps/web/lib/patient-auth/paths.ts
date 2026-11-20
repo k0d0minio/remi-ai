@@ -19,6 +19,8 @@ export const QUESTIONNAIRE_PATH = "/questionnaire";
 export const WAITING_PATH = "/attente";
 export const HOME_PATH = "/accueil";
 export const RECIPES_PATH = "/recettes";
+/** The page of one recipe of the patient (REM-94). */
+export const recipePath = (id: string) => `${RECIPES_PATH}/${id}`;
 export const PROFILE_PATH = "/profil";
 /** « Mes recommandations », below the Profil tab (story 23). */
 export const RECOMMENDATIONS_PATH = "/profil/recommandations";
