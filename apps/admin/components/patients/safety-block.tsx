@@ -15,6 +15,7 @@ import {
   CardTitle,
   Typography,
 } from "@remi/ui/server";
+import { AbsentValue } from "@/components/patients/file/value";
 import type { QuestionnaireView } from "@/components/patients/questionnaire-answers";
 
 type Props = {
@@ -22,14 +23,6 @@ type Props = {
   /** The patient's text, as entered. Null or blank is no answer. */
   medications: string | null;
 };
-
-const NOT_ENTERED = "Non renseigné";
-
-const NotEntered = () => (
-  <Typography size="sm" tone="muted">
-    {NOT_ENTERED}
-  </Typography>
-);
 
 type ListProps = {
   kind: "allergy" | "intolerance";
@@ -42,7 +35,7 @@ type ListProps = {
  */
 const ListValue = ({ kind, list }: ListProps) => {
   if (list.state === "not_entered") {
-    return <NotEntered />;
+    return <AbsentValue />;
   }
   if (list.state === "none_known") {
     return <Typography size="sm">{noneKnownLabels[kind].fr}</Typography>;
@@ -100,7 +93,7 @@ export const SafetyBlock = ({ questionnaire, medications }: Props) => {
       label: optionalQuestionnaireFieldLabels.celiacDisease.fr,
       value:
         celiac === null ? (
-          <NotEntered />
+          <AbsentValue />
         ) : celiac ? (
           <Typography size="sm" weight="medium" className="text-warning-text">
             {strictGlutenLabel.fr}
@@ -114,7 +107,7 @@ export const SafetyBlock = ({ questionnaire, medications }: Props) => {
       label: optionalQuestionnaireFieldLabels.medications.fr,
       value:
         medicationText === null ? (
-          <NotEntered />
+          <AbsentValue />
         ) : (
           <Typography size="sm" className="whitespace-pre-line break-words">
             {medicationText}
@@ -128,7 +121,7 @@ export const SafetyBlock = ({ questionnaire, medications }: Props) => {
       id="safety"
       data-segment="suivi"
       aria-labelledby="safety-title"
-      className="scroll-mt-32"
+      className="scroll-mt-60"
     >
       <Card variant="warning">
         <CardHeader>

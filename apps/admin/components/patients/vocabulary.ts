@@ -11,6 +11,7 @@ import type {
   GoalDirection,
   Locale,
   MealSlot,
+  PatientFileGroup,
   PatientSex,
   PatientStatus,
   RecommendationCategory,
@@ -234,3 +235,28 @@ export const messagesAwaitingLabel = (count: number) =>
   count === 1
     ? "1 message attend une réponse"
     : `${count} messages attendent une réponse`;
+
+/**
+ * The groups of the patient file (`patientFileLayout`), as Morgane reads them
+ * above their rows: by her work, never by table.
+ */
+export const fileGroupLabels: Record<PatientFileGroup, string> = {
+  answers: "Réponses de la personne",
+  calculations: "Calculs",
+  protocol: "Protocole",
+  follow_up: "Entre deux consultations",
+  preparation: "Notes et préparation",
+  resources: "Remis à la personne",
+  profile: "Profil et consentement",
+};
+
+/** The phone segment each group lives under. */
+export const fileGroupSegments: Record<PatientFileGroup, PatientSegment> = {
+  answers: "suivi",
+  calculations: "suivi",
+  protocol: "suivi",
+  follow_up: "journal",
+  preparation: "dossier",
+  resources: "dossier",
+  profile: "profil",
+};

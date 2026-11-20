@@ -97,14 +97,44 @@ Admin is a tool, not a showcase. Density over polish: rows that show everything,
 fast, states that say what is actually happening. It uses the same design system as the product — so
 the two never drift — but it is allowed to be plainer.
 
-**Phone-usable is a requirement, not a nicety.** Morgane works from consultations. The patient page
-opens on the patient file (story 6): the name, the file status and the appointment in the header,
-« Informations manquantes » with the mandatory fields apart from the optional ones, then every
-questionnaire answer in the patient's order, each one its value or « Non renseigné ». The living
-summary and the anamnesis follow, folded, then the preparation tools: the consultation date, the
-preparation note, the context to copy and the quick actions. Every other section is behind
-navigation: a section index on desktop, a segmented control on phone (Suivi · Journal · Dossier ·
-Profil).
+**Phone-usable is a requirement, not a nicety.** Morgane works from consultations.
+
+**The patient page follows the file status, and shows one thing to do** (stories 5 and 6). It
+answers four questions on the first screen: « Où en est-on ? Sur quoi travaille-t-on ? Que s'est-il
+passé depuis la dernière fois ? Que dois-je faire maintenant ? ». It has four parts, in this order:
+
+1. **The header** (`file/header.tsx`) stays in view while the page scrolls: the name, the
+   appointment, the four statuses as a path with the present one marked (`StepPath` of `@remi/ui`:
+   an icon and the label, never colour alone), and the safety items in short form
+   (`file/safety-strip.tsx`). « Non renseigné » and « Aucune … connue » are two different states.
+2. **The action card** (`file/next-step.tsx`) is the only place with a dominant button. Its content
+   follows the status: the missing information, then the appointment and the preparation note, then
+   what the validation will hold with « Valider les recommandations », then the validated version
+   and the count of the patient's open changes. The quick actions are in this card, as secondary
+   buttons.
+3. **The work column** holds the open blocks. Before the consultation (« Dossier à compléter »,
+   « Prêt pour consultation »): « Sécurité », every questionnaire answer, then the calculations.
+   From « Recommandations à valider » on: the goals, the recommendations, the supplements, the
+   essentials, then the calculations.
+4. **Every other section is one row** (`file/section-row.tsx`): its name, one line or a count, and
+   it opens in place. An empty section is one quiet line. The rows are in groups named by her work
+   (`fileGroupLabels`), not by table. A link or a quick action to a closed row opens the row.
+
+The rule of which section goes where is one pure function, `patientFileLayout` in
+`@remi/services/shared` (`patient-file-layout.ts`), with its tests. It is there because this app has
+no test runner. To add a section to the page: add one line to `patientFileSections` with its group,
+put the body in its own file under `components/patients/`, and add its entry to `views` in
+`app/(admin)/patients/[id]/page.tsx`. `page.tsx` loads the data, checks the access and composes: it
+holds no section of its own. Do not add a card to the page by hand.
+
+A value has three states, shown the same way in all places (`file/value.tsx`): absent
+(« Non renseigné », muted), entered (plain), validated by the practitioner (the mark and the word
+« validé »). A mark needs a fact in the data: never show one from a guess.
+
+Navigation is a section index on desktop, in the order of the page, and a segmented control on
+phone (Suivi · Journal · Dossier · Profil). A group has one segment (`fileGroupSegments`). On a
+phone the page is one column in the same order, with no horizontal scroll and touch targets of
+44 px.
 
 The secondary sections read the way she works, not the way the schema stores things. The anamnesis
 lists what she has written first and offers the rest as « Compléter »; the profile is a read summary

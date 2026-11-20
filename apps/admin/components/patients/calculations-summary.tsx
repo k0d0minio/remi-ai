@@ -16,6 +16,7 @@ import {
   proteinEstimateParameters,
 } from "@remi/services/shared";
 import { Badge, Typography } from "@remi/ui/server";
+import { ValidatedMark } from "@/components/patients/file/value";
 
 type Props = {
   /** The patient's rows of `patient_calculations`, at most one per kind. */
@@ -65,6 +66,20 @@ const EstimateBadge = () => (
     estimation
   </Badge>
 );
+
+/**
+ * Beside a value that the practitioner validated: the mark « validé ». When a
+ * later change of the file asks for a new validation, the row says so, and the
+ * mark does not show.
+ */
+const ValidationState = ({ row }: { row: PatientCalculation | undefined }) =>
+  row?.needsRevalidation ? (
+    <Badge variant="warning" tone="subtle" size="sm">
+      À revalider
+    </Badge>
+  ) : (
+    <ValidatedMark />
+  );
 
 /**
  * The BMI row (story 7): « IMC 23,9 · Corpulence normale », an indicator and
@@ -129,9 +144,12 @@ const ProteinValue = ({
   const validated = row?.validatedValue ?? null;
   if (validated !== null) {
     return (
-      <Typography size="sm" weight="medium">
-        {`${formatNumber(validated, "fr-BE")}${units.protein}`}
-      </Typography>
+      <div className="flex flex-wrap items-center gap-2">
+        <Typography size="sm" weight="medium">
+          {`${formatNumber(validated, "fr-BE")}${units.protein}`}
+        </Typography>
+        <ValidationState row={row} />
+      </div>
     );
   }
   const value = row?.estimatedValue ?? null;
@@ -206,15 +224,15 @@ const CalculationValue = ({
       <Typography size="sm" weight="medium">
         {`${formatNumber(value, "fr-BE")}${units[kind]}`}
       </Typography>
-      {validated === null ? <EstimateBadge /> : null}
+      {validated === null ? <EstimateBadge /> : <ValidationState row={row} />}
     </div>
   );
 };
 
 /**
  * « Calculs » (story 6): one row per calculation, under the questionnaire
- * data. A row shows the validated value, else the estimate with the badge
- * « estimation » (D-30). With no value it reads « Non calculé » and names
+ * data. A row shows the validated value with the mark « validé », else the
+ * estimate with the badge « estimation » (D-30). With no value it reads « Non calculé » and names
  * the missing data. The calculation epics fill the rows. This slot is the
  * only one.
  */
