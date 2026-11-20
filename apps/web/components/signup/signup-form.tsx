@@ -1,9 +1,10 @@
 "use client";
 
 import NextLink from "next/link";
-import { useActionState, useState } from "react";
+import { Fragment, useActionState, useState } from "react";
 import {
   localePath,
+  parseDateEntry,
   shownConsentValue,
   signupFields,
   type ConsentKey,
@@ -12,6 +13,7 @@ import {
 } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Field, Input, Link, Typography } from "@remi/ui/server";
+import { DateInput } from "@/components/date-entry/date-input";
 import type { Content } from "@/lib/content/types";
 import { fill } from "@/lib/content/fill";
 import { SIGN_IN_PATH } from "@/lib/patient-auth/paths";
@@ -30,6 +32,8 @@ type Props = {
   token: string;
   locale: Locale;
   content: Content["signupLink"];
+  /** The texts of the birth date field (REM-159). */
+  dateText: Content["dateEntry"];
   /** The mandatory consent texts, rendered on the server (story 3). */
   consents: readonly ConsentStepText[];
 };
@@ -41,7 +45,8 @@ const controls: Record<
 > = {
   lastName: { type: "text", autoComplete: "family-name" },
   firstName: { type: "text", autoComplete: "given-name" },
-  birthDate: { type: "date", autoComplete: "bday" },
+  // Typed as « JJ/MM/AAAA » in a `DateInput`, never a native date picker.
+  birthDate: { type: "text", autoComplete: "bday" },
   email: { type: "email", autoComplete: "email", inputMode: "email" },
   phone: { type: "tel", autoComplete: "tel", inputMode: "tel" },
   password: { type: "password", autoComplete: "new-password" },
@@ -66,7 +71,13 @@ const empty = Object.fromEntries(signupFields.map((name) => [name, ""])) as Reco
  * one keeps its values: the final submit posts the fields and the ticks
  * together. A refusal of the consents brings the consent step back.
  */
-export const SignupForm = ({ token, locale, content, consents }: Props) => {
+export const SignupForm = ({
+  token,
+  locale,
+  content,
+  dateText,
+  consents,
+}: Props) => {
   const [state, formAction, pending] = useActionState(
     signUpAction,
     initialSignupState,
@@ -213,6 +224,42 @@ export const SignupForm = ({ token, locale, content, consents }: Props) => {
             name === "phone" || name === "password"
               ? content.hints[name]
               : undefined;
+          if (name === "birthDate") {
+            // The field shows « JJ/MM/AAAA » and starts empty. The form posts
+            // the day as `YYYY-MM-DD`. A text that is not a real day is posted
+            // as typed, so the server refuses it and names the field.
+            const typed = values.birthDate;
+            const entry = parseDateEntry(typed);
+            return (
+              <Fragment key={name}>
+                <input
+                  type="hidden"
+                  name="birthDate"
+                  value={entry.state === "valid" ? entry.iso : typed}
+                />
+                <Field
+                  id={id}
+                  label={content.labels.birthDate}
+                  hint={dateText.hint}
+                  error={message(name)}
+                >
+                  <DateInput
+                  id={id}
+                  autoComplete={control.autoComplete}
+                  required
+                  size="lg"
+                  className="min-h-11"
+                  placeholder={dateText.placeholder}
+                  invalid={Boolean(state.fields.birthDate)}
+                  value={typed}
+                  onValueChange={(next) =>
+                    setValues((current) => ({ ...current, birthDate: next }))
+                  }
+                  />
+                </Field>
+              </Fragment>
+            );
+          }
           return (
             <Field
               key={name}

@@ -45,7 +45,8 @@ const SignupLinkPage = async ({ params }: { params: Promise<Params> }) => {
   if (!found.ok) {
     notFound();
   }
-  const content = getContent(locale).signupLink;
+  const dictionary = getContent(locale);
+  const content = dictionary.signupLink;
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-10">
@@ -60,6 +61,7 @@ const SignupLinkPage = async ({ params }: { params: Promise<Params> }) => {
         token={token}
         locale={locale}
         content={content}
+        dateText={dictionary.dateEntry}
         consents={consentTexts(locale)}
       />
     </main>

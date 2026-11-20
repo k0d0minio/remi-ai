@@ -20,34 +20,23 @@ export type ChoiceOption = {
 type Props = {
   field: AnswerField;
   legend: ReactNode;
-  hint?: ReactNode;
   options: readonly ChoiceOption[];
   /** The saved value, `""` when « Non renseigné ». */
   initial: string;
-  /**
-   * The option shown selected while nothing is saved. Display only: it saves
-   * when the patient taps it, never on its own (D-30).
-   */
-  shownByDefault?: string;
-  onSelect?: (value: string) => void;
 };
 
 /**
- * One choice among a few, as a radio group. A tap saves it. A tap on the
- * option shown by default saves it too, although it already looks selected:
- * that is why the save listens to the click, not only to the change.
+ * One choice among a few, as a radio group. A tap saves it. Nothing is
+ * selected while nothing is saved (D-30).
  */
 export const ChoiceAnswer = ({
   field,
   legend,
-  hint,
   options,
   initial,
-  shownByDefault,
-  onSelect,
 }: Props) => {
   const { text } = useQuestionnaire();
-  const [selected, setSelected] = useState(initial || shownByDefault || "");
+  const [selected, setSelected] = useState(initial);
   const { state, commit, retry } = useAutosave(
     (next) => saveAnswerAction(field, next),
     initial,
@@ -55,11 +44,8 @@ export const ChoiceAnswer = ({
   const refusal = refusalOf(state, text);
   const choose = async (value: string) => {
     setSelected(value);
-    onSelect?.(value);
     await commit(value);
   };
-  // The hint explains the default while nothing is saved.
-  const showHint = hint && initial === "" && state.kind === "idle";
   const name = `questionnaire-${field}`;
 
   return (
@@ -67,11 +53,6 @@ export const ChoiceAnswer = ({
       <Typography as="legend" size="sm" weight="medium" className="mb-2">
         {legend}
       </Typography>
-      {showHint ? (
-        <Typography as="p" size="sm" tone="muted">
-          {hint}
-        </Typography>
-      ) : null}
       <div className="flex flex-col gap-2">
         {options.map((option) => (
           <RadioCard
@@ -82,7 +63,6 @@ export const ChoiceAnswer = ({
             description={option.description}
             checked={selected === option.value}
             onChange={() => void choose(option.value)}
-            onClick={() => void choose(option.value)}
           />
         ))}
       </div>

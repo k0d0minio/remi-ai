@@ -18,6 +18,7 @@ import type {
   CookingAffinity,
   CookingTime,
   FoodBudget,
+  MandatoryQuestionnaireField,
   MealIntent,
   MealSlot,
   PersonalisationDimension,
@@ -568,8 +569,9 @@ export type Content = {
   };
   /**
    * The preparatory questionnaire (story 4), where a new patient lands after
-   * sign-up. The labels of the shared lists (diets, activity levels, the
-   * mandatory fields…) come from `@remi/services/shared`, not from here.
+   * sign-up. The labels of the shared lists (diets, activity levels,
+   * allergens…) come from `@remi/services/shared`, not from here. The
+   * questions are the patient's own, with « tu », so they live here.
    */
   questionnaire: {
     metaTitle: string;
@@ -611,9 +613,16 @@ export type Content = {
       birthDate: string;
       email: string;
       phone: string;
+      /**
+       * The patient's label of each mandatory question, also the link text
+       * on the end screen. The console has its own labels.
+       */
+      mandatory: Record<MandatoryQuestionnaireField, string>;
       desiredWeight: string;
       consultationDate: string;
+      /** The diet question (REM-162). */
       diet: string;
+      /** Shown after « Autre », where it is mandatory. */
       dietNote: string;
       pathologies: string;
       celiacDisease: string;
@@ -624,17 +633,35 @@ export type Content = {
     };
     hints: {
       email: string;
+      phone: string;
       height: string;
       weight: string;
       desiredWeight: string;
-      /** While the diet has no saved answer: the default is shown, not saved. */
-      dietDefault: string;
       allergies: string;
       intolerances: string;
       otherText: string;
       celiacDisease: string;
       medications: string;
       supplements: string;
+    };
+    /**
+     * The first step (REM-158): the personal data of the sign-up, shown as
+     * known. The patient reads it, and opens the fields to correct it.
+     */
+    identity: {
+      known: string;
+      edit: string;
+      /** In place of a value the file does not hold. */
+      empty: string;
+    };
+    /** The diet question (REM-162). */
+    diet: {
+      /** Under « Aucun régime particulier » while no diet is saved. */
+      proposed: string;
+      /** Saves the proposed choice. Shown while no diet is saved. */
+      confirm: string;
+      /** After « Autre », while its note is empty: nothing is saved. */
+      noteRequired: string;
     };
     /** The genetic consent and the three genotype lists (`genotype-section`). */
     genetic: {
@@ -652,6 +679,18 @@ export type Content = {
       /** A decision that did not save. */
       decisionFailed: string;
     };
+  };
+  /**
+   * A date field of the sign-up and of the questionnaire (REM-159): the
+   * patient types « JJ/MM/AAAA ».
+   */
+  dateEntry: {
+    placeholder: string;
+    hint: string;
+    /** A day that no calendar has, or a date left half typed. */
+    invalid: string;
+    /** A birth date of today or later. */
+    notPast: string;
   };
   /**
    * The patient's sign-in at `/connexion` (story 2): the password form, the

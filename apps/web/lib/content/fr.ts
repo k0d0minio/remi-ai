@@ -576,6 +576,8 @@ export const fr: Content = {
     errors: {
       required: "Ce champ ne peut pas rester vide.",
       invalid: "Cette valeur n'est pas valide.",
+      phone:
+        "Ce numéro n'est pas valide. Utilise 8 à 15 chiffres, avec un + au début si besoin.",
       height_range: "Indique une taille entre 100 et 250 cm, sans décimale.",
       weight_range:
         "Indique un poids entre 25 et 300 kg, avec une décimale au plus.",
@@ -592,9 +594,19 @@ export const fr: Content = {
       birthDate: "Date de naissance",
       email: "Adresse e-mail",
       phone: "Téléphone",
-      desiredWeight: "Poids souhaité",
+      mandatory: {
+        sexForCalculation:
+          "Sexe biologique utilisé pour les calculs nutritionnels",
+        heightCm: "Taille (cm)",
+        weightKg: "Poids actuel (kg)",
+        activityLevel: "Niveau d'activité physique",
+        consultationReason: "Motif de consultation",
+        allergies: "Allergies",
+        intolerances: "Intolérances",
+      },
+      desiredWeight: "Poids souhaité (kg)",
       consultationDate: "Date de consultation",
-      diet: "Type d'alimentation",
+      diet: "Quel type d'alimentation suis-tu ?",
       dietNote: "Précise ton type d'alimentation",
       pathologies: "Pathologies",
       celiacDisease: "Maladie cœliaque",
@@ -606,11 +618,10 @@ export const fr: Content = {
     },
     hints: {
       email: "Pour modifier ton e-mail, contacte ton praticien.",
-      height: "En cm, de 100 à 250.",
-      weight: "En kg, de 25 à 300.",
-      desiredWeight: "En kg, de 25 à 300. Laisse vide si tu n'en as pas.",
-      dietDefault:
-        "« Aucun type d'alimentation particulier » est proposé par défaut. Touche ta réponse pour l'enregistrer.",
+      phone: "Des chiffres, avec un + au début si besoin.",
+      height: "Entre 100 et 250 cm.",
+      weight: "Entre 25 et 300 kg.",
+      desiredWeight: "Laisse vide si tu n'en as pas.",
       allergies:
         "Coche « Aucune allergie connue » ou chaque allergie. Une catégorie cochée sans précision est exclue en entier.",
       intolerances:
@@ -621,6 +632,17 @@ export const fr: Content = {
       medications:
         "Ceux que tu prends aujourd'hui, avec leur dose si tu la connais.",
       supplements: "Vitamines, minéraux, plantes…",
+    },
+    identity: {
+      known:
+        "Ces informations viennent de ton inscription. Vérifie-les : tu peux les corriger si besoin.",
+      edit: "Modifier mes informations",
+      empty: "Non renseigné",
+    },
+    diet: {
+      proposed: "Choix proposé",
+      confirm: "Confirmer ce choix",
+      noteRequired: "Précise ton type d'alimentation pour enregistrer « Autre ».",
     },
     genetic: {
       consentTitle: "Traitement de tes données génétiques",
@@ -637,6 +659,12 @@ export const fr: Content = {
       decisionFailed:
         "Ta réponse n'a pas pu être enregistrée. Vérifie ta connexion et réessaie.",
     },
+  },
+  dateEntry: {
+    placeholder: "JJ/MM/AAAA",
+    hint: "Format : JJ/MM/AAAA.",
+    invalid: "Cette date n'est pas valide. Utilise le format JJ/MM/AAAA.",
+    notPast: "La date de naissance doit être dans le passé.",
   },
   patientSignIn: {
     metaTitle: "Connexion",
