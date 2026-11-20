@@ -138,6 +138,15 @@ export {
   getActivationRecap,
   getCareActivationDate,
 } from "../db/services/care-activation";
+export {
+  getActivationEmailStatus,
+  sendActivationEmail,
+} from "../db/services/care-activation/email";
+export type {
+  ActivationEmailInput,
+  ActivationEmailOutcome,
+  ActivationEmailStatus,
+} from "../db/services/care-activation/email";
 
 export {
   countOpenPatientChanges,
@@ -500,6 +509,7 @@ export {
   createResendMailer,
   getMailer,
   isMailerRegistered,
+  activationEmail,
   fileClaimEmail,
   operatorInvitationEmail,
   patientLinkEmail,

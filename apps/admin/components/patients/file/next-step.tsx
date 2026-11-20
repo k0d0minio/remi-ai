@@ -16,6 +16,7 @@ import {
   Typography,
 } from "@remi/ui/server";
 import {
+  ActivationEmail,
   ActivationRecapBlock,
   CareActivated,
 } from "@/components/patients/file/activation";
@@ -156,7 +157,8 @@ const changesLine = (count: number) =>
  * `ProtocolValidation` renders at each status, as before this layout: it
  * shows nothing until a version exists or the file can be validated. At
  * « Recommandations à valider » the recap of the activation follows it, with
- * « Activer l'accompagnement » (story 19). An active file shows its date.
+ * « Activer l'accompagnement » (story 19). An active file shows its date,
+ * and the state of the e-mail « Votre espace REMI est prêt ».
  */
 export const NextStepCard = ({
   action,
@@ -209,6 +211,14 @@ export const NextStepCard = ({
           {action === "validate" ? <ProtocolLines protocol={protocol} /> : null}
 
           {action === "follow" ? <CareActivated patient={patient} /> : null}
+
+          {/*
+            « Votre espace REMI est prêt » (story 19): the date of the e-mail,
+            or why it did not go out, with « Renvoyer l'e-mail ».
+          */}
+          {action === "follow" ? (
+            <ActivationEmail patient={patient} readOnly={readOnly} />
+          ) : null}
 
           {action === "follow" && openChanges !== null ? (
             <Typography size="sm" weight={openChanges > 0 ? "medium" : "normal"}>

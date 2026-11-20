@@ -76,6 +76,19 @@ export type {
   MealSlotState,
 } from "./meal-configuration";
 export { canActivate } from "./care-activation";
+export {
+  activationEmailDecision,
+  activationEmailFailures,
+  activationEmailState,
+  patientSignInPath,
+} from "./activation-email";
+export type {
+  ActivationEmailDecision,
+  ActivationEmailEvent,
+  ActivationEmailFailure,
+  ActivationEmailState,
+  ActivationEmailTrigger,
+} from "./activation-email";
 export type { ActivationBlocker, ActivationRecap } from "./care-activation";
 export type {
   PatientChangeValue,

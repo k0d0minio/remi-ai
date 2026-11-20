@@ -221,6 +221,18 @@ export const auditActions = [
   "share_link.regenerated",
   "share_link.emailed",
   /**
+   * « Votre espace REMI est prêt » went out to the patient (stories 19 and
+   * 22). The detail is the kind of link: `sign_in` or `takeover`. With no
+   * column on the file, this event is the record that the e-mail went out
+   * once (`shared/activation-email`).
+   */
+  "activation_email.sent",
+  /**
+   * A send of that e-mail did not go out. The detail is the reason, a key of
+   * `activationEmailFailures`. No detail holds an address or a link.
+   */
+  "activation_email.failed",
+  /**
    * The patient's pseudonymous context copied out of the console to be pasted
    * into a model of the operator's choosing. Health data leaving the console is
    * worth a line in the trail even when what leaves carries no real identity.

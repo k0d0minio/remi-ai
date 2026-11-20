@@ -126,6 +126,8 @@ export const actionLabels: Record<AuditActionName, string> = {
   "genotype.changed": "génotype modifié",
   "share_link.regenerated": "lien patient régénéré",
   "share_link.emailed": "lien patient envoyé",
+  "activation_email.sent": "e-mail « Votre espace REMI est prêt » envoyé",
+  "activation_email.failed": "e-mail « Votre espace REMI est prêt » non envoyé",
   "context.exported": "contexte copié",
   "protocol.copied_from_patient": "lignes reprises d'un autre patient",
   "template.saved": "modèle enregistré",
@@ -268,6 +270,9 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "genotype.changed": "neutral",
   "share_link.regenerated": "warning",
   "share_link.emailed": "info",
+  "activation_email.sent": "info",
+  // The patient does not know that the space is open: the practitioner must see it.
+  "activation_email.failed": "warning",
   // Health data left the console, pseudonymous but real — worth the eye, not an
   // alarm: it is the operator doing her job with the tool built for it.
   "context.exported": "warning",
@@ -321,6 +326,13 @@ const storedDetails: Readonly<Record<string, string>> = {
   acquired: "acquis",
   not_acquired: "non acquis",
   abandoned: "abandonné",
+  // The activation e-mail: the kind of link, then why a send did not go out.
+  sign_in: "lien de connexion",
+  takeover: "lien de reprise du dossier",
+  no_email: "le dossier n'a pas d'adresse e-mail",
+  no_mailer: "l'envoi d'e-mails n'est pas configuré",
+  link_failed: "le lien n'a pas pu être créé",
+  send_failed: "le service d'e-mail a refusé l'envoi",
 };
 
 /**

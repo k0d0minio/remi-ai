@@ -48,6 +48,12 @@ const sentences: Readonly<Record<string, string>> = {
     "Cette identité a déjà un compte.",
   "this e-mail already has an account": EMAIL_HAS_ACCOUNT,
   "this file already has an account": "Ce dossier a déjà un compte.",
+  "the care of this file is not active":
+    "L'accompagnement de ce dossier n'est pas actif.",
+  "the activation e-mail already went out":
+    "L'e-mail « Votre espace REMI est prêt » est déjà parti. Il n'est envoyé qu'une fois.",
+  "a send of the activation e-mail was already tried":
+    "Un envoi de l'e-mail a déjà été tenté. Utilisez « Renvoyer l'e-mail ».",
   "this invitation has already been used":
     "Cette invitation a déjà été utilisée.",
   "this link has already served": "Ce lien a déjà servi.",

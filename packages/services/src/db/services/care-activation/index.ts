@@ -105,7 +105,9 @@ export type CareActivation = {
  * 5. `setFileStatus` writes the audit event `patient.file_status_changed`
  *    with the practitioner, the patient and the reason (D-32).
  *
- * The e-mail to the patient is not sent here (`activation-email`).
+ * The e-mail to the patient is not sent here. The caller sends it after an
+ * `ok` with `alreadyActive` false (`./email.ts`, `sendActivationEmail`). A
+ * send that fails does not undo the activation.
  */
 const unscopedActivateCare = async (
   patientId: Id,
