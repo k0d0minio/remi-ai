@@ -12,3 +12,6 @@ pnpm-lock.yaml
 # The consent texts are records: a hash of each file's bytes sits on every consent row, so a
 # reformat would break the link between a row and the text it accepted.
 packages/services/src/consent/texts/
+
+# A prompt is exact text: the model reads each character, and a test pins the text of each step.
+packages/agent/flows/**/prompt.md

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockInstance } from "vitest";
+import type { MealSuggestionReply } from "@remi/agent";
 
 import type {
   ProviderReply,
@@ -7,7 +8,6 @@ import type {
   TextProvider,
 } from "../../ai/index";
 import type { PatientSafetyData } from "../../ai/compatibility";
-import type { MealSuggestionReply } from "../../ai/prompts/meal";
 import type { ProtocolSnapshot } from "../../shared/protocol-snapshot";
 import type { MealSuggestionInput } from "./suggest";
 

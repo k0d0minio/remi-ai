@@ -74,6 +74,14 @@ for both. The files seam is the same: the apps register and call it through `/se
 also the copy `deletePatient` reads — a store registered through `/files` would leave a deleted
 patient's files behind.
 
+## REMI's prompts are in `@remi/agent`
+
+A prompt for a model is not in this package. It is one step folder of
+[`packages/agent`](../agent/AGENTS.md): a contract, a system text and the shape of the reply.
+A service here loads the data, starts a run with `startFlow()` of `src/server/agent/runner.ts`,
+and gives each step the inputs that its contract names. It then does its checks in code (D-16).
+`@remi/agent` is the one workspace dependency of this package, and it never imports this one.
+
 ## Environment
 
 Every server-side `process.env` read goes through `env()` / `requireEnv()` in `src/server/env.ts`.
@@ -110,6 +118,9 @@ src/
   shared/      isomorphic — no fs, no driver, no secret
   server/      the Node barrel + env · meals/suggest.ts (REMI's answer to a planned meal:
                the database reads, the model call, then the gate in code) ·
+               agent/runner.ts (the runner of the steps of `@remi/agent`: it holds the
+               folder order of a flow, calls the seam with the texts, the role and the
+               schema of the step, and has no business rule) ·
                ai-models/ (the model of each AI role as a console setting: the service
                that calls the seam reads it with `roleModel()` and gives it in
                `options.model`, because `ai/` reads no database) ·
@@ -121,8 +132,7 @@ src/
   db/          client.ts (the seam) · schema.ts (Drizzle) · adapters/ · models/ · services/ · migrations/
   email/       the mailer seam + templates
   files/       the files seam · adapters/ (the server adapter and its browser half) · client.ts
-  ai/          model roles · the provider seam · context.ts (the prompt's context block) ·
-               prompts/ (one pure module for each prompt, pseudonymous by type)
+  ai/          model roles · the provider seam · context.ts (the prompt's context block)
 ```
 
 `db/models/` files are **types only**. That is what lets `shared/` re-export the domain vocabulary
