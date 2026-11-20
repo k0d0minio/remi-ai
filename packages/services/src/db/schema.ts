@@ -19,6 +19,17 @@ import {
   watchedPatientFields,
   type PatientChangeValue,
 } from "../shared/patient-changes";
+import type {
+  FoodDirectiveKind,
+  FoodLimitLevel,
+} from "../shared/food-directives";
+import type {
+  MealFasting,
+  MealOrientation,
+  MealSlot,
+} from "../shared/meal-configuration";
+import type { ProtocolSnapshot } from "../shared/protocol-snapshot";
+import type { StructuredRecipe } from "../shared/structured-recipe";
 
 /**
  * The Drizzle schema — the single definition the checked-in migrations under
@@ -860,10 +871,13 @@ export const patientPantryEssentials = pgTable("patient_pantry_essentials", {
  * have her retyping the same recipe five times and leave five versions of it to
  * fix when one changes.
  *
- * `body` is prose, one field, no structure imposed: she writes ingredients and
- * steps as a paragraph in chat today, and § 7 bans the dozen-field form that
- * would replace it. There is no `minutes`, `servings`, `ingredients[]` or
- * `method[]` here — those were v1's fields, and their absence is the spec.
+ * `body` is prose, one field: the form of the recipes of before REM-90. Since
+ * REM-90 (stories 24 and 25) a recipe also has `content`, the structured
+ * recipe that the recipe page, the shopping list and the weekly plan read. A
+ * recipe of the old form keeps its body and has `content` null.
+ *
+ * The library is the template base of the generation (D-34). Only a row with
+ * `verified_at` set feeds the generation.
  */
 export const recipes = pgTable("recipes", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -895,8 +909,71 @@ export const recipes = pgTable("recipes", {
   variantOfId: uuid("variant_of_id").references((): AnyPgColumn => recipes.id, {
     onDelete: "restrict",
   }),
+  /**
+   * The structured recipe (`shared/structured-recipe.ts`), or null for a
+   * recipe of the old prose form. The zod schema is the one definition of the
+   * shape: a reader parses the value and never trusts it.
+   */
+  content: jsonb("content").$type<StructuredRecipe>(),
+  /**
+   * When a practitioner marked the recipe « vérifiée », or null. Only an
+   * explicit act sets it, and an edit of the recipe sets it back to null.
+   */
+  verifiedAt: timestamp("verified_at", { withTimezone: true, mode: "date" }),
+  /**
+   * Who verified. No foreign key, as on `app_settings`: the record of who
+   * verified stays when the account is removed. The name is beside it for the
+   * same reason.
+   */
+  verifiedById: uuid("verified_by_id"),
+  verifiedByName: text("verified_by_name").notNull().default(""),
   ...timestamps,
 });
+
+/**
+ * One recipe that REMI generated for one patient — REM-90, story 24.
+ *
+ * The row is patient data: it goes with the patient. It names the verified
+ * template of the library that it started from (D-34). The template cannot be
+ * deleted: the library archives.
+ *
+ * The day and the meal are the weekly plan. A patient has one recipe at most
+ * for one day and one meal, and there is no separate plan table (Jamie,
+ * 2026-11-20).
+ */
+export const patientRecipes = pgTable(
+  "patient_recipes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    templateId: uuid("template_id")
+      .notNull()
+      .references(() => recipes.id, { onDelete: "restrict" }),
+    title: text("title").notNull(),
+    content: jsonb("content").$type<StructuredRecipe>().notNull(),
+    /** The day in Europe/Brussels, as a calendar date. */
+    plannedOn: date("planned_on", { mode: "string" }).notNull(),
+    /** `breakfast`, `lunch`, `snack` or `dinner`. */
+    meal: text("meal").$type<MealSlot>().notNull(),
+    generatedAt: timestamp("generated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("patient_recipes_patient_day_meal_idx").on(
+      table.patientId,
+      table.plannedOn,
+      table.meal,
+    ),
+    check(
+      "patient_recipes_meal_check",
+      sql`${table.meal} in ('breakfast', 'lunch', 'snack', 'dinner')`,
+    ),
+  ],
+);
 
 /**
  * One recipe given to one patient — the half of § I that is personal.
@@ -1477,4 +1554,173 @@ export const leads = pgTable(
       sql`${table.offerInterest} is null or ${table.offerInterest} in ('genetic', 'consultation', 'undecided')`,
     ),
   ],
+);
+
+/**
+ * The validated versions of a patient's protocol — story 20. One row for each
+ * validation: the number, the date, the operator and a snapshot of the live
+ * protocol (`shared/protocol-snapshot.ts`). A row is immutable: the service
+ * has no update and no delete. The rows go with the patient.
+ */
+export const protocolVersions = pgTable(
+  "protocol_versions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    versionNumber: integer("version_number").notNull(),
+    validatedAt: timestamp("validated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+    /** The operator who validated. No foreign key, like `audit_events`. */
+    validatedBy: uuid("validated_by").notNull(),
+    snapshot: jsonb("snapshot").$type<ProtocolSnapshot>().notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("protocol_versions_patient_version_idx").on(
+      table.patientId,
+      table.versionNumber,
+    ),
+    check(
+      "protocol_versions_version_number_check",
+      sql`${table.versionNumber} >= 1`,
+    ),
+  ],
+);
+
+/**
+ * The food directives of a patient file — REM-54, story 13. One row for each
+ * term of « À favoriser », « À limiter » and « Éviction totale ». The term is
+ * stored as typed: REMI has no term base yet.
+ *
+ * A total eviction (`exclude`) is safety data (story 14, D-30): the check
+ * `patient_food_directives_eviction_period_check` refuses one with no end date
+ * and no durable status, and one with the two. A row that leaves the list is
+ * disabled (`disabled_at`), never deleted. The rows go with the patient.
+ */
+export const patientFoodDirectives = pgTable(
+  "patient_food_directives",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    /** `favour`, `limit` or `exclude`. */
+    kind: text("kind").$type<FoodDirectiveKind>().notNull(),
+    /** The term as the practitioner typed it. */
+    term: text("term").notNull(),
+    /** For `limit` only: `reduce` or `rare`. Null when no level is chosen. */
+    limitLevel: text("limit_level").$type<FoodLimitLevel>(),
+    /** For `exclude` only. Null: the eviction applies from the save. */
+    startsOn: date("starts_on", { mode: "string" }),
+    /** For `exclude` only. Null for a durable eviction. */
+    endsOn: date("ends_on", { mode: "string" }),
+    /** For `exclude` only. The durable medical exclusion. */
+    durable: boolean("durable").notNull().default(false),
+    /** Rank in the field of its kind. */
+    position: integer("position").notNull().default(0),
+    /** Null for a directive in force. */
+    disabledAt: timestamp("disabled_at", { withTimezone: true, mode: "date" }),
+    ...timestamps,
+  },
+  (table) => [
+    index("patient_food_directives_patient_idx").on(table.patientId),
+    check(
+      "patient_food_directives_kind_check",
+      sql`${table.kind} in ('favour', 'limit', 'exclude')`,
+    ),
+    check(
+      "patient_food_directives_limit_level_check",
+      sql`${table.limitLevel} is null or (${table.kind} = 'limit' and ${table.limitLevel} in ('reduce', 'rare'))`,
+    ),
+    check(
+      "patient_food_directives_eviction_period_check",
+      sql`(${table.kind} = 'exclude' and ${table.durable} <> (${table.endsOn} is not null)) or (${table.kind} <> 'exclude' and not ${table.durable} and ${table.startsOn} is null and ${table.endsOn} is null)`,
+    ),
+    check(
+      "patient_food_directives_period_order_check",
+      sql`${table.startsOn} is null or ${table.endsOn} is null or ${table.endsOn} >= ${table.startsOn}`,
+    ),
+  ],
+);
+
+/**
+ * The meal configuration of a patient file — REM-68 and REM-70, stories 11
+ * and 12. One row for each patient: for each of the four meals, whether the
+ * patient eats it and its orientation, then the intermittent fasting option.
+ *
+ * The fasting option is one fact for each patient, so the table has one row
+ * for each patient and not one row for each meal. Each value is nullable:
+ * null means that the practitioner has not entered it. REMI enters no value.
+ * The row goes with the patient.
+ */
+export const patientMealConfigurations = pgTable(
+  "patient_meal_configurations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    breakfastEnabled: boolean("breakfast_enabled"),
+    breakfastOrientation: text("breakfast_orientation").$type<MealOrientation>(),
+    lunchEnabled: boolean("lunch_enabled"),
+    lunchOrientation: text("lunch_orientation").$type<MealOrientation>(),
+    snackEnabled: boolean("snack_enabled"),
+    snackOrientation: text("snack_orientation").$type<MealOrientation>(),
+    dinnerEnabled: boolean("dinner_enabled"),
+    dinnerOrientation: text("dinner_orientation").$type<MealOrientation>(),
+    /** `none`, `skip_breakfast` or `skip_dinner`. */
+    fasting: text("fasting").$type<MealFasting>(),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("patient_meal_configurations_patient_idx").on(table.patientId),
+    check(
+      "patient_meal_configurations_breakfast_orientation_check",
+      sql`${table.breakfastOrientation} is null or ${table.breakfastOrientation} in ('protein_fat', 'complete_balanced', 'light_plant', 'carb_leaning', 'free')`,
+    ),
+    check(
+      "patient_meal_configurations_lunch_orientation_check",
+      sql`${table.lunchOrientation} is null or ${table.lunchOrientation} in ('protein_fat', 'complete_balanced', 'light_plant', 'carb_leaning', 'free')`,
+    ),
+    check(
+      "patient_meal_configurations_snack_orientation_check",
+      sql`${table.snackOrientation} is null or ${table.snackOrientation} in ('protein_fat', 'complete_balanced', 'light_plant', 'carb_leaning', 'free')`,
+    ),
+    check(
+      "patient_meal_configurations_dinner_orientation_check",
+      sql`${table.dinnerOrientation} is null or ${table.dinnerOrientation} in ('protein_fat', 'complete_balanced', 'light_plant', 'carb_leaning', 'free')`,
+    ),
+    check(
+      "patient_meal_configurations_fasting_check",
+      sql`${table.fasting} is null or ${table.fasting} in ('none', 'skip_breakfast', 'skip_dinner')`,
+    ),
+  ],
+);
+
+/**
+ * Settings of the application that an admin changes in the console. One row
+ * for each key. The first keys are the model of each AI role (`ai.model.fast`,
+ * `ai.model.balanced`, `ai.model.deep`): with no row, the code default applies.
+ *
+ * It holds no secret and no patient data. A key of a vendor stays an
+ * environment variable.
+ *
+ * `updated_by_id` is a plain id with no foreign key, as `audit_events.actor_id`
+ * is: the record of who set a value must stay when the account is removed. The
+ * name is kept beside it for the same reason.
+ */
+export const appSettings = pgTable(
+  "app_settings",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    key: text("key").notNull(),
+    value: text("value").notNull(),
+    updatedById: uuid("updated_by_id"),
+    updatedByName: text("updated_by_name").notNull().default(""),
+    ...timestamps,
+  },
+  (table) => [uniqueIndex("app_settings_key_idx").on(table.key)],
 );

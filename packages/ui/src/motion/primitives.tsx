@@ -107,7 +107,7 @@ export const CountUp = ({ value, className }: CountUpProps) => (
       viewport={viewport}
       transition={{ duration: duration.slow, ease: ease.standard }}
     >
-      {value.toLocaleString("en-GB")}
+      {value.toLocaleString("fr-BE")}
     </m.span>
   </Root>
 );

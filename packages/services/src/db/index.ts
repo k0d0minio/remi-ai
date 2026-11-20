@@ -118,7 +118,6 @@ export {
   recordWeeklyCheckIn,
   updateGoalCheckIn,
   updatePatientGoal,
-  MAX_ACTIVE_GOALS,
 } from "./services/patient-goals";
 export type {
   GoalCheckInInput,
@@ -173,6 +172,20 @@ export {
 export { listPatientCalculations } from "./services/patient-calculations";
 
 export {
+  getValidatedProtocol,
+  validateProtocol,
+} from "./services/protocol-versions";
+
+export {
+  activateCare,
+  getActivationRecap,
+  getCareActivationDate,
+} from "./services/care-activation";
+
+export { countMissingMandatoryFields } from "./services/patient-questionnaire/missing-counts";
+
+export {
+  acknowledgePatientChanges,
   countOpenPatientChanges,
   listOpenPatientChanges,
 } from "./services/patient-changes";

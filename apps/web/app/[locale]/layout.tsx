@@ -3,7 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
-import { isLocale, locales } from "@remi/services/shared";
+import { defaultLocale, isLocale, locales } from "@remi/services/shared";
 import { BRAND_NAME } from "@remi/ui/server";
 import { getContent } from "@/lib/content";
 import "../globals.css";
@@ -24,7 +24,7 @@ type Params = { locale: string };
 export const generateStaticParams = (): Params[] =>
   locales.map((locale) => ({ locale }));
 
-/** Only /en and /fr exist — an unknown locale is a 404, not a half-valid render. */
+/** Only /fr exists. An unknown locale is a 404, not a half-valid render. */
 export const dynamicParams = false;
 
 export const generateMetadata = async ({
@@ -33,7 +33,7 @@ export const generateMetadata = async ({
   params: Promise<Params>;
 }): Promise<Metadata> => {
   const { locale } = await params;
-  const { meta } = getContent(isLocale(locale) ? locale : "en");
+  const { meta } = getContent(isLocale(locale) ? locale : defaultLocale);
 
   return {
     title: {

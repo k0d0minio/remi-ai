@@ -24,8 +24,8 @@ const schema = z.object({
   BLOB_READ_WRITE_TOKEN: z.string().optional(),
   /** Vercel Cron sends it as `Authorization: Bearer <value>`. Unset: 503. */
   CRON_SECRET: z.string().optional(),
+  /** The Vercel AI Gateway key. Unset: no AI adapter registers. */
   AI_GATEWAY_API_KEY: z.string().optional(),
-  ANTHROPIC_API_KEY: z.string().optional(),
 });
 
 export type ServerEnv = z.infer<typeof schema>;

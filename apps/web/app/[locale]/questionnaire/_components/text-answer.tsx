@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { maskNumberEntry } from "@remi/services/shared";
 import { Field, Input, Textarea } from "@remi/ui/server";
 import { saveAnswerAction } from "@/lib/questionnaire/actions";
 import type { AnswerField } from "@/lib/questionnaire/state";
 import {
+  refusalOf,
   SaveStatus,
   useAutosave,
   useQuestionnaire,
@@ -17,8 +19,14 @@ type Props = {
   /** The saved value, `""` when « Non renseigné ». */
   initial: string;
   multiline?: boolean;
-  type?: "text" | "date" | "tel";
-  inputMode?: "text" | "numeric" | "decimal" | "tel";
+  type?: "text" | "tel";
+  inputMode?: "text" | "tel";
+  /**
+   * A number field (REM-160): the numeric keyboard of a phone, and no
+   * character that is not part of the number. `integer` is a height in cm,
+   * `decimal` a weight in kg. The server checks the plausible range.
+   */
+  numeric?: "integer" | "decimal";
   autoComplete?: string;
 };
 
@@ -34,17 +42,20 @@ export const TextAnswer = ({
   multiline,
   type = "text",
   inputMode,
+  numeric,
   autoComplete,
 }: Props) => {
   const { text } = useQuestionnaire();
   const [value, setValue] = useState(initial);
-  const { state, commit, schedule } = useAutosave(
+  const { state, commit, schedule, retry } = useAutosave(
     (next) => saveAnswerAction(field, next),
     initial,
   );
   const id = `questionnaire-${field}`;
-  const invalid = state.kind === "error";
-  const onChange = (next: string) => {
+  const refusal = refusalOf(state, text);
+  const invalid = refusal !== undefined;
+  const onChange = (typed: string) => {
+    const next = numeric ? maskNumberEntry(typed, numeric) : typed;
     setValue(next);
     schedule(next);
   };
@@ -58,7 +69,7 @@ export const TextAnswer = ({
         id={id}
         label={label}
         hint={hint}
-        error={invalid ? text.errors[state.error] : undefined}
+        error={refusal}
       >
         {multiline ? (
           <Textarea
@@ -75,14 +86,20 @@ export const TextAnswer = ({
             size="lg"
             value={value}
             invalid={invalid}
-            inputMode={inputMode}
+            inputMode={
+              numeric === "integer"
+                ? "numeric"
+                : numeric === "decimal"
+                  ? "decimal"
+                  : inputMode
+            }
             autoComplete={autoComplete}
             onChange={(event) => onChange(event.target.value)}
             onBlur={onBlur}
           />
         )}
       </Field>
-      <SaveStatus state={state} />
+      <SaveStatus state={state} onRetry={() => void retry()} />
     </div>
   );
 };

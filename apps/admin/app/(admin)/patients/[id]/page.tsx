@@ -1,9 +1,6 @@
-import { ArrowLeft } from "lucide-react";
-import NextLink from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import {
-  MAX_ACTIVE_GOALS,
   adminOpenablePatient,
   consentsOf,
   countGoalCheckInsAwaitingAttention,
@@ -11,6 +8,7 @@ import {
   getCurrentChallenge,
   patientOf,
   getPatientInstruction,
+  getPatientMealConfiguration,
   getPatientQuestionnaire,
   getPatientSummary,
   listArchivedMealEntries,
@@ -21,6 +19,7 @@ import {
   listArchivedPatientRecipes,
   listArchivedPatientRecommendations,
   listGoalCheckIns,
+  computePatientEstimates,
   listPatientCalculations,
   listMealEntries,
   listPantryEssentials,
@@ -34,6 +33,10 @@ import {
   listPatientRecipes,
   listPatientRecommendations,
   listArchivedPatientSupplements,
+  listDisabledPatientFoodDirectives,
+  listDisabledPatientLifestyleAdvices,
+  listPatientFoodDirectives,
+  listPatientLifestyleAdvices,
   listPatientSupplements,
   listRecipes,
   missingQuestionnaireFields,
@@ -43,81 +46,66 @@ import {
   bmiIndicator,
   calculationKinds,
   canManageOperators,
-  fileStatusLabels,
   formatDate,
   missingCalculationInputs,
   missingOptionalFields,
+  patientFileLayout,
   patientLinkPreviewParam,
   todayAtPractice,
   type CalculationInput,
   type CalculationKind,
 } from "@remi/services/shared";
-import {
-  Badge,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Typography,
-} from "@remi/ui/server";
+import { Typography } from "@remi/ui/server";
 import { AdminOpenForm } from "@/components/patients/admin-open-form";
 import { AnamnesisBlock } from "@/components/patients/anamnesis-block";
-import { AssignRecipeForm } from "@/components/patients/assign-recipe-form";
 import { CalculationsSummary } from "@/components/patients/calculations-summary";
-import { ChallengeHistory } from "@/components/patients/challenge-history";
-import { ChallengeSection } from "@/components/patients/challenge-section";
-import { ConsultationDate } from "@/components/patients/consultation-date";
 import { CopyContextCard } from "@/components/patients/copy-context-card";
-import { DeletePatient } from "@/components/patients/delete-patient";
-import { FoldedCard } from "@/components/patients/folded-card";
-import { RetentionHold } from "@/components/patients/retention-hold";
 import {
   DocumentSection,
   type AttachmentOption,
 } from "@/components/patients/document-section";
-import { GoalAddForm } from "@/components/patients/goal-add-form";
+import { ChallengesSection } from "@/components/patients/file/challenges";
+import { countLabel } from "@/components/patients/file/count-label";
+import { FoodDirectivesSection } from "@/components/patients/file/food-directives";
+import { MealStructureSection } from "@/components/patients/file/meal-structure";
+import { GoalsSection } from "@/components/patients/file/goals";
+import { PatientHeader } from "@/components/patients/file/header";
+import { LearningsSection } from "@/components/patients/file/learnings";
+import { LifestyleAdviceSection } from "@/components/patients/file/lifestyle-advice";
 import {
-  GoalList,
-  GoalsAwaitingAttention,
-} from "@/components/patients/goal-list";
-import { InstructionBlock } from "@/components/patients/instruction-block";
+  MealsSection,
+  mealsAwaitingLabel,
+} from "@/components/patients/file/meals";
+import { MessagesSection } from "@/components/patients/file/messages";
+import { NextStepCard } from "@/components/patients/file/next-step";
+import { PantryEssentialsSection } from "@/components/patients/file/pantry";
+import { PreparationSection } from "@/components/patients/file/preparation";
+import { ProfileSection } from "@/components/patients/file/profile";
+import { RecipesSection } from "@/components/patients/file/recipes";
+import { RecommendationsSection } from "@/components/patients/file/recommendations";
 import {
-  ArchivedObservations,
-  LearningsList,
-} from "@/components/patients/learnings-list";
-import { MealAddForm } from "@/components/patients/meal-add-form";
-import { MealJournal } from "@/components/patients/meal-journal";
+  SectionRows,
+  WorkColumn,
+  type FileSectionViews,
+} from "@/components/patients/file/sections";
+import { SupplementsSection } from "@/components/patients/file/supplements";
+import { NOT_ENTERED } from "@/components/patients/file/value";
+import { mealConfigurationSummary } from "@/components/patients/meal-configuration-labels";
 import { NoteTimeline } from "@/components/patients/note-timeline";
-import { ObservationAddForm } from "@/components/patients/observation-add-form";
 import {
   PatientNavigation,
   type PatientSectionEntry,
 } from "@/components/patients/patient-navigation";
-import { PantryAddForm } from "@/components/patients/pantry-add-form";
-import { PantryList } from "@/components/patients/pantry-list";
-import { PantrySection } from "@/components/patients/pantry-section";
-import { ProfileSummary } from "@/components/patients/profile-summary";
 import { QuestionnaireFile } from "@/components/patients/questionnaire-file";
-import { PrepNote } from "@/components/patients/prep-note";
 import { QuickActions } from "@/components/patients/quick-actions";
-import { RecipeAssignments } from "@/components/patients/recipe-assignments";
-import { RecommendationAddForm } from "@/components/patients/recommendation-add-form";
-import { RecommendationGroups } from "@/components/patients/recommendation-groups";
-import { RecommendationSection } from "@/components/patients/recommendation-section";
-import { SectionFold } from "@/components/patients/section-fold";
+import { SafetyBlock } from "@/components/patients/safety-block";
 import { ShareLinkCard } from "@/components/patients/share-link-card";
 import { SummaryBlock } from "@/components/patients/summary-block";
-import { SupplementAddForm } from "@/components/patients/supplement-add-form";
-import { SupplementProtocol } from "@/components/patients/supplement-protocol";
-import { SupplementSection } from "@/components/patients/supplement-section";
-import { MessageThread } from "@/components/patients/message-thread";
 import {
   consentChannelLabels,
+  fileGroupSegments,
   messagesAwaitingLabel,
   patientSegments,
-  patientStatusIntents,
-  patientStatusLabels,
   type PatientSegment,
 } from "@/components/patients/vocabulary";
 import { patientContextInput } from "@/lib/patients/context";
@@ -144,14 +132,16 @@ const isPatientSegment = (value: string): value is PatientSegment =>
   (patientSegments as readonly string[]).includes(value);
 
 /**
- * One patient's file (story 6), opening on the questionnaire: the header names
- * the patient, the file status and the appointment, « Informations
- * manquantes » lists what is empty, and every answer follows in the order the
- * patient met it. The living summary and the anamnesis sit under it, folded,
- * then the preparation tools. Every other section is behind navigation: a
- * section index on desktop, a segmented control on phone (Suivi · Journal ·
- * Dossier · Profil), an anchor row in between. One DOM order — the views are
- * classes and segments over it, never a second tree.
+ * One patient's file (stories 5 and 6). This file loads the data, checks the
+ * access and composes the layout. It holds no section of its own.
+ *
+ * The page follows the file status (`patientFileLayout`): a header that stays
+ * in view, one action card with the thing to do now, a work column whose
+ * first block depends on the status, then every other section as one row that
+ * opens in place. Navigation is a section index on desktop, a segmented
+ * control on phone (Suivi · Journal · Dossier · Profil), an anchor row in
+ * between. One DOM order — the views are classes and segments over it, never
+ * a second tree.
  */
 const PatientDetail = async ({ params, searchParams }: PageProps) => {
   // The page's own graph, not the layout's — the two render in parallel.
@@ -249,11 +239,13 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   // The questionnaire half of the file (story 1): its answers for the form,
   // what is still missing, and whether the genotype may be entered. Then the
   // automatic calculations that read those answers (stories 7, 8 and 9).
-  const [questionnaire, missing, calculations] = await Promise.all([
-    getPatientQuestionnaire(actor, patient.id),
-    missingQuestionnaireFields(actor, patient.id),
-    listPatientCalculations(actor, patient.id),
-  ]);
+  const [questionnaire, missing, calculations, computedEstimates] =
+    await Promise.all([
+      getPatientQuestionnaire(actor, patient.id),
+      missingQuestionnaireFields(actor, patient.id),
+      listPatientCalculations(actor, patient.id),
+      computePatientEstimates(actor, patient.id),
+    ]);
   if (!questionnaire.ok) {
     notFound();
   }
@@ -351,87 +343,493 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   // working across midnight or from another timezone.
   const today = todayAtPractice();
 
+  // The layout follows the file status: what the action card shows, which
+  // sections are open in the work column and which are folded rows.
+  const layout = patientFileLayout(patient.fileStatus);
+  const validatedCalculations = calculations.filter(
+    (row) => row.validatedValue !== null && !row.needsRevalidation,
+  ).length;
+  const missingCount = missingMandatory.length + missingOptional.length;
+
+  const preparation = (
+    <PreparationSection
+      patientId={patient.id}
+      pseudonym={patient.pseudonym}
+      consultationDate={consultationDate}
+      prepNote={patient.nextConsultationPrep}
+    />
+  );
+
+  // The food directives (REM-54): the ones in force and the disabled ones.
+  const [foodDirectives, disabledFoodDirectives] = await Promise.all([
+    listPatientFoodDirectives(actor, patient.id),
+    listDisabledPatientFoodDirectives(actor, patient.id),
+  ]);
+
+  // The lifestyle advice (REM-65): the advice in force and the disabled ones.
+  const [lifestyleAdvices, disabledLifestyleAdvices] = await Promise.all([
+    listPatientLifestyleAdvices(actor, patient.id),
+    listDisabledPatientLifestyleAdvices(actor, patient.id),
+  ]);
+
+  // The meals and the fasting option (REM-68, REM-70). Null: not entered.
+  const mealConfiguration = await getPatientMealConfiguration(
+    actor,
+    patient.id,
+  );
+
+  // Each section of the page: its words, its one line for a folded row, and
+  // its body. `patientFileLayout` places them. To add a section, add its id in
+  // `patient-file-layout.ts` and its entry here.
+  const views: FileSectionViews = {
+    "patient-file": {
+      title: "Dossier patient",
+      description:
+        "Les réponses du questionnaire, dans son ordre. Un champ vide reste « Non renseigné ».",
+      summary: countLabel(missingCount, {
+        none: "Rien ne manque",
+        one: "information manquante",
+        many: "informations manquantes",
+      }),
+      empty: false,
+      lead: (
+        <SafetyBlock
+          questionnaire={questionnaire.data}
+          medications={patient.medications}
+        />
+      ),
+      body: (
+        <QuestionnaireFile
+          patient={patient}
+          questionnaire={questionnaire.data}
+          genotypeOpen={genotypeOpen}
+        />
+      ),
+    },
+    calculations: {
+      title: "Calculs",
+      description:
+        "Calculés à partir du dossier. Une valeur reste une estimation tant que vous ne l'avez pas validée.",
+      summary: countLabel(validatedCalculations, {
+        none: "Aucun calcul validé",
+        one: "calcul validé",
+        many: "calculs validés",
+      }),
+      empty: false,
+      body: (
+        <CalculationsSummary
+          patientId={patient.id}
+          readOnly={readOnly}
+          calculations={calculations}
+          missing={missingCalculation}
+          bmi={bmiIndicator(calculationData)}
+          computed={computedEstimates}
+        />
+      ),
+    },
+    objectifs: {
+      title: "Objectifs et consigne",
+      description:
+        "Deux ou trois priorités, dans votre ordre, avec leur évolution — et la consigne que vous vous donnez pour cet accompagnement.",
+      summary: `${countLabel(goals.length, {
+        none: "Aucun objectif",
+        one: "objectif",
+        many: "objectifs",
+      })} · ${instruction ? "consigne rédigée" : "aucune consigne"}`,
+      empty: goals.length === 0 && !instruction,
+      count: goals.length,
+      body: (
+        <GoalsSection
+          patientId={patient.id}
+          pseudonym={patient.pseudonym}
+          goals={goals}
+          archivedGoals={archivedGoals}
+          checkIns={checkIns}
+          awaitingAttention={goalsAwaitingAttention}
+          instruction={instruction}
+          supersededInstructions={supersededInstructions}
+          today={today}
+        />
+      ),
+    },
+    recommendations: {
+      title: "Recommandations",
+      description:
+        "Le protocole, encodé entrée par entrée — c'est ce que montre le lien patient.",
+      summary: countLabel(recommendations.length, {
+        none: "Aucune recommandation",
+        one: "recommandation",
+        many: "recommandations",
+      }),
+      empty: recommendations.length === 0,
+      count: recommendations.length,
+      body: (
+        <RecommendationsSection
+          patientId={patient.id}
+          pseudonym={patient.pseudonym}
+          recommendations={recommendations}
+          archived={archived}
+        />
+      ),
+    },
+    "food-directives": {
+      title: "Consignes alimentaires",
+      description:
+        "« À favoriser », « À limiter » et « Éviction totale » : un terme par consigne, séparés par « ; ». Une éviction porte une date de fin ou le statut durable.",
+      summary: countLabel(foodDirectives.length, {
+        none: "Aucune consigne",
+        one: "consigne",
+        many: "consignes",
+      }),
+      empty: foodDirectives.length === 0,
+      count: foodDirectives.length,
+      body: (
+        <FoodDirectivesSection
+          patientId={patient.id}
+          pseudonym={patient.pseudonym}
+          directives={foodDirectives}
+          disabled={disabledFoodDirectives}
+          today={today}
+        />
+      ),
+    },
+    "meal-structure": {
+      title: "Repas",
+      description:
+        "Les repas que la personne prend, l'orientation de chacun et le jeûne intermittent. Chaque choix est enregistré aussitôt.",
+      summary: mealConfigurationSummary(mealConfiguration),
+      empty: mealConfiguration === null,
+      body: (
+        <MealStructureSection
+          patientId={patient.id}
+          configuration={mealConfiguration}
+        />
+      ),
+    },
+    supplements: {
+      title: "Protocole de compléments",
+      description:
+        "Les compléments que vous prescrivez, avec dose, moment et raison. Ceux que la personne prend déjà d'elle-même se notent dans le profil.",
+      summary: countLabel(supplements.length, {
+        none: "Aucun complément prescrit",
+        one: "complément",
+        many: "compléments",
+      }),
+      empty: supplements.length === 0,
+      count: supplements.length,
+      body: (
+        <SupplementsSection
+          patientId={patient.id}
+          pseudonym={patient.pseudonym}
+          supplements={supplements}
+          archived={archivedSupplements}
+        />
+      ),
+    },
+    "lifestyle-advice": {
+      title: "Hygiène de vie",
+      description:
+        "Vos conseils hors alimentation, dans six catégories. Aucune n'est obligatoire. La personne les lit tels que vous les avez écrits, après la validation.",
+      summary: countLabel(lifestyleAdvices.length, {
+        none: "Aucun conseil",
+        one: "conseil",
+        many: "conseils",
+      }),
+      empty: lifestyleAdvices.length === 0,
+      count: lifestyleAdvices.length,
+      body: (
+        <LifestyleAdviceSection
+          patientId={patient.id}
+          advices={lifestyleAdvices}
+          disabled={disabledLifestyleAdvices}
+        />
+      ),
+    },
+    pantry: {
+      title: "Essentiels placard / frigo",
+      description:
+        "La courte liste d'aliments à avoir sous la main, avec le pourquoi de chacun — pour cette personne.",
+      summary: countLabel(essentials.length, {
+        none: "Aucun essentiel",
+        one: "essentiel",
+        many: "essentiels",
+      }),
+      empty: essentials.length === 0,
+      count: essentials.length,
+      body: (
+        <PantryEssentialsSection
+          patientId={patient.id}
+          pseudonym={patient.pseudonym}
+          essentials={essentials}
+          archived={archivedEssentials}
+        />
+      ),
+    },
+    messages: {
+      title: "Messages",
+      description:
+        "L'endroit général où la personne dit comment se passe son accompagnement. Votre réponse s'affiche sur son lien, sous votre nom.",
+      summary:
+        unreadMessages > 0
+          ? messagesAwaitingLabel(unreadMessages)
+          : countLabel(messages.length, {
+              none: "Aucun message",
+              one: "message",
+              many: "messages",
+            }),
+      empty: messages.length === 0,
+      count: messages.length,
+      body: (
+        <MessagesSection
+          patientId={patient.id}
+          pseudonym={patient.pseudonym}
+          messages={messages}
+          unread={unreadMessages}
+        />
+      ),
+    },
+    meals: {
+      title: "Journal des repas",
+      description:
+        "Ce que la personne a envoyé, transcrit ici, avec votre retour sous chaque repas. Texte seulement pour l'instant — les photos restent sur WhatsApp.",
+      summary:
+        awaitingFeedback > 0
+          ? mealsAwaitingLabel(awaitingFeedback)
+          : countLabel(mealEntries.length, {
+              none: "Aucun repas noté",
+              one: "repas",
+              many: "repas",
+            }),
+      empty: mealEntries.length === 0,
+      count: mealEntries.length,
+      body: (
+        <MealsSection
+          patientId={patient.id}
+          entries={mealEntries}
+          archived={archivedMealEntries}
+          awaitingFeedback={awaitingFeedback}
+          today={today}
+        />
+      ),
+    },
+    retain: {
+      title: "À retenir",
+      description:
+        "Ce que les semaines vous apprennent sur cette personne : ce qui est noté sur un repas, et ce que vous observez en dehors.",
+      summary: countLabel(learnings.length, {
+        none: "Rien à retenir pour le moment",
+        one: "note",
+        many: "notes",
+      }),
+      empty: learnings.length === 0,
+      count: learnings.length,
+      body: (
+        <LearningsSection
+          patientId={patient.id}
+          learnings={learnings}
+          archivedObservations={archivedObservations}
+          today={today}
+        />
+      ),
+    },
+    consultations: {
+      title: "Consultations",
+      description:
+        "Vos notes de séance, de la plus récente à la plus ancienne. Elles ne s'affichent jamais sur le lien patient.",
+      summary: countLabel(notes.length, {
+        none: "Aucune note de séance",
+        one: "note de séance",
+        many: "notes de séance",
+      }),
+      empty: notes.length === 0,
+      count: notes.length,
+      body: <NoteTimeline patientId={patient.id} notes={notes} today={today} />,
+    },
+    challenges: {
+      title: "Challenges",
+      description:
+        "Une habitude à la fois, écrite pour la personne. Elle indique sur son lien quand le challenge est acquis et quand elle est prête pour le suivant.",
+      summary: currentChallenge ? "1 challenge en cours" : "Aucun en cours",
+      empty: !currentChallenge && pastChallenges.length === 0,
+      count: currentChallenge ? 1 : 0,
+      body: (
+        <ChallengesSection
+          patientId={patient.id}
+          current={currentChallenge}
+          past={pastChallenges}
+          today={today}
+        />
+      ),
+    },
+    preparation: {
+      title: "Préparation",
+      description:
+        "Le rendez-vous et ce que vous voulez avoir en tête pour la prochaine consultation.",
+      summary: `Rendez-vous : ${
+        consultationDate ? formatDate(consultationDate) : NOT_ENTERED
+      }`,
+      empty: !consultationDate && !patient.nextConsultationPrep,
+      body: preparation,
+    },
+    summary: {
+      title: "Résumé vivant",
+      description:
+        "La synthèse de la personne. Une seule, révisée à chaque consultation.",
+      summary: summary ? "Rédigé" : "Aucun résumé",
+      empty: !summary,
+      body: (
+        <SummaryBlock
+          patientId={patient.id}
+          pseudonym={patient.pseudonym}
+          summary={summary}
+        />
+      ),
+    },
+    anamnesis: {
+      title: "Anamnèse",
+      description:
+        "Le terrain, catégorie par catégorie. Ne s'affiche jamais sur le lien patient.",
+      summary: countLabel(anamnesis.length, {
+        none: "Aucune entrée",
+        one: "entrée",
+        many: "entrées",
+      }),
+      empty: anamnesis.length === 0,
+      count: anamnesis.length,
+      body: <AnamnesisBlock patientId={patient.id} entries={anamnesis} />,
+    },
+    "copy-context": {
+      title: "Copier le contexte",
+      description:
+        "Le contexte de la personne en texte clair, à coller dans le modèle de votre choix. Pseudonyme uniquement, aucun appel au modèle depuis REMI.",
+      summary: "Texte clair, pseudonyme uniquement",
+      empty: false,
+      body: (
+        <CopyContextCard
+          patientId={patient.id}
+          context={patientContextInput({
+            patient,
+            goals,
+            instruction,
+            recommendations,
+            supplements,
+            essentials,
+            summary,
+          })}
+        />
+      ),
+    },
+    recipes: {
+      title: "Recettes",
+      description:
+        "Les recettes que cette personne a en ce moment, avec le mot qui va avec chacune. Attribuez-en plusieurs d'un coup, écrivez-en une ici, ou adaptez-en une en variante — la bibliothèque « Recettes » garde tout.",
+      summary: countLabel(assignedRecipes.length, {
+        none: "Aucune recette attribuée",
+        one: "recette",
+        many: "recettes",
+      }),
+      empty: assignedRecipes.length === 0,
+      count: assignedRecipes.length,
+      body: (
+        <RecipesSection
+          patientId={patient.id}
+          assigned={assignedRecipes}
+          past={pastRecipes}
+          library={library}
+          today={today}
+        />
+      ),
+    },
+    documents: {
+      title: "Documents",
+      description:
+        "Les PDF, images et liens de cette personne — elle les lit dans « Mes documents », et ceux classés comme recette aussi dans « Mes recettes ».",
+      summary: countLabel(documents.length, {
+        none: "Aucun document",
+        one: "document",
+        many: "documents",
+      }),
+      empty: documents.length === 0,
+      count: documents.length,
+      body: (
+        <DocumentSection
+          patientId={patient.id}
+          documents={documents}
+          attachments={attachments}
+          uploadsAvailable={fileStoreReady()}
+        />
+      ),
+    },
+    "patient-link": {
+      title: "Lien patient",
+      description:
+        "Leur vue du profil et des recommandations — pour la personne suivie, et pour les consultantes et consultants qui testent l'interface.",
+      summary: patient.linkLastOpenedAt
+        ? `Dernière ouverture le ${formatDate(patient.linkLastOpenedAt)}`
+        : "Le lien n'a pas encore été ouvert",
+      empty: false,
+      body: (
+        <ShareLinkCard
+          patientId={patient.id}
+          url={shareUrl}
+          email={patient.email}
+          lastOpenedAt={patient.linkLastOpenedAt}
+          lastWroteAt={patient.linkLastWroteAt}
+        />
+      ),
+    },
+    profile: {
+      title: "Profil",
+      description:
+        "Le tableau de fond contre lequel les recommandations et les recettes sont personnalisées, et le consentement recueilli pour le tenir.",
+      summary: `Consentement : ${consent ?? NOT_ENTERED}`,
+      empty: false,
+      body: (
+        <ProfileSection
+          summary={{
+            patient,
+            lastEditedAt: formatDate(patient.lastEditedAt),
+            consent,
+            careConsentGiven: consents.care?.decision === "given",
+            patientEditedOn: Object.fromEntries(
+              Object.entries(patient.patientEditedAt).flatMap(([field, at]) =>
+                at ? [[field, formatDate(at)]] : [],
+              ),
+            ),
+            questionnaire: questionnaire.data,
+            consultationDate: consultationDate
+              ? formatDate(consultationDate)
+              : null,
+            genotypeOpen,
+          }}
+          patientId={patient.id}
+          pseudonym={patient.pseudonym}
+          heldAt={patient.retentionHoldAt}
+          canHold={canManageOperators(operator.role)}
+          readOnly={readOnly}
+        />
+      ),
+    },
+  };
+
   // The section registry — the one list the desktop index, the phone segments
   // and the medium anchor row all read. Every rendered section, in DOM order.
   const sections: PatientSectionEntry[] = [
-    { id: "patient-file", label: "Dossier patient", segment: "suivi" },
-    { id: "calculations", label: "Calculs", segment: "suivi" },
-    { id: "summary", label: "Résumé vivant", segment: "suivi" },
-    {
-      id: "anamnesis",
-      label: "Anamnèse",
-      segment: "suivi",
-      count: anamnesis.length,
-    },
-    { id: "preparation", label: "Préparation", segment: "suivi" },
-    { id: "patient-link", label: "Lien patient", segment: "dossier" },
-    {
-      id: "objectifs",
-      label: "Objectifs et consigne",
-      segment: "suivi",
-      count: goals.length,
-    },
-    {
-      id: "challenges",
-      label: "Challenges",
-      segment: "suivi",
-      count: currentChallenge ? 1 : 0,
-    },
-    {
-      id: "recommendations",
-      label: "Recommandations",
-      segment: "suivi",
-      count: recommendations.length,
-    },
-    {
-      id: "supplements",
-      label: "Protocole de compléments",
-      segment: "suivi",
-      count: supplements.length,
-    },
-    {
-      id: "pantry",
-      label: "Essentiels placard / frigo",
-      segment: "suivi",
-      count: essentials.length,
-    },
-    {
-      id: "recipes",
-      label: "Recettes",
-      segment: "dossier",
-      count: assignedRecipes.length,
-    },
-    {
-      id: "documents",
-      label: "Documents",
-      segment: "dossier",
-      count: documents.length,
-    },
-    {
-      id: "messages",
-      label: "Messages",
-      segment: "journal",
-      count: messages.length,
-    },
-    {
-      id: "meals",
-      label: "Journal des repas",
-      segment: "journal",
-      count: mealEntries.length,
-    },
-    {
-      id: "retain",
-      label: "À retenir",
-      segment: "journal",
-      count: learnings.length,
-    },
-    {
-      id: "consultations",
-      label: "Consultations",
-      segment: "dossier",
-      count: notes.length,
-    },
-    { id: "profile", label: "Profil", segment: "profil" },
+    { id: "next-step", label: "À faire", segment: "suivi" },
+    ...layout.work.map((id) => ({
+      id,
+      label: views[id].title,
+      segment: "suivi" as const,
+      count: views[id].count,
+    })),
+    ...layout.rows.flatMap(({ group, sections: ids }) =>
+      ids.map((id) => ({
+        id,
+        label: views[id].title,
+        segment: fileGroupSegments[group],
+        count: views[id].count,
+      })),
+    ),
   ];
 
   return (
@@ -445,706 +843,85 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
       </Suspense>
 
       <div className="flex min-w-0 flex-1 flex-col gap-6 lg:order-1">
-        {/* Status banner — above every section, stays put on desktop. */}
-        <div className="bg-background flex flex-col gap-2 lg:sticky lg:top-14 lg:z-20">
-          <NextLink
-            href={
-              fromConsultation
-                ? `/patients/${patient.id}/consultation`
-                : "/patients"
-            }
-            className="text-muted-foreground hover:text-foreground focus-visible:ring-ring inline-flex w-fit items-center gap-1.5 rounded-sm text-sm transition-colors duration-[--duration-fast] focus-visible:outline-none focus-visible:ring-[3px]"
-          >
-            <ArrowLeft aria-hidden="true" className="size-4" />
-            {fromConsultation ? "Retour à la consultation" : "Patients"}
-          </NextLink>
-          <div className="flex flex-wrap items-center gap-3">
-            <Typography as="h1" size="2xl" weight="semibold">
-              {name}
-            </Typography>
-            <Badge
-              variant={
-                patient.fileStatus === "to_complete" ? "warning" : "info"
-              }
-              tone="subtle"
-              size="sm"
-            >
-              {fileStatusLabels[patient.fileStatus].fr}
-            </Badge>
-            <Badge
-              variant={patientStatusIntents[patient.status]}
-              tone="subtle"
-              size="sm"
-            >
-              {patientStatusLabels[patient.status]}
-            </Badge>
-          </div>
-          <Typography size="sm" tone="muted">
-            {`Pseudonyme : ${patient.pseudonym} · Rendez-vous : ${
-              consultationDate ? formatDate(consultationDate) : "Non renseigné"
-            }`}
+        <PatientHeader
+          patient={patient}
+          name={name}
+          questionnaire={questionnaire.data}
+          readOnly={readOnly}
+          back={
+            fromConsultation
+              ? {
+                  href: `/patients/${patient.id}/consultation`,
+                  label: "Retour à la consultation",
+                }
+              : { href: "/patients", label: "Patients" }
+          }
+        />
+
+        {readOnly ? (
+          <Typography size="sm" role="status" className="text-warning-text">
+            Lecture seule : accès équipe REMI à un dossier suivi par un autre
+            compte. Le motif est au journal. Toute modification est refusée.
           </Typography>
-          {readOnly ? (
-            <Typography size="sm" role="status" className="text-warning-text">
-              Lecture seule : accès équipe REMI à un dossier suivi par un autre
-              compte. Le motif est au journal. Toute modification est refusée.
-            </Typography>
-          ) : null}
-          {alreadyExists ? (
-            <Typography size="sm" role="status" className="text-info-text">
-              Ce dossier existe déjà : l&apos;adresse email saisie est la
-              sienne. Aucun second dossier n&apos;a été créé.
-            </Typography>
-          ) : null}
-        </div>
+        ) : null}
+        {alreadyExists ? (
+          <Typography size="sm" role="status" className="text-info-text">
+            Ce dossier existe déjà : l&apos;adresse email saisie est la sienne.
+            Aucun second dossier n&apos;a été créé.
+          </Typography>
+        ) : null}
 
         {/* The anchor row — medium only; the rail takes over from lg, the
             segmented control below md. */}
         <nav
           aria-label="Sections de la page"
-          className="flex gap-2 overflow-x-auto pb-1 md:flex lg:hidden"
+          className="hidden gap-2 overflow-x-auto pb-1 md:flex lg:hidden"
         >
           {sections.map((section) => (
             <a
               key={section.id}
               href={`#${section.id}`}
-              className="border-border text-muted-foreground hover:bg-accent hover:text-foreground shrink-0 rounded-full border px-3 py-1 text-sm transition-colors"
+              className="border-border text-muted-foreground hover:bg-accent hover:text-foreground inline-flex min-h-11 shrink-0 items-center rounded-full border px-3 text-sm transition-colors"
             >
               {section.label}
             </a>
           ))}
         </nav>
 
-        {/* The patient file — the landing state (story 6). */}
-        <section
-          id="patient-file"
-          data-segment="suivi"
-          aria-label="Dossier patient"
-          className="scroll-mt-32"
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Dossier patient</CardTitle>
-              <CardDescription>
-                Les réponses du questionnaire, dans son ordre. Un champ vide
-                reste « Non renseigné ».
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <QuestionnaireFile
-                patient={patient}
-                questionnaire={questionnaire.data}
-                genotypeOpen={genotypeOpen}
-                missingMandatory={missingMandatory}
-                missingOptional={missingOptional}
-              />
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* « Calculs » — under the data, above the protocol (story 6). */}
-        <section
-          id="calculations"
-          data-segment="suivi"
-          className="scroll-mt-32"
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Calculs</CardTitle>
-              <CardDescription>
-                Calculés à partir du dossier. Une valeur reste une estimation
-                tant que vous ne l&apos;avez pas validée.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <CalculationsSummary
-                calculations={calculations}
-                missing={missingCalculation}
-                bmi={bmiIndicator(calculationData)}
-              />
-            </CardContent>
-          </Card>
-        </section>
-
-        <section id="summary" data-segment="suivi" className="scroll-mt-32">
-          <FoldedCard
-            id="summary-fold"
-            title="Résumé vivant"
-            description="La synthèse de la personne. Une seule, révisée à chaque consultation."
-            openLabel="Afficher le résumé"
-          >
-            <SummaryBlock
-              patientId={patient.id}
-              pseudonym={patient.pseudonym}
-              summary={summary}
-            />
-          </FoldedCard>
-        </section>
-
-        <section id="anamnesis" data-segment="suivi" className="scroll-mt-32">
-          <FoldedCard
-            id="anamnesis-fold"
-            title="Anamnèse"
-            description="Le terrain, catégorie par catégorie. Ne s'affiche jamais sur le lien patient."
-            openLabel={`Afficher l'anamnèse · ${anamnesis.length}`}
-          >
-            <AnamnesisBlock patientId={patient.id} entries={anamnesis} />
-          </FoldedCard>
-        </section>
-
-        {/* The preparation tools — kept from the September working view. */}
-        <section
-          id="preparation"
-          data-segment="suivi"
-          aria-label="Préparation"
-          className="flex scroll-mt-32 flex-col gap-6"
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Date de consultation</CardTitle>
-              <CardDescription>
-                Le rendez-vous de la personne. Le questionnaire écrit la même
-                date.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ConsultationDate
+        {/* The one thing to do at this status (stories 5 and 6). */}
+        <NextStepCard
+          action={layout.action}
+          patient={patient}
+          readOnly={readOnly}
+          missingMandatory={missingMandatory}
+          missingOptional={missingOptional}
+          preparation={
+            layout.inAction.includes("preparation") ? preparation : null
+          }
+          protocol={{
+            goals: goals.length,
+            recommendations: recommendations.length,
+            supplements: supplements.length,
+            instruction: instruction !== null,
+            validatedCalculations,
+          }}
+          shortcuts={
+            // It reads the segment from the URL, same as the navigation.
+            <Suspense fallback={null}>
+              <QuickActions
                 patientId={patient.id}
-                value={consultationDate}
-                formatted={
-                  consultationDate ? formatDate(consultationDate) : null
-                }
+                previewUrl={previewUrl}
+                withConsultation={layout.action !== "prepare"}
               />
-            </CardContent>
-          </Card>
+            </Suspense>
+          }
+        />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>À préparer pour la prochaine consultation</CardTitle>
-              <CardDescription>
-                Ce que vous voulez avoir en tête quand vous la revoyez, écrit et
-                revu entre deux consultations.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <PrepNote
-                patientId={patient.id}
-                pseudonym={patient.pseudonym}
-                value={patient.nextConsultationPrep}
-              />
-            </CardContent>
-          </Card>
+        {/* The work column: the open blocks of this status. */}
+        <WorkColumn sections={layout.work} views={views} />
 
-          <Card id="copy-context" className="scroll-mt-32">
-            <CardHeader>
-              <CardTitle>Copier le contexte</CardTitle>
-              <CardDescription>
-                Le contexte de la personne en texte clair, à coller dans le
-                modèle de votre choix. Pseudonyme uniquement, aucun appel au
-                modèle depuis REMI.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <CopyContextCard
-                patientId={patient.id}
-                context={patientContextInput({
-                  patient,
-                  goals,
-                  instruction,
-                  recommendations,
-                  supplements,
-                  essentials,
-                  summary,
-                })}
-              />
-            </CardContent>
-          </Card>
-
-          {/* It reads the segment from the URL, same as the navigation. */}
-          <Suspense fallback={null}>
-            <QuickActions patientId={patient.id} previewUrl={previewUrl} />
-          </Suspense>
-        </section>
-
-        {/* Secondary sections — each registered once above, body untouched. */}
-        <section
-          id="patient-link"
-          data-segment="dossier"
-          className="scroll-mt-32"
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Lien patient</CardTitle>
-              <CardDescription>
-                Leur vue du profil et des recommandations — pour la personne
-                suivie, et pour les consultantes et consultants qui testent
-                l&apos;interface.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ShareLinkCard
-                patientId={patient.id}
-                url={shareUrl}
-                email={patient.email}
-                lastOpenedAt={patient.linkLastOpenedAt}
-                lastWroteAt={patient.linkLastWroteAt}
-              />
-            </CardContent>
-          </Card>
-        </section>
-
-        <section id="objectifs" data-segment="suivi" className="scroll-mt-32">
-          <Card>
-            <CardHeader>
-              <CardTitle>Objectifs et consigne</CardTitle>
-              <CardDescription>
-                Deux ou trois priorités, dans votre ordre, avec leur évolution —
-                et la consigne que vous vous donnez pour cet accompagnement.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-6">
-              <GoalsAwaitingAttention count={goalsAwaitingAttention} />
-              {goals.length === 0 ? (
-                <Typography size="sm" tone="muted">
-                  Aucun objectif pour le moment.
-                </Typography>
-              ) : (
-                <GoalList
-                  goals={goals}
-                  checkIns={checkIns}
-                  ranked
-                  today={today}
-                />
-              )}
-
-              {goals.length < MAX_ACTIVE_GOALS ? (
-                <GoalAddForm patientId={patient.id} />
-              ) : (
-                <Typography size="sm" tone="muted">
-                  {`${MAX_ACTIVE_GOALS} objectifs actifs — archivez-en un pour en ajouter un autre.`}
-                </Typography>
-              )}
-
-              <div className="border-border flex flex-col gap-3 border-t pt-6">
-                <InstructionBlock
-                  patientId={patient.id}
-                  pseudonym={patient.pseudonym}
-                  instruction={instruction}
-                  superseded={supersededInstructions}
-                />
-              </div>
-
-              {archivedGoals.length > 0 ? (
-                <SectionFold
-                  id="archived-goals"
-                  label="Objectifs archivés"
-                  count={archivedGoals.length}
-                >
-                  <GoalList
-                    goals={archivedGoals}
-                    checkIns={checkIns}
-                    ranked={false}
-                    today={today}
-                  />
-                </SectionFold>
-              ) : null}
-            </CardContent>
-          </Card>
-        </section>
-
-        <section id="challenges" data-segment="suivi" className="scroll-mt-32">
-          <Card>
-            <CardHeader>
-              <CardTitle>Challenges</CardTitle>
-              <CardDescription>
-                Une habitude à la fois, écrite pour la personne. Elle indique
-                sur son lien quand le challenge est acquis et quand elle est
-                prête pour le suivant.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-6">
-              <ChallengeSection
-                patientId={patient.id}
-                current={currentChallenge}
-                today={todayAtPractice()}
-              />
-
-              {pastChallenges.length > 0 ? (
-                <SectionFold
-                  id="past-challenges"
-                  label="Challenges passés"
-                  count={pastChallenges.length}
-                >
-                  <ChallengeHistory challenges={pastChallenges} />
-                </SectionFold>
-              ) : null}
-            </CardContent>
-          </Card>
-        </section>
-
-        <section
-          id="recommendations"
-          data-segment="suivi"
-          className="scroll-mt-32"
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Recommandations</CardTitle>
-              <CardDescription>
-                Le protocole, encodé entrée par entrée — c&apos;est ce que
-                montre le lien patient.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-6">
-              <RecommendationSection
-                patientId={patient.id}
-                pseudonym={patient.pseudonym}
-                recommendations={recommendations}
-              >
-                {recommendations.length === 0 ? (
-                  <Typography size="sm" tone="muted">
-                    Rien d&apos;encodé pour le moment.
-                  </Typography>
-                ) : (
-                  <RecommendationGroups recommendations={recommendations} />
-                )}
-                <RecommendationAddForm patientId={patient.id} />
-              </RecommendationSection>
-
-              {archived.length > 0 ? (
-                <SectionFold
-                  id="archived-recommendations"
-                  label="Recommandations archivées"
-                  count={archived.length}
-                >
-                  <div className="flex flex-col gap-3">
-                    <Typography size="sm" tone="muted">
-                      Ce qui a été suivi puis arrêté. Invisible sur le lien
-                      patient, gardé pour la suite du dossier.
-                    </Typography>
-                    <RecommendationGroups recommendations={archived} />
-                  </div>
-                </SectionFold>
-              ) : null}
-            </CardContent>
-          </Card>
-        </section>
-
-        <section id="supplements" data-segment="suivi" className="scroll-mt-32">
-          <Card>
-            <CardHeader>
-              <CardTitle>Protocole de compléments</CardTitle>
-              <CardDescription>
-                Les compléments que vous prescrivez, avec dose, moment et
-                raison. Ceux que la personne prend déjà d&apos;elle-même se
-                notent dans le profil.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-6">
-              <SupplementSection
-                patientId={patient.id}
-                pseudonym={patient.pseudonym}
-                supplements={supplements}
-              >
-                {supplements.length === 0 ? (
-                  <Typography size="sm" tone="muted">
-                    Aucun complément prescrit pour le moment.
-                  </Typography>
-                ) : (
-                  <SupplementProtocol supplements={supplements} />
-                )}
-                <SupplementAddForm patientId={patient.id} />
-              </SupplementSection>
-
-              {archivedSupplements.length > 0 ? (
-                <SectionFold
-                  id="archived-supplements"
-                  label="Compléments arrêtés"
-                  count={archivedSupplements.length}
-                >
-                  <SupplementProtocol supplements={archivedSupplements} />
-                </SectionFold>
-              ) : null}
-            </CardContent>
-          </Card>
-        </section>
-
-        <section id="pantry" data-segment="suivi" className="scroll-mt-32">
-          <Card>
-            <CardHeader>
-              <CardTitle>Essentiels placard / frigo</CardTitle>
-              <CardDescription>
-                La courte liste d&apos;aliments à avoir sous la main, avec le
-                pourquoi de chacun — pour cette personne.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-6">
-              <PantrySection
-                patientId={patient.id}
-                pseudonym={patient.pseudonym}
-                essentials={essentials}
-              >
-                {essentials.length === 0 ? (
-                  <Typography size="sm" tone="muted">
-                    Aucun essentiel pour le moment.
-                  </Typography>
-                ) : (
-                  <PantryList essentials={essentials} />
-                )}
-                <PantryAddForm patientId={patient.id} />
-              </PantrySection>
-
-              {archivedEssentials.length > 0 ? (
-                <SectionFold
-                  id="archived-pantry"
-                  label="Essentiels archivés"
-                  count={archivedEssentials.length}
-                >
-                  <PantryList essentials={archivedEssentials} />
-                </SectionFold>
-              ) : null}
-            </CardContent>
-          </Card>
-        </section>
-
-        <section id="recipes" data-segment="dossier" className="scroll-mt-32">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recettes</CardTitle>
-              <CardDescription>
-                Les recettes que cette personne a en ce moment, avec le mot qui
-                va avec chacune. Attribuez-en plusieurs d&apos;un coup,
-                écrivez-en une ici, ou adaptez-en une en variante — la
-                bibliothèque « Recettes » garde tout.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-6">
-              {assignedRecipes.length === 0 ? (
-                <Typography size="sm" tone="muted">
-                  Aucune recette attribuée pour le moment.
-                </Typography>
-              ) : (
-                <RecipeAssignments entries={assignedRecipes} today={today} />
-              )}
-
-              <AssignRecipeForm
-                patientId={patient.id}
-                recipes={library}
-                today={today}
-              />
-
-              {pastRecipes.length > 0 ? (
-                <SectionFold
-                  id="past-recipes"
-                  label="Recettes précédentes"
-                  count={pastRecipes.length}
-                >
-                  <RecipeAssignments entries={pastRecipes} today={today} />
-                </SectionFold>
-              ) : null}
-            </CardContent>
-          </Card>
-        </section>
-
-        <section id="documents" data-segment="dossier" className="scroll-mt-32">
-          <Card>
-            <CardHeader>
-              <CardTitle>Documents</CardTitle>
-              <CardDescription>
-                Les PDF, images et liens de cette personne — elle les lit dans «
-                Mes documents », et ceux classés comme recette aussi dans « Mes
-                recettes ».
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DocumentSection
-                patientId={patient.id}
-                documents={documents}
-                attachments={attachments}
-                uploadsAvailable={fileStoreReady()}
-              />
-            </CardContent>
-          </Card>
-        </section>
-
-        <section id="messages" data-segment="journal" className="scroll-mt-32">
-          <Card>
-            <CardHeader>
-              <CardTitle>Messages</CardTitle>
-              <CardDescription>
-                L&apos;endroit général où la personne dit comment se passe son
-                accompagnement. Votre réponse s&apos;affiche sur son lien, sous
-                votre nom.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-6">
-              {unreadMessages > 0 ? (
-                <Typography size="sm" tone="muted">
-                  {`${messagesAwaitingLabel(unreadMessages)}.`}
-                </Typography>
-              ) : null}
-              <MessageThread
-                patientId={patient.id}
-                pseudonym={patient.pseudonym}
-                messages={messages}
-              />
-            </CardContent>
-          </Card>
-        </section>
-
-        <section id="meals" data-segment="journal" className="scroll-mt-32">
-          <Card>
-            <CardHeader>
-              <CardTitle>Journal des repas</CardTitle>
-              <CardDescription>
-                Ce que la personne a envoyé, transcrit ici, avec votre retour
-                sous chaque repas. Texte seulement pour l&apos;instant — les
-                photos restent sur WhatsApp.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-6">
-              {awaitingFeedback > 0 ? (
-                <Typography size="sm" tone="muted">
-                  {awaitingFeedback === 1
-                    ? "1 repas attend un retour."
-                    : `${awaitingFeedback} repas attendent un retour.`}
-                </Typography>
-              ) : null}
-
-              {mealEntries.length === 0 ? (
-                <Typography size="sm" tone="muted">
-                  Aucun repas noté pour le moment.
-                </Typography>
-              ) : (
-                <MealJournal entries={mealEntries} />
-              )}
-
-              <MealAddForm patientId={patient.id} today={today} />
-
-              {archivedMealEntries.length > 0 ? (
-                <SectionFold
-                  id="archived-meals"
-                  label="Repas archivés"
-                  count={archivedMealEntries.length}
-                >
-                  <MealJournal entries={archivedMealEntries} />
-                </SectionFold>
-              ) : null}
-            </CardContent>
-          </Card>
-        </section>
-
-        <section id="retain" data-segment="journal" className="scroll-mt-32">
-          <Card>
-            <CardHeader>
-              <CardTitle>À retenir</CardTitle>
-              <CardDescription>
-                Ce que les semaines vous apprennent sur cette personne : ce qui
-                est noté sur un repas, et ce que vous observez en dehors.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-6">
-              {learnings.length === 0 ? (
-                <Typography size="sm" tone="muted">
-                  Rien à retenir pour le moment.
-                </Typography>
-              ) : (
-                <LearningsList learnings={learnings} />
-              )}
-
-              <ObservationAddForm patientId={patient.id} today={today} />
-
-              {archivedObservations.length > 0 ? (
-                <SectionFold
-                  id="archived-observations"
-                  label="Observations archivées"
-                  count={archivedObservations.length}
-                >
-                  <ArchivedObservations observations={archivedObservations} />
-                </SectionFold>
-              ) : null}
-            </CardContent>
-          </Card>
-        </section>
-
-        <section
-          id="consultations"
-          data-segment="dossier"
-          className="scroll-mt-32"
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Consultations</CardTitle>
-              <CardDescription>
-                Vos notes de séance, de la plus récente à la plus ancienne.
-                Elles ne s&apos;affichent jamais sur le lien patient.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <NoteTimeline
-                patientId={patient.id}
-                notes={notes}
-                today={today}
-              />
-            </CardContent>
-          </Card>
-        </section>
-
-        <section id="profile" data-segment="profil" className="scroll-mt-32">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profil</CardTitle>
-              <CardDescription>
-                Le tableau de fond contre lequel les recommandations et les
-                recettes sont personnalisées, et le consentement recueilli pour
-                le tenir.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-6">
-              <ProfileSummary
-                patient={patient}
-                lastEditedAt={formatDate(patient.lastEditedAt)}
-                consent={consent}
-                careConsentGiven={consents.care?.decision === "given"}
-                patientEditedOn={Object.fromEntries(
-                  Object.entries(patient.patientEditedAt).flatMap(
-                    ([field, at]) => (at ? [[field, formatDate(at)]] : []),
-                  ),
-                )}
-                questionnaire={questionnaire.data}
-                consultationDate={
-                  consultationDate ? formatDate(consultationDate) : null
-                }
-                genotypeOpen={genotypeOpen}
-              />
-
-              <SectionFold id="danger-zone" label="Zone sensible" tone="error">
-                <div className="flex flex-col gap-4">
-                  <Typography size="sm" tone="muted">
-                    La suppression retire le profil, ses recommandations, son
-                    protocole de compléments, ses essentiels, ses notes, son
-                    anamnèse, ses objectifs et leurs points d&apos;étape, ses
-                    consignes, ses recettes attribuées, son journal des repas,
-                    ses observations et le lien patient — définitivement. Les
-                    recettes elles-mêmes restent dans la bibliothèque.
-                  </Typography>
-                  {canManageOperators(operator.role) && !readOnly ? (
-                    <RetentionHold
-                      patientId={patient.id}
-                      heldAt={patient.retentionHoldAt}
-                    />
-                  ) : null}
-                  {readOnly ? null : (
-                    <DeletePatient
-                      patientId={patient.id}
-                      pseudonym={patient.pseudonym}
-                    />
-                  )}
-                </div>
-              </SectionFold>
-            </CardContent>
-          </Card>
-        </section>
+        {/* Every other section: one row each, opening in place. */}
+        <SectionRows rows={layout.rows} views={views} />
       </div>
     </div>
   );

@@ -10,10 +10,10 @@ type Props = {
 };
 
 /**
- * Branded to match the entry screen and the 404 beside it, and bilingual for the
- * same reason they are: an error boundary is a client component, so reading the
- * locale here would mean shipping both dictionaries to the browser for a page
- * almost nobody sees.
+ * Branded to match the entry screen and the 404 beside it, and written here, not in the
+ * dictionary: an error boundary is a client component, so reading the content
+ * would mean shipping the dictionary to the browser for a page almost nobody
+ * sees.
  *
  * The message never quotes `error.message` — that string comes from the server
  * and can carry a query, a path or an id. The digest is the safe half: it is a
@@ -30,15 +30,14 @@ const ErrorBoundary = ({ error, reset }: Props) => (
     <div className="relative flex max-w-lg flex-col items-center gap-5 text-center">
       <Wordmark />
       <Typography variant="eyebrow" tone="muted">
-        Error · Erreur
+        Erreur
       </Typography>
       <Typography as="h1" variant="display" size="4xl" balance>
-        Something went wrong · Quelque chose s&apos;est mal passé
+        Quelque chose s&apos;est mal passé
       </Typography>
       <Typography variant="lead" balance>
-        Nothing you entered was lost. Try again, and tell your practitioner if
-        it keeps happening. · Rien de ce que vous avez saisi n&apos;est perdu.
-        Réessayez, et prévenez votre praticien si cela se répète.
+        Rien de ce que tu as saisi n&apos;est perdu. Réessaie, et préviens ton
+        praticien si cela se répète.
       </Typography>
       {error.digest ? (
         <Typography size="xs" tone="muted">
@@ -50,7 +49,7 @@ const ErrorBoundary = ({ error, reset }: Props) => (
     <div className="relative flex flex-wrap justify-center gap-3">
       <Button onClick={reset}>
         <RotateCcw aria-hidden="true" />
-        Try again · Réessayer
+        Réessayer
       </Button>
     </div>
   </main>

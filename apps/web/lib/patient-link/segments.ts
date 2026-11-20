@@ -6,7 +6,7 @@
  *
  * The paths are French because the reader is francophone and the URL is part
  * of what Morgane sends over WhatsApp — `/p/<token>/placard-frigo` reads as
- * hers even in the English locale.
+ * hers.
  */
 export const patientLinkSegments = [
   "home",

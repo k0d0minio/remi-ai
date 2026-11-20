@@ -20,7 +20,6 @@ export const fr: Content = {
   userMenu: {
     label: "Menu du compte",
     account: "Compte",
-    language: "Langue",
     help: "Aide",
     documentation: "Documentation",
     signOut: "Se déconnecter",
@@ -542,16 +541,14 @@ export const fr: Content = {
   },
   questionnaire: {
     metaTitle: "Questionnaire",
-    title: "Questionnaire préparatoire",
+    title: "Préparons ta consultation",
     intro:
-      "Remplis-le avant ta consultation. Chaque réponse est enregistrée dès que tu la modifies. Tu peux partir et revenir quand tu veux.",
-    statusLabel: "Statut du dossier :",
-    missingTitle: "Champs obligatoires à remplir :",
-    complete: "Tous les champs obligatoires sont remplis.",
+      "Quelques informations pour mieux te connaître et préparer ton accompagnement. Tu peux compléter ce questionnaire à ton rythme.",
+    progressLabel: "Progression du questionnaire",
+    step: "Étape {current} sur {total}",
     mandatoryLegend: "* Champ obligatoire",
     mandatory: "obligatoire",
     optional: "(facultatif)",
-    sectionsLabel: "Sections du questionnaire",
     sections: {
       identite: "Identité",
       profil: "Profil",
@@ -561,12 +558,26 @@ export const fr: Content = {
       genetique: "Génétique",
     },
     previous: "Précédent",
-    next: "Suivant",
+    next: "Continuer",
     saving: "Enregistrement…",
     saved: "Enregistré",
+    retry: "Réessayer",
+    end: {
+      readyTitle: "Ton questionnaire est prêt !",
+      readyBody:
+        "Tes réponses ont bien été enregistrées et permettront à ton praticien de préparer votre consultation.",
+      finish: "Terminer",
+      edit: "Modifier mes réponses",
+      incompleteTitle: "Il reste quelques informations à compléter.",
+      incompleteBody:
+        "Complète les questions ci-dessous pour finaliser ton questionnaire.",
+      back: "Revenir au questionnaire",
+    },
     errors: {
       required: "Ce champ ne peut pas rester vide.",
       invalid: "Cette valeur n'est pas valide.",
+      phone:
+        "Ce numéro n'est pas valide. Utilise 8 à 15 chiffres, avec un + au début si besoin.",
       height_range: "Indique une taille entre 100 et 250 cm, sans décimale.",
       weight_range:
         "Indique un poids entre 25 et 300 kg, avec une décimale au plus.",
@@ -575,8 +586,7 @@ export const fr: Content = {
       genetic_consent:
         "Tes génotypes demandent ton consentement génétique. Donne-le plus haut pour les enregistrer.",
       signed_out: "Ta session a expiré. Reconnecte-toi pour continuer.",
-      unavailable:
-        "L'enregistrement n'a pas abouti. Vérifie ta connexion et réessaie.",
+      unavailable: "Impossible d'enregistrer.",
     },
     labels: {
       firstName: "Prénom",
@@ -584,9 +594,19 @@ export const fr: Content = {
       birthDate: "Date de naissance",
       email: "Adresse e-mail",
       phone: "Téléphone",
-      desiredWeight: "Poids souhaité",
+      mandatory: {
+        sexForCalculation:
+          "Sexe biologique utilisé pour les calculs nutritionnels",
+        heightCm: "Taille (cm)",
+        weightKg: "Poids actuel (kg)",
+        activityLevel: "Niveau d'activité physique",
+        consultationReason: "Motif de consultation",
+        allergies: "Allergies",
+        intolerances: "Intolérances",
+      },
+      desiredWeight: "Poids souhaité (kg)",
       consultationDate: "Date de consultation",
-      diet: "Type d'alimentation",
+      diet: "Quel type d'alimentation suis-tu ?",
       dietNote: "Précise ton type d'alimentation",
       pathologies: "Pathologies",
       celiacDisease: "Maladie cœliaque",
@@ -598,11 +618,10 @@ export const fr: Content = {
     },
     hints: {
       email: "Pour modifier ton e-mail, contacte ton praticien.",
-      height: "En cm, de 100 à 250.",
-      weight: "En kg, de 25 à 300.",
-      desiredWeight: "En kg, de 25 à 300. Laisse vide si tu n'en as pas.",
-      dietDefault:
-        "« Aucun type d'alimentation particulier » est proposé par défaut. Touche ta réponse pour l'enregistrer.",
+      phone: "Des chiffres, avec un + au début si besoin.",
+      height: "Entre 100 et 250 cm.",
+      weight: "Entre 25 et 300 kg.",
+      desiredWeight: "Laisse vide si tu n'en as pas.",
       allergies:
         "Coche « Aucune allergie connue » ou chaque allergie. Une catégorie cochée sans précision est exclue en entier.",
       intolerances:
@@ -613,6 +632,17 @@ export const fr: Content = {
       medications:
         "Ceux que tu prends aujourd'hui, avec leur dose si tu la connais.",
       supplements: "Vitamines, minéraux, plantes…",
+    },
+    identity: {
+      known:
+        "Ces informations viennent de ton inscription. Vérifie-les : tu peux les corriger si besoin.",
+      edit: "Modifier mes informations",
+      empty: "Non renseigné",
+    },
+    diet: {
+      proposed: "Choix proposé",
+      confirm: "Confirmer ce choix",
+      noteRequired: "Précise ton type d'alimentation pour enregistrer « Autre ».",
     },
     genetic: {
       consentTitle: "Traitement de tes données génétiques",
@@ -629,6 +659,12 @@ export const fr: Content = {
       decisionFailed:
         "Ta réponse n'a pas pu être enregistrée. Vérifie ta connexion et réessaie.",
     },
+  },
+  dateEntry: {
+    placeholder: "JJ/MM/AAAA",
+    hint: "Format : JJ/MM/AAAA.",
+    invalid: "Cette date n'est pas valide. Utilise le format JJ/MM/AAAA.",
+    notPast: "La date de naissance doit être dans le passé.",
   },
   patientSignIn: {
     metaTitle: "Connexion",
@@ -691,7 +727,7 @@ export const fr: Content = {
     passwordLabel: "Nouveau mot de passe",
     passwordHint: "Au moins 8 caractères.",
     submit: "Enregistrer et me connecter",
-    submitting: "Enregistrement…",
+    submitting: "REMI regarde ton repas…",
     form: {
       too_short: "Le mot de passe compte au moins 8 caractères.",
       too_long: "Ce mot de passe est trop long.",
@@ -755,8 +791,175 @@ export const fr: Content = {
   patientProfile: {
     metaTitle: "Profil",
     title: "Profil",
-    comingSoon:
-      "Tes recommandations, tes informations personnelles et les réglages de ton compte arrivent bientôt ici.",
+  },
+  patientRecommendations: {
+    metaTitle: "Mes recommandations",
+    title: "Mes recommandations",
+    profileEntry: "Mes recommandations",
+    profileEntryHint: "Ce que ton praticien a validé pour toi.",
+    backToProfile: "Retour au profil",
+    updatedOn: "Mis à jour le {date}",
+    empty:
+      "Tes recommandations apparaîtront ici dès que ton praticien les aura validées.",
+    unavailable:
+      "Tes recommandations ne peuvent pas s'afficher pour le moment. Réessaie dans un instant.",
+    supplementsTitle:
+      "Compléments alimentaires, plantes et huiles essentielles",
+    doseLabel: "Posologie",
+    timingLabel: "Moment de prise",
+    reasonLabel: "Pourquoi",
+    lifestyleTitle: "Conseils d'hygiène de vie",
+    lifestyleCategories: {
+      physical_activity: "Activité physique",
+      stress_management: "Gestion du stress",
+      sleep: "Sommeil",
+      hydration: "Hydratation",
+      eating_behaviour: "Comportements alimentaires / habitudes à table",
+      lifestyle_other: "Autres conseils d'hygiène de vie",
+      monitoring: "Suivi",
+    },
+    foodTitle: "Recommandations alimentaires",
+    evictionsTitle: "Évictions totales",
+    evictionUntil: "jusqu'au {date}",
+    evictionFrom: "à partir du {date}",
+    evictionDurable: "exclusion durable",
+    favourTitle: "À favoriser",
+    limitTitle: "À limiter",
+    limitLevels: {
+      reduce: "à réduire",
+      rare: "rarement",
+    },
+    foodAdviceTitle: "Conseils de ton praticien",
+    goalsTitle: "Objectifs prioritaires",
+  },
+  patientPersonalData: {
+    unavailable:
+      "Tes informations ne peuvent pas s'afficher pour le moment. Réessaie dans un instant.",
+    empty: "Non renseigné",
+    edit: "Modifier",
+    editLabel: "Modifier : {label}",
+    save: "Enregistrer",
+    saving: "Enregistrement…",
+    cancel: "Annuler",
+    personalTitle: "Mes informations personnelles",
+    personalIntro:
+      "Tu peux modifier ton téléphone ici. Pour corriger ton nom, ton prénom ou ta date de naissance, contacte ton praticien.",
+    phoneSaved: "Ton numéro de téléphone est enregistré.",
+    dataTitle: "Mes données de suivi",
+    dataIntro:
+      "Tu peux les mettre à jour à tout moment. Ton praticien voit chaque changement, et tes recommandations validées ne changent pas.",
+    rows: {
+      weight: "Poids actuel",
+      desiredWeight: "Poids souhaité",
+      activityLevel: "Niveau d'activité physique",
+      diet: "Type d'alimentation",
+      allergies: "Allergies",
+      intolerances: "Intolérances",
+      medications: "Médicaments",
+      supplements: "Compléments alimentaires",
+    },
+    kilograms: "{value} kg",
+    dietWithNote: "{diet} : {note}",
+    weightSaved:
+      "Ton poids est enregistré. Ton praticien voit ce changement.",
+    dataLink: "Modifier mes autres données",
+    dataLinkHint:
+      "Alimentation, allergies, intolérances, activité, poids souhaité, médicaments et compléments.",
+    accountTitle: "Mon compte",
+    consentTitle: "Mes consentements",
+    consentNotYet:
+      "Tu ne peux pas encore consulter ni modifier tes consentements ici.",
+    dataPage: {
+      metaTitle: "Mes données de suivi",
+      title: "Mes données de suivi",
+      intro:
+        "Chaque changement s'enregistre tout seul, sans bouton. Ton praticien le voit, et tes recommandations validées ne changent pas.",
+      foodTitle: "Alimentation, allergies et intolérances",
+      foodSaved:
+        "C'est enregistré : ce changement s'applique tout de suite aux idées que REMI te propose, et ton praticien le voit.",
+      otherTitle: "Activité, poids souhaité et traitements",
+    },
   },
   signOut: "Se déconnecter",
+  patientWaiting: {
+    metaTitle: "Ton accompagnement se prépare",
+    title: "Ton praticien prépare ton accompagnement",
+    body:
+      "Tes réponses sont bien arrivées. Dès que ton accompagnement est prêt, ton espace REMI s'ouvre ici, avec le même compte.",
+    practitionerLabel: "Ton praticien",
+    appointmentLabel: "Ton rendez-vous",
+    questionnaireHint: "Tu peux encore adapter tes réponses, à ton rythme.",
+    questionnaireLink: "Revoir mon questionnaire",
+  },
+  patientMeal: {
+    question: "Qu'as-tu prévu de manger ?",
+    hint: "Écris le plat et, si tu les connais, ses ingrédients.",
+    placeholder: "Par exemple : spaghetti sauce tomate, parmesan, salade verte",
+    submit: "Améliorer mon repas",
+    submitting: "REMI regarde ton repas…",
+    remaining: "Caractères restants : {count}",
+    errors: {
+      empty: "Écris d'abord ce que tu as prévu de manger.",
+      too_long: "Ton texte est trop long : 500 caractères au maximum.",
+      daily_limit:
+        "Tu as enregistré 20 repas aujourd'hui, le maximum pour une journée. Tu pourras en ajouter demain.",
+      unavailable:
+        "Ton repas n'a pas pu être enregistré. Réessaie dans un instant.",
+    },
+    saved: {
+      title: "Ton repas est enregistré",
+      mealLabel: "Ton repas",
+      another: "Saisir un autre repas",
+      suggestion: {
+        alertTitle: "À regarder avant tout",
+        alerts: {
+          allergy:
+            "« {food} » ne convient pas avec une allergie que tu as déclarée.",
+          intolerance:
+            "« {food} » ne convient pas avec une intolérance que tu as déclarée.",
+          coeliac:
+            "« {food} » contient du gluten, à écarter avec la maladie cœliaque.",
+          eviction:
+            "« {food} » fait partie des aliments que ton praticien t'a demandé d'écarter.",
+          diet: "« {food} » ne correspond pas au type d'alimentation que tu as déclaré.",
+        },
+        trace:
+          "« {food} » peut contenir un aliment à écarter pour toi. Vérifie ses ingrédients.",
+        toCheck:
+          "REMI pense que ces aliments peuvent contenir un aliment à écarter pour toi : {foods}. Vérifie leurs ingrédients.",
+        checkIngredients:
+          "REMI ne connaît pas la composition exacte de ton repas. Vérifie toujours les ingrédients.",
+        goodTitle: "Ce qui est déjà bien",
+        improveTitle: "Ce que tu pourrais améliorer",
+        kinds: {
+          add: "Tu peux essayer d'ajouter : {food}",
+          replace: "Tu peux essayer de remplacer {replaces} par : {food}",
+          remove: "Tu peux essayer de retirer : {food}",
+        },
+        basis: "En lien avec : {basis}",
+        aligned:
+          "Ton repas est déjà en accord avec tes recommandations. Bon appétit !",
+        withheld:
+          "REMI n'a pas trouvé d'amélioration sûre à te proposer pour ce repas. Vérifie les ingrédients de ton repas.",
+        noProtocol:
+          "Ton praticien n'a pas encore validé tes recommandations. REMI ne propose donc pas d'amélioration pour le moment.",
+        addressAlert:
+          "Une piste : remplace ou retire d'abord l'aliment signalé plus haut.",
+        unclear:
+          "REMI n'a pas compris ton repas. Écris le plat et ses ingrédients dans un nouveau repas.",
+        unavailable:
+          "La suggestion de REMI n'est pas disponible pour le moment. Ton repas est bien enregistré.",
+        feedback: {
+          accept: "Ça me convient",
+          decline: "Pas pour moi",
+          declined: "D'accord. REMI peut te proposer une autre piste.",
+          another: "Une autre suggestion",
+          anotherPending: "REMI cherche une autre piste…",
+          noOther:
+            "REMI n'a pas d'autre suggestion à te proposer pour ce repas. Bon appétit.",
+          closing: "Merci pour ton retour. Bon appétit.",
+        },
+      },
+    },
+  },
 };

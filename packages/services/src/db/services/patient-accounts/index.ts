@@ -103,13 +103,33 @@ export const createPatientAccount = async (
       patientProfileId,
       email,
       authSubject,
-      activatedAt: null,
+      // The practitioner can activate a file before the patient has an
+      // account (story 19). The account of an active file is thus active
+      // from its first day: the patient lands on the home.
+      activatedAt: patient.data.fileStatus === "active" ? new Date() : null,
       lastSeenAt: null,
       inactivityNoticeSentAt: null,
     });
     return ok(created);
   };
   return db ? write(db) : getDatabase().transaction(write);
+};
+
+/**
+ * Dates the account of a file at its activation (story 19). A file with no
+ * account changes nothing and answers null. An account that has a date keeps
+ * it: the activation runs once.
+ */
+export const markPatientAccountActivated = async (
+  patientProfileId: Id,
+  at: Date,
+  db?: DatabaseClient,
+): Promise<PatientAccount | null> => {
+  const account = await findOne({ patientProfileId }, db);
+  if (!account || account.activatedAt) {
+    return account;
+  }
+  return (await accounts(db).update(account.id, { activatedAt: at })) ?? account;
 };
 
 /** How stale `lastSeenAt` must be before a live session writes it again. */

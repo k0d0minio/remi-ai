@@ -186,7 +186,8 @@ Value per target: `NEON_AUTH_BASE_URL` comes from the integration: production fr
 from the main branch of `uat-remi-ai`, preview from the branch `preview/<git branch>` of
 `uat-remi-ai`. `NEON_AUTH_COOKIE_SECRET` is one value per target, made with
 `openssl rand -base64 32`. uat never reuses production's. With either unset, `/api/auth` answers
-503 and the log names the variable.
+503 and the log names the variable. `NEON_AUTH_COOKIE_SECRET` also signs the ticket of the second
+meal suggestion (REM-103). With it unset, the patient gets no second suggestion.
 
 ## Email
 
@@ -250,16 +251,30 @@ file cannot be opened. Nothing is ever reported as stored when it was not.
 
 ## AI
 
-| Variable             | Purpose                                               | Where set | Public? |
-| -------------------- | ----------------------------------------------------- | --------- | ------- |
-| `ANTHROPIC_API_KEY`  | Direct Anthropic API access                           | both      | no      |
-| `AI_GATEWAY_API_KEY` | Vercel AI Gateway key, if routing through the gateway | Vercel    | no      |
+| Variable             | Purpose                                                               | Where set | Public? |
+| -------------------- | --------------------------------------------------------------------- | --------- | ------- |
+| `AI_GATEWAY_API_KEY` | Vercel AI Gateway key. The AI adapter of `web` and `admin` reads it. | Vercel    | no      |
 
-Value per target: AI has no vendor adapter yet. Set neither key on any target until an adapter reads it.
+The AI Gateway is the registered AI vendor (decision D-16):
+`packages/services/src/ai/adapters/gateway.ts` implements the `TextProvider` seam with the AI SDK.
+Two apps register it, each from its `lib/ai.ts`: `apps/web` and `apps/admin`. **The key is required
+on the two projects**, on each target where a generation must work. Make the key in the Vercel
+dashboard of team `remi21` (AI Gateway, API keys). `ANTHROPIC_API_KEY` left this catalogue with
+REM-89: no code reads it.
 
-Model ids are **not** environment variables — they live in `packages/services/src/ai/index.ts`
-behind three role names (`fast` / `balanced` / `deep`), so an upgrade is one edit rather than a
-config change in five places.
+With the variable unset, no adapter registers. Each generation then returns the failure `error`,
+and all other functions of the apps work as before. The unit tests need no key.
+
+Each generation writes one JSON line in the server log (`"event":"ai.generation"`): role, model,
+duration, token counts, outcome. The line never holds the prompt or the reply.
+
+Model ids are **not** environment variables. Callers ask for one of three roles (`fast` /
+`balanced` / `deep`). The code default of each role is in `packages/services/src/ai/index.ts`. An
+admin can set another model for a role in the console, on the page « Modèles d'IA »
+(`/ai-models`): the value is a row of the table `app_settings`, and it applies to the next call.
+A save is refused unless the gateway lists the model, the model has the tag `structured-output`,
+and its `no_training` is `all`. The list comes from `GET https://ai-gateway.vercel.sh/v1/models`,
+which needs no key.
 
 ## Analytics
 

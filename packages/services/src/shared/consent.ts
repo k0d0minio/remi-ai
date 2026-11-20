@@ -22,8 +22,9 @@ export const consentDecisions = ["given", "refused", "withdrawn"] as const;
 export type ConsentDecision = (typeof consentDecisions)[number];
 
 /**
- * The languages a consent text exists in. Version 1 is `fr-BE` only. An `en`
- * file comes from Morgane's counsel (Jamie, 2026-11-01).
+ * The languages a consent row can name. Every text is `fr-BE`, and the apps
+ * show no other language (Jamie, 2026-11-20). `en` stays in the list because
+ * it is a stored value of the vocabulary: no text file carries it.
  */
 export const consentTextLocales = ["fr-BE", "en"] as const;
 
@@ -57,8 +58,10 @@ export type ShownConsent = {
 };
 
 /** The text language a page shows for a locale of the app. */
+const textLocaleOf: Record<Locale, ConsentTextLocale> = { fr: "fr-BE" };
+
 export const consentTextLocaleFor = (locale: Locale): ConsentTextLocale =>
-  locale === "fr" ? "fr-BE" : "en";
+  textLocaleOf[locale];
 
 /** How a form posts one shown consent: `key:version:locale`. */
 export const shownConsentValue = (shown: ShownConsent) =>

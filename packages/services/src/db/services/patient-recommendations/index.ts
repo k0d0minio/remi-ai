@@ -6,6 +6,7 @@ import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientRecommendation } from "../../models/patient-recommendation";
 import type { RecommendationCategory } from "../../models/recommendation";
 import { touchPatient } from "../patients";
+import { moveToValidateAfterSave } from "../first-recommendation";
 import {
   countSectionPlan,
   isEmptySave,
@@ -71,7 +72,14 @@ const allForPatient = async (
     return [];
   }
   const page = await recommendations().findMany({ patientId }, { limit: 200 });
-  return [...page.items].sort(byCategoryThenPosition);
+  // A lifestyle advice (REM-65) is a row of this table with a category of its
+  // own. `patient-lifestyle-advices` owns it: it is not a recommendation here,
+  // so a whole-section save of the recommendations cannot archive it.
+  return page.items
+    .filter((row) =>
+      (recommendationCategories as readonly string[]).includes(row.category),
+    )
+    .sort(byCategoryThenPosition);
 };
 
 /** The protocol in force — what the patient link shows. */
@@ -128,6 +136,7 @@ const unscopedAddPatientRecommendation = async (
     archivedAt: null,
   });
   await touchPatient(patientId);
+  await moveToValidateAfterSave(patientId);
   return ok(created);
 };
 
@@ -323,7 +332,7 @@ const unscopedSavePatientRecommendations = async (
     return ok(counts);
   }
 
-  return getDatabase().transaction(async (tx) => {
+  const saved = await getDatabase().transaction(async (tx) => {
     const archivedAt = new Date();
     for (const id of plan.archives) {
       await recommendations(tx).update(id, { archivedAt });
@@ -352,6 +361,11 @@ const unscopedSavePatientRecommendations = async (
     await touchPatient(patientId, tx);
     return ok(counts);
   });
+  // After the transaction, and only for a save that leaves content (D-31).
+  if (counts.added > 0 || counts.updated > 0) {
+    await moveToValidateAfterSave(patientId);
+  }
+  return saved;
 };
 
 /**

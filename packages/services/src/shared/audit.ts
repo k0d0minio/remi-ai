@@ -57,6 +57,11 @@ export const auditActions = [
    * old and the new values.
    */
   "patient.changed",
+  /**
+   * The practitioner marked patient changes as taken into account (story 21,
+   * D-32). The detail names the field keys, and never a value.
+   */
+  "patient.change_acknowledged",
   "patient.deleted",
   /**
    * The inactivity sweep sent the notice of deletion (`inactive-account-
@@ -77,6 +82,11 @@ export const auditActions = [
    * detail is JSON: the kind, the value and the parameters used.
    */
   "calculation.validated",
+  /**
+   * The practitioner validated the protocol into its next version (story 20,
+   * D-32). The detail is JSON: the version number and the count of each part.
+   */
+  "protocol.validated",
   "recommendation.added",
   "recommendation.updated",
   "recommendation.archived",
@@ -91,6 +101,25 @@ export const auditActions = [
   "supplement.deleted",
   "supplement.reordered",
   "supplement.batch_saved",
+  /**
+   * The practitioner saved « À favoriser », « À limiter » and « Éviction
+   * totale » (REM-54, D-32). The detail is JSON: the counts, and no term.
+   */
+  "food_directive.batch_saved",
+  /**
+   * The practitioner saved, disabled, put back or deleted a lifestyle advice
+   * (REM-65, D-32). The detail is JSON: counts and categories, and no text.
+   */
+  "lifestyle_advice.batch_saved",
+  "lifestyle_advice.disabled",
+  "lifestyle_advice.restored",
+  "lifestyle_advice.deleted",
+  /**
+   * The practitioner changed the switch of a meal, the orientation of a meal
+   * or the fasting option (REM-68, REM-70, D-32). The detail is JSON: each
+   * value that moved, with its old and its new value.
+   */
+  "meal_configuration.updated",
   "pantry.added",
   "pantry.updated",
   "pantry.archived",
@@ -105,6 +134,13 @@ export const auditActions = [
   "recipe.assigned",
   "recipe.created_and_assigned",
   "recipe.duplicated_as_variant",
+  /**
+   * A practitioner marked a recipe of the library « vérifiée », or the mark
+   * left (REM-90, D-34, D-32). The detail of a removal is `explicit` for the
+   * practitioner's act and `edit` for an edit of the verified recipe.
+   */
+  "recipe.verified",
+  "recipe.verification_removed",
   "recipe.assigned_bulk",
   "recipe.assignment_updated",
   "recipe.assignment_archived",
@@ -116,6 +152,13 @@ export const auditActions = [
   "nutrition_rule.validated",
   "nutrition_rule.archived",
   "nutrition_rule.restored",
+  /**
+   * An admin set the model of an AI role, or removed the setting so that the
+   * code default applies again (D-32). The detail is JSON: the role, the
+   * model before and the model after.
+   */
+  "ai_model.set",
+  "ai_model.reset",
   "meal.logged",
   "meal.updated",
   "meal.feedback_written",
@@ -204,6 +247,18 @@ export const auditActions = [
   "genotype.changed",
   "share_link.regenerated",
   "share_link.emailed",
+  /**
+   * « Votre espace REMI est prêt » went out to the patient (stories 19 and
+   * 22). The detail is the kind of link: `sign_in` or `takeover`. With no
+   * column on the file, this event is the record that the e-mail went out
+   * once (`shared/activation-email`).
+   */
+  "activation_email.sent",
+  /**
+   * A send of that e-mail did not go out. The detail is the reason, a key of
+   * `activationEmailFailures`. No detail holds an address or a link.
+   */
+  "activation_email.failed",
   /**
    * The patient's pseudonymous context copied out of the console to be pasted
    * into a model of the operator's choosing. Health data leaving the console is

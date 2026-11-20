@@ -24,3 +24,14 @@ export type PatientCalculation = Entity & {
   /** The inputs changed after the validation. The epics that validate set it. */
   needsRevalidation: boolean;
 };
+
+/**
+ * The estimates that REMI computes from the file as it is now, for the kinds
+ * whose estimate is written only at a save (REM-52). Nothing stores them: a
+ * screen shows one where the row has no estimate yet. Null: a datum is
+ * missing or out of range, so there is no number (D-30).
+ */
+export type ComputedEstimates = Record<
+  "protein" | "energy",
+  { value: number; parameters: CalculationParameters } | null
+>;

@@ -16,6 +16,7 @@ import {
 import {
   appHref,
   operatorRoles,
+  userMessage,
   type OperatorRoleName,
 } from "@remi/services/shared";
 import { audit } from "@/lib/audit";
@@ -72,7 +73,7 @@ export const inviteOperatorAction = async (
     operator.email,
   );
   if (!issued.ok) {
-    return { error: issued.message, invited: null };
+    return { error: userMessage(issued), invited: null };
   }
 
   const { invitation, token } = issued.data;
@@ -136,7 +137,7 @@ export const setOperatorRoleAction = async (
   const role = asRole(field(formData, "role"));
   const result = await setOperatorRole(id, role);
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "operator.role_changed", {
     type: "operator",
@@ -163,7 +164,7 @@ export const removeOperatorAction = async (
   }
   const result = await deleteOperator(id);
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "operator.removed", {
     type: "operator",
@@ -193,7 +194,7 @@ export const acceptInvitationAction = async (
     password: field(formData, "password"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(result.data, "operator.joined", {
     type: "operator",
@@ -214,7 +215,7 @@ export const updateAccountNameAction = async (
   ensureDatabase();
   const result = await updateOperatorName(operator.id, field(formData, "name"));
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   revalidatePath("/account");
   revalidatePath("/team");
@@ -239,7 +240,7 @@ export const changePasswordAction = async (
     field(formData, "password"),
   );
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   return { error: null, saved: true };
 };

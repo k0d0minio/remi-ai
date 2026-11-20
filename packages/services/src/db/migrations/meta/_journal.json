@@ -288,6 +288,41 @@
       "when": 1794414132086,
       "tag": "0040_patient_changes",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1795139011756,
+      "tag": "0041_protocol_versions",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1795144798349,
+      "tag": "0042_patient_food_directives",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1795162615487,
+      "tag": "0043_patient_meal_configurations",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1795164063142,
+      "tag": "0044_app_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1795166914658,
+      "tag": "0045_recipe_structure",
+      "breakpoints": true
     }
   ]
 }

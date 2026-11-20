@@ -2,13 +2,16 @@ import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { getDatabase, registerDatabase } from "../db/client";
 import type { AuditAction } from "../db/models/audit-event";
 import type { PatientAccount } from "../db/models/patient-account";
+import type { PatientProfile } from "../db/models/patient-profile";
 import { listAuditEvents } from "../db/services/audit";
 import { createPatientAccount } from "../db/services/patient-accounts";
 import { createPatient } from "../db/services/patients";
 import { createMemoryDatabase, testPractitionerId } from "../db/test-helpers";
+import { fileStatuses, type FileStatus } from "../shared/file-status";
 import { err, ok, type ServiceErrorCode } from "../shared/result";
 import {
   patientLandingFor,
+  patientLandingOf,
   requestPatientMagicLink,
   requestPatientPasswordReset,
   resetPatientPassword,
@@ -36,6 +39,12 @@ const identity = (subject: string, email: string): AuthIdentity => ({
 
 let claire: PatientAccount;
 let claireId: string;
+
+/** Writes the status on the row. The moves of the status have their own tests. */
+const setClaireFileStatus = (fileStatus: FileStatus) =>
+  getDatabase()
+    .collection<PatientProfile>("patient_profiles")
+    .update(claireId, { fileStatus });
 
 beforeAll(async () => {
   registerDatabase(createMemoryDatabase());
@@ -90,6 +99,7 @@ beforeAll(async () => {
       return ok(null);
     },
     completeRedirectSignIn: async () => null,
+    renewSessionCache: async () => null,
     routeHandlers: () => {
       throw new Error("not used");
     },
@@ -134,9 +144,55 @@ const countOf = async (action: AuditAction) =>
   (await listAuditEvents(systemActor, { action })).length;
 
 describe("the landing", () => {
-  it("is the questionnaire before activation and the home after it", () => {
-    expect(patientLandingFor({ activatedAt: null })).toBe("questionnaire");
-    expect(patientLandingFor({ activatedAt: new Date() })).toBe("home");
+  it("is the questionnaire while the file is to complete", () => {
+    expect(patientLandingFor({ fileStatus: "to_complete" })).toBe(
+      "questionnaire",
+    );
+  });
+
+  it("is the waiting screen from a complete questionnaire to the activation", () => {
+    expect(patientLandingFor({ fileStatus: "ready" })).toBe("waiting");
+    expect(patientLandingFor({ fileStatus: "to_validate" })).toBe("waiting");
+  });
+
+  it("is the home when the file is active", () => {
+    expect(patientLandingFor({ fileStatus: "active" })).toBe("home");
+  });
+
+  it("opens the home for each status only when it is active", () => {
+    expect(
+      fileStatuses.filter(
+        (fileStatus) => patientLandingFor({ fileStatus }) === "home",
+      ),
+    ).toEqual(["active"]);
+  });
+
+  it("reads the file of the account at each call", async () => {
+    expect(await patientLandingOf(claire)).toBe("questionnaire");
+    await setClaireFileStatus("to_validate");
+    expect(await patientLandingOf(claire)).toBe("waiting");
+    await setClaireFileStatus("active");
+    expect(await patientLandingOf(claire)).toBe("home");
+    await setClaireFileStatus("to_complete");
+  });
+
+  it("does not open the home on the activation date alone", async () => {
+    await getDatabase()
+      .collection<PatientAccount>("patient_accounts")
+      .update(claire.id, { activatedAt: new Date() });
+    const landing = await patientLandingOf(claire);
+    await getDatabase()
+      .collection<PatientAccount>("patient_accounts")
+      .update(claire.id, { activatedAt: null });
+    expect(landing).toBe("questionnaire");
+  });
+
+  it("is the questionnaire for a file that cannot be read", async () => {
+    expect(
+      await patientLandingOf({
+        patientProfileId: "00000000-0000-4000-8000-00000000dead",
+      }),
+    ).toBe("questionnaire");
   });
 });
 
@@ -167,18 +223,25 @@ describe("the password sign-in", () => {
     );
   });
 
-  it("lands an activated patient on the home", async () => {
-    await getDatabase()
-      .collection<PatientAccount>("patient_accounts")
-      .update(claire.id, { activatedAt: new Date() });
+  it("lands a patient who waits for the activation on the waiting screen", async () => {
+    await setClaireFileStatus("ready");
     const result = await signInPatient({
       email: "claire@example.be",
       password: "correct horse",
     });
-    await getDatabase()
-      .collection<PatientAccount>("patient_accounts")
-      .update(claire.id, { activatedAt: null });
+    await setClaireFileStatus("to_complete");
+    expect(result.ok ? result.data.landing : null).toBe("waiting");
+  });
+
+  it("lands an activated patient on the home, with the same account", async () => {
+    await setClaireFileStatus("active");
+    const result = await signInPatient({
+      email: "claire@example.be",
+      password: "correct horse",
+    });
+    await setClaireFileStatus("to_complete");
     expect(result.ok ? result.data.landing : null).toBe("home");
+    expect(result.ok ? result.data.account.id : null).toBe(claire.id);
   });
 
   it("answers one code for a wrong password and for an unknown e-mail", async () => {

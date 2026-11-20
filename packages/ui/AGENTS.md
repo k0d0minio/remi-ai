@@ -93,9 +93,10 @@ blocker (`CONVENTIONS.md` → "Keeping the codebase lean"), so split it instead:
 classes become a pure primitive in `src/server/`, and each app keeps a thin client wrapper that
 reads the value and passes it down.
 
-`LocaleSwitcher` is the worked example. It takes `locales`, `current`, a `hrefFor(locale)` and an
-`as` for the app's router link; each app's wrapper is the four lines that call `usePathname()`. The
-switcher itself renders on the server in every app, and the client cost is the wrapper alone.
+`BottomNav` is the worked example. It takes the items and which one is current; the app's wrapper
+reads the pathname. The bar itself renders on the server, and the client cost is the wrapper alone.
+A component of this package renders no text of its own except in French (Jamie, 2026-11-20): a
+label comes from the caller, and a built-in one (« Fermer », « (facultatif) ») is French.
 
 The same shape covers a callback the primitive should not own: take it as a prop rather than
 reaching for the hook here, which would move the whole component to the client barrel and put it in

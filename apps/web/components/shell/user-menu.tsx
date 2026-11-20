@@ -2,14 +2,12 @@
 
 import {
   BookOpen,
-  Check,
   ChevronDown,
   LogOut,
   Repeat,
   User,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { appHref, locales, type Locale } from "@remi/services/shared";
+import { appHref, type Locale } from "@remi/services/shared";
 import {
   Avatar,
   AvatarFallback,
@@ -21,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@remi/ui";
 import type { Content } from "@/lib/content/types";
-import { setLocale, switchRole } from "@/lib/actions/session";
+import { switchRole } from "@/lib/actions/session";
 import type { Role } from "@/lib/auth/session";
 
 type Props = {
@@ -32,19 +30,8 @@ type Props = {
   content: Content;
 };
 
-const localeLabels: Record<Locale, string> = {
-  en: "English",
-  fr: "Français",
-};
-
-/**
- * The locale switch lives in here rather than as its own control: inside the
- * app, language is an account preference, not a piece of page navigation the way
- * it is on the public site.
- */
+/** No language choice: the app is French only (Jamie, 2026-11-20). */
 export const UserMenu = ({ name, initials, role, locale, content }: Props) => {
-  const pathname = usePathname();
-  const unprefixed = pathname.replace(`/${locale}`, "") || "/";
   const otherRole: Role = role === "practitioner" ? "patient" : "practitioner";
 
   return (
@@ -66,22 +53,6 @@ export const UserMenu = ({ name, initials, role, locale, content }: Props) => {
           <User aria-hidden="true" />
           {content.roles[role]}
         </DropdownMenuItem>
-
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel>{content.userMenu.language}</DropdownMenuLabel>
-        {locales.map((option) => (
-          <DropdownMenuItem
-            key={option}
-            onSelect={() => setLocale(option, unprefixed)}
-          >
-            {option === locale ? (
-              <Check aria-hidden="true" />
-            ) : (
-              <span className="size-4" />
-            )}
-            {localeLabels[option]}
-          </DropdownMenuItem>
-        ))}
 
 
         <DropdownMenuSeparator />

@@ -1,42 +1,38 @@
 /**
- * The locale vocabulary, shared by every app that ships in more than one
- * language. It lives here rather than in an app because the marketing site and
- * the product must agree on it — a link from the app to the public site has to
- * build the same path the site actually serves.
+ * The locale vocabulary. REMI is French only (Jamie, 2026-11-20): Morgane's
+ * patients and practitioners are French-speaking, and no page ships in a
+ * second language.
+ *
+ * The list and the `[locale]` segment stay so that every address keeps its
+ * `/fr` prefix. The links in the e-mails and in the console carry it. A second
+ * language is one more entry here, and one more dictionary in each app.
  */
 
-export const locales = ["en", "fr"] as const;
+export const locales = ["fr"] as const;
 
 export type Locale = (typeof locales)[number];
 
-/**
- * French is the market the product is launching into (Belgium, France); English
- * is the fallback for everyone else and the x-default for search engines.
- */
-export const defaultLocale: Locale = "en";
+export const defaultLocale: Locale = "fr";
 
 export const isLocale = (value: string): value is Locale =>
   (locales as readonly string[]).includes(value);
 
-/** "/", "fr" → "/fr" · "/contact", "en" → "/en/contact" */
+/** "/", "fr" → "/fr" · "/contact", "fr" → "/fr/contact" */
 export const localePath = (locale: Locale, path: string) =>
   `/${locale}${path === "/" ? "" : path}`;
 
 /**
- * The first language in an Accept-Language header that we can actually serve,
- * so a Brussels visitor lands on French and everyone else on English. Takes the
- * raw header rather than a request object, which is what keeps this isomorphic
- * and testable — the caller's proxy owns the redirect.
+ * The same address under the one locale the apps serve. A first segment of two
+ * letters is a language that is not served (`/en/accueil`): it is replaced. A
+ * path with no language gets the prefix. The proxy of each localised app
+ * redirects with this, whatever the browser's language.
+ *
+ * "/" → "/fr" · "/accueil" → "/fr/accueil" · "/en/accueil" → "/fr/accueil"
  */
-export const pickLocaleFromHeader = (header: string | null): Locale => {
-  if (!header) {
-    return defaultLocale;
-  }
-  for (const part of header.split(",")) {
-    const code = part.split(";")[0].trim().slice(0, 2).toLowerCase();
-    if (isLocale(code)) {
-      return code;
-    }
-  }
-  return defaultLocale;
+export const defaultLocalePath = (pathname: string) => {
+  const [, first = "", ...rest] = pathname.split("/");
+  const withoutLanguage = /^[a-z]{2}$/i.test(first)
+    ? `/${rest.join("/")}`
+    : pathname;
+  return localePath(defaultLocale, withoutLanguage);
 };

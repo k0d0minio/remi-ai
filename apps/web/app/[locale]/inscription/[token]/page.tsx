@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPractitionerBySignupToken } from "@remi/services/server";
-import { isLocale } from "@remi/services/shared";
+import { defaultLocale, isLocale } from "@remi/services/shared";
 import { Typography, Wordmark } from "@remi/ui/server";
 import { SignupForm } from "@/components/signup/signup-form";
 import { getContent } from "@/lib/content";
@@ -21,7 +21,7 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const { locale } = await params;
   return {
-    title: getContent(isLocale(locale) ? locale : "en").signupLink.metaTitle,
+    title: getContent(isLocale(locale) ? locale : defaultLocale).signupLink.metaTitle,
   };
 };
 
@@ -45,7 +45,8 @@ const SignupLinkPage = async ({ params }: { params: Promise<Params> }) => {
   if (!found.ok) {
     notFound();
   }
-  const content = getContent(locale).signupLink;
+  const dictionary = getContent(locale);
+  const content = dictionary.signupLink;
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-10">
@@ -60,6 +61,7 @@ const SignupLinkPage = async ({ params }: { params: Promise<Params> }) => {
         token={token}
         locale={locale}
         content={content}
+        dateText={dictionary.dateEntry}
         consents={consentTexts(locale)}
       />
     </main>

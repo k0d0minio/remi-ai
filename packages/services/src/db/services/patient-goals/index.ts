@@ -14,22 +14,21 @@ import type { PatientGoal } from "../../models/patient-goal";
 import type { WrittenBy } from "../../models/meal-entry";
 import type { PatientGoalCheckIn } from "../../models/patient-goal-check-in";
 import { touchPatient } from "../patients";
+import { moveToValidateAfterSave } from "../first-recommendation";
 import { byPatient, byRecord, noSuchPatient } from "../access";
 
 /**
- * The two or three priority goals Morgane steers an accompaniment by, and the
- * dated check-ins that make each one's evolution legible — brainstorm § D.
+ * The patient's goals, in the practitioner's order, and the dated check-ins
+ * that make each one's evolution legible.
  *
- * Two rules live here rather than in the schema, and both are deliberate. The
- * active cap is a count of rows, which a constraint cannot express without a
- * trigger, and § D's "2-3 maximum" is a rule about the accompaniment that
- * Morgane may still want relaxed — a branch here, not a migration. And a
- * check-in must carry something: § D offers a direction *or* a measure, so
- * either will do, but a dated row saying neither records nothing.
+ * A goal is one free text, and their number has no limit (story 16). The first
+ * goal of the active list is the main goal; the others are secondary (D-30).
+ * A disabled goal keeps its row: `archivedAt` is the date it was disabled.
+ *
+ * One rule lives here rather than in the schema. A check-in must carry
+ * something: a direction, a measure or a note. A dated row that says none of
+ * the three records nothing.
  */
-
-/** § D's "2-3 maximum", enforced at the top of the range. */
-export const MAX_ACTIVE_GOALS = 3;
 
 const goals = (db: DatabaseClient = getDatabase()) =>
   db.collection<PatientGoal>("patient_goals");
@@ -133,13 +132,6 @@ const unscopedAddPatientGoal = async (
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
   }
-  const active = await unscopedListPatientGoals(patientId);
-  if (active.length >= MAX_ACTIVE_GOALS) {
-    return err(
-      "conflict",
-      `at most ${MAX_ACTIVE_GOALS} active goals — archive one first`,
-    );
-  }
   const created = await goals().insert({
     patientId,
     title: parsed.data.title,
@@ -148,6 +140,7 @@ const unscopedAddPatientGoal = async (
     archivedAt: null,
   });
   await touchPatient(patientId);
+  await moveToValidateAfterSave(patientId);
   return ok(created);
 };
 
@@ -217,8 +210,10 @@ const unscopedMovePatientGoal = async (
 };
 
 /**
- * Archiving is the everyday exit; restoring is the undo. A restore has to pass
- * the same cap an add does, or the refusal would be trivially routed around.
+ * Disabling is the everyday exit, and enabling again is the undo. The row
+ * stays in both directions. A goal that comes back goes to the end of the
+ * order: its old rank now belongs to another goal, and two goals on one rank
+ * would leave the main goal to the creation date.
  */
 const unscopedArchivePatientGoal = async (
   id: Id,
@@ -232,17 +227,22 @@ const unscopedArchivePatientGoal = async (
     return err("not_found", "no such goal");
   }
   if (!archived && existing.archivedAt !== null) {
-    const active = await unscopedListPatientGoals(existing.patientId);
-    if (active.length >= MAX_ACTIVE_GOALS) {
-      return err(
-        "conflict",
-        `at most ${MAX_ACTIVE_GOALS} active goals — archive one first`,
-      );
+    const restored = await goals().update(id, {
+      archivedAt: null,
+      position: await nextPosition(existing.patientId),
+    });
+    if (!restored) {
+      return err("not_found", "no such goal");
     }
+    await touchPatient(restored.patientId);
+    return ok(restored);
   }
-  const updated = await goals().update(id, {
-    archivedAt: archived ? new Date() : null,
-  });
+  if (!archived || existing.archivedAt !== null) {
+    // Already in the state that was asked for: nothing to write, and the date
+    // of a goal that is disabled stays the date it was first disabled.
+    return ok(existing);
+  }
+  const updated = await goals().update(id, { archivedAt: new Date() });
   if (!updated) {
     return err("not_found", "no such goal");
   }

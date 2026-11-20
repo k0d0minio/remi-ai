@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { PatientAllergen } from "@remi/services/shared";
 import {
   ALL_SUB_KEY,
@@ -14,7 +14,12 @@ import {
   noneKnownLabels,
 } from "@remi/services/shared";
 import { Checkbox } from "@remi/ui";
-import { ChoiceChip, Input, Typography } from "@remi/ui/server";
+import { Input, Typography } from "@remi/ui/server";
+import {
+  ChoiceCards,
+  useFormChange,
+} from "@/components/patients/choice-cards";
+import { MandatoryLabel } from "@/components/patients/form-groups";
 import {
   allergenNames,
   type AllergenState,
@@ -24,6 +29,7 @@ type Kind = "allergy" | "intolerance";
 
 type Props = {
   kind: Kind;
+  legend: string;
   /** The list's « none known » flag: true, false or null. */
   noneKnown: boolean | null;
   /** The rows already stored for this list. */
@@ -60,16 +66,20 @@ const subLabelOf = (key: string, subKey: string) => {
   return labels?.[subKey]?.fr ?? subKey;
 };
 
+const boxClass =
+  "border-border bg-card flex min-h-11 cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 text-sm has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60";
+
 /**
- * One allergen list of the questionnaire, as the console encodes it: three
- * answers, then the boxes when the answer is « Oui ». A checked category opens
- * its sub-list, with « Tous » first. « Autre » takes a text.
+ * One allergen list of the questionnaire, as the console encodes it: the
+ * answer first, then the boxes when the answer is « Oui ». A checked category
+ * opens its sub-list, with « Tous » first, and « Tous » locks the other boxes
+ * of the sub-list, as on the patient's page. « Autre » takes a text.
  *
- * The radio is plain HTML, and the boxes post through Radix's hidden inputs,
- * so the form submits without any handler of this component. The state here
- * only decides what is shown.
+ * No answer is selected until one exists. The boxes post through Radix's
+ * hidden inputs, so the form reads them with no handler of this component.
+ * The state here only decides what is shown.
  */
-export const AllergenField = ({ kind, noneKnown, rows }: Props) => {
+export const AllergenField = ({ kind, legend, noneKnown, rows }: Props) => {
   const names = allergenNames(kind);
   const keys: readonly string[] = kind === "allergy" ? allergens : intolerances;
   const labels: Record<string, { fr: string }> =
@@ -79,6 +89,11 @@ export const AllergenField = ({ kind, noneKnown, rows }: Props) => {
   const [checked, setChecked] = useState<ReadonlySet<string>>(
     () => new Set(rows.map((row) => boxValue(row.key, row.subKey))),
   );
+  const notify = useFormChange();
+  useEffect(() => {
+    notify();
+  }, [state, checked, notify]);
+
   // Keyed by the box's key: `other`, or the category of a sub-list « Autre ».
   const otherTexts = new Map<string, string>(
     rows
@@ -107,94 +122,91 @@ export const AllergenField = ({ kind, noneKnown, rows }: Props) => {
   const isOpen = (key: string) =>
     [...checked].some((value) => value === key || value.startsWith(`${key}/`));
 
-  const title = kind === "allergy" ? "Allergies" : "Intolérances";
-
   return (
-    <fieldset className="flex flex-col gap-3">
-      <legend className="text-sm font-medium">{title}</legend>
-      <div
-        className="flex flex-wrap gap-2"
-        onChange={(event) => {
-          const target = event.target as HTMLInputElement;
-          if (target.name === names.state) {
-            setState(target.value as AllergenState);
-          }
-        }}
-      >
-        <ChoiceChip
-          name={names.state}
-          value="unanswered"
-          label="Non renseigné"
-          defaultChecked={state === "unanswered"}
-        />
-        <ChoiceChip
-          name={names.state}
-          value="none_known"
-          label={noneKnownLabels[kind].fr}
-          defaultChecked={state === "none_known"}
-        />
-        <ChoiceChip
-          name={names.state}
-          value="declared"
-          label="Oui, lesquelles"
-          defaultChecked={state === "declared"}
-        />
-      </div>
+    <div className="flex min-w-0 flex-col gap-3">
+      <ChoiceCards
+        name={names.state}
+        legend={<MandatoryLabel>{legend}</MandatoryLabel>}
+        initial={state}
+        emptyValue="unanswered"
+        onSelect={(value) =>
+          setState(value === "" ? "unanswered" : (value as AllergenState))
+        }
+        options={[
+          { value: "none_known", label: noneKnownLabels[kind].fr },
+          { value: "declared", label: "Oui, lesquelles" },
+        ]}
+      />
 
       {state === "declared" ? (
-        <ul className="grid gap-2 sm:grid-cols-2">
+        <ul
+          aria-label={legend}
+          className="@xl:grid-cols-2 grid grid-cols-1 gap-2"
+        >
           {keys.map((key) => {
             const value = boxValue(key, null);
             const subList = kind === "allergy" ? subListOf(key) : [];
             const id = `${kind}-${key}`;
+            const label = labels[key]?.fr ?? key;
+            const open = isOpen(key);
+            const all = checked.has(boxValue(key, ALL_SUB_KEY));
             return (
-              <li key={key} className="flex flex-col gap-2">
-                <label
-                  htmlFor={id}
-                  className="flex items-center gap-2 text-sm"
-                >
+              <li
+                key={key}
+                className={
+                  subList.length > 0 && open
+                    ? "col-span-full flex flex-col gap-2"
+                    : "flex flex-col gap-2"
+                }
+              >
+                <label htmlFor={id} className={boxClass}>
                   <Checkbox
                     id={id}
                     name={names.item}
                     value={value}
-                    checked={checked.has(value) || isOpen(key)}
+                    checked={checked.has(value) || open}
                     onCheckedChange={(on) => toggle(value, on === true)}
                   />
-                  {labels[key]?.fr ?? key}
+                  {label}
                 </label>
                 {key === "other" && checked.has(value) ? (
                   <Input
                     name={names.other(key)}
-                    aria-label={`${title} : autre`}
+                    aria-label={`${legend} : autre`}
+                    placeholder="Précisez"
                     defaultValue={otherTexts.get(key) ?? ""}
                   />
                 ) : null}
-                {subList.length > 0 && isOpen(key) ? (
-                  <ul className="border-border ml-6 flex flex-col gap-1.5 border-l pl-3">
+                {subList.length > 0 && open ? (
+                  <ul
+                    aria-label={label}
+                    className="border-border @xl:grid-cols-2 ml-3 grid grid-cols-1 gap-2 border-l pl-3"
+                  >
                     {[ALL_SUB_KEY, ...subList].map((subKey) => {
                       const subValue = boxValue(key, subKey);
                       const subId = `${kind}-${key}-${subKey}`;
+                      const locked = all && subKey !== ALL_SUB_KEY;
+                      const on = !locked && checked.has(subValue);
                       return (
-                        <li key={subKey} className="flex flex-col gap-1.5">
-                          <label
-                            htmlFor={subId}
-                            className="flex items-center gap-2 text-sm"
-                          >
+                        <li key={subKey} className="flex flex-col gap-2">
+                          <label htmlFor={subId} className={boxClass}>
                             <Checkbox
                               id={subId}
                               name={names.item}
                               value={subValue}
-                              checked={checked.has(subValue)}
-                              onCheckedChange={(on) =>
-                                toggle(subValue, on === true)
+                              checked={on}
+                              disabled={locked}
+                              onCheckedChange={(next) =>
+                                toggle(subValue, next === true)
                               }
                             />
                             {subLabelOf(key, subKey)}
                           </label>
-                          {subKey === "other" && checked.has(subValue) ? (
+                          {subKey === "other" && on ? (
                             <Input
                               name={names.other(key)}
-                              aria-label={`${labels[key]?.fr ?? key} : autre`}
+                              aria-label={`${label} : autre`}
+                              placeholder="Précisez"
                               defaultValue={otherTexts.get(key) ?? ""}
                             />
                           ) : null}
@@ -214,6 +226,6 @@ export const AllergenField = ({ kind, noneKnown, rows }: Props) => {
           Cochez au moins une case, ou choisissez « {noneKnownLabels[kind].fr} ».
         </Typography>
       ) : null}
-    </fieldset>
+    </div>
   );
 };

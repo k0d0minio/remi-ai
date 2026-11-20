@@ -4,6 +4,7 @@ import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientInstruction } from "../../models/patient-instruction";
 import { touchPatient } from "../patients";
+import { moveToValidateAfterSave } from "../first-recommendation";
 import { byPatient, byRecord, noSuchPatient } from "../access";
 
 /**
@@ -142,6 +143,7 @@ const unscopedSetPatientInstruction = async (
     archivedAt: null,
   });
   await touchPatient(patientId, db);
+  await moveToValidateAfterSave(patientId);
   return ok(created);
 };
 

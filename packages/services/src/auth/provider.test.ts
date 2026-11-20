@@ -3,7 +3,9 @@ import { ok } from "../shared/result";
 import {
   getAuthProvider,
   isAuthProviderRegistered,
+  isSessionReadError,
   registerAuthProvider,
+  SessionReadError,
   type AuthProvider,
 } from "./provider";
 
@@ -19,6 +21,7 @@ const fakeProvider = (name: string): AuthProvider => ({
   requestPasswordReset: async () => ok(null),
   resetPassword: async () => ok(null),
   completeRedirectSignIn: async () => null,
+  renewSessionCache: async () => null,
   routeHandlers: () => {
     throw new Error("not used");
   },
@@ -46,5 +49,25 @@ describe("the auth seam", () => {
     expect(() => registerAuthProvider(fakeProvider("second"))).toThrow(
       /already registered/,
     );
+  });
+});
+
+describe("the session read error", () => {
+  it("is known by its name, across two copies of the module", () => {
+    expect(isSessionReadError(new SessionReadError("502 NETWORK_ERROR"))).toBe(
+      true,
+    );
+    // A copy of the class from another route bundle: not `instanceof`.
+    expect(isSessionReadError({ name: "SessionReadError", reason: "x" })).toBe(
+      true,
+    );
+    expect(isSessionReadError(new Error("NEXT_REDIRECT"))).toBe(false);
+    expect(isSessionReadError(null)).toBe(false);
+  });
+
+  it("carries the reason, and names no session", () => {
+    const failure = new SessionReadError("429 no code");
+    expect(failure.reason).toBe("429 no code");
+    expect(failure.message).toBe("the session read failed (429 no code)");
   });
 });

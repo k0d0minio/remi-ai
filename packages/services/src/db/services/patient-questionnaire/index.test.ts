@@ -86,7 +86,7 @@ const errorOf = (result: { ok: boolean; error?: string }) =>
   result.ok ? null : result.error;
 
 describe("the questionnaire vocabulary", () => {
-  it("gives every key a French and an English label", () => {
+  it("gives every key a French label", () => {
     const tables = [
       [diets, dietLabels],
       [allergens, allergenLabels],
@@ -94,17 +94,14 @@ describe("the questionnaire vocabulary", () => {
     ] as const;
     for (const [keys, labels] of tables) {
       for (const key of keys) {
-        const label = (labels as Record<string, { fr: string; en: string }>)[
-          key
-        ];
+        const label = (labels as Record<string, { fr: string }>)[key];
         expect(label.fr.length).toBeGreaterThan(0);
-        expect(label.en.length).toBeGreaterThan(0);
       }
     }
     for (const [category, keys] of Object.entries(allergenSubLists)) {
       const labels = allergenSubLabels[
         category as keyof typeof allergenSubLabels
-      ] as Record<string, { fr: string; en: string }>;
+      ] as Record<string, { fr: string }>;
       for (const key of keys) {
         expect(labels[key].fr.length).toBeGreaterThan(0);
       }

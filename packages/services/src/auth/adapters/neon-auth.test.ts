@@ -1,7 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { isSessionReadError } from "../provider";
 import {
   neonAuthProviderFrom,
+  SESSION_READ_WAITS_MS,
   SESSION_VERIFIER_PARAM,
+  sortSessionAnswer,
   toServiceError,
   type NeonAuthClient,
 } from "./neon-auth";
@@ -178,5 +181,290 @@ describe("the Neon Auth adapter", () => {
     const request = new Request(`${landing}?${SESSION_VERIFIER_PARAM}=spent`);
     const provider = neonAuthProviderFrom(client);
     expect(await provider.completeRedirectSignIn(request)).toBeNull();
+  });
+});
+
+/** The SDK's answers of `getSession`, as the auth server causes them. */
+const signedInAnswer = { data: { user }, error: null };
+const nobodyAnswer = { data: null, error: null };
+const unreachable = {
+  data: null,
+  error: { status: 502, code: "NETWORK_TIMEOUT", message: "timed out" },
+};
+const serverError = {
+  data: null,
+  error: { status: 500, message: "Internal Server Error" },
+};
+const rateLimited = {
+  data: null,
+  error: { status: 429, message: "Too many requests." },
+};
+
+type SessionAnswer = Awaited<ReturnType<NeonAuthClient["getSession"]>>;
+
+/** A provider whose reads answer `answers` in order, and that never waits. */
+const readerOver = (...answers: SessionAnswer[]) => {
+  const client = fakeClient();
+  const getSession = vi.fn<NeonAuthClient["getSession"]>();
+  for (const answer of answers) {
+    getSession.mockResolvedValueOnce(answer);
+  }
+  client.getSession = getSession;
+  const waits: number[] = [];
+  const provider = neonAuthProviderFrom(client, {
+    wait: async (ms) => {
+      waits.push(ms);
+    },
+  });
+  return { provider, getSession, waits };
+};
+
+/** The error of a rejected read, or null when the read answered. */
+const failureOf = async (read: Promise<unknown>): Promise<unknown> =>
+  read.then(
+    () => null,
+    (cause: unknown) => cause,
+  );
+
+describe("the session read of the Neon Auth adapter", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("sorts the three answers apart", () => {
+    expect(sortSessionAnswer(signedInAnswer).kind).toBe("identity");
+    expect(sortSessionAnswer(nobodyAnswer)).toEqual({ kind: "nobody" });
+    expect(sortSessionAnswer({ data: {}, error: null })).toEqual({
+      kind: "nobody",
+    });
+    expect(sortSessionAnswer({ data: null, error: { status: 401 } })).toEqual({
+      kind: "nobody",
+    });
+    expect(sortSessionAnswer(unreachable)).toEqual({
+      kind: "failed",
+      reason: "502 NETWORK_TIMEOUT",
+      retry: true,
+    });
+    expect(sortSessionAnswer(serverError)).toEqual({
+      kind: "failed",
+      reason: "500 no code",
+      retry: true,
+    });
+    expect(sortSessionAnswer(rateLimited)).toEqual({
+      kind: "failed",
+      reason: "429 no code",
+      retry: false,
+    });
+  });
+
+  it("never reads an error as an identity, whatever data comes with it", () => {
+    const answer = sortSessionAnswer({
+      data: { user },
+      error: { status: 500 },
+    });
+    expect(answer.kind).toBe("failed");
+  });
+
+  it("answers nobody at the first read, with no second read", async () => {
+    const { provider, getSession, waits } = readerOver(nobodyAnswer);
+    expect(await provider.readIdentity()).toBeNull();
+    expect(getSession).toHaveBeenCalledTimes(1);
+    expect(waits).toEqual([]);
+  });
+
+  it("reads again after a failed read, and answers the identity", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const { provider, getSession, waits } = readerOver(
+      serverError,
+      signedInAnswer,
+    );
+    expect(await provider.readIdentity()).toMatchObject({ subject: "user-1" });
+    expect(getSession).toHaveBeenCalledTimes(2);
+    expect(waits).toEqual([SESSION_READ_WAITS_MS[0]]);
+  });
+
+  it("answers nobody when the second read says nobody", async () => {
+    const { provider } = readerOver(unreachable, nobodyAnswer);
+    expect(await provider.readIdentity()).toBeNull();
+  });
+
+  it("throws a session read error after three failed reads, not nobody", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { provider, getSession, waits } = readerOver(
+      unreachable,
+      serverError,
+      unreachable,
+    );
+    const failure = await failureOf(provider.readIdentity());
+    expect(isSessionReadError(failure)).toBe(true);
+    expect(failure).toMatchObject({ reason: "502 NETWORK_TIMEOUT" });
+    expect(getSession).toHaveBeenCalledTimes(3);
+    expect(waits).toEqual([...SESSION_READ_WAITS_MS]);
+    expect(logged).toHaveBeenCalledWith("[auth] the session read failed", {
+      reason: "502 NETWORK_TIMEOUT",
+    });
+  });
+
+  it("does not read again at once after a rate limit", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const { provider, getSession, waits } = readerOver(
+      rateLimited,
+      signedInAnswer,
+    );
+    const failure = await failureOf(provider.readIdentity());
+    expect(isSessionReadError(failure)).toBe(true);
+    expect(getSession).toHaveBeenCalledTimes(1);
+    expect(waits).toEqual([]);
+  });
+
+  it("reads again when the SDK throws, as it does for a cookie in a render", async () => {
+    const client = fakeClient();
+    const getSession = vi
+      .fn<NeonAuthClient["getSession"]>()
+      .mockRejectedValueOnce(new Error("Cookies can only be modified"))
+      .mockResolvedValueOnce(signedInAnswer);
+    client.getSession = getSession;
+    const provider = neonAuthProviderFrom(client, { wait: async () => {} });
+    expect(await provider.readIdentity()).toMatchObject({ subject: "user-1" });
+    expect(getSession).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps the message of a thrown error out of the reason and the log", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+    const client = fakeClient();
+    client.getSession = vi.fn<NeonAuthClient["getSession"]>(async () => {
+      throw new TypeError("fetch failed for cookie abc");
+    });
+    const provider = neonAuthProviderFrom(client, { wait: async () => {} });
+    const failure = await failureOf(provider.readIdentity());
+    expect(isSessionReadError(failure)).toBe(true);
+    expect(failure).toMatchObject({ reason: "TypeError" });
+    expect(JSON.stringify(logged.mock.calls)).not.toContain("abc");
+  });
+});
+
+const TOKEN = "__Secure-neon-auth.session_token";
+const CACHE = "__Secure-neon-auth.local.session_data";
+const page = "https://app.example.be/fr/accueil";
+
+const pageRequest = (cookie: string) =>
+  new Request(page, { headers: cookie ? { cookie } : {} });
+
+/** The route handler's `get-session` answer for a token with no cache. */
+const renewedAnswer = (extraCookies: string[] = []) => {
+  const headers = new Headers({ "content-type": "application/json" });
+  headers.append(
+    "set-cookie",
+    `${CACHE}=signed.copy; Path=/; Max-Age=299; HttpOnly; Secure; SameSite=Lax`,
+  );
+  for (const cookie of extraCookies) {
+    headers.append("set-cookie", cookie);
+  }
+  return new Response(JSON.stringify({ user, session: { id: "s-1" } }), {
+    status: 200,
+    headers,
+  });
+};
+
+describe("the session cache renewal of the Neon Auth adapter", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("does nothing for a request with no session token", async () => {
+    const client = fakeClient();
+    const provider = neonAuthProviderFrom(client);
+    expect(await provider.renewSessionCache(pageRequest(""))).toBeNull();
+    expect(
+      await provider.renewSessionCache(pageRequest("remi-link-preview=abc")),
+    ).toBeNull();
+    expect(client.handler).not.toHaveBeenCalled();
+  });
+
+  it("does nothing while the cache is there", async () => {
+    const client = fakeClient();
+    const provider = neonAuthProviderFrom(client);
+    const request = pageRequest(`${TOKEN}=t.sig; ${CACHE}=old.copy`);
+    expect(await provider.renewSessionCache(request)).toBeNull();
+    expect(client.handler).not.toHaveBeenCalled();
+  });
+
+  it("asks get-session with the cookies, and answers the cache only", async () => {
+    const client = fakeClient();
+    const handlers = handlersAnswering(
+      renewedAnswer([`${TOKEN}=other; Path=/; Max-Age=0`]),
+    );
+    client.handler = vi.fn(() => handlers);
+    const provider = neonAuthProviderFrom(client);
+    const cookie = `other=1; ${TOKEN}=t.sig`;
+
+    const renewal = await provider.renewSessionCache(pageRequest(cookie));
+
+    expect(renewal?.setCookies).toEqual([
+      `${CACHE}=signed.copy; Path=/; Max-Age=299; HttpOnly; Secure; SameSite=Lax`,
+    ]);
+    expect(renewal?.cookieHeader).toBe(`${cookie}; ${CACHE}=signed.copy`);
+    const [sent, context] = handlers.GET.mock.calls[0] ?? [];
+    expect(sent?.url).toBe("https://app.example.be/api/auth/get-session");
+    expect(sent?.headers.get("cookie")).toBe(cookie);
+    expect(await context?.params).toEqual({ path: ["get-session"] });
+  });
+
+  it("answers null, and clears nothing, when the auth server knows no session", async () => {
+    const client = fakeClient();
+    const headers = new Headers({ "content-type": "application/json" });
+    headers.append("set-cookie", `${TOKEN}=; Path=/; Max-Age=0`);
+    const gone = new Response("null", { status: 200, headers });
+    client.handler = vi.fn(() => handlersAnswering(gone));
+    const provider = neonAuthProviderFrom(client);
+    expect(
+      await provider.renewSessionCache(pageRequest(`${TOKEN}=t.sig`)),
+    ).toBeNull();
+  });
+
+  it("answers null when the answer has a user and no cache", async () => {
+    const client = fakeClient();
+    const plain = new Response(JSON.stringify({ user }), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+    client.handler = vi.fn(() => handlersAnswering(plain));
+    const provider = neonAuthProviderFrom(client);
+    expect(
+      await provider.renewSessionCache(pageRequest(`${TOKEN}=t.sig`)),
+    ).toBeNull();
+  });
+
+  it("answers null when the auth server refuses the read", async () => {
+    const client = fakeClient();
+    const refused = new Response(JSON.stringify({ message: "Too many" }), {
+      status: 429,
+      headers: { "content-type": "application/json" },
+    });
+    client.handler = vi.fn(() => handlersAnswering(refused));
+    const provider = neonAuthProviderFrom(client);
+    expect(
+      await provider.renewSessionCache(pageRequest(`${TOKEN}=t.sig`)),
+    ).toBeNull();
+  });
+
+  it("answers null when the handler throws", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const client = fakeClient();
+    const GET = vi.fn<Get>(async () => {
+      throw new Error("no request scope");
+    });
+    const unused = vi.fn();
+    client.handler = vi.fn(() => ({
+      GET,
+      POST: unused,
+      PUT: unused,
+      PATCH: unused,
+      DELETE: unused,
+    }));
+    const provider = neonAuthProviderFrom(client);
+    expect(
+      await provider.renewSessionCache(pageRequest(`${TOKEN}=t.sig`)),
+    ).toBeNull();
   });
 });

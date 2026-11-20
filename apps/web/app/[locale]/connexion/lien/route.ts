@@ -1,5 +1,8 @@
 import { redirect } from "next/navigation";
-import { completePatientSignIn } from "@remi/services/server";
+import {
+  completePatientSignIn,
+  isSessionReadError,
+} from "@remi/services/server";
 import { isLocale, localePath } from "@remi/services/shared";
 import { ensureAuthProvider } from "@/lib/auth/provider";
 import { ensureDatabase } from "@/lib/database";
@@ -21,6 +24,8 @@ type Context = { params: Promise<{ locale: string }> };
  * - An identity with no patient file: the session closes, and the sign-in
  *   page says to sign up with the practitioner's link.
  * - No session: the link expired or was used. The sign-in page opens.
+ * - The session read failed: the sign-in page opens too. The visitor is not
+ *   signed in on this path until the read succeeds, so no session is lost.
  *
  * A signed-in patient who opens this address again writes one more event.
  * The trail then reads one sign-in too many, never one too few.
@@ -37,7 +42,14 @@ export const GET = async (request: Request, { params }: Context) => {
   if (exchanged) {
     return exchanged;
   }
-  const identity = provider ? await provider.readIdentity() : null;
+  const identity = provider
+    ? await provider.readIdentity().catch((cause: unknown) => {
+        if (isSessionReadError(cause)) {
+          return null;
+        }
+        throw cause;
+      })
+    : null;
   if (!provider || !identity) {
     redirect(signIn);
   }

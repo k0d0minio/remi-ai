@@ -22,13 +22,18 @@ const ACTIONS: readonly Action[] = [
   },
   { label: "Proposer une recette", targetId: "recipes", segment: "dossier" },
   { label: "Ajouter un retour repas", targetId: "meals", segment: "journal" },
-  { label: "Copier le contexte", targetId: "copy-context", segment: "suivi" },
+  { label: "Copier le contexte", targetId: "copy-context", segment: "dossier" },
 ];
 
 type Props = {
   patientId: string;
   /** The patient's own link, marked as her preview — built server-side. */
   previewUrl: string;
+  /**
+   * False when the action card already carries « Nouvelle consultation » as
+   * its dominant button: the page shows the link one time.
+   */
+  withConsultation: boolean;
 };
 
 /**
@@ -42,8 +47,16 @@ type Props = {
  * section's add form; when that section lives in another phone segment, they
  * switch the segment first (same mechanism as the segmented control — the URL
  * and the root's data-segment) and scroll once it is back in the layout.
+ * `scrollTo` opens the section first when it is a folded row.
+ *
+ * They sit in the action card and are all secondary buttons: the card has the
+ * one dominant button of the page (charter, section 8).
  */
-export const QuickActions = ({ patientId, previewUrl }: Props) => {
+export const QuickActions = ({
+  patientId,
+  previewUrl,
+  withConsultation,
+}: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -69,16 +82,19 @@ export const QuickActions = ({ patientId, previewUrl }: Props) => {
 
   return (
     <div className="flex flex-wrap gap-2">
-      <Button size="sm" asChild>
-        <NextLink href={`/patients/${patientId}/consultation`}>
-          Nouvelle consultation
-        </NextLink>
-      </Button>
+      {withConsultation ? (
+        <Button size="sm" variant="outline" asChild>
+          <NextLink href={`/patients/${patientId}/consultation`}>
+            Nouvelle consultation
+          </NextLink>
+        </Button>
+      ) : null}
       {ACTIONS.map((action) => (
         <Button
           key={action.targetId}
           type="button"
           size="sm"
+          variant="outline"
           onClick={() => go(action)}
         >
           {action.label}

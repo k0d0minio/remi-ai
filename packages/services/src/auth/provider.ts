@@ -77,6 +77,47 @@ export type AuthRouteHandlers = {
   DELETE: RouteHandler;
 };
 
+/**
+ * A session read that got no answer from the identity store: the store was
+ * not reachable, it refused the read (a rate limit), or it answered an error.
+ * It is not a sign-out. The session of the visitor is unknown, so the caller
+ * shows an error and keeps the visitor's cookies. It never treats the visitor
+ * as signed in, and it never sends them to the sign-in page as signed out.
+ *
+ * `reason` is a status and a code of the store. It holds no cookie, no token
+ * and no session id.
+ */
+export class SessionReadError extends Error {
+  override readonly name = "SessionReadError";
+  readonly reason: string;
+
+  constructor(reason: string) {
+    super(`the session read failed (${reason})`);
+    this.reason = reason;
+  }
+}
+
+/**
+ * True for a `SessionReadError`. It reads the name, not the class: each route
+ * bundle has its own copy of this module, and `instanceof` fails across two
+ * copies.
+ */
+export const isSessionReadError = (error: unknown): error is SessionReadError =>
+  typeof error === "object" &&
+  error !== null &&
+  (error as { name?: unknown }).name === "SessionReadError";
+
+/**
+ * What the proxy applies when the adapter renewed its cached session for a
+ * page request (`renewSessionCache`).
+ */
+export type SessionRenewal = {
+  /** The `set-cookie` lines for the browser. They set the cache only. */
+  setCookies: string[];
+  /** The `cookie` header of this request, with the renewed cache added. */
+  cookieHeader: string;
+};
+
 export type AuthProvider = {
   /** Vendor name, for logs only. */
   readonly name: string;
@@ -84,8 +125,21 @@ export type AuthProvider = {
   signIn: (input: PasswordSignInInput) => Promise<AuthResult<AuthIdentity>>;
   requestMagicLink: (input: MagicLinkInput) => Promise<AuthResult<null>>;
   signOut: () => Promise<AuthResult<null>>;
-  /** The signed-in user of the current request, or `null`. */
+  /**
+   * The signed-in user of the current request, or `null` when the identity
+   * store answers that nobody is signed in. It throws `SessionReadError` when
+   * the store gave no answer: a failed read is not a sign-out.
+   */
   readIdentity: () => Promise<AuthIdentity | null>;
+  /**
+   * Renews the adapter's cached session for one page request. The caller is
+   * the app's proxy, the one place where a page request can write a cookie
+   * (a page render cannot). With a fresh cache, `readIdentity` does not call
+   * the identity store. It answers `null` when there is nothing to renew, and
+   * when the renewal failed: the read then goes to the store as before. It
+   * never clears a cookie.
+   */
+  renewSessionCache: (request: Request) => Promise<SessionRenewal | null>;
   requestPasswordReset: (
     input: PasswordResetRequestInput,
   ) => Promise<AuthResult<null>>;

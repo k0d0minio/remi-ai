@@ -65,7 +65,7 @@ export const SheetContent = ({
       {children}
       <SheetPrimitive.Close className="focus-visible:ring-ring absolute right-4 top-4 rounded-sm opacity-70 transition-opacity duration-[--duration-fast] hover:opacity-100 focus-visible:outline-none focus-visible:ring-[3px]">
         <X aria-hidden="true" className="size-5" />
-        <span className="sr-only">Close</span>
+        <span className="sr-only">Fermer</span>
       </SheetPrimitive.Close>
     </SheetPrimitive.Content>
   </SheetPrimitive.Portal>

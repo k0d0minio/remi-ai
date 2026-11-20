@@ -2,6 +2,7 @@ import {
   BookOpen,
   Carrot,
   ChefHat,
+  Cpu,
   Home,
   Inbox,
   ScrollText,
@@ -24,7 +25,7 @@ export type NavSection = {
 };
 
 /**
- * The console's whole surface. It is deliberately seven rows: this console is
+ * The console's whole surface. It is deliberately a few rows: this console is
  * Morgane's patient tool and the accounts that reach it, and nothing else. The
  * practitioner, pilot, support and flag screens that used to live here were
  * fixtures with no data behind them — they were deleted rather than hidden.
@@ -61,6 +62,9 @@ export const navSections: readonly NavSection[] = [
     title: "Console",
     items: [
       { href: "/team", label: "Équipe", icon: UsersRound, adminOnly: true },
+      // The model of each AI role. The page and each of its actions check the
+      // role again: this row is only hidden from a practitioner.
+      { href: "/ai-models", label: "Modèles d'IA", icon: Cpu, adminOnly: true },
       { href: "/audit", label: "Journal", icon: ScrollText },
     ],
   },

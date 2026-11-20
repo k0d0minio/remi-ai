@@ -27,8 +27,16 @@ import type {
 } from "../../models/patient-questionnaire";
 import { recordAuditEvent, type AuditActor } from "../audit";
 import { consentInForce } from "../patient-consents/in-force";
-import { refreshBmiEstimate } from "../patient-calculations";
-import { changesMeasures, setFileStatus } from "../patients";
+import {
+  refreshBmiEstimate,
+  refreshEnergyEstimate,
+  refreshProteinEstimate,
+} from "../patient-calculations";
+import {
+  changesMeasures,
+  changesProteinInputs,
+  setFileStatus,
+} from "../patients";
 import {
   byPatient,
   byPatientWrite,
@@ -471,6 +479,14 @@ const unscopedSavePatientQuestionnaire = async (
     (byThePatient
       ? { kind: "patient", id: current.id, name: current.pseudonym ?? "" }
       : null);
+  // The energy estimate reads these two answers (story 9).
+  const energyFields = ["sexForCalculation", "activityLevel"] as const;
+  const changesEnergyInputs = energyFields.some(
+    (field) => patch[field] !== undefined && patch[field] !== current[field],
+  );
+  if (changesEnergyInputs) {
+    await refreshEnergyEstimate(patientId);
+  }
   await recordConsultationDateChange(current, patch, trailActor);
   await recordGenotypeChanges(current, patch, trailActor);
   if (byThePatient) {
@@ -617,6 +633,10 @@ const unscopedSavePatientProfileAnswers = async (
   const written = await rows.update(patientId, patch);
   if (written && changesMeasures(current, patch)) {
     await refreshBmiEstimate(patientId);
+  }
+  if (written && changesProteinInputs(current, patch)) {
+    await refreshProteinEstimate(patientId);
+    await refreshEnergyEstimate(patientId);
   }
   if (written && byThePatient) {
     const fields = Object.keys(patch);

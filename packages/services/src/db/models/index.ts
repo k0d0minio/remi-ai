@@ -75,11 +75,15 @@ export type {
 export type { PatientRecommendation } from "./patient-recommendation";
 export type {
   CalculationParameters,
+  ComputedEstimates,
   PatientCalculation,
 } from "./patient-calculation";
 export type { PatientSummary } from "./patient-summary";
 export type { PatientChange } from "./patient-change";
+export type { ProtocolVersion, ValidatedProtocol } from "./protocol-version";
 export type { PatientSupplement } from "./patient-supplement";
+export type { PatientFoodDirective } from "./patient-food-directive";
+export type { PatientMealConfiguration } from "./patient-meal-configuration";
 export type {
   GenotypeMarker,
   HabitsProfile,
@@ -97,6 +101,7 @@ export type {
   SignalKind,
   SignalSeverity,
 } from "./progress-signal";
+export type { GeneratedRecipe } from "./generated-recipe";
 export type { Recipe } from "./recipe";
 export type { AssignedRecipe, RecipeAssignment } from "./recipe-assignment";
 export type { Recommendation, RecommendationCategory } from "./recommendation";

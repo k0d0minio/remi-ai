@@ -6,8 +6,9 @@ import type {
 /**
  * The answers the questionnaire saves one at a time. The first eight are
  * profile columns (`savePatientProfileAnswers`), the rest questionnaire
- * columns (`savePatientQuestionnaire`). The two lists save through their own
- * action. Kept out of `actions.ts`: a "use server" file exports only actions.
+ * columns (`savePatientQuestionnaire`). The two lists and the diet save
+ * through their own actions. Kept out of `actions.ts`: a "use server" file
+ * exports only actions.
  */
 export const answerFields = [
   "firstName",
@@ -23,8 +24,6 @@ export const answerFields = [
   "desiredWeightKg",
   "consultationReason",
   "consultationDate",
-  "diet",
-  "dietNote",
   "pathologies",
   "celiacDisease",
   "geneticTest",
@@ -38,6 +37,7 @@ export type AnswerField = (typeof answerFields)[number];
 export type SaveError =
   | "required"
   | "invalid"
+  | "phone"
   | "height_range"
   | "weight_range"
   | "consent"

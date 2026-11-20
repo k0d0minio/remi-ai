@@ -19,14 +19,116 @@ export {
 } from "./format";
 export {
   defaultLocale,
+  defaultLocalePath,
   isLocale,
   localePath,
   locales,
-  pickLocaleFromHeader,
 } from "./i18n";
 export type { Locale } from "./i18n";
+export { userMessage } from "./user-message";
+export type { ServiceFailure } from "./user-message";
 export { auditActions } from "./audit";
+export {
+  checkPlannedMealText,
+  PLANNED_MEAL_MAX_LENGTH,
+  PLANNED_MEALS_PER_DAY,
+} from "./planned-meal";
+export type { PlannedMealTextError } from "./planned-meal";
+export type {
+  MealAlert,
+  MealAnswer,
+  MealImprovement,
+  MealImprovementKind,
+  MealSuggestion,
+} from "./meal-suggestion";
 export { isWatchedPatientField, watchedPatientFields } from "./patient-changes";
+export {
+  comparePatientChangesForReview,
+  isSafetyPatientField,
+  patientChangeValueLabel,
+  watchedPatientFieldLabels,
+} from "./patient-change-labels";
+export {
+  PROTOCOL_SNAPSHOT_SCHEMA_VERSION,
+  isEmptyProtocolSnapshot,
+  protocolSnapshotSchema,
+} from "./protocol-snapshot";
+export type { ProtocolSnapshot } from "./protocol-snapshot";
+export { validatedRecommendationsView } from "./validated-recommendations";
+export type {
+  LifestyleAdviceCategory,
+  ValidatedAdvice,
+  ValidatedEviction,
+  ValidatedFoodLimit,
+  ValidatedRecommendationsView,
+  ValidatedSupplement,
+} from "./validated-recommendations";
+export {
+  evictionsOfDirectives,
+  foodDirectiveFaults,
+  foodDirectiveKinds,
+  foodDirectiveTermKey,
+  foodLimitLevels,
+  joinFoodDirectiveTerms,
+  splitFoodDirectiveTerms,
+} from "./food-directives";
+export {
+  LIFESTYLE_ADVICE_DETAILS_MAX,
+  LIFESTYLE_ADVICE_TEXT_MAX,
+  isLifestyleAdviceKey,
+  lifestyleAdviceFaults,
+  lifestyleAdviceKeys,
+  lifestyleKeyOf,
+} from "./lifestyle-advice";
+export type {
+  LifestyleAdvice,
+  LifestyleAdviceDraft,
+  LifestyleAdviceEdit,
+  LifestyleAdviceFault,
+  LifestyleAdviceFaultCode,
+  LifestyleAdviceKey,
+} from "./lifestyle-advice";
+export type {
+  FoodDirectiveDraft,
+  FoodDirectiveFault,
+  FoodDirectiveFaultCode,
+  FoodDirectiveKind,
+  FoodLimitLevel,
+} from "./food-directives";
+export {
+  activeMealSlots,
+  defaultMealConfiguration,
+  emptyMealConfiguration,
+  mealFastingOptions,
+  mealOrientations,
+  mealRemovedByFasting,
+  mealSlotState,
+  // The meal journal already exports `mealSlots` and `MealSlot` (`patient.ts`).
+  mealSlots as mealConfigurationSlots,
+} from "./meal-configuration";
+export type {
+  MealConfiguration,
+  MealConfigurationChange,
+  MealFasting,
+  MealOrientation,
+  MealSlot as MealConfigurationSlot,
+  MealSlotState,
+} from "./meal-configuration";
+export { canActivate } from "./care-activation";
+export {
+  activationEmailDecision,
+  activationEmailFailures,
+  activationEmailState,
+  patientSignInPath,
+} from "./activation-email";
+export type {
+  ActivationEmailDecision,
+  ActivationEmailEvent,
+  ActivationEmailFailure,
+  ActivationEmailState,
+  ActivationEmailTrigger,
+} from "./activation-email";
+export type { ActivationBlocker, ActivationRecap } from "./care-activation";
 export type {
   PatientChangeValue,
   WatchedPatientField,
@@ -40,12 +142,40 @@ export {
   calculationKindLabels,
   calculationKinds,
   missingCalculationInputs,
+  specialSituationLabels,
+  specialSituations,
 } from "./calculations";
 export type {
   BmiIndicator,
   CalculationInput,
   CalculationKind,
+  SpecialSituation,
 } from "./calculations";
+export {
+  energyEstimateParameters,
+  energyGoalLabels,
+  energyGoals,
+  energyTarget,
+  energyTargetBounds,
+  energyTargetDefaults,
+  energyTargetEntries,
+  energyTargetParameters,
+  restingMetabolismSexConstants,
+} from "./energy";
+export type {
+  EnergyGoal,
+  EnergyTargetDefaults,
+  EnergyTargetEntry,
+} from "./energy";
+export {
+  defaultProteinCoefficient,
+  proteinAdaptationLabels,
+  proteinEstimateParameters,
+  proteinTarget,
+  proteinTargetBounds,
+  proteinTargetDefaults,
+} from "./protein";
+export type { ProteinTargetDefaults, ProteinTargetField } from "./protein";
 export {
   defaultMacroSplit,
   genotypeMappingValidated,
@@ -99,6 +229,7 @@ export {
   isPatientFileKey,
   MAX_DOCUMENT_FILE_BYTES,
 } from "./files";
+export type { AiModelRole, ModelCheck, ModelTestOutcome } from "./ai-models";
 export { nutritionRuleKinds, nutritionRuleStatuses } from "./nutrition-rules";
 export type { NutritionRuleKind, NutritionRuleStatus } from "./nutrition-rules";
 export {
@@ -131,6 +262,13 @@ export {
   isFileStatus,
 } from "./file-status";
 export type { FileOrigin, FileStatus } from "./file-status";
+export { patientFileLayout } from "./patient-file-layout";
+export type {
+  PatientFileAction,
+  PatientFileGroup,
+  PatientFileLayout,
+  PatientFileSectionId,
+} from "./patient-file-layout";
 export {
   canManageOperators,
   defaultPatientListSort,
@@ -180,11 +318,14 @@ export {
   intolerances,
   mandatoryQuestionnaireFieldLabels,
   mandatoryQuestionnaireFields,
+  missingBySection,
   missingMandatoryFields,
   heightCmRange,
   missingOptionalFields,
   noneKnownLabels,
   optionalQuestionnaireFieldLabels,
+  questionnaireSections,
+  sectionOfMandatoryField,
   sexesForCalculation,
   sexForCalculationLabels,
   weightKgRange,
@@ -195,7 +336,17 @@ export type {
   OptionalQuestionnaireField,
   QuestionnaireCompleteness,
   QuestionnaireLabel,
+  QuestionnaireSection,
 } from "./questionnaire";
+export { safetyList, strictGlutenLabel } from "./safety-highlights";
+export {
+  dateEntryFromIso,
+  isCalendarDay,
+  maskDateEntry,
+  maskNumberEntry,
+  parseDateEntry,
+} from "./typed-entry";
+export type { SafetyBox, SafetyList } from "./safety-highlights";
 export {
   componentsForRecommendation,
   normaliseNutritionText,
@@ -204,6 +355,28 @@ export {
 } from "./nutrition";
 export type { NutrientComponent, NutrientDirection } from "./nutrition";
 export { variantTitle, VARIANT_SUFFIX } from "./recipe";
+export {
+  formatIngredientLine,
+  formatRecipeMinutes,
+  formatRecipeQuantity,
+  parseIngredientLines,
+  parseStepLines,
+  recipeGateItem,
+  recipeSeasonLabels,
+  recipeSeasons,
+  recipeTotalMinutes,
+  recipeUnitLabels,
+  structuredRecipeOf,
+  structuredRecipeSchema,
+  structuredRecipeText,
+} from "./structured-recipe";
+export type {
+  RecipeIngredient,
+  RecipeSeason,
+  RecipeStep,
+  RecipeUnit,
+  StructuredRecipe,
+} from "./structured-recipe";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
 export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";
@@ -267,10 +440,12 @@ export type {
   PatientQuestionnaire,
   PatientRecommendation,
   PatientSupplement,
+  PatientFoodDirective,
   PatientSex,
   PatientStatus,
   PatientSummary,
   PatientCalculation,
+  ComputedEstimates,
   PatientChange,
   PersonalisationDimension,
   PersonalisationProfile,
@@ -283,7 +458,9 @@ export type {
   ProtocolTemplate,
   ProtocolTemplateKind,
   ProtocolTemplateView,
+  ProtocolVersion,
   PsychologyProfile,
+  GeneratedRecipe,
   Recipe,
   RecipeAssignment,
   Recommendation,
@@ -295,6 +472,7 @@ export type {
   Step,
   StepStatus,
   TherapeuticFrame,
+  ValidatedProtocol,
 } from "../db/models";
 
 /**

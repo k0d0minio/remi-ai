@@ -3,7 +3,7 @@
 The global rules in [`/CONVENTIONS.md`](../../CONVENTIONS.md) still apply. This file holds only
 what is specific to this package.
 
-## Seams, not integrations — AI still has no vendor, and that is the design
+## Seams, not integrations
 
 Storage, email, files and AI are **seams**: each defines an interface and a `register*()` call; the
 concrete adapter is registered by the app that owns the process — **lazily, at first use**, from
@@ -19,7 +19,7 @@ file plus one registration line — never a rewrite of the callers.
 | Storage | `DatabaseClient` | `registerDatabase()`     | Neon (`createNeonDatabase()`)               | throws — a missing DB must be loud                                |
 | Email   | `Mailer`         | `registerMailer()`       | Resend (`createResendMailer()`)             | `consoleMailer` — logs, never sends                               |
 | Files   | `FileStore`      | `registerFileStore()`    | Vercel Blob (`createVercelBlobFileStore()`) | stores nothing — uploads refused, `isFileStoreConfigured()` false |
-| AI      | `TextProvider`   | `registerTextProvider()` | none yet                                    | throws                                                            |
+| AI      | `TextProvider`   | `registerTextProvider()` | AI Gateway (`gatewayTextProviderFromEnv()`) | `generateText()` / `generateJson()` return the failure `error`    |
 | Auth    | `AuthProvider`   | `registerAuthProvider()` | Neon Auth (`createNeonAuthProvider()`)      | throws — `apps/web`'s `ensureAuthProvider()` answers 503 instead  |
 
 Storage's vendor is **Neon Postgres** (owner decision, 27 Aug 2026 — supersedes the earlier
@@ -36,6 +36,7 @@ An adapter goes in this package under `src/<seam>/adapters/<vendor>.ts`, the sea
 the only thing that re-exports it, and `.icm/docs/ENV.md` gains its variables in the same PR. A vendor
 SDK, if one is needed, becomes a dependency of **this** package only. The Resend adapter needs none:
 it is one POST to one endpoint, so it uses `fetch` and the package stays at a single dependency.
+The AI Gateway adapter uses the AI SDK (`ai`): the SDK does the structured output and the retries.
 The Neon Auth SDK reads cookies through `next/headers`, so `next` is a peer dependency of this
 package. Apps are lint-blocked from `@neon/auth`.
 
@@ -107,13 +108,18 @@ malformed environment. That split is what lets a route handler stay free of `try
 src/
   types/       the storage-agnostic vocabulary everything else is written against
   shared/      isomorphic — no fs, no driver, no secret
-  server/      the Node barrel + env
+  server/      the Node barrel + env · meals/suggest.ts (REMI's answer to a planned meal:
+               the database reads, the model call, then the gate in code) ·
+               ai-models/ (the model of each AI role as a console setting: the service
+               that calls the seam reads it with `roleModel()` and gives it in
+               `options.model`, because `ai/` reads no database)
   auth/        the auth seam (provider.ts, session.ts) · adapters/ · the operator console's
                password hashing + session tokens, vendor-free, `node:crypto` only
   db/          client.ts (the seam) · schema.ts (Drizzle) · adapters/ · models/ · services/ · migrations/
   email/       the mailer seam + templates
   files/       the files seam · adapters/ (the server adapter and its browser half) · client.ts
-  ai/          model roles · the provider seam · context.ts (the prompt's context block)
+  ai/          model roles · the provider seam · context.ts (the prompt's context block) ·
+               prompts/ (one pure module for each prompt, pseudonymous by type)
 ```
 
 `db/models/` files are **types only**. That is what lets `shared/` re-export the domain vocabulary

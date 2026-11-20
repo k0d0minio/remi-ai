@@ -1,7 +1,7 @@
-import { Footer, Layout, Navbar } from "nextra-theme-docs";
+import { Footer, LastUpdated, Layout, Navbar } from "nextra-theme-docs";
 import type { Metadata } from "next";
 import type { CSSProperties, ReactNode } from "react";
-import { Head } from "nextra/components";
+import { Head, Search } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
 import { appHref } from "@remi/services/shared";
 import "nextra-theme-docs/style.css";
@@ -31,8 +31,8 @@ const brandLegalName = "Remi AI";
  */
 export const metadata: Metadata = {
   title: {
-    default: `${brandName} — docs`,
-    template: `%s · ${brandName} docs`,
+    default: `${brandName} — documentation`,
+    template: `%s · Documentation ${brandName}`,
   },
   description: `Comment fonctionne ${brandName} — direction de l’entreprise et référence technique.`,
   robots: { index: false, follow: false },
@@ -45,8 +45,9 @@ export const metadata: Metadata = {
  * 725 × 229 px; the navbar shows it at 32 px high, about 101 px wide, which is
  * in the charter's 96 to 120 px for a phone.
  *
- * "docs" stays in the theme's own sans at a lower weight and opacity: it is the
- * qualifier, not part of the brand.
+ * "doc" (the French short form of "documentation") stays in the theme's own
+ * sans at a lower weight and opacity: it is the qualifier, not part of the
+ * brand.
  *
  * The visible image is `aria-hidden` and the accessible name comes from the
  * hidden label, so a screen reader hears the product name once, as a word.
@@ -91,7 +92,7 @@ const darkLogoCss =
 const Logo = () => (
   <span style={logoStyle}>
     <style>{darkLogoCss}</style>
-    <span style={hiddenLabelStyle}>{brandLegalName} docs</span>
+    <span style={hiddenLabelStyle}>Documentation {brandLegalName}</span>
     <img
       src="/remi-logo.png"
       alt=""
@@ -102,7 +103,7 @@ const Logo = () => (
       height={229}
     />
     <span aria-hidden="true" style={qualifierStyle}>
-      docs
+      doc
     </span>
   </span>
 );
@@ -130,6 +131,21 @@ const OutboundLinks = () => (
   </>
 );
 
+/**
+ * The theme's own labels are English by default and the site is French. Each
+ * label the theme lets a caller set is set here. The "copy page" button has
+ * fixed English labels ("Copy page", "Open in ChatGPT") and no prop for them,
+ * so it is off. A few labels stay English in Nextra 4.6 because it has no prop
+ * for them: "Skip to Content", "Copy code", "Toggle word wrap" and the sidebar
+ * and heading-anchor `aria-label`s.
+ */
+const searchLabels = {
+  placeholder: "Rechercher dans la documentation…",
+  emptyResult: "Aucun résultat.",
+  errorText: "L’index de recherche n’a pas pu être chargé.",
+  loading: "Chargement…",
+};
+
 const RootLayout = async ({ children }: { children: ReactNode }) => (
   <html lang="fr" dir="ltr" suppressHydrationWarning>
     <Head />
@@ -143,6 +159,15 @@ const RootLayout = async ({ children }: { children: ReactNode }) => (
         footer={<Footer>© {brandLegalName}</Footer>}
         pageMap={await getPageMap()}
         docsRepositoryBase="https://github.com/k0d0minio/remi-ai/tree/main/apps/docs"
+        search={<Search {...searchLabels} />}
+        editLink="Modifier cette page"
+        feedback={{ content: "Une question ? Donnez-nous votre avis" }}
+        toc={{ title: "Sur cette page", backToTop: "Retour en haut" }}
+        lastUpdated={
+          <LastUpdated locale="fr-BE">Dernière mise à jour le</LastUpdated>
+        }
+        themeSwitch={{ dark: "Sombre", light: "Clair", system: "Système" }}
+        copyPageButton={false}
         // Light only (REM-175): no theme button, and a device in dark mode
         // gets the light theme, so the logo never sits on a dark background.
         darkMode={false}

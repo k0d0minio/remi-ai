@@ -99,11 +99,12 @@ import {
   documentTags,
   foodBudgets,
   goalDirections,
-  isLocale,
+  defaultLocale,
   mealSlots,
   patientSexes,
   patientStatuses,
   recommendationCategories,
+  userMessage,
   type ChallengeOutcome,
   type CookingAffinity,
   type CookingTime,
@@ -278,7 +279,6 @@ const postedField = (formData: FormData, name: string) =>
  * leaves `fullName` as it is: a file created before the split keeps its name.
  */
 const patientInputFrom = (formData: FormData): PatientInput => {
-  const locale = field(formData, "locale");
   const firstName = field(formData, "firstName").trim();
   const lastName = field(formData, "lastName").trim();
   const fullName = [firstName, lastName].filter(Boolean).join(" ");
@@ -289,7 +289,9 @@ const patientInputFrom = (formData: FormData): PatientInput => {
     ...(fullName ? { fullName } : {}),
     phone: field(formData, "phone"),
     email: field(formData, "email"),
-    locale: isLocale(locale) ? locale : "fr",
+    // The patient space is French only (Morgane, 2026-10-23). The form has no
+    // language field: the column stays and holds `fr`.
+    locale: defaultLocale,
     birthDate: field(formData, "birthDate"),
     sex: asSex(field(formData, "sex")),
     heightCm: field(formData, "heightCm"),
@@ -384,7 +386,7 @@ const writeQuestionnaire = async (
       actorOf(operator),
     );
     if (!saved.ok) {
-      return saved.message;
+      return userMessage(saved);
     }
   }
   for (const kind of ["allergy", "intolerance"] as const) {
@@ -392,7 +394,7 @@ const writeQuestionnaire = async (
     if (answer) {
       const written = await setPatientAllergens(actor, patientId, kind, answer);
       if (!written.ok) {
-        return written.message;
+        return userMessage(written);
       }
     }
   }
@@ -446,7 +448,7 @@ export const savePatientAction = async (
   ];
   const refused = checks.find((check) => !check.ok);
   if (refused && !refused.ok) {
-    return { error: refused.message, saved: false };
+    return { error: userMessage(refused), saved: false };
   }
 
   const sameEmail = input.email
@@ -467,7 +469,7 @@ export const savePatientAction = async (
       createdBy: "practitioner",
     });
     if (!created.ok) {
-      return { error: created.message, saved: false };
+      return { error: userMessage(created), saved: false };
     }
     const failed = await writeQuestionnaire(
       operator,
@@ -503,7 +505,7 @@ export const savePatientAction = async (
   const status = asStatus(field(formData, "status"));
   const updated = await updatePatient(actor, id, { ...input, status });
   if (!updated.ok) {
-    return { error: updated.message, saved: false };
+    return { error: userMessage(updated), saved: false };
   }
   const failed = await writeQuestionnaire(operator, actor, id, answers, lists);
   if (failed) {
@@ -561,7 +563,7 @@ export const deletePatientAction = async (
   const existing = await getPatient(actor, id);
   const removed = await deletePatient(actor, id);
   if (!removed.ok && removed.error !== "not_found") {
-    return { error: removed.message };
+    return { error: userMessage(removed) };
   }
   if (removed.ok) {
     await audit(operator, "patient.deleted", {
@@ -672,7 +674,7 @@ export const addRecommendationAction = async (
     detail: field(formData, "detail"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "recommendation.added", {
     type: "recommendation",
@@ -700,7 +702,7 @@ export const updateRecommendationAction = async (
     detail: field(formData, "detail"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "recommendation.updated", {
     type: "recommendation",
@@ -784,7 +786,7 @@ export const addSupplementAction = async (
     reason: field(formData, "reason"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "supplement.added", {
     type: "patient_supplement",
@@ -812,7 +814,7 @@ export const updateSupplementAction = async (
     reason: field(formData, "reason"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "supplement.updated", {
     type: "patient_supplement",
@@ -896,7 +898,7 @@ export const addPantryEssentialAction = async (
     why: field(formData, "why"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "pantry.added", {
     type: "pantry_essential",
@@ -922,7 +924,7 @@ export const updatePantryEssentialAction = async (
     why: field(formData, "why"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "pantry.updated", {
     type: "pantry_essential",
@@ -1024,7 +1026,7 @@ export const addMealEntryAction = async (
     learning: field(formData, "learning"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "meal.logged", {
     type: "meal_entry",
@@ -1054,7 +1056,7 @@ export const updateMealEntryAction = async (
     patientComment: field(formData, "patientComment"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "meal.updated", {
     type: "meal_entry",
@@ -1082,7 +1084,7 @@ export const writeMealFeedbackAction = async (
     learning: field(formData, "learning"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(
     operator,
@@ -1157,7 +1159,7 @@ export const addObservationAction = async (
     observedOn: field(formData, "observedOn"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "observation.added", {
     type: "patient_observation",
@@ -1183,7 +1185,7 @@ export const updateObservationAction = async (
     observedOn: field(formData, "observedOn"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "observation.updated", {
     type: "patient_observation",
@@ -1239,8 +1241,8 @@ export const deleteObservationAction = async (formData: FormData) => {
  * The steering — § D's priority goals with their check-ins, and § E's standing
  * consigne.
  *
- * The cap on active goals is the service's; these actions surface its refusal
- * rather than repeating the count, so the form and the rule can never disagree.
+ * A goal is one free text, and the service puts no limit on their number
+ * (story 16). The actions do not write the starting point of September.
  */
 export const addGoalAction = async (
   _previous: GoalFormState,
@@ -1254,10 +1256,9 @@ export const addGoalAction = async (
   const patientId = field(formData, "patientId");
   const result = await addPatientGoal(actor, patientId, {
     title: field(formData, "title"),
-    baseline: field(formData, "baseline"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "goal.added", {
     type: "patient_goal",
@@ -1280,10 +1281,9 @@ export const updateGoalAction = async (
   const id = field(formData, "id");
   const result = await updatePatientGoal(actor, id, {
     title: field(formData, "title"),
-    baseline: field(formData, "baseline"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "goal.updated", {
     type: "patient_goal",
@@ -1314,10 +1314,10 @@ export const moveGoalAction = async (formData: FormData) => {
 };
 
 /**
- * Archiving and restoring share a form, and restoring can be refused: the cap
- * counts active goals, so a restore into a full list is the same conflict an
- * add would hit. The refusal is silent here — the list re-renders unchanged,
- * which is what the operator sees — because this form posts without a state.
+ * « Désactiver » and « Réactiver » share a form. The row stays in the data in
+ * both directions, and each one writes its audit event (D-32). The event names
+ * `goal.archived` and `goal.restored` are the names of the audit trail since
+ * September: they do not change.
  */
 export const archiveGoalAction = async (formData: FormData) => {
   const operator = await requireOperator();
@@ -1374,7 +1374,7 @@ export const addCheckInAction = async (
     note: field(formData, "note"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "goal.checked_in", {
     type: "patient_goal_check_in",
@@ -1404,7 +1404,7 @@ export const updateCheckInAction = async (
     note: field(formData, "note"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "goal.check_in_updated", {
     type: "patient_goal_check_in",
@@ -1488,7 +1488,7 @@ export const setInstructionAction = async (
     patientBody,
   });
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   if (result.data && result.data.id !== before?.id) {
     await audit(operator, "instruction.updated", {
@@ -1543,7 +1543,7 @@ export const startChallengeAction = async (
     closeCurrentWith,
   );
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   const { created, closed } = result.data;
   if (closed) {
@@ -1579,7 +1579,7 @@ export const updateChallengeAction = async (
     startedOn: field(formData, "startedOn"),
   });
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   await audit(operator, "challenge.updated", {
     type: "patient_challenge",
@@ -1609,7 +1609,7 @@ export const closeChallengeAction = async (
   }
   const result = await closeChallenge(actor, id, outcome);
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   await audit(operator, "challenge.closed", {
     type: "patient_challenge",
@@ -1647,7 +1647,7 @@ export const replyToPatientAction = async (
       error:
         result.error === "invalid_input"
           ? "Écrivez une réponse — 2000 caractères au plus."
-          : result.message,
+          : userMessage(result),
       saved: false,
     };
   }
@@ -1677,7 +1677,7 @@ export const markMessageReadAction = async (
   const id = field(formData, "id");
   const result = await markPatientMessageRead(actor, id);
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   await audit(operator, "message.marked_read", {
     type: "patient_message",
@@ -1708,7 +1708,7 @@ export const setSummaryAction = async (
   const before = await getPatientSummary(actor, patientId);
   const result = await setPatientSummary(actor, patientId, body);
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   if (result.data && (!before || result.data.body !== before.body)) {
     await audit(operator, "summary.updated", {
@@ -1751,7 +1751,7 @@ export const updateNextConsultationPrepAction = async (
     field(formData, "body"),
   );
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   const changed =
     !before.ok ||
@@ -1847,7 +1847,7 @@ export const assignRecipesAction = async (
     assignedOn: field(formData, "assignedOn"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "recipe.assigned_bulk", {
     type: "recipe_assignment",
@@ -1882,7 +1882,7 @@ export const createAndAssignRecipeAction = async (
     },
   );
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "recipe.created_and_assigned", {
     type: "recipe",
@@ -1918,7 +1918,7 @@ export const duplicateAndAssignRecipeAction = async (
     },
   );
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "recipe.duplicated_as_variant", {
     type: "recipe",
@@ -1946,7 +1946,7 @@ export const updateRecipeAssignmentAction = async (
     assignedOn: field(formData, "assignedOn"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "recipe.assignment_updated", {
     type: "recipe_assignment",
@@ -2019,7 +2019,7 @@ export const addNoteAction = async (
     authorName: operator.name,
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "note.added", {
     type: "note",
@@ -2082,7 +2082,7 @@ export const recordConsultationAction = async (
   });
 
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
 
   await audit(operator, "consultation.recorded", {
@@ -2111,7 +2111,7 @@ export const updateNoteAction = async (
     body: field(formData, "body"),
   });
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "note.updated", {
     type: "note",
@@ -2164,7 +2164,7 @@ export const saveAnamnesisAction = async (
     field(formData, "body"),
   );
   if (!result.ok) {
-    return { error: result.message };
+    return { error: userMessage(result) };
   }
   await audit(operator, "anamnesis.updated", {
     type: "anamnesis",
@@ -2314,7 +2314,7 @@ export const saveRecommendationSectionAction = async (
     return failedSave(cause);
   }
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   await audit(operator, "recommendation.batch_saved", {
     type: "patient",
@@ -2361,7 +2361,7 @@ export const saveSupplementSectionAction = async (
     return failedSave(cause);
   }
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   await audit(operator, "supplement.batch_saved", {
     type: "patient",
@@ -2400,7 +2400,7 @@ export const savePantrySectionAction = async (
     return failedSave(cause);
   }
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   await audit(operator, "pantry.batch_saved", {
     type: "patient",
@@ -2439,7 +2439,7 @@ export const addDocumentLinkAction = async (
     operator.email,
   );
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   await audit(operator, "document.added", {
     type: "patient_document",
@@ -2479,7 +2479,7 @@ export const addDocumentFileAction = async (
     operator.email,
   );
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   await audit(operator, "document.added", {
     type: "patient_document",
@@ -2507,7 +2507,7 @@ export const updateDocumentAction = async (
     ...attachmentFrom(formData),
   });
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   await audit(operator, "document.updated", {
     type: "patient_document",
@@ -2532,7 +2532,7 @@ export const removeDocumentAction = async (
   const id = field(formData, "id");
   const result = await removePatientDocument(actor, id);
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   await audit(operator, "document.removed", {
     type: "patient_document",

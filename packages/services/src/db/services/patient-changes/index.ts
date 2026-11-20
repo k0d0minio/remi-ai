@@ -9,20 +9,22 @@ import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientChange } from "../../models/patient-change";
 import type { PatientProfile } from "../../models/patient-profile";
+import type { ProtocolVersion } from "../../models/protocol-version";
 import type { Actor } from "../../models/actor";
-import { recordAuditEvent } from "../audit";
+import { recordAuditEvent, type OperatorActor } from "../audit";
 import { byPatient, listablePatientIds, noSuchPatient } from "../access";
 
 /**
  * The patient's change signals — story 21, `patient-change-signals`.
  *
  * Every patient-side write of a watched field passes its values before and
- * after to `recordPatientChanges`. On a file whose care is active, each field
- * that differs leaves one open signal. The practitioner's own writes never
+ * after to `recordPatientChanges`. On a file with a validated version, or
+ * whose care is active, each field that differs leaves one open signal. The practitioner's own writes never
  * come here: the services call it only for a `patient` actor.
  *
  * The reads serve the file's markers (`listOpenPatientChanges`) and the
- * patient list's indicator (`countOpenPatientChanges`). The seam's filter is
+ * patient list's indicator (`countOpenPatientChanges`). The practitioner
+ * clears a signal with `acknowledgePatientChanges`: the row stays, closed. The seam's filter is
  * equality, and `acknowledged_at = null` matches nothing in SQL, so the open
  * filter runs here, as for the unread messages.
  */
@@ -41,18 +43,38 @@ export type ChangedPatient = Pick<PatientProfile, "id" | "pseudonym"> & {
 };
 
 /**
- * Whether a patient change on this file raises a signal.
- *
- * Story 21 says « after validation ». `protocol_versions` does not exist yet,
- * so the file status stands in: « Accompagnement actif » follows the
- * practitioner's validation of the recommendations. The first questionnaire
- * fill happens before it and raises nothing.
- * `protocol-versions/working-copy-and-validate` replaces this check with
- * « holds a validated version » (Jamie, question 1, 2026-11-11).
+ * Whether the file status alone arms the signal. « Accompagnement actif »
+ * follows the practitioner's validation of the recommendations. A file that
+ * became active before the versions existed has no version, and its status
+ * arms the signal.
  */
 export const isChangeSignalArmed = (
   patient: Pick<ChangedPatient, "fileStatus">,
 ) => patient.fileStatus === "active";
+
+/**
+ * Whether a patient change on this file raises a signal.
+ *
+ * Story 21 says « after validation ». The fact is a validated version of the
+ * protocol (`protocol_versions`): a change between the validation and the
+ * activation raises a signal too. An active file is armed with no read. The
+ * first questionnaire fill happens before each of them and raises nothing.
+ *
+ * The read goes to the table, not to the protocol-versions service: that
+ * service imports the services that call this module.
+ */
+const changeSignalArmed = async (
+  patient: Pick<ChangedPatient, "id" | "fileStatus">,
+  db: DatabaseClient = getDatabase(),
+): Promise<boolean> => {
+  if (isChangeSignalArmed(patient)) {
+    return true;
+  }
+  const page = await db
+    .collection<ProtocolVersion>("protocol_versions")
+    .findMany({ patientId: patient.id }, { limit: 1 });
+  return page.items.length > 0;
+};
 
 /**
  * The stored form of a value: an empty text or an empty list is `null`, a list
@@ -122,9 +144,6 @@ export const recordPatientChanges = async (
   after: WatchedValues,
   db?: DatabaseClient,
 ): Promise<Result<PatientChange[]>> => {
-  if (!isChangeSignalArmed(patient)) {
-    return ok([]);
-  }
   const changed: WatchedPatientField[] = [];
   for (const field of Object.keys(after)) {
     if (!isWatchedPatientField(field) || !(field in before)) {
@@ -144,6 +163,9 @@ export const recordPatientChanges = async (
   }
 
   try {
+    if (!(await changeSignalArmed(patient, db))) {
+      return ok([]);
+    }
     const open = new Map(
       (await rowsOf(patient.id, db))
         .filter(isOpen)
@@ -243,3 +265,77 @@ export const countOpenPatientChanges = async (
   } while (cursor);
   return counts;
 };
+
+/** What the practitioner acknowledges: each open signal, or the named ones. */
+export type AcknowledgeSelection = "all" | readonly Id[];
+
+/**
+ * « Pris en compte » (story 21): the practitioner acknowledges open signals of
+ * one file. Each row gets `acknowledged_at` and `acknowledged_by`. The row
+ * stays in the table: it leaves the card and the list, not the data.
+ *
+ * 1. A named id that is not an open signal of this file is ignored. A second
+ *    click, or an id of another file, changes nothing and is not an error.
+ * 2. One `patient.change_acknowledged` event names the field keys (D-32). The
+ *    old and the new values are health data: they never go to the trail.
+ * 3. Nothing else is written. A validated recommendation, a protocol version
+ *    and a calculation do not change here.
+ *
+ * The result holds the rows that this call closed.
+ */
+const unscopedAcknowledgePatientChanges = async (
+  patientId: Id,
+  actor: OperatorActor,
+  selection: AcknowledgeSelection,
+): Promise<Result<PatientChange[]>> => {
+  if (!uuidSchema.safeParse(patientId).success) {
+    return noSuchPatient();
+  }
+  const file = await getDatabase()
+    .collection<PatientProfile>("patient_profiles")
+    .findById(patientId);
+  if (!file) {
+    return noSuchPatient();
+  }
+  const open = (await rowsOf(patientId)).filter(isOpen);
+  const chosen =
+    selection === "all"
+      ? open
+      : open.filter((row) => selection.includes(row.id));
+  if (chosen.length === 0) {
+    return ok([]);
+  }
+  const now = new Date();
+  const closed: PatientChange[] = [];
+  for (const row of chosen) {
+    const updated = await changes().update(row.id, {
+      acknowledgedAt: now,
+      acknowledgedBy: actor.id,
+    });
+    if (updated) {
+      closed.push(updated);
+    }
+  }
+  if (closed.length > 0) {
+    await recordAuditEvent({
+      actor,
+      action: "patient.change_acknowledged",
+      targetType: "patient",
+      targetId: patientId,
+      targetLabel: file.pseudonym,
+      detail: closed.map((row) => row.fieldKey).join(", "),
+    });
+  }
+  return ok(closed);
+};
+
+/**
+ * The scoped surface (story 3, D-27). Only the practitioner who holds the
+ * file may acknowledge. An admin's read-only open is refused, as a missing
+ * file.
+ */
+export const acknowledgePatientChanges = byPatient(
+  "write",
+  unscopedAcknowledgePatientChanges,
+  noSuchPatient,
+);

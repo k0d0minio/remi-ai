@@ -19,7 +19,7 @@ export const GET = async (
 ): Promise<Response> => {
   const operator = await getOperatorSession();
   if (!operator) {
-    return new Response("Not signed in", { status: 401 });
+    return new Response("Non connecté", { status: 401 });
   }
   const actor = await actorOf(operator);
   const { documentId } = await params;
@@ -27,13 +27,15 @@ export const GET = async (
   // (D-27): another practitioner's patient answers 404, like a missing file.
   const document = await getPatientDocument(actor, documentId);
   if (!document || document.kind !== "file" || !document.blobKey) {
-    return new Response("Not found", { status: 404 });
+    return new Response("Document introuvable", { status: 404 });
   }
   if (!(await patientOf(actor, document.patientId)).ok) {
-    return new Response("Not found", { status: 404 });
+    return new Response("Document introuvable", { status: 404 });
   }
   if (!fileStoreReady()) {
-    return new Response("No file store is configured", { status: 503 });
+    return new Response("Aucun stockage de fichiers n'est configuré", {
+      status: 503,
+    });
   }
   const url = await signedFileUrl(document.blobKey);
   return new Response(null, {

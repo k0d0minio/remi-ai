@@ -6,6 +6,7 @@ import { Typography } from "@remi/ui/server";
 import { saveAnswerAction } from "@/lib/questionnaire/actions";
 import type { AnswerField } from "@/lib/questionnaire/state";
 import {
+  refusalOf,
   SaveStatus,
   useAutosave,
   useQuestionnaire,
@@ -26,10 +27,11 @@ type Props = {
 export const FlagAnswer = ({ field, label, hint, initial }: Props) => {
   const { text } = useQuestionnaire();
   const [checked, setChecked] = useState(initial === true);
-  const { state, commit } = useAutosave(
+  const { state, commit, retry } = useAutosave(
     (next) => saveAnswerAction(field, next),
     initial === null ? "" : String(initial),
   );
+  const refusal = refusalOf(state, text);
   const id = `questionnaire-${field}`;
   const toggle = (on: boolean) => {
     setChecked(on);
@@ -55,12 +57,12 @@ export const FlagAnswer = ({ field, label, hint, initial }: Props) => {
       <Typography id={`${id}-hint`} as="p" size="sm" tone="muted">
         {hint}
       </Typography>
-      {state.kind === "error" ? (
+      {refusal ? (
         <Typography as="p" size="sm" className="text-error-text">
-          {text.errors[state.error]}
+          {refusal}
         </Typography>
       ) : null}
-      <SaveStatus state={state} />
+      <SaveStatus state={state} onRetry={() => void retry()} />
     </div>
   );
 };

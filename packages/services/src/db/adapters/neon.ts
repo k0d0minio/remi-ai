@@ -6,6 +6,7 @@ import { requireEnv } from "../../server/env";
 import type { Id, Page, PageQuery } from "../../types";
 import type { Collection, DatabaseClient } from "../client";
 import * as schema from "../schema";
+import { isRetryableRead } from "./retry";
 
 /**
  * The Neon adapter — the first concrete implementation of the storage seam
@@ -172,6 +173,26 @@ export const createNeonDatabase = (): DatabaseClient => {
   pool.on("error", (cause: Error) => {
     console.error("[database] idle client error", cause);
   });
+
+  // A read that fails on a dead socket is sent once more (`./retry`). Drizzle
+  // sends every statement outside a transaction through `pool.query`, so this
+  // one place covers each collection. A transaction takes its own client and
+  // is never sent again.
+  const sendQuery = pool.query.bind(pool) as (
+    ...args: unknown[]
+  ) => Promise<unknown>;
+  const queryWithRetry = async (...args: unknown[]): Promise<unknown> => {
+    try {
+      return await sendQuery(...args);
+    } catch (error) {
+      if (!isRetryableRead(args[0], error)) {
+        throw error;
+      }
+      console.error("[database] read failed on a closed connection, sent again");
+      return sendQuery(...args);
+    }
+  };
+  pool.query = queryWithRetry as typeof pool.query;
 
   const db = drizzle(pool);
 

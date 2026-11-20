@@ -1,8 +1,32 @@
 import type { Metadata } from "next";
-import { Typography } from "@remi/ui/server";
+import NextLink from "next/link";
+import {
+  getPatient,
+  getPatientQuestionnaire,
+  patientActor,
+} from "@remi/services/server";
+import {
+  activityLevelDetails,
+  dateEntryFromIso,
+  dietLabels,
+  localePath,
+  noneKnownLabels,
+  safetyList,
+  type AllergenKind,
+  type Locale,
+  type PatientAllergen,
+} from "@remi/services/shared";
+import { Link, Typography } from "@remi/ui/server";
 import { SignOutButton } from "@/components/patient-auth/sign-out-button";
+import { EditableField } from "@/components/patient-profile/editable-field";
 import { getContent } from "@/lib/content";
+import { fill } from "@/lib/content/fill";
 import { resolveLocale, type LocaleParams } from "@/lib/locale-params";
+import {
+  PROFILE_DATA_PATH,
+  RECOMMENDATIONS_PATH,
+} from "@/lib/patient-auth/paths";
+import { requireActivePatient } from "@/lib/patient-auth/session";
 
 export const generateMetadata = async ({
   params,
@@ -13,10 +37,77 @@ export const generateMetadata = async ({
   return { title: getContent(locale).patientProfile.metaTitle };
 };
 
+/** A kilogram value as the patient types it: with a comma. `""` for none. */
+const kilograms = (value: number | null) =>
+  value === null ? "" : String(value).replace(".", ",");
+
+/** One list as one line. `""` when the patient gave no answer. */
+const listLine = (
+  kind: AllergenKind,
+  noneKnown: boolean | null,
+  rows: readonly PatientAllergen[],
+  locale: Locale,
+) => {
+  const list = safetyList(kind, noneKnown, rows, locale);
+  if (list.state === "listed") {
+    return list.items.join(", ");
+  }
+  return list.state === "none_known" ? noneKnownLabels[kind][locale] : "";
+};
+
+const entryClass =
+  "bg-card flex min-h-14 flex-col justify-center gap-1 self-stretch rounded-2xl border px-4 py-3";
+
+const groupClass = "bg-card flex flex-col gap-4 rounded-2xl border p-4";
+
+type RowProps = {
+  label: string;
+  /** `""` shows as « Non renseigné »: no value is invented. */
+  value: string;
+  empty: string;
+  /** A line below the value, in the same `dd`. */
+  hint?: string;
+};
+
+/** A value with no edit control on this page. */
+const Row = ({ label, value, empty, hint }: RowProps) => (
+  <div className="flex flex-col gap-0.5">
+    <Typography as="dt" size="sm" tone="muted">
+      {label}
+    </Typography>
+    <dd className="flex flex-col gap-0.5">
+      <Typography
+        as="span"
+        size="base"
+        className="whitespace-pre-line break-words"
+      >
+        {value || empty}
+      </Typography>
+      {hint ? (
+        <Typography as="span" size="sm" tone="muted">
+          {hint}
+        </Typography>
+      ) : null}
+    </dd>
+  </div>
+);
+
 /**
- * The « Profil » tab. `patient-home-navigation/profile-tab` fills it and keeps
- * the sign-out in the account settings. Sign-out stays visible here, never in
- * a menu.
+ * The « Profil » tab (story 31, REM-85), in three parts and in this order:
+ *
+ * 1. The entry to « Mes recommandations » (story 23). It has no edit control:
+ *    the practitioner's validated version is read-only, and no save of this
+ *    tab writes it.
+ * 2. « Mes informations personnelles », from the sign-up (REM-158). The phone
+ *    has an edit control. The name, the birth date and the e-mail have none
+ *    (the breakdown's question 2).
+ * 3. The data that the patient keeps up to date (story 21): the weight is
+ *    changed in place, the others on `/profil/mes-donnees`.
+ *
+ * Then the account: the sign-out, visible and never in a menu, and the place
+ * of the consent settings.
+ *
+ * The patient's id comes from the session, never from the address (D-26).
  */
 const PatientProfilePage = async ({
   params,
@@ -24,19 +115,206 @@ const PatientProfilePage = async ({
   params: Promise<LocaleParams>;
 }) => {
   const locale = await resolveLocale(params);
+  // The space opens at the activation (story 19).
+  const account = await requireActivePatient(locale);
+  const patientId = account.patientProfileId;
+  const [patient, questionnaire] = await Promise.all([
+    getPatient(patientActor(patientId), patientId),
+    getPatientQuestionnaire(patientActor(patientId), patientId),
+  ]);
   const content = getContent(locale);
+  const text = content.patientPersonalData;
+  const labels = content.questionnaire.labels;
+  const errors = content.questionnaire.errors;
+  const profile = patient.ok ? patient.data : null;
+  const answers = questionnaire.ok ? questionnaire.data.answers : null;
+  const boxes = questionnaire.ok ? questionnaire.data.allergens : [];
+
+  const diet = answers?.diet ? dietLabels[answers.diet][locale] : "";
+  const dietLine =
+    answers?.diet === "other" && answers.dietNote
+      ? fill(text.dietWithNote, { diet, note: answers.dietNote })
+      : diet;
+  const desiredWeight = kilograms(answers?.desiredWeightKg ?? null);
 
   return (
-    <div className="flex flex-col items-start gap-6">
-      <div className="flex flex-col gap-4">
-        <Typography as="h1" size="2xl" weight="semibold">
-          {content.patientProfile.title}
+    <div className="flex flex-col gap-8">
+      <Typography as="h1" size="2xl" weight="semibold">
+        {content.patientProfile.title}
+      </Typography>
+
+      <Link
+        as={NextLink}
+        href={localePath(locale, RECOMMENDATIONS_PATH)}
+        className={entryClass}
+      >
+        <Typography as="span" weight="semibold">
+          {content.patientRecommendations.profileEntry}
         </Typography>
-        <Typography tone="muted">
-          {content.patientProfile.comingSoon}
+        <Typography as="span" size="sm" tone="muted">
+          {content.patientRecommendations.profileEntryHint}
         </Typography>
-      </div>
-      <SignOutButton locale={locale} label={content.signOut} />
+      </Link>
+
+      <section
+        aria-labelledby="profile-personal"
+        className="flex flex-col gap-3"
+      >
+        <Typography as="h2" id="profile-personal" size="lg" weight="semibold">
+          {text.personalTitle}
+        </Typography>
+        {profile ? (
+          <>
+            <Typography size="sm" tone="muted">
+              {text.personalIntro}
+            </Typography>
+            <dl className={groupClass}>
+              <Row
+                label={labels.lastName}
+                value={profile.lastName ?? ""}
+                empty={text.empty}
+              />
+              <Row
+                label={labels.firstName}
+                value={profile.firstName ?? ""}
+                empty={text.empty}
+              />
+              <Row
+                label={labels.birthDate}
+                value={dateEntryFromIso(profile.birthDate)}
+                empty={text.empty}
+              />
+              <Row
+                label={labels.email}
+                value={profile.email ?? account.email}
+                empty={text.empty}
+                hint={content.questionnaire.hints.email}
+              />
+              <EditableField
+                field="phone"
+                label={labels.phone}
+                inputLabel={labels.phone}
+                hint={content.questionnaire.hints.phone}
+                initial={profile.phone ?? ""}
+                autoComplete="tel"
+                savedMessage={text.phoneSaved}
+                text={text}
+                errors={errors}
+              />
+            </dl>
+          </>
+        ) : (
+          <Typography tone="muted">{text.unavailable}</Typography>
+        )}
+      </section>
+
+      <section aria-labelledby="profile-data" className="flex flex-col gap-3">
+        <Typography as="h2" id="profile-data" size="lg" weight="semibold">
+          {text.dataTitle}
+        </Typography>
+        {profile && answers ? (
+          <>
+            <Typography size="sm" tone="muted">
+              {text.dataIntro}
+            </Typography>
+            <dl className={groupClass}>
+              <EditableField
+                field="weightKg"
+                label={text.rows.weight}
+                inputLabel={labels.mandatory.weightKg}
+                hint={content.questionnaire.hints.weight}
+                initial={kilograms(profile.weightKg)}
+                valueTemplate={text.kilograms}
+                decimal
+                savedMessage={text.weightSaved}
+                text={text}
+                errors={errors}
+              />
+              <Row
+                label={text.rows.desiredWeight}
+                value={
+                  desiredWeight
+                    ? fill(text.kilograms, { value: desiredWeight })
+                    : ""
+                }
+                empty={text.empty}
+              />
+              <Row
+                label={text.rows.activityLevel}
+                value={
+                  answers.activityLevel
+                    ? activityLevelDetails[answers.activityLevel].label[locale]
+                    : ""
+                }
+                empty={text.empty}
+              />
+              <Row label={text.rows.diet} value={dietLine} empty={text.empty} />
+              <Row
+                label={text.rows.allergies}
+                value={listLine(
+                  "allergy",
+                  answers.noKnownAllergies,
+                  boxes,
+                  locale,
+                )}
+                empty={text.empty}
+              />
+              <Row
+                label={text.rows.intolerances}
+                value={listLine(
+                  "intolerance",
+                  answers.noKnownIntolerances,
+                  boxes,
+                  locale,
+                )}
+                empty={text.empty}
+              />
+              <Row
+                label={text.rows.medications}
+                value={profile.medications}
+                empty={text.empty}
+              />
+              <Row
+                label={text.rows.supplements}
+                value={profile.supplements}
+                empty={text.empty}
+              />
+            </dl>
+            <Link
+              as={NextLink}
+              href={localePath(locale, PROFILE_DATA_PATH)}
+              className={entryClass}
+            >
+              <Typography as="span" weight="semibold">
+                {text.dataLink}
+              </Typography>
+              <Typography as="span" size="sm" tone="muted">
+                {text.dataLinkHint}
+              </Typography>
+            </Link>
+          </>
+        ) : (
+          <Typography tone="muted">{text.unavailable}</Typography>
+        )}
+      </section>
+
+      <section
+        aria-labelledby="profile-account"
+        className="flex flex-col items-start gap-4"
+      >
+        <Typography as="h2" id="profile-account" size="lg" weight="semibold">
+          {text.accountTitle}
+        </Typography>
+        <div className="flex flex-col gap-1">
+          <Typography as="h3" size="base" weight="medium">
+            {text.consentTitle}
+          </Typography>
+          <Typography size="sm" tone="muted">
+            {text.consentNotYet}
+          </Typography>
+        </div>
+        <SignOutButton locale={locale} label={content.signOut} />
+      </section>
     </div>
   );
 };

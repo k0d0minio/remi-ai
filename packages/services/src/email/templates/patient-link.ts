@@ -41,17 +41,6 @@ const copy: Record<Locale, Copy> = {
       "Ce lien t'est personnel — garde-le pour toi. Tu peux le rouvrir à tout moment ; la page est mise à jour au fil des consultations.",
     signature: "— REMI",
   },
-  en: {
-    subject: "Your REMI space",
-    greeting: (name) => (name ? `Hello ${name},` : "Hello,"),
-    lead: (practitioner) =>
-      `${practitioner} has prepared your REMI space: your objective and your recommendations, on one page.`,
-    action: "Open my space",
-    fallback: "Or copy this link:",
-    privacy:
-      "This link is personal to you — please keep it to yourself. You can reopen it any time; the page is kept up to date as the consultations go.",
-    signature: "— REMI",
-  },
 };
 
 export const patientLinkEmail = ({

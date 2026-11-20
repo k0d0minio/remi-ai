@@ -1,10 +1,28 @@
 "use client";
 
 import { Plus, Save } from "lucide-react";
-import { useActionState } from "react";
-import type { Recipe } from "@remi/services/shared";
+import { useActionState, useState } from "react";
+import {
+  formatIngredientLine,
+  mealConfigurationSlots,
+  parseIngredientLines,
+  parseStepLines,
+  recipeSeasonLabels,
+  recipeSeasons,
+  structuredRecipeOf,
+  structuredRecipeText,
+  type MealConfigurationSlot,
+  type Recipe,
+  type RecipeSeason,
+} from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Field, Input, Textarea, Typography } from "@remi/ui/server";
+import { mealSlotLabels } from "@/components/patients/meal-configuration-labels";
+import { ChoiceToggle } from "@/components/recipes/choice-toggle";
+import {
+  IngredientPreview,
+  StepPreview,
+} from "@/components/recipes/recipe-preview";
 import {
   createRecipeAction,
   updateRecipeAction,
@@ -18,21 +36,99 @@ type Props = {
   recipe?: Recipe;
 };
 
+type Values = {
+  title: string;
+  description: string;
+  meals: readonly MealConfigurationSlot[];
+  seasons: readonly RecipeSeason[];
+  portions: string;
+  prepMinutes: string;
+  cookMinutes: string;
+  ingredients: string;
+  steps: string;
+  tags: string;
+  body: string;
+};
+
+const minutesText = (minutes: number | null) =>
+  minutes === null ? "" : String(minutes);
+
 /**
- * Three fields, and § 7 is the reason there are not more: a title, the recipe
- * as prose, and the tags she filters on. No minutes, no servings, no separate
- * ingredient rows — she writes the whole thing the way she already writes it in
- * chat, and pastes.
+ * The prose that the practitioner typed, or `""`. The body of a structured
+ * recipe that the service wrote from its lines is not typed prose: the form
+ * does not show it a second time.
+ */
+const typedProse = (recipe: Recipe | undefined) => {
+  if (!recipe) {
+    return "";
+  }
+  const content = structuredRecipeOf(recipe.content);
+  return content && recipe.body === structuredRecipeText(content)
+    ? ""
+    : recipe.body;
+};
+
+const valuesOf = (recipe: Recipe | undefined): Values => {
+  const content = structuredRecipeOf(recipe?.content ?? null);
+  return {
+    title: recipe?.title ?? "",
+    description: content?.description ?? "",
+    meals: content?.meals ?? [],
+    seasons: content?.seasons ?? [],
+    portions: content ? String(content.portions) : "",
+    prepMinutes: minutesText(content?.prepMinutes ?? null),
+    cookMinutes: minutesText(content?.cookMinutes ?? null),
+    ingredients: content
+      ? content.ingredients.map(formatIngredientLine).join("\n")
+      : "",
+    steps: content ? content.steps.map((step) => step.text).join("\n") : "",
+    tags: recipe?.tags.join(", ") ?? "",
+    body: typedProse(recipe),
+  };
+};
+
+const toggled = <T,>(list: readonly T[], value: T): T[] =>
+  list.includes(value)
+    ? list.filter((item) => item !== value)
+    : [...list, value];
+
+/**
+ * The form of a recipe (REM-90, stories 24 and 25): the title, the meals it
+ * suits, the portions and the times, then two text boxes with one ingredient
+ * and one step for each line. The lines are what Morgane already types, and a
+ * paste of several lines works as it is. Under each box, the form shows what
+ * REMI reads in the lines: the quantity, the unit and the food apart.
+ *
+ * Each field is held in state. A refused save thus keeps what she typed.
  */
 export const RecipeForm = ({ recipe }: Props) => {
   const [state, action, pending] = useActionState(
     recipe ? updateRecipeAction : createRecipeAction,
     initial,
   );
+  const [values, setValues] = useState(() => valuesOf(recipe));
+  const set = <K extends keyof Values>(key: K, value: Values[K]) =>
+    setValues((current) => ({ ...current, [key]: value }));
+
+  const ingredients = parseIngredientLines(values.ingredients);
+  const steps = parseStepLines(values.steps);
+  const prose = typedProse(recipe);
+  const wasProseOnly = recipe !== undefined && recipe.content === null;
+  // A new recipe and a structured recipe need their lines. A recipe of the
+  // old form can be saved as it is, until she types its lines.
+  const needsLines = !wasProseOnly;
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form action={action} className="flex flex-col gap-5">
       {recipe ? <input type="hidden" name="id" value={recipe.id} /> : null}
+
+      {recipe?.verifiedAt ? (
+        <Typography size="sm" tone="muted" role="note">
+          Cette recette est vérifiée. Si vous enregistrez une modification, la
+          marque « vérifiée » est retirée jusqu&apos;à une nouvelle
+          vérification.
+        </Typography>
+      ) : null}
 
       <Field id="recipe-title" label="Titre">
         <Input
@@ -40,25 +136,155 @@ export const RecipeForm = ({ recipe }: Props) => {
           name="title"
           required
           maxLength={140}
-          defaultValue={recipe?.title}
-          placeholder="ex. Tartine de sardines"
+          value={values.title}
+          onChange={(event) => set("title", event.target.value)}
+          placeholder="ex. Bol de quinoa aux légumes rôtis"
         />
       </Field>
 
       <Field
-        id="recipe-body"
-        label="La recette"
-        hint="Ingrédients et étapes, comme vous les écrivez déjà — un seul champ, en texte libre."
+        id="recipe-description"
+        label="Description courte"
+        optional
+        hint="Une ou deux phrases que la personne lit en haut de la recette."
       >
-        <Textarea
-          id="recipe-body"
-          name="body"
-          required
-          rows={12}
-          maxLength={4000}
-          defaultValue={recipe?.body}
+        <Input
+          id="recipe-description"
+          name="description"
+          maxLength={300}
+          value={values.description}
+          onChange={(event) => set("description", event.target.value)}
         />
       </Field>
+
+      <fieldset className="flex flex-col gap-2">
+        <Typography as="legend" size="sm" weight="medium">
+          Repas
+        </Typography>
+        <div className="flex flex-wrap gap-2">
+          {mealConfigurationSlots.map((meal) => (
+            <ChoiceToggle
+              key={meal}
+              name="meals"
+              value={meal}
+              label={mealSlotLabels[meal]}
+              on={values.meals.includes(meal)}
+              onToggle={() => set("meals", toggled(values.meals, meal))}
+            />
+          ))}
+        </div>
+        <Typography size="xs" tone="muted">
+          Les repas auxquels la recette convient. Au moins un.
+        </Typography>
+      </fieldset>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Field id="recipe-portions" label="Portions">
+          <Input
+            id="recipe-portions"
+            name="portions"
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={50}
+            step={1}
+            required={needsLines}
+            value={values.portions}
+            onChange={(event) => set("portions", event.target.value)}
+          />
+        </Field>
+        <Field id="recipe-prep" label="Préparation (min)" optional>
+          <Input
+            id="recipe-prep"
+            name="prepMinutes"
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={1440}
+            step={1}
+            value={values.prepMinutes}
+            onChange={(event) => set("prepMinutes", event.target.value)}
+          />
+        </Field>
+        <Field id="recipe-cook" label="Cuisson (min)" optional>
+          <Input
+            id="recipe-cook"
+            name="cookMinutes"
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={1440}
+            step={1}
+            value={values.cookMinutes}
+            onChange={(event) => set("cookMinutes", event.target.value)}
+          />
+        </Field>
+      </div>
+
+      <Field
+        id="recipe-ingredients"
+        label="Ingrédients"
+        hint="Une ligne par ingrédient : la quantité, l'unité, puis l'aliment. Par exemple « 200 g de quinoa », « 1 c. à s. d'huile d'olive », « 2 œufs », « sel ». Vous pouvez coller plusieurs lignes en une fois."
+      >
+        <Textarea
+          id="recipe-ingredients"
+          name="ingredients"
+          required={needsLines}
+          rows={8}
+          value={values.ingredients}
+          onChange={(event) => set("ingredients", event.target.value)}
+          placeholder={"200 g de quinoa\n1 c. à s. d'huile d'olive\n2 œufs\nsel"}
+        />
+      </Field>
+      {ingredients.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          <Typography size="xs" tone="muted">
+            Ce que REMI lit dans vos lignes. Si une ligne est mal découpée,
+            corrigez son texte ci-dessus.
+          </Typography>
+          <IngredientPreview ingredients={ingredients} />
+        </div>
+      ) : null}
+
+      <Field
+        id="recipe-steps"
+        label="Étapes"
+        hint="Une ligne par étape, dans l'ordre. Écrivez la température et la durée dans le texte (« Enfourner 20 min à 180 °C ») : REMI les relève."
+      >
+        <Textarea
+          id="recipe-steps"
+          name="steps"
+          required={needsLines}
+          rows={8}
+          value={values.steps}
+          onChange={(event) => set("steps", event.target.value)}
+          placeholder={
+            "Rincer le quinoa, puis le cuire 15 min.\nEnfourner les légumes 20 min à 180 °C."
+          }
+        />
+      </Field>
+      {steps.length > 0 ? <StepPreview steps={steps} /> : null}
+
+      <fieldset className="flex flex-col gap-2">
+        <Typography as="legend" size="sm" weight="medium">
+          Saisons
+        </Typography>
+        <div className="flex flex-wrap gap-2">
+          {recipeSeasons.map((season) => (
+            <ChoiceToggle
+              key={season}
+              name="seasons"
+              value={season}
+              label={recipeSeasonLabels[season]}
+              on={values.seasons.includes(season)}
+              onToggle={() => set("seasons", toggled(values.seasons, season))}
+            />
+          ))}
+        </div>
+        <Typography size="xs" tone="muted">
+          Aucune saison choisie : la recette convient toute l&apos;année.
+        </Typography>
+      </fieldset>
 
       <Field
         id="recipe-tags"
@@ -69,10 +295,32 @@ export const RecipeForm = ({ recipe }: Props) => {
         <Input
           id="recipe-tags"
           name="tags"
-          defaultValue={recipe?.tags.join(", ")}
+          value={values.tags}
+          onChange={(event) => set("tags", event.target.value)}
           placeholder="hiver, végétarien"
         />
       </Field>
+
+      {prose !== "" ? (
+        <Field
+          id="recipe-body"
+          label="Ancien texte libre"
+          hint={
+            wasProseOnly
+              ? "Cette recette est dans l'ancienne forme. Son texte reste lisible. Pour la structurer, recopiez ses ingrédients et ses étapes dans les deux zones ci-dessus : REMI ne lit que les lignes."
+              : "Le texte d'avant la forme structurée. Il reste tel quel : REMI ne lit que les lignes ci-dessus."
+          }
+        >
+          <Textarea
+            id="recipe-body"
+            name="body"
+            rows={10}
+            maxLength={4000}
+            value={values.body}
+            onChange={(event) => set("body", event.target.value)}
+          />
+        </Field>
+      ) : null}
 
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" disabled={pending} size="sm">

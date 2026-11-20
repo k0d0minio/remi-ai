@@ -9,8 +9,8 @@ import type {
   DocumentTag,
   FoodBudget,
   GoalDirection,
-  Locale,
   MealSlot,
+  PatientFileGroup,
   PatientSex,
   PatientStatus,
   RecommendationCategory,
@@ -68,16 +68,6 @@ export const segmentLabels: Record<PatientSegment, string> = {
   profil: "Profil",
 };
 
-/**
- * The two locales a patient record can carry, as Morgane reads them. Named here
- * rather than beside one form because the profile summary and the profile form
- * both render it, and a language must read identically in each.
- */
-export const localeLabels: Record<Locale, string> = {
-  fr: "français",
-  en: "anglais",
-};
-
 /** How the consent was given — read on the profile and in the select. */
 export const consentChannelLabels: Record<ConsentChannel, string> = {
   consultation: "en consultation",
@@ -95,13 +85,17 @@ export const categoryLabels: Record<RecommendationCategory, string> = {
 
 /**
  * The categories the recommendation add form offers — every one except
- * `supplement`, which the supplement protocol now owns (§ G). The full
+ * `supplement`, which the supplement protocol now owns (§ G), and `habit` and
+ * `activity`, which « Hygiène de vie » now owns (REM-65, story 17). The full
  * `recommendationCategories` is untouched, so an existing `supplement`-category
  * recommendation still validates, groups and renders, and can still be
  * re-categorised from the edit form; only new entries are steered away from it.
  */
 export const addableRecommendationCategories = recommendationCategories.filter(
-  (category) => category !== "supplement",
+  (category) =>
+    category !== "supplement" &&
+    category !== "habit" &&
+    category !== "activity",
 );
 
 /** Whether the person likes cooking — read on the profile and in the select. */
@@ -234,3 +228,40 @@ export const messagesAwaitingLabel = (count: number) =>
   count === 1
     ? "1 message attend une réponse"
     : `${count} messages attendent une réponse`;
+
+/**
+ * The roster's mark of a file with an open patient change (stories 5 and 21):
+ * a change that the patient made after the validation, not yet taken into
+ * account.
+ */
+export const patientChangedLabel = (count: number) =>
+  count === 1 ? "Modifié par le patient" : `Modifié par le patient (${count})`;
+
+/** The roster's mark of a file with missing mandatory answers (story 5). */
+export const missingInformationLabel = (count: number) =>
+  `Informations manquantes (${count})`;
+
+/**
+ * The groups of the patient file (`patientFileLayout`), as Morgane reads them
+ * above their rows: by her work, never by table.
+ */
+export const fileGroupLabels: Record<PatientFileGroup, string> = {
+  answers: "Réponses de la personne",
+  calculations: "Calculs",
+  protocol: "Protocole",
+  follow_up: "Entre deux consultations",
+  preparation: "Notes et préparation",
+  resources: "Remis à la personne",
+  profile: "Profil et consentement",
+};
+
+/** The phone segment each group lives under. */
+export const fileGroupSegments: Record<PatientFileGroup, PatientSegment> = {
+  answers: "suivi",
+  calculations: "suivi",
+  protocol: "suivi",
+  follow_up: "journal",
+  preparation: "dossier",
+  resources: "dossier",
+  profile: "profil",
+};

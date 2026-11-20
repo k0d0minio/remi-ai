@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getInvitationByToken } from "@remi/services/server";
+import { userMessage } from "@remi/services/shared";
 import {
   Alert,
   AlertDescription,
@@ -83,7 +84,7 @@ const Invitation = async ({ params }: { params: Promise<Params> }) => {
                   Ce lien ne fonctionne pas
                 </Typography>
                 <Alert variant="warning">
-                  <AlertTitle>{result.message}</AlertTitle>
+                  <AlertTitle>{userMessage(result)}</AlertTitle>
                   <AlertDescription>
                     Demandez une nouvelle invitation à la personne qui gère la
                     console.

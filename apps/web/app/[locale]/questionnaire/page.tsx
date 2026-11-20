@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import {
   consentsOf,
@@ -7,16 +8,13 @@ import {
   missingQuestionnaireFields,
   patientActor,
 } from "@remi/services/server";
-import { isLocale, type Locale } from "@remi/services/shared";
+import { defaultLocale, isLocale } from "@remi/services/shared";
 import { Wordmark } from "@remi/ui/server";
 import { SignOutButton } from "@/components/patient-auth/sign-out-button";
 import { getContent } from "@/lib/content";
 import { requirePatient } from "@/lib/patient-auth/session";
 import { geneticConsentText } from "@/lib/questionnaire/genetic-consent";
-import {
-  isQuestionnaireSection,
-  resumeSection,
-} from "@/lib/questionnaire/sections";
+import { startStep, STEP_COOKIE } from "@/lib/questionnaire/sections";
 import {
   QuestionnaireFlow,
   type QuestionnaireValues,
@@ -36,24 +34,20 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const { locale } = await params;
   return {
-    title: getContent(isLocale(locale) ? locale : "en").questionnaire.metaTitle,
+    title: getContent(isLocale(locale) ? locale : defaultLocale).questionnaire
+      .metaTitle,
   };
 };
 
-/** A kilogram value as the patient types it: a comma in French. */
-const kilograms = (value: number | null, locale: Locale) => {
-  if (value === null) {
-    return "";
-  }
-  const typed = String(value);
-  return locale === "fr" ? typed.replace(".", ",") : typed;
-};
+/** A kilogram value as the patient types it: with a comma. */
+const kilograms = (value: number | null) =>
+  value === null ? "" : String(value).replace(".", ",");
 
 /**
  * The preparatory questionnaire (story 4), where a new patient lands after
  * sign-up. Behind the patient session: the patient's id comes from their
- * account, never from the URL. Without `?section`, it opens on the first
- * section that still misses a mandatory field.
+ * account, never from the URL. Without `?section`, it opens on the step the
+ * patient looked at last (`startStep`).
  */
 const QuestionnairePage = async ({
   params,
@@ -81,6 +75,7 @@ const QuestionnairePage = async ({
   const profile = patient.data;
   const answers = questionnaire.data.answers;
   const { section } = await searchParams;
+  const lastStep = (await cookies()).get(STEP_COOKIE)?.value;
 
   const values: QuestionnaireValues = {
     firstName: profile.firstName ?? "",
@@ -90,9 +85,9 @@ const QuestionnairePage = async ({
     phone: profile.phone ?? "",
     sexForCalculation: answers.sexForCalculation ?? "",
     heightCm: profile.heightCm === null ? "" : String(profile.heightCm),
-    weightKg: kilograms(profile.weightKg, locale),
+    weightKg: kilograms(profile.weightKg),
     activityLevel: answers.activityLevel ?? "",
-    desiredWeightKg: kilograms(answers.desiredWeightKg, locale),
+    desiredWeightKg: kilograms(answers.desiredWeightKg),
     consultationReason: answers.consultationReason ?? "",
     consultationDate: answers.consultationDate ?? "",
     diet: answers.diet ?? "",
@@ -117,15 +112,11 @@ const QuestionnairePage = async ({
       <QuestionnaireFlow
         locale={locale}
         text={content.questionnaire}
+        dateText={content.dateEntry}
         values={values}
         geneticConsent={geneticConsentText(locale)}
-        initialStatus={profile.fileStatus}
         initialMissing={missing.data}
-        initialSection={
-          isQuestionnaireSection(section)
-            ? section
-            : resumeSection(missing.data)
-        }
+        initialStep={startStep(section, lastStep, missing.data)}
       />
       <SignOutButton locale={locale} label={content.signOut} />
     </main>

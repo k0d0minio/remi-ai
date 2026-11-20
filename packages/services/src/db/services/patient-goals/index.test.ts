@@ -3,7 +3,6 @@ import { registerDatabase } from "../../client";
 import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { createPatient, getPatient } from "../patients";
 import {
-  MAX_ACTIVE_GOALS,
   addGoalCheckIn,
   addPatientGoal,
   archivePatientGoal,
@@ -74,39 +73,68 @@ describe("priority goals", () => {
     expect(active[1].baseline).toBe("");
   });
 
-  it("refuses a fourth active goal and writes no row", async () => {
+  it("has no limit on the number of active goals", async () => {
     await clearActive();
-    await add("Énergie");
-    await add("Digestion");
-    await add("Sommeil");
-
-    const fourth = await addPatientGoal(systemActor, patientId, {
-      title: "Peau",
-    });
-    expect(fourth.ok).toBe(false);
-    if (!fourth.ok) {
-      expect(fourth.error).toBe("conflict");
+    const wanted = [
+      "Énergie",
+      "Digestion",
+      "Sommeil",
+      "Peau",
+      "Stress",
+      "Hydratation",
+    ];
+    for (const title of wanted) {
+      await add(title);
     }
-    expect(await titles(patientId)).toHaveLength(MAX_ACTIVE_GOALS);
+
+    const active = await listPatientGoals(systemActor, patientId);
+    expect(active.map((goal) => goal.title)).toEqual(wanted);
+    expect(new Set(active.map((goal) => goal.position)).size).toBe(
+      wanted.length,
+    );
   });
 
-  it("makes room the moment one is archived", async () => {
+  it("refuses an empty text and writes no row", async () => {
+    await clearActive();
+    const empty = await addPatientGoal(systemActor, patientId, {
+      title: "   ",
+    });
+    expect(empty.ok).toBe(false);
+    if (!empty.ok) {
+      expect(empty.error).toBe("invalid_input");
+    }
+    expect(await titles(patientId)).toEqual([]);
+  });
+
+  it("keeps the row of a disabled goal, with its date", async () => {
     await clearActive();
     const first = await add("Énergie");
     await add("Digestion");
     await add("Sommeil");
 
-    expect((await archivePatientGoal(systemActor, first.id, true)).ok).toBe(
-      true,
+    const disabled = await archivePatientGoal(systemActor, first.id, true);
+    expect(disabled.ok).toBe(true);
+    expect(await titles(patientId)).toEqual(["Digestion", "Sommeil"]);
+
+    const kept = (await listArchivedPatientGoals(systemActor, patientId)).find(
+      (goal) => goal.id === first.id,
     );
-    const fourth = await addPatientGoal(systemActor, patientId, {
-      title: "Peau",
-    });
-    expect(fourth.ok).toBe(true);
-    expect(await titles(patientId)).toEqual(["Digestion", "Sommeil", "Peau"]);
+    expect(kept?.title).toBe("Énergie");
+    expect(kept?.archivedAt).toBeInstanceOf(Date);
   });
 
-  it("refuses to restore an archived goal into a full list", async () => {
+  it("keeps the first date when a disabled goal is disabled again", async () => {
+    await clearActive();
+    const goal = await add("Énergie");
+    const once = await archivePatientGoal(systemActor, goal.id, true);
+    const twice = await archivePatientGoal(systemActor, goal.id, true);
+    if (!once.ok || !twice.ok) {
+      throw new Error("goal not disabled");
+    }
+    expect(twice.data.archivedAt).toEqual(once.data.archivedAt);
+  });
+
+  it("puts a goal that is enabled again at the end of the order", async () => {
     await clearActive();
     const parked = await add("Énergie");
     await archivePatientGoal(systemActor, parked.id, true);
@@ -115,16 +143,64 @@ describe("priority goals", () => {
     await add("Peau");
 
     const restored = await archivePatientGoal(systemActor, parked.id, false);
-    expect(restored.ok).toBe(false);
-    if (!restored.ok) {
-      expect(restored.error).toBe("conflict");
-    }
-    expect(await titles(patientId)).toHaveLength(MAX_ACTIVE_GOALS);
+    expect(restored.ok).toBe(true);
+    expect(await titles(patientId)).toEqual([
+      "Digestion",
+      "Sommeil",
+      "Peau",
+      "Énergie",
+    ]);
     expect(
       (await listArchivedPatientGoals(systemActor, patientId)).some(
         (goal) => goal.id === parked.id,
       ),
-    ).toBe(true);
+    ).toBe(false);
+  });
+
+  it("moves a goal one rank at a time in a long list, and stops at each end", async () => {
+    await clearActive();
+    await add("Un");
+    await add("Deux");
+    await add("Trois");
+    await add("Quatre");
+    const five = await add("Cinq");
+
+    await movePatientGoal(systemActor, five.id, "up");
+    await movePatientGoal(systemActor, five.id, "up");
+    expect(await titles(patientId)).toEqual([
+      "Un",
+      "Deux",
+      "Cinq",
+      "Trois",
+      "Quatre",
+    ]);
+
+    for (let step = 0; step < 4; step += 1) {
+      await movePatientGoal(systemActor, five.id, "up");
+    }
+    expect(await titles(patientId)).toEqual([
+      "Cinq",
+      "Un",
+      "Deux",
+      "Trois",
+      "Quatre",
+    ]);
+    const active = await listPatientGoals(systemActor, patientId);
+    expect(active.map((goal) => goal.position)).toEqual([0, 1, 2, 3, 4]);
+  });
+
+  it("keeps the order of the active goals when a disabled goal sits between them", async () => {
+    await clearActive();
+    await add("Un");
+    const two = await add("Deux");
+    const three = await add("Trois");
+    await archivePatientGoal(systemActor, two.id, true);
+
+    await movePatientGoal(systemActor, three.id, "up");
+    expect(await titles(patientId)).toEqual(["Trois", "Un"]);
+
+    await add("Quatre");
+    expect(await titles(patientId)).toEqual(["Trois", "Un", "Quatre"]);
   });
 
   it("edits and reorders one goal without touching its siblings", async () => {

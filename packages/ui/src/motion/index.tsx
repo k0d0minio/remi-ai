@@ -117,7 +117,7 @@ type CountUpProps = {
 export const CountUp = ({ value, className }: CountUpProps) => {
   const Animated = useAnimated("CountUp") as ComponentType<CountUpProps> | null;
   if (!Animated) {
-    return <span className={className}>{value.toLocaleString("en-GB")}</span>;
+    return <span className={className}>{value.toLocaleString("fr-BE")}</span>;
   }
   return <Animated value={value} className={className} />;
 };

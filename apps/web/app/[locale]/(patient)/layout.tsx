@@ -1,19 +1,14 @@
 import NextLink from "next/link";
-import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import {
-  getPatient,
-  patientActor,
-  patientLandingFor,
-} from "@remi/services/server";
+import { getPatient, patientActor } from "@remi/services/server";
 import { localePath } from "@remi/services/shared";
 import { Link, Typography, Wordmark } from "@remi/ui/server";
 import { PatientTabBar } from "@/components/patient-shell/patient-tab-bar";
 import { getContent } from "@/lib/content";
 import { fill } from "@/lib/content/fill";
 import { resolveLocale, type LocaleParams } from "@/lib/locale-params";
-import { PROFILE_PATH, QUESTIONNAIRE_PATH } from "@/lib/patient-auth/paths";
-import { requirePatient } from "@/lib/patient-auth/session";
+import { PROFILE_PATH } from "@/lib/patient-auth/paths";
+import { requireActivePatient } from "@/lib/patient-auth/session";
 
 /** Reads the session on every hit — never prerendered. */
 export const dynamic = "force-dynamic";
@@ -24,7 +19,7 @@ export const dynamic = "force-dynamic";
  * sits beside `(app)`, which runs on the development session only.
  *
  * A layout does not guard the data its pages read: a page renders alongside
- * its layout. A page that reads patient data calls `requirePatient()` itself.
+ * its layout. Each page of the space calls `requireActivePatient()` itself.
  */
 const PatientLayout = async ({
   children,
@@ -34,11 +29,10 @@ const PatientLayout = async ({
   params: Promise<LocaleParams>;
 }) => {
   const locale = await resolveLocale(params);
-  const account = await requirePatient(locale);
-  // No recipe before activation (story 2, criterion 5).
-  if (patientLandingFor(account) !== "home") {
-    redirect(localePath(locale, QUESTIONNAIRE_PATH));
-  }
+  // No recipe and no recommendation before activation (stories 19 and 22):
+  // a patient who is not active leaves for the questionnaire or the waiting
+  // screen, whatever address they typed.
+  const account = await requireActivePatient(locale);
   const patientId = account.patientProfileId;
   const patient = await getPatient(patientActor(patientId), patientId);
   const firstName = patient.ok ? patient.data.firstName?.trim() : undefined;

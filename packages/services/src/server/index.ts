@@ -74,7 +74,6 @@ export {
   recordWeeklyCheckIn,
   updateGoalCheckIn,
   updatePatientGoal,
-  MAX_ACTIVE_GOALS,
 } from "../db/services/patient-goals";
 export type {
   GoalCheckInInput,
@@ -127,9 +126,37 @@ export {
   setPatientSummary,
 } from "../db/services/patient-summaries";
 
-export { listPatientCalculations } from "../db/services/patient-calculations";
+export {
+  computePatientEstimates,
+  listPatientCalculations,
+  validateEnergyTarget,
+  validateProteinTarget,
+} from "../db/services/patient-calculations";
 
 export {
+  getValidatedProtocol,
+  validateProtocol,
+} from "../db/services/protocol-versions";
+
+export {
+  activateCare,
+  getActivationRecap,
+  getCareActivationDate,
+} from "../db/services/care-activation";
+export {
+  getActivationEmailStatus,
+  sendActivationEmail,
+} from "../db/services/care-activation/email";
+export type {
+  ActivationEmailInput,
+  ActivationEmailOutcome,
+  ActivationEmailStatus,
+} from "../db/services/care-activation/email";
+
+export { countMissingMandatoryFields } from "../db/services/patient-questionnaire/missing-counts";
+
+export {
+  acknowledgePatientChanges,
   countOpenPatientChanges,
   listOpenPatientChanges,
 } from "../db/services/patient-changes";
@@ -163,6 +190,23 @@ export type {
   SupplementInput,
   SupplementRow,
 } from "../db/services/patient-supplements";
+export {
+  listDisabledPatientFoodDirectives,
+  listPatientEvictions,
+  listPatientFoodDirectives,
+  savePatientFoodDirectives,
+} from "../db/services/patient-food-directives";
+export {
+  deleteLifestyleAdvice,
+  listDisabledPatientLifestyleAdvices,
+  listPatientLifestyleAdvices,
+  savePatientLifestyleAdvices,
+  setLifestyleAdviceDisabled,
+} from "../db/services/patient-lifestyle-advices";
+export {
+  getPatientMealConfiguration,
+  updatePatientMealConfiguration,
+} from "../db/services/patient-meal-configuration";
 
 export {
   addPantryEssential,
@@ -200,9 +244,22 @@ export {
   listArchivedRecipes,
   listRecipeTags,
   listRecipes,
+  listVerifiedTemplates,
+  setRecipeVerified,
   updateRecipe,
 } from "../db/services/recipes";
-export type { RecipeInput } from "../db/services/recipes";
+export type {
+  RecipeInput,
+  VerifiedTemplate,
+} from "../db/services/recipes";
+export {
+  GENERATED_RECIPES_MAX_DAYS,
+  getGeneratedRecipe,
+  listGeneratedRecipes,
+  writeGeneratedRecipes,
+} from "../db/services/generated-recipes";
+export type { GeneratedRecipeInput } from "../db/services/generated-recipes";
+export type { GeneratedRecipe } from "../db/models/generated-recipe";
 
 export {
   NUTRITION_RULE_RETRIEVAL_LIMIT,
@@ -274,6 +331,7 @@ export {
   listMealEntries,
   markMealEntryEaten,
   mealEntryOwner,
+  planPatientMeal,
   updateMealEntry,
 } from "../db/services/meal-entries";
 export type { MealEntryInput } from "../db/services/meal-entries";
@@ -388,7 +446,9 @@ export { hashPassword, verifyPassword } from "../auth/password";
 export {
   getAuthProvider,
   isAuthProviderRegistered,
+  isSessionReadError,
   registerAuthProvider,
+  SessionReadError,
 } from "../auth/provider";
 export type {
   AuthIdentity,
@@ -400,6 +460,7 @@ export type {
   PasswordResetRequestInput,
   PasswordSignInInput,
   PasswordSignUpInput,
+  SessionRenewal,
 } from "../auth/provider";
 export { readPatientAccount, readSession } from "../auth/session";
 export {
@@ -410,6 +471,8 @@ export {
   resetPatientPassword,
   signInPatient,
 } from "../auth/patient-sign-in";
+export { getPatientWaitingView } from "../db/services/patient-waiting";
+export type { PatientWaitingView } from "../db/services/patient-waiting";
 export { signUpPatient, validateSignup } from "../auth/patient-signup";
 export type {
   PatientSignupInput,
@@ -477,6 +540,7 @@ export {
   createResendMailer,
   getMailer,
   isMailerRegistered,
+  activationEmail,
   fileClaimEmail,
   operatorInvitationEmail,
   patientLinkEmail,
@@ -501,11 +565,24 @@ export {
 export {
   DEFAULTS as AI_DEFAULTS,
   MODELS,
+  failedChecks,
+  gatewayTextProviderFromEnv,
+  generateJson,
+  generateText,
   getTextProvider,
+  isTextProviderRegistered,
   registerTextProvider,
   resolveModel,
 } from "../ai";
-export type { GenerateOptions, ModelRole, TextProvider } from "../ai";
+export type {
+  GenerateOptions,
+  GenerationError,
+  GenerationResult,
+  ModelRole,
+  ProviderReply,
+  ProviderRequest,
+  TextProvider,
+} from "../ai";
 
 export {
   DEFAULT_CONTEXT_PREAMBLE,
@@ -523,6 +600,45 @@ export type {
   PatientContextInput,
   PatientContextOptions,
 } from "../ai";
+
+/*
+ * The compatibility gate (REM-57). From the file and not from `../ai`: the gate
+ * imports no seam.
+ */
+export { checkCompatibility, mayBeShown } from "../ai/compatibility";
+export type {
+  CompatibilityItem,
+  CompatibilityReason,
+  CompatibilityResult,
+  CompatibilitySource,
+  CompatibilityUnknown,
+  CompatibilityUnknownKind,
+  PatientSafetyData,
+  SafetyAllergen,
+  TotalEviction,
+} from "../ai/compatibility";
+
+/*
+ * REMI's answer to a planned meal (REM-102). It calls `generateJson` of this
+ * entrypoint: register the provider through `/server` (`apps/web/lib/ai.ts`).
+ */
+export {
+  issueMealRetryTicket,
+  suggestAnotherMeal,
+  suggestPlannedMeal,
+} from "./meals/suggest";
+
+/*
+ * The model of each AI role, as a setting of the console. It calls the seam of
+ * this entrypoint, as the meal suggestion does.
+ */
+export {
+  listCatalogueModels,
+  listRoleModels,
+  resetRoleModel,
+  setRoleModel,
+  testRoleModel,
+} from "./ai-models";
 
 export { env, requireEnv } from "./env";
 export type { ServerEnv } from "./env";

@@ -64,5 +64,6 @@ export const sendEmail = (message: EmailMessage) => mailer.send(message);
 
 export { createResendMailer } from "./adapters/resend";
 export { operatorInvitationEmail } from "./templates/operator-invitation";
+export { activationEmail } from "./templates/activation";
 export { fileClaimEmail } from "./templates/file-claim";
 export { patientLinkEmail } from "./templates/patient-link";

@@ -25,6 +25,7 @@ export const actionLabels: Record<AuditActionName, string> = {
   "patient.file_status_changed": "statut du dossier changé",
   "patient.consultation_date_changed": "date de consultation changée",
   "patient.changed": "modifié par le patient",
+  "patient.change_acknowledged": "modification du patient prise en compte",
   "patient.deleted": "profil supprimé",
   "patient.inactivity_notice_sent":
     "avis de suppression pour inactivité envoyé",
@@ -32,6 +33,7 @@ export const actionLabels: Record<AuditActionName, string> = {
   "patient.retention_hold_set": "conservation posée",
   "patient.retention_hold_cleared": "conservation levée",
   "calculation.validated": "calcul validé",
+  "protocol.validated": "recommandations validées",
   "recommendation.added": "recommandation ajoutée",
   "recommendation.updated": "recommandation modifiée",
   "recommendation.archived": "recommandation archivée",
@@ -46,6 +48,12 @@ export const actionLabels: Record<AuditActionName, string> = {
   "supplement.deleted": "complément supprimé",
   "supplement.reordered": "compléments réordonnés",
   "supplement.batch_saved": "protocole de compléments enregistré",
+  "food_directive.batch_saved": "consignes alimentaires enregistrées",
+  "lifestyle_advice.batch_saved": "conseils d'hygiène de vie enregistrés",
+  "lifestyle_advice.disabled": "conseil d'hygiène de vie désactivé",
+  "lifestyle_advice.restored": "conseil d'hygiène de vie réactivé",
+  "lifestyle_advice.deleted": "conseil d'hygiène de vie supprimé",
+  "meal_configuration.updated": "repas et jeûne intermittent modifiés",
   "pantry.added": "essentiel ajouté",
   "pantry.updated": "essentiel modifié",
   "pantry.archived": "essentiel archivé",
@@ -60,6 +68,8 @@ export const actionLabels: Record<AuditActionName, string> = {
   "recipe.assigned": "recette attribuée",
   "recipe.created_and_assigned": "recette créée et attribuée",
   "recipe.duplicated_as_variant": "variante créée",
+  "recipe.verified": "recette vérifiée",
+  "recipe.verification_removed": "vérification retirée",
   "recipe.assigned_bulk": "recettes attribuées",
   "recipe.assignment_updated": "attribution modifiée",
   "recipe.assignment_archived": "attribution archivée",
@@ -71,6 +81,8 @@ export const actionLabels: Record<AuditActionName, string> = {
   "nutrition_rule.validated": "règle validée",
   "nutrition_rule.archived": "règle archivée",
   "nutrition_rule.restored": "règle réactivée",
+  "ai_model.set": "modèle d'IA modifié",
+  "ai_model.reset": "modèle d'IA remis à la valeur par défaut",
   "meal.logged": "repas ajouté",
   "meal.updated": "repas modifié",
   "meal.feedback_written": "retour écrit",
@@ -123,6 +135,8 @@ export const actionLabels: Record<AuditActionName, string> = {
   "genotype.changed": "génotype modifié",
   "share_link.regenerated": "lien patient régénéré",
   "share_link.emailed": "lien patient envoyé",
+  "activation_email.sent": "e-mail « Votre espace REMI est prêt » envoyé",
+  "activation_email.failed": "e-mail « Votre espace REMI est prêt » non envoyé",
   "context.exported": "contexte copié",
   "protocol.copied_from_patient": "lignes reprises d'un autre patient",
   "template.saved": "modèle enregistré",
@@ -158,12 +172,14 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "patient.file_status_changed": "neutral",
   "patient.consultation_date_changed": "neutral",
   "patient.changed": "info",
+  "patient.change_acknowledged": "success",
   "patient.deleted": "error",
   "patient.inactivity_notice_sent": "warning",
   "patient.admin_opened": "warning",
   "patient.retention_hold_set": "info",
   "patient.retention_hold_cleared": "warning",
   "calculation.validated": "neutral",
+  "protocol.validated": "success",
   "recommendation.added": "neutral",
   "recommendation.updated": "neutral",
   "recommendation.archived": "neutral",
@@ -178,6 +194,12 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "supplement.deleted": "error",
   "supplement.reordered": "neutral",
   "supplement.batch_saved": "neutral",
+  "food_directive.batch_saved": "neutral",
+  "lifestyle_advice.batch_saved": "neutral",
+  "lifestyle_advice.disabled": "neutral",
+  "lifestyle_advice.restored": "neutral",
+  "lifestyle_advice.deleted": "error",
+  "meal_configuration.updated": "neutral",
   "pantry.added": "neutral",
   "pantry.updated": "neutral",
   "pantry.archived": "neutral",
@@ -192,6 +214,8 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "recipe.assigned": "neutral",
   "recipe.created_and_assigned": "neutral",
   "recipe.duplicated_as_variant": "neutral",
+  "recipe.verified": "success",
+  "recipe.verification_removed": "warning",
   "recipe.assigned_bulk": "neutral",
   "recipe.assignment_updated": "neutral",
   "recipe.assignment_archived": "neutral",
@@ -205,6 +229,9 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "nutrition_rule.validated": "success",
   "nutrition_rule.archived": "warning",
   "nutrition_rule.restored": "neutral",
+  // A change of the model that reads patient data: it must stand out.
+  "ai_model.set": "warning",
+  "ai_model.reset": "info",
   "meal.logged": "neutral",
   "meal.updated": "neutral",
   "meal.feedback_written": "neutral",
@@ -262,6 +289,9 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   "genotype.changed": "neutral",
   "share_link.regenerated": "warning",
   "share_link.emailed": "info",
+  "activation_email.sent": "info",
+  // The patient does not know that the space is open: the practitioner must see it.
+  "activation_email.failed": "warning",
   // Health data left the console, pseudonymous but real — worth the eye, not an
   // alarm: it is the operator doing her job with the tool built for it.
   "context.exported": "warning",
@@ -293,17 +323,47 @@ export const actionIntents: Record<AuditActionName, Intent> = {
 const fileStatusReasons: Readonly<Record<string, string>> = {
   "every mandatory field is filled":
     "tous les champs obligatoires sont remplis",
+  "a first recommendation is saved":
+    "une première recommandation est enregistrée",
+  "the practitioner activated the care": "accompagnement activé",
+};
+
+/**
+ * The French of the details that a service stores as an English word or
+ * phrase. The stored row does not change: the journal reads it through this
+ * table. A detail that is a name, a date, a count or a technical key shows as
+ * it is stored.
+ */
+const storedDetails: Readonly<Record<string, string>> = {
+  "consent given": "consentement donné",
+  "consent refused": "consentement refusé",
+  "consent withdrawn": "consentement retiré",
+  inactivity: "inactivité",
+  "patient not identified": "patient non identifié",
+  link: "lien",
+  file: "fichier",
+  acquired: "acquis",
+  not_acquired: "non acquis",
+  abandoned: "abandonné",
+  // The activation e-mail: the kind of link, then why a send did not go out.
+  sign_in: "lien de connexion",
+  takeover: "lien de reprise du dossier",
+  no_email: "le dossier n'a pas d'adresse e-mail",
+  no_mailer: "l'envoi d'e-mails n'est pas configuré",
+  link_failed: "le lien n'a pas pu être créé",
+  send_failed: "le service d'e-mail a refusé l'envoi",
 };
 
 /**
  * The detail as the journal shows it. A file status move is stored as
  * `to_complete → ready: <reason>` and reads with the French labels here. A
- * reason with no French entry is left out, never shown in English. Every
- * other detail shows as it is stored. No stored row changes.
+ * reason with no French entry is left out, never shown in English. A detail of
+ * `storedDetails` reads in French. Every other detail shows as it is stored.
+ * No stored row changes.
  */
 export const detailLabel = (action: AuditActionName, detail: string) => {
   if (action !== "patient.file_status_changed") {
-    return detail;
+    return storedDetails[detail] ?? detail;
   }
   const [, from, to, reason] =
     /^(\w+) → (\w+)(?:: (.*))?$/.exec(detail) ?? [];

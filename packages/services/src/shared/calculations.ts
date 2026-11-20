@@ -39,6 +39,23 @@ export const specialSituations = [
 
 export type SpecialSituation = (typeof specialSituations)[number];
 
+/** The text of each situation, as the practitioner reads it in a list. */
+export const specialSituationLabels = {
+  none: { fr: "Aucune" },
+  pregnancy_1: { fr: "Grossesse, 1er trimestre" },
+  pregnancy_2: { fr: "Grossesse, 2e trimestre" },
+  pregnancy_3: { fr: "Grossesse, 3e trimestre" },
+  lactation_first_6_months: { fr: "Allaitement, 6 premiers mois" },
+  lactation_after_6_months: { fr: "Allaitement, après 6 mois" },
+  pathology: { fr: "Pathologie" },
+  malnutrition: { fr: "Dénutrition" },
+  other: { fr: "Autre situation" },
+} as const satisfies Record<SpecialSituation, Readonly<Record<Locale, string>>>;
+
+export const isSpecialSituation = (value: unknown): value is SpecialSituation =>
+  typeof value === "string" &&
+  (specialSituations as readonly string[]).includes(value);
+
 /**
  * The four WHO classes, lowest first. A class holds every BMI under its
  * `below` bound and at or above the bound of the class before it. Obesity has
@@ -48,22 +65,22 @@ export const bmiClasses = [
   {
     key: "underweight",
     below: 18.5,
-    label: { fr: "Insuffisance pondérale", en: "Underweight" },
+    label: { fr: "Insuffisance pondérale"},
   },
   {
     key: "normal",
     below: 25,
-    label: { fr: "Corpulence normale", en: "Normal weight" },
+    label: { fr: "Corpulence normale"},
   },
   {
     key: "overweight",
     below: 30,
-    label: { fr: "Surpoids", en: "Overweight" },
+    label: { fr: "Surpoids"},
   },
   {
     key: "obesity",
     below: null,
-    label: { fr: "Obésité", en: "Obesity" },
+    label: { fr: "Obésité"},
   },
 ] as const satisfies readonly {
   key: string;
@@ -91,9 +108,9 @@ export const bmiClass = (value: number): BmiClass =>
 
 /** The row titles of « Calculs » (story 6). */
 export const calculationKindLabels = {
-  bmi: { fr: "IMC", en: "BMI" },
-  protein: { fr: "Besoins protéiques", en: "Protein needs" },
-  energy: { fr: "Besoins énergétiques", en: "Energy needs" },
+  bmi: { fr: "IMC"},
+  protein: { fr: "Besoins protéiques"},
+  energy: { fr: "Besoins énergétiques"},
 } as const satisfies Record<CalculationKind, Readonly<Record<Locale, string>>>;
 
 /** A datum a calculation reads. The age comes from the birth date. */
@@ -114,15 +131,13 @@ export const calculationInputs = {
 /** Lower case: they follow « Non renseigné : ». */
 export const calculationInputLabels = {
   sexForCalculation: {
-    fr: "sexe utilisé pour le calcul",
-    en: "sex used for the calculation",
+    fr: "sexe utilisé pour le calcul"
   },
-  age: { fr: "âge", en: "age" },
-  heightCm: { fr: "taille", en: "height" },
-  weightKg: { fr: "poids actuel", en: "current weight" },
+  age: { fr: "âge"},
+  heightCm: { fr: "taille"},
+  weightKg: { fr: "poids actuel"},
   activityLevel: {
-    fr: "niveau d'activité physique",
-    en: "physical activity level",
+    fr: "niveau d'activité physique"
   },
 } as const satisfies Record<CalculationInput, Readonly<Record<Locale, string>>>;
 

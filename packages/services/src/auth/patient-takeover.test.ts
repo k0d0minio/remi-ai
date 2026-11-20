@@ -70,6 +70,7 @@ beforeAll(async () => {
     requestPasswordReset: async () => ok(null),
     resetPassword: async () => ok(null),
     completeRedirectSignIn: async () => null,
+    renewSessionCache: async () => null,
     routeHandlers: () => {
       throw new Error("not used");
     },

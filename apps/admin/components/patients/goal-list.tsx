@@ -3,11 +3,11 @@ import { Typography } from "@remi/ui/server";
 import { GoalItem } from "@/components/patients/goal-item";
 
 type Props = {
-  /** Already ordered by the service — her priority order, or archive date. */
+  /** Already ordered by the service: her priority order, or the date disabled. */
   goals: readonly PatientGoal[];
   /** Every goal's trail, keyed by goal id and newest first within each. */
   checkIns: Record<string, readonly PatientGoalCheckIn[]>;
-  /** Numbered in the active list; the archived one is a record, not a ranking. */
+  /** Numbered in the active list. The disabled list is a record, not a ranking. */
   ranked: boolean;
   today: string;
 };

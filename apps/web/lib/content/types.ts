@@ -1,7 +1,7 @@
 /**
- * The shape every locale dictionary fills in full. One type, two files —
- * TypeScript is what guarantees the French app never silently misses a label
- * the English one has.
+ * The shape of the dictionary. The app is French only (Jamie, 2026-11-20):
+ * `fr.ts` is the one dictionary, and a new text is one line here and one line
+ * there. TypeScript is what guarantees no screen reads a label that is missing.
  *
  * It covers chrome — navigation, labels, headings, empty states — for both
  * surfaces.
@@ -18,6 +18,11 @@ import type {
   CookingAffinity,
   CookingTime,
   FoodBudget,
+  FoodLimitLevel,
+  LifestyleAdviceCategory,
+  MandatoryQuestionnaireField,
+  MealAlert,
+  MealImprovementKind,
   MealIntent,
   MealSlot,
   PersonalisationDimension,
@@ -26,6 +31,7 @@ import type {
   SignupField,
   StepStatus,
 } from "@remi/services/shared";
+import type { PlanMealError } from "@/lib/meals/state";
 import type { PatientWriteError } from "@/lib/patient-link/actions";
 import type { QuestionnaireSection } from "@/lib/questionnaire/sections";
 import type { SaveError } from "@/lib/questionnaire/state";
@@ -60,9 +66,7 @@ export type PlaceholderContent = {
 export type Content = {
   /**
    * The root layout's metadata. Here rather than hard-coded in `layout.tsx`
-   * because the app ships in two languages and a browser tab is copy like any
-   * other — an English title over a French page is the same bug as an English
-   * button on one.
+   * because a browser tab is copy like any other.
    */
   meta: {
     /** Follows the brand's title convention: rendered as "REMI — <title>". */
@@ -85,7 +89,6 @@ export type Content = {
   userMenu: {
     label: string;
     account: string;
-    language: string;
     /** Heading over the link that leaves for the docs app. */
     help: string;
     documentation: string;
@@ -295,7 +298,7 @@ export type Content = {
     lead: string;
     /**
      * The segment navigation. One label per route, so a segment cannot be
-     * added without both locales naming it.
+     * added without the dictionary naming it.
      */
     /** Accessible name for the segment nav element. */
     navLabel: string;
@@ -384,7 +387,7 @@ export type Content = {
      *
      * `actions` are the two buttons that write an entry; `states` are how one
      * already written reads back. They are separate because the verb and the
-     * state are different words in both languages — « Je vais manger » writes
+     * state are different words — « Je vais manger » writes
      * a meal that reads « Prévu ».
      */
     mealEntry: {
@@ -570,27 +573,43 @@ export type Content = {
   };
   /**
    * The preparatory questionnaire (story 4), where a new patient lands after
-   * sign-up. The labels of the shared lists (diets, activity levels, the
-   * mandatory fields…) come from `@remi/services/shared`, not from here.
+   * sign-up. The labels of the shared lists (diets, activity levels,
+   * allergens…) come from `@remi/services/shared`, not from here. The
+   * questions are the patient's own, with « tu », so they live here.
    */
   questionnaire: {
     metaTitle: string;
     title: string;
+    /** Shown on the first step only (REM-157). */
     intro: string;
-    statusLabel: string;
-    missingTitle: string;
-    complete: string;
-    /** Under the header: what the mandatory mark means. */
+    /** The accessible name of the progress bar. */
+    progressLabel: string;
+    /** Holds `{current}` and `{total}`: « Étape 2 sur 6 ». */
+    step: string;
+    /** Under a step that has a mandatory field: what the mark means. */
     mandatoryLegend: string;
     /** Read by a screen reader in place of the mark. */
     mandatory: string;
     optional: string;
-    sectionsLabel: string;
     sections: Record<QuestionnaireSection, string>;
     previous: string;
     next: string;
     saving: string;
+    /** Shown only after the server confirmed the save (REM-167). */
     saved: string;
+    /** The action beside `errors.unavailable`: it sends the value again. */
+    retry: string;
+    /** The end screen (REM-168): ready, or the mandatory questions left. */
+    end: {
+      readyTitle: string;
+      readyBody: string;
+      finish: string;
+      /** On the ready screen: returns to the questions. */
+      edit: string;
+      incompleteTitle: string;
+      incompleteBody: string;
+      back: string;
+    };
     errors: Record<SaveError, string>;
     labels: {
       firstName: string;
@@ -598,9 +617,16 @@ export type Content = {
       birthDate: string;
       email: string;
       phone: string;
+      /**
+       * The patient's label of each mandatory question, also the link text
+       * on the end screen. The console has its own labels.
+       */
+      mandatory: Record<MandatoryQuestionnaireField, string>;
       desiredWeight: string;
       consultationDate: string;
+      /** The diet question (REM-162). */
       diet: string;
+      /** Shown after « Autre », where it is mandatory. */
       dietNote: string;
       pathologies: string;
       celiacDisease: string;
@@ -611,17 +637,35 @@ export type Content = {
     };
     hints: {
       email: string;
+      phone: string;
       height: string;
       weight: string;
       desiredWeight: string;
-      /** While the diet has no saved answer: the default is shown, not saved. */
-      dietDefault: string;
       allergies: string;
       intolerances: string;
       otherText: string;
       celiacDisease: string;
       medications: string;
       supplements: string;
+    };
+    /**
+     * The first step (REM-158): the personal data of the sign-up, shown as
+     * known. The patient reads it, and opens the fields to correct it.
+     */
+    identity: {
+      known: string;
+      edit: string;
+      /** In place of a value the file does not hold. */
+      empty: string;
+    };
+    /** The diet question (REM-162). */
+    diet: {
+      /** Under « Aucun régime particulier » while no diet is saved. */
+      proposed: string;
+      /** Saves the proposed choice. Shown while no diet is saved. */
+      confirm: string;
+      /** After « Autre », while its note is empty: nothing is saved. */
+      noteRequired: string;
     };
     /** The genetic consent and the three genotype lists (`genotype-section`). */
     genetic: {
@@ -639,6 +683,18 @@ export type Content = {
       /** A decision that did not save. */
       decisionFailed: string;
     };
+  };
+  /**
+   * A date field of the sign-up and of the questionnaire (REM-159): the
+   * patient types « JJ/MM/AAAA ».
+   */
+  dateEntry: {
+    placeholder: string;
+    hint: string;
+    /** A day that no calendar has, or a date left half typed. */
+    invalid: string;
+    /** A birth date of today or later. */
+    notPast: string;
   };
   /**
    * The patient's sign-in at `/connexion` (story 2): the password form, the
@@ -740,8 +796,173 @@ export type Content = {
   patientProfile: {
     metaTitle: string;
     title: string;
-    comingSoon: string;
+  };
+  /**
+   * « Mes recommandations » at `/profil/recommandations` (story 23). The
+   * headings are Morgane's. The recommendations themselves are the
+   * practitioner's text and are not in this dictionary.
+   */
+  patientRecommendations: {
+    metaTitle: string;
+    title: string;
+    /** The entry on the Profil tab, and the line below it. */
+    profileEntry: string;
+    profileEntryHint: string;
+    backToProfile: string;
+    /** `{date}` is the day of the validated version. */
+    updatedOn: string;
+    /** No version is validated yet, or the version shows nothing. */
+    empty: string;
+    /** The validated version cannot be read. */
+    unavailable: string;
+    supplementsTitle: string;
+    doseLabel: string;
+    timingLabel: string;
+    reasonLabel: string;
+    lifestyleTitle: string;
+    lifestyleCategories: Record<LifestyleAdviceCategory, string>;
+    foodTitle: string;
+    evictionsTitle: string;
+    /** `{date}` is the last day of the eviction. */
+    evictionUntil: string;
+    /** `{date}` is the first day of an eviction that has not started. */
+    evictionFrom: string;
+    evictionDurable: string;
+    favourTitle: string;
+    limitTitle: string;
+    limitLevels: Record<FoodLimitLevel, string>;
+    /** Above the practitioner's recommendations of the category nutrition. */
+    foodAdviceTitle: string;
+    goalsTitle: string;
+  };
+  /**
+   * The patient's own data on the Profil tab and at `/profil/mes-donnees`
+   * (story 31, REM-85). The labels and the errors of the fields are those of
+   * `questionnaire`: one field has one name.
+   */
+  patientPersonalData: {
+    /** The patient's file cannot be read. */
+    unavailable: string;
+    /** A value that the file does not hold. */
+    empty: string;
+    edit: string;
+    /** The accessible name of « Modifier ». `{label}` is the field's name. */
+    editLabel: string;
+    save: string;
+    saving: string;
+    cancel: string;
+    personalTitle: string;
+    personalIntro: string;
+    phoneSaved: string;
+    dataTitle: string;
+    dataIntro: string;
+    rows: {
+      weight: string;
+      desiredWeight: string;
+      activityLevel: string;
+      diet: string;
+      allergies: string;
+      intolerances: string;
+      medications: string;
+      supplements: string;
+    };
+    /** `{value}` is a weight with a comma. */
+    kilograms: string;
+    /** « Autre » and what the patient wrote. */
+    dietWithNote: string;
+    weightSaved: string;
+    /** The entry to `/profil/mes-donnees`, and the line below it. */
+    dataLink: string;
+    dataLinkHint: string;
+    accountTitle: string;
+    consentTitle: string;
+    /** The consent settings are not built yet. */
+    consentNotYet: string;
+    dataPage: {
+      metaTitle: string;
+      title: string;
+      intro: string;
+      foodTitle: string;
+      /** After a saved change of the diet, the allergies or the intolerances. */
+      foodSaved: string;
+      otherTitle: string;
+    };
   };
   /** The sign-out button on the pages behind the patient session. */
   signOut: string;
+  /**
+   * The waiting screen at `/attente` (story 22): from a complete questionnaire
+   * to the activation.
+   */
+  patientWaiting: {
+    metaTitle: string;
+    title: string;
+    body: string;
+    /** Above the practitioner's name. */
+    practitionerLabel: string;
+    /** Above the appointment date. Shown only when a date is set. */
+    appointmentLabel: string;
+    /** Says that the answers stay editable. Above the link. */
+    questionnaireHint: string;
+    questionnaireLink: string;
+  };
+  /**
+   * The meal block of `/accueil` (stories 28 and 31). The question is the
+   * page's title and the label of the field.
+   */
+  patientMeal: {
+    question: string;
+    hint: string;
+    placeholder: string;
+    /** The charter's label of the home page's one dominant button (8.1). */
+    submit: string;
+    submitting: string;
+    /** `{count}` is the number of characters left. Shown near the limit only. */
+    remaining: string;
+    errors: Record<PlanMealError, string>;
+    /** After a save: the record, then REMI's answer (REM-102). */
+    saved: {
+      title: string;
+      mealLabel: string;
+      another: string;
+      suggestion: {
+        alertTitle: string;
+        /** `{food}` is the part of the meal, in the patient's own words. */
+        alerts: Record<MealAlert["source"], string>;
+        /** `{food}` is a part of the meal that can hold an excluded food. */
+        trace: string;
+        /** `{foods}` is a list of foods that the model named. Never a certainty. */
+        toCheck: string;
+        checkIngredients: string;
+        goodTitle: string;
+        improveTitle: string;
+        /** `{food}`, and `{replaces}` for a replacement. */
+        kinds: Record<MealImprovementKind, string>;
+        /** `{basis}` is the validated item, in the practitioner's words. */
+        basis: string;
+        aligned: string;
+        /** The safety message: REMI has no improvement that the gate confirms. */
+        withheld: string;
+        noProtocol: string;
+        addressAlert: string;
+        unclear: string;
+        unavailable: string;
+        /**
+         * The patient's answer to a suggestion (REM-103, story 28). The only
+         * feedback of the patient space (story 30).
+         */
+        feedback: {
+          accept: string;
+          decline: string;
+          /** After « Pas pour moi » on the first suggestion. */
+          declined: string;
+          another: string;
+          anotherPending: string;
+          /** The second generation showed no other improvement. */
+          noOther: string;
+          closing: string;
+        };
+      };
+    };
+  };
 };

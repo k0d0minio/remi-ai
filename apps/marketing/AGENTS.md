@@ -31,8 +31,8 @@ commercial prices of 399 € and 149 €), and the CGV read them from the same l
 ## Imports
 
 Primitives from `@remi/ui`, `cn()` from `@remi/ui/utils`, `@/*` for app-local paths.
-The locale vocabulary — `locales`, `Locale`, `isLocale`, `localePath`, `pickLocaleFromHeader` —
-comes from `@remi/services/shared`, because the product app ships in the same two languages and a
+The locale vocabulary — `locales`, `Locale`, `isLocale`, `localePath`, `defaultLocalePath` —
+comes from `@remi/services/shared`, because the product app serves the same `/fr` prefix and a
 cross-app link has to build the path this site actually serves. So do `appHref()` / `appOrigin()`,
 the catalogue of where the four apps answer: this site's own `metadataBase` and every link that
 leaves it come from there, and no origin is written out in this app.
