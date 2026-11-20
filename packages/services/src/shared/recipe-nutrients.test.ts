@@ -3,6 +3,7 @@ import {
   computeRecipeNutrients,
   foodNutrientValuesOf,
   formatRecipeNutrient,
+  ingredientGrams,
   nutrientIngredientsOf,
   recipeIngredientGrams,
   recipeNutrientKeys,
@@ -20,8 +21,14 @@ const OIL = "17701"; // Huile combinée, mélange d'huile d'olive et de graines
 const SUGAR = "31017"; // Sucre roux
 
 const values: CiqualValues = new Map([
-  [RICE, { energy: 350, protein: 7.02, carbohydrate: 77.5, fat: 0.79, fibre: 1.53 }],
-  [EGG, { energy: 134, protein: 13.5, carbohydrate: 0.52, fat: 8.62, fibre: 0 }],
+  [
+    RICE,
+    { energy: 350, protein: 7.02, carbohydrate: 77.5, fat: 0.79, fibre: 1.53 },
+  ],
+  [
+    EGG,
+    { energy: 134, protein: 13.5, carbohydrate: 0.52, fat: 8.62, fibre: 0 },
+  ],
   [OIL, { energy: 900, protein: 0, carbohydrate: 0, fat: 100, fibre: 0 }],
   [SUGAR, { energy: 393, protein: 0.12, carbohydrate: 98.1, fat: 0, fibre: 0 }],
 ]);
@@ -250,7 +257,40 @@ describe("recipeIngredientGrams", () => {
   });
 });
 
+describe("ingredientGrams", () => {
+  it("gives the stored weight first", () => {
+    expect(ingredientGrams({ quantity: 2, unit: null, grams: 110 })).toBe(110);
+    expect(ingredientGrams({ quantity: 200, unit: "g", grams: 180 })).toBe(180);
+  });
+
+  it("reads the text of a line with no stored weight, as before", () => {
+    expect(ingredientGrams({ quantity: 200, unit: "g" })).toBe(200);
+    expect(ingredientGrams({ quantity: 2, unit: null })).toBeNull();
+  });
+});
+
 describe("nutrientIngredientsOf", () => {
+  it("gives the stored grams of a line of the structure of REM-192", () => {
+    expect(
+      nutrientIngredientsOf({
+        ingredients: [
+          {
+            quantity: 2,
+            unit: null,
+            name: "œufs",
+            note: "",
+            foodCode: EGG,
+            grams: 110,
+          },
+          { quantity: 1, unit: "tbsp", name: "huile", note: "", foodCode: OIL },
+        ],
+      }),
+    ).toEqual([
+      { foodCode: EGG, grams: 110 },
+      { foodCode: OIL, grams: null },
+    ]);
+  });
+
   it("keeps the order and the code of each line", () => {
     expect(
       nutrientIngredientsOf({

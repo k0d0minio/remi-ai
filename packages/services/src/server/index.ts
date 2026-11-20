@@ -248,10 +248,7 @@ export {
   setRecipeVerified,
   updateRecipe,
 } from "../db/services/recipes";
-export type {
-  RecipeInput,
-  VerifiedTemplate,
-} from "../db/services/recipes";
+export type { RecipeInput, VerifiedTemplate } from "../db/services/recipes";
 export {
   GENERATED_RECIPES_MAX_DAYS,
   getGeneratedRecipe,
@@ -353,6 +350,14 @@ export type { FoodRecord } from "../db/models/food-record";
 export { proposeFirstLot, proposeFoodRecord } from "./foods/propose";
 /** The energy and the macronutrients of a recipe, from CIQUAL (REM-191). */
 export { estimateRecipeNutrients } from "../db/services/foods/recipe-nutrients";
+/**
+ * The CIQUAL foods that the recipe form offers for an ingredient (REM-192):
+ * the confirmed « cuisinable » foods first, then each other food of the table.
+ */
+export {
+  ingredientFoodsByCode,
+  searchIngredientFoods,
+} from "./recipes/ingredient-foods";
 export type {
   RecipeNutrientEstimate,
   RecipeNutrientLine,
@@ -652,11 +657,7 @@ export type {
  * The compatibility gate (REM-57). From the file and not from `../ai`: the gate
  * imports no seam.
  */
-export {
-  checkCompatibility,
-  gateTags,
-  mayBeShown,
-} from "../ai/compatibility";
+export { checkCompatibility, gateTags, mayBeShown } from "../ai/compatibility";
 export type {
   GateFood,
   CompatibilityItem,

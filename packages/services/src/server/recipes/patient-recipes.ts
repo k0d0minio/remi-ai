@@ -12,6 +12,12 @@
  * A recipe with no structured content is a free text for the gate, and the
  * gate never confirms a free text.
  *
+ * An ingredient can name a CIQUAL food by its code (REM-192). The gate still
+ * reads the name of each ingredient, and it also reads the food record of a
+ * code when a person confirmed that record (`recipeGateItem`). A code with no
+ * confirmed record changes nothing. The quantity of a line with a weight in
+ * grams shows in the confirmed kitchen units of its food, or in grams.
+ *
  * A failed read of the safety data is a failure. No recipe is then shown.
  */
 
@@ -28,12 +34,17 @@ import {
   getGeneratedRecipe,
   listGeneratedRecipes,
 } from "../../db/services/generated-recipes";
+import {
+  recipeFoodsByCode,
+  type RecipeFoods,
+} from "../../db/services/food-records";
 import { listPatientRecipes } from "../../db/services/recipe-assignments";
 import { addDays, todayAtPractice } from "../../shared/format";
 import type {
   PatientRecipeCard,
   PatientRecipeSource,
 } from "../../shared/recipe-card";
+import { ingredientAmountText } from "../../shared/recipe-quantities";
 import { err, ok, type Result } from "../../shared/result";
 import {
   recipeGateItem,
@@ -85,22 +96,37 @@ export const assignedCandidate = ({
   justification: assignment.note.trim(),
 });
 
+const NO_FOODS: RecipeFoods = { gate: new Map(), units: new Map() };
+
+/** The food record data of each CIQUAL code that the candidates name. */
+const foodsOf = (
+  candidates: readonly PatientRecipeCandidate[],
+): Promise<RecipeFoods> =>
+  recipeFoodsByCode(
+    candidates.flatMap(({ content }) =>
+      (content?.ingredients ?? []).flatMap(({ foodCode }) =>
+        foodCode === null ? [] : [foodCode],
+      ),
+    ),
+  );
+
 /**
  * The card of a recipe for this patient on the day `today`, or null when the
- * gate does not confirm the recipe. Pure: the caller gives the safety data
- * and the day.
+ * gate does not confirm the recipe. Pure: the caller gives the safety data,
+ * the day and the food record data of the CIQUAL codes of the recipe.
  */
 export const gatedRecipeCard = (
   candidate: PatientRecipeCandidate,
   safety: PatientSafetyData,
   today: string,
+  foods: RecipeFoods = NO_FOODS,
 ): PatientRecipeCard | null => {
   const { content } = candidate;
   const verdict = checkCompatibility(
     safety,
     content === null
       ? { kind: "text", text: candidate.body }
-      : recipeGateItem(content),
+      : recipeGateItem(content, foods.gate),
     today,
   );
   if (content === null || !mayBeShown(verdict)) {
@@ -111,6 +137,14 @@ export const gatedRecipeCard = (
     source: candidate.source,
     title: candidate.title,
     content,
+    amounts: content.ingredients.map((ingredient) =>
+      ingredientAmountText(
+        ingredient,
+        ingredient.foodCode === null
+          ? null
+          : (foods.units.get(ingredient.foodCode) ?? null),
+      ),
+    ),
     justification: candidate.justification,
   };
 };
@@ -126,9 +160,10 @@ export const gatedRecipeList = (
   candidates: readonly PatientRecipeCandidate[],
   safety: PatientSafetyData,
   today: string,
+  foods: RecipeFoods = NO_FOODS,
 ): PatientRecipeList => {
   const cards = candidates.flatMap((candidate) => {
-    const card = gatedRecipeCard(candidate, safety, today);
+    const card = gatedRecipeCard(candidate, safety, today, foods);
     return card ? [card] : [];
   });
   return { cards, withheld: candidates.length - cards.length };
@@ -162,13 +197,15 @@ export const listPatientRecipeCards = async (
     to: addDays(today, LIST_DAYS_EACH_SIDE),
   });
   const assigned = await listPatientRecipes(actor, patientId);
+  const candidates = [
+    ...[...generated].reverse().map(generatedCandidate),
+    ...assigned.map(assignedCandidate),
+  ];
   const list = gatedRecipeList(
-    [
-      ...[...generated].reverse().map(generatedCandidate),
-      ...assigned.map(assignedCandidate),
-    ],
+    candidates,
     loaded.data.safety,
     today,
+    await foodsOf(candidates),
   );
   log("patient.recipes.list", {
     shown: list.cards.length,
@@ -222,6 +259,7 @@ export const getPatientRecipeCard = async (
     candidate,
     loaded.data.safety,
     todayAtPractice(at),
+    await foodsOf([candidate]),
   );
   log("patient.recipes.read", {
     status: card ? "shown" : "withheld",

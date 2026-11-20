@@ -7,16 +7,23 @@ import {
   createRecipe,
   duplicateRecipe,
   getRecipe,
+  searchIngredientFoods,
   setRecipeVerified,
   updateRecipe,
 } from "@remi/services/server";
 import {
+  carryRecipeData,
+  linkIngredientFoods,
   parseIngredientLines,
+  parseIngredientLinks,
   parseStepLines,
+  structuredRecipeOf,
   userMessage,
+  type IngredientFood,
 } from "@remi/services/shared";
 import { audit } from "@/lib/audit";
 import { requireOperator } from "@/lib/auth/session";
+import { ensureDatabase } from "@/lib/database";
 
 /**
  * The library's writes. Same shape as the patient actions next door: the
@@ -61,17 +68,43 @@ const hasStructuredLines = (formData: FormData) =>
  * hold one ingredient and one step for each line: the parsers of
  * `@remi/services/shared` read them, the same ones that draw the preview of
  * the form. The service checks the result with the schema.
+ *
+ * REM-192: the field `ingredientFoods` holds the CIQUAL food and the weight in
+ * grams of each line, by place. The level and the equipment are optional: an
+ * empty answer writes no key, so a recipe with none is stored as before.
  */
-const contentFrom = (formData: FormData) => ({
-  description: field(formData, "description"),
-  prepMinutes: minutesFrom(formData, "prepMinutes"),
-  cookMinutes: minutesFrom(formData, "cookMinutes"),
-  portions: Number(field(formData, "portions").trim() || "NaN"),
-  meals: formData.getAll("meals").map(String),
-  seasons: formData.getAll("seasons").map(String),
-  ingredients: parseIngredientLines(field(formData, "ingredients")),
-  steps: parseStepLines(field(formData, "steps")),
-});
+const contentFrom = (formData: FormData) => {
+  const level = field(formData, "level").trim();
+  const equipment = formData.getAll("equipment").map(String);
+  return {
+    description: field(formData, "description"),
+    prepMinutes: minutesFrom(formData, "prepMinutes"),
+    cookMinutes: minutesFrom(formData, "cookMinutes"),
+    portions: Number(field(formData, "portions").trim() || "NaN"),
+    meals: formData.getAll("meals").map(String),
+    seasons: formData.getAll("seasons").map(String),
+    ingredients: linkIngredientFoods(
+      parseIngredientLines(field(formData, "ingredients")),
+      parseIngredientLinks(field(formData, "ingredientFoods")),
+    ),
+    steps: parseStepLines(field(formData, "steps")),
+    ...(level === "" ? {} : { level: Number(level) }),
+    ...(equipment.length === 0 ? {} : { equipment }),
+  };
+};
+
+/**
+ * The CIQUAL foods that the recipe form offers for an ingredient (REM-192):
+ * the confirmed « cuisinable » foods first. A read of reference data, with no
+ * patient data. It checks the session, because an action is an endpoint.
+ */
+export const searchIngredientFoodsAction = async (
+  text: string,
+): Promise<readonly IngredientFood[]> => {
+  await requireOperator();
+  ensureDatabase();
+  return searchIngredientFoods(String(text).slice(0, 120));
+};
 
 const revalidateLibrary = (id?: string) => {
   revalidatePath("/recipes");
@@ -119,13 +152,20 @@ export const updateRecipeAction = async (
   // practitioner types its lines. A structured recipe stays structured.
   const structured =
     existing.data.content !== null || hasStructuredLines(formData);
+  const posted = contentFrom(formData);
+  // The form has no field for the skeleton and for the technique and the
+  // ingredients of a step: they stay as the stored recipe has them.
+  const content = {
+    ...posted,
+    ...carryRecipeData(structuredRecipeOf(existing.data.content), posted),
+  };
   const result = await updateRecipe(
     id,
     {
       title: field(formData, "title"),
       body: field(formData, "body"),
       tags: tagsFrom(formData),
-      ...(structured ? { content: contentFrom(formData) } : {}),
+      ...(structured ? { content } : {}),
     },
     // An edit of a verified recipe removes the mark: the event names who.
     { id: operator.id, email: operator.email, name: operator.name },

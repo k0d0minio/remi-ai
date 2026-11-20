@@ -1,12 +1,15 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { PatientSafetyData } from "../../ai/compatibility";
+import type { GateFood, PatientSafetyData } from "../../ai/compatibility";
 import { registerDatabase } from "../../db/client";
 import { patientActor, systemActor } from "../../db/services/access";
 import { createPatient } from "../../db/services/patients";
 import { assignRecipes } from "../../db/services/recipe-assignments";
 import { createRecipe } from "../../db/services/recipes";
-import { createMemoryDatabase, testPractitionerId } from "../../db/test-helpers";
+import {
+  createMemoryDatabase,
+  testPractitionerId,
+} from "../../db/test-helpers";
 import type { StructuredRecipe } from "../../shared/structured-recipe";
 import {
   assignedCandidate,
@@ -77,6 +80,7 @@ describe("gatedRecipeCard", () => {
       source: "practitioner",
       title: "Salade de carottes",
       content: contentWith("carotte"),
+      amounts: ["1"],
       justification: "Pour tes fibres",
     });
   });
@@ -118,6 +122,91 @@ describe("gatedRecipeCard", () => {
         TODAY,
       ),
     ).toBeNull();
+  });
+});
+
+describe("gatedRecipeCard with CIQUAL foods (REM-192)", () => {
+  const CODE = "22000";
+
+  const withFood = (name: string, grams: number): StructuredRecipe => ({
+    ...contentWith(name),
+    ingredients: [
+      { quantity: 2, unit: null, name, note: "", foodCode: CODE, grams },
+    ],
+  });
+
+  const gateFood = (overrides: Partial<GateFood> = {}): GateFood => ({
+    code: CODE,
+    name: "Oeuf, cru",
+    status: "confirmed",
+    cookable: true,
+    contains: ["eggs"],
+    mayContain: [],
+    lexiconId: null,
+    ...overrides,
+  });
+
+  const eggUnits = {
+    densityGPerMl: null,
+    units: [{ one: "œuf", many: "œufs", grams: 55 }],
+  };
+
+  const eggAllergy: PatientSafetyData = {
+    ...noExclusion,
+    noKnownAllergies: false,
+    allergens: [
+      { kind: "allergy", key: "eggs", subKey: null, otherText: null },
+    ],
+  };
+
+  it("writes the quantity in the confirmed kitchen unit of the food", () => {
+    const card = gatedRecipeCard(
+      candidate({ content: withFood("carotte", 110) }),
+      noExclusion,
+      TODAY,
+      { gate: new Map(), units: new Map([[CODE, eggUnits]]) },
+    );
+    expect(card?.amounts).toEqual(["2 œufs"]);
+  });
+
+  it("writes grams when the food has no confirmed unit", () => {
+    const card = gatedRecipeCard(
+      candidate({ content: withFood("carotte", 110) }),
+      noExclusion,
+      TODAY,
+    );
+    expect(card?.amounts).toEqual(["110 g"]);
+  });
+
+  it("hides a recipe whose code has no confirmed record and whose name is unknown", () => {
+    for (const status of ["proposed", "none"] as const) {
+      expect(
+        gatedRecipeCard(
+          candidate({ content: withFood("zzqxv", 110) }),
+          noExclusion,
+          TODAY,
+          { gate: new Map([[CODE, gateFood({ status })]]), units: new Map() },
+        ),
+      ).toBeNull();
+    }
+  });
+
+  it("hides an unknown name with a confirmed record too", () => {
+    expect(
+      gatedRecipeCard(
+        candidate({ content: withFood("zzqxv", 110) }),
+        noExclusion,
+        TODAY,
+        { gate: new Map([[CODE, gateFood()]]), units: new Map() },
+      ),
+    ).toBeNull();
+  });
+
+  it("hides a recipe whose confirmed record has a tag that the patient excludes", () => {
+    const foods = { gate: new Map([[CODE, gateFood()]]), units: new Map() };
+    const recipe = candidate({ content: withFood("carotte", 110) });
+    expect(gatedRecipeCard(recipe, eggAllergy, TODAY, foods)).toBeNull();
+    expect(gatedRecipeCard(recipe, noExclusion, TODAY, foods)).not.toBeNull();
   });
 });
 
@@ -242,9 +331,14 @@ describe("the reads of a patient", () => {
     if (!recipe.ok) {
       throw new Error("test recipe not created");
     }
-    const given = await assignRecipes(systemActor, patientId, [recipe.data.id], {
-      assignedOn: TODAY,
-    });
+    const given = await assignRecipes(
+      systemActor,
+      patientId,
+      [recipe.data.id],
+      {
+        assignedOn: TODAY,
+      },
+    );
     if (!given.ok || !given.data[0]) {
       throw new Error("test assignment not created");
     }
