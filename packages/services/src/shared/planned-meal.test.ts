@@ -36,7 +36,7 @@ describe("checkPlannedMealText", () => {
   });
 
   it("counts a line break of a browser as one character", () => {
-    const lines = "a\r\n".repeat(PLANNED_MEAL_MAX_LENGTH / 2);
+    const lines = "a\r\n".repeat(PLANNED_MEAL_MAX_LENGTH / 2 - 1);
     const checked = checkPlannedMealText(`${lines}b`);
 
     expect(checked.ok).toBe(true);

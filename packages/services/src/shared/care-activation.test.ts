@@ -42,6 +42,7 @@ const validated: ActivationVersion = {
       },
     ],
     instruction: null,
+    foodDirectives: [],
     calculations: [
       {
         kind: "protein",

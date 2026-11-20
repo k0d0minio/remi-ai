@@ -2,11 +2,10 @@
 
 import {
   patientActor,
-  patientLandingFor,
   planPatientMeal,
 } from "@remi/services/server";
 import { checkPlannedMealText, isLocale } from "@remi/services/shared";
-import { requirePatient } from "@/lib/patient-auth/session";
+import { patientLanding, requirePatient } from "@/lib/patient-auth/session";
 import type { PlanMealError, PlanMealState } from "./state";
 
 /**
@@ -35,7 +34,7 @@ export const planMealAction = async (
   const account = await requirePatient(locale);
   // The layout stops a patient before activation. An action is reachable
   // without the layout, so it checks again (story 31, criterion 7).
-  if (patientLandingFor(account) !== "home") {
+  if ((await patientLanding(account)) !== "home") {
     return failed("unavailable");
   }
 
