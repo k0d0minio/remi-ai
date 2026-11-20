@@ -377,6 +377,16 @@ export type {
   RecipeUnit,
   StructuredRecipe,
 } from "./structured-recipe";
+export {
+  recipeIngredientAmount,
+  recipeStepDetails,
+  recipeSummaryOf,
+} from "./recipe-card";
+export type {
+  PatientRecipeCard,
+  PatientRecipeSource,
+  PatientRecipeSummary,
+} from "./recipe-card";
 export { err, ok, unwrap } from "./result";
 export type { Result, ServiceErrorCode } from "./result";
 export type { Actor, Entity, Id, Page, PageQuery, Timestamped } from "../types";

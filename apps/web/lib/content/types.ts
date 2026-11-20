@@ -965,4 +965,40 @@ export type Content = {
       };
     };
   };
+  /**
+   * The recipe page of the patient and the list that opens it (REM-94, story
+   * 25). The recipe itself is not in this dictionary.
+   */
+  patientRecipeCard: {
+    metaTitle: string;
+    back: string;
+    /** The label of a recipe that REMI generated for the patient. */
+    proposedByRemi: string;
+    /** The label of a recipe of the library that the practitioner gave. */
+    chosenByPractitioner: string;
+    justificationTitle: string;
+    prep: string;
+    cook: string;
+    portions: string;
+    /** A time that the recipe does not give: no value is invented (D-30). */
+    notEntered: string;
+    ingredientsTitle: string;
+    ingredientsForOne: string;
+    /** `{count}` is the number of portions, 2 or more. */
+    ingredientsForMany: string;
+    stepsTitle: string;
+    /** The recipe is the patient's, and the compatibility gate refuses it. */
+    withheldTitle: string;
+    withheld: string;
+    /** The safety data could not be read: no recipe shows. */
+    unavailable: string;
+    list: {
+      /** `{time}` is the preparation and the cooking together. */
+      totalTime: string;
+      withheldOne: string;
+      /** `{count}` is the number of recipes that do not show, 2 or more. */
+      withheldMany: string;
+      unavailable: string;
+    };
+  };
 };

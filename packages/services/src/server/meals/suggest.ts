@@ -50,8 +50,6 @@ import {
 import type { Actor } from "../../db/models/actor";
 import type { MealEntry } from "../../db/models/meal-entry";
 import { claimMealRetry } from "../../db/services/meal-entries";
-import { listPatientEvictions } from "../../db/services/patient-food-directives";
-import { getPatientQuestionnaire } from "../../db/services/patient-questionnaire";
 import { getValidatedProtocol } from "../../db/services/protocol-versions";
 import { todayAtPractice } from "../../shared/format";
 import type {
@@ -66,6 +64,7 @@ import { dietLabels } from "../../shared/questionnaire";
 import { err, ok, type Result } from "../../shared/result";
 import { roleModel } from "../ai-models";
 import { env } from "../env";
+import { loadPatientSafety } from "../patient-safety";
 import {
   MEAL_RETRY_TTL_SECONDS,
   readMealRetry,
@@ -594,13 +593,9 @@ const loadMealInput = async (
   meal: string,
   at: Date,
 ): Promise<Result<MealSuggestionInput>> => {
-  const questionnaire = await getPatientQuestionnaire(actor, patientId);
-  if (!questionnaire.ok) {
-    return questionnaire;
-  }
-  const evictions = await listPatientEvictions(actor, patientId);
-  if (!evictions.ok) {
-    return evictions;
+  const loaded = await loadPatientSafety(actor, patientId);
+  if (!loaded.ok) {
+    return loaded;
   }
   const validated = await getValidatedProtocol(actor, patientId);
   if (!validated.ok) {
@@ -610,23 +605,10 @@ const loadMealInput = async (
   // One read of the setting for this call. The seam reads no database.
   const model = await roleModel("fast");
 
-  const { answers, allergens } = questionnaire.data;
   return ok({
     meal,
-    safety: {
-      allergens: allergens.map((row) => ({
-        kind: row.kind,
-        key: row.key,
-        subKey: row.subKey,
-        otherText: row.otherText,
-      })),
-      noKnownAllergies: answers.noKnownAllergies,
-      noKnownIntolerances: answers.noKnownIntolerances,
-      celiacDisease: answers.celiacDisease,
-      diet: answers.diet,
-      evictions: evictions.data,
-    },
-    dietNote: answers.dietNote,
+    safety: loaded.data.safety,
+    dietNote: loaded.data.dietNote,
     protocol: validated.data?.snapshot ?? null,
     today: todayAtPractice(at),
     model,

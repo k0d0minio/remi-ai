@@ -962,4 +962,33 @@ export const fr: Content = {
       },
     },
   },
+  patientRecipeCard: {
+    metaTitle: "Recette",
+    back: "Retour aux recettes",
+    proposedByRemi: "Proposé par REMI",
+    chosenByPractitioner: "Choisie par ton praticien",
+    justificationTitle: "Pourquoi cette recette pour toi",
+    prep: "Préparation",
+    cook: "Cuisson",
+    portions: "Portions",
+    notEntered: "Non renseigné",
+    ingredientsTitle: "Ingrédients",
+    ingredientsForOne: "Pour 1 portion",
+    ingredientsForMany: "Pour {count} portions",
+    stepsTitle: "Étapes",
+    withheldTitle: "Cette recette ne s'affiche pas",
+    withheld:
+      "REMI n'a pas pu confirmer que cette recette convient à tes allergies, à tes intolérances et aux aliments que tu évites. Elle ne s'affiche donc pas. Si tu as une question, parles-en à ton praticien.",
+    unavailable:
+      "Cette recette n'est pas disponible pour le moment. Réessaie dans un instant.",
+    list: {
+      totalTime: "{time} au total",
+      withheldOne:
+        "Une recette ne s'affiche pas : REMI n'a pas pu confirmer qu'elle convient à tes allergies, à tes intolérances et aux aliments que tu évites.",
+      withheldMany:
+        "{count} recettes ne s'affichent pas : REMI n'a pas pu confirmer qu'elles conviennent à tes allergies, à tes intolérances et aux aliments que tu évites.",
+      unavailable:
+        "Tes recettes ne sont pas disponibles pour le moment. Réessaie dans un instant.",
+    },
+  },
 };
