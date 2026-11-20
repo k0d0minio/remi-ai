@@ -3,7 +3,7 @@ import {
   type MealConfiguration,
   type MealFasting,
   type MealOrientation,
-  type MealSlot,
+  type MealConfigurationSlot,
   type MealSlotState,
 } from "@remi/services/shared";
 import { countLabel } from "@/components/patients/file/count-label";
@@ -13,7 +13,7 @@ import { NOT_ENTERED } from "@/components/patients/file/value";
  * The words of « Repas » (REM-68, REM-70). The labels and the descriptions
  * are Morgane's, from her tables of stories 11 and 12.
  */
-export const mealSlotLabels: Record<MealSlot, string> = {
+export const mealSlotLabels: Record<MealConfigurationSlot, string> = {
   breakfast: "Petit-déjeuner",
   lunch: "Déjeuner",
   snack: "Collation",

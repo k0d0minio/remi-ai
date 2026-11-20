@@ -7,10 +7,10 @@ import {
   mealOrientations,
   mealRemovedByFasting,
   mealSlotState,
-  mealSlots,
+  mealConfigurationSlots,
   type MealConfiguration,
   type MealConfigurationChange,
-  type MealSlot,
+  type MealConfigurationSlot,
 } from "@remi/services/shared";
 import { Button, Switch } from "@remi/ui";
 import {
@@ -37,7 +37,7 @@ type Props = {
 };
 
 type MealProps = {
-  meal: MealSlot;
+  meal: MealConfigurationSlot;
   configuration: MealConfiguration;
   pending: boolean;
   onChange: (change: MealConfigurationChange) => void;
@@ -171,7 +171,7 @@ export const MealStructureSection = ({ patientId, configuration }: Props) => {
       ) : null}
 
       <ul className="divide-border flex flex-col divide-y">
-        {mealSlots.map((meal) => (
+        {mealConfigurationSlots.map((meal) => (
           <MealRow
             key={meal}
             meal={meal}

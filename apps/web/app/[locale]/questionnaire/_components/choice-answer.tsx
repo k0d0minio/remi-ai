@@ -23,6 +23,8 @@ type Props = {
   options: readonly ChoiceOption[];
   /** The saved value, `""` when « Non renseigné ». */
   initial: string;
+  /** Tells the parent the choice at once: the genetic step opens on « Oui ». */
+  onSelect?: (value: string) => void;
 };
 
 /**
@@ -34,6 +36,7 @@ export const ChoiceAnswer = ({
   legend,
   options,
   initial,
+  onSelect,
 }: Props) => {
   const { text } = useQuestionnaire();
   const [selected, setSelected] = useState(initial);
@@ -44,6 +47,7 @@ export const ChoiceAnswer = ({
   const refusal = refusalOf(state, text);
   const choose = async (value: string) => {
     setSelected(value);
+    onSelect?.(value);
     await commit(value);
   };
   const name = `questionnaire-${field}`;

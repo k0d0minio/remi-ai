@@ -97,7 +97,9 @@ const reply = (overrides: Partial<MealSuggestionReply> = {}): ProviderReply => (
   } satisfies MealSuggestionReply),
 });
 
-const add = (food: string): MealSuggestionReply["improvement"] => ({
+const add = (
+  food: string,
+): NonNullable<MealSuggestionReply["improvement"]> => ({
   kind: "add",
   food,
   replaces: null,

@@ -1,8 +1,6 @@
-import type {
-  ActivationEmailInput,
-  ActivationEmailTrigger,
-} from "@remi/services/server";
+import type { ActivationEmailInput } from "@remi/services/server";
 import {
+  type ActivationEmailTrigger,
   appHref,
   fileTakeoverPath,
   patientSignInPath,

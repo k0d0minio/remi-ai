@@ -81,14 +81,15 @@ export {
   mealOrientations,
   mealRemovedByFasting,
   mealSlotState,
-  mealSlots,
+  // The meal journal already exports `mealSlots` and `MealSlot` (`patient.ts`).
+  mealSlots as mealConfigurationSlots,
 } from "./meal-configuration";
 export type {
   MealConfiguration,
   MealConfigurationChange,
   MealFasting,
   MealOrientation,
-  MealSlot,
+  MealSlot as MealConfigurationSlot,
   MealSlotState,
 } from "./meal-configuration";
 export { canActivate } from "./care-activation";
