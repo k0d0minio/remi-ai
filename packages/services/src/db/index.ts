@@ -118,7 +118,6 @@ export {
   recordWeeklyCheckIn,
   updateGoalCheckIn,
   updatePatientGoal,
-  MAX_ACTIVE_GOALS,
 } from "./services/patient-goals";
 export type {
   GoalCheckInInput,
