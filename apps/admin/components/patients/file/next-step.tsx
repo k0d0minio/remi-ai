@@ -15,6 +15,10 @@ import {
   CardTitle,
   Typography,
 } from "@remi/ui/server";
+import {
+  ActivationRecapBlock,
+  CareActivated,
+} from "@/components/patients/file/activation";
 import { countLabel } from "@/components/patients/file/count-label";
 import { MissingInformation } from "@/components/patients/file/missing-information";
 import { ProtocolValidation } from "@/components/patients/protocol-validation";
@@ -61,9 +65,9 @@ const titles: Record<
         "Le dossier est prêt. Le rendez-vous, votre note de préparation, puis la consultation.",
     },
     validate: {
-      title: "À faire : valider les recommandations",
+      title: "À faire : valider, puis activer l'accompagnement",
       description:
-        "Relisez le protocole ci-dessous, puis validez-le. La validation enregistre une version.",
+        "Relisez le protocole ci-dessous et validez-le : la validation enregistre une version. Relisez ensuite le récapitulatif, puis activez l'accompagnement.",
     },
     follow: {
       title: "Accompagnement actif",
@@ -150,7 +154,9 @@ const changesLine = (count: number) =>
  * place of the page with a dominant button (charter, section 8).
  *
  * `ProtocolValidation` renders at each status, as before this layout: it
- * shows nothing until a version exists or the file can be validated.
+ * shows nothing until a version exists or the file can be validated. At
+ * « Recommandations à valider » the recap of the activation follows it, with
+ * « Activer l'accompagnement » (story 19). An active file shows its date.
  */
 export const NextStepCard = ({
   action,
@@ -202,6 +208,8 @@ export const NextStepCard = ({
 
           {action === "validate" ? <ProtocolLines protocol={protocol} /> : null}
 
+          {action === "follow" ? <CareActivated patient={patient} /> : null}
+
           {action === "follow" && openChanges !== null ? (
             <Typography size="sm" weight={openChanges > 0 ? "medium" : "normal"}>
               {changesLine(openChanges)}
@@ -211,11 +219,13 @@ export const NextStepCard = ({
           <ProtocolValidation patient={patient} readOnly={readOnly} />
 
           {/*
-            Activation (story 19). The recap (validated values, evictions with
-            their period, elements not recognised) and the button « Activer
-            l'accompagnement » go here, for `validate`. Another ticket builds
-            them.
+            Activation (story 19): the recap of the validated version, the
+            blockers and « Activer l'accompagnement ». It comes after the
+            validation: the practitioner validates, then activates.
           */}
+          {action === "validate" ? (
+            <ActivationRecapBlock patient={patient} readOnly={readOnly} />
+          ) : null}
 
           {/*
             Patient changes (story 21). The list of the open changes (field,

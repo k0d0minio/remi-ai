@@ -299,6 +299,7 @@ const fileStatusReasons: Readonly<Record<string, string>> = {
     "tous les champs obligatoires sont remplis",
   "a first recommendation is saved":
     "une première recommandation est enregistrée",
+  "the practitioner activated the care": "accompagnement activé",
 };
 
 /**

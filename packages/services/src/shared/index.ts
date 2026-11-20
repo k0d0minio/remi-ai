@@ -49,6 +49,8 @@ export type {
   FoodDirectiveKind,
   FoodLimitLevel,
 } from "./food-directives";
+export { canActivate } from "./care-activation";
+export type { ActivationBlocker, ActivationRecap } from "./care-activation";
 export type {
   PatientChangeValue,
   WatchedPatientField,
