@@ -101,6 +101,10 @@ const sentences: Readonly<Record<string, string>> = {
     "Un modèle demande au moins une ligne.",
   "another template already uses that name":
     "Un autre modèle porte déjà ce nom.",
+  "a new advice is not valid": "Un nouveau conseil n'est pas valide.",
+  "an edited advice is not valid": "Un conseil modifié n'est pas valide.",
+  "an edited advice is not in force in this file":
+    "Un conseil modifié n'est plus actif dans ce dossier.",
   "choose at least one recipe": "Choisissez au moins une recette.",
   "declare at least one item, or answer « none known »":
     "Cochez au moins un élément, ou répondez « Aucune connue ».",
@@ -150,6 +154,7 @@ const sentences: Readonly<Record<string, string>> = {
   "the new password is too short": "Le nouveau mot de passe est trop court.",
 
   // not_found
+  "no such advice": "Ce conseil est introuvable.",
   "no such anamnesis entry": "Cette entrée d'anamnèse est introuvable.",
   "no such assignment": "Cette attribution est introuvable.",
   "no such challenge": "Ce challenge est introuvable.",

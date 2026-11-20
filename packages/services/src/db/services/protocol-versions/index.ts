@@ -21,6 +21,7 @@ import { listPatientFoodDirectives } from "../patient-food-directives";
 import { listPatientGoals } from "../patient-goals";
 import { getPatientMealConfiguration } from "../patient-meal-configuration";
 import { getPatientInstruction } from "../patient-instructions";
+import { lifestyleSnapshotRowsAfterAccessCheck } from "../patient-lifestyle-advices";
 import { listPatientRecommendations } from "../patient-recommendations";
 import { listPatientSupplements } from "../patient-supplements";
 
@@ -85,6 +86,7 @@ const snapshotOfLiveProtocol = async (patientId: Id): Promise<unknown> => {
     calculations,
     foodDirectives,
     mealConfiguration,
+    lifestyleAdvice,
   ] = await Promise.all([
     listPatientRecommendations(systemActor, patientId),
     listPatientGoals(systemActor, patientId),
@@ -93,16 +95,22 @@ const snapshotOfLiveProtocol = async (patientId: Id): Promise<unknown> => {
     listPatientCalculations(systemActor, patientId),
     listPatientFoodDirectives(systemActor, patientId),
     getPatientMealConfiguration(systemActor, patientId),
+    lifestyleSnapshotRowsAfterAccessCheck(patientId),
   ]);
   return {
     schemaVersion: PROTOCOL_SNAPSHOT_SCHEMA_VERSION,
-    recommendations: recommendations.map((row) => ({
-      id: row.id,
-      category: row.category,
-      title: row.title,
-      detail: row.detail,
-      position: row.position,
-    })),
+    // The recommendations, then the lifestyle advice of the six categories
+    // (REM-65). An old `habit` or `activity` row is in the first list.
+    recommendations: [
+      ...recommendations.map((row) => ({
+        id: row.id,
+        category: row.category,
+        title: row.title,
+        detail: row.detail,
+        position: row.position,
+      })),
+      ...lifestyleAdvice,
+    ],
     goals: [...goals]
       .sort((a, b) => a.position - b.position)
       .map((row) => ({

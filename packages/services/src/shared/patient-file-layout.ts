@@ -49,6 +49,7 @@ export const patientFileSections = [
   { id: "food-directives", group: "protocol" },
   { id: "meal-structure", group: "protocol" },
   { id: "supplements", group: "protocol" },
+  { id: "lifestyle-advice", group: "protocol" },
   { id: "pantry", group: "protocol" },
   { id: "messages", group: "follow_up" },
   { id: "meals", group: "follow_up" },

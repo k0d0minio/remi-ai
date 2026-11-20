@@ -85,13 +85,17 @@ export const categoryLabels: Record<RecommendationCategory, string> = {
 
 /**
  * The categories the recommendation add form offers — every one except
- * `supplement`, which the supplement protocol now owns (§ G). The full
+ * `supplement`, which the supplement protocol now owns (§ G), and `habit` and
+ * `activity`, which « Hygiène de vie » now owns (REM-65, story 17). The full
  * `recommendationCategories` is untouched, so an existing `supplement`-category
  * recommendation still validates, groups and renders, and can still be
  * re-categorised from the edit form; only new entries are steered away from it.
  */
 export const addableRecommendationCategories = recommendationCategories.filter(
-  (category) => category !== "supplement",
+  (category) =>
+    category !== "supplement" &&
+    category !== "habit" &&
+    category !== "activity",
 );
 
 /** Whether the person likes cooking — read on the profile and in the select. */

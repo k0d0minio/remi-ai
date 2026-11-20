@@ -72,6 +72,22 @@ export {
   joinFoodDirectiveTerms,
   splitFoodDirectiveTerms,
 } from "./food-directives";
+export {
+  LIFESTYLE_ADVICE_DETAILS_MAX,
+  LIFESTYLE_ADVICE_TEXT_MAX,
+  isLifestyleAdviceKey,
+  lifestyleAdviceFaults,
+  lifestyleAdviceKeys,
+  lifestyleKeyOf,
+} from "./lifestyle-advice";
+export type {
+  LifestyleAdvice,
+  LifestyleAdviceDraft,
+  LifestyleAdviceEdit,
+  LifestyleAdviceFault,
+  LifestyleAdviceFaultCode,
+  LifestyleAdviceKey,
+} from "./lifestyle-advice";
 export type {
   FoodDirectiveDraft,
   FoodDirectiveFault,

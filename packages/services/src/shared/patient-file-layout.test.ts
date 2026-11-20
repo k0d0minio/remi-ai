@@ -64,6 +64,7 @@ describe("the layout of the patient file", () => {
         "food-directives",
         "meal-structure",
         "supplements",
+        "lifestyle-advice",
         "pantry",
         "calculations",
       ]);

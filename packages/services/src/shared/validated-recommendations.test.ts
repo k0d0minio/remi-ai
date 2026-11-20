@@ -137,7 +137,7 @@ describe("validatedRecommendationsView", () => {
     // No `activity` item: the sub-category is not in the view.
     expect(view.lifestyle).toEqual([
       {
-        category: "habit",
+        category: "eating_behaviour",
         items: [
           { id: id(2), title: "Coucher avant 23 h", detail: "" },
           { id: id(5), title: "Respiration le matin", detail: "" },
@@ -148,6 +148,39 @@ describe("validatedRecommendationsView", () => {
         items: [{ id: id(4), title: "Noter le sommeil", detail: "" }],
       },
     ]);
+  });
+
+  it("puts the lifestyle advice in the six categories, in Morgane's order", () => {
+    const rec = (
+      n: number,
+      category: ProtocolSnapshot["recommendations"][number]["category"],
+      title: string,
+      position: number,
+    ) => ({ id: id(n), category, title, detail: "", position });
+    const view = viewOf({
+      ...empty,
+      recommendations: [
+        rec(1, "sleep", "Coucher avant 23 h", 0),
+        rec(2, "physical_activity", "Marcher 30 minutes", 1),
+        // An old `activity` row is read in « Activité physique ».
+        rec(3, "activity", "Prendre l'escalier", 0),
+        rec(4, "habit", "Poser les couverts", 0),
+        rec(5, "lifestyle_other", "Lumière du jour le matin", 0),
+      ],
+    });
+    expect(
+      view.lifestyle.map((group) => [
+        group.category,
+        group.items.map((item) => item.title),
+      ]),
+    ).toEqual([
+      ["physical_activity", ["Prendre l'escalier", "Marcher 30 minutes"]],
+      ["sleep", ["Coucher avant 23 h"]],
+      ["eating_behaviour", ["Poser les couverts"]],
+      ["lifestyle_other", ["Lumière du jour le matin"]],
+    ]);
+    expect(view.foodAdvice).toEqual([]);
+    expect(view.isEmpty).toBe(false);
   });
 
   it("splits the food directives into the three lists", () => {

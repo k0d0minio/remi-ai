@@ -120,7 +120,7 @@ passé depuis la dernière fois ? Que dois-je faire maintenant ? ». It has four
 3. **The work column** holds the open blocks. Before the consultation (« Dossier à compléter »,
    « Prêt pour consultation »): « Sécurité », every questionnaire answer, then the calculations.
    From « Recommandations à valider » on: the goals, the recommendations, the food directives,
-   the meals, the supplements, the essentials, then the calculations.
+   the meals, the supplements, the lifestyle advice, the essentials, then the calculations.
 4. **Every other section is one row** (`file/section-row.tsx`): its name, one line or a count, and
    it opens in place. An empty section is one quiet line. The rows are in groups named by her work
    (`fileGroupLabels`), not by table. A link or a quick action to a closed row opens the row.
