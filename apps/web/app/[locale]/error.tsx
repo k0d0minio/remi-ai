@@ -36,8 +36,8 @@ const ErrorBoundary = ({ error, reset }: Props) => (
         Quelque chose s&apos;est mal passé
       </Typography>
       <Typography variant="lead" balance>
-        Rien de ce que vous avez saisi n&apos;est perdu. Réessayez, et prévenez
-        votre praticien si cela se répète.
+        Rien de ce que tu as saisi n&apos;est perdu. Réessaie, et préviens ton
+        praticien si cela se répète.
       </Typography>
       {error.digest ? (
         <Typography size="xs" tone="muted">
