@@ -18,7 +18,9 @@ import {
 import {
   allergenKinds,
   consentTextLocales,
+  diets,
   heightCmRange,
+  isCalendarDay,
   weightKgRange,
   type Result,
 } from "@remi/services/shared";
@@ -124,7 +126,10 @@ const writeAnswer = async (
     const checked = validateSignup({ [field]: value });
     const code = checked.ok ? undefined : checked.fields[field];
     if (code) {
-      return failed(code === "required" ? "required" : "invalid");
+      if (code === "required") {
+        return failed("required");
+      }
+      return failed(field === "phone" ? "phone" : "invalid");
     }
     return fromService(
       await savePatientProfileAnswers(patientActor(patientId), patientId, {
@@ -175,11 +180,12 @@ const writeAnswer = async (
       }),
     );
   }
-  // A diet other than « Autre » drops the note that described « Autre ».
-  const input: QuestionnaireInput =
-    field === "diet" && value !== "other"
-      ? { diet: value as QuestionnaireInput["diet"], dietNote: null }
-      : ({ [field]: value } as QuestionnaireInput);
+  // The service's floor takes `2026-02-31`. A day that no calendar has is
+  // refused here (REM-159). A future consultation date is a valid answer.
+  if (field === "consultationDate" && value !== "" && !isCalendarDay(value)) {
+    return failed("invalid");
+  }
+  const input = { [field]: value } as QuestionnaireInput;
   // The service writes the audit events of this save (a genotype change, the
   // consultation date) in the patient's name.
   return fromService(
@@ -240,6 +246,43 @@ export const saveAnswerAction = async (
   }
   const patientId = account.patientProfileId;
   const refused = await writeAnswer(patientId, field, value.trim());
+  return refused ?? settle(patientId);
+};
+
+const isDiet = (value: unknown): value is (typeof diets)[number] =>
+  typeof value === "string" && (diets as readonly string[]).includes(value);
+
+/**
+ * Saves the diet and its note in one write (REM-162). « Autre » is refused
+ * with no note: the patient must say which diet. A diet other than « Autre »
+ * drops the note that described « Autre ». The page calls this only after the
+ * patient chose or confirmed a diet: the proposed choice is never sent on its
+ * own.
+ */
+export const saveDietAction = async (
+  diet: string,
+  note: string,
+): Promise<SaveResult> => {
+  if (!isDiet(diet) || typeof note !== "string" || note.length > 500) {
+    return failed("invalid");
+  }
+  const dietNote = diet === "other" ? note.trim() : null;
+  if (dietNote === "") {
+    return failed("required");
+  }
+  const account = await currentPatient();
+  if (!account) {
+    return failed("signed_out");
+  }
+  const patientId = account.patientProfileId;
+  const refused = fromService(
+    await savePatientQuestionnaire(
+      patientActor(patientId),
+      patientId,
+      { diet, dietNote },
+      await auditActorOf(patientId),
+    ),
+  );
   return refused ?? settle(patientId);
 };
 

@@ -112,6 +112,7 @@ const QuestionnairePage = async ({
       <QuestionnaireFlow
         locale={locale}
         text={content.questionnaire}
+        dateText={content.dateEntry}
         values={values}
         geneticConsent={geneticConsentText(locale)}
         initialMissing={missing.data}

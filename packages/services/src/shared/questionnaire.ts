@@ -35,36 +35,38 @@ export const sexForCalculationLabels = {
 export const activityLevels = ["low", "moderate", "high", "very_high"] as const;
 
 /**
- * Each level's label, its description for the patient, and its NAP coefficient
- * (« niveau d'activité physique »), the multiplier `energy-needs` applies to
- * the resting expenditure. The coefficients are the story's table.
+ * Each level's label, its description, and its NAP coefficient (« niveau
+ * d'activité physique »), the multiplier `energy-needs` applies to the resting
+ * expenditure. The coefficients are the story's table. The descriptions are
+ * Morgane's short ones (REM-160). They address no one, so the patient's
+ * questionnaire and the console show the same text.
  */
 export const activityLevelDetails = {
   low: {
     label: { fr: "Faible (sédentaire)"},
     description: {
-      fr: "Travail assis, peu de marche, peu ou pas de sport"
+      fr: "Travail assis, peu de marche ou de sport."
     },
     nap: 1.4,
   },
   moderate: {
     label: { fr: "Modéré (légèrement actif)"},
     description: {
-      fr: "Marche quotidienne, déplacements réguliers, sport léger 1 à 3 fois/semaine"
+      fr: "Marche quotidienne ou sport léger 1 à 3 fois/semaine."
     },
     nap: 1.6,
   },
   high: {
     label: { fr: "Élevé (actif)"},
     description: {
-      fr: "Beaucoup de déplacements à pied, travail physique ou sport 4 à 5 fois/semaine"
+      fr: "Activité physique régulière ou sport 4 à 5 fois/semaine."
     },
     nap: 1.8,
   },
   very_high: {
     label: { fr: "Très élevé (très actif)"},
     description: {
-      fr: "Travail physique intense ou entraînements sportifs intensifs presque quotidiens"
+      fr: "Travail physique intense ou sport intensif presque quotidien."
     },
     nap: 2.0,
   },
@@ -78,10 +80,11 @@ export const activityLevelDetails = {
 >;
 
 /**
- * « Régime / type d'alimentation », one choice. `none` is « aucun régime
- * particulier ». The story makes it the default selection on the page, but the
- * column stays null until the patient answers (D-30: nothing is invented).
- * `other` carries a note in `diet_note`.
+ * The diet, one choice. `none` is « Aucun régime particulier ». The patient's
+ * page shows it as the proposed choice, but the column stays null until the
+ * patient confirms it (REM-162, D-30: nothing is invented). `other` carries a
+ * note in `diet_note`. The labels are Morgane's list of REM-162. Each side
+ * writes its own question.
  */
 export const diets = [
   "none",
@@ -96,7 +99,7 @@ export const diets = [
 
 export const dietLabels = {
   none: {
-    fr: "Aucun type d'alimentation particulier"
+    fr: "Aucun régime particulier"
   },
   omnivore: { fr: "Omnivore"},
   flexitarian: { fr: "Flexitarien"},

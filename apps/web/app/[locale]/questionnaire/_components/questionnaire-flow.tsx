@@ -14,7 +14,6 @@ import {
   diets,
   intoleranceLabels,
   intolerances,
-  mandatoryQuestionnaireFieldLabels,
   noneKnownLabels,
   sexesForCalculation,
   sexForCalculationLabels,
@@ -23,7 +22,7 @@ import {
   type PatientAllergen,
 } from "@remi/services/shared";
 import { Button } from "@remi/ui";
-import { Field, Input, Progress, Typography } from "@remi/ui/server";
+import { Progress, Typography } from "@remi/ui/server";
 import type { ConsentStepText } from "@/components/signup/consent-step";
 import { fill } from "@/lib/content/fill";
 import type { Content } from "@/lib/content/types";
@@ -43,8 +42,11 @@ import {
 import type { SaveResult } from "@/lib/questionnaire/state";
 import { AllergenAnswer } from "./allergen-answer";
 import { ChoiceAnswer } from "./choice-answer";
+import { DateAnswer } from "./date-answer";
+import { DietAnswer } from "./diet-answer";
 import { FlagAnswer } from "./flag-answer";
 import { GeneticSection, type GeneticValues } from "./genetic-section";
+import { IdentitySection, type IdentityValues } from "./identity-section";
 import {
   MandatoryLabel,
   OptionalLabel,
@@ -55,12 +57,8 @@ import { QuestionnaireEnd, type EndState } from "./questionnaire-end";
 import { TextAnswer } from "./text-answer";
 
 /** The saved answers as the form shows them. `""` is « Non renseigné ». */
-export type QuestionnaireValues = GeneticValues & {
-  firstName: string;
-  lastName: string;
-  birthDate: string;
-  email: string;
-  phone: string;
+export type QuestionnaireValues = GeneticValues &
+  IdentityValues & {
   sexForCalculation: string;
   heightCm: string;
   weightKg: string;
@@ -82,6 +80,8 @@ export type QuestionnaireValues = GeneticValues & {
 type Props = {
   locale: Locale;
   text: Content["questionnaire"];
+  /** The texts of a date field (REM-159). */
+  dateText: Content["dateEntry"];
   values: QuestionnaireValues;
   /** The genetic consent text, rendered on the server. */
   geneticConsent: ConsentStepText;
@@ -121,6 +121,7 @@ const subListsOf = (locale: Locale) =>
 export const QuestionnaireFlow = ({
   locale,
   text,
+  dateText,
   values,
   geneticConsent,
   initialMissing,
@@ -133,16 +134,6 @@ export const QuestionnaireFlow = ({
   // The page read `initialMissing` on the server, so a first render on the end
   // screen is already checked.
   const [end, setEnd] = useState<EndState>("checked");
-  const [diet, setDiet] = useState(values.diet || "none");
-  // A diet other than « Autre » clears the saved note: a note shown again
-  // starts empty.
-  const [dietNote, setDietNote] = useState(values.dietNote);
-  const selectDiet = (value: string) => {
-    setDiet(value);
-    if (value !== "other") {
-      setDietNote("");
-    }
-  };
 
   const savers = useRef(new Map<string, Saver>());
   const register = (id: string, saver: Saver) => {
@@ -226,8 +217,9 @@ export const QuestionnaireFlow = ({
     void check();
   };
 
+  // The patient's own labels (REM-160). The console keeps its labels.
   const label = (field: MandatoryQuestionnaireField) =>
-    mandatoryQuestionnaireFieldLabels[field][locale];
+    text.labels.mandatory[field];
 
   // Null on the end screen. The six steps stay mounted there, hidden: a
   // patient who returns to a step finds what they typed.
@@ -281,46 +273,7 @@ export const QuestionnaireFlow = ({
           name="identite"
           title={text.sections.identite}
         >
-          <TextAnswer
-            field="firstName"
-            label={text.labels.firstName}
-            initial={values.firstName}
-            autoComplete="given-name"
-          />
-          <TextAnswer
-            field="lastName"
-            label={text.labels.lastName}
-            initial={values.lastName}
-            autoComplete="family-name"
-          />
-          <TextAnswer
-            field="birthDate"
-            type="date"
-            label={text.labels.birthDate}
-            initial={values.birthDate}
-            autoComplete="bday"
-          />
-          <Field
-            id="questionnaire-email"
-            label={text.labels.email}
-            hint={text.hints.email}
-          >
-            <Input
-              id="questionnaire-email"
-              type="email"
-              size="lg"
-              value={values.email}
-              readOnly
-            />
-          </Field>
-          <TextAnswer
-            field="phone"
-            type="tel"
-            inputMode="tel"
-            label={text.labels.phone}
-            initial={values.phone}
-            autoComplete="tel"
-          />
+          <IdentitySection values={values} dateText={dateText} />
         </Section>
 
         <Section current={section} name="profil" title={text.sections.profil}>
@@ -335,14 +288,14 @@ export const QuestionnaireFlow = ({
           />
           <TextAnswer
             field="heightCm"
-            inputMode="numeric"
+            numeric="integer"
             label={<MandatoryLabel label={label("heightCm")} />}
             hint={text.hints.height}
             initial={values.heightCm}
           />
           <TextAnswer
             field="weightKg"
-            inputMode="decimal"
+            numeric="decimal"
             label={<MandatoryLabel label={label("weightKg")} />}
             hint={text.hints.weight}
             initial={values.weightKg}
@@ -359,8 +312,8 @@ export const QuestionnaireFlow = ({
           />
           <TextAnswer
             field="desiredWeightKg"
-            inputMode="decimal"
-            label={text.labels.desiredWeight}
+            numeric="decimal"
+            label={<OptionalLabel label={text.labels.desiredWeight} />}
             hint={text.hints.desiredWeight}
             initial={values.desiredWeightKg}
           />
@@ -377,10 +330,11 @@ export const QuestionnaireFlow = ({
             label={<MandatoryLabel label={label("consultationReason")} />}
             initial={values.consultationReason}
           />
-          <TextAnswer
+          {/* The practitioner's date when the file holds one, empty if not. */}
+          <DateAnswer
             field="consultationDate"
-            type="date"
             label={text.labels.consultationDate}
+            dateText={dateText}
             initial={values.consultationDate}
           />
         </Section>
@@ -390,25 +344,15 @@ export const QuestionnaireFlow = ({
           name="alimentation"
           title={text.sections.alimentation}
         >
-          <ChoiceAnswer
-            field="diet"
+          <DietAnswer
             legend={text.labels.diet}
-            hint={text.hints.dietDefault}
-            initial={values.diet}
-            shownByDefault="none"
-            onSelect={selectDiet}
+            initialDiet={values.diet}
+            initialNote={values.dietNote}
             options={diets.map((value) => ({
               value,
               label: dietLabels[value][locale],
             }))}
           />
-          {diet === "other" ? (
-            <TextAnswer
-              field="dietNote"
-              label={text.labels.dietNote}
-              initial={dietNote}
-            />
-          ) : null}
           <AllergenAnswer
             kind="allergy"
             legend={<MandatoryLabel label={label("allergies")} />}

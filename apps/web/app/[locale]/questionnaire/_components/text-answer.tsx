@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { maskNumberEntry } from "@remi/services/shared";
 import { Field, Input, Textarea } from "@remi/ui/server";
 import { saveAnswerAction } from "@/lib/questionnaire/actions";
 import type { AnswerField } from "@/lib/questionnaire/state";
@@ -18,8 +19,14 @@ type Props = {
   /** The saved value, `""` when « Non renseigné ». */
   initial: string;
   multiline?: boolean;
-  type?: "text" | "date" | "tel";
-  inputMode?: "text" | "numeric" | "decimal" | "tel";
+  type?: "text" | "tel";
+  inputMode?: "text" | "tel";
+  /**
+   * A number field (REM-160): the numeric keyboard of a phone, and no
+   * character that is not part of the number. `integer` is a height in cm,
+   * `decimal` a weight in kg. The server checks the plausible range.
+   */
+  numeric?: "integer" | "decimal";
   autoComplete?: string;
 };
 
@@ -35,6 +42,7 @@ export const TextAnswer = ({
   multiline,
   type = "text",
   inputMode,
+  numeric,
   autoComplete,
 }: Props) => {
   const { text } = useQuestionnaire();
@@ -46,7 +54,8 @@ export const TextAnswer = ({
   const id = `questionnaire-${field}`;
   const refusal = refusalOf(state, text);
   const invalid = refusal !== undefined;
-  const onChange = (next: string) => {
+  const onChange = (typed: string) => {
+    const next = numeric ? maskNumberEntry(typed, numeric) : typed;
     setValue(next);
     schedule(next);
   };
@@ -77,7 +86,13 @@ export const TextAnswer = ({
             size="lg"
             value={value}
             invalid={invalid}
-            inputMode={inputMode}
+            inputMode={
+              numeric === "integer"
+                ? "numeric"
+                : numeric === "decimal"
+                  ? "decimal"
+                  : inputMode
+            }
             autoComplete={autoComplete}
             onChange={(event) => onChange(event.target.value)}
             onBlur={onBlur}

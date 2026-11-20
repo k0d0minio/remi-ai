@@ -242,6 +242,13 @@ export type {
   QuestionnaireSection,
 } from "./questionnaire";
 export { safetyList, strictGlutenLabel } from "./safety-highlights";
+export {
+  dateEntryFromIso,
+  isCalendarDay,
+  maskDateEntry,
+  maskNumberEntry,
+  parseDateEntry,
+} from "./typed-entry";
 export type { SafetyBox, SafetyList } from "./safety-highlights";
 export {
   componentsForRecommendation,

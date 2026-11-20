@@ -3,7 +3,6 @@
 import NextLink from "next/link";
 import {
   localePath,
-  mandatoryQuestionnaireFieldLabels,
   type Locale,
   type MandatoryQuestionnaireField,
 } from "@remi/services/shared";
@@ -135,7 +134,7 @@ export const QuestionnaireEnd = ({
               className="h-auto min-h-12 px-0 text-base"
               onClick={() => onOpenField(field)}
             >
-              {mandatoryQuestionnaireFieldLabels[field][locale]}
+              {text.labels.mandatory[field]}
             </Button>
           </li>
         ))}
