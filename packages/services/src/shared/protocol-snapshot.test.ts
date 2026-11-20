@@ -15,6 +15,7 @@ const empty: ProtocolSnapshot = {
   supplements: [],
   instruction: null,
   calculations: [],
+  foodDirectives: [],
 };
 
 const full: ProtocolSnapshot = {
@@ -48,6 +49,18 @@ const full: ProtocolSnapshot = {
       validatedAt: "2026-11-20T09:00:00.000Z",
     },
   ],
+  foodDirectives: [
+    {
+      id: id(5),
+      kind: "exclude",
+      term: "kiwi",
+      limitLevel: null,
+      startsOn: null,
+      endsOn: "2027-01-31",
+      durable: false,
+      position: 0,
+    },
+  ],
 };
 
 describe("the protocol snapshot schema", () => {
@@ -59,6 +72,30 @@ describe("the protocol snapshot schema", () => {
   it("survives a round trip through JSON, as the jsonb column stores it", () => {
     const stored: unknown = JSON.parse(JSON.stringify(full));
     expect(protocolSnapshotSchema.parse(stored)).toEqual(full);
+  });
+
+  it("reads a snapshot from before the food directives with an empty list", () => {
+    const older: Record<string, unknown> = { ...full };
+    delete older.foodDirectives;
+    const parsed = protocolSnapshotSchema.parse(older);
+    expect(parsed.foodDirectives).toEqual([]);
+    expect(parsed.recommendations).toEqual(full.recommendations);
+  });
+
+  it("refuses an eviction with no end date and no durable status", () => {
+    const eviction = full.foodDirectives[0];
+    expect(
+      protocolSnapshotSchema.safeParse({
+        ...full,
+        foodDirectives: [{ ...eviction, endsOn: null }],
+      }).success,
+    ).toBe(false);
+    expect(
+      protocolSnapshotSchema.safeParse({
+        ...full,
+        foodDirectives: [{ ...eviction, endsOn: null, durable: true }],
+      }).success,
+    ).toBe(true);
   });
 
   it("refuses another schema version", () => {

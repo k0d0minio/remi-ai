@@ -15,9 +15,18 @@
 
 import { z } from "zod";
 import { calculationKinds } from "./calculations";
+import {
+  FOOD_DIRECTIVE_TERM_MAX,
+  foodDirectiveKinds,
+  foodLimitLevels,
+} from "./food-directives";
 import { recommendationCategories } from "./patient";
 
-/** Raise it when the shape changes, and keep a reader of each older shape. */
+/**
+ * Raise it when the shape changes, and keep a reader of each older shape.
+ * `foodDirectives` (REM-54) did not raise it: a snapshot written before the
+ * directives existed has none, and it reads with an empty list.
+ */
 export const PROTOCOL_SNAPSHOT_SCHEMA_VERSION = 1;
 
 const position = z.number().int().nonnegative();
@@ -63,6 +72,29 @@ const snapshotCalculation = z.object({
   validatedAt: z.iso.datetime(),
 });
 
+const isoDay = z.iso.date();
+
+/**
+ * One food directive in force at the validation (REM-54). The term is as the
+ * practitioner typed it. An `exclude` directive is a total eviction: it has an
+ * end date or the durable status.
+ */
+const snapshotFoodDirective = z
+  .object({
+    id: z.uuid(),
+    kind: z.enum(foodDirectiveKinds),
+    term: z.string().min(1).max(FOOD_DIRECTIVE_TERM_MAX),
+    limitLevel: z.enum(foodLimitLevels).nullable(),
+    startsOn: isoDay.nullable(),
+    endsOn: isoDay.nullable(),
+    durable: z.boolean(),
+    position,
+  })
+  .refine(
+    (row) => row.kind !== "exclude" || row.durable !== (row.endsOn !== null),
+    { message: "an eviction has an end date or the durable status" },
+  );
+
 export const protocolSnapshotSchema = z.object({
   schemaVersion: z.literal(PROTOCOL_SNAPSHOT_SCHEMA_VERSION),
   /** In the order of the categories, then by position. */
@@ -74,6 +106,11 @@ export const protocolSnapshotSchema = z.object({
   instruction: snapshotInstruction.nullable(),
   /** Only the kinds with a validated value that needs no revalidation. */
   calculations: z.array(snapshotCalculation),
+  /**
+   * « À favoriser », « À limiter » and « Éviction totale », in that order,
+   * then by position. Absent in a snapshot from before REM-54: read as empty.
+   */
+  foodDirectives: z.array(snapshotFoodDirective).default([]),
 });
 
 export type ProtocolSnapshot = z.infer<typeof protocolSnapshotSchema>;
@@ -84,4 +121,5 @@ export const isEmptyProtocolSnapshot = (snapshot: ProtocolSnapshot) =>
   snapshot.goals.length === 0 &&
   snapshot.supplements.length === 0 &&
   snapshot.instruction === null &&
-  snapshot.calculations.length === 0;
+  snapshot.calculations.length === 0 &&
+  snapshot.foodDirectives.length === 0;

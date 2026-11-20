@@ -19,6 +19,10 @@ import {
   watchedPatientFields,
   type PatientChangeValue,
 } from "../shared/patient-changes";
+import type {
+  FoodDirectiveKind,
+  FoodLimitLevel,
+} from "../shared/food-directives";
 import type { ProtocolSnapshot } from "../shared/protocol-snapshot";
 
 /**
@@ -1510,6 +1514,62 @@ export const protocolVersions = pgTable(
     check(
       "protocol_versions_version_number_check",
       sql`${table.versionNumber} >= 1`,
+    ),
+  ],
+);
+
+/**
+ * The food directives of a patient file — REM-54, story 13. One row for each
+ * term of « À favoriser », « À limiter » and « Éviction totale ». The term is
+ * stored as typed: REMI has no term base yet.
+ *
+ * A total eviction (`exclude`) is safety data (story 14, D-30): the check
+ * `patient_food_directives_eviction_period_check` refuses one with no end date
+ * and no durable status, and one with the two. A row that leaves the list is
+ * disabled (`disabled_at`), never deleted. The rows go with the patient.
+ */
+export const patientFoodDirectives = pgTable(
+  "patient_food_directives",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    /** `favour`, `limit` or `exclude`. */
+    kind: text("kind").$type<FoodDirectiveKind>().notNull(),
+    /** The term as the practitioner typed it. */
+    term: text("term").notNull(),
+    /** For `limit` only: `reduce` or `rare`. Null when no level is chosen. */
+    limitLevel: text("limit_level").$type<FoodLimitLevel>(),
+    /** For `exclude` only. Null: the eviction applies from the save. */
+    startsOn: date("starts_on", { mode: "string" }),
+    /** For `exclude` only. Null for a durable eviction. */
+    endsOn: date("ends_on", { mode: "string" }),
+    /** For `exclude` only. The durable medical exclusion. */
+    durable: boolean("durable").notNull().default(false),
+    /** Rank in the field of its kind. */
+    position: integer("position").notNull().default(0),
+    /** Null for a directive in force. */
+    disabledAt: timestamp("disabled_at", { withTimezone: true, mode: "date" }),
+    ...timestamps,
+  },
+  (table) => [
+    index("patient_food_directives_patient_idx").on(table.patientId),
+    check(
+      "patient_food_directives_kind_check",
+      sql`${table.kind} in ('favour', 'limit', 'exclude')`,
+    ),
+    check(
+      "patient_food_directives_limit_level_check",
+      sql`${table.limitLevel} is null or (${table.kind} = 'limit' and ${table.limitLevel} in ('reduce', 'rare'))`,
+    ),
+    check(
+      "patient_food_directives_eviction_period_check",
+      sql`(${table.kind} = 'exclude' and ${table.durable} <> (${table.endsOn} is not null)) or (${table.kind} <> 'exclude' and not ${table.durable} and ${table.startsOn} is null and ${table.endsOn} is null)`,
+    ),
+    check(
+      "patient_food_directives_period_order_check",
+      sql`${table.startsOn} is null or ${table.endsOn} is null or ${table.endsOn} >= ${table.startsOn}`,
     ),
   ],
 );

@@ -46,6 +46,7 @@ export const patientFileSections = [
   { id: "calculations", group: "calculations" },
   { id: "objectifs", group: "protocol" },
   { id: "recommendations", group: "protocol" },
+  { id: "food-directives", group: "protocol" },
   { id: "supplements", group: "protocol" },
   { id: "pantry", group: "protocol" },
   { id: "messages", group: "follow_up" },

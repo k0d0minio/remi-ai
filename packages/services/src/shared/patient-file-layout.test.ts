@@ -61,6 +61,7 @@ describe("the layout of the patient file", () => {
       expect(layout.work).toEqual([
         "objectifs",
         "recommendations",
+        "food-directives",
         "supplements",
         "pantry",
         "calculations",

@@ -32,6 +32,8 @@ import {
   listPatientRecipes,
   listPatientRecommendations,
   listArchivedPatientSupplements,
+  listDisabledPatientFoodDirectives,
+  listPatientFoodDirectives,
   listPatientSupplements,
   listRecipes,
   missingQuestionnaireFields,
@@ -61,6 +63,7 @@ import {
 } from "@/components/patients/document-section";
 import { ChallengesSection } from "@/components/patients/file/challenges";
 import { countLabel } from "@/components/patients/file/count-label";
+import { FoodDirectivesSection } from "@/components/patients/file/food-directives";
 import { GoalsSection } from "@/components/patients/file/goals";
 import { PatientHeader } from "@/components/patients/file/header";
 import { LearningsSection } from "@/components/patients/file/learnings";
@@ -355,6 +358,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     />
   );
 
+  // The food directives (REM-54): the ones in force and the disabled ones.
+  const [foodDirectives, disabledFoodDirectives] = await Promise.all([
+    listPatientFoodDirectives(actor, patient.id),
+    listDisabledPatientFoodDirectives(actor, patient.id),
+  ]);
+
   // Each section of the page: its words, its one line for a folded row, and
   // its body. `patientFileLayout` places them. To add a section, add its id in
   // `patient-file-layout.ts` and its entry here.
@@ -443,6 +452,27 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
           pseudonym={patient.pseudonym}
           recommendations={recommendations}
           archived={archived}
+        />
+      ),
+    },
+    "food-directives": {
+      title: "Consignes alimentaires",
+      description:
+        "« À favoriser », « À limiter » et « Éviction totale » : un terme par consigne, séparés par « ; ». Une éviction porte une date de fin ou le statut durable.",
+      summary: countLabel(foodDirectives.length, {
+        none: "Aucune consigne",
+        one: "consigne",
+        many: "consignes",
+      }),
+      empty: foodDirectives.length === 0,
+      count: foodDirectives.length,
+      body: (
+        <FoodDirectivesSection
+          patientId={patient.id}
+          pseudonym={patient.pseudonym}
+          directives={foodDirectives}
+          disabled={disabledFoodDirectives}
+          today={today}
         />
       ),
     },

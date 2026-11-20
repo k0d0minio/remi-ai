@@ -96,6 +96,11 @@ export const auditActions = [
   "supplement.deleted",
   "supplement.reordered",
   "supplement.batch_saved",
+  /**
+   * The practitioner saved « À favoriser », « À limiter » and « Éviction
+   * totale » (REM-54, D-32). The detail is JSON: the counts, and no term.
+   */
+  "food_directive.batch_saved",
   "pantry.added",
   "pantry.updated",
   "pantry.archived",

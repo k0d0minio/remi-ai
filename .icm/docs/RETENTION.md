@@ -34,6 +34,7 @@ One row in `patient_profiles`, plus what hangs off it:
 | The automatic calculations: estimate, validated value, parameters                           | `patient_calculations`    | no                                                 |
 | Each change the patient made after activation: field, old and new value, when, acknowledged | `patient_changes`         | no                                                 |
 | Each validated version of the protocol: number, date, who validated, a copy of the content | `protocol_versions`       | no — no page reads them yet                        |
+| Each food directive: kind, the term as typed, limit level, eviction period or durable status, when disabled| `patient_food_directives` | no — no patient page shows them yet                |
 | The share token, when the link was last opened, last written                                | `patient_profiles`        | the token is the link                              |
 | The protocol, entry by entry                                                                | `patient_recommendations` | yes, unless archived                               |
 | Consultation notes                                                                          | `patient_notes`           | no                                                 |
