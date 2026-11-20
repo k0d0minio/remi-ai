@@ -16,6 +16,8 @@ export const WAITING_PATH = "/attente";
 export const HOME_PATH = "/accueil";
 export const RECIPES_PATH = "/recettes";
 export const PROFILE_PATH = "/profil";
+/** « Mes recommandations », below the Profil tab (story 23). */
+export const RECOMMENDATIONS_PATH = "/profil/recommandations";
 
 /** The page a signed-in patient reaches first. */
 export const landingPaths: Record<PatientLanding, string> = {

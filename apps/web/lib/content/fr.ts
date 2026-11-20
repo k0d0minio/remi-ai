@@ -766,6 +766,42 @@ export const fr: Content = {
     comingSoon:
       "Tes recommandations, tes informations personnelles et les réglages de ton compte arrivent bientôt ici.",
   },
+  patientRecommendations: {
+    metaTitle: "Mes recommandations",
+    title: "Mes recommandations",
+    profileEntry: "Mes recommandations",
+    profileEntryHint: "Ce que ton praticien a validé pour toi.",
+    backToProfile: "Retour au profil",
+    updatedOn: "Mis à jour le {date}",
+    empty:
+      "Tes recommandations apparaîtront ici dès que ton praticien les aura validées.",
+    unavailable:
+      "Tes recommandations ne peuvent pas s'afficher pour le moment. Réessaie dans un instant.",
+    supplementsTitle:
+      "Compléments alimentaires, plantes et huiles essentielles",
+    doseLabel: "Posologie",
+    timingLabel: "Moment de prise",
+    reasonLabel: "Pourquoi",
+    lifestyleTitle: "Conseils d'hygiène de vie",
+    lifestyleCategories: {
+      habit: "Habitudes",
+      activity: "Activité physique",
+      monitoring: "Suivi",
+    },
+    foodTitle: "Recommandations alimentaires",
+    evictionsTitle: "Évictions totales",
+    evictionUntil: "jusqu'au {date}",
+    evictionFrom: "à partir du {date}",
+    evictionDurable: "exclusion durable",
+    favourTitle: "À favoriser",
+    limitTitle: "À limiter",
+    limitLevels: {
+      reduce: "à réduire",
+      rare: "rarement",
+    },
+    foodAdviceTitle: "Conseils de ton praticien",
+    goalsTitle: "Objectifs prioritaires",
+  },
   signOut: "Se déconnecter",
   patientWaiting: {
     metaTitle: "Ton accompagnement se prépare",
