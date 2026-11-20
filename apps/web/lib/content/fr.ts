@@ -899,6 +899,16 @@ export const fr: Content = {
           "REMI n'a pas compris ton repas. Écris le plat et ses ingrédients dans un nouveau repas.",
         unavailable:
           "La suggestion de REMI n'est pas disponible pour le moment. Ton repas est bien enregistré.",
+        feedback: {
+          accept: "Ça me convient",
+          decline: "Pas pour moi",
+          declined: "D'accord. REMI peut te proposer une autre piste.",
+          another: "Une autre suggestion",
+          anotherPending: "REMI cherche une autre piste…",
+          noOther:
+            "REMI n'a pas d'autre suggestion à te proposer pour ce repas. Bon appétit.",
+          closing: "Merci pour ton retour. Bon appétit.",
+        },
       },
     },
   },

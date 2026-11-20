@@ -28,7 +28,21 @@ export type PlanMealState =
        * be read: the page then shows no answer, and the meal stays recorded.
        */
       suggestion: MealSuggestion | null;
+      /**
+       * The ticket of the one second suggestion (REM-103). The server signs
+       * it, and the page sends it back with « Une autre suggestion ». Null
+       * when the answer shows no improvement.
+       */
+      retry: string | null;
     }
   | { status: "error"; error: PlanMealError };
+
+/**
+ * The result of « Une autre suggestion » (REM-103). `none`: the server gave no
+ * second answer. The ticket was used, it is not valid, or a read failed.
+ */
+export type AnotherSuggestionState =
+  | { status: "answered"; suggestion: MealSuggestion }
+  | { status: "none" };
 
 export const initialPlanMealState: PlanMealState = { status: "idle" };

@@ -1,8 +1,10 @@
 "use server";
 
 import {
+  issueMealRetryTicket,
   patientActor,
   planPatientMeal,
+  suggestAnotherMeal,
   suggestPlannedMeal,
 } from "@remi/services/server";
 import {
@@ -12,7 +14,11 @@ import {
 } from "@remi/services/shared";
 import { aiReady } from "@/lib/ai";
 import { patientLanding, requirePatient } from "@/lib/patient-auth/session";
-import type { PlanMealError, PlanMealState } from "./state";
+import type {
+  AnotherSuggestionState,
+  PlanMealError,
+  PlanMealState,
+} from "./state";
 
 /**
  * The home page's save of a typed meal (stories 28 and 31). A public endpoint:
@@ -91,9 +97,52 @@ export const planMealAction = async (
     return failed("unavailable");
   }
 
+  const suggestion = await suggestionFor(patientId, result.data.description);
   return {
     status: "saved",
     meal: { id: result.data.id, description: result.data.description },
-    suggestion: await suggestionFor(patientId, result.data.description),
+    suggestion,
+    retry: suggestion ? issueMealRetryTicket(result.data, suggestion) : null,
   };
+};
+
+/**
+ * « Une autre suggestion », after « Pas pour moi » (REM-103, story 28). A
+ * public endpoint: the ticket is caller input, and the service checks its
+ * signature, its patient and its one use. The patient's id comes from the
+ * session. A hidden button is not the limit: the service refuses a ticket
+ * that was used.
+ *
+ * The answer of the patient is not recorded: no table and no column holds it.
+ */
+export const anotherSuggestionAction = async (
+  locale: unknown,
+  ticket: unknown,
+): Promise<AnotherSuggestionState> => {
+  if (typeof locale !== "string" || !isLocale(locale)) {
+    return { status: "none" };
+  }
+  const account = await requirePatient(locale);
+  if ((await patientLanding(account)) !== "home") {
+    return { status: "none" };
+  }
+  const patientId = account.patientProfileId;
+  try {
+    aiReady();
+    const suggested = await suggestAnotherMeal(
+      patientActor(patientId),
+      patientId,
+      ticket,
+    );
+    if (suggested.ok) {
+      return { status: "answered", suggestion: suggested.data };
+    }
+    // The code only: a ticket holds a food name.
+    console.error("[meals] no second suggestion", { error: suggested.error });
+  } catch (error) {
+    console.error("[meals] the second suggestion failed", {
+      name: error instanceof Error ? error.name : "UnknownError",
+    });
+  }
+  return { status: "none" };
 };

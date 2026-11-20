@@ -266,7 +266,8 @@ describe("buildMealSuggestion — an excluded food in the meal", () => {
     expect(result.checkIngredients).toBe(true);
     expect(result.answer).toEqual({
       status: "answered",
-      toCheck: ["spaghetti"],
+      // The alert names the spaghetti already: one warning, not two.
+      toCheck: [],
       goodPoints: ["La tomate est un légume."],
       // One more food does not answer an excluded food.
       improvement: { status: "address_alert" },
@@ -418,6 +419,156 @@ describe("buildMealSuggestion — the model of the role", () => {
     await buildMealSuggestion(input());
 
     expect(modelsOf()).toEqual([seam.MODELS.fast]);
+  });
+});
+
+describe("buildMealSuggestion — the model's foods to check (REM-103)", () => {
+  it("adds no warning for a food that the gate does not flag", async () => {
+    const { seam, buildMealSuggestion } = await load();
+    // The call of 2026-11-20: the model named rice as a source of gluten.
+    seam.registerTextProvider(fakeProvider(reply({ excludedFound: ["riz"] })));
+
+    const result = await buildMealSuggestion(input());
+
+    expect(result.alerts).toEqual([]);
+    expect(result.traces).toEqual([]);
+    expect(result.answer).toMatchObject({
+      status: "answered",
+      toCheck: [],
+      improvement: { status: "aligned" },
+    });
+  });
+
+  it("keeps a food that the gate flags and that no alert shows", async () => {
+    const { seam, buildMealSuggestion } = await load();
+    seam.registerTextProvider(
+      fakeProvider(reply({ excludedFound: ["boulgour", "riz"] })),
+    );
+
+    const result = await buildMealSuggestion(input());
+
+    expect(result.answer).toMatchObject({
+      toCheck: ["boulgour"],
+      improvement: { status: "withheld" },
+    });
+  });
+
+  it("never removes an alert of the gate that the model did not name", async () => {
+    const { seam, buildMealSuggestion } = await load();
+    seam.registerTextProvider(fakeProvider(reply({ excludedFound: [] })));
+
+    const result = await buildMealSuggestion(
+      input({ meal: "spaghetti, sauce tomate" }),
+    );
+
+    expect(result.alerts).toEqual([{ food: "spaghetti", source: "allergy" }]);
+    expect(result.traces).toEqual(["sauce tomate"]);
+  });
+});
+
+describe("buildMealSuggestion — the improvement is said one time (REM-103)", () => {
+  it("drops a sentence of the model that names the proposed food", async () => {
+    const { seam, buildMealSuggestion } = await load();
+    seam.registerTextProvider(
+      fakeProvider(
+        reply({
+          improvement: {
+            ...add("courgette"),
+            explanation: "Tu peux ajouter des courgettes à ton repas.",
+          },
+        }),
+      ),
+    );
+
+    const result = await buildMealSuggestion(input());
+
+    expect(result.answer).toMatchObject({
+      improvement: { status: "shown", food: "courgette", explanation: null },
+    });
+  });
+});
+
+describe("buildMealSuggestion — the second suggestion (REM-103)", () => {
+  const refused = { kind: "add", food: "courgette", replaces: null } as const;
+
+  it("tells the model what the patient refused", async () => {
+    const { seam, buildMealSuggestion } = await load();
+    const seen: ProviderRequest[] = [];
+    seam.registerTextProvider(
+      fakeProvider(reply({ improvement: add("carotte") }), seen),
+    );
+
+    const result = await buildMealSuggestion(input({ refused }));
+
+    expect(JSON.stringify(seen)).toContain("Pas pour moi");
+    expect(JSON.stringify(seen)).toContain("courgette");
+    expect(result.answer).toMatchObject({
+      improvement: { status: "shown", food: "carotte" },
+    });
+  });
+
+  it("does not repeat the refused improvement", async () => {
+    const { seam, buildMealSuggestion } = await load();
+    seam.registerTextProvider(
+      fakeProvider(reply({ improvement: add("courgette") })),
+    );
+
+    const result = await buildMealSuggestion(input({ refused }));
+
+    expect(result.answer).toMatchObject({
+      improvement: { status: "repeated" },
+    });
+    expect(JSON.stringify(result.answer)).not.toContain("courgette");
+  });
+
+  it("blocks a second proposal that the gate does not confirm", async () => {
+    const { seam, buildMealSuggestion } = await load();
+    seam.registerTextProvider(
+      fakeProvider(reply({ improvement: add("boulgour") })),
+    );
+
+    const result = await buildMealSuggestion(input({ refused }));
+
+    expect(result.answer).toMatchObject({
+      improvement: { status: "withheld" },
+    });
+    expect(JSON.stringify(result)).not.toContain("boulgour");
+  });
+
+  it("blocks a second proposal of unknown composition", async () => {
+    const { seam, buildMealSuggestion } = await load();
+    seam.registerTextProvider(
+      fakeProvider(reply({ improvement: add("mélange surprise") })),
+    );
+
+    const result = await buildMealSuggestion(input({ refused }));
+
+    expect(result.answer).toMatchObject({
+      improvement: { status: "withheld" },
+    });
+  });
+
+  it("keeps the alerts of the gate on the second answer", async () => {
+    const { seam, buildMealSuggestion } = await load();
+    seam.registerTextProvider(fakeProvider(new Error("down")));
+
+    const result = await buildMealSuggestion(
+      input({ meal: "spaghetti, sauce tomate", refused }),
+    );
+
+    expect(result.alerts).toEqual([{ food: "spaghetti", source: "allergy" }]);
+    expect(result.answer).toEqual({ status: "unavailable" });
+  });
+});
+
+describe("sameFood", () => {
+  it("reads a variant of a food as the same food", async () => {
+    const { sameFood } = await import("./suggest");
+
+    expect(sameFood("courgette", "Des courgettes grillées")).toBe(true);
+    expect(sameFood("Épinards", "epinard")).toBe(true);
+    expect(sameFood("courgette", "carotte")).toBe(false);
+    expect(sameFood("", "carotte")).toBe(false);
   });
 });
 

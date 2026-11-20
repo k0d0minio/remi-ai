@@ -594,7 +594,11 @@ export type {
  * REMI's answer to a planned meal (REM-102). It calls `generateJson` of this
  * entrypoint: register the provider through `/server` (`apps/web/lib/ai.ts`).
  */
-export { suggestPlannedMeal } from "./meals/suggest";
+export {
+  issueMealRetryTicket,
+  suggestAnotherMeal,
+  suggestPlannedMeal,
+} from "./meals/suggest";
 
 /*
  * The model of each AI role, as a setting of the console. It calls the seam of

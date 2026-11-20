@@ -19,7 +19,10 @@
 
 import { z } from "zod";
 
-import { mealImprovementKinds } from "../../shared/meal-suggestion";
+import {
+  mealImprovementKinds,
+  type RefusedImprovement,
+} from "../../shared/meal-suggestion";
 
 /** One validated item. `detail` is `""` when the practitioner wrote none. */
 export type MealPromptItem = { title: string; detail: string };
@@ -53,6 +56,11 @@ export type MealPromptContext = {
   diet: string | null;
   /** Null when no version is validated: the prompt then has safety data only. */
   protocol: MealPromptProtocol | null;
+  /**
+   * The improvement that the person refused (REM-103). The prompt then asks
+   * for a different one. The caller checks the reply in code.
+   */
+  refused?: RefusedImprovement | null;
 };
 
 /**
@@ -84,7 +92,11 @@ export const mealSuggestionSchema = z.object({
         .string()
         .nullable()
         .describe("for replace: the food of the meal that is replaced"),
-      explanation: z.string().describe("one short sentence in French"),
+      explanation: z
+        .string()
+        .describe(
+          "one short sentence in French: the reason only, without the action and without the name of the proposed food",
+        ),
       basis: z
         .string()
         .describe("the reference in brackets of the item that it serves"),
@@ -103,7 +115,7 @@ export const MEAL_SUGGESTION_SYSTEM = [
   "2. Le contexte est écrit par ordre de priorité, du niveau 1 (le plus fort) au niveau 6. Les éléments compatibles s'appliquent ensemble. En cas de conflit, le niveau le plus fort gagne.",
   "3. « excludedFound » : chaque aliment du repas qui contient, ou peut contenir, une exclusion du niveau 1, ou qui ne respecte pas l'alimentation déclarée. Une liste vide s'il n'y en a aucun.",
   "4. « goodPoints » : un à trois points courts et vrais sur ce qui est déjà bien dans ce repas. Ne félicite jamais pour un aliment exclu.",
-  "5. « improvement » : une seule amélioration, la plus prioritaire, simple à appliquer : ajouter, remplacer ou retirer un aliment. Elle sert un élément du contexte qui porte une référence entre crochets, et « basis » est cette référence, sans les crochets.",
+  "5. « improvement » : une seule amélioration, la plus prioritaire, simple à appliquer : ajouter, remplacer ou retirer un aliment. Elle sert un élément du contexte qui porte une référence entre crochets, et « basis » est cette référence, sans les crochets. « explanation » dit seulement pourquoi : ne répète pas l'action et ne nomme pas l'aliment proposé.",
   "6. « improvement » est null si aucun élément du contexte ne porte de référence, ou si le repas est déjà en accord avec le contexte. Une amélioration n'est pas obligatoire.",
   "7. L'aliment proposé est un aliment simple, nommé en un à trois mots, sans quantité. Il ne contient aucune exclusion. Si tu as un doute sur sa composition, ne le propose pas.",
   "8. Si le texte ne décrit pas un repas, ou s'il est trop vague, « understood » est false, les listes sont vides et « improvement » est null. Ne devine pas.",
@@ -112,6 +124,22 @@ export const MEAL_SUGGESTION_SYSTEM = [
 ].join("\n");
 
 const NOT_ENTERED = "Non renseigné";
+
+/** A text of the model or of the patient, as one line with no angle bracket. */
+const inline = (value: string | null | undefined) =>
+  (value ?? "").replace(/[<>]/g, " ").replace(/\s+/g, " ").trim();
+
+const refusedText = (refused: RefusedImprovement) => {
+  const food = inline(refused.food);
+  switch (refused.kind) {
+    case "add":
+      return `ajouter « ${food} »`;
+    case "remove":
+      return `retirer « ${food} »`;
+    case "replace":
+      return `remplacer « ${inline(refused.replaces)} » par « ${food} »`;
+  }
+};
 
 const filled = (value: string | null | undefined) => (value ?? "").trim();
 
@@ -197,9 +225,21 @@ export const mealSuggestionPrompt = (context: MealPromptContext): MealPrompt => 
       : null,
   ].filter((part): part is string => part !== null);
 
+  const refused = context.refused
+    ? [
+        [
+          "Suggestion déjà refusée",
+          `- La personne a répondu « Pas pour moi » à cette suggestion : ${refusedText(context.refused)}.`,
+          "- Propose une amélioration différente, avec un autre aliment. Ne propose pas de nouveau cet aliment, ni une variante de cet aliment.",
+          "- S'il n'y a pas d'autre amélioration utile, « improvement » est null.",
+        ].join("\n"),
+      ]
+    : [];
+
   const prompt = [
     "Contexte",
     ...sections,
+    ...refused,
     "Repas prévu",
     // The patient's text cannot close the block: it has no angle bracket.
     `<repas>\n${context.meal.replace(/[<>]/g, " ").trim()}\n</repas>`,
