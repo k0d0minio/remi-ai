@@ -1,11 +1,15 @@
-import type { PatientLanding } from "@remi/services/shared";
+import {
+  patientSignInPath,
+  type PatientLanding,
+} from "@remi/services/shared";
 
 /**
  * The patient's routes, as paths under the locale. One home for them: the
  * sign-up, the sign-in and the pages behind the patient session all link here.
  * The paths are French, as `/inscription` is.
  */
-export const SIGN_IN_PATH = "/connexion";
+/** From the services package: the activation e-mail links to the same page. */
+export const SIGN_IN_PATH = patientSignInPath;
 export const FORGOT_PASSWORD_PATH = "/connexion/mot-de-passe-oublie";
 export const NEW_PASSWORD_PATH = "/connexion/nouveau-mot-de-passe";
 /** Where the magic link lands. A route handler: it completes the sign-in. */

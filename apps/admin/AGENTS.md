@@ -111,8 +111,9 @@ passé depuis la dernière fois ? Que dois-je faire maintenant ? ». It has four
    follows the status: the missing information, then the appointment and the preparation note, then
    what the validation will hold with « Valider les recommandations » and the recap of the
    activation with « Activer l'accompagnement » (`file/activation.tsx`), then the validated
-   version, the date of the activation and the count of the patient's open changes. The quick actions are in this card, as secondary
-   buttons.
+   version, the date of the activation, the state of the e-mail « Votre espace REMI est prêt » (its
+   date, or why it did not go out, with « Renvoyer l'e-mail ») and the count of the patient's open
+   changes. The quick actions are in this card, as secondary buttons.
 3. **The work column** holds the open blocks. Before the consultation (« Dossier à compléter »,
    « Prêt pour consultation »): « Sécurité », every questionnaire answer, then the calculations.
    From « Recommandations à valider » on: the goals, the recommendations, the food directives,

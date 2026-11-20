@@ -1,11 +1,16 @@
 import type { ReactNode } from "react";
-import { getActivationRecap, getCareActivationDate } from "@remi/services/server";
+import {
+  getActivationEmailStatus,
+  getActivationRecap,
+  getCareActivationDate,
+} from "@remi/services/server";
 import {
   calculationKindLabels,
   canActivate,
   formatDate,
   formatNumber,
   type ActivationBlocker,
+  type ActivationEmailFailure,
   type ActivationRecap,
   type CalculationKind,
   type PatientProfile,
@@ -14,6 +19,7 @@ import { Typography } from "@remi/ui/server";
 import { ActivateCareButton } from "@/components/patients/file/activate-care-button";
 import { countLabel } from "@/components/patients/file/count-label";
 import { fieldAnchor } from "@/components/patients/file/missing-information";
+import { ResendActivationEmailButton } from "@/components/patients/file/resend-activation-email-button";
 import { requireActor } from "@/lib/auth/session";
 
 type Props = {
@@ -263,5 +269,64 @@ export const CareActivated = async ({
     <Typography size="sm" weight="medium">
       {`Accompagnement activé le ${formatDate(activatedAt)}.`}
     </Typography>
+  );
+};
+
+const EMAIL_NAME = "L'e-mail « Votre espace REMI est prêt »";
+
+/** Why the e-mail did not go out, and what the practitioner can do. */
+const emailFailureLines: Record<ActivationEmailFailure, string> = {
+  no_email: `${EMAIL_NAME} n'a pas pu partir : le dossier n'a pas d'adresse e-mail. Ajoutez l'adresse dans le profil, puis renvoyez l'e-mail.`,
+  no_mailer: `${EMAIL_NAME} n'a pas pu partir : l'envoi d'e-mails n'est pas configuré sur ce déploiement. Prévenez l'équipe REMI, puis renvoyez l'e-mail.`,
+  link_failed: `${EMAIL_NAME} n'a pas pu partir : le lien d'accès n'a pas pu être créé. Renvoyez l'e-mail.`,
+  send_failed: `${EMAIL_NAME} n'a pas pu partir : le service d'e-mail a refusé l'envoi. Vérifiez l'adresse e-mail du dossier, puis renvoyez l'e-mail.`,
+};
+
+/**
+ * The e-mail « Votre espace REMI est prêt » in the action card of an active
+ * file (story 19). The audit trail is the record: the service reads it.
+ *
+ * - A sent e-mail shows its date, and no button: it goes out once.
+ * - A failed send shows the reason in plain words and « Renvoyer l'e-mail ».
+ * - A file with no try shows that no e-mail went out, with the same button.
+ * - A file with no address says so. The button is off until an address is
+ *   in the profile.
+ *
+ * The care stays active in each case. An admin's read-only open reads the
+ * line and gets no button.
+ */
+export const ActivationEmail = async ({ patient, readOnly }: Props) => {
+  const status = await getActivationEmailStatus(
+    await requireActor(),
+    patient.id,
+  );
+  if (!status) {
+    return null;
+  }
+  const { state, hasRecipient } = status;
+  if (state.kind === "sent") {
+    return (
+      <Typography size="sm" tone="muted">
+        {`${EMAIL_NAME} est parti le ${formatDate(state.at)}.`}
+      </Typography>
+    );
+  }
+  const line = !hasRecipient
+    ? emailFailureLines.no_email
+    : state.kind === "failed"
+      ? emailFailureLines[state.reason]
+      : `${EMAIL_NAME} n'est pas parti. L'accompagnement est actif : envoyez l'e-mail pour prévenir la personne.`;
+  return (
+    <div className="flex flex-col gap-2">
+      <Typography size="sm" role="status" className="text-warning-text">
+        {line}
+      </Typography>
+      {readOnly ? null : (
+        <ResendActivationEmailButton
+          patientId={patient.id}
+          disabled={!hasRecipient}
+        />
+      )}
+    </div>
   );
 };
