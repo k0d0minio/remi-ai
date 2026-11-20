@@ -46,6 +46,7 @@ export { Link, linkVariants } from "./server/link";
 export { Markdown, markdownToText } from "./server/markdown";
 export { LocaleSwitcher } from "./server/locale-switcher";
 export { Progress, progressBarVariants } from "./server/progress";
+export { RadioCard } from "./server/radio-card";
 export { ScoreStrip } from "./server/score-strip";
 export { Section } from "./server/section";
 export { Separator } from "./server/separator";
