@@ -501,11 +501,23 @@ export {
 export {
   DEFAULTS as AI_DEFAULTS,
   MODELS,
+  gatewayTextProviderFromEnv,
+  generateJson,
+  generateText,
   getTextProvider,
+  isTextProviderRegistered,
   registerTextProvider,
   resolveModel,
 } from "../ai";
-export type { GenerateOptions, ModelRole, TextProvider } from "../ai";
+export type {
+  GenerateOptions,
+  GenerationError,
+  GenerationResult,
+  ModelRole,
+  ProviderReply,
+  ProviderRequest,
+  TextProvider,
+} from "../ai";
 
 export {
   DEFAULT_CONTEXT_PREAMBLE,

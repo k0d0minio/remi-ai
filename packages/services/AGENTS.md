@@ -3,7 +3,7 @@
 The global rules in [`/CONVENTIONS.md`](../../CONVENTIONS.md) still apply. This file holds only
 what is specific to this package.
 
-## Seams, not integrations — AI still has no vendor, and that is the design
+## Seams, not integrations
 
 Storage, email, files and AI are **seams**: each defines an interface and a `register*()` call; the
 concrete adapter is registered by the app that owns the process — **lazily, at first use**, from
@@ -19,7 +19,7 @@ file plus one registration line — never a rewrite of the callers.
 | Storage | `DatabaseClient` | `registerDatabase()`     | Neon (`createNeonDatabase()`)               | throws — a missing DB must be loud                                |
 | Email   | `Mailer`         | `registerMailer()`       | Resend (`createResendMailer()`)             | `consoleMailer` — logs, never sends                               |
 | Files   | `FileStore`      | `registerFileStore()`    | Vercel Blob (`createVercelBlobFileStore()`) | stores nothing — uploads refused, `isFileStoreConfigured()` false |
-| AI      | `TextProvider`   | `registerTextProvider()` | none yet                                    | throws                                                            |
+| AI      | `TextProvider`   | `registerTextProvider()` | AI Gateway (`gatewayTextProviderFromEnv()`) | `generateText()` / `generateJson()` return the failure `error`    |
 | Auth    | `AuthProvider`   | `registerAuthProvider()` | Neon Auth (`createNeonAuthProvider()`)      | throws — `apps/web`'s `ensureAuthProvider()` answers 503 instead  |
 
 Storage's vendor is **Neon Postgres** (owner decision, 27 Aug 2026 — supersedes the earlier
@@ -36,6 +36,7 @@ An adapter goes in this package under `src/<seam>/adapters/<vendor>.ts`, the sea
 the only thing that re-exports it, and `.icm/docs/ENV.md` gains its variables in the same PR. A vendor
 SDK, if one is needed, becomes a dependency of **this** package only. The Resend adapter needs none:
 it is one POST to one endpoint, so it uses `fetch` and the package stays at a single dependency.
+The AI Gateway adapter uses the AI SDK (`ai`): the SDK does the structured output and the retries.
 The Neon Auth SDK reads cookies through `next/headers`, so `next` is a peer dependency of this
 package. Apps are lint-blocked from `@neon/auth`.
 

@@ -250,12 +250,22 @@ file cannot be opened. Nothing is ever reported as stored when it was not.
 
 ## AI
 
-| Variable             | Purpose                                               | Where set | Public? |
-| -------------------- | ----------------------------------------------------- | --------- | ------- |
-| `ANTHROPIC_API_KEY`  | Direct Anthropic API access                           | both      | no      |
-| `AI_GATEWAY_API_KEY` | Vercel AI Gateway key, if routing through the gateway | Vercel    | no      |
+| Variable             | Purpose                                                               | Where set | Public? |
+| -------------------- | --------------------------------------------------------------------- | --------- | ------- |
+| `AI_GATEWAY_API_KEY` | Vercel AI Gateway key. The AI adapter of `web` and `admin` reads it. | Vercel    | no      |
 
-Value per target: AI has no vendor adapter yet. Set neither key on any target until an adapter reads it.
+The AI Gateway is the registered AI vendor (decision D-16):
+`packages/services/src/ai/adapters/gateway.ts` implements the `TextProvider` seam with the AI SDK.
+Two apps register it, each from its `lib/ai.ts`: `apps/web` and `apps/admin`. **The key is required
+on the two projects**, on each target where a generation must work. Make the key in the Vercel
+dashboard of team `remi21` (AI Gateway, API keys). `ANTHROPIC_API_KEY` left this catalogue with
+REM-89: no code reads it.
+
+With the variable unset, no adapter registers. Each generation then returns the failure `error`,
+and all other functions of the apps work as before. The unit tests need no key.
+
+Each generation writes one JSON line in the server log (`"event":"ai.generation"`): role, model,
+duration, token counts, outcome. The line never holds the prompt or the reply.
 
 Model ids are **not** environment variables — they live in `packages/services/src/ai/index.ts`
 behind three role names (`fast` / `balanced` / `deep`), so an upgrade is one edit rather than a
