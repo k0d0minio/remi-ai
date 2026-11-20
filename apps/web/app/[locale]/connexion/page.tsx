@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { isLocale, localePath } from "@remi/services/shared";
+import { defaultLocale, isLocale, localePath } from "@remi/services/shared";
 import { Alert, AlertDescription, Typography, Wordmark } from "@remi/ui/server";
 import { PatientSignInForm } from "@/components/patient-auth/patient-sign-in-form";
 import { getContent } from "@/lib/content";
@@ -19,7 +19,7 @@ export const generateMetadata = async ({
   params: Promise<Params>;
 }): Promise<Metadata> => {
   const { locale } = await params;
-  const content = getContent(isLocale(locale) ? locale : "en");
+  const content = getContent(isLocale(locale) ? locale : defaultLocale);
   return { title: content.patientSignIn.metaTitle };
 };
 

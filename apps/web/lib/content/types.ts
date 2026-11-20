@@ -1,7 +1,7 @@
 /**
- * The shape every locale dictionary fills in full. One type, two files —
- * TypeScript is what guarantees the French app never silently misses a label
- * the English one has.
+ * The shape of the dictionary. The app is French only (Jamie, 2026-11-20):
+ * `fr.ts` is the one dictionary, and a new text is one line here and one line
+ * there. TypeScript is what guarantees no screen reads a label that is missing.
  *
  * It covers chrome — navigation, labels, headings, empty states — for both
  * surfaces.
@@ -61,9 +61,7 @@ export type PlaceholderContent = {
 export type Content = {
   /**
    * The root layout's metadata. Here rather than hard-coded in `layout.tsx`
-   * because the app ships in two languages and a browser tab is copy like any
-   * other — an English title over a French page is the same bug as an English
-   * button on one.
+   * because a browser tab is copy like any other.
    */
   meta: {
     /** Follows the brand's title convention: rendered as "REMI — <title>". */
@@ -86,7 +84,6 @@ export type Content = {
   userMenu: {
     label: string;
     account: string;
-    language: string;
     /** Heading over the link that leaves for the docs app. */
     help: string;
     documentation: string;
@@ -296,7 +293,7 @@ export type Content = {
     lead: string;
     /**
      * The segment navigation. One label per route, so a segment cannot be
-     * added without both locales naming it.
+     * added without the dictionary naming it.
      */
     /** Accessible name for the segment nav element. */
     navLabel: string;
@@ -385,7 +382,7 @@ export type Content = {
      *
      * `actions` are the two buttons that write an entry; `states` are how one
      * already written reads back. They are separate because the verb and the
-     * state are different words in both languages — « Je vais manger » writes
+     * state are different words — « Je vais manger » writes
      * a meal that reads « Prévu ».
      */
     mealEntry: {

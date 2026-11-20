@@ -89,7 +89,7 @@ const Accueil = async () => {
           <Typography size="xs" tone="muted">
             {ciqual ? (
               <>
-                {formatNumber(ciqual.foodCount, "fr-FR")} aliments importés —{" "}
+                {formatNumber(ciqual.foodCount)} aliments importés —{" "}
                 {ciqual.edition} (ANSES) ·{" "}
                 <NextLink href="/aliments" className="underline">
                   consulter la table

@@ -52,10 +52,3 @@ export const signIn = async (formData: FormData) => {
 export const switchRole = async (role: Role, locale: Locale) => {
   await enter(role, locale);
 };
-
-export const setLocale = async (locale: string, path: string) => {
-  if (!isLocale(locale)) {
-    return;
-  }
-  redirect(localePath(locale, path));
-};

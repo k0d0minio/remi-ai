@@ -19,12 +19,14 @@ export {
 } from "./format";
 export {
   defaultLocale,
+  defaultLocalePath,
   isLocale,
   localePath,
   locales,
-  pickLocaleFromHeader,
 } from "./i18n";
 export type { Locale } from "./i18n";
+export { userMessage } from "./user-message";
+export type { ServiceFailure } from "./user-message";
 export { auditActions } from "./audit";
 export {
   checkPlannedMealText,

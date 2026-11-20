@@ -6,7 +6,12 @@
  * "Grep before writing a helper".
  */
 
-const DEFAULT_LOCALE = "en-GB";
+/**
+ * Every screen is French (Jamie, 2026-11-20), and the practice is Belgian: a
+ * date reads « 20 nov. 2026 » and a number « 3 484,5 ». A caller passes no
+ * locale.
+ */
+const DEFAULT_LOCALE = "fr-BE";
 
 export const formatCurrency = (
   amountInMinorUnits: number,
@@ -18,7 +23,7 @@ export const formatCurrency = (
   );
 
 /**
- * A number with its locale's grouping — `3 484` in French, `3,484` in English.
+ * A number with the French grouping: `3 484`.
  *
  * `fractionDigits` is fixed rather than maximum, because a column of nutrient
  * values that alternates between `0,5` and `12` reads as noise; the console

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPractitionerBySignupToken } from "@remi/services/server";
-import { isLocale } from "@remi/services/shared";
+import { defaultLocale, isLocale } from "@remi/services/shared";
 import { Typography, Wordmark } from "@remi/ui/server";
 import { SignupForm } from "@/components/signup/signup-form";
 import { getContent } from "@/lib/content";
@@ -21,7 +21,7 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const { locale } = await params;
   return {
-    title: getContent(isLocale(locale) ? locale : "en").signupLink.metaTitle,
+    title: getContent(isLocale(locale) ? locale : defaultLocale).signupLink.metaTitle,
   };
 };
 

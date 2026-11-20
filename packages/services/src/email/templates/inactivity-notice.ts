@@ -4,8 +4,8 @@ import type { EmailMessage } from "../index";
 
 /**
  * The notice of deletion for an inactive account (`inactive-account-deletion`,
- * privacy policy § 7). The patient gets it in their file's language. The
- * practitioner gets a copy in French that names the pseudonym only.
+ * privacy policy § 7). Both messages are in French. The practitioner's
+ * copy names the pseudonym only.
  *
  * The shape follows `patient-link.ts`: plain text first, the same inline HTML.
  * The names come from what a patient typed, so the HTML escapes them.
@@ -21,8 +21,8 @@ const escapeHtml = (value: string) =>
     .replaceAll("'", "&#39;");
 
 /** The day of the deletion, as the practice's calendar reads it. */
-const deletionDay = (at: Date, locale: Locale) =>
-  new Intl.DateTimeFormat(locale === "fr" ? "fr-BE" : "en-GB", {
+const deletionDay = (at: Date) =>
+  new Intl.DateTimeFormat("fr-BE", {
     dateStyle: "long",
     timeZone: PRACTICE_TIME_ZONE,
   }).format(at);
@@ -64,16 +64,6 @@ const notice: Record<Locale, NoticeCopy> = {
     fallback: "Ou copie ce lien :",
     signature: "— REMI",
   },
-  en: {
-    subject: (day) => `Your REMI account will be deleted on ${day}`,
-    greeting: (name) => (name ? `Hello ${name},` : "Hello,"),
-    lead: (day) =>
-      `You have not signed in to REMI for eleven months. As our privacy policy says, your account and your data will be deleted for good on ${day}.`,
-    keep: "To keep your account, sign in before that date. The deletion is then cancelled.",
-    action: "Sign in",
-    fallback: "Or copy this link:",
-    signature: "— REMI",
-  },
 };
 
 export const inactivityNoticeEmail = ({
@@ -83,7 +73,7 @@ export const inactivityNoticeEmail = ({
   locale,
 }: NoticeProps): Omit<EmailMessage, "to"> => {
   const t = notice[locale];
-  const day = deletionDay(deletionDate, locale);
+  const day = deletionDay(deletionDate);
   const greeting = t.greeting(name.trim());
 
   const text = [
@@ -120,7 +110,7 @@ export const inactivityNoticeCopyEmail = ({
   pseudonym,
   deletionDate,
 }: CopyProps): Omit<EmailMessage, "to"> => {
-  const day = deletionDay(deletionDate, "fr");
+  const day = deletionDay(deletionDate);
   const subject = `Copie : le compte de ${pseudonym} sera supprimé le ${day}`;
   const lines = [
     "Bonjour,",

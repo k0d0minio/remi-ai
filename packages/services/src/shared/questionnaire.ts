@@ -24,8 +24,8 @@ export type QuestionnaireLabel = Readonly<Record<Locale, string>>;
 export const sexesForCalculation = ["female", "male"] as const;
 
 export const sexForCalculationLabels = {
-  female: { fr: "Femme", en: "Female" },
-  male: { fr: "Homme", en: "Male" },
+  female: { fr: "Femme"},
+  male: { fr: "Homme"},
 } as const satisfies Record<
   (typeof sexesForCalculation)[number],
   QuestionnaireLabel
@@ -41,34 +41,30 @@ export const activityLevels = ["low", "moderate", "high", "very_high"] as const;
  */
 export const activityLevelDetails = {
   low: {
-    label: { fr: "Faible (sédentaire)", en: "Low (sedentary)" },
+    label: { fr: "Faible (sédentaire)"},
     description: {
-      fr: "Travail assis, peu de marche, peu ou pas de sport",
-      en: "Desk work, little walking, little or no sport",
+      fr: "Travail assis, peu de marche, peu ou pas de sport"
     },
     nap: 1.4,
   },
   moderate: {
-    label: { fr: "Modéré (légèrement actif)", en: "Moderate (lightly active)" },
+    label: { fr: "Modéré (légèrement actif)"},
     description: {
-      fr: "Marche quotidienne, déplacements réguliers, sport léger 1 à 3 fois/semaine",
-      en: "Daily walking, regular trips on foot, light sport 1 to 3 times a week",
+      fr: "Marche quotidienne, déplacements réguliers, sport léger 1 à 3 fois/semaine"
     },
     nap: 1.6,
   },
   high: {
-    label: { fr: "Élevé (actif)", en: "High (active)" },
+    label: { fr: "Élevé (actif)"},
     description: {
-      fr: "Beaucoup de déplacements à pied, travail physique ou sport 4 à 5 fois/semaine",
-      en: "Much walking, physical work or sport 4 to 5 times a week",
+      fr: "Beaucoup de déplacements à pied, travail physique ou sport 4 à 5 fois/semaine"
     },
     nap: 1.8,
   },
   very_high: {
-    label: { fr: "Très élevé (très actif)", en: "Very high (very active)" },
+    label: { fr: "Très élevé (très actif)"},
     description: {
-      fr: "Travail physique intense ou entraînements sportifs intensifs presque quotidiens",
-      en: "Hard physical work or intensive training almost every day",
+      fr: "Travail physique intense ou entraînements sportifs intensifs presque quotidiens"
     },
     nap: 2.0,
   },
@@ -100,16 +96,15 @@ export const diets = [
 
 export const dietLabels = {
   none: {
-    fr: "Aucun type d'alimentation particulier",
-    en: "No particular diet",
+    fr: "Aucun type d'alimentation particulier"
   },
-  omnivore: { fr: "Omnivore", en: "Omnivore" },
-  flexitarian: { fr: "Flexitarien", en: "Flexitarian" },
-  pescatarian: { fr: "Pescétarien", en: "Pescatarian" },
-  vegetarian: { fr: "Végétarien", en: "Vegetarian" },
-  vegan: { fr: "Végétalien / vegan", en: "Vegan" },
-  ketogenic: { fr: "Cétogène", en: "Ketogenic" },
-  other: { fr: "Autre", en: "Other" },
+  omnivore: { fr: "Omnivore"},
+  flexitarian: { fr: "Flexitarien"},
+  pescatarian: { fr: "Pescétarien"},
+  vegetarian: { fr: "Végétarien"},
+  vegan: { fr: "Végétalien / vegan"},
+  ketogenic: { fr: "Cétogène"},
+  other: { fr: "Autre"},
 } as const satisfies Record<(typeof diets)[number], QuestionnaireLabel>;
 
 /**
@@ -144,21 +139,21 @@ export const allergens = [
 ] as const;
 
 export const allergenLabels = {
-  gluten: { fr: "Gluten", en: "Gluten" },
-  crustaceans: { fr: "Crustacés", en: "Crustaceans" },
-  eggs: { fr: "Œufs", en: "Eggs" },
-  fish: { fr: "Poissons", en: "Fish" },
-  peanuts: { fr: "Arachides", en: "Peanuts" },
-  soy: { fr: "Soja", en: "Soy" },
-  milk: { fr: "Lait / protéines de lait", en: "Milk / milk proteins" },
-  tree_nuts: { fr: "Fruits à coque", en: "Tree nuts" },
-  celery: { fr: "Céleri", en: "Celery" },
-  mustard: { fr: "Moutarde", en: "Mustard" },
-  sesame: { fr: "Sésame", en: "Sesame" },
-  sulphites: { fr: "Sulfites", en: "Sulphites" },
-  lupin: { fr: "Lupin", en: "Lupin" },
-  molluscs: { fr: "Mollusques", en: "Molluscs" },
-  other: { fr: "Autre", en: "Other" },
+  gluten: { fr: "Gluten"},
+  crustaceans: { fr: "Crustacés"},
+  eggs: { fr: "Œufs"},
+  fish: { fr: "Poissons"},
+  peanuts: { fr: "Arachides"},
+  soy: { fr: "Soja"},
+  milk: { fr: "Lait / protéines de lait"},
+  tree_nuts: { fr: "Fruits à coque"},
+  celery: { fr: "Céleri"},
+  mustard: { fr: "Moutarde"},
+  sesame: { fr: "Sésame"},
+  sulphites: { fr: "Sulfites"},
+  lupin: { fr: "Lupin"},
+  molluscs: { fr: "Mollusques"},
+  other: { fr: "Autre"},
 } as const satisfies Record<(typeof allergens)[number], QuestionnaireLabel>;
 
 /**
@@ -168,7 +163,7 @@ export const allergenLabels = {
  */
 export const ALL_SUB_KEY = "all";
 
-export const allSubKeyLabel: QuestionnaireLabel = { fr: "Tous", en: "All" };
+export const allSubKeyLabel: QuestionnaireLabel = { fr: "Tous"};
 
 /**
  * The sub-lists that open under a checked category. Gluten's is the story's
@@ -208,48 +203,48 @@ export const allergenSubLists = {
 
 export const allergenSubLabels = {
   gluten: {
-    wheat: { fr: "Blé", en: "Wheat" },
-    rye: { fr: "Seigle", en: "Rye" },
-    barley: { fr: "Orge", en: "Barley" },
-    oats: { fr: "Avoine", en: "Oats" },
-    spelt: { fr: "Épeautre", en: "Spelt" },
+    wheat: { fr: "Blé"},
+    rye: { fr: "Seigle"},
+    barley: { fr: "Orge"},
+    oats: { fr: "Avoine"},
+    spelt: { fr: "Épeautre"},
   },
   tree_nuts: {
-    almond: { fr: "Amande", en: "Almond" },
-    hazelnut: { fr: "Noisette", en: "Hazelnut" },
-    walnut: { fr: "Noix", en: "Walnut" },
-    cashew: { fr: "Noix de cajou", en: "Cashew" },
-    pecan: { fr: "Noix de pécan", en: "Pecan" },
-    pistachio: { fr: "Pistache", en: "Pistachio" },
-    brazil_nut: { fr: "Noix du Brésil", en: "Brazil nut" },
-    macadamia: { fr: "Noix de macadamia", en: "Macadamia" },
-    other: { fr: "Autre", en: "Other" },
+    almond: { fr: "Amande"},
+    hazelnut: { fr: "Noisette"},
+    walnut: { fr: "Noix"},
+    cashew: { fr: "Noix de cajou"},
+    pecan: { fr: "Noix de pécan"},
+    pistachio: { fr: "Pistache"},
+    brazil_nut: { fr: "Noix du Brésil"},
+    macadamia: { fr: "Noix de macadamia"},
+    other: { fr: "Autre"},
   },
   fish: {
-    salmon: { fr: "Saumon", en: "Salmon" },
-    tuna: { fr: "Thon", en: "Tuna" },
-    cod: { fr: "Cabillaud", en: "Cod" },
-    sole: { fr: "Sole", en: "Sole" },
-    trout: { fr: "Truite", en: "Trout" },
-    sardine: { fr: "Sardine", en: "Sardine" },
-    mackerel: { fr: "Maquereau", en: "Mackerel" },
-    anchovy: { fr: "Anchois", en: "Anchovy" },
-    other: { fr: "Autre", en: "Other" },
+    salmon: { fr: "Saumon"},
+    tuna: { fr: "Thon"},
+    cod: { fr: "Cabillaud"},
+    sole: { fr: "Sole"},
+    trout: { fr: "Truite"},
+    sardine: { fr: "Sardine"},
+    mackerel: { fr: "Maquereau"},
+    anchovy: { fr: "Anchois"},
+    other: { fr: "Autre"},
   },
   crustaceans: {
-    shrimp: { fr: "Crevette", en: "Shrimp" },
-    crab: { fr: "Crabe", en: "Crab" },
-    lobster: { fr: "Homard", en: "Lobster" },
-    langoustine: { fr: "Langoustine", en: "Langoustine" },
-    other: { fr: "Autre", en: "Other" },
+    shrimp: { fr: "Crevette"},
+    crab: { fr: "Crabe"},
+    lobster: { fr: "Homard"},
+    langoustine: { fr: "Langoustine"},
+    other: { fr: "Autre"},
   },
   molluscs: {
-    mussel: { fr: "Moule", en: "Mussel" },
-    oyster: { fr: "Huître", en: "Oyster" },
-    squid: { fr: "Calamar", en: "Squid" },
-    octopus: { fr: "Poulpe", en: "Octopus" },
-    scallop: { fr: "Coquille Saint-Jacques", en: "Scallop" },
-    other: { fr: "Autre", en: "Other" },
+    mussel: { fr: "Moule"},
+    oyster: { fr: "Huître"},
+    squid: { fr: "Calamar"},
+    octopus: { fr: "Poulpe"},
+    scallop: { fr: "Coquille Saint-Jacques"},
+    other: { fr: "Autre"},
   },
 } as const satisfies {
   [K in keyof typeof allergenSubLists]: Record<
@@ -274,26 +269,25 @@ export const intolerances = [
 ] as const;
 
 export const intoleranceLabels = {
-  lactose: { fr: "Lactose", en: "Lactose" },
-  gluten: { fr: "Gluten", en: "Gluten" },
+  lactose: { fr: "Lactose"},
+  gluten: { fr: "Gluten"},
   milk_proteins: {
-    fr: "Protéines de lait / caséine",
-    en: "Milk proteins / casein",
+    fr: "Protéines de lait / caséine"
   },
-  egg: { fr: "Œuf", en: "Egg" },
-  fructose: { fr: "Fructose", en: "Fructose" },
-  sorbitol: { fr: "Sorbitol", en: "Sorbitol" },
-  polyols: { fr: "Polyols", en: "Polyols" },
-  histamine: { fr: "Histamine", en: "Histamine" },
-  fodmap: { fr: "FODMAP", en: "FODMAP" },
-  sulphites: { fr: "Sulfites", en: "Sulphites" },
-  other: { fr: "Autre", en: "Other" },
+  egg: { fr: "Œuf"},
+  fructose: { fr: "Fructose"},
+  sorbitol: { fr: "Sorbitol"},
+  polyols: { fr: "Polyols"},
+  histamine: { fr: "Histamine"},
+  fodmap: { fr: "FODMAP"},
+  sulphites: { fr: "Sulfites"},
+  other: { fr: "Autre"},
 } as const satisfies Record<(typeof intolerances)[number], QuestionnaireLabel>;
 
 /** « Aucune allergie connue » and « Aucune intolérance connue ». */
 export const noneKnownLabels = {
-  allergy: { fr: "Aucune allergie connue", en: "No known allergy" },
-  intolerance: { fr: "Aucune intolérance connue", en: "No known intolerance" },
+  allergy: { fr: "Aucune allergie connue"},
+  intolerance: { fr: "Aucune intolérance connue"},
 } as const satisfies Record<(typeof allergenKinds)[number], QuestionnaireLabel>;
 
 /**
@@ -303,8 +297,8 @@ export const noneKnownLabels = {
 export const geneticTestAnswers = ["yes", "no_or_unknown"] as const;
 
 export const geneticTestAnswerLabels = {
-  yes: { fr: "Oui", en: "Yes" },
-  no_or_unknown: { fr: "Non / Je ne sais pas", en: "No / I do not know" },
+  yes: { fr: "Oui"},
+  no_or_unknown: { fr: "Non / Je ne sais pas"},
 } as const satisfies Record<
   (typeof geneticTestAnswers)[number],
   QuestionnaireLabel
@@ -355,21 +349,18 @@ export type MandatoryQuestionnaireField =
 
 export const mandatoryQuestionnaireFieldLabels = {
   sexForCalculation: {
-    fr: "Sexe utilisé pour le calcul",
-    en: "Sex used for the calculation",
+    fr: "Sexe utilisé pour le calcul"
   },
-  heightCm: { fr: "Taille", en: "Height" },
-  weightKg: { fr: "Poids actuel", en: "Current weight" },
+  heightCm: { fr: "Taille"},
+  weightKg: { fr: "Poids actuel"},
   activityLevel: {
-    fr: "Niveau d'activité physique",
-    en: "Physical activity level",
+    fr: "Niveau d'activité physique"
   },
   consultationReason: {
-    fr: "Motif de consultation",
-    en: "Reason for consultation",
+    fr: "Motif de consultation"
   },
-  allergies: { fr: "Allergies", en: "Allergies" },
-  intolerances: { fr: "Intolérances", en: "Intolerances" },
+  allergies: { fr: "Allergies"},
+  intolerances: { fr: "Intolérances"},
 } as const satisfies Record<MandatoryQuestionnaireField, QuestionnaireLabel>;
 
 /**
@@ -499,20 +490,20 @@ export type OptionalQuestionnaireField =
   (typeof optionalQuestionnaireFields)[number];
 
 export const optionalQuestionnaireFieldLabels = {
-  birthDate: { fr: "Date de naissance", en: "Date of birth" },
-  phone: { fr: "Téléphone", en: "Phone" },
-  desiredWeightKg: { fr: "Poids souhaité", en: "Desired weight" },
-  consultationDate: { fr: "Date de consultation", en: "Consultation date" },
-  diet: { fr: "Régime / type d'alimentation", en: "Diet / type of eating" },
-  dietNote: { fr: "Précision du régime", en: "Diet details" },
-  celiacDisease: { fr: "Maladie cœliaque", en: "Coeliac disease" },
-  pathologies: { fr: "Pathologies", en: "Medical conditions" },
-  medications: { fr: "Médicaments", en: "Medications" },
-  supplements: { fr: "Compléments alimentaires", en: "Food supplements" },
-  geneticTest: { fr: "Test génétique", en: "Genetic test" },
-  apoe: { fr: "Génotype APOE", en: "APOE genotype" },
-  dio2: { fr: "Génotype DIO2", en: "DIO2 genotype" },
-  amy1a: { fr: "Génotype AMY1A", en: "AMY1A genotype" },
+  birthDate: { fr: "Date de naissance"},
+  phone: { fr: "Téléphone"},
+  desiredWeightKg: { fr: "Poids souhaité"},
+  consultationDate: { fr: "Date de consultation"},
+  diet: { fr: "Régime / type d'alimentation"},
+  dietNote: { fr: "Précision du régime"},
+  celiacDisease: { fr: "Maladie cœliaque"},
+  pathologies: { fr: "Pathologies"},
+  medications: { fr: "Médicaments"},
+  supplements: { fr: "Compléments alimentaires"},
+  geneticTest: { fr: "Test génétique"},
+  apoe: { fr: "Génotype APOE"},
+  dio2: { fr: "Génotype DIO2"},
+  amy1a: { fr: "Génotype AMY1A"},
 } as const satisfies Record<OptionalQuestionnaireField, QuestionnaireLabel>;
 
 /** What the optional check reads. Null, or an empty text, is « Non renseigné ». */

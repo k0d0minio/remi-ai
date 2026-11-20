@@ -19,7 +19,7 @@ only in the ticket that asks for it.
 ## Structure
 
 ```text
-app/[locale]/       every page ships in en and fr; `[locale]/layout.tsx` IS the
+app/[locale]/       `fr` only (Jamie, 2026-11-20); `[locale]/layout.tsx` IS the
                     root layout — there is no app/layout.tsx
   page.tsx          the entry screen — the only route outside the auth boundary
   (app)/            signed-in routes on the development session only — the route
@@ -45,16 +45,16 @@ lib/patient-auth/   the patient's routes, session guard and sign-in actions.
                     patient's id from the account it returns, never from the URL.
                     A page of `(patient)/` calls `requireActivePatient()`: no
                     page of the space opens before the activation
-lib/content/        one dictionary per locale, typed by `types.ts` so a missing
-                    translation is a type error
+lib/content/        `fr.ts`, the one dictionary, typed by `types.ts` so a missing
+                    text is a type error. A new text is one line in each
 lib/fixtures/       stand-in data — deleted by the PR that registers a real
                     DatabaseClient
 lib/                queries, actions, types, app-local helpers
-proxy.ts            redirects bare paths to the visitor's language
+proxy.ts            redirects bare paths and /en to /fr
 ```
 
-The route groups add no URL segment, so the paths stay `/en/clients`, `/en/today` and
-`/en/accueil`. No group may hold a root `page.tsx` — it would collide with the entry screen at `/[locale]`, which
+The route groups add no URL segment, so the paths stay `/fr/clients`, `/fr/today` and
+`/fr/accueil`. No group may hold a root `page.tsx` — it would collide with the entry screen at `/[locale]`, which
 owns that path and redirects a visitor who already has a session to their role's landing route.
 
 `(app)/layout.tsx` redirects a null session to `/[locale]`. That target has to stay outside the

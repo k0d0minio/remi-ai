@@ -32,8 +32,7 @@ export type SafetyList =
 
 /** The line that coeliac disease adds: gluten is out, traces included. */
 export const strictGlutenLabel: QuestionnaireLabel = {
-  fr: "Gluten — exclusion stricte, contaminations croisées comprises (maladie cœliaque)",
-  en: "Gluten — strict exclusion, cross-contamination included (coeliac disease)",
+  fr: "Gluten — exclusion stricte, contaminations croisées comprises (maladie cœliaque)"
 };
 
 const position = (order: readonly string[], key: string) => {

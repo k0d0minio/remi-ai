@@ -1,10 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { isLocale, pickLocaleFromHeader } from "@remi/services/shared";
+import { defaultLocalePath, isLocale } from "@remi/services/shared";
 import { previewRedirect } from "@/lib/patient-link/preview";
 
 /**
- * Every page lives under /en or /fr; this redirects the bare paths there. It
- * also starts a « voir comme la patiente » preview of a patient link
+ * Every page lives under /fr. The app is French only (Jamie, 2026-11-20), so
+ * a bare path and an /en path both go to the same page under /fr, whatever the
+ * browser's language. It also starts a « voir comme la patiente » preview of a patient link
  * (`lib/patient-link/preview.ts`).
  *
  * A 307, not a 308, because the answer depends on a request header and must not
@@ -19,9 +20,8 @@ const proxy = (request: NextRequest) => {
     return previewRedirect(request) ?? NextResponse.next();
   }
 
-  const locale = pickLocaleFromHeader(request.headers.get("accept-language"));
   const url = request.nextUrl.clone();
-  url.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
+  url.pathname = defaultLocalePath(pathname);
   return NextResponse.redirect(url);
 };
 

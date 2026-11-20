@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import NextLink from "next/link";
 import { notFound } from "next/navigation";
-import { isLocale, localePath } from "@remi/services/shared";
+import { defaultLocale, isLocale, localePath } from "@remi/services/shared";
 import { Link, Typography, Wordmark } from "@remi/ui/server";
 import { NewPasswordForm } from "@/components/patient-auth/new-password-form";
 import { getContent } from "@/lib/content";
@@ -20,7 +20,7 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const { locale } = await params;
   return {
-    title: getContent(isLocale(locale) ? locale : "en").newPassword.metaTitle,
+    title: getContent(isLocale(locale) ? locale : defaultLocale).newPassword.metaTitle,
   };
 };
 

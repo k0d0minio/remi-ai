@@ -21,11 +21,8 @@ export const geneticConsentText = (locale: Locale): ConsentStepText => {
     version: text.version,
     locale: text.locale,
     // Noon UTC: the same calendar day in every time zone of Europe.
-    date: formatDate(
-      `${text.date}T12:00:00Z`,
-      locale === "fr" ? "fr-BE" : "en-GB",
-    ),
-    lang: text.locale === "fr-BE" ? "fr" : "en",
+    date: formatDate(`${text.date}T12:00:00Z`),
+    lang: "fr",
     body: <Markdown>{text.body}</Markdown>,
   };
 };

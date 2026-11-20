@@ -8,6 +8,7 @@ import {
   duplicateRecipe,
   updateRecipe,
 } from "@remi/services/server";
+import { userMessage } from "@remi/services/shared";
 import { audit } from "@/lib/audit";
 import { requireOperator } from "@/lib/auth/session";
 
@@ -59,7 +60,7 @@ export const createRecipeAction = async (
     tags: tagsFrom(formData),
   });
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   await audit(operator, "recipe.created", {
     type: "recipe",
@@ -82,7 +83,7 @@ export const updateRecipeAction = async (
     tags: tagsFrom(formData),
   });
   if (!result.ok) {
-    return { error: result.message, saved: false };
+    return { error: userMessage(result), saved: false };
   }
   await audit(operator, "recipe.updated", {
     type: "recipe",

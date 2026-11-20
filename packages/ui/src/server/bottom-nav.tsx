@@ -24,7 +24,7 @@ type Props = {
 
 /**
  * The tab bar of a phone-first screen, fixed to the bottom of the viewport.
- * Pure and server-safe, like `LocaleSwitcher`: the caller says which item is
+ * Pure and server-safe: the caller says which item is
  * active, so the only client code an app needs is the wrapper that reads the
  * pathname.
  *

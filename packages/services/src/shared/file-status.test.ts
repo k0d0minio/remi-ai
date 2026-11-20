@@ -19,13 +19,13 @@ describe("the file status vocabulary", () => {
     expect(initialFileStatus).toBe("to_complete");
   });
 
-  it("labels each status in French and English", () => {
+  it("labels each status in French", () => {
     expect(fileStatusLabels.to_complete.fr).toBe("Dossier à compléter");
     expect(fileStatusLabels.ready.fr).toBe("Prêt pour consultation");
     expect(fileStatusLabels.to_validate.fr).toBe("Recommandations à valider");
     expect(fileStatusLabels.active.fr).toBe("Accompagnement actif");
     for (const status of fileStatuses) {
-      expect(fileStatusLabels[status].en).not.toBe("");
+      expect(fileStatusLabels[status].fr).not.toBe("");
     }
   });
 

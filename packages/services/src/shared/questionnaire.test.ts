@@ -26,10 +26,9 @@ const complete: QuestionnaireCompleteness = {
 };
 
 describe("the mandatory questionnaire fields", () => {
-  it("labels each field in French and English", () => {
+  it("labels each field in French", () => {
     for (const field of mandatoryQuestionnaireFields) {
       expect(mandatoryQuestionnaireFieldLabels[field].fr).not.toBe("");
-      expect(mandatoryQuestionnaireFieldLabels[field].en).not.toBe("");
     }
   });
 
@@ -92,10 +91,9 @@ const emptyOptional: OptionalQuestionnaireAnswers = {
 };
 
 describe("the optional questionnaire fields", () => {
-  it("labels each field in French and English", () => {
+  it("labels each field in French", () => {
     for (const field of optionalQuestionnaireFields) {
       expect(optionalQuestionnaireFieldLabels[field].fr).not.toBe("");
-      expect(optionalQuestionnaireFieldLabels[field].en).not.toBe("");
     }
   });
 

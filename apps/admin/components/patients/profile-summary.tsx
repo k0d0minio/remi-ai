@@ -10,6 +10,7 @@ import {
   activityLevelDetails,
   ageInYears,
   dietLabels,
+  formatNumber,
   geneticTestAnswerLabels,
   sexForCalculationLabels,
 } from "@remi/services/shared";
@@ -24,7 +25,6 @@ import {
   cookingAffinityLabels,
   cookingTimeLabels,
   foodBudgetLabels,
-  localeLabels,
   patientSexLabels,
   patientStatusLabels,
 } from "@/components/patients/vocabulary";
@@ -113,7 +113,6 @@ export const ProfileSummary = ({
     { label: "Nom complet", value: patient.fullName },
     { label: "Adresse email", value: patient.email },
     { label: "Téléphone", value: patient.phone },
-    { label: "Langue", value: localeLabels[patient.locale] },
     { label: "Statut", value: patientStatusLabels[patient.status] },
   ];
 
@@ -130,7 +129,10 @@ export const ProfileSummary = ({
     },
     {
       label: "Poids",
-      value: patient.weightKg === null ? null : `${patient.weightKg} kg`,
+      value:
+        patient.weightKg === null
+          ? null
+          : `${formatNumber(patient.weightKg)} kg`,
     },
   ];
 
@@ -153,7 +155,7 @@ export const ProfileSummary = ({
       value:
         answers.desiredWeightKg === null
           ? null
-          : `${answers.desiredWeightKg} kg`,
+          : `${formatNumber(answers.desiredWeightKg)} kg`,
     },
     { label: "Motif de consultation", value: answers.consultationReason },
     {

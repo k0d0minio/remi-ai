@@ -35,13 +35,12 @@ export const initialFileStatus: FileStatus = "to_complete";
  * (D-31, Jamie accepted the default on 2026-11-03).
  */
 export const fileStatusLabels = {
-  to_complete: { fr: "Dossier à compléter", en: "File to complete" },
-  ready: { fr: "Prêt pour consultation", en: "Ready for consultation" },
+  to_complete: { fr: "Dossier à compléter"},
+  ready: { fr: "Prêt pour consultation"},
   to_validate: {
-    fr: "Recommandations à valider",
-    en: "Recommendations to validate",
+    fr: "Recommandations à valider"
   },
-  active: { fr: "Accompagnement actif", en: "Active care" },
+  active: { fr: "Accompagnement actif"},
 } as const satisfies Record<FileStatus, Readonly<Record<Locale, string>>>;
 
 /**

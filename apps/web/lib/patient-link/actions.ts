@@ -52,7 +52,7 @@ import { writePatientLink } from "@/lib/patient-link/write";
  * rather than defaulted into the wrong sentence.
  *
  * What comes back is an error *key*, never a service message. The services
- * layer speaks English to developers; the patient reads their own language, so
+ * layer speaks English to developers; the patient reads French, so
  * the dictionary owns the wording and this file only says which sentence.
  */
 export type WriteState = { error: PatientWriteError | null };

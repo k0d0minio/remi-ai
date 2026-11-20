@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import NextLink from "next/link";
 import { notFound } from "next/navigation";
 import { checkFileTakeover } from "@remi/services/server";
-import { isLocale, localePath } from "@remi/services/shared";
+import { defaultLocale, isLocale, localePath } from "@remi/services/shared";
 import { Link, Typography, Wordmark } from "@remi/ui/server";
 import { TakeoverForm } from "@/components/takeover/takeover-form";
 import { getContent } from "@/lib/content";
@@ -23,7 +23,7 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const { locale } = await params;
   return {
-    title: getContent(isLocale(locale) ? locale : "en").takeover.metaTitle,
+    title: getContent(isLocale(locale) ? locale : defaultLocale).takeover.metaTitle,
     // A one-time credential lives in the URL: no other site it links to reads
     // it. Not "no-referrer": that policy sends `Origin: null` on the form's
     // POST, and Next.js then refuses the server action.

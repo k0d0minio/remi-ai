@@ -93,13 +93,11 @@ describe("the missing data of a calculation", () => {
     ).toEqual(["age"]);
   });
 
-  it("labels every input and every kind in French and English", () => {
+  it("labels every input and every kind in French", () => {
     for (const kind of calculationKinds) {
       expect(calculationKindLabels[kind].fr).not.toBe("");
-      expect(calculationKindLabels[kind].en).not.toBe("");
       for (const input of calculationInputs[kind]) {
         expect(calculationInputLabels[input].fr).not.toBe("");
-        expect(calculationInputLabels[input].en).not.toBe("");
       }
     }
   });

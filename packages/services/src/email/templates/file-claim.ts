@@ -22,8 +22,8 @@ const escapeHtml = (value: string) =>
     .replaceAll("'", "&#39;");
 
 /** The expiry, as the practice's clock reads it: a day and an hour. */
-const expiryMoment = (at: Date, locale: Locale) =>
-  new Intl.DateTimeFormat(locale === "fr" ? "fr-BE" : "en-GB", {
+const expiryMoment = (at: Date) =>
+  new Intl.DateTimeFormat("fr-BE", {
     dateStyle: "long",
     timeStyle: "short",
     timeZone: PRACTICE_TIME_ZONE,
@@ -60,17 +60,6 @@ const copy: Record<Locale, Copy> = {
       `Ce lien est personnel. Il sert une seule fois et expire le ${moment}. Si tu n'as rien demandé, ignore ce message : sans le lien, aucun compte n'est créé.`,
     signature: "— REMI",
   },
-  en: {
-    subject: "Take over your REMI file",
-    greeting: (name) => (name ? `Hello ${name},` : "Hello,"),
-    lead: "The person who follows you already opened a REMI file at your e-mail address. This link lets you take it over: you find the information already recorded.",
-    how: "The link first asks for your consent to the processing of your data, then for a password.",
-    action: "Take over my file",
-    fallback: "Or copy this link:",
-    expiry: (moment) =>
-      `This link is personal. It works once and expires on ${moment}. If you did not ask for it, ignore this message: without the link, no account is created.`,
-    signature: "— REMI",
-  },
 };
 
 export const fileClaimEmail = ({
@@ -81,7 +70,7 @@ export const fileClaimEmail = ({
 }: Props): Omit<EmailMessage, "to"> => {
   const t = copy[locale];
   const greeting = t.greeting(name.trim());
-  const expiry = t.expiry(expiryMoment(expiresAt, locale));
+  const expiry = t.expiry(expiryMoment(expiresAt));
 
   const text = [
     greeting,

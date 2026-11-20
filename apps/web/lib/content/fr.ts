@@ -20,7 +20,6 @@ export const fr: Content = {
   userMenu: {
     label: "Menu du compte",
     account: "Compte",
-    language: "Langue",
     help: "Aide",
     documentation: "Documentation",
     signOut: "Se déconnecter",

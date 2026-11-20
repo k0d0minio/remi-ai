@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import NextLink from "next/link";
 import { notFound } from "next/navigation";
-import { isLocale, localePath } from "@remi/services/shared";
+import { defaultLocale, isLocale, localePath } from "@remi/services/shared";
 import { Link, Typography, Wordmark } from "@remi/ui/server";
 import { ForgotPasswordForm } from "@/components/patient-auth/forgot-password-form";
 import { getContent } from "@/lib/content";
@@ -15,7 +15,7 @@ export const generateMetadata = async ({
   params: Promise<Params>;
 }): Promise<Metadata> => {
   const { locale } = await params;
-  const content = getContent(isLocale(locale) ? locale : "en");
+  const content = getContent(isLocale(locale) ? locale : defaultLocale);
   return { title: content.forgotPassword.metaTitle };
 };
 

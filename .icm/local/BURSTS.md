@@ -45,12 +45,14 @@ about six. One ticket is one local branch. No ticket branch goes to GitHub.
      file, not in `apps/admin/lib/patients/actions.ts`, unless your brief says otherwise.
    - Only the ticket that your brief names changes the action card
      (`apps/admin/components/patients/file/next-step.tsx`).
-   - Put new patient texts in one new block of `apps/web/lib/content/fr.ts`, `en.ts` and
-     `types.ts`. Do not change a line that exists, unless your ticket is about that text.
+   - Put new patient texts in one new block of `apps/web/lib/content/fr.ts` and `types.ts`. Do not change a line that exists, unless your ticket is about that text.
 7. If the ticket has a stub in `.icm/intake/`, move the stub to the `_done/` folder of its epic in
    your commit.
 8. The commit title is `<KEY>: <ticket title>`. Add no attribution line.
-9. Client-facing text is in `fr-BE` and `en`. The patient is addressed with « tu ».
+9. Text that a user reads is French only (`fr-BE`): no English text, no second locale (Jamie,
+   2026-11-20). The patient is addressed with « tu », the practitioner with « vous ». A console
+   action shows a refusal of a service with `userMessage()` of `@remi/services/shared`, never
+   with its `message`.
 
 ## Rules that no shortcut drops
 

@@ -21,6 +21,7 @@ import {
   isProtocolTemplateKind,
   protocolKindFields,
   readProtocolRow,
+  userMessage,
   type ProtocolCopyKindName,
   type ProtocolRow,
   type ProtocolTemplateKindName,
@@ -416,7 +417,7 @@ export const saveTemplateAction = async (
     rows,
   );
   if (!saved.ok) {
-    return { error: saved.message };
+    return { error: userMessage(saved) };
   }
 
   await audit(
@@ -465,7 +466,7 @@ export const renameTemplateAction = async (
 
   const renamed = await renameProtocolTemplate(id, operator.id, name);
   if (!renamed.ok) {
-    return { error: renamed.message };
+    return { error: userMessage(renamed) };
   }
   await audit(operator, "template.renamed", {
     type: "protocol_template",
@@ -483,7 +484,7 @@ export const deleteTemplateAction = async (
 
   const removed = await deleteProtocolTemplate(id, operator.id);
   if (!removed.ok) {
-    return { error: removed.message };
+    return { error: userMessage(removed) };
   }
   await audit(operator, "template.deleted", {
     type: "protocol_template",
@@ -502,7 +503,7 @@ export const shareTemplateAction = async (
 
   const updated = await setProtocolTemplateShared(id, operator.id, shared);
   if (!updated.ok) {
-    return { error: updated.message };
+    return { error: userMessage(updated) };
   }
   await audit(operator, shared ? "template.shared" : "template.unshared", {
     type: "protocol_template",

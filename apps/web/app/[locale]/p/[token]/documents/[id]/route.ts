@@ -35,10 +35,10 @@ export const GET = async (
     document.kind !== "file" ||
     !document.blobKey
   ) {
-    return new Response("Not found", { status: 404 });
+    return new Response("Document introuvable", { status: 404 });
   }
   if (!fileStoreReady()) {
-    return new Response("Unavailable", { status: 503 });
+    return new Response("Service indisponible", { status: 503 });
   }
   const url = await signedFileUrl(document.blobKey);
   return new Response(null, {
