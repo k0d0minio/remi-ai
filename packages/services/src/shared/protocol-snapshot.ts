@@ -25,6 +25,7 @@ import {
   mealFastingOptions,
   mealOrientations,
 } from "./meal-configuration";
+import { lifestyleAdviceKeys } from "./lifestyle-advice";
 import { recommendationCategories } from "./patient";
 
 /**
@@ -33,6 +34,8 @@ import { recommendationCategories } from "./patient";
  * directives existed has none, and it reads with an empty list.
  * `mealConfiguration` (REM-68) did not raise it: the key is optional, and a
  * snapshot from before it reads as a file with no meal configuration.
+ * The lifestyle advice (REM-65) did not raise it: an advice is one more row of
+ * `recommendations`, with a category that an older snapshot does not have.
  */
 export const PROTOCOL_SNAPSHOT_SCHEMA_VERSION = 1;
 
@@ -41,7 +44,11 @@ const position = z.number().int().nonnegative();
 const snapshotRecommendation = z.object({
   /** The id of the live row at the validation. The row can be gone since. */
   id: z.uuid(),
-  category: z.enum(recommendationCategories),
+  /**
+   * A recommendation category, or one of the six lifestyle keys (REM-65). A
+   * snapshot from before REM-65 has no row with a lifestyle key.
+   */
+  category: z.enum([...recommendationCategories, ...lifestyleAdviceKeys]),
   title: z.string().min(1),
   detail: z.string(),
   position,

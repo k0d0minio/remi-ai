@@ -192,6 +192,13 @@ export {
   savePatientFoodDirectives,
 } from "../db/services/patient-food-directives";
 export {
+  deleteLifestyleAdvice,
+  listDisabledPatientLifestyleAdvices,
+  listPatientLifestyleAdvices,
+  savePatientLifestyleAdvices,
+  setLifestyleAdviceDisabled,
+} from "../db/services/patient-lifestyle-advices";
+export {
   getPatientMealConfiguration,
   updatePatientMealConfiguration,
 } from "../db/services/patient-meal-configuration";

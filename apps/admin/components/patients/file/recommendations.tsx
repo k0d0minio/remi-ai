@@ -1,4 +1,5 @@
 import type { ComponentProps } from "react";
+import { lifestyleKeyOf } from "@remi/services/shared";
 import { Typography } from "@remi/ui/server";
 import { RecommendationAddForm } from "@/components/patients/recommendation-add-form";
 import { RecommendationGroups } from "@/components/patients/recommendation-groups";
@@ -14,8 +15,11 @@ type Props = {
   archived: Rows;
 };
 
-/** « Recommandations »: the protocol entry by entry, then the archived ones. */
-export const RecommendationsSection = ({
+/** A row of the old categories `habit` and `activity` is not shown here. */
+const notLifestyle = (rows: Rows): Rows =>
+  rows.filter((row) => lifestyleKeyOf(row.category) === null);
+
+const RecommendationsBody = ({
   patientId,
   pseudonym,
   recommendations,
@@ -53,4 +57,19 @@ export const RecommendationsSection = ({
       </SectionFold>
     ) : null}
   </>
+);
+
+/**
+ * « Recommandations »: the protocol entry by entry, then the archived ones.
+ *
+ * « Hygiène de vie » shows the rows of the old categories `habit` and
+ * `activity` (REM-65), so this section leaves them out. Its whole-section save
+ * archives only a row that the editor showed, so it does not touch them.
+ */
+export const RecommendationsSection = (props: Props) => (
+  <RecommendationsBody
+    {...props}
+    recommendations={notLifestyle(props.recommendations)}
+    archived={notLifestyle(props.archived)}
+  />
 );

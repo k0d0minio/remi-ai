@@ -13,16 +13,18 @@
 
 import type { FoodLimitLevel } from "./food-directives";
 import { todayAtPractice } from "./format";
+import { lifestyleAdviceKeys, lifestyleKeyOf } from "./lifestyle-advice";
 import type { ProtocolSnapshot } from "./protocol-snapshot";
 
 /**
- * The sub-categories of « Conseils d'hygiène de vie », in the order of
- * `recommendationCategories`. A `nutrition` recommendation goes with the food
- * recommendations, and a `supplement` one with the supplements.
+ * The sub-categories of « Conseils d'hygiène de vie »: the six categories of
+ * story 17 in Morgane's order (REM-65), then `monitoring`. A row of the old
+ * categories `habit` and `activity` is in the category that `lifestyleKeyOf`
+ * gives. A `nutrition` recommendation goes with the food recommendations, and
+ * a `supplement` one with the supplements.
  */
 export const lifestyleAdviceCategories = [
-  "habit",
-  "activity",
+  ...lifestyleAdviceKeys,
   "monitoring",
 ] as const;
 
@@ -114,8 +116,17 @@ export const validatedRecommendationsView = (
     reason: row.reason,
   }));
   const supplementAdvice = adviceOf("supplement");
+  // An old `habit` or `activity` row comes first in its category, then the
+  // advice of the section. Each run is in the practitioner's order.
   const lifestyle = lifestyleAdviceCategories.flatMap((category) => {
-    const items = adviceOf(category);
+    const items =
+      category === "monitoring"
+        ? adviceOf(category)
+        : byPosition(
+            snapshot.recommendations.filter(
+              (row) => lifestyleKeyOf(row.category) === category,
+            ),
+          ).map((row) => ({ id: row.id, title: row.title, detail: row.detail }));
     return items.length > 0 ? [{ category, items }] : [];
   });
   const evictions = directivesOf("exclude")

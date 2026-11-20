@@ -72,7 +72,14 @@ const allForPatient = async (
     return [];
   }
   const page = await recommendations().findMany({ patientId }, { limit: 200 });
-  return [...page.items].sort(byCategoryThenPosition);
+  // A lifestyle advice (REM-65) is a row of this table with a category of its
+  // own. `patient-lifestyle-advices` owns it: it is not a recommendation here,
+  // so a whole-section save of the recommendations cannot archive it.
+  return page.items
+    .filter((row) =>
+      (recommendationCategories as readonly string[]).includes(row.category),
+    )
+    .sort(byCategoryThenPosition);
 };
 
 /** The protocol in force — what the patient link shows. */

@@ -34,7 +34,9 @@ import {
   listPatientRecommendations,
   listArchivedPatientSupplements,
   listDisabledPatientFoodDirectives,
+  listDisabledPatientLifestyleAdvices,
   listPatientFoodDirectives,
+  listPatientLifestyleAdvices,
   listPatientSupplements,
   listRecipes,
   missingQuestionnaireFields,
@@ -69,6 +71,7 @@ import { MealStructureSection } from "@/components/patients/file/meal-structure"
 import { GoalsSection } from "@/components/patients/file/goals";
 import { PatientHeader } from "@/components/patients/file/header";
 import { LearningsSection } from "@/components/patients/file/learnings";
+import { LifestyleAdviceSection } from "@/components/patients/file/lifestyle-advice";
 import {
   MealsSection,
   mealsAwaitingLabel,
@@ -367,6 +370,12 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     listDisabledPatientFoodDirectives(actor, patient.id),
   ]);
 
+  // The lifestyle advice (REM-65): the advice in force and the disabled ones.
+  const [lifestyleAdvices, disabledLifestyleAdvices] = await Promise.all([
+    listPatientLifestyleAdvices(actor, patient.id),
+    listDisabledPatientLifestyleAdvices(actor, patient.id),
+  ]);
+
   // The meals and the fasting option (REM-68, REM-70). Null: not entered.
   const mealConfiguration = await getPatientMealConfiguration(
     actor,
@@ -517,6 +526,25 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
           pseudonym={patient.pseudonym}
           supplements={supplements}
           archived={archivedSupplements}
+        />
+      ),
+    },
+    "lifestyle-advice": {
+      title: "Hygiène de vie",
+      description:
+        "Vos conseils hors alimentation, dans six catégories. Aucune n'est obligatoire. La personne les lit tels que vous les avez écrits, après la validation.",
+      summary: countLabel(lifestyleAdvices.length, {
+        none: "Aucun conseil",
+        one: "conseil",
+        many: "conseils",
+      }),
+      empty: lifestyleAdvices.length === 0,
+      count: lifestyleAdvices.length,
+      body: (
+        <LifestyleAdviceSection
+          patientId={patient.id}
+          advices={lifestyleAdvices}
+          disabled={disabledLifestyleAdvices}
         />
       ),
     },

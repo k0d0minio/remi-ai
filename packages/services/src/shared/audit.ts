@@ -102,6 +102,14 @@ export const auditActions = [
    */
   "food_directive.batch_saved",
   /**
+   * The practitioner saved, disabled, put back or deleted a lifestyle advice
+   * (REM-65, D-32). The detail is JSON: counts and categories, and no text.
+   */
+  "lifestyle_advice.batch_saved",
+  "lifestyle_advice.disabled",
+  "lifestyle_advice.restored",
+  "lifestyle_advice.deleted",
+  /**
    * The practitioner changed the switch of a meal, the orientation of a meal
    * or the fasting option (REM-68, REM-70, D-32). The detail is JSON: each
    * value that moved, with its old and its new value.
