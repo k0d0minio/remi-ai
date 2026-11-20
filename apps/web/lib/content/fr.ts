@@ -768,4 +768,14 @@ export const fr: Content = {
       "Tes recommandations, tes informations personnelles et les réglages de ton compte arrivent bientôt ici.",
   },
   signOut: "Se déconnecter",
+  patientWaiting: {
+    metaTitle: "Ton accompagnement se prépare",
+    title: "Ton praticien prépare ton accompagnement",
+    body:
+      "Tes réponses sont bien arrivées. Dès que ton accompagnement est prêt, ton espace REMI s'ouvre ici, avec le même compte.",
+    practitionerLabel: "Ton praticien",
+    appointmentLabel: "Ton rendez-vous",
+    questionnaireHint: "Tu peux encore adapter tes réponses, à ton rythme.",
+    questionnaireLink: "Revoir mon questionnaire",
+  },
 };

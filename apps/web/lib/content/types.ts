@@ -759,4 +759,20 @@ export type Content = {
   };
   /** The sign-out button on the pages behind the patient session. */
   signOut: string;
+  /**
+   * The waiting screen at `/attente` (story 22): from a complete questionnaire
+   * to the activation.
+   */
+  patientWaiting: {
+    metaTitle: string;
+    title: string;
+    body: string;
+    /** Above the practitioner's name. */
+    practitionerLabel: string;
+    /** Above the appointment date. Shown only when a date is set. */
+    appointmentLabel: string;
+    /** Says that the answers stay editable. Above the link. */
+    questionnaireHint: string;
+    questionnaireLink: string;
+  };
 };

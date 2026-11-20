@@ -3,6 +3,7 @@ import { Typography } from "@remi/ui/server";
 import { SignOutButton } from "@/components/patient-auth/sign-out-button";
 import { getContent } from "@/lib/content";
 import { resolveLocale, type LocaleParams } from "@/lib/locale-params";
+import { requireActivePatient } from "@/lib/patient-auth/session";
 
 export const generateMetadata = async ({
   params,
@@ -24,6 +25,8 @@ const PatientProfilePage = async ({
   params: Promise<LocaleParams>;
 }) => {
   const locale = await resolveLocale(params);
+  // The space opens at the activation (story 19).
+  await requireActivePatient(locale);
   const content = getContent(locale);
 
   return (

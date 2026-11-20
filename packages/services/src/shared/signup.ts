@@ -23,7 +23,12 @@ export type SignupFieldErrors = Partial<Record<SignupField, SignupFieldError>>;
 export const minPasswordLength = 8;
 
 /**
- * Where a signed-in patient lands: the questionnaire before activation, the
- * home after it (story 2). The app maps each value to its route.
+ * Where a signed-in patient lands (stories 2, 19 and 22). The app maps each
+ * value to its route.
+ *
+ * - `questionnaire`: the file is « Dossier à compléter ».
+ * - `waiting`: the questionnaire is complete and the practitioner has not
+ *   activated the care. Only the waiting screen and the questionnaire open.
+ * - `home`: the care is active. The patient space opens.
  */
-export type PatientLanding = "questionnaire" | "home";
+export type PatientLanding = "questionnaire" | "waiting" | "home";

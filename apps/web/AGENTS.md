@@ -32,6 +32,8 @@ app/[locale]/       every page ships in en and fr; `[locale]/layout.tsx` IS the
   inscription/      the patient's sign-up from the practitioner's link
   connexion/        the patient's sign-in, the reset pages, the magic link's landing
   questionnaire/    behind the patient session: the page before activation
+  attente/          behind the patient session: the waiting screen, from a
+                    complete questionnaire to the activation
 app/api/            route handlers (webhooks, cron, uploads) — outside the locale
                     segment, because a machine surface has no language
 components/         composition only, grouped by feature — never primitives
@@ -40,7 +42,9 @@ lib/auth/           the session seam + the development stand-in, and the auth
                     seam's registration (`provider.ts`)
 lib/patient-auth/   the patient's routes, session guard and sign-in actions.
                     A patient page calls `requirePatient()` and reads the
-                    patient's id from the account it returns, never from the URL
+                    patient's id from the account it returns, never from the URL.
+                    A page of `(patient)/` calls `requireActivePatient()`: no
+                    page of the space opens before the activation
 lib/content/        one dictionary per locale, typed by `types.ts` so a missing
                     translation is a type error
 lib/fixtures/       stand-in data — deleted by the PR that registers a real
