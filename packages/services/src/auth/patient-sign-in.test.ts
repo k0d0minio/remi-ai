@@ -99,6 +99,7 @@ beforeAll(async () => {
       return ok(null);
     },
     completeRedirectSignIn: async () => null,
+    renewSessionCache: async () => null,
     routeHandlers: () => {
       throw new Error("not used");
     },

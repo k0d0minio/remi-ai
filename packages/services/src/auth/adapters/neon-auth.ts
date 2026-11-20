@@ -2,11 +2,13 @@ import { createNeonAuth } from "@neon/auth/next/server";
 import { err, ok } from "../../shared/result";
 import type { ServiceErrorCode } from "../../shared/result";
 import { requireEnv } from "../../server/env";
+import { SessionReadError } from "../provider";
 import type {
   AuthIdentity,
   AuthProvider,
   AuthResult,
   AuthRouteHandlers,
+  SessionRenewal,
 } from "../provider";
 
 /**
@@ -73,6 +75,30 @@ export type NeonAuthClient = {
  */
 export const SESSION_VERIFIER_PARAM = "neon_auth_session_verifier";
 
+/**
+ * The two cookies of a session. The token is the session: the auth server
+ * checks it. The cache is the session's data, signed by this app, and it
+ * lives 5 minutes (`cookies.sessionDataTtl`). While the cache is fresh,
+ * `getSession` reads it and does not call the auth server.
+ *
+ * The SDK writes the cache at sign-in. After that, only its route handler and
+ * its middleware renew it, and this app does not mount the middleware. Thus
+ * `renewSessionCache` renews it from the app's proxy. Without it, each session
+ * read of each request is a call to the auth server, and the auth server
+ * limits the calls of one address (HTTP 429).
+ */
+const SESSION_TOKEN_COOKIE = "__Secure-neon-auth.session_token";
+const SESSION_CACHE_COOKIE = "__Secure-neon-auth.local.session_data";
+
+/** The cookie names of a `cookie` header. A value is never read here. */
+const cookieNames = (cookieHeader: string): Set<string> =>
+  new Set(
+    cookieHeader
+      .split(";")
+      .map((pair) => pair.split("=")[0]?.trim() ?? "")
+      .filter((name) => name !== ""),
+  );
+
 /** Better Auth's error codes, mapped onto the codes a page can render. */
 export const toServiceError = (error: SdkError): ServiceErrorCode => {
   const code = error.code ?? "";
@@ -111,6 +137,52 @@ const toIdentity = (user: SdkUser): AuthIdentity => ({
   emailVerified: user.emailVerified === true,
 });
 
+/**
+ * One answer of `getSession`, sorted. The three cases must stay apart:
+ * `failed` is not `nobody`. Before 2026-11-20 each error was read as `nobody`,
+ * and a signed-in patient saw the sign-in page when the auth server refused
+ * one read.
+ */
+export type SessionRead =
+  | { kind: "identity"; identity: AuthIdentity }
+  | { kind: "nobody" }
+  | { kind: "failed"; reason: string; retry: boolean };
+
+/** How long the adapter waits before the second and the third read. */
+export const SESSION_READ_WAITS_MS = [150, 450] as const;
+
+const wait = (ms: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+/**
+ * Sorts the SDK's answer. The auth server answers `200 null` when nobody is
+ * signed in, and that is the only `nobody`, with a 401. Each other error is a
+ * failed read: a transport error (502 from the SDK), a 5xx, a rate limit.
+ * A rate limit is not read again at once: the wait that it asks (36 seconds
+ * when measured) is longer than the retries.
+ */
+export const sortSessionAnswer = (answer: {
+  data: { user?: SdkUser | null } | null;
+  error: SdkError | null;
+}): SessionRead => {
+  const { data, error } = answer;
+  if (error) {
+    if (error.status === 401) {
+      return { kind: "nobody" };
+    }
+    return {
+      kind: "failed",
+      reason: `${error.status ?? "no status"} ${error.code ?? "no code"}`,
+      retry: error.status !== 429,
+    };
+  }
+  return data?.user
+    ? { kind: "identity", identity: toIdentity(data.user) }
+    : { kind: "nobody" };
+};
+
 const done = async (answer: SdkAnswer<unknown>): Promise<AuthResult<null>> => {
   const { error } = await answer;
   return error ? fail(error) : ok(null);
@@ -129,12 +201,37 @@ const signedIn = async (
   return ok(toIdentity(data.user));
 };
 
-/** Build the provider over any client of the SDK's shape. The tests pass a fake. */
-export const neonAuthProviderFrom = (client: NeonAuthClient): AuthProvider => {
+/**
+ * Build the provider over any client of the SDK's shape. The tests pass a
+ * fake, and a `wait` that does not wait.
+ */
+export const neonAuthProviderFrom = (
+  client: NeonAuthClient,
+  options: { wait?: (ms: number) => Promise<void> } = {},
+): AuthProvider => {
+  const pause = options.wait ?? wait;
   let handlers: AuthRouteHandlers | null = null;
   const routeHandlers = () => {
     handlers ??= client.handler();
     return handlers;
+  };
+
+  /**
+   * One read. A throw of the SDK is a failed read too: the SDK throws when
+   * the auth server sends a cookie during a page render, which cannot write
+   * one (the daily renewal of a session does this). The next read succeeds.
+   */
+  const readOnce = async (): Promise<SessionRead> => {
+    try {
+      return sortSessionAnswer(await client.getSession());
+    } catch (cause) {
+      return {
+        kind: "failed",
+        // The name only: a message can quote a request.
+        reason: cause instanceof Error ? cause.name : "unknown error",
+        retry: true,
+      };
+    }
   };
 
   return {
@@ -153,12 +250,70 @@ export const neonAuthProviderFrom = (client: NeonAuthClient): AuthProvider => {
     requestMagicLink: async ({ email, name, callbackPath }) =>
       done(client.signIn.magicLink({ email, name, callbackURL: callbackPath })),
     signOut: async () => done(client.signOut()),
+    // A failed read is read again, twice at most. Then it is an error for
+    // the caller, never "nobody is signed in". The check itself stays as it
+    // was: an identity comes only from an answer that has a user.
     readIdentity: async () => {
-      const { data, error } = await client.getSession();
-      if (error || !data?.user) {
+      let read = await readOnce();
+      for (const ms of SESSION_READ_WAITS_MS) {
+        if (read.kind !== "failed" || !read.retry) {
+          break;
+        }
+        await pause(ms);
+        read = await readOnce();
+      }
+      if (read.kind === "identity") {
+        return read.identity;
+      }
+      if (read.kind === "nobody") {
         return null;
       }
-      return toIdentity(data.user);
+      console.error("[auth] the session read failed", { reason: read.reason });
+      throw new SessionReadError(read.reason);
+    },
+    // The SDK's own route handler renews the cache: asked for `get-session`
+    // with a token and no cache, it reads the session at the auth server and
+    // answers the cache cookie. Only that cookie goes on. A deletion, or a
+    // change of the token, never leaves this function.
+    renewSessionCache: async (request): Promise<SessionRenewal | null> => {
+      const cookieHeader = request.headers.get("cookie") ?? "";
+      const names = cookieNames(cookieHeader);
+      if (!names.has(SESSION_TOKEN_COOKIE) || names.has(SESSION_CACHE_COOKIE)) {
+        return null;
+      }
+      try {
+        const url = new URL("/api/auth/get-session", request.url);
+        const answer = await routeHandlers().GET(
+          new Request(url, {
+            headers: { cookie: cookieHeader, origin: url.origin },
+          }),
+          { params: Promise.resolve({ path: ["get-session"] }) },
+        );
+        const body = (await answer
+          .clone()
+          .json()
+          .catch(() => null)) as { user?: unknown } | null;
+        if (!answer.ok || !body?.user) {
+          return null;
+        }
+        const prefix = `${SESSION_CACHE_COOKIE}=`;
+        const line = answer.headers
+          .getSetCookie()
+          .find((cookie) => cookie.startsWith(prefix));
+        const value = line?.slice(prefix.length).split(";")[0];
+        if (!line || !value) {
+          return null;
+        }
+        return {
+          setCookies: [line],
+          cookieHeader: `${cookieHeader}; ${prefix}${value}`,
+        };
+      } catch (cause) {
+        console.error("[auth] the session cache was not renewed", {
+          name: cause instanceof Error ? cause.name : "unknown error",
+        });
+        return null;
+      }
     },
     requestPasswordReset: async ({ email, redirectPath }) =>
       done(client.requestPasswordReset({ email, redirectTo: redirectPath })),

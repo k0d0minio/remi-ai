@@ -18,6 +18,12 @@ import { landingPaths, SIGN_IN_PATH } from "./paths";
 /**
  * The signed-in patient's account, or `null`. With the auth variables unset,
  * nobody is signed in: the log names the variable.
+ *
+ * `null` means that the auth server answered "nobody is signed in". When the
+ * read itself failed, this throws `SessionReadError` (the auth seam). A page
+ * then shows the error page of its segment, with « Réessayer », and the
+ * patient keeps their session. The patient is not sent to the sign-in page,
+ * and no page or action runs without a session that was read.
  */
 export const currentPatient = async (): Promise<PatientAccount | null> => {
   ensureDatabase();
