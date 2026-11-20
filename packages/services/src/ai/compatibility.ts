@@ -18,6 +18,19 @@
  *   `uncertain`. The gate invents no answer.
  * - An eviction past its end date still applies. The gate never lifts one: the
  *   practitioner ends it, and then the loader does not supply it.
+ *
+ * A food by its CIQUAL code (REM-189). An ingredient can carry `food`: the food
+ * record of a CIQUAL food. The gate then reads the tags of the record and does
+ * not look for the name in the lexicon. The rules for such a food:
+ * - Only a record that is `confirmed` and « cuisinable » counts. Any other
+ *   food is `uncertain` (`unconfirmed_food`): a proposal of REMI is never a
+ *   safety decision.
+ * - A tag that the gate does not know makes the food `uncertain`.
+ * - An eviction that names one food (« kiwi ») is looked for in the CIQUAL
+ *   name, in the linked lexicon row and in the lexicon foods that the name
+ *   holds. A food with no such link cannot be compared with a named eviction:
+ *   it is `uncertain` for that patient.
+ * An ingredient with no `food` is read as before, by its name.
  */
 
 import {
@@ -62,11 +75,31 @@ export type PatientSafetyData = {
   evictions: readonly TotalEviction[];
 };
 
+/**
+ * The food record of one CIQUAL food, as the gate reads it. The service
+ * `gateFoodsByCode` builds it. `status` is `none` for a food with no record.
+ */
+export type GateFood = {
+  /** CIQUAL's `alim_code`. */
+  code: string;
+  /** The CIQUAL name: « Courgette, pulpe et peau, crue ». */
+  name: string;
+  status: "confirmed" | "proposed" | "none";
+  cookable: boolean;
+  contains: readonly string[];
+  mayContain: readonly string[];
+  /** The id of the lexicon row that names this food, or null. */
+  lexiconId: string | null;
+};
+
 export type CompatibilityItem =
   | {
       kind: "recipe";
-      /** One food for each name. No quantity and no unit in the name. */
-      ingredients: readonly { name: string }[];
+      /**
+       * One food for each name. No quantity and no unit in the name. With
+       * `food`, the gate reads the food record and not the name.
+       */
+      ingredients: readonly { name: string; food?: GateFood }[];
     }
   | { kind: "text"; text: string };
 
@@ -88,8 +121,10 @@ export type CompatibilityUnknownKind =
   | "free_text"
   /** The item has no ingredient, or an ingredient has no name. */
   | "empty_item"
-  /** The lexicon does not know a word of the ingredient. */
+  /** The lexicon does not know a word of the ingredient, or a tag of its record. */
   | "unknown_ingredient"
+  /** The food record is not confirmed, or the food is not « cuisinable ». */
+  | "unconfirmed_food"
   /** The ingredient can contain an excluded food. */
   | "possible_trace"
   /** The ingredient can carry gluten, for a coeliac patient. */
@@ -203,6 +238,10 @@ const buildLexicon = () => {
 
 const LEXICON = buildLexicon();
 
+const LEXICON_BY_ID = new Map(
+  [...LEXICON.phrases.values()].map((food) => [food.id, food]),
+);
+
 const MAX_PHRASE_TOKENS = Math.max(
   ...[...LEXICON.phrases.keys()].map((key) => key.split(" ").length),
 );
@@ -277,6 +316,38 @@ export const compatibilityLexiconFaults = (): string[] => {
   return faults;
 };
 
+/**
+ * Each tag that a food record can hold, in a fixed order: the allergen
+ * families of the questionnaire with their sub-keys, then the other families
+ * with the sub-keys that the lexicon uses (`meat:pork`). The console and the
+ * proposal prompt read this list: there is no second vocabulary.
+ */
+export const gateTags = (): string[] => {
+  const lexiconTags = [...LEXICON_BY_ID.values()].flatMap((food) => [
+    ...food.contains,
+    ...food.mayContain,
+  ]);
+  const families = [
+    ...allergens.filter((key) => key !== "other"),
+    ...OTHER_FAMILIES,
+  ];
+  const tags: string[] = [];
+  for (const family of families) {
+    tags.push(family);
+    const subs = [
+      ...(subListOf(family) ?? []).map((sub) => `${family}:${sub}`),
+      ...lexiconTags.filter((tag) => tag.startsWith(`${family}:`)).sort(),
+    ];
+    tags.push(...new Set(subs));
+  }
+  return tags;
+};
+
+const GATE_TAGS = new Set(gateTags());
+
+/** True for a tag that the gate can compare with an exclusion. */
+export const isGateTag = (tag: string) => GATE_TAGS.has(tag);
+
 type Parsed = { tokens: string[]; foods: Food[]; unknownWords: string[] };
 
 /** The longest name wins: « lait de coco » is not « lait ». */
@@ -307,6 +378,60 @@ const parse = (text: string): Parsed => {
     index += matched;
   }
   return { tokens, foods, unknownWords };
+};
+
+/**
+ * The lexicon row that names a CIQUAL food, or null. It reads the name before
+ * the first comma (« Courgette » of « Courgette, pulpe et peau, crue »). A
+ * link needs exactly one lexicon food and no unknown word: « Lait d'amande »
+ * names two foods, so it gets no link.
+ */
+export const lexiconIdOfFoodName = (name: string): string | null => {
+  const parsed = parse(name.split(",")[0] ?? "");
+  const ids = new Set(parsed.foods.map((food) => food.id));
+  const [id] = ids;
+  return ids.size === 1 && parsed.unknownWords.length === 0 && id !== undefined
+    ? id
+    : null;
+};
+
+/**
+ * The tags of a lexicon row, by its id, or null. REMI's proposal for a linked
+ * food starts from them. A person confirms the result as for each proposal.
+ */
+export const lexiconTagsOf = (
+  lexiconId: string,
+): { contains: readonly string[]; mayContain: readonly string[] } | null => {
+  const row = LEXICON_BY_ID.get(lexiconId);
+  return row ? { contains: row.contains, mayContain: row.mayContain } : null;
+};
+
+/** A food record as the rules read a lexicon food. */
+const parseGateFood = (food: GateFood, fallbackName: string): Parsed => {
+  const linked =
+    food.lexiconId === null ? undefined : LEXICON_BY_ID.get(food.lexiconId);
+  // The lexicon foods that the CIQUAL name holds. They give ids only, for an
+  // eviction that names one food. The tags come from the record alone.
+  const named = parse(food.name).foods;
+  return {
+    tokens: tokenize(food.name.trim() === "" ? fallbackName : food.name),
+    foods: [
+      {
+        id: linked?.id ?? `ciqual:${food.code}`,
+        contains: food.contains,
+        mayContain: food.mayContain,
+        // With no link and no lexicon food in the name, the gate cannot
+        // compare this food with a named eviction: `judge` reads `composite`
+        // and answers « possible ».
+        composite: linked ? linked.composite : named.length === 0,
+        foods: [
+          ...(linked?.foods ?? []),
+          ...named.flatMap((entry) => [entry.id, ...entry.foods]),
+        ],
+      },
+    ],
+    unknownWords: [],
+  };
 };
 
 /* ───────────────────────── rules ───────────────────────── */
@@ -563,25 +688,38 @@ export const checkCompatibility = (
     }
   }
 
-  const names =
+  const entries: readonly { name: string; food?: GateFood }[] =
     item.kind === "recipe"
-      ? item.ingredients.map((ingredient) => ingredient.name.trim())
-      : [item.text.trim()];
+      ? item.ingredients.map((ingredient) => ({
+          name: ingredient.name.trim(),
+          ...(ingredient.food ? { food: ingredient.food } : {}),
+        }))
+      : [{ name: item.text.trim() }];
 
   if (item.kind === "text") {
     unknowns.push({ kind: "free_text", subject: item.text.trim() });
   }
-  if (names.length === 0) {
+  if (entries.length === 0) {
     unknowns.push({ kind: "empty_item", subject: "" });
   }
 
-  for (const name of names) {
-    const parsed = parse(name);
+  for (const entry of entries) {
+    const food = entry.food;
+    const name = food && entry.name === "" ? food.name.trim() : entry.name;
+    const parsed = food ? parseGateFood(food, name) : parse(name);
     if (parsed.tokens.length === 0) {
       unknowns.push({ kind: "empty_item", subject: name });
       continue;
     }
-    if (
+    if (food) {
+      // D-30: a record that no person confirmed is never read as safe.
+      if (food.status !== "confirmed" || !food.cookable) {
+        unknowns.push({ kind: "unconfirmed_food", subject: name });
+      }
+      if (![...food.contains, ...food.mayContain].every(isGateTag)) {
+        unknowns.push({ kind: "unknown_ingredient", subject: name });
+      }
+    } else if (
       item.kind === "recipe" &&
       (parsed.foods.length === 0 || parsed.unknownWords.length > 0)
     ) {

@@ -130,7 +130,22 @@ export const getFood = async (code: string): Promise<Result<Food>> => {
 };
 
 /**
- * A food's composition — every component the export carries for it, including
+ * The foods of a list of codes, by code, from the memoised catalogue. A code
+ * that CIQUAL does not have is not in the map.
+ */
+export const getFoodsByCode = async (
+  codes: readonly string[],
+): Promise<ReadonlyMap<string, Food>> => {
+  const wanted = new Set(codes);
+  return new Map(
+    (await allFoods())
+      .filter((food) => wanted.has(food.code))
+      .map((food) => [food.code, food]),
+  );
+};
+
+/**
+ * A food's composition— every component the export carries for it, including
  * the ones it never determined, because "not measured" is an answer a reader
  * needs and a blank row is not.
  */

@@ -112,7 +112,10 @@ src/
                the database reads, the model call, then the gate in code) ·
                ai-models/ (the model of each AI role as a console setting: the service
                that calls the seam reads it with `roleModel()` and gives it in
-               `options.model`, because `ai/` reads no database)
+               `options.model`, because `ai/` reads no database) ·
+               foods/propose.ts (REMI proposes the record of a CIQUAL food: the model
+               call, then the checks in code. `db/services/food-records` stores it as
+               `proposed`, and only a person confirms it)
   auth/        the auth seam (provider.ts, session.ts) · adapters/ · the operator console's
                password hashing + session tokens, vendor-free, `node:crypto` only
   db/          client.ts (the seam) · schema.ts (Drizzle) · adapters/ · models/ · services/ · migrations/

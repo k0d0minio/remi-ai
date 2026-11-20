@@ -3,11 +3,16 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import NextLink from "next/link";
 import {
+  confirmedKitchenUnits,
+  gateTags,
   getCiqualImport,
   getFood,
   getFoodNutrients,
+  getFoodRecord,
   type FoodNutrient,
+  type FoodRecord,
 } from "@remi/services/server";
+import { formatDateTime, kitchenQuantityText } from "@remi/services/shared";
 import {
   Badge,
   Table,
@@ -19,6 +24,15 @@ import {
   Typography,
 } from "@remi/ui/server";
 import { CiqualAttribution } from "@/components/foods/ciqual-attribution";
+import {
+  FoodRecordCard,
+  type FoodRecordView,
+} from "@/components/foods/food-record-card";
+import {
+  FoodUnitsCard,
+  type FoodUnitsView,
+} from "@/components/foods/food-units-card";
+import { tagGroups } from "@/components/foods/vocabulary";
 import { ensureDatabase } from "@/lib/database";
 
 /** Reads the database on every hit — never prerendered. */
@@ -77,6 +91,59 @@ const markerLabels: Record<FoodNutrient["marker"], string> = {
   not_determined: "non déterminé",
 };
 
+const decimal = (value: number) => String(value).replace(".", ",");
+
+/** « Morgane, le 20/11/2026 14:02 ». The account can be gone: the fact stays. */
+const confirmedLine = (name: string, at: Date | null) =>
+  at === null
+    ? null
+    : `${name || "un compte supprimé"}, le ${formatDateTime(at)}`;
+
+const recordView = (record: FoodRecord | null): FoodRecordView | null =>
+  record === null
+    ? null
+    : {
+        status: record.status,
+        proposedByRemi: record.source === "remi",
+        cookable: record.cookable,
+        role: record.role,
+        containsTags: record.containsTags,
+        mayContainTags: record.mayContainTags,
+        confirmedLine: confirmedLine(record.confirmedByName, record.confirmedAt),
+        lexiconId: record.lexiconId,
+      };
+
+/** The weights that the example line of the units shows. */
+const EXAMPLE_GRAMS = [5, 15, 50, 100, 250];
+
+const unitsView = (record: FoodRecord | null): FoodUnitsView => {
+  const confirmed = confirmedKitchenUnits(record);
+  return {
+    status: record?.unitsStatus ?? null,
+    density:
+      record === null || record.densityGPerMl === null
+        ? ""
+        : decimal(record.densityGPerMl),
+    units: (record?.units ?? []).map((unit) => ({
+      one: unit.one,
+      many: unit.many,
+      grams: decimal(unit.grams),
+    })),
+    confirmedLine: record
+      ? confirmedLine(record.unitsConfirmedByName, record.unitsConfirmedAt)
+      : null,
+    // Only a weight that the confirmed units write in another way than grams.
+    examples: confirmed
+      ? EXAMPLE_GRAMS.flatMap((grams) => {
+          const text = kitchenQuantityText(grams, confirmed);
+          return text === null || text === kitchenQuantityText(grams, null)
+            ? []
+            : [`${grams} g → ${text}`];
+        })
+      : [],
+  };
+};
+
 const Aliment = async ({ params }: { params: Params }) => {
   ensureDatabase();
   const { code } = await params;
@@ -90,7 +157,10 @@ const Aliment = async ({ params }: { params: Params }) => {
   }
 
   const food = result.data;
-  const nutrients = await getFoodNutrients(food.code);
+  const [nutrients, record] = await Promise.all([
+    getFoodNutrients(food.code),
+    getFoodRecord(food.code),
+  ]);
   const determined = nutrients.filter(
     (nutrient) => nutrient.marker !== "not_determined",
   );
@@ -119,6 +189,20 @@ const Aliment = async ({ params }: { params: Params }) => {
           {determined.length} constituants renseignés sur {nutrients.length}.
         </Typography>
       </div>
+
+      {/* A saved record changes the key: each form then shows the stored values. */}
+      <FoodRecordCard
+        key={`record:${record?.updatedAt.getTime() ?? "none"}`}
+        code={food.code}
+        record={recordView(record)}
+        groups={tagGroups(gateTags())}
+      />
+      <FoodUnitsCard
+        key={`units:${record?.updatedAt.getTime() ?? "none"}`}
+        code={food.code}
+        hasRecord={record !== null}
+        view={unitsView(record)}
+      />
 
       <Table>
         <TableHeader>

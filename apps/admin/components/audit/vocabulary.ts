@@ -84,6 +84,9 @@ export const actionLabels: Record<AuditActionName, string> = {
   "nutrition_rule.restored": "règle réactivée",
   "ai_model.set": "modèle d'IA modifié",
   "ai_model.reset": "modèle d'IA remis à la valeur par défaut",
+  "food_record.proposed": "fiche d'aliment proposée par REMI",
+  "food_record.confirmed": "fiche d'aliment confirmée",
+  "food_record.units_confirmed": "unités de cuisine d'un aliment confirmées",
   "meal.logged": "repas ajouté",
   "meal.updated": "repas modifié",
   "meal.feedback_written": "retour écrit",
@@ -234,6 +237,10 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   // A change of the model that reads patient data: it must stand out.
   "ai_model.set": "warning",
   "ai_model.reset": "info",
+  "food_record.proposed": "neutral",
+  // A confirmation makes a food usable in a recipe: it must stand out.
+  "food_record.confirmed": "info",
+  "food_record.units_confirmed": "info",
   "meal.logged": "neutral",
   "meal.updated": "neutral",
   "meal.feedback_written": "neutral",

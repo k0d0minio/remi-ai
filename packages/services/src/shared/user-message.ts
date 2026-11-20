@@ -42,6 +42,20 @@ const sentences: Readonly<Record<string, string>> = {
     "Ce modèle ne produit pas de sortie structurée. REMI en a besoin pour lire la réponse.",
   "the providers of this model may train on the data":
     "Ce modèle est refusé : ses fournisseurs peuvent utiliser les données envoyées pour entraîner leurs modèles. Les demandes de REMI contiennent des données de santé.",
+  // the food records (`db/services/food-records`, `server/foods/propose`)
+  "this food already has a record":
+    "Cet aliment a déjà une fiche. Une proposition ne remplace jamais une fiche.",
+  "this food has no record yet":
+    "Cet aliment n'a pas encore de fiche. Confirmez d'abord sa fiche.",
+  "the compatibility gate does not know this tag":
+    "Une étiquette d'allergène n'est pas reconnue par le contrôle de compatibilité.",
+  "this role in a dish does not exist": "Ce rôle dans un plat n'existe pas.",
+  "a cookable food needs a role in a dish":
+    "Choisissez le rôle de l'aliment dans un plat : un aliment cuisinable en a un.",
+  "the kitchen units are not valid":
+    "Les unités de cuisine ne sont pas valides. Vérifiez les noms, les poids et la densité.",
+  "the food proposal is not available":
+    "REMI n'a pas pu proposer de fiche. Réessayez dans un instant.",
   // conflict
   "a challenge is already running — pick its outcome to replace it":
     "Un challenge est déjà en cours. Choisissez son issue pour le remplacer.",

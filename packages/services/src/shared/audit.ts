@@ -164,6 +164,16 @@ export const auditActions = [
    */
   "ai_model.set",
   "ai_model.reset",
+  /**
+   * The record of a CIQUAL food (REM-189, REM-190, D-32). `proposed`: REMI's
+   * model proposed a record, at the request of the account. `confirmed`: a
+   * person confirmed or corrected the record. `units_confirmed`: a person
+   * confirmed the kitchen units. The detail is JSON: the code and the values.
+   * A food record holds no patient data.
+   */
+  "food_record.proposed",
+  "food_record.confirmed",
+  "food_record.units_confirmed",
   "meal.logged",
   "meal.updated",
   "meal.feedback_written",
