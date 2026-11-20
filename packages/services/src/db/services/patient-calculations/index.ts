@@ -6,7 +6,11 @@ import {
 } from "../../../shared/calculations";
 import { energyProposal } from "../../../shared/energy";
 import { ageInYears } from "../../../shared/format";
-import { proteinProposal } from "../../../shared/protein";
+import {
+  proteinProposal,
+  proteinTarget,
+  proteinTargetDefaults,
+} from "../../../shared/protein";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
@@ -173,6 +177,82 @@ const unscopedValidateCalculation = async (
     }),
   });
   return ok(updated);
+};
+
+/** What the practitioner gives for the protein target. Null is an empty field. */
+export type ProteinTargetValidation = {
+  referenceWeightKg: number | null;
+  coefficient: number | null;
+  /** The final value in g/day as typed. Null: the computed value is the target. */
+  value: number | null;
+};
+
+const targetNumber = z.number().finite().nullable();
+
+const proteinTargetSchema = z.object({
+  referenceWeightKg: targetNumber,
+  coefficient: targetNumber,
+  value: targetNumber,
+});
+
+/**
+ * Validate the protein target of a file (story 8, REM-50). `proteinTarget`
+ * gives the value from the reference weight and the coefficient, or keeps the
+ * final value that the practitioner typed. The addition of the pregnancy or
+ * the lactation comes from the row, never from the caller.
+ *
+ * The write is `validateCalculation`: the validated columns and one
+ * `calculation.validated` event with the reference weight, the coefficient
+ * and the final value (D-32). The estimate stays as it is. The reference
+ * weight is a parameter of this row only: no weight of the file, no BMI and no
+ * energy estimate is read or written here.
+ *
+ * A file with no protein estimate and no validated value is refused: the
+ * target starts from a fact of the row (D-30).
+ */
+const unscopedValidateProteinTarget = async (
+  patientId: Id,
+  input: ProteinTargetValidation,
+  actor: OperatorActor,
+  db?: DatabaseClient,
+): Promise<Result<PatientCalculation>> => {
+  if (!uuidSchema.safeParse(patientId).success) {
+    return noSuchPatient();
+  }
+  const parsed = proteinTargetSchema.safeParse(input);
+  if (!parsed.success) {
+    return err("invalid_input", "that protein target is not valid");
+  }
+  const defaults = proteinTargetDefaults(
+    await rowFor(patientId, "protein", db),
+  );
+  if (!defaults) {
+    return err("conflict", "the protein need has no estimate yet");
+  }
+  const target = proteinTarget({
+    referenceWeightKg: parsed.data.referenceWeightKg,
+    coefficient: parsed.data.coefficient,
+    additionGramsPerDay: defaults.additionGramsPerDay,
+    directValue: parsed.data.value,
+  });
+  if (target.state === "invalid") {
+    return err("invalid_input", "that protein target is not valid");
+  }
+  return unscopedValidateCalculation(
+    patientId,
+    "protein",
+    {
+      value: target.value,
+      parameters: {
+        referenceWeightKg: target.referenceWeightKg,
+        coefficient: target.coefficient,
+        additionGramsPerDay: target.additionGramsPerDay,
+        direct: target.direct,
+      },
+    },
+    actor,
+    db,
+  );
 };
 
 type Measures = Pick<PatientProfile, "id" | "heightCm" | "weightKg">;
@@ -357,5 +437,10 @@ export const setCalculationEstimate = byPatient(
 export const validateCalculation = byPatient(
   "write",
   unscopedValidateCalculation,
+  noSuchPatient,
+);
+export const validateProteinTarget = byPatient(
+  "write",
+  unscopedValidateProteinTarget,
   noSuchPatient,
 );

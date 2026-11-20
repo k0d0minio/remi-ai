@@ -79,7 +79,15 @@ export type {
   CalculationKind,
 } from "./calculations";
 export { energyEstimateParameters } from "./energy";
-export { proteinAdaptationLabels, proteinEstimateParameters } from "./protein";
+export {
+  defaultProteinCoefficient,
+  proteinAdaptationLabels,
+  proteinEstimateParameters,
+  proteinTarget,
+  proteinTargetBounds,
+  proteinTargetDefaults,
+} from "./protein";
+export type { ProteinTargetDefaults, ProteinTargetField } from "./protein";
 export {
   defaultMacroSplit,
   genotypeMappingValidated,

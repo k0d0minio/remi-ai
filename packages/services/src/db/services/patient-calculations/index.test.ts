@@ -13,6 +13,7 @@ import {
   refreshProteinEstimate,
   setCalculationEstimate,
   validateCalculation,
+  validateProteinTarget,
 } from "./index";
 
 const practitioner = {
@@ -505,5 +506,199 @@ describe("the energy estimate", () => {
     const row = await energyRow();
     expect(row?.estimatedValue).toBeNull();
     expect(row?.estimateParameters).toBeNull();
+  });
+});
+
+describe("the protein target", () => {
+  let fileId: string;
+
+  const rows = async () => listPatientCalculations(systemActor, fileId);
+
+  const proteinRow = async () =>
+    (await rows()).find((row) => row.kind === "protein");
+
+  const profile = async () =>
+    getDatabase()
+      .collection<{ id: string; weightKg: number | null }>("patient_profiles")
+      .findById(fileId);
+
+  const validations = async () =>
+    (
+      await getDatabase()
+        .collection<AuditEvent>("audit_events")
+        .findMany({ action: "calculation.validated", targetId: fileId })
+    ).items;
+
+  beforeAll(async () => {
+    const created = await createPatient(systemActor, {
+      practitionerId: testPractitionerId,
+      pseudonym: "Louise",
+      heightCm: 175,
+      weightKg: 100,
+    });
+    if (!created.ok) {
+      throw new Error("test patient not created");
+    }
+    fileId = created.data.id;
+  });
+
+  it("is refused for a file with no protein estimate", async () => {
+    const empty = await createPatient(systemActor, {
+      practitionerId: testPractitionerId,
+      pseudonym: "Nora",
+    });
+    if (!empty.ok) {
+      throw new Error("test patient not created");
+    }
+    const refused = await validateProteinTarget(
+      systemActor,
+      empty.data.id,
+      { referenceWeightKg: 75, coefficient: 1.2, value: null },
+      practitioner,
+    );
+    expect(refused).toMatchObject({ ok: false, error: "conflict" });
+    expect(await listPatientCalculations(systemActor, empty.data.id)).toEqual(
+      [],
+    );
+  });
+
+  it("writes 90 g/day for 75 kg at 1.2, and keeps the weight at 100 kg", async () => {
+    const before = await rows();
+    const result = await validateProteinTarget(
+      systemActor,
+      fileId,
+      { referenceWeightKg: 75, coefficient: 1.2, value: null },
+      practitioner,
+    );
+    expect(result.ok).toBe(true);
+    const row = await proteinRow();
+    expect(row?.validatedValue).toBe(90);
+    expect(row?.validationParameters).toEqual({
+      referenceWeightKg: 75,
+      coefficient: 1.2,
+      additionGramsPerDay: 0,
+      direct: false,
+    });
+    expect(row?.validatedBy).toBe(practitioner.id);
+    expect(row?.estimatedValue).toBe(83);
+    expect(row?.estimateParameters).toMatchObject({ referenceWeightKg: 100 });
+
+    expect((await profile())?.weightKg).toBe(100);
+    const after = await rows();
+    for (const kind of ["bmi", "energy"] as const) {
+      expect(after.find((entry) => entry.kind === kind)).toEqual(
+        before.find((entry) => entry.kind === kind),
+      );
+    }
+  });
+
+  it("records the reference weight, the coefficient and the final value", async () => {
+    const events = await validations();
+    expect(events).toHaveLength(1);
+    expect(events[0]?.actorEmail).toBe(practitioner.email);
+    expect(JSON.parse(events[0]?.detail ?? "{}")).toEqual({
+      kind: "protein",
+      value: 90,
+      parameters: {
+        referenceWeightKg: 75,
+        coefficient: 1.2,
+        additionGramsPerDay: 0,
+        direct: false,
+      },
+    });
+  });
+
+  it("keeps a typed final value as typed", async () => {
+    const result = await validateProteinTarget(
+      systemActor,
+      fileId,
+      { referenceWeightKg: 75, coefficient: 1.2, value: 80 },
+      practitioner,
+    );
+    expect(result.ok).toBe(true);
+    const row = await proteinRow();
+    expect(row?.validatedValue).toBe(80);
+    expect(row?.validationParameters).toMatchObject({ direct: true });
+    expect(await validations()).toHaveLength(2);
+  });
+
+  it("keeps the validated value when the weight of the file changes", async () => {
+    const saved = await updatePatient(systemActor, fileId, { weightKg: 98 });
+    expect(saved.ok).toBe(true);
+    const row = await proteinRow();
+    expect(row?.estimatedValue).toBe(81);
+    expect(row?.validatedValue).toBe(80);
+    expect(row?.validationParameters).toMatchObject({ referenceWeightKg: 75 });
+  });
+
+  it("takes the addition from the row, never from the caller", async () => {
+    await getDatabase()
+      .collection<{ id: string; specialSituation: string | null }>(
+        "patient_profiles",
+      )
+      .update(fileId, { specialSituation: "pregnancy_2" });
+    await refreshProteinEstimate(fileId);
+    const result = await validateProteinTarget(
+      systemActor,
+      fileId,
+      { referenceWeightKg: 75, coefficient: 1.2, value: null },
+      practitioner,
+    );
+    expect(result.ok).toBe(true);
+    const row = await proteinRow();
+    expect(row?.validatedValue).toBe(99);
+    expect(row?.validationParameters).toMatchObject({
+      additionGramsPerDay: 9,
+      direct: false,
+    });
+  });
+
+  it("refuses a value out of its limits and writes nothing", async () => {
+    const before = await proteinRow();
+    const count = (await validations()).length;
+    for (const input of [
+      { referenceWeightKg: 10, coefficient: 1.2, value: null },
+      { referenceWeightKg: 75, coefficient: 0, value: null },
+      { referenceWeightKg: 75, coefficient: null, value: 80 },
+      { referenceWeightKg: 75, coefficient: 1.2, value: 80.5 },
+      { referenceWeightKg: Number.NaN, coefficient: 1.2, value: null },
+    ]) {
+      const refused = await validateProteinTarget(
+        systemActor,
+        fileId,
+        input,
+        practitioner,
+      );
+      expect(refused).toMatchObject({ ok: false, error: "invalid_input" });
+    }
+    expect(await proteinRow()).toEqual(before);
+    expect(await validations()).toHaveLength(count);
+  });
+
+  it("answers another practitioner as a missing file", async () => {
+    const before = await proteinRow();
+    const refused = await validateProteinTarget(
+      otherPractitioner,
+      fileId,
+      { referenceWeightKg: 60, coefficient: 1, value: null },
+      practitioner,
+    );
+    expect(refused).toMatchObject({ ok: false, error: "not_found" });
+    expect(await proteinRow()).toEqual(before);
+  });
+
+  it("answers an admin's read-only open as a missing file", async () => {
+    const admin = operatorActor(
+      { id: "00000000-0000-4000-8000-000000000003", role: "admin" },
+      [fileId],
+    );
+    expect(await listPatientCalculations(admin, fileId)).not.toEqual([]);
+    const refused = await validateProteinTarget(
+      admin,
+      fileId,
+      { referenceWeightKg: 60, coefficient: 1, value: null },
+      practitioner,
+    );
+    expect(refused).toMatchObject({ ok: false, error: "not_found" });
   });
 });

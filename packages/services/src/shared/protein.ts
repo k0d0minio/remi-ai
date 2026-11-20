@@ -232,3 +232,175 @@ export const proteinEstimateParameters = (
     validationRequired: adaptations.some(isValidationSituation),
   };
 };
+
+/**
+ * The limits of the three values of the protein target (REM-50). They are
+ * limits of plausibility for a typed value, not clinical rules. The reference
+ * weight has the limits of the current weight. Story 8 gives no limit for the
+ * coefficient: this one is wide, and the practitioner decides inside it. The
+ * final value has the largest product of the two other limits.
+ */
+export const proteinTargetBounds = {
+  referenceWeightKg: weightKgRange,
+  coefficient: { min: 0.1, max: 5 },
+  value: { min: 1, max: 1500 },
+} as const;
+
+/** One value of the protein target. */
+export type ProteinTargetField = keyof typeof proteinTargetBounds;
+
+/** What the practitioner gives for the target. Null is an empty field. */
+export type ProteinTargetInput = {
+  referenceWeightKg: number | null;
+  coefficient: number | null;
+  /** The grams of the pregnancy or the lactation. REMI gives it, not the form. */
+  additionGramsPerDay: number;
+  /** The final value in g/day as typed. Null: the computed value is the target. */
+  directValue: number | null;
+};
+
+/** The target that a validation writes, or the fields that are not valid. */
+export type ProteinTarget =
+  | { state: "invalid"; fields: ProteinTargetField[] }
+  | {
+      state: "computed";
+      /** g/day: the value that the validation writes. */
+      value: number;
+      /** g/day: the reference weight times the coefficient, plus the addition. */
+      proposedValue: number;
+      referenceWeightKg: number;
+      coefficient: number;
+      additionGramsPerDay: number;
+      /** The practitioner typed a final value that is not the proposed one. */
+      direct: boolean;
+    };
+
+const within = (value: number | null, range: { min: number; max: number }) =>
+  value !== null &&
+  Number.isFinite(value) &&
+  value >= range.min &&
+  value <= range.max;
+
+/**
+ * The protein target from the reference weight and the coefficient (story 8).
+ * The proposed value is the need plus the addition. A typed final value
+ * prevails and is kept as typed: it must be a whole number of grams. The
+ * reference weight is a parameter of this value only. Nothing here reads or
+ * changes the current weight.
+ *
+ * A field that is empty or out of its limits gives no value: the result names
+ * each field.
+ */
+export const proteinTarget = (input: ProteinTargetInput): ProteinTarget => {
+  const { referenceWeightKg, coefficient, additionGramsPerDay, directValue } =
+    input;
+  const fields: ProteinTargetField[] = [];
+  if (!within(referenceWeightKg, proteinTargetBounds.referenceWeightKg)) {
+    fields.push("referenceWeightKg");
+  }
+  if (!within(coefficient, proteinTargetBounds.coefficient)) {
+    fields.push("coefficient");
+  }
+  if (
+    directValue !== null &&
+    (!within(directValue, proteinTargetBounds.value) ||
+      !Number.isInteger(directValue))
+  ) {
+    fields.push("value");
+  }
+  if (referenceWeightKg === null || coefficient === null || fields.length > 0) {
+    return { state: "invalid", fields };
+  }
+  const addition =
+    Number.isFinite(additionGramsPerDay) && additionGramsPerDay > 0
+      ? additionGramsPerDay
+      : 0;
+  const proposedValue =
+    proteinNeed({ referenceWeightKg, coefficient }) + addition;
+  const value = directValue ?? proposedValue;
+  if (!within(value, proteinTargetBounds.value)) {
+    return { state: "invalid", fields: ["value"] };
+  }
+  return {
+    state: "computed",
+    value,
+    proposedValue,
+    referenceWeightKg,
+    coefficient,
+    additionGramsPerDay: addition,
+    direct: value !== proposedValue,
+  };
+};
+
+/** The columns of the `protein` row that the detail reads. */
+export type ProteinTargetRow = {
+  estimatedValue: number | null;
+  estimateParameters: Readonly<Record<string, unknown>> | null;
+  validatedValue: number | null;
+  validationParameters: Readonly<Record<string, unknown>> | null;
+};
+
+/** What the detail of the protein target opens with. */
+export type ProteinTargetDefaults = {
+  referenceWeightKg: number;
+  coefficient: number;
+  additionGramsPerDay: number;
+  /** g/day: the validated value, else the estimate. */
+  value: number;
+  /** The validated value was typed, not computed from the two parameters. */
+  direct: boolean;
+};
+
+/**
+ * The values that the detail of the protein target opens with, from facts of
+ * the row only (D-30). A validated value gives its own parameters. Else the
+ * estimate gives them. The addition is the one of the estimate while an
+ * estimate exists: it follows the present situation. With no usable validated
+ * value and no usable estimate the answer is null, and the detail offers no
+ * number.
+ */
+export const proteinTargetDefaults = (
+  row: ProteinTargetRow | null,
+): ProteinTargetDefaults | null => {
+  if (!row) {
+    return null;
+  }
+  const estimate =
+    row.estimatedValue === null
+      ? null
+      : proteinEstimateParameters(row.estimateParameters);
+  const validated =
+    row.validatedValue === null
+      ? null
+      : proteinEstimateParameters(row.validationParameters);
+  if (
+    row.validatedValue !== null &&
+    validated !== null &&
+    validated.referenceWeightKg !== null &&
+    validated.coefficient !== null
+  ) {
+    return {
+      referenceWeightKg: validated.referenceWeightKg,
+      coefficient: validated.coefficient,
+      additionGramsPerDay:
+        estimate?.additionGramsPerDay ?? validated.additionGramsPerDay,
+      value: row.validatedValue,
+      direct: row.validationParameters?.direct === true,
+    };
+  }
+  if (
+    row.estimatedValue !== null &&
+    estimate !== null &&
+    estimate.referenceWeightKg !== null &&
+    estimate.coefficient !== null
+  ) {
+    return {
+      referenceWeightKg: estimate.referenceWeightKg,
+      coefficient: estimate.coefficient,
+      additionGramsPerDay: estimate.additionGramsPerDay,
+      value: row.estimatedValue,
+      direct: false,
+    };
+  }
+  return null;
+};

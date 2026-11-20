@@ -13,15 +13,23 @@ import {
   calculationKindLabels,
   calculationKinds,
   energyEstimateParameters,
+  formatDate,
   formatNumber,
   proteinAdaptationLabels,
   proteinEstimateParameters,
+  proteinTargetDefaults,
   sexForCalculationLabels,
 } from "@remi/services/shared";
 import { Badge, Typography } from "@remi/ui/server";
+import { CalculationDetail } from "@/components/patients/calculation-detail";
 import { ValidatedMark } from "@/components/patients/file/value";
+import { ProteinTargetFields } from "@/components/patients/protein-target-fields";
+import { validateProteinTargetAction } from "@/lib/patients/protein-target";
 
 type Props = {
+  patientId: string;
+  /** An admin's open of another practitioner's file: no control that writes. */
+  readOnly: boolean;
   /** The patient's rows of `patient_calculations`, at most one per kind. */
   calculations: readonly PatientCalculation[];
   /** Per kind, the data the file lacks (`missingCalculationInputs`). */
@@ -73,15 +81,27 @@ const EstimateBadge = () => (
 /**
  * Beside a value that the practitioner validated: the mark « validé ». When a
  * later change of the file asks for a new validation, the row says so, and the
- * mark does not show.
+ * mark does not show. With `dated` the mark gives the date of the validation.
  */
-const ValidationState = ({ row }: { row: PatientCalculation | undefined }) =>
+const ValidationState = ({
+  row,
+  dated = false,
+}: {
+  row: PatientCalculation | undefined;
+  dated?: boolean;
+}) =>
   row?.needsRevalidation ? (
     <Badge variant="warning" tone="subtle" size="sm">
       À revalider
     </Badge>
   ) : (
-    <ValidatedMark />
+    <ValidatedMark
+      label={
+        dated && row?.validatedAt
+          ? `validé le ${formatDate(row.validatedAt)}`
+          : undefined
+      }
+    />
   );
 
 /**
@@ -127,54 +147,138 @@ const BmiValue = ({
   );
 };
 
-/**
- * The protein row (story 8): the estimate in g/jour with the badge
- * « estimation » (D-30), the reference weight and the coefficient used, then
- * the adaptations that REMI proposes and the practitioner confirms. A
- * pathology, a malnutrition or a special situation adds « Validation
- * obligatoire ». A validated value shows alone: its row belongs to REM-50.
- */
-const ProteinValue = ({
-  missing,
-  row,
+/** « Poids de référence 75 kg × 1,2 g/kg/jour + 9 g/jour », or null. */
+const proteinFormula = ({
+  referenceWeightKg,
+  coefficient,
+  additionGramsPerDay,
 }: {
-  missing: readonly CalculationInput[];
-  row: PatientCalculation | undefined;
+  referenceWeightKg: number | null;
+  coefficient: number | null;
+  additionGramsPerDay: number;
 }) => {
-  if (missing.length > 0) {
-    return <NotCalculated reason={missingLine(missing)} />;
+  if (referenceWeightKg === null || coefficient === null) {
+    return null;
   }
-  const validated = row?.validatedValue ?? null;
-  if (validated !== null) {
-    return (
-      <div className="flex flex-wrap items-center gap-2">
-        <Typography size="sm" weight="medium">
-          {`${formatNumber(validated, "fr-BE")}${units.protein}`}
-        </Typography>
-        <ValidationState row={row} />
-      </div>
-    );
-  }
-  const value = row?.estimatedValue ?? null;
-  if (value === null) {
-    return <NotCalculated reason={NOT_AVAILABLE} />;
-  }
-  const {
-    referenceWeightKg,
-    coefficient,
-    additionGramsPerDay,
-    adaptations,
-    validationRequired,
-  } = proteinEstimateParameters(row?.estimateParameters ?? null);
   const addition =
     additionGramsPerDay > 0
       ? ` + ${formatNumber(additionGramsPerDay, "fr-BE")} g/jour`
       : "";
+  return `Poids de référence ${formatNumber(referenceWeightKg, "fr-BE")} kg × ${formatNumber(coefficient, "fr-BE")} g/kg/jour${addition}`;
+};
+
+const gramsPerDay = (value: number) =>
+  `${formatNumber(value, "fr-BE")}${units.protein}`;
+
+/**
+ * The protein row (story 8). Before a validation: the estimate in g/jour with
+ * the badge « estimation » (D-30), the reference weight and the coefficient
+ * used, then the adaptations that REMI proposes and the practitioner
+ * confirms. A pathology, a malnutrition or a special situation adds
+ * « Validation obligatoire ».
+ *
+ * After a validation (REM-50): the validated value with the mark « validé le
+ * … » and its own parameters, then the estimate beside it, still named as an
+ * estimate. The validated value does not follow the estimate.
+ *
+ * « Modifier » opens the detail: the reference weight, the coefficient and
+ * the final value. A read-only open gets no « Modifier ». With no estimate and
+ * no validated value the detail says what the file lacks and offers no number.
+ */
+const ProteinValue = ({
+  patientId,
+  readOnly,
+  missing,
+  row,
+}: {
+  patientId: string;
+  readOnly: boolean;
+  missing: readonly CalculationInput[];
+  row: PatientCalculation | undefined;
+}) => {
+  const validated = row?.validatedValue ?? null;
+  const estimate = row?.estimatedValue ?? null;
+  const estimateParameters = proteinEstimateParameters(
+    row?.estimateParameters ?? null,
+  );
+  const defaults = proteinTargetDefaults(row ?? null);
+  const unavailable =
+    defaults !== null
+      ? null
+      : missing.length > 0
+        ? `Aucune valeur n'est proposée. ${missingLine(missing)}. Complétez le dossier, puis revenez ici.`
+        : "Aucune valeur n'est proposée : l'estimation n'est pas encore disponible.";
+  const detail = readOnly ? null : (
+    <CalculationDetail
+      patientId={patientId}
+      editLabel="Modifier les besoins protéiques"
+      action={validateProteinTargetAction}
+      unavailable={unavailable}
+    >
+      {defaults ? <ProteinTargetFields defaults={defaults} /> : null}
+    </CalculationDetail>
+  );
+
+  if (validated !== null) {
+    const validation = proteinEstimateParameters(
+      row?.validationParameters ?? null,
+    );
+    const formula = proteinFormula(validation);
+    const typed = row?.validationParameters?.direct === true;
+    return (
+      <>
+        <div className="flex flex-wrap items-center gap-2">
+          <Typography size="sm" weight="medium">
+            {gramsPerDay(validated)}
+          </Typography>
+          <ValidationState row={row} dated />
+        </div>
+        {formula ? (
+          <Typography size="xs" tone="muted">
+            {typed ? `Valeur saisie par vous. ${formula}` : formula}
+          </Typography>
+        ) : null}
+        {estimate !== null ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <Typography size="xs" tone="muted">
+              {`Estimation de REMI : ${gramsPerDay(estimate)}`}
+            </Typography>
+            <EstimateBadge />
+          </div>
+        ) : (
+          <Typography size="xs" tone="muted">
+            {missing.length > 0
+              ? `Estimation non calculée. ${missingLine(missing)}`
+              : "Estimation non calculée"}
+          </Typography>
+        )}
+        {detail}
+      </>
+    );
+  }
+  if (missing.length > 0) {
+    return (
+      <>
+        <NotCalculated reason={missingLine(missing)} />
+        {detail}
+      </>
+    );
+  }
+  if (estimate === null) {
+    return (
+      <>
+        <NotCalculated reason={NOT_AVAILABLE} />
+        {detail}
+      </>
+    );
+  }
+  const { adaptations, validationRequired } = estimateParameters;
+  const formula = proteinFormula(estimateParameters);
   return (
     <>
       <div className="flex flex-wrap items-center gap-2">
         <Typography size="sm" weight="medium">
-          {`${formatNumber(value, "fr-BE")}${units.protein}`}
+          {gramsPerDay(estimate)}
         </Typography>
         <EstimateBadge />
         {validationRequired ? (
@@ -183,9 +287,9 @@ const ProteinValue = ({
           </Badge>
         ) : null}
       </div>
-      {referenceWeightKg !== null && coefficient !== null ? (
+      {formula ? (
         <Typography size="xs" tone="muted">
-          {`Poids de référence ${formatNumber(referenceWeightKg, "fr-BE")} kg × ${formatNumber(coefficient, "fr-BE")} g/kg/jour${addition}`}
+          {formula}
         </Typography>
       ) : null}
       {adaptations.length > 0 ? (
@@ -200,6 +304,7 @@ const ProteinValue = ({
           ))}
         </div>
       ) : null}
+      {detail}
     </>
   );
 };
@@ -303,7 +408,13 @@ const EnergyValue = ({
  * the missing data. Each kind has its own value component. This slot is the
  * only one.
  */
-export const CalculationsSummary = ({ calculations, missing, bmi }: Props) => (
+export const CalculationsSummary = ({
+  patientId,
+  readOnly,
+  calculations,
+  missing,
+  bmi,
+}: Props) => (
   <dl className="flex flex-col gap-4">
     {calculationKinds.map((kind) => {
       const row = calculations.find((entry) => entry.kind === kind);
@@ -319,7 +430,12 @@ export const CalculationsSummary = ({ calculations, missing, bmi }: Props) => (
               <BmiValue indicator={bmi} row={row} />
             ) : null}
             {kind === "protein" ? (
-              <ProteinValue missing={missing[kind]} row={row} />
+              <ProteinValue
+                patientId={patientId}
+                readOnly={readOnly}
+                missing={missing[kind]}
+                row={row}
+              />
             ) : null}
             {kind === "energy" ? (
               <EnergyValue missing={missing[kind]} indicator={bmi} row={row} />
