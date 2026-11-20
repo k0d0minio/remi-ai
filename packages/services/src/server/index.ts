@@ -541,5 +541,22 @@ export type {
   PatientContextOptions,
 } from "../ai";
 
+/*
+ * The compatibility gate (REM-57). From the file and not from `../ai`: the gate
+ * imports no seam.
+ */
+export { checkCompatibility, mayBeShown } from "../ai/compatibility";
+export type {
+  CompatibilityItem,
+  CompatibilityReason,
+  CompatibilityResult,
+  CompatibilitySource,
+  CompatibilityUnknown,
+  CompatibilityUnknownKind,
+  PatientSafetyData,
+  SafetyAllergen,
+  TotalEviction,
+} from "../ai/compatibility";
+
 export { env, requireEnv } from "./env";
 export type { ServerEnv } from "./env";
