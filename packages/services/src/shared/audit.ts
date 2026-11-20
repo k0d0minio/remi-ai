@@ -77,6 +77,11 @@ export const auditActions = [
    * detail is JSON: the kind, the value and the parameters used.
    */
   "calculation.validated",
+  /**
+   * The practitioner validated the protocol into its next version (story 20,
+   * D-32). The detail is JSON: the version number and the count of each part.
+   */
+  "protocol.validated",
   "recommendation.added",
   "recommendation.updated",
   "recommendation.archived",

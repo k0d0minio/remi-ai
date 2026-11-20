@@ -130,6 +130,11 @@ export {
 export { listPatientCalculations } from "../db/services/patient-calculations";
 
 export {
+  getValidatedProtocol,
+  validateProtocol,
+} from "../db/services/protocol-versions";
+
+export {
   countOpenPatientChanges,
   listOpenPatientChanges,
 } from "../db/services/patient-changes";

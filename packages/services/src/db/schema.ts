@@ -19,6 +19,7 @@ import {
   watchedPatientFields,
   type PatientChangeValue,
 } from "../shared/patient-changes";
+import type { ProtocolSnapshot } from "../shared/protocol-snapshot";
 
 /**
  * The Drizzle schema — the single definition the checked-in migrations under
@@ -1475,6 +1476,40 @@ export const leads = pgTable(
     check(
       "leads_offer_interest_check",
       sql`${table.offerInterest} is null or ${table.offerInterest} in ('genetic', 'consultation', 'undecided')`,
+    ),
+  ],
+);
+
+/**
+ * The validated versions of a patient's protocol — story 20. One row for each
+ * validation: the number, the date, the operator and a snapshot of the live
+ * protocol (`shared/protocol-snapshot.ts`). A row is immutable: the service
+ * has no update and no delete. The rows go with the patient.
+ */
+export const protocolVersions = pgTable(
+  "protocol_versions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    patientId: uuid("patient_id")
+      .notNull()
+      .references(() => patientProfiles.id, { onDelete: "cascade" }),
+    versionNumber: integer("version_number").notNull(),
+    validatedAt: timestamp("validated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+    /** The operator who validated. No foreign key, like `audit_events`. */
+    validatedBy: uuid("validated_by").notNull(),
+    snapshot: jsonb("snapshot").$type<ProtocolSnapshot>().notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("protocol_versions_patient_version_idx").on(
+      table.patientId,
+      table.versionNumber,
+    ),
+    check(
+      "protocol_versions_version_number_check",
+      sql`${table.versionNumber} >= 1`,
     ),
   ],
 );

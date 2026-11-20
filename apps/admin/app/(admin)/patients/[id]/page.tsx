@@ -94,6 +94,7 @@ import {
   PatientNavigation,
   type PatientSectionEntry,
 } from "@/components/patients/patient-navigation";
+import { ProtocolValidation } from "@/components/patients/protocol-validation";
 import { PantryAddForm } from "@/components/patients/pantry-add-form";
 import { PantryList } from "@/components/patients/pantry-list";
 import { PantrySection } from "@/components/patients/pantry-section";
@@ -484,6 +485,7 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
               consultationDate ? formatDate(consultationDate) : "Non renseigné"
             }`}
           </Typography>
+          <ProtocolValidation patient={patient} readOnly={readOnly} />
           {readOnly ? (
             <Typography size="sm" role="status" className="text-warning-text">
               Lecture seule : accès équipe REMI à un dossier suivi par un autre

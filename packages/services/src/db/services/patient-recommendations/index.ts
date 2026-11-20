@@ -6,6 +6,7 @@ import { getDatabase, type DatabaseClient } from "../../client";
 import type { PatientRecommendation } from "../../models/patient-recommendation";
 import type { RecommendationCategory } from "../../models/recommendation";
 import { touchPatient } from "../patients";
+import { moveToValidateAfterSave } from "../first-recommendation";
 import {
   countSectionPlan,
   isEmptySave,
@@ -128,6 +129,7 @@ const unscopedAddPatientRecommendation = async (
     archivedAt: null,
   });
   await touchPatient(patientId);
+  await moveToValidateAfterSave(patientId);
   return ok(created);
 };
 
@@ -323,7 +325,7 @@ const unscopedSavePatientRecommendations = async (
     return ok(counts);
   }
 
-  return getDatabase().transaction(async (tx) => {
+  const saved = await getDatabase().transaction(async (tx) => {
     const archivedAt = new Date();
     for (const id of plan.archives) {
       await recommendations(tx).update(id, { archivedAt });
@@ -352,6 +354,11 @@ const unscopedSavePatientRecommendations = async (
     await touchPatient(patientId, tx);
     return ok(counts);
   });
+  // After the transaction, and only for a save that leaves content (D-31).
+  if (counts.added > 0 || counts.updated > 0) {
+    await moveToValidateAfterSave(patientId);
+  }
+  return saved;
 };
 
 /**
