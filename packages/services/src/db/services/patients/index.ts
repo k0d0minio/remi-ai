@@ -33,7 +33,10 @@ import type {
   PatientEditableProfileField,
   PatientProfile,
 } from "../../models/patient-profile";
-import { refreshBmiEstimate } from "../patient-calculations";
+import {
+  refreshBmiEstimate,
+  refreshProteinEstimate,
+} from "../patient-calculations";
 import { recordPatientChanges, type WatchedValues } from "../patient-changes";
 import { consentInForce } from "../patient-consents/in-force";
 import type { AccessMode, Actor } from "../../models/actor";
@@ -551,6 +554,7 @@ export const createPatient = async (
   });
   if (patient.heightCm !== null || patient.weightKg !== null) {
     await refreshBmiEstimate(patient.id, db);
+    await refreshProteinEstimate(patient.id, db);
   }
   return ok(patient);
 };
@@ -565,6 +569,17 @@ export const changesMeasures = (
 ) =>
   (patch.heightCm !== undefined && patch.heightCm !== current.heightCm) ||
   (patch.weightKg !== undefined && patch.weightKg !== current.weightKg);
+
+/**
+ * The patch changes a datum that the protein estimate reads (story 8): the
+ * height or the weight, or the birth date for the proposal from 65.
+ */
+export const changesProteinInputs = (
+  current: Pick<PatientProfile, "heightCm" | "weightKg" | "birthDate">,
+  patch: Partial<Pick<PatientProfile, "heightCm" | "weightKg" | "birthDate">>,
+) =>
+  changesMeasures(current, patch) ||
+  (patch.birthDate !== undefined && patch.birthDate !== current.birthDate);
 
 type EditableValues = Pick<PatientProfile, PatientEditableProfileField>;
 
@@ -658,6 +673,9 @@ const unscopedUpdatePatient = async (
   const patient = await patients().update(id, patch);
   if (patient && changesMeasures(current, patch)) {
     await refreshBmiEstimate(id);
+  }
+  if (patient && changesProteinInputs(current, patch)) {
+    await refreshProteinEstimate(id);
   }
   return patient ? ok(patient) : err("not_found", "no such patient");
 };

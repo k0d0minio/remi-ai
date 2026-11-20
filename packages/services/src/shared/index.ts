@@ -52,6 +52,7 @@ export type {
   CalculationInput,
   CalculationKind,
 } from "./calculations";
+export { proteinAdaptationLabels, proteinEstimateParameters } from "./protein";
 export {
   defaultMacroSplit,
   genotypeMappingValidated,

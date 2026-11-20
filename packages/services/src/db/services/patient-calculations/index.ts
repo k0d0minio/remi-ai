@@ -4,6 +4,8 @@ import {
   calculationKinds,
   type CalculationKind,
 } from "../../../shared/calculations";
+import { ageInYears } from "../../../shared/format";
+import { proteinProposal } from "../../../shared/protein";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
@@ -25,7 +27,7 @@ import { byPatient, noSuchPatient } from "../access";
  *   that names the value and the parameters (D-32).
  *
  * Neither write touches the other's columns. Nothing here computes: the
- * functions live in `shared/calculations.ts`.
+ * functions live in `shared/calculations.ts` and `shared/protein.ts`.
  */
 
 const calculations = (db: DatabaseClient = getDatabase()) =>
@@ -207,6 +209,64 @@ export const refreshBmiEstimate = async (
   const row = await rowFor(patientId, "bmi", db);
   if (row && row.estimatedValue !== null) {
     await unscopedSetCalculationEstimate(patientId, "bmi", null, db);
+  }
+};
+
+type ProteinInputs = Pick<
+  PatientProfile,
+  "id" | "heightCm" | "weightKg" | "birthDate"
+> & {
+  /** `patient_profiles.special_situation`. Null until the practitioner enters it. */
+  specialSituation?: string | null;
+};
+
+/**
+ * Recompute the protein estimate from the file's current weight, with the
+ * adaptations proposed (story 8). The services that refresh the BMI call it
+ * after the same save, and after a save of the birth date. Unscoped: the
+ * caller has checked the actor before its own write.
+ *
+ * The row keeps the reference weight, the coefficient, the addition and the
+ * adaptations with the value (D-32). The age is derived on the day and is
+ * not stored. A missing or implausible weight clears the estimate (D-30). A
+ * file with no estimate yet gets no empty row.
+ */
+export const refreshProteinEstimate = async (
+  patientId: Id,
+  db?: DatabaseClient,
+): Promise<void> => {
+  const profile = await (db ?? getDatabase())
+    .collection<ProteinInputs>("patient_profiles")
+    .findById(patientId);
+  if (!profile) {
+    return;
+  }
+  const proposal = proteinProposal({
+    weightKg: profile.weightKg ?? null,
+    heightCm: profile.heightCm ?? null,
+    age: ageInYears(profile.birthDate ?? null),
+    specialSituation: profile.specialSituation ?? null,
+  });
+  if (proposal.state === "computed") {
+    await unscopedSetCalculationEstimate(
+      patientId,
+      "protein",
+      {
+        value: proposal.value,
+        parameters: {
+          referenceWeightKg: proposal.referenceWeightKg,
+          coefficient: proposal.coefficient,
+          additionGramsPerDay: proposal.additionGramsPerDay,
+          adaptations: proposal.adaptations,
+        },
+      },
+      db,
+    );
+    return;
+  }
+  const row = await rowFor(patientId, "protein", db);
+  if (row && row.estimatedValue !== null) {
+    await unscopedSetCalculationEstimate(patientId, "protein", null, db);
   }
 };
 

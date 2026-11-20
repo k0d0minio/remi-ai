@@ -27,8 +27,15 @@ import type {
 } from "../../models/patient-questionnaire";
 import { recordAuditEvent, type AuditActor } from "../audit";
 import { consentInForce } from "../patient-consents/in-force";
-import { refreshBmiEstimate } from "../patient-calculations";
-import { changesMeasures, setFileStatus } from "../patients";
+import {
+  refreshBmiEstimate,
+  refreshProteinEstimate,
+} from "../patient-calculations";
+import {
+  changesMeasures,
+  changesProteinInputs,
+  setFileStatus,
+} from "../patients";
 import {
   byPatient,
   byPatientWrite,
@@ -617,6 +624,9 @@ const unscopedSavePatientProfileAnswers = async (
   const written = await rows.update(patientId, patch);
   if (written && changesMeasures(current, patch)) {
     await refreshBmiEstimate(patientId);
+  }
+  if (written && changesProteinInputs(current, patch)) {
+    await refreshProteinEstimate(patientId);
   }
   if (written && byThePatient) {
     const fields = Object.keys(patch);
