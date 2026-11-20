@@ -216,7 +216,10 @@ export const SaveStatus = ({ state, onRetry }: SaveStatusProps) => {
         ? text.saved
         : "";
   return (
-    <div aria-live="polite" className="flex min-h-4 flex-wrap items-center gap-x-2">
+    <div
+      aria-live="polite"
+      className="flex min-h-4 flex-wrap items-center gap-x-2"
+    >
       {unavailable ? (
         <>
           <Typography as="p" size="sm" className="text-error-text">

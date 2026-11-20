@@ -64,7 +64,12 @@ export const QuestionnaireEnd = ({
               <Button type="button" size="lg" onClick={onRetry}>
                 {text.retry}
               </Button>
-              <Button type="button" variant="outline" size="lg" onClick={onBack}>
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                onClick={onBack}
+              >
                 {text.end.back}
               </Button>
             </div>
