@@ -33,6 +33,22 @@ export {
   protocolSnapshotSchema,
 } from "./protocol-snapshot";
 export type { ProtocolSnapshot } from "./protocol-snapshot";
+export {
+  evictionsOfDirectives,
+  foodDirectiveFaults,
+  foodDirectiveKinds,
+  foodDirectiveTermKey,
+  foodLimitLevels,
+  joinFoodDirectiveTerms,
+  splitFoodDirectiveTerms,
+} from "./food-directives";
+export type {
+  FoodDirectiveDraft,
+  FoodDirectiveFault,
+  FoodDirectiveFaultCode,
+  FoodDirectiveKind,
+  FoodLimitLevel,
+} from "./food-directives";
 export type {
   PatientChangeValue,
   WatchedPatientField,
@@ -287,6 +303,7 @@ export type {
   PatientQuestionnaire,
   PatientRecommendation,
   PatientSupplement,
+  PatientFoodDirective,
   PatientSex,
   PatientStatus,
   PatientSummary,

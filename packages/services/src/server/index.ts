@@ -168,6 +168,12 @@ export type {
   SupplementInput,
   SupplementRow,
 } from "../db/services/patient-supplements";
+export {
+  listDisabledPatientFoodDirectives,
+  listPatientEvictions,
+  listPatientFoodDirectives,
+  savePatientFoodDirectives,
+} from "../db/services/patient-food-directives";
 
 export {
   addPantryEssential,

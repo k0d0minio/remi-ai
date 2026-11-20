@@ -17,6 +17,7 @@ import type {
 import { byPatient, noSuchPatient, systemActor } from "../access";
 import { recordAuditEvent, type OperatorActor } from "../audit";
 import { listPatientCalculations } from "../patient-calculations";
+import { listPatientFoodDirectives } from "../patient-food-directives";
 import { listPatientGoals } from "../patient-goals";
 import { getPatientInstruction } from "../patient-instructions";
 import { listPatientRecommendations } from "../patient-recommendations";
@@ -26,7 +27,7 @@ import { listPatientSupplements } from "../patient-supplements";
  * The validated versions of a protocol — story 20, D-30.
  *
  * The live tables (recommendations, goals, supplements, instruction,
- * calculations) are the practitioner's working copy. `validateProtocol` copies
+ * calculations, food directives) are the practitioner's working copy. `validateProtocol` copies
  * them into the next row of `protocol_versions`. `getValidatedProtocol`
  * returns the latest row. A reader of validated content (the patient space,
  * the generation) calls only `getValidatedProtocol`: a change in the working
@@ -75,14 +76,21 @@ const latestOf = (rows: readonly ProtocolVersion[]): ProtocolVersion | null =>
  * checked the actor, so the reads use the system actor.
  */
 const snapshotOfLiveProtocol = async (patientId: Id): Promise<unknown> => {
-  const [recommendations, goals, supplements, instruction, calculations] =
-    await Promise.all([
-      listPatientRecommendations(systemActor, patientId),
-      listPatientGoals(systemActor, patientId),
-      listPatientSupplements(systemActor, patientId),
-      getPatientInstruction(systemActor, patientId),
-      listPatientCalculations(systemActor, patientId),
-    ]);
+  const [
+    recommendations,
+    goals,
+    supplements,
+    instruction,
+    calculations,
+    foodDirectives,
+  ] = await Promise.all([
+    listPatientRecommendations(systemActor, patientId),
+    listPatientGoals(systemActor, patientId),
+    listPatientSupplements(systemActor, patientId),
+    getPatientInstruction(systemActor, patientId),
+    listPatientCalculations(systemActor, patientId),
+    listPatientFoodDirectives(systemActor, patientId),
+  ]);
   return {
     schemaVersion: PROTOCOL_SNAPSHOT_SCHEMA_VERSION,
     recommendations: recommendations.map((row) => ({
@@ -132,6 +140,18 @@ const snapshotOfLiveProtocol = async (patientId: Id): Promise<unknown> => {
             },
           ],
     ),
+    // Each directive in force, with the term as typed. An eviction whose term
+    // REMI does not recognise is in the version like the others (D-30).
+    foodDirectives: foodDirectives.map((row) => ({
+      id: row.id,
+      kind: row.kind,
+      term: row.term,
+      limitLevel: row.limitLevel,
+      startsOn: row.startsOn,
+      endsOn: row.endsOn,
+      durable: row.durable,
+      position: row.position,
+    })),
   };
 };
 
@@ -144,6 +164,7 @@ const auditDetailOf = (versionNumber: number, snapshot: ProtocolSnapshot) =>
     supplements: snapshot.supplements.length,
     instruction: snapshot.instruction !== null,
     calculations: snapshot.calculations.map((row) => row.kind),
+    foodDirectives: snapshot.foodDirectives.length,
   });
 
 /**

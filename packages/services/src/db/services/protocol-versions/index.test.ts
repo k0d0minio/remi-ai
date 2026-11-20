@@ -178,6 +178,7 @@ describe("the validated protocol of a patient", () => {
       supplements: 1,
       instruction: true,
       calculations: ["protein"],
+      foodDirectives: 0,
     });
   });
 
