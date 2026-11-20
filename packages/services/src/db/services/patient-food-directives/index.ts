@@ -276,6 +276,15 @@ const unscopedSavePatientFoodDirectives = async (
 };
 
 /**
+ * The active directives for a caller that has already checked the actor's
+ * access to `patientId`: the activation recap (story 19), which reads the
+ * validated version and the questionnaire through their scoped services
+ * first. No other caller may use it.
+ */
+export const activeFoodDirectivesAfterAccessCheck =
+  unscopedListPatientFoodDirectives;
+
+/**
  * The scoped surface (story 3, D-27). The actor comes first, and
  * `db/services/access` checks it before the body runs. A refused call answers
  * as a missing file.

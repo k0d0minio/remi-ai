@@ -1,5 +1,6 @@
 import type { ActivationEviction } from "../../../shared/care-activation";
 import type { Id } from "../../../types";
+import { activeFoodDirectivesAfterAccessCheck } from "../patient-food-directives";
 
 /** What the activation reads from the practitioner's directives. */
 export type ActivationDirectives = {
@@ -10,22 +11,32 @@ export type ActivationDirectives = {
 };
 
 /**
- * The one read of the directives for the activation (story 19).
+ * The one read of the directives for the activation (story 19). The recap,
+ * the blockers, the service and the card read only this function.
  *
- * TO WIRE AFTER THE MERGE OF BURST 2. The table of evictions comes from
- * another ticket of the same burst, so this ticket cannot read it. Today the
- * function returns two empty lists. Thus no eviction blocks an activation,
- * and the recap lists no eviction and no element that is not recognised.
+ * The caller has already checked the actor's access to `patientId`.
  *
- * When the table is on the branch, read the rows in force of `patientId`
- * here and map each row to an `ActivationEviction`:
- * - `label`: what is evicted, as the practitioner wrote it,
- * - `periodStart` and `periodEnd`: the ISO dates, or null,
- * - `durable`: true for the durable status.
- * Put the elements that are not recognised in `unrecognised`.
- * No other file changes: the recap, the blockers, the service and the card
- * read only this function.
+ * An « Éviction totale » is an eviction of the recap, with its period or its
+ * durable status. The repo has no term base yet (D-33), so REMI recognises
+ * no term. An eviction still applies: the compatibility gate reads it as
+ * text. A term « À favoriser » or « À limiter » is applied by nothing yet,
+ * so it is listed as not recognised and not applied. It never blocks.
  */
 export const listActivationDirectives = async (
-  _patientId: Id,
-): Promise<ActivationDirectives> => ({ evictions: [], unrecognised: [] });
+  patientId: Id,
+): Promise<ActivationDirectives> => {
+  const directives = await activeFoodDirectivesAfterAccessCheck(patientId);
+  return {
+    evictions: directives
+      .filter((directive) => directive.kind === "exclude")
+      .map((directive) => ({
+        label: directive.term,
+        periodStart: directive.startsOn,
+        periodEnd: directive.endsOn,
+        durable: directive.durable,
+      })),
+    unrecognised: directives
+      .filter((directive) => directive.kind !== "exclude")
+      .map((directive) => directive.term),
+  };
+};
