@@ -120,13 +120,31 @@ export {
   calculationKindLabels,
   calculationKinds,
   missingCalculationInputs,
+  specialSituationLabels,
+  specialSituations,
 } from "./calculations";
 export type {
   BmiIndicator,
   CalculationInput,
   CalculationKind,
+  SpecialSituation,
 } from "./calculations";
-export { energyEstimateParameters } from "./energy";
+export {
+  energyEstimateParameters,
+  energyGoalLabels,
+  energyGoals,
+  energyTarget,
+  energyTargetBounds,
+  energyTargetDefaults,
+  energyTargetEntries,
+  energyTargetParameters,
+  restingMetabolismSexConstants,
+} from "./energy";
+export type {
+  EnergyGoal,
+  EnergyTargetDefaults,
+  EnergyTargetEntry,
+} from "./energy";
 export {
   defaultProteinCoefficient,
   proteinAdaptationLabels,
@@ -383,6 +401,7 @@ export type {
   PatientStatus,
   PatientSummary,
   PatientCalculation,
+  ComputedEstimates,
   PatientChange,
   PersonalisationDimension,
   PersonalisationProfile,

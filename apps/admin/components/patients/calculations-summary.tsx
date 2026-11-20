@@ -2,6 +2,7 @@ import type {
   BmiIndicator,
   CalculationInput,
   CalculationKind,
+  ComputedEstimates,
   PatientCalculation,
 } from "@remi/services/shared";
 import {
@@ -13,17 +14,24 @@ import {
   calculationKindLabels,
   calculationKinds,
   energyEstimateParameters,
+  energyGoalLabels,
+  energyTargetDefaults,
+  energyTargetParameters,
   formatDate,
   formatNumber,
   proteinAdaptationLabels,
   proteinEstimateParameters,
   proteinTargetDefaults,
+  restingMetabolismSexConstants,
   sexForCalculationLabels,
+  specialSituationLabels,
 } from "@remi/services/shared";
 import { Badge, Typography } from "@remi/ui/server";
 import { CalculationDetail } from "@/components/patients/calculation-detail";
+import { EnergyTargetFields } from "@/components/patients/energy-target-fields";
 import { ValidatedMark } from "@/components/patients/file/value";
 import { ProteinTargetFields } from "@/components/patients/protein-target-fields";
+import { validateEnergyTargetAction } from "@/lib/patients/energy-target";
 import { validateProteinTargetAction } from "@/lib/patients/protein-target";
 
 type Props = {
@@ -36,6 +44,26 @@ type Props = {
   missing: Readonly<Record<CalculationKind, readonly CalculationInput[]>>;
   /** The BMI's state from the file's height and weight (`bmiIndicator`). */
   bmi: BmiIndicator;
+  /**
+   * The estimates of the file as it is now, computed and not stored
+   * (`computePatientEstimates`). A row with no stored estimate shows this one.
+   */
+  computed: ComputedEstimates;
+};
+
+/**
+ * The estimate that a row shows: the stored one, else the one computed from
+ * the file as it is now. A file that was saved before the estimate existed
+ * has its data and no stored estimate (REM-52). Null: there is no number.
+ */
+const shownEstimate = (
+  row: PatientCalculation | undefined,
+  computed: ComputedEstimates[keyof ComputedEstimates],
+) => {
+  const stored = row?.estimatedValue ?? null;
+  return stored !== null
+    ? { value: stored, parameters: row?.estimateParameters ?? null }
+    : computed;
 };
 
 /** The unit each value reads with. */
@@ -190,18 +218,26 @@ const ProteinValue = ({
   readOnly,
   missing,
   row,
+  computed,
 }: {
   patientId: string;
   readOnly: boolean;
   missing: readonly CalculationInput[];
   row: PatientCalculation | undefined;
+  computed: ComputedEstimates["protein"];
 }) => {
   const validated = row?.validatedValue ?? null;
-  const estimate = row?.estimatedValue ?? null;
+  const shown = shownEstimate(row, computed);
+  const estimate = shown?.value ?? null;
   const estimateParameters = proteinEstimateParameters(
-    row?.estimateParameters ?? null,
+    shown?.parameters ?? null,
   );
-  const defaults = proteinTargetDefaults(row ?? null);
+  const defaults = proteinTargetDefaults({
+    estimatedValue: estimate,
+    estimateParameters: shown?.parameters ?? null,
+    validatedValue: validated,
+    validationParameters: row?.validationParameters ?? null,
+  });
   const unavailable =
     defaults !== null
       ? null
@@ -313,37 +349,24 @@ const ProteinValue = ({
 const kcalPerDay = (value: number) =>
   `${formatNumber(value, "fr-BE", 0)}${units.energy}`;
 
+/** « + 300 kcal/jour », « − 300 kcal/jour », « 0 kcal/jour ». */
+const signedKcalPerDay = (value: number) =>
+  value === 0
+    ? kcalPerDay(0)
+    : `${value > 0 ? "+" : "−"} ${kcalPerDay(Math.abs(value))}`;
+
 /**
- * The energy row (story 9): the resting metabolism and the estimated daily
- * need, each with the badge « estimation » (D-30), then the data that gave
- * them. The need is on the current weight: the protein reference weight
- * changes nothing here. With a datum missing or out of range the row gives no
- * number and names the datum.
- *
- * The practitioner's calorie target is a second value, kept apart from the
- * estimate (REM-52). When the row holds one, it shows above the estimate
- * with the mark « validé », and the estimate stays as it is.
+ * « Voir le détail du calcul » (story 9): the two formulas with the values
+ * used. Closed by default. It writes nothing, so a read-only open shows it
+ * too. A value that the row does not hold gives no line.
  */
-const EnergyValue = ({
-  missing,
-  indicator,
-  row,
+const EnergyFormula = ({
+  value,
+  parameters,
 }: {
-  missing: readonly CalculationInput[];
-  indicator: BmiIndicator;
-  row: PatientCalculation | undefined;
+  value: number;
+  parameters: Readonly<Record<string, unknown>> | null;
 }) => {
-  if (missing.length > 0) {
-    return <NotCalculated reason={missingLine(missing)} />;
-  }
-  if (indicator.state === "out_of_range") {
-    return <NotCalculated reason={outOfRangeLine(indicator.inputs)} />;
-  }
-  const value = row?.estimatedValue ?? null;
-  if (value === null) {
-    return <NotCalculated reason={NOT_AVAILABLE} />;
-  }
-  const validated = row?.validatedValue ?? null;
   const {
     restingMetabolism,
     sexForCalculation,
@@ -352,27 +375,118 @@ const EnergyValue = ({
     weightKg,
     activityLevel,
     nap,
-  } = energyEstimateParameters(row?.estimateParameters ?? null);
-  const inputs = [
+  } = energyEstimateParameters(parameters);
+  const constant =
     sexForCalculation === null
       ? null
-      : sexForCalculationLabels[sexForCalculation].fr,
-    ageYears === null ? null : `${formatNumber(ageYears, "fr-BE")} ans`,
-    heightCm === null ? null : `${formatNumber(heightCm, "fr-BE")} cm`,
-    weightKg === null
+      : restingMetabolismSexConstants[sexForCalculation];
+  const resting =
+    restingMetabolism !== null &&
+    sexForCalculation !== null &&
+    constant !== null &&
+    ageYears !== null &&
+    heightCm !== null &&
+    weightKg !== null
+      ? `Métabolisme de repos (Mifflin-St Jeor, ${sexForCalculationLabels[sexForCalculation].fr.toLowerCase()}) : 10 × ${formatNumber(weightKg, "fr-BE")} kg + 6,25 × ${formatNumber(heightCm, "fr-BE")} cm − 5 × ${formatNumber(ageYears, "fr-BE")} ans ${constant < 0 ? "−" : "+"} ${formatNumber(Math.abs(constant), "fr-BE")} = ${kcalPerDay(restingMetabolism)}`
+      : null;
+  const need =
+    restingMetabolism !== null && activityLevel !== null && nap !== null
+      ? `Besoins énergétiques estimés : ${kcalPerDay(restingMetabolism)} × ${formatNumber(nap, "fr-BE", 1)} (niveau d'activité physique : ${activityLevelDetails[activityLevel].label.fr}) = ${kcalPerDay(value)}`
+      : null;
+  if (resting === null && need === null) {
+    return null;
+  }
+  return (
+    <details className="w-full">
+      <summary className="flex min-h-11 cursor-pointer items-center text-sm underline underline-offset-4">
+        Voir le détail du calcul
+      </summary>
+      <div className="flex flex-col gap-1 pt-1">
+        {resting ? (
+          <Typography size="xs" tone="muted">
+            {resting}
+          </Typography>
+        ) : null}
+        {need ? (
+          <Typography size="xs" tone="muted">
+            {need}
+          </Typography>
+        ) : null}
+        <Typography size="xs" tone="muted">
+          Le poids est le poids actuel du dossier. Le poids de référence des
+          besoins protéiques ne change pas ce calcul.
+        </Typography>
+      </div>
+    </details>
+  );
+};
+
+/**
+ * The energy row (story 9, REM-52): three values, kept apart and named. The
+ * resting metabolism and the estimated daily need each carry the badge
+ * « estimation » (D-30), before and after a validation. The validated calorie
+ * target is the practitioner's value, with the mark « validé le … », the goal
+ * and the special situation. A new estimate never replaces it: the row then
+ * says that the estimate changed, and the target waits for a new « Valider ».
+ *
+ * With a datum missing or out of range the row gives no estimate and names
+ * the datum. A validated target still shows.
+ *
+ * « Modifier » opens the detail: the goal, the special situation, the target
+ * or the difference, and « Voir le détail du calcul ». A read-only open gets
+ * no « Modifier ». With no estimate the detail says so and offers no field.
+ */
+const EnergyValue = ({
+  patientId,
+  readOnly,
+  missing,
+  indicator,
+  row,
+  computed,
+}: {
+  patientId: string;
+  readOnly: boolean;
+  missing: readonly CalculationInput[];
+  indicator: BmiIndicator;
+  row: PatientCalculation | undefined;
+  computed: ComputedEstimates["energy"];
+}) => {
+  // A missing datum gives no number, whatever a row still holds (D-30).
+  const shown =
+    missing.length > 0 || indicator.state === "out_of_range"
       ? null
-      : `poids actuel ${formatNumber(weightKg, "fr-BE")} kg`,
+      : shownEstimate(row, computed);
+  const reason =
+    missing.length > 0
+      ? missingLine(missing)
+      : indicator.state === "out_of_range"
+        ? outOfRangeLine(indicator.inputs)
+        : NOT_AVAILABLE;
+  const { restingMetabolism } = energyEstimateParameters(
+    shown?.parameters ?? null,
+  );
+  const validated = row?.validatedValue ?? null;
+  const target = energyTargetParameters(row?.validationParameters ?? null);
+  const targetFacts = [
+    target.goal === null ? null : `Objectif : ${energyGoalLabels[target.goal].fr}`,
+    target.specialSituation === null
+      ? null
+      : `Situation particulière : ${specialSituationLabels[target.specialSituation].fr}`,
+    target.difference === null
+      ? null
+      : `${signedKcalPerDay(target.difference)} par rapport à l'estimation de la validation`,
   ].filter((part) => part !== null);
+  const estimateMoved =
+    validated !== null &&
+    shown !== null &&
+    target.estimatedNeed !== null &&
+    Math.round(shown.value) !== target.estimatedNeed;
+  const formula = shown ? (
+    <EnergyFormula value={shown.value} parameters={shown.parameters} />
+  ) : null;
+
   return (
     <>
-      {validated !== null ? (
-        <div className="flex flex-wrap items-center gap-2">
-          <Typography size="sm" weight="medium">
-            {`Objectif calorique : ${kcalPerDay(validated)}`}
-          </Typography>
-          <ValidationState row={row} />
-        </div>
-      ) : null}
       {restingMetabolism !== null ? (
         <div className="flex flex-wrap items-center gap-2">
           <Typography size="sm" weight="medium">
@@ -380,32 +494,84 @@ const EnergyValue = ({
           </Typography>
           <EstimateBadge />
         </div>
-      ) : null}
-      <div className="flex flex-wrap items-center gap-2">
-        <Typography size="sm" weight="medium">
-          {`Besoins énergétiques estimés : ${kcalPerDay(value)}`}
+      ) : (
+        <Typography size="sm">Métabolisme de repos : non calculé</Typography>
+      )}
+      {shown ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <Typography size="sm" weight="medium">
+            {`Besoins énergétiques estimés : ${kcalPerDay(shown.value)}`}
+          </Typography>
+          <EstimateBadge />
+        </div>
+      ) : (
+        <>
+          <Typography size="sm">
+            Besoins énergétiques estimés : non calculé
+          </Typography>
+          <Typography size="xs" tone="muted">
+            {reason}
+          </Typography>
+        </>
+      )}
+      {validated !== null ? (
+        <>
+          <div className="flex flex-wrap items-center gap-2">
+            <Typography size="sm" weight="medium">
+              {`Objectif calorique validé : ${kcalPerDay(validated)}`}
+            </Typography>
+            <ValidationState row={row} dated />
+          </div>
+          {targetFacts.length > 0 ? (
+            <Typography size="xs" tone="muted">
+              {targetFacts.join(" · ")}
+            </Typography>
+          ) : null}
+          {estimateMoved && shown && target.estimatedNeed !== null ? (
+            <Typography size="xs" role="status">
+              {`L'estimation a changé depuis la validation : ${kcalPerDay(target.estimatedNeed)}, puis ${kcalPerDay(shown.value)}. L'objectif calorique validé reste ${kcalPerDay(validated)} tant que vous ne validez pas de nouveau.`}
+            </Typography>
+          ) : null}
+        </>
+      ) : (
+        <Typography size="sm" tone="muted">
+          Objectif calorique validé : aucun
         </Typography>
-        <EstimateBadge />
-      </div>
-      {inputs.length > 0 ? (
-        <Typography size="xs" tone="muted">
-          {`Mifflin-St Jeor : ${inputs.join(", ")}`}
-        </Typography>
-      ) : null}
-      {activityLevel !== null && nap !== null ? (
-        <Typography size="xs" tone="muted">
-          {`Niveau d'activité physique : ${activityLevelDetails[activityLevel].label.fr}, coefficient ${formatNumber(nap, "fr-BE", 1)}`}
-        </Typography>
-      ) : null}
+      )}
+      {readOnly ? (
+        formula
+      ) : (
+        <CalculationDetail
+          patientId={patientId}
+          editLabel="Modifier l'objectif calorique"
+          action={validateEnergyTargetAction}
+          unavailable={
+            shown
+              ? null
+              : `Aucun objectif calorique ne peut être validé sans estimation. ${reason}. Complétez le dossier, puis revenez ici.`
+          }
+        >
+          {shown ? (
+            <>
+              <EnergyTargetFields
+                defaults={energyTargetDefaults(row ?? null)}
+                estimateKcalPerDay={shown.value}
+              />
+              {formula}
+            </>
+          ) : null}
+        </CalculationDetail>
+      )}
     </>
   );
 };
 
 /**
  * « Calculs » (story 6): one row per calculation, under the questionnaire
- * data. A row shows the validated value with the mark « validé », else the
- * estimate with the badge « estimation » (D-30). With no value it reads « Non calculé » and names
- * the missing data. Each kind has its own value component. This slot is the
+ * data. A row shows the validated value with the mark « validé », and the
+ * estimate with the badge « estimation » (D-30). With no value it reads
+ * « Non calculé » and names the missing data. A file with its data and no
+ * stored estimate shows the estimate computed from the file (REM-52). Each kind has its own value component. This slot is the
  * only one.
  */
 export const CalculationsSummary = ({
@@ -414,6 +580,7 @@ export const CalculationsSummary = ({
   calculations,
   missing,
   bmi,
+  computed,
 }: Props) => (
   <dl className="flex flex-col gap-4">
     {calculationKinds.map((kind) => {
@@ -435,10 +602,18 @@ export const CalculationsSummary = ({
                 readOnly={readOnly}
                 missing={missing[kind]}
                 row={row}
+                computed={computed.protein}
               />
             ) : null}
             {kind === "energy" ? (
-              <EnergyValue missing={missing[kind]} indicator={bmi} row={row} />
+              <EnergyValue
+                patientId={patientId}
+                readOnly={readOnly}
+                missing={missing[kind]}
+                indicator={bmi}
+                row={row}
+                computed={computed.energy}
+              />
             ) : null}
           </dd>
         </div>

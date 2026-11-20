@@ -4,6 +4,11 @@ import {
   energyEstimateParameters,
   energyNeed,
   energyProposal,
+  energyTarget,
+  energyTargetBounds,
+  energyTargetDefaults,
+  energyTargetParameters,
+  type EnergyTargetInput,
   restingMetabolism,
   restingMetabolismSexConstants,
   type EnergyProfile,
@@ -241,5 +246,202 @@ describe("the parameters of a stored energy estimate", () => {
       activityLevel: null,
       nap: null,
     });
+  });
+});
+
+describe("the calorie target", () => {
+  const input = (patch: Partial<EnergyTargetInput> = {}): EnergyTargetInput => ({
+    estimateKcalPerDay: 2300,
+    goal: "weight_loss",
+    specialSituation: null,
+    entry: "value",
+    amount: 2000,
+    ...patch,
+  });
+
+  it("keeps a typed 2 000 kcal/day against an estimate of 2 300", () => {
+    expect(energyTarget(input())).toEqual({
+      state: "computed",
+      value: 2000,
+      estimatedNeed: 2300,
+      difference: -300,
+      goal: "weight_loss",
+      specialSituation: null,
+      entry: "value",
+    });
+  });
+
+  it("gives 2 000 kcal/day for a difference of − 300 against 2 300", () => {
+    const target = energyTarget(input({ entry: "difference", amount: -300 }));
+    expect(target).toMatchObject({
+      state: "computed",
+      value: 2000,
+      difference: -300,
+      entry: "difference",
+    });
+  });
+
+  it("adds the difference to the estimate as the screen rounds it", () => {
+    const target = energyTarget(
+      input({ estimateKcalPerDay: 2152.4, entry: "difference", amount: 0 }),
+    );
+    expect(target).toMatchObject({
+      state: "computed",
+      value: 2152,
+      estimatedNeed: 2152,
+      difference: 0,
+    });
+  });
+
+  it("takes a target above, equal to or below the estimate", () => {
+    for (const amount of [2600, 2300, 1800]) {
+      expect(energyTarget(input({ amount }))).toMatchObject({
+        state: "computed",
+        value: amount,
+        difference: amount - 2300,
+      });
+    }
+  });
+
+  it("gives no target for a weight-loss goal with no typed amount", () => {
+    for (const entry of ["value", "difference"]) {
+      expect(energyTarget(input({ entry, amount: null }))).toEqual({
+        state: "invalid",
+        fields: ["amount"],
+      });
+    }
+  });
+
+  it("gives the same value for each goal and each situation", () => {
+    for (const goal of ["maintenance", "weight_loss", "weight_gain", "muscle_gain"]) {
+      for (const specialSituation of [null, "none", "pregnancy_2", "pathology"]) {
+        expect(energyTarget(input({ goal, specialSituation }))).toMatchObject({
+          state: "computed",
+          value: 2000,
+          goal,
+          specialSituation,
+        });
+      }
+    }
+  });
+
+  it("gives no target with no estimate", () => {
+    for (const estimateKcalPerDay of [null, 0, Number.NaN]) {
+      expect(energyTarget(input({ estimateKcalPerDay }))).toEqual({
+        state: "invalid",
+        fields: ["estimate"],
+      });
+    }
+  });
+
+  it("names a goal, a situation and an entry that do not exist", () => {
+    expect(
+      energyTarget(input({ goal: null, specialSituation: "flu", entry: "ratio" })),
+    ).toEqual({
+      state: "invalid",
+      fields: ["goal", "specialSituation", "entry", "amount"],
+    });
+    expect(energyTarget(input({ goal: "diet" }))).toEqual({
+      state: "invalid",
+      fields: ["goal"],
+    });
+  });
+
+  it("refuses an amount out of its limits or not whole", () => {
+    const { value, difference } = energyTargetBounds;
+    const refused: Partial<EnergyTargetInput>[] = [
+      { amount: value.min - 1 },
+      { amount: value.max + 1 },
+      { amount: 2000.5 },
+      { amount: Number.NaN },
+      { entry: "difference", amount: difference.min - 1 },
+      { entry: "difference", amount: difference.max + 1 },
+      // 900 − 500 is under the lowest target.
+      { estimateKcalPerDay: 900, entry: "difference", amount: -500 },
+    ];
+    for (const patch of refused) {
+      expect(energyTarget(input(patch))).toEqual({
+        state: "invalid",
+        fields: ["amount"],
+      });
+    }
+    expect(energyTarget(input({ amount: value.min }))).toMatchObject({
+      state: "computed",
+    });
+    expect(energyTarget(input({ amount: value.max }))).toMatchObject({
+      state: "computed",
+    });
+  });
+
+  it("reads stored parameters field by field", () => {
+    expect(
+      energyTargetParameters({
+        goal: "muscle_gain",
+        specialSituation: "none",
+        entry: "difference",
+        estimatedNeed: 2300,
+        difference: 200,
+      }),
+    ).toEqual({
+      goal: "muscle_gain",
+      specialSituation: "none",
+      entry: "difference",
+      estimatedNeed: 2300,
+      difference: 200,
+    });
+    expect(
+      energyTargetParameters({ goal: "diet", entry: 3, difference: "200" }),
+    ).toEqual({
+      goal: null,
+      specialSituation: null,
+      entry: null,
+      estimatedNeed: null,
+      difference: null,
+    });
+    expect(energyTargetParameters(null).goal).toBeNull();
+  });
+
+  it("opens the detail empty with no validated target", () => {
+    const empty = {
+      goal: null,
+      specialSituation: null,
+      entry: "value",
+      amount: null,
+    };
+    expect(energyTargetDefaults(null)).toEqual(empty);
+    expect(
+      energyTargetDefaults({ validatedValue: null, validationParameters: null }),
+    ).toEqual(empty);
+  });
+
+  it("opens the detail with what the practitioner typed", () => {
+    expect(
+      energyTargetDefaults({
+        validatedValue: 2000,
+        validationParameters: {
+          goal: "weight_loss",
+          specialSituation: "none",
+          entry: "value",
+          estimatedNeed: 2300,
+          difference: -300,
+        },
+      }),
+    ).toEqual({
+      goal: "weight_loss",
+      specialSituation: "none",
+      entry: "value",
+      amount: 2000,
+    });
+    expect(
+      energyTargetDefaults({
+        validatedValue: 2000,
+        validationParameters: {
+          goal: "weight_loss",
+          entry: "difference",
+          estimatedNeed: 2300,
+          difference: -300,
+        },
+      }),
+    ).toMatchObject({ entry: "difference", amount: -300 });
   });
 });

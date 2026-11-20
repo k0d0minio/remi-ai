@@ -57,6 +57,8 @@ const sentences: Readonly<Record<string, string>> = {
     "Aucun consentement en vigueur ne peut être retiré.",
   "that address already has an account": EMAIL_HAS_ACCOUNT,
   "the protocol is empty": "Le protocole est vide.",
+  "the energy need has no estimate yet":
+    "Les besoins énergétiques n'ont pas encore d'estimation. Complétez d'abord le dossier.",
   "the protein need has no estimate yet":
     "Les besoins protéiques n'ont pas encore d'estimation. Complétez d'abord le dossier.",
   "this auth user already has an account":
@@ -117,6 +119,8 @@ const sentences: Readonly<Record<string, string>> = {
     "Cette rubrique d'anamnèse n'existe pas.",
   "that calculation does not exist": "Ce calcul n'existe pas.",
   "that estimate is not valid": "Cette estimation n'est pas valide.",
+  "that calorie target is not valid":
+    "L'objectif, la situation particulière ou l'objectif calorique n'est pas valide. Vérifiez votre saisie.",
   "that protein target is not valid":
     "Le poids de référence, le coefficient ou la valeur finale n'est pas valide. Vérifiez votre saisie.",
   "that file status does not exist": "Ce statut de dossier n'existe pas.",

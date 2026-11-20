@@ -75,6 +75,7 @@ export type {
 export type { PatientRecommendation } from "./patient-recommendation";
 export type {
   CalculationParameters,
+  ComputedEstimates,
   PatientCalculation,
 } from "./patient-calculation";
 export type { PatientSummary } from "./patient-summary";

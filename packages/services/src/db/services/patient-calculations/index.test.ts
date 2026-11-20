@@ -9,11 +9,14 @@ import {
 } from "../patient-questionnaire";
 import { createPatient, updatePatient } from "../patients";
 import {
+  computePatientEstimates,
   listPatientCalculations,
   refreshProteinEstimate,
   setCalculationEstimate,
   validateCalculation,
+  validateEnergyTarget,
   validateProteinTarget,
+  type EnergyTargetValidation,
 } from "./index";
 
 const practitioner = {
@@ -700,5 +703,298 @@ describe("the protein target", () => {
       practitioner,
     );
     expect(refused).toMatchObject({ ok: false, error: "not_found" });
+  });
+});
+
+describe("the calorie target", () => {
+  let fileId: string;
+
+  /** Born on 1 January, 35 years before this year: 35 on any day of the year. */
+  const birthDate = `${new Date().getUTCFullYear() - 35}-01-01`;
+
+  const rows = async () => listPatientCalculations(systemActor, fileId);
+
+  const energyRow = async () =>
+    (await rows()).find((row) => row.kind === "energy");
+
+  const validations = async () =>
+    (
+      await getDatabase()
+        .collection<AuditEvent>("audit_events")
+        .findMany({ action: "calculation.validated", targetId: fileId })
+    ).items;
+
+  const target = (
+    patch: Partial<EnergyTargetValidation> = {},
+  ): EnergyTargetValidation => ({
+    goal: "weight_loss",
+    specialSituation: "none",
+    entry: "value",
+    amount: 2000,
+    ...patch,
+  });
+
+  /** Story 9's control: female, 35, 165 cm, 65 kg. */
+  const completeFile = async (pseudonym: string) => {
+    const created = await createPatient(systemActor, {
+      practitionerId: testPractitionerId,
+      pseudonym,
+      heightCm: 165,
+      weightKg: 65,
+    });
+    if (!created.ok) {
+      throw new Error("test patient not created");
+    }
+    const id = created.data.id;
+    const dated = await updatePatient(systemActor, id, { birthDate });
+    const answered = await savePatientQuestionnaire(systemActor, id, {
+      sexForCalculation: "female",
+      activityLevel: "moderate",
+    });
+    if (!dated.ok || !answered.ok) {
+      throw new Error("test patient not completed");
+    }
+    return id;
+  };
+
+  beforeAll(async () => {
+    fileId = await completeFile("Jeanne");
+  });
+
+  it("is refused for a file with a datum missing, and writes nothing", async () => {
+    const empty = await createPatient(systemActor, {
+      practitionerId: testPractitionerId,
+      pseudonym: "Odile",
+      heightCm: 165,
+      weightKg: 65,
+    });
+    if (!empty.ok) {
+      throw new Error("test patient not created");
+    }
+    const refused = await validateEnergyTarget(
+      systemActor,
+      empty.data.id,
+      target(),
+      practitioner,
+    );
+    expect(refused).toMatchObject({ ok: false, error: "conflict" });
+    const energy = (
+      await listPatientCalculations(systemActor, empty.data.id)
+    ).find((row) => row.kind === "energy");
+    expect(energy).toBeUndefined();
+  });
+
+  it("writes no target with no typed amount, for a weight-loss goal too", async () => {
+    const refused = await validateEnergyTarget(
+      systemActor,
+      fileId,
+      target({ amount: null }),
+      practitioner,
+    );
+    expect(refused).toMatchObject({ ok: false, error: "invalid_input" });
+    expect((await energyRow())?.validatedValue).toBeNull();
+    expect(await validations()).toHaveLength(0);
+  });
+
+  it("refuses a goal that is not one of the four", async () => {
+    const refused = await validateEnergyTarget(
+      systemActor,
+      fileId,
+      target({ goal: "diet" }),
+      practitioner,
+    );
+    expect(refused).toMatchObject({ ok: false, error: "invalid_input" });
+    expect((await energyRow())?.validatedValue).toBeNull();
+  });
+
+  it("writes the target and leaves the estimate and the other rows", async () => {
+    const before = await rows();
+    const estimate = (await energyRow())?.estimatedValue;
+    expect(Math.round(estimate ?? 0)).toBe(2152);
+    const result = await validateEnergyTarget(
+      systemActor,
+      fileId,
+      target(),
+      practitioner,
+    );
+    expect(result.ok).toBe(true);
+    const row = await energyRow();
+    expect(row?.validatedValue).toBe(2000);
+    expect(row?.validationParameters).toEqual({
+      goal: "weight_loss",
+      specialSituation: "none",
+      entry: "value",
+      estimatedNeed: 2152,
+      difference: -152,
+    });
+    expect(row?.validatedBy).toBe(practitioner.id);
+    expect(row?.estimatedValue).toBe(estimate);
+    const after = await rows();
+    for (const kind of ["bmi", "protein"] as const) {
+      expect(after.find((entry) => entry.kind === kind)).toEqual(
+        before.find((entry) => entry.kind === kind),
+      );
+    }
+  });
+
+  it("records the goal, the situation, the estimate and the target", async () => {
+    const events = await validations();
+    expect(events).toHaveLength(1);
+    expect(events[0]?.actorEmail).toBe(practitioner.email);
+    expect(JSON.parse(events[0]?.detail ?? "{}")).toEqual({
+      kind: "energy",
+      value: 2000,
+      parameters: {
+        goal: "weight_loss",
+        specialSituation: "none",
+        entry: "value",
+        estimatedNeed: 2152,
+        difference: -152,
+      },
+    });
+  });
+
+  it("adds a typed difference to the estimate of the row", async () => {
+    const result = await validateEnergyTarget(
+      systemActor,
+      fileId,
+      target({ goal: "muscle_gain", entry: "difference", amount: 300 }),
+      practitioner,
+    );
+    expect(result.ok).toBe(true);
+    const row = await energyRow();
+    expect(row?.validatedValue).toBe(2452);
+    expect(row?.validationParameters).toMatchObject({
+      goal: "muscle_gain",
+      entry: "difference",
+      difference: 300,
+    });
+    expect(await validations()).toHaveLength(2);
+  });
+
+  it("keeps the validated target when the activity level changes", async () => {
+    const saved = await savePatientQuestionnaire(systemActor, fileId, {
+      activityLevel: "high",
+    });
+    expect(saved.ok).toBe(true);
+    const row = await energyRow();
+    expect(Math.round(row?.estimatedValue ?? 0)).toBe(2421);
+    expect(row?.validatedValue).toBe(2452);
+    expect(row?.validationParameters).toMatchObject({ estimatedNeed: 2152 });
+    expect(await validations()).toHaveLength(2);
+  });
+
+  it("answers another practitioner as a missing file", async () => {
+    const before = await energyRow();
+    const refused = await validateEnergyTarget(
+      otherPractitioner,
+      fileId,
+      target({ amount: 1500 }),
+      practitioner,
+    );
+    expect(refused).toMatchObject({ ok: false, error: "not_found" });
+    expect(await energyRow()).toEqual(before);
+  });
+
+  it("answers an admin's read-only open as a missing file", async () => {
+    const admin = operatorActor(
+      { id: "00000000-0000-4000-8000-000000000003", role: "admin" },
+      [fileId],
+    );
+    expect(await computePatientEstimates(admin, fileId)).not.toEqual({
+      protein: null,
+      energy: null,
+    });
+    const refused = await validateEnergyTarget(
+      admin,
+      fileId,
+      target({ amount: 1500 }),
+      practitioner,
+    );
+    expect(refused).toMatchObject({ ok: false, error: "not_found" });
+    expect((await energyRow())?.validatedValue).toBe(2452);
+  });
+
+  describe("on a file that has its data and no stored estimate", () => {
+    let staleId: string;
+
+    const staleRows = async () => listPatientCalculations(systemActor, staleId);
+
+    beforeAll(async () => {
+      staleId = await completeFile("Solange");
+      for (const kind of ["protein", "energy"] as const) {
+        const cleared = await setCalculationEstimate(
+          systemActor,
+          staleId,
+          kind,
+          null,
+        );
+        if (!cleared.ok) {
+          throw new Error("test estimate not cleared");
+        }
+      }
+    });
+
+    it("computes the two estimates for the screen and writes nothing", async () => {
+      const before = await staleRows();
+      const computed = await computePatientEstimates(systemActor, staleId);
+      expect(Math.round(computed.energy?.value ?? 0)).toBe(2152);
+      expect(computed.energy?.parameters).toMatchObject({
+        activityLevel: "moderate",
+        nap: 1.6,
+      });
+      expect(computed.protein?.value).toBe(54);
+      expect(computed.protein?.parameters).toMatchObject({
+        referenceWeightKg: 65,
+        coefficient: 0.83,
+      });
+      expect(await staleRows()).toEqual(before);
+    });
+
+    it("computes no estimate when a datum is missing", async () => {
+      const bare = await createPatient(systemActor, {
+        practitionerId: testPractitionerId,
+        pseudonym: "Agathe",
+      });
+      if (!bare.ok) {
+        throw new Error("test patient not created");
+      }
+      expect(await computePatientEstimates(systemActor, bare.data.id)).toEqual({
+        protein: null,
+        energy: null,
+      });
+    });
+
+    it("answers another practitioner with no estimate", async () => {
+      expect(await computePatientEstimates(otherPractitioner, staleId)).toEqual(
+        { protein: null, energy: null },
+      );
+    });
+
+    it("writes the energy estimate at the validation of the target", async () => {
+      const result = await validateEnergyTarget(
+        systemActor,
+        staleId,
+        target({ entry: "difference", amount: -152 }),
+        practitioner,
+      );
+      expect(result.ok).toBe(true);
+      const row = (await staleRows()).find((entry) => entry.kind === "energy");
+      expect(Math.round(row?.estimatedValue ?? 0)).toBe(2152);
+      expect(row?.validatedValue).toBe(2000);
+    });
+
+    it("writes the protein estimate at the validation of the target", async () => {
+      const result = await validateProteinTarget(
+        systemActor,
+        staleId,
+        { referenceWeightKg: 60, coefficient: 1, value: null },
+        practitioner,
+      );
+      expect(result.ok).toBe(true);
+      const row = (await staleRows()).find((entry) => entry.kind === "protein");
+      expect(row?.estimatedValue).toBe(54);
+      expect(row?.validatedValue).toBe(60);
+    });
   });
 });

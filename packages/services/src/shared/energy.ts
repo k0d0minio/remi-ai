@@ -18,9 +18,12 @@
 import {
   bmiInputRanges,
   calculationInputs,
+  isSpecialSituation,
   type BmiInput,
   type CalculationInput,
+  type SpecialSituation,
 } from "./calculations";
+import type { Locale } from "./i18n";
 import {
   activityLevelDetails,
   activityLevels,
@@ -191,5 +194,231 @@ export const energyEstimateParameters = (
     weightKg: numberOrNull(parameters?.weightKg),
     activityLevel: isActivityLevel(level) ? level : null,
     nap: numberOrNull(parameters?.nap),
+  };
+};
+
+/**
+ * The goal that the practitioner records with the calorie target (story 9).
+ * It names the target. It changes no estimate and no target: REMI sets no
+ * restriction from a goal (Morgane's question 2, default accepted).
+ */
+export const energyGoals = [
+  "maintenance",
+  "weight_loss",
+  "weight_gain",
+  "muscle_gain",
+] as const;
+
+export type EnergyGoal = (typeof energyGoals)[number];
+
+/** Morgane's wording (story 9). */
+export const energyGoalLabels = {
+  maintenance: { fr: "Maintien" },
+  weight_loss: { fr: "Perte de poids" },
+  weight_gain: { fr: "Prise de poids" },
+  muscle_gain: { fr: "Prise de masse musculaire" },
+} as const satisfies Record<EnergyGoal, Readonly<Record<Locale, string>>>;
+
+const isEnergyGoal = (value: unknown): value is EnergyGoal =>
+  typeof value === "string" &&
+  (energyGoals as readonly string[]).includes(value);
+
+/**
+ * How the practitioner gives the target: the value in kcal/day, or a
+ * difference in kcal/day from the estimated need.
+ */
+export const energyTargetEntries = ["value", "difference"] as const;
+
+export type EnergyTargetEntry = (typeof energyTargetEntries)[number];
+
+const isEnergyTargetEntry = (value: unknown): value is EnergyTargetEntry =>
+  typeof value === "string" &&
+  (energyTargetEntries as readonly string[]).includes(value);
+
+/**
+ * The limits of a typed calorie target and of a typed difference, in
+ * kcal/day (REM-52). They are limits of plausibility for a typed value, not
+ * clinical rules. Story 9 gives none: these are wide, and the practitioner
+ * decides inside them.
+ */
+export const energyTargetBounds = {
+  value: { min: 500, max: 6000 },
+  difference: { min: -2000, max: 2000 },
+} as const;
+
+/** One field of the calorie target. `estimate` is not typed: REMI gives it. */
+export type EnergyTargetField =
+  | "estimate"
+  | "goal"
+  | "specialSituation"
+  | "entry"
+  | "amount";
+
+/** What the practitioner gives for the target. Null is an empty field. */
+export type EnergyTargetInput = {
+  /** The estimated need of the row, in kcal/day, not rounded. REMI gives it. */
+  estimateKcalPerDay: number | null;
+  /** A key of `energyGoals`. */
+  goal: string | null;
+  /** A key of `specialSituations`. Null: not entered. */
+  specialSituation: string | null;
+  /** A key of `energyTargetEntries`. */
+  entry: string | null;
+  /** The typed number: the target, or the difference from the estimate. */
+  amount: number | null;
+};
+
+/** The target that a validation writes, or the fields that are not valid. */
+export type EnergyTarget =
+  | { state: "invalid"; fields: EnergyTargetField[] }
+  | {
+      state: "computed";
+      /** kcal/day, a whole number: the value that the validation writes. */
+      value: number;
+      /** kcal/day: the estimated need, rounded as the screen shows it. */
+      estimatedNeed: number;
+      /** kcal/day: the target minus the rounded estimate. */
+      difference: number;
+      goal: EnergyGoal;
+      specialSituation: SpecialSituation | null;
+      entry: EnergyTargetEntry;
+    };
+
+const wholeWithin = (
+  value: number | null,
+  range: { min: number; max: number },
+): value is number =>
+  value !== null &&
+  Number.isInteger(value) &&
+  value >= range.min &&
+  value <= range.max;
+
+/**
+ * The calorie target from what the practitioner typed (story 9). A typed
+ * value is the target. A typed difference is added to the estimated need,
+ * rounded to the kcal as the screen shows it: − 300 against 2 300 gives 2 000.
+ *
+ * The goal and the special situation are kept with the target. They change no
+ * number. An empty amount gives no target: REMI writes no target alone, and
+ * applies no restriction from a goal or from the BMI. With no estimate there
+ * is no target (D-30): the result names `estimate`.
+ *
+ * A field that is empty, unknown or out of its limits gives no value: the
+ * result names each field.
+ */
+export const energyTarget = (input: EnergyTargetInput): EnergyTarget => {
+  const { estimateKcalPerDay, goal, specialSituation, entry, amount } = input;
+  const fields: EnergyTargetField[] = [];
+  const estimate =
+    estimateKcalPerDay !== null &&
+    Number.isFinite(estimateKcalPerDay) &&
+    estimateKcalPerDay > 0
+      ? Math.round(estimateKcalPerDay)
+      : null;
+  if (estimate === null) {
+    fields.push("estimate");
+  }
+  if (!isEnergyGoal(goal)) {
+    fields.push("goal");
+  }
+  if (specialSituation !== null && !isSpecialSituation(specialSituation)) {
+    fields.push("specialSituation");
+  }
+  if (!isEnergyTargetEntry(entry)) {
+    fields.push("entry");
+  }
+  const amountValid =
+    isEnergyTargetEntry(entry) && wholeWithin(amount, energyTargetBounds[entry]);
+  if (!amountValid) {
+    fields.push("amount");
+  }
+  if (
+    estimate === null ||
+    !isEnergyGoal(goal) ||
+    (specialSituation !== null && !isSpecialSituation(specialSituation)) ||
+    !isEnergyTargetEntry(entry) ||
+    amount === null ||
+    !amountValid
+  ) {
+    return { state: "invalid", fields };
+  }
+  const value = entry === "value" ? amount : estimate + amount;
+  if (!wholeWithin(value, energyTargetBounds.value)) {
+    return { state: "invalid", fields: ["amount"] };
+  }
+  return {
+    state: "computed",
+    value,
+    estimatedNeed: estimate,
+    difference: value - estimate,
+    goal,
+    specialSituation,
+    entry,
+  };
+};
+
+/** What the `energy` row keeps with its validated target (D-32). */
+export type EnergyTargetParameters = {
+  goal: EnergyGoal | null;
+  specialSituation: SpecialSituation | null;
+  entry: EnergyTargetEntry | null;
+  /** kcal/day: the rounded estimate that the practitioner saw at « Valider ». */
+  estimatedNeed: number | null;
+  /** kcal/day: the target minus that estimate. */
+  difference: number | null;
+};
+
+/**
+ * Read the parameters of a validated calorie target. The column is free
+ * JSON, so each field is checked: a field of the wrong type or with an
+ * unknown key reads as null.
+ */
+export const energyTargetParameters = (
+  parameters: Readonly<Record<string, unknown>> | null,
+): EnergyTargetParameters => {
+  const goal = parameters?.goal;
+  const situation = parameters?.specialSituation;
+  const entry = parameters?.entry;
+  return {
+    goal: isEnergyGoal(goal) ? goal : null,
+    specialSituation: isSpecialSituation(situation) ? situation : null,
+    entry: isEnergyTargetEntry(entry) ? entry : null,
+    estimatedNeed: numberOrNull(parameters?.estimatedNeed),
+    difference: numberOrNull(parameters?.difference),
+  };
+};
+
+/** What the detail of the calorie target opens with. */
+export type EnergyTargetDefaults = {
+  goal: EnergyGoal | null;
+  specialSituation: SpecialSituation | null;
+  entry: EnergyTargetEntry;
+  /** Null: the field opens empty. Never the estimate. */
+  amount: number | null;
+};
+
+/**
+ * The values that the detail of the calorie target opens with, from facts of
+ * the row only (D-30). A validated target gives its goal, its situation and
+ * what the practitioner typed: the value, or the difference. With no
+ * validated target every field opens empty: the estimate is never offered as
+ * a target.
+ */
+export const energyTargetDefaults = (
+  row: {
+    validatedValue: number | null;
+    validationParameters: Readonly<Record<string, unknown>> | null;
+  } | null,
+): EnergyTargetDefaults => {
+  if (!row || row.validatedValue === null) {
+    return { goal: null, specialSituation: null, entry: "value", amount: null };
+  }
+  const stored = energyTargetParameters(row.validationParameters);
+  const byDifference = stored.entry === "difference" && stored.difference !== null;
+  return {
+    goal: stored.goal,
+    specialSituation: stored.specialSituation,
+    entry: byDifference ? "difference" : "value",
+    amount: byDifference ? stored.difference : row.validatedValue,
   };
 };
