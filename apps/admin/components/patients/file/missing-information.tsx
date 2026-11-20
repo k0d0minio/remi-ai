@@ -10,6 +10,9 @@ import { Typography } from "@remi/ui/server";
 
 type FieldKey = MandatoryQuestionnaireField | OptionalQuestionnaireField;
 
+/** The anchor of the block. The patient list links to it. */
+export const MISSING_INFORMATION_ANCHOR = "missing-information";
+
 /** The anchor of one field in « Dossier patient »: `#field-<key>`. */
 export const fieldAnchor = (key: string) => `field-${key}`;
 
@@ -25,10 +28,16 @@ type Props = {
 export const MissingInformation = ({ mandatory, optional }: Props) => (
   <div
     role="group"
-    aria-labelledby="missing-information"
+    aria-labelledby={MISSING_INFORMATION_ANCHOR}
     className="border-border flex flex-col gap-3 rounded-md border p-4"
   >
-    <Typography as="h3" id="missing-information" size="sm" weight="semibold">
+    <Typography
+      as="h3"
+      id={MISSING_INFORMATION_ANCHOR}
+      size="sm"
+      weight="semibold"
+      className="scroll-mt-60"
+    >
       Informations manquantes
     </Typography>
     <MissingList

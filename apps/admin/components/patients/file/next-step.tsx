@@ -22,6 +22,7 @@ import {
 } from "@/components/patients/file/activation";
 import { countLabel } from "@/components/patients/file/count-label";
 import { MissingInformation } from "@/components/patients/file/missing-information";
+import { PatientChangesBlock } from "@/components/patients/file/patient-changes";
 import { ProtocolValidation } from "@/components/patients/protocol-validation";
 
 /** What the validation will hold, one line for each topic. */
@@ -46,8 +47,6 @@ type Props = {
   /** The appointment and the preparation note. Shown for `prepare` only. */
   preparation: ReactNode;
   protocol: ProtocolCounts;
-  /** The patient's open changes. Null when the page did not count them. */
-  openChanges: number | null;
   /** The quick actions, under the content of the card. */
   shortcuts: ReactNode;
 };
@@ -142,13 +141,6 @@ const ProtocolLines = ({ protocol }: { protocol: ProtocolCounts }) => {
   );
 };
 
-const changesLine = (count: number) =>
-  count === 0
-    ? "Aucune modification de la personne en attente."
-    : count === 1
-      ? "1 modification de la personne à prendre en compte."
-      : `${count} modifications de la personne à prendre en compte.`;
-
 /**
  * The action card: the one thing to do at the present status, directly under
  * the header. It answers « Que dois-je faire maintenant ? ». It is the only
@@ -158,7 +150,8 @@ const changesLine = (count: number) =>
  * shows nothing until a version exists or the file can be validated. At
  * « Recommandations à valider » the recap of the activation follows it, with
  * « Activer l'accompagnement » (story 19). An active file shows its date,
- * and the state of the e-mail « Votre espace REMI est prêt ».
+ * and the state of the e-mail « Votre espace REMI est prêt », then the
+ * patient's open changes (story 21, `file/patient-changes.tsx`).
  */
 export const NextStepCard = ({
   action,
@@ -168,7 +161,6 @@ export const NextStepCard = ({
   missingOptional,
   preparation,
   protocol,
-  openChanges,
   shortcuts,
 }: Props) => {
   const { title, description } = titles[action];
@@ -220,11 +212,18 @@ export const NextStepCard = ({
             <ActivationEmail patient={patient} readOnly={readOnly} />
           ) : null}
 
-          {action === "follow" && openChanges !== null ? (
-            <Typography size="sm" weight={openChanges > 0 ? "medium" : "normal"}>
-              {changesLine(openChanges)}
-            </Typography>
-          ) : null}
+          {/*
+            Patient changes (story 21): each open change with the field, the
+            old value, the new value and the date, and « Pris en compte ». An
+            active file shows one calm line when none is open. A validated
+            version arms the signal, so a file that is not active yet shows
+            the block only when a change is open.
+          */}
+          <PatientChangesBlock
+            patient={patient}
+            readOnly={readOnly}
+            showWhenEmpty={action === "follow"}
+          />
 
           <ProtocolValidation patient={patient} readOnly={readOnly} />
 
@@ -236,12 +235,6 @@ export const NextStepCard = ({
           {action === "validate" ? (
             <ActivationRecapBlock patient={patient} readOnly={readOnly} />
           ) : null}
-
-          {/*
-            Patient changes (story 21). The list of the open changes (field,
-            old value, new value, date) and the acknowledge action go here,
-            for `follow`. Another ticket builds them.
-          */}
 
           {action !== "complete" && missingCount > 0 ? (
             <MissingInformation

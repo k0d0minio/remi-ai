@@ -57,6 +57,11 @@ export const auditActions = [
    * old and the new values.
    */
   "patient.changed",
+  /**
+   * The practitioner marked patient changes as taken into account (story 21,
+   * D-32). The detail names the field keys, and never a value.
+   */
+  "patient.change_acknowledged",
   "patient.deleted",
   /**
    * The inactivity sweep sent the notice of deletion (`inactive-account-

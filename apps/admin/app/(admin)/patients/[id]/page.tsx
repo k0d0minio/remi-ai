@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import {
   adminOpenablePatient,
   consentsOf,
-  countOpenPatientChanges,
   countGoalCheckInsAwaitingAttention,
   countMealEntriesAwaitingFeedback,
   getCurrentChallenge,
@@ -341,12 +340,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
   // The layout follows the file status: what the action card shows, which
   // sections are open in the work column and which are folded rows.
   const layout = patientFileLayout(patient.fileStatus);
-  // The open signals of this file (story 21). The read counts each file of the
-  // actor, so it runs only where the card shows the count.
-  const openChanges =
-    layout.action === "follow"
-      ? ((await countOpenPatientChanges(actor)).get(patient.id) ?? 0)
-      : null;
   const validatedCalculations = calculations.filter(
     (row) => row.validatedValue !== null && !row.needsRevalidation,
   ).length;
@@ -880,7 +873,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
             instruction: instruction !== null,
             validatedCalculations,
           }}
-          openChanges={openChanges}
           shortcuts={
             // It reads the segment from the URL, same as the navigation.
             <Suspense fallback={null}>

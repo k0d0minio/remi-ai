@@ -43,6 +43,12 @@ export type {
 } from "./meal-suggestion";
 export { isWatchedPatientField, watchedPatientFields } from "./patient-changes";
 export {
+  comparePatientChangesForReview,
+  isSafetyPatientField,
+  patientChangeValueLabel,
+  watchedPatientFieldLabels,
+} from "./patient-change-labels";
+export {
   PROTOCOL_SNAPSHOT_SCHEMA_VERSION,
   isEmptyProtocolSnapshot,
   protocolSnapshotSchema,
