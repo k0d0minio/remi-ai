@@ -1,6 +1,7 @@
 import { ShieldAlert } from "lucide-react";
 import {
   mandatoryQuestionnaireFieldLabels,
+  mentionsCeliacDisease,
   noneKnownLabels,
   optionalQuestionnaireFieldLabels,
   safetyList,
@@ -61,6 +62,10 @@ const ListValue = ({ kind, list }: ListProps) => {
 export const SafetyBlock = ({ questionnaire, medications }: Props) => {
   const { answers, allergens } = questionnaire;
   const celiac = answers.celiacDisease;
+  // The patient writes their pathologies as free text (REM-165). A mention of
+  // the disease starts no exclusion: it asks the practitioner to confirm.
+  const celiacToConfirm =
+    celiac !== true && mentionsCeliacDisease(answers.pathologies);
   const medicationText =
     medications === null || medications.trim() === "" ? null : medications;
   const rows = [
@@ -91,16 +96,21 @@ export const SafetyBlock = ({ questionnaire, medications }: Props) => {
     {
       key: "celiacDisease",
       label: optionalQuestionnaireFieldLabels.celiacDisease.fr,
-      value:
-        celiac === null ? (
-          <AbsentValue />
-        ) : celiac ? (
-          <Typography size="sm" weight="medium" className="text-warning-text">
-            {strictGlutenLabel.fr}
-          </Typography>
-        ) : (
-          <Typography size="sm">Non</Typography>
-        ),
+      value: celiacToConfirm ? (
+        <Typography size="sm" weight="medium" className="text-warning-text">
+          À confirmer : la personne cite une maladie cœliaque dans ses
+          pathologies. Aucune exclusion stricte du gluten ne s&apos;applique
+          tant que le profil ne dit pas « Oui ».
+        </Typography>
+      ) : celiac === null ? (
+        <AbsentValue />
+      ) : celiac ? (
+        <Typography size="sm" weight="medium" className="text-warning-text">
+          {strictGlutenLabel.fr}
+        </Typography>
+      ) : (
+        <Typography size="sm">Non</Typography>
+      ),
     },
     {
       key: "medications",

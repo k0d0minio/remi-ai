@@ -391,8 +391,6 @@ export type Content = {
       diet: string;
       /** Shown after « Autre », where it is mandatory. */
       dietNote: string;
-      pathologies: string;
-      celiacDisease: string;
       medications: string;
       supplements: string;
       geneticTest: string;
@@ -407,7 +405,6 @@ export type Content = {
       allergies: string;
       intolerances: string;
       otherText: string;
-      celiacDisease: string;
       medications: string;
       supplements: string;
     };
@@ -432,6 +429,8 @@ export type Content = {
     };
     /** The genetic consent and the three genotype lists (`genotype-section`). */
     genetic: {
+      /** Over the question (REM-166): the step is optional. */
+      intro: string;
       consentTitle: string;
       consentIntro: string;
       /** `{version}` and `{date}` of the text shown. */
@@ -441,10 +440,30 @@ export type Content = {
       deciding: string;
       /** After « Je refuse »: the text and « J'accepte » stay. */
       refused: string;
-      /** Over the three lists. */
-      listsIntro: string;
+      /** The first line of a result's list: it empties the result. */
+      noResult: string;
+      /** Under the three lists. */
+      listsNote: string;
       /** A decision that did not save. */
       decisionFailed: string;
+    };
+    /** The allergy question of the questionnaire (REM-163). */
+    food: {
+      allergiesQuestion: string;
+      allergiesHint: string;
+      /** In an open sub-list: no sub-choice excludes the whole family. */
+      familyRule: string;
+      /** Over the stored rows that no box of the list holds. */
+      alsoDeclared: string;
+    };
+    /** The three questions of « Santé » and their examples (REM-165). */
+    health: {
+      pathologies: string;
+      pathologiesPlaceholder: string;
+      medications: string;
+      medicationsPlaceholder: string;
+      supplements: string;
+      supplementsPlaceholder: string;
     };
   };
   /**

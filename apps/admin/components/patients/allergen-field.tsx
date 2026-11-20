@@ -4,14 +4,11 @@ import { useEffect, useState } from "react";
 import type { PatientAllergen } from "@remi/services/shared";
 import {
   ALL_SUB_KEY,
-  allergenLabels,
-  allergens,
-  allergenSubLabels,
-  allergenSubLists,
+  allergenOptions,
+  allergenRowLabel,
   allSubKeyLabel,
-  intoleranceLabels,
-  intolerances,
   noneKnownLabels,
+  uncategorisedAllergenRows,
 } from "@remi/services/shared";
 import { Checkbox } from "@remi/ui";
 import { Input, Typography } from "@remi/ui/server";
@@ -51,21 +48,6 @@ const stateOf = (
 const boxValue = (key: string, subKey: string | null) =>
   subKey === null ? key : `${key}/${subKey}`;
 
-const subListOf = (key: string): readonly string[] =>
-  Object.hasOwn(allergenSubLists, key)
-    ? allergenSubLists[key as keyof typeof allergenSubLists]
-    : [];
-
-const subLabelOf = (key: string, subKey: string) => {
-  if (subKey === ALL_SUB_KEY) {
-    return allSubKeyLabel.fr;
-  }
-  const labels = allergenSubLabels[key as keyof typeof allergenSubLabels] as
-    | Record<string, { fr: string }>
-    | undefined;
-  return labels?.[subKey]?.fr ?? subKey;
-};
-
 const boxClass =
   "border-border bg-card flex min-h-11 cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 text-sm has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60";
 
@@ -75,15 +57,18 @@ const boxClass =
  * opens its sub-list, with « Tous » first, and « Tous » locks the other boxes
  * of the sub-list, as on the patient's page. « Autre » takes a text.
  *
+ * The boxes are `allergenOptions`, the patient's own list (REM-163, REM-164):
+ * each cereal is a box, and its value is `gluten/<cereal>`. A stored row that
+ * no box holds shows first, checked, so a save keeps it.
+ *
  * No answer is selected until one exists. The boxes post through Radix's
  * hidden inputs, so the form reads them with no handler of this component.
  * The state here only decides what is shown.
  */
 export const AllergenField = ({ kind, legend, noneKnown, rows }: Props) => {
   const names = allergenNames(kind);
-  const keys: readonly string[] = kind === "allergy" ? allergens : intolerances;
-  const labels: Record<string, { fr: string }> =
-    kind === "allergy" ? allergenLabels : intoleranceLabels;
+  const options = allergenOptions(kind);
+  const kept = uncategorisedAllergenRows(kind, rows);
 
   const [state, setState] = useState<AllergenState>(stateOf(noneKnown, rows));
   const [checked, setChecked] = useState<ReadonlySet<string>>(
@@ -118,9 +103,15 @@ export const AllergenField = ({ kind, legend, noneKnown, rows }: Props) => {
       return next;
     });
 
-  // A category counts as open when it or any of its sub-boxes is checked.
+  // A family counts as open when it or any of its sub-boxes is checked. A
+  // kept row is not a sub-box: it does not open a family.
+  const keptValues = new Set(kept.map((row) => boxValue(row.key, row.subKey)));
   const isOpen = (key: string) =>
-    [...checked].some((value) => value === key || value.startsWith(`${key}/`));
+    [...checked].some(
+      (value) =>
+        value === key ||
+        (value.startsWith(`${key}/`) && !keptValues.has(value)),
+    );
 
   return (
     <div className="flex min-w-0 flex-col gap-3">
@@ -143,16 +134,36 @@ export const AllergenField = ({ kind, legend, noneKnown, rows }: Props) => {
           aria-label={legend}
           className="@xl:grid-cols-2 grid grid-cols-1 gap-2"
         >
-          {keys.map((key) => {
-            const value = boxValue(key, null);
-            const subList = kind === "allergy" ? subListOf(key) : [];
-            const id = `${kind}-${key}`;
-            const label = labels[key]?.fr ?? key;
-            const open = isOpen(key);
+          {kept.map((row, index) => {
+            const value = boxValue(row.key, row.subKey);
+            const id = `${kind}-kept-${index}`;
+            return (
+              <li key={value} className="col-span-full flex flex-col gap-2">
+                <label htmlFor={id} className={boxClass}>
+                  <Checkbox
+                    id={id}
+                    name={names.item}
+                    value={value}
+                    checked={checked.has(value)}
+                    onCheckedChange={(on) => toggle(value, on === true)}
+                  />
+                  {allergenRowLabel(kind, row)}
+                </label>
+              </li>
+            );
+          })}
+          {options.map((option) => {
+            const { key } = option;
+            const value = option.id;
+            const subList = option.subList;
+            const id = `${kind}-${value.replace("/", "-")}`;
+            const label = option.label.fr;
+            // A member box (« Blé ») is its one value. A family opens.
+            const open = option.subKey === null && isOpen(key);
             const all = checked.has(boxValue(key, ALL_SUB_KEY));
             return (
               <li
-                key={key}
+                key={value}
                 className={
                   subList.length > 0 && open
                     ? "col-span-full flex flex-col gap-2"
@@ -167,7 +178,14 @@ export const AllergenField = ({ kind, legend, noneKnown, rows }: Props) => {
                     checked={checked.has(value) || open}
                     onCheckedChange={(on) => toggle(value, on === true)}
                   />
-                  {label}
+                  <span className="flex min-w-0 flex-col">
+                    {label}
+                    {option.description ? (
+                      <span className="text-muted-foreground text-xs">
+                        {option.description.fr}
+                      </span>
+                    ) : null}
+                  </span>
                 </label>
                 {key === "other" && checked.has(value) ? (
                   <Input
@@ -182,7 +200,10 @@ export const AllergenField = ({ kind, legend, noneKnown, rows }: Props) => {
                     aria-label={label}
                     className="border-border @xl:grid-cols-2 ml-3 grid grid-cols-1 gap-2 border-l pl-3"
                   >
-                    {[ALL_SUB_KEY, ...subList].map((subKey) => {
+                    {[
+                      { key: ALL_SUB_KEY, label: allSubKeyLabel },
+                      ...subList,
+                    ].map(({ key: subKey, label: subLabel }) => {
                       const subValue = boxValue(key, subKey);
                       const subId = `${kind}-${key}-${subKey}`;
                       const locked = all && subKey !== ALL_SUB_KEY;
@@ -200,7 +221,7 @@ export const AllergenField = ({ kind, legend, noneKnown, rows }: Props) => {
                                 toggle(subValue, next === true)
                               }
                             />
-                            {subLabelOf(key, subKey)}
+                            {subLabel.fr}
                           </label>
                           {subKey === "other" && on ? (
                             <Input

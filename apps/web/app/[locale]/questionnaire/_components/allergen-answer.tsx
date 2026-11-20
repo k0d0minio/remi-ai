@@ -3,35 +3,31 @@
 import { useState, type ReactNode } from "react";
 import {
   ALL_SUB_KEY,
+  allergenOptionOfRow,
+  allergenOptions,
+  allergenRowLabel,
+  allSubKeyLabel,
+  noneKnownLabels,
+  uncategorisedAllergenRows,
   type AllergenKind,
+  type AllergenOption,
   type PatientAllergen,
 } from "@remi/services/shared";
 import { Checkbox } from "@remi/ui";
 import { Field, Input, Typography } from "@remi/ui/server";
 import { saveAllergensAction } from "@/lib/questionnaire/actions";
 import {
+  MandatoryLabel,
   refusalOf,
   SaveStatus,
   useAutosave,
   useQuestionnaire,
 } from "./questionnaire-context";
 
-type Option = { key: string; label: string };
-
 type Props = {
   kind: AllergenKind;
   legend: ReactNode;
   hint: string;
-  noneKnownLabel: string;
-  /** The list's categories, « Autre » last. */
-  options: readonly Option[];
-  /**
-   * The sub-list under each category that has one, without « Tous ». The
-   * intolerance list has none.
-   */
-  subLists?: Readonly<Record<string, readonly Option[]>>;
-  /** « Tous ». */
-  allLabel: string;
   /** The « none known » flag: true, false (declared rows) or null. */
   initialNoneKnown: boolean | null;
   /** This list's saved rows. */
@@ -43,12 +39,22 @@ const OTHER = "other";
 /** The top-level « Autre » text sits under this key, a sub-list's under its category. */
 const TOP_OTHER = "";
 
+/**
+ * A stored row that no box of the list holds (`uncategorisedAllergenRows`). It
+ * shows as a ticked box of its own, and a save sends it again as it is: a
+ * declared allergy is never lost.
+ */
+type Kept = { id: string; label: string; item: Item };
+
+const keptId = (row: Pick<PatientAllergen, "key" | "subKey">) =>
+  `kept:${row.key}/${row.subKey ?? ""}`;
+
 /** What the patient has ticked and typed, before it becomes an answer. */
 type Draft = {
   noneKnown: boolean;
-  /** The ticked categories. */
+  /** The ids of the ticked boxes, the kept rows included. */
   checked: readonly string[];
-  /** Per category, the ticked sub-keys. `all` stands alone. */
+  /** Per family box, the ticked sub-keys. `all` stands alone. */
   subs: Readonly<Record<string, readonly string[]>>;
   /** The « Autre » texts. */
   texts: Readonly<Record<string, string>>;
@@ -61,47 +67,59 @@ type Answer =
   | { state: "none_known" }
   | { state: "declared"; items: Item[] };
 
-/** The saved rows as the boxes show them. A bare category with a sub-list reads as « Tous ». */
+/** The saved rows as the boxes show them. A bare family with a sub-list reads as « Tous ». */
 const draftOf = (
+  kind: AllergenKind,
   noneKnown: boolean | null,
   rows: readonly PatientAllergen[],
-  subLists: Props["subLists"],
 ): Draft => {
+  const checked = new Set<string>();
   const subs: Record<string, string[]> = {};
   const texts: Record<string, string> = {};
   for (const row of rows) {
+    const option = allergenOptionOfRow(kind, row);
+    if (!option) {
+      checked.add(keptId(row));
+      continue;
+    }
+    checked.add(option.id);
+    // A member box (« Blé ») is its row: it has no sub-choice and no text.
+    if (option.subKey !== null) {
+      continue;
+    }
     const subKey =
-      row.subKey === null && subLists?.[row.key] ? ALL_SUB_KEY : row.subKey;
+      row.subKey === null && option.subList.length > 0
+        ? ALL_SUB_KEY
+        : row.subKey;
     if (subKey !== null) {
-      subs[row.key] = [...(subs[row.key] ?? []), subKey];
+      subs[option.id] = [...(subs[option.id] ?? []), subKey];
     }
     if (row.otherText !== null) {
-      texts[subKey === OTHER ? row.key : TOP_OTHER] = row.otherText;
+      texts[subKey === OTHER ? option.id : TOP_OTHER] = row.otherText;
     }
   }
-  return {
-    noneKnown: noneKnown === true,
-    checked: [...new Set(rows.map((row) => row.key))],
-    subs,
-    texts,
-  };
+  return { noneKnown: noneKnown === true, checked: [...checked], subs, texts };
 };
 
 /**
- * One category's rows. « Tous » stands alone. A sub-list « Autre » joins only
- * with its text. A category with no sub-choice is sent bare, and the service
- * stores it as « Tous »: no precision excludes the whole category (story 4,
- * criterion 14).
+ * One box's rows. A member box is its one row. « Tous » stands alone. A
+ * sub-list « Autre » joins only with its text. A family with no sub-choice is
+ * sent bare, and the service stores it as « Tous »: no precision excludes the
+ * whole family (story 4, criterion 14).
  */
-const itemsOf = (draft: Draft, key: string, hasSubList: boolean): Item[] => {
+const itemsOf = (draft: Draft, option: AllergenOption): Item[] => {
+  const { key } = option;
+  if (option.subKey !== null) {
+    return [{ key, subKey: option.subKey, otherText: null }];
+  }
   if (key === OTHER) {
     const text = (draft.texts[TOP_OTHER] ?? "").trim();
     return text ? [{ key, subKey: null, otherText: text }] : [];
   }
-  if (!hasSubList) {
+  if (option.subList.length === 0) {
     return [{ key, subKey: null, otherText: null }];
   }
-  const ticked = draft.subs[key] ?? [];
+  const ticked = draft.subs[option.id] ?? [];
   if (ticked.includes(ALL_SUB_KEY)) {
     return [{ key, subKey: ALL_SUB_KEY, otherText: null }];
   }
@@ -109,7 +127,7 @@ const itemsOf = (draft: Draft, key: string, hasSubList: boolean): Item[] => {
     if (subKey !== OTHER) {
       return [{ key, subKey, otherText: null }];
     }
-    const text = (draft.texts[key] ?? "").trim();
+    const text = (draft.texts[option.id] ?? "").trim();
     return text ? [{ key, subKey, otherText: text }] : [];
   });
   return items.length > 0 ? items : [{ key, subKey: null, otherText: null }];
@@ -118,17 +136,20 @@ const itemsOf = (draft: Draft, key: string, hasSubList: boolean): Item[] => {
 /** Unticking every box returns the list to « no answer », never to « none known ». */
 const answerOf = (
   draft: Draft,
-  options: readonly Option[],
-  subLists: Props["subLists"],
+  options: readonly AllergenOption[],
+  kept: readonly Kept[],
 ): Answer => {
   if (draft.noneKnown) {
     return { state: "none_known" };
   }
-  const items = options
-    .filter((option) => draft.checked.includes(option.key))
-    .flatMap((option) =>
-      itemsOf(draft, option.key, Boolean(subLists?.[option.key])),
-    );
+  const items = [
+    ...kept
+      .filter((row) => draft.checked.includes(row.id))
+      .map((row) => row.item),
+    ...options
+      .filter((option) => draft.checked.includes(option.id))
+      .flatMap((option) => itemsOf(draft, option)),
+  ];
   return items.length > 0 ? { state: "declared", items } : { state: "unanswered" };
 };
 
@@ -138,52 +159,77 @@ const boxClass =
 type BoxProps = {
   id: string;
   label: string;
+  /** A short explanation under the label (REM-164). */
+  description?: string;
   checked: boolean;
   disabled?: boolean;
   onChange: (on: boolean) => void;
   strong?: boolean;
 };
 
-const Box = ({ id, label, checked, disabled, onChange, strong }: BoxProps) => (
+const Box = ({
+  id,
+  label,
+  description,
+  checked,
+  disabled,
+  onChange,
+  strong,
+}: BoxProps) => (
   <label htmlFor={id} className={boxClass}>
     <Checkbox
       id={id}
       checked={checked}
       disabled={disabled}
+      aria-describedby={description ? `${id}-description` : undefined}
       onCheckedChange={(value) => onChange(value === true)}
     />
-    <Typography as="span" size="sm" weight={strong ? "medium" : "normal"}>
-      {label}
-    </Typography>
+    <span className="flex min-w-0 flex-col gap-0.5">
+      <Typography as="span" size="sm" weight={strong ? "medium" : "normal"}>
+        {label}
+      </Typography>
+      {description ? (
+        <Typography id={`${id}-description`} as="span" size="xs" tone="muted">
+          {description}
+        </Typography>
+      ) : null}
+    </span>
   </label>
 );
 
 /**
  * One list, allergies or intolerances (story 4, `allergy-intolerance-lists`):
  * « Aucune … connue », or the boxes the patient ticks. « Aucune … connue »
- * unticks and locks the rest of its list. A ticked category with a sub-list
- * opens it, « Tous » first, and « Tous » locks the individual boxes.
+ * unticks and locks the rest of its list. A ticked family with a sub-list
+ * opens it, « Tous » first, and « Tous » locks the individual boxes. The boxes
+ * come from `allergenOptions` (REM-163, REM-164), the same list as the console.
  */
 export const AllergenAnswer = ({
   kind,
   legend,
   hint,
-  noneKnownLabel,
-  options,
-  subLists,
-  allLabel,
   initialNoneKnown,
   initialRows,
 }: Props) => {
-  const { text } = useQuestionnaire();
+  const { text, locale } = useQuestionnaire();
+  const options = allergenOptions(kind);
+  // Fixed for the mount: an unticked kept row stays on screen, so the patient
+  // can tick it again.
+  const [kept] = useState<readonly Kept[]>(() =>
+    uncategorisedAllergenRows(kind, initialRows).map((row) => ({
+      id: keptId(row),
+      label: allergenRowLabel(kind, row),
+      item: { key: row.key, subKey: row.subKey, otherText: row.otherText },
+    })),
+  );
   const [draft, setDraft] = useState(() =>
-    draftOf(initialNoneKnown, initialRows, subLists),
+    draftOf(kind, initialNoneKnown, initialRows),
   );
   const serialise = (next: Draft) =>
-    JSON.stringify(answerOf(next, options, subLists));
+    JSON.stringify(answerOf(next, options, kept));
   const { state, commit, schedule, retry } = useAutosave(
     (next) => saveAllergensAction(kind, JSON.parse(next)),
-    serialise(draftOf(initialNoneKnown, initialRows, subLists)),
+    serialise(draftOf(kind, initialNoneKnown, initialRows)),
   );
   const refusal = refusalOf(state, text);
   const apply = (next: Draft) => {
@@ -198,7 +244,7 @@ export const AllergenAnswer = ({
         : { ...draft, noneKnown: false },
     );
   const toggle = (key: string, on: boolean) => {
-    // Unticking a category drops its sub-choices. Ticking it starts clean.
+    // Unticking a family drops its sub-choices. Ticking it starts clean.
     const subs = Object.fromEntries(
       Object.entries(draft.subs).filter(([k]) => k !== key),
     );
@@ -236,7 +282,7 @@ export const AllergenAnswer = ({
     return (
       <Field
         id={fieldId}
-        label={text.labels.otherText}
+        label={<MandatoryLabel label={text.labels.otherText} />}
         hint={value.trim() ? undefined : text.hints.otherText}
       >
         <Input
@@ -250,36 +296,39 @@ export const AllergenAnswer = ({
     );
   };
 
-  const subListOf = (option: Option, subOptions: readonly Option[]) => {
-    const ticked = draft.subs[option.key] ?? [];
+  const subListOf = (option: AllergenOption) => {
+    const ticked = draft.subs[option.id] ?? [];
     const all = ticked.includes(ALL_SUB_KEY);
     return (
       <div
         role="group"
-        aria-label={option.label}
+        aria-label={option.label[locale]}
         className="border-border col-span-full ml-4 flex flex-col gap-2 border-l pl-4"
       >
+        <Typography as="p" size="xs" tone="muted">
+          {text.food.familyRule}
+        </Typography>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <Box
             id={`${id}-${option.key}-${ALL_SUB_KEY}`}
-            label={allLabel}
+            label={allSubKeyLabel[locale]}
             checked={all}
             strong
-            onChange={(on) => toggleSub(option.key, ALL_SUB_KEY, on)}
+            onChange={(on) => toggleSub(option.id, ALL_SUB_KEY, on)}
           />
-          {subOptions.map((sub) => (
+          {option.subList.map((sub) => (
             <Box
               key={sub.key}
               id={`${id}-${option.key}-${sub.key}`}
-              label={sub.label}
+              label={sub.label[locale]}
               checked={!all && ticked.includes(sub.key)}
               disabled={all}
-              onChange={(on) => toggleSub(option.key, sub.key, on)}
+              onChange={(on) => toggleSub(option.id, sub.key, on)}
             />
           ))}
         </div>
         {!all && ticked.includes(OTHER)
-          ? otherField(option.key, `${id}-${option.key}-other-text`)
+          ? otherField(option.id, `${id}-${option.key}-other-text`)
           : null}
       </div>
     );
@@ -295,25 +344,49 @@ export const AllergenAnswer = ({
       </Typography>
       <Box
         id={`${id}-none`}
-        label={noneKnownLabel}
+        label={noneKnownLabels[kind][locale]}
         checked={draft.noneKnown}
         strong
         onChange={toggleNone}
       />
+      {kept.length > 0 ? (
+        <div
+          role="group"
+          aria-label={text.food.alsoDeclared}
+          className="flex flex-col gap-2"
+        >
+          <Typography as="p" size="xs" tone="muted">
+            {text.food.alsoDeclared}
+          </Typography>
+          {kept.map((row, index) => (
+            <Box
+              key={row.id}
+              id={`${id}-kept-${index}`}
+              label={row.label}
+              checked={draft.checked.includes(row.id)}
+              disabled={draft.noneKnown}
+              onChange={(on) => toggle(row.id, on)}
+            />
+          ))}
+        </div>
+      ) : null}
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {options.map((option) => {
-          const checked = draft.checked.includes(option.key);
-          const subOptions = subLists?.[option.key];
+          const checked = draft.checked.includes(option.id);
+          const boxId = `${id}-${option.id.replace("/", "-")}`;
           return (
-            <div key={option.key} className="contents">
+            <div key={option.id} className="contents">
               <Box
-                id={`${id}-${option.key}`}
-                label={option.label}
+                id={boxId}
+                label={option.label[locale]}
+                description={option.description?.[locale]}
                 checked={checked}
                 disabled={draft.noneKnown}
-                onChange={(on) => toggle(option.key, on)}
+                onChange={(on) => toggle(option.id, on)}
               />
-              {checked && subOptions ? subListOf(option, subOptions) : null}
+              {checked && option.subList.length > 0
+                ? subListOf(option)
+                : null}
             </div>
           );
         })}

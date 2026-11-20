@@ -7,7 +7,6 @@ import {
   dio2Categories,
   geneticTestAnswerLabels,
   geneticTestAnswers,
-  optionalQuestionnaireFieldLabels,
   type ConsentDecision,
   type Locale,
 } from "@remi/services/shared";
@@ -19,7 +18,7 @@ import type { Content } from "@/lib/content/types";
 import { decideGeneticConsentAction } from "@/lib/questionnaire/actions";
 import type { GeneticConsentDecision } from "@/lib/questionnaire/state";
 import { ChoiceAnswer } from "./choice-answer";
-import { OptionalLabel } from "./questionnaire-context";
+import { SelectAnswer } from "./select-answer";
 
 /** The section's saved state, as the page read it. `""` is « Non renseigné ». */
 export type GeneticValues = {
@@ -44,11 +43,13 @@ type Props = {
 };
 
 /**
- * « Génétique » (story 4, `genotype-section`). The test question first. « Oui »
- * shows the genetic consent. A `given` consent shows the APOE, DIO2 and AMY1A
- * lists, one choice each, nothing pre-selected. « Non / Je ne sais pas » hides
- * the rest: the service keeps the values and leaves them out of every read
- * and every calculation. The whole section is optional.
+ * « Tes informations génétiques » (story 4, `genotype-section`, REM-166). The
+ * introduction says that the step is optional, then the test question, « Non
+ * / Je ne sais pas » first. « Oui » shows the genetic consent. A `given`
+ * consent shows the APOE, DIO2 and AMY1A drop-down lists, one choice each,
+ * nothing pre-selected. « Non / Je ne sais pas » hides the rest at once: the
+ * service keeps the values and leaves them out of every read and every
+ * calculation, so the profile is DEFAULT again.
  */
 export const GeneticSection = ({ locale, text, values, consent }: Props) => {
   const [answer, setAnswer] = useState(values.geneticTest);
@@ -69,9 +70,12 @@ export const GeneticSection = ({ locale, text, values, consent }: Props) => {
 
   return (
     <>
+      <Typography as="p" size="base" tone="muted">
+        {text.genetic.intro}
+      </Typography>
       <ChoiceAnswer
         field="geneticTest"
-        legend={<OptionalLabel label={text.labels.geneticTest} />}
+        legend={text.labels.geneticTest}
         initial={values.geneticTest}
         onSelect={setAnswer}
         options={geneticTestAnswers.map((value) => ({
@@ -83,7 +87,6 @@ export const GeneticSection = ({ locale, text, values, consent }: Props) => {
         decision === "given" ? (
           <GenotypeLists
             text={text}
-            locale={locale}
             genotype={genotype}
             onChange={(field, value) =>
               setGenotype((current) => ({ ...current, [field]: value }))
@@ -212,38 +215,40 @@ const GeneticConsentPanel = ({
   );
 };
 
+/** The three genes, named as the laboratory report names them. */
 const genotypeLists = [
-  { field: "apoe", values: apoeGenotypes },
-  { field: "dio2", values: dio2Categories },
-  { field: "amy1a", values: amy1aCategories },
+  { field: "apoe", name: "APOE", values: apoeGenotypes },
+  { field: "dio2", name: "DIO2", values: dio2Categories },
+  { field: "amy1a", name: "AMY1A", values: amy1aCategories },
 ] as const;
 
 type ListsProps = {
   text: Content["questionnaire"];
-  locale: Locale;
   genotype: Genotype;
   onChange: (field: keyof Genotype, value: string) => void;
 };
 
-/** One radio group per gene. A tap saves it. An unanswered list stays empty. */
-const GenotypeLists = ({ text, locale, genotype, onChange }: ListsProps) => (
-  <div className="flex flex-col gap-6">
+/**
+ * One drop-down list per gene, each on its own. A choice saves it. An
+ * unanswered list stays empty: the first line of a list empties it again.
+ */
+const GenotypeLists = ({ text, genotype, onChange }: ListsProps) => (
+  <div className="flex flex-col gap-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      {genotypeLists.map(({ field, name, values }) => (
+        <SelectAnswer
+          key={field}
+          field={field}
+          label={name}
+          options={values}
+          initial={genotype[field]}
+          emptyLabel={text.genetic.noResult}
+          onSelect={(value) => onChange(field, value)}
+        />
+      ))}
+    </div>
     <Typography as="p" size="sm" tone="muted">
-      {text.genetic.listsIntro}
+      {text.genetic.listsNote}
     </Typography>
-    {genotypeLists.map(({ field, values }) => (
-      <ChoiceAnswer
-        key={field}
-        field={field}
-        legend={
-          <OptionalLabel
-            label={optionalQuestionnaireFieldLabels[field][locale]}
-          />
-        }
-        initial={genotype[field]}
-        onSelect={(value) => onChange(field, value)}
-        options={values.map((value) => ({ value, label: value }))}
-      />
-    ))}
   </div>
 );
