@@ -377,7 +377,11 @@ export {
   uncategorisedAllergenRows,
 } from "./allergen-options";
 export type { AllergenOption } from "./allergen-options";
-export { mentionsCeliacDisease } from "./celiac-mention";
+export {
+  celiacToConfirm,
+  mentionsCeliacDisease,
+  strictGlutenApplies,
+} from "./celiac-mention";
 export {
   dateEntryFromIso,
   isCalendarDay,

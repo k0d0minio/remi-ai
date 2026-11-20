@@ -1,7 +1,7 @@
 import { ShieldAlert } from "lucide-react";
 import {
   mandatoryQuestionnaireFieldLabels,
-  mentionsCeliacDisease,
+  celiacToConfirm,
   noneKnownLabels,
   optionalQuestionnaireFieldLabels,
   safetyList,
@@ -67,9 +67,10 @@ export const SafetyStrip = ({ questionnaire, medications }: Props) => {
     {
       key: "celiacDisease",
       label: optionalQuestionnaireFieldLabels.celiacDisease.fr,
-      // A mention in the free text asks for a confirmation (REM-165).
+      // A mention in the free text asks for a confirmation (REM-165). The
+      // practitioner's « Oui » or « Non » ends it.
       value:
-        celiac !== true && mentionsCeliacDisease(answers.pathologies)
+        celiacToConfirm(answers)
           ? "À confirmer"
           : celiac === null
             ? null

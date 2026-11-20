@@ -52,6 +52,13 @@ export const auditActions = [
    */
   "patient.consultation_date_changed",
   /**
+   * The answer to « Maladie cœliaque confirmée » changed: « Oui », « Non » or
+   * cleared (REM-165). The answer starts or lifts the strict gluten
+   * exclusion. The detail names the field, never the value: the trail holds
+   * no health data.
+   */
+  "patient.celiac_answer_changed",
+  /**
    * A patient changed a watched field on a file whose care is active (story
    * 21, D-32). The detail names the field keys. `patient_changes` holds the
    * old and the new values.

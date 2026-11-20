@@ -5,6 +5,7 @@ import {
   careActivationReason,
   type ActivationRecap,
 } from "../../../shared/care-activation";
+import { celiacToConfirm } from "../../../shared/celiac-mention";
 import { initialFileStatus } from "../../../shared/file-status";
 import { err, ok, type Result } from "../../../shared/result";
 import { safetyList } from "../../../shared/safety-highlights";
@@ -66,6 +67,8 @@ const recapOf = async (patientId: Id): Promise<Result<ActivationRecap>> => {
           allergens,
         ).state,
       },
+      // The live answers: the practitioner's « Oui » or « Non » lifts it.
+      celiacToConfirm: celiacToConfirm(answers),
       // The live rows, not the snapshot: the mark comes after the validation.
       staleCalculations: calculations
         .filter(

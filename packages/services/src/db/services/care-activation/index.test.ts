@@ -286,3 +286,55 @@ describe("the activation of the care", () => {
     }
   });
 });
+
+describe("a coeliac disease that the patient names (REM-165)", () => {
+  it("blocks the activation until the practitioner answers « Oui » or « Non »", async () => {
+    for (const answer of [true, false]) {
+      const patientId = await newPatient(`Coeliac ${answer}`, safe);
+      await validate(patientId);
+      // The patient names the disease after the validation.
+      await answerRows().update(patientId, {
+        pathologies: "Hypothyroïdie, maladie cœliaque",
+      });
+
+      const blocked = await getActivationRecap(holder, patientId);
+      expect(blocked.ok).toBe(true);
+      if (blocked.ok) {
+        expect(blocked.data.blockers).toEqual([{ kind: "celiac_to_confirm" }]);
+      }
+      const refused = await activateCare(holder, patientId, practitioner);
+      expect(refused.ok).toBe(false);
+      if (!refused.ok) {
+        expect(refused.error).toBe("conflict");
+        expect(refused.message).toContain("celiac_to_confirm");
+      }
+      expect((await profiles().findById(patientId))?.fileStatus).toBe(
+        "to_validate",
+      );
+
+      await answerRows().update(patientId, { celiacDisease: answer });
+      const cleared = await getActivationRecap(holder, patientId);
+      expect(cleared.ok).toBe(true);
+      if (cleared.ok) {
+        expect(cleared.data.blockers).toEqual([]);
+      }
+      const activated = await activateCare(holder, patientId, practitioner);
+      expect(activated.ok).toBe(true);
+      expect((await profiles().findById(patientId))?.fileStatus).toBe("active");
+    }
+  });
+
+  it("does not block on « pas de maladie cœliaque » after a « Non »", async () => {
+    const patientId = await newPatient("Nope", {
+      ...safe,
+      pathologies: "pas de maladie cœliaque",
+      celiacDisease: false,
+    });
+    await validate(patientId);
+    const recap = await getActivationRecap(holder, patientId);
+    expect(recap.ok).toBe(true);
+    if (recap.ok) {
+      expect(recap.data.blockers).toEqual([]);
+    }
+  });
+});

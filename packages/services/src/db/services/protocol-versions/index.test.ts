@@ -325,3 +325,42 @@ describe("the limits of a validation", () => {
     }
   });
 });
+
+describe("a coeliac disease that the patient names (REM-165)", () => {
+  /** The same rows, read as the questionnaire reads them. */
+  const answerRows = () =>
+    getDatabase().collection<{
+      id: string;
+      pathologies: string | null;
+      celiacDisease: boolean | null;
+    }>("patient_profiles");
+
+  it("refuses the validation until the practitioner answers", async () => {
+    const id = await newPatient("Coeliac", "to_validate");
+    await addPatientGoal(systemActor, id, { title: "Sleep" });
+    await answerRows().update(id, { pathologies: "Maladie cœliaque" });
+
+    const refused = await validateProtocol(holder, id, practitioner);
+    expect(refused.ok).toBe(false);
+    if (!refused.ok) {
+      expect(refused.error).toBe("conflict");
+      expect(refused.message).toBe("a coeliac disease is not confirmed");
+    }
+    expect(await validatedOf(id)).toBeNull();
+
+    await answerRows().update(id, { celiacDisease: false });
+    const validated = await validateProtocol(holder, id, practitioner);
+    expect(validated.ok).toBe(true);
+  });
+
+  it("validates after the practitioner's « Oui »", async () => {
+    const id = await newPatient("Confirmed", "to_validate");
+    await addPatientGoal(systemActor, id, { title: "Sleep" });
+    await answerRows().update(id, {
+      pathologies: "Maladie cœliaque",
+      celiacDisease: true,
+    });
+    const validated = await validateProtocol(holder, id, practitioner);
+    expect(validated.ok).toBe(true);
+  });
+});

@@ -67,6 +67,7 @@ const eviction = (
 const input = (patch: Partial<ActivationInput> = {}): ActivationInput => ({
   validated,
   safety: { allergies: "none_known", intolerances: "listed" },
+  celiacToConfirm: false,
   evictions: [],
   staleCalculations: [],
   unrecognised: [],
@@ -173,6 +174,28 @@ describe("the recap of an activation", () => {
       "no_validated_version",
       "safety_answer_missing",
       "eviction_without_period",
+    ]);
+  });
+
+  it("blocks on a coeliac disease that the practitioner has not confirmed", () => {
+    const recap = activationRecap(input({ celiacToConfirm: true }));
+    expect(recap.blockers).toEqual([{ kind: "celiac_to_confirm" }]);
+    expect(canActivate(recap)).toBe(false);
+    expect(recap.values).toEqual(activationRecap(input()).values);
+  });
+
+  it("puts the coeliac disease after the safety answers and before the calculations", () => {
+    const recap = activationRecap(
+      input({
+        safety: { allergies: "not_entered", intolerances: "listed" },
+        celiacToConfirm: true,
+        staleCalculations: ["energy"],
+      }),
+    );
+    expect(recap.blockers.map((blocker) => blocker.kind)).toEqual([
+      "safety_answer_missing",
+      "celiac_to_confirm",
+      "calculation_to_revalidate",
     ]);
   });
 

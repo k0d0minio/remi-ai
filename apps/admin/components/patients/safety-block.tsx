@@ -1,7 +1,7 @@
 import { ShieldAlert } from "lucide-react";
 import {
   mandatoryQuestionnaireFieldLabels,
-  mentionsCeliacDisease,
+  celiacToConfirm,
   noneKnownLabels,
   optionalQuestionnaireFieldLabels,
   safetyList,
@@ -63,9 +63,9 @@ export const SafetyBlock = ({ questionnaire, medications }: Props) => {
   const { answers, allergens } = questionnaire;
   const celiac = answers.celiacDisease;
   // The patient writes their pathologies as free text (REM-165). A mention of
-  // the disease starts no exclusion: it asks the practitioner to confirm.
-  const celiacToConfirm =
-    celiac !== true && mentionsCeliacDisease(answers.pathologies);
+  // the disease asks the practitioner to confirm. The practitioner's « Oui »
+  // or « Non » ends it.
+  const toConfirm = celiacToConfirm(answers);
   const medicationText =
     medications === null || medications.trim() === "" ? null : medications;
   const rows = [
@@ -96,11 +96,12 @@ export const SafetyBlock = ({ questionnaire, medications }: Props) => {
     {
       key: "celiacDisease",
       label: optionalQuestionnaireFieldLabels.celiacDisease.fr,
-      value: celiacToConfirm ? (
+      value: toConfirm ? (
         <Typography size="sm" weight="medium" className="text-warning-text">
           À confirmer : la personne cite une maladie cœliaque dans ses
-          pathologies. Aucune exclusion stricte du gluten ne s&apos;applique
-          tant que le profil ne dit pas « Oui ».
+          pathologies. Par précaution, le gluten est exclu strictement tant
+          que vous n&apos;avez pas répondu « Oui » ou « Non » dans le profil.
+          Sans réponse, la validation et l&apos;activation sont refusées.
         </Typography>
       ) : celiac === null ? (
         <AbsentValue />
