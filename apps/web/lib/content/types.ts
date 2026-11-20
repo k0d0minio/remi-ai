@@ -796,7 +796,6 @@ export type Content = {
   patientProfile: {
     metaTitle: string;
     title: string;
-    comingSoon: string;
   };
   /**
    * « Mes recommandations » at `/profil/recommandations` (story 23). The
@@ -835,6 +834,59 @@ export type Content = {
     /** Above the practitioner's recommendations of the category nutrition. */
     foodAdviceTitle: string;
     goalsTitle: string;
+  };
+  /**
+   * The patient's own data on the Profil tab and at `/profil/mes-donnees`
+   * (story 31, REM-85). The labels and the errors of the fields are those of
+   * `questionnaire`: one field has one name.
+   */
+  patientPersonalData: {
+    /** The patient's file cannot be read. */
+    unavailable: string;
+    /** A value that the file does not hold. */
+    empty: string;
+    edit: string;
+    /** The accessible name of « Modifier ». `{label}` is the field's name. */
+    editLabel: string;
+    save: string;
+    saving: string;
+    cancel: string;
+    personalTitle: string;
+    personalIntro: string;
+    phoneSaved: string;
+    dataTitle: string;
+    dataIntro: string;
+    rows: {
+      weight: string;
+      desiredWeight: string;
+      activityLevel: string;
+      diet: string;
+      allergies: string;
+      intolerances: string;
+      medications: string;
+      supplements: string;
+    };
+    /** `{value}` is a weight with a comma. */
+    kilograms: string;
+    /** « Autre » and what the patient wrote. */
+    dietWithNote: string;
+    weightSaved: string;
+    /** The entry to `/profil/mes-donnees`, and the line below it. */
+    dataLink: string;
+    dataLinkHint: string;
+    accountTitle: string;
+    consentTitle: string;
+    /** The consent settings are not built yet. */
+    consentNotYet: string;
+    dataPage: {
+      metaTitle: string;
+      title: string;
+      intro: string;
+      foodTitle: string;
+      /** After a saved change of the diet, the allergies or the intolerances. */
+      foodSaved: string;
+      otherTitle: string;
+    };
   };
   /** The sign-out button on the pages behind the patient session. */
   signOut: string;

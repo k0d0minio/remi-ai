@@ -22,6 +22,8 @@ export const RECIPES_PATH = "/recettes";
 export const PROFILE_PATH = "/profil";
 /** « Mes recommandations », below the Profil tab (story 23). */
 export const RECOMMENDATIONS_PATH = "/profil/recommandations";
+/** The patient's own follow-up data, below the Profil tab (REM-85). */
+export const PROFILE_DATA_PATH = "/profil/mes-donnees";
 
 /** The page a signed-in patient reaches first. */
 export const landingPaths: Record<PatientLanding, string> = {
