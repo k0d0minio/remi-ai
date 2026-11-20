@@ -138,6 +138,13 @@ export {
   isFileStatus,
 } from "./file-status";
 export type { FileOrigin, FileStatus } from "./file-status";
+export { patientFileLayout } from "./patient-file-layout";
+export type {
+  PatientFileAction,
+  PatientFileGroup,
+  PatientFileLayout,
+  PatientFileSectionId,
+} from "./patient-file-layout";
 export {
   canManageOperators,
   defaultPatientListSort,

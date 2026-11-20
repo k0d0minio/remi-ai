@@ -50,6 +50,7 @@ export { ScoreStrip } from "./server/score-strip";
 export { Section } from "./server/section";
 export { Separator } from "./server/separator";
 export { Skeleton } from "./server/skeleton";
+export { StepPath } from "./server/step-path";
 export {
   Table,
   TableBody,

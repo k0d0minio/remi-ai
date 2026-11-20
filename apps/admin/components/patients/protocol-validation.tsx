@@ -3,6 +3,7 @@ import { getValidatedProtocol } from "@remi/services/server";
 import { formatDate, type PatientProfile } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Typography } from "@remi/ui/server";
+import { ValidatedMark } from "@/components/patients/file/value";
 import { requireActor } from "@/lib/auth/session";
 import { validateProtocolAction } from "@/lib/patients/protocol-validation";
 
@@ -36,13 +37,21 @@ export const ProtocolValidation = async ({ patient, readOnly }: Props) => {
       className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
     >
       <input type="hidden" name="id" value={patient.id} />
-      {validated.ok ? (
-        <Typography size="sm" tone="muted">
-          {version
-            ? `Version ${version.versionNumber} validée le ${formatDate(version.validatedAt)}`
-            : "Aucune version validée pour l'instant."}
-        </Typography>
+      {!validated.ok ? null : version ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <Typography size="sm" weight="medium">
+            {`Version ${version.versionNumber}`}
+          </Typography>
+          <ValidatedMark
+            label={`validée le ${formatDate(version.validatedAt)}`}
+          />
+        </div>
       ) : (
+        <Typography size="sm" tone="muted">
+          Aucune version validée pour l&apos;instant.
+        </Typography>
+      )}
+      {validated.ok ? null : (
         <Typography size="sm" role="status" className="text-warning-text">
           La version validée ne peut pas être lue.
         </Typography>

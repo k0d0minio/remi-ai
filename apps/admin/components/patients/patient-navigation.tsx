@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { OPEN_SECTION_EVENT } from "@/components/patients/file/section-row";
 import {
   patientSegments,
   segmentLabels,
@@ -30,7 +31,9 @@ const isPatientSegment = (value: string | null): value is PatientSegment =>
 const ROOT_ID = "patient-page";
 const rootSegment = () =>
   document.getElementById(ROOT_ID)?.getAttribute("data-segment") ?? "suivi";
+/** Scroll to a section. A folded row opens first (`SectionRow`). */
 const scrollTo = (id: string) => {
+  window.dispatchEvent(new CustomEvent(OPEN_SECTION_EVENT, { detail: id }));
   document.getElementById(id)?.scrollIntoView({
     behavior: "smooth",
     block: "start",
@@ -40,8 +43,9 @@ const scrollTo = (id: string) => {
 /**
  * The patient page's two navigation modes, one component.
  *
- * On desktop a sticky section index sits in the right rail — every section,
- * working view first, with its count, the current one marked as she scrolls. On
+ * On desktop a sticky section index sits in the right rail — every section in
+ * the order of the page, which follows the file status (`patientFileLayout`),
+ * with its count, the current one marked as she scrolls. On
  * phone it becomes the segmented control (Suivi · Journal · Dossier · Profil):
  * switching a segment writes it to the URL (`?segment=…`, so a link lands on it
  * and back-navigation restores it) and flips a `data-segment` attribute on the
@@ -84,7 +88,8 @@ export const PatientNavigation = ({ sections }: Props) => {
           setActiveId(last);
         }
       },
-      { rootMargin: "-112px 0px -70% 0px" },
+      // The top margin clears the console header and the file header.
+      { rootMargin: "-240px 0px -60% 0px" },
     );
     for (const section of sections) {
       const el = document.getElementById(section.id);
@@ -123,7 +128,7 @@ export const PatientNavigation = ({ sections }: Props) => {
               role="tab"
               aria-selected={selected}
               onClick={() => setSegment(value)}
-              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              className={`min-h-11 flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 selected
                   ? "bg-card text-foreground shadow-sm"
                   : "hover:text-foreground"
@@ -139,7 +144,7 @@ export const PatientNavigation = ({ sections }: Props) => {
       <aside className="hidden w-56 shrink-0 lg:order-2 lg:block">
         <nav
           aria-label="Sections de la page"
-          className="bg-card border-border sticky top-14 flex flex-col gap-1 rounded-lg border p-3"
+          className="bg-card border-border sticky top-16 flex max-h-[calc(100dvh-5rem)] flex-col gap-1 overflow-y-auto rounded-lg border p-3"
         >
           <p className="text-muted-foreground px-2 pb-1 text-xs font-medium uppercase tracking-wide">
             Sections
