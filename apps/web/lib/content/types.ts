@@ -26,6 +26,7 @@ import type {
   SignupField,
   StepStatus,
 } from "@remi/services/shared";
+import type { PlanMealError } from "@/lib/meals/state";
 import type { PatientWriteError } from "@/lib/patient-link/actions";
 import type { QuestionnaireSection } from "@/lib/questionnaire/sections";
 import type { SaveError } from "@/lib/questionnaire/state";
@@ -774,5 +775,27 @@ export type Content = {
     /** Says that the answers stay editable. Above the link. */
     questionnaireHint: string;
     questionnaireLink: string;
+  };
+  /**
+   * The meal block of `/accueil` (stories 28 and 31). The question is the
+   * page's title and the label of the field.
+   */
+  patientMeal: {
+    question: string;
+    hint: string;
+    placeholder: string;
+    /** The charter's label of the home page's one dominant button (8.1). */
+    submit: string;
+    submitting: string;
+    /** `{count}` is the number of characters left. Shown near the limit only. */
+    remaining: string;
+    errors: Record<PlanMealError, string>;
+    /** After a save. The suggestion is the next ticket: no text promises one now. */
+    saved: {
+      title: string;
+      soon: string;
+      mealLabel: string;
+      another: string;
+    };
   };
 };
