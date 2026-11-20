@@ -791,8 +791,6 @@ export const fr: Content = {
   patientProfile: {
     metaTitle: "Profil",
     title: "Profil",
-    comingSoon:
-      "Tes recommandations, tes informations personnelles et les réglages de ton compte arrivent bientôt ici.",
   },
   patientRecommendations: {
     metaTitle: "Mes recommandations",
@@ -833,6 +831,54 @@ export const fr: Content = {
     },
     foodAdviceTitle: "Conseils de ton praticien",
     goalsTitle: "Objectifs prioritaires",
+  },
+  patientPersonalData: {
+    unavailable:
+      "Tes informations ne peuvent pas s'afficher pour le moment. Réessaie dans un instant.",
+    empty: "Non renseigné",
+    edit: "Modifier",
+    editLabel: "Modifier : {label}",
+    save: "Enregistrer",
+    saving: "Enregistrement…",
+    cancel: "Annuler",
+    personalTitle: "Mes informations personnelles",
+    personalIntro:
+      "Tu peux modifier ton téléphone ici. Pour corriger ton nom, ton prénom ou ta date de naissance, contacte ton praticien.",
+    phoneSaved: "Ton numéro de téléphone est enregistré.",
+    dataTitle: "Mes données de suivi",
+    dataIntro:
+      "Tu peux les mettre à jour à tout moment. Ton praticien voit chaque changement, et tes recommandations validées ne changent pas.",
+    rows: {
+      weight: "Poids actuel",
+      desiredWeight: "Poids souhaité",
+      activityLevel: "Niveau d'activité physique",
+      diet: "Type d'alimentation",
+      allergies: "Allergies",
+      intolerances: "Intolérances",
+      medications: "Médicaments",
+      supplements: "Compléments alimentaires",
+    },
+    kilograms: "{value} kg",
+    dietWithNote: "{diet} : {note}",
+    weightSaved:
+      "Ton poids est enregistré. Ton praticien voit ce changement.",
+    dataLink: "Modifier mes autres données",
+    dataLinkHint:
+      "Alimentation, allergies, intolérances, activité, poids souhaité, médicaments et compléments.",
+    accountTitle: "Mon compte",
+    consentTitle: "Mes consentements",
+    consentNotYet:
+      "Tu ne peux pas encore consulter ni modifier tes consentements ici.",
+    dataPage: {
+      metaTitle: "Mes données de suivi",
+      title: "Mes données de suivi",
+      intro:
+        "Chaque changement s'enregistre tout seul, sans bouton. Ton praticien le voit, et tes recommandations validées ne changent pas.",
+      foodTitle: "Alimentation, allergies et intolérances",
+      foodSaved:
+        "C'est enregistré : ce changement s'applique tout de suite aux idées que REMI te propose, et ton praticien le voit.",
+      otherTitle: "Activité, poids souhaité et traitements",
+    },
   },
   signOut: "Se déconnecter",
   patientWaiting: {
