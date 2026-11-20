@@ -164,6 +164,13 @@ export const auditActions = [
    */
   "ai_model.set",
   "ai_model.reset",
+  /**
+   * A console account corrected the table of the meal shares, or removed the
+   * setting so that the code default applies again (REM-197, D-32). The
+   * detail is JSON: each cell that changed, with its value before and after.
+   */
+  "meal_shares.set",
+  "meal_shares.reset",
   "meal.logged",
   "meal.updated",
   "meal.feedback_written",

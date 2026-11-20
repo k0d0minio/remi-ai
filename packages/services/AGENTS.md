@@ -112,7 +112,9 @@ src/
                the database reads, the model call, then the gate in code) ·
                ai-models/ (the model of each AI role as a console setting: the service
                that calls the seam reads it with `roleModel()` and gives it in
-               `options.model`, because `ai/` reads no database)
+               `options.model`, because `ai/` reads no database) ·
+               meal-shares/ (the table of the meal shares as a console setting: the
+               default is `shared/meal-shares.ts`, a product call reads `mealShareTable()`)
   auth/        the auth seam (provider.ts, session.ts) · adapters/ · the operator console's
                password hashing + session tokens, vendor-free, `node:crypto` only
   db/          client.ts (the seam) · schema.ts (Drizzle) · adapters/ · models/ · services/ · migrations/

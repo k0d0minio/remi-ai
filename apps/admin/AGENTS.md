@@ -10,7 +10,9 @@ protocol as recommendations, writes up her consultations, and shares a link the 
 the accounts that reach it, and one reference surface — `/aliments`, the CIQUAL food-composition
 table, read-only — which is here because it is what the recipe step will query and she needs to be
 able to check it by hand. One page is for the REMI team only: « Modèles d'IA » (`/ai-models`), the
-model of each AI role. It answers not-found to a practitioner. Nothing else lives here.
+model of each AI role. It answers not-found to a practitioner. One table belongs to no patient:
+« Parts des repas » (`/meal-shares`, REM-197), the part of the day's energy and protein that each
+meal carries. Each console account reads it and corrects it. Nothing else lives here.
 
 It is a **separate deployment** from `apps/web` on purpose — its own URL, its own environment
 variables, its own access control. A `/admin` route group inside the product app would put every

@@ -84,6 +84,8 @@ export const actionLabels: Record<AuditActionName, string> = {
   "nutrition_rule.restored": "règle réactivée",
   "ai_model.set": "modèle d'IA modifié",
   "ai_model.reset": "modèle d'IA remis à la valeur par défaut",
+  "meal_shares.set": "parts des repas corrigées",
+  "meal_shares.reset": "parts des repas remises aux valeurs par défaut",
   "meal.logged": "repas ajouté",
   "meal.updated": "repas modifié",
   "meal.feedback_written": "retour écrit",
@@ -234,6 +236,9 @@ export const actionIntents: Record<AuditActionName, Intent> = {
   // A change of the model that reads patient data: it must stand out.
   "ai_model.set": "warning",
   "ai_model.reset": "info",
+  // A change of the table moves the meal targets of each file.
+  "meal_shares.set": "warning",
+  "meal_shares.reset": "info",
   "meal.logged": "neutral",
   "meal.updated": "neutral",
   "meal.feedback_written": "neutral",

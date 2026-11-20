@@ -117,6 +117,24 @@ export type {
   MealSlot as MealConfigurationSlot,
   MealSlotState,
 } from "./meal-configuration";
+export {
+  defaultMealShareTable,
+  MEAL_SHARE_MAX,
+  MEAL_SHARE_MIN,
+  mealShareNutrients,
+  mealTargets,
+  parseMealShareTable,
+  referenceDayOrientations,
+  referenceDayTotal,
+} from "./meal-shares";
+export type {
+  DayTargets,
+  MealShareNutrient,
+  MealShareTable,
+  MealTarget,
+  MealTargets,
+  MealTargetStatus,
+} from "./meal-shares";
 export { canActivate } from "./care-activation";
 export {
   activationEmailDecision,

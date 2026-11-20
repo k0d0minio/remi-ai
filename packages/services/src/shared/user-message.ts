@@ -42,6 +42,15 @@ const sentences: Readonly<Record<string, string>> = {
     "Ce modèle ne produit pas de sortie structurée. REMI en a besoin pour lire la réponse.",
   "the providers of this model may train on the data":
     "Ce modèle est refusé : ses fournisseurs peuvent utiliser les données envoyées pour entraîner leurs modèles. Les demandes de REMI contiennent des données de santé.",
+  // the table of the meal shares (`server/meal-shares`)
+  "only a console account reads or changes the meal shares":
+    "Seul un compte de la console peut lire ou corriger les parts des repas.",
+  "each column of the reference day must give 100":
+    "Sur la journée de référence, la somme de chaque colonne doit être de 100 %.",
+  "each meal share is a whole number from 1 to 100":
+    "Chaque part est un nombre entier de 1 à 100.",
+  "the meal share table is not complete":
+    "La table est incomplète. Rechargez la page, puis réessayez.",
   // conflict
   "a challenge is already running — pick its outcome to replace it":
     "Un challenge est déjà en cours. Choisissez son issue pour le remplacer.",
