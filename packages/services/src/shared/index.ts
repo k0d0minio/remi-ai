@@ -52,6 +52,7 @@ export type {
   CalculationInput,
   CalculationKind,
 } from "./calculations";
+export { energyEstimateParameters } from "./energy";
 export { proteinAdaptationLabels, proteinEstimateParameters } from "./protein";
 export {
   defaultMacroSplit,

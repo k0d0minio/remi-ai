@@ -4,6 +4,7 @@ import {
   calculationKinds,
   type CalculationKind,
 } from "../../../shared/calculations";
+import { energyProposal } from "../../../shared/energy";
 import { ageInYears } from "../../../shared/format";
 import { proteinProposal } from "../../../shared/protein";
 import { err, ok, type Result } from "../../../shared/result";
@@ -27,7 +28,8 @@ import { byPatient, noSuchPatient } from "../access";
  *   that names the value and the parameters (D-32).
  *
  * Neither write touches the other's columns. Nothing here computes: the
- * functions live in `shared/calculations.ts` and `shared/protein.ts`.
+ * functions live in `shared/calculations.ts`, `shared/protein.ts` and
+ * `shared/energy.ts`.
  */
 
 const calculations = (db: DatabaseClient = getDatabase()) =>
@@ -267,6 +269,73 @@ export const refreshProteinEstimate = async (
   const row = await rowFor(patientId, "protein", db);
   if (row && row.estimatedValue !== null) {
     await unscopedSetCalculationEstimate(patientId, "protein", null, db);
+  }
+};
+
+type EnergyInputs = Pick<
+  PatientProfile,
+  "id" | "heightCm" | "weightKg" | "birthDate"
+> & {
+  /** `patient_profiles.sex_for_calculation`: `female`, `male` or null. */
+  sexForCalculation?: string | null;
+  /** `patient_profiles.activity_level`: one of the four NAP levels, or null. */
+  activityLevel?: string | null;
+};
+
+/**
+ * Recompute the energy estimate (story 9): the resting metabolism of
+ * Mifflin-St Jeor times the NAP coefficient. The services that refresh the
+ * protein estimate call it after the same save, and the questionnaire calls
+ * it after a save of the sex used for the calculation or of the activity
+ * level. Unscoped: the caller has checked the actor before its own write.
+ *
+ * The weight is the current weight. The protein reference weight is not
+ * read. The value is the daily need, not rounded: the screen rounds. The row
+ * keeps the resting metabolism, the sex, the age, the height, the weight,
+ * the activity level and the NAP with the value (D-32). The validated
+ * columns stay as they are. Missing or implausible data clears the estimate
+ * (D-30). A file with no estimate yet gets no empty row.
+ */
+export const refreshEnergyEstimate = async (
+  patientId: Id,
+  db?: DatabaseClient,
+): Promise<void> => {
+  const profile = await (db ?? getDatabase())
+    .collection<EnergyInputs>("patient_profiles")
+    .findById(patientId);
+  if (!profile) {
+    return;
+  }
+  const proposal = energyProposal({
+    sexForCalculation: profile.sexForCalculation ?? null,
+    ageYears: ageInYears(profile.birthDate ?? null),
+    heightCm: profile.heightCm ?? null,
+    weightKg: profile.weightKg ?? null,
+    activityLevel: profile.activityLevel ?? null,
+  });
+  if (proposal.state === "computed") {
+    await unscopedSetCalculationEstimate(
+      patientId,
+      "energy",
+      {
+        value: proposal.value,
+        parameters: {
+          restingMetabolism: proposal.restingMetabolism,
+          sexForCalculation: proposal.sexForCalculation,
+          ageYears: proposal.ageYears,
+          heightCm: proposal.heightCm,
+          weightKg: proposal.weightKg,
+          activityLevel: proposal.activityLevel,
+          nap: proposal.nap,
+        },
+      },
+      db,
+    );
+    return;
+  }
+  const row = await rowFor(patientId, "energy", db);
+  if (row && row.estimatedValue !== null) {
+    await unscopedSetCalculationEstimate(patientId, "energy", null, db);
   }
 };
 

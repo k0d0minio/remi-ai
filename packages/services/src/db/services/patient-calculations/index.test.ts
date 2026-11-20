@@ -3,7 +3,10 @@ import { getDatabase, registerDatabase } from "../../client";
 import type { AuditEvent } from "../../models/audit-event";
 import { createMemoryDatabase, testPractitionerId } from "../../test-helpers";
 import { operatorActor, systemActor } from "../access";
-import { savePatientProfileAnswers } from "../patient-questionnaire";
+import {
+  savePatientProfileAnswers,
+  savePatientQuestionnaire,
+} from "../patient-questionnaire";
 import { createPatient, updatePatient } from "../patients";
 import {
   listPatientCalculations,
@@ -390,5 +393,117 @@ describe("the protein estimate", () => {
     }
     const rows = await listPatientCalculations(systemActor, bare.data.id);
     expect(rows.find((row) => row.kind === "protein")).toBeUndefined();
+  });
+});
+
+describe("the energy estimate", () => {
+  let fileId: string;
+
+  /** Born on 1 January, 35 years before this year: 35 on any day of the year. */
+  const birthDate = `${new Date().getUTCFullYear() - 35}-01-01`;
+
+  const energyRow = async () =>
+    (await listPatientCalculations(systemActor, fileId)).find(
+      (row) => row.kind === "energy",
+    );
+
+  beforeAll(async () => {
+    const created = await createPatient(systemActor, {
+      practitionerId: testPractitionerId,
+      pseudonym: "Lucie",
+      heightCm: 165,
+      weightKg: 65,
+    });
+    if (!created.ok) {
+      throw new Error("test patient not created");
+    }
+    fileId = created.data.id;
+  });
+
+  it("is not written while a datum is missing", async () => {
+    expect(await energyRow()).toBeUndefined();
+    const dated = await updatePatient(systemActor, fileId, { birthDate });
+    expect(dated.ok).toBe(true);
+    const sexed = await savePatientQuestionnaire(systemActor, fileId, {
+      sexForCalculation: "female",
+    });
+    expect(sexed.ok).toBe(true);
+    expect(await energyRow()).toBeUndefined();
+  });
+
+  it("is written with its parameters on a save of the last datum", async () => {
+    const saved = await savePatientQuestionnaire(systemActor, fileId, {
+      activityLevel: "moderate",
+    });
+    expect(saved.ok).toBe(true);
+    const row = await energyRow();
+    expect(row?.estimatedValue).toBeCloseTo(2152.4, 6);
+    expect(row?.estimateParameters).toMatchObject({
+      sexForCalculation: "female",
+      ageYears: 35,
+      heightCm: 165,
+      weightKg: 65,
+      activityLevel: "moderate",
+      nap: 1.6,
+    });
+    expect(row?.estimateParameters?.restingMetabolism).toBeCloseTo(1345.25, 6);
+    expect(row?.validatedValue).toBeNull();
+  });
+
+  it("is computed again on a save of the current weight", async () => {
+    const saved = await updatePatient(systemActor, fileId, { weightKg: 80 });
+    expect(saved.ok).toBe(true);
+    const row = await energyRow();
+    expect(row?.estimatedValue).toBeCloseTo(2392.4, 6);
+    expect(row?.estimateParameters).toMatchObject({ weightKg: 80 });
+  });
+
+  it("is computed again on a save of the activity level", async () => {
+    const saved = await savePatientQuestionnaire(systemActor, fileId, {
+      activityLevel: "high",
+    });
+    expect(saved.ok).toBe(true);
+    const row = await energyRow();
+    expect(row?.estimatedValue).toBeCloseTo(2691.45, 6);
+    expect(row?.estimateParameters).toMatchObject({
+      activityLevel: "high",
+      nap: 1.8,
+    });
+  });
+
+  it("stays as it is when the protein reference weight changes", async () => {
+    const before = await energyRow();
+    const validated = await validateCalculation(
+      systemActor,
+      fileId,
+      "protein",
+      { value: 60, parameters: { referenceWeightKg: 60, coefficient: 1 } },
+      practitioner,
+    );
+    expect(validated.ok).toBe(true);
+    const after = await energyRow();
+    expect(after?.estimatedValue).toBe(before?.estimatedValue);
+    expect(after?.estimateParameters).toEqual(before?.estimateParameters);
+    expect(after?.updatedAt).toEqual(before?.updatedAt);
+  });
+
+  it("stays as it is on a save of any other field", async () => {
+    const before = await energyRow();
+    const saved = await savePatientQuestionnaire(systemActor, fileId, {
+      consultationReason: "Fatigue",
+      activityLevel: "high",
+    });
+    expect(saved.ok).toBe(true);
+    expect((await energyRow())?.updatedAt).toEqual(before?.updatedAt);
+  });
+
+  it("is cleared when the activity level goes", async () => {
+    const saved = await savePatientQuestionnaire(systemActor, fileId, {
+      activityLevel: null,
+    });
+    expect(saved.ok).toBe(true);
+    const row = await energyRow();
+    expect(row?.estimatedValue).toBeNull();
+    expect(row?.estimateParameters).toBeNull();
   });
 });
