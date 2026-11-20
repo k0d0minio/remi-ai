@@ -26,7 +26,7 @@ type Props = {
   goal: PatientGoal;
   /** The goal's check-ins, newest first — already ordered by the service. */
   checkIns: readonly PatientGoalCheckIn[];
-  /** Its rank in the active list, 1-based. Absent on an archived goal. */
+  /** Its rank in the active list, 1-based. Absent on a disabled goal. */
   rank?: number;
   canMoveUp: boolean;
   canMoveDown: boolean;
@@ -34,7 +34,9 @@ type Props = {
 };
 
 /**
- * One priority goal: what it is, where it started, how it has moved.
+ * One goal: its text, its rank and how it has moved. Rank 1 is the main goal
+ * (D-30). The starting point of September is not shown and not written
+ * (story 16): a goal is one free text.
  *
  * The latest check-in reads at a glance beside the title because that is the
  * question asked at a follow-up; the rest of the trail is one click away, so a
@@ -72,30 +74,15 @@ export const GoalItem = ({
           <input type="hidden" name="id" value={goal.id} />
           <input type="hidden" name="patientId" value={goal.patientId} />
 
-          <div className="grid gap-4 sm:grid-cols-[1fr_14rem]">
-            <Field id={`goal-title-${goal.id}`} label="Objectif">
-              <Input
-                id={`goal-title-${goal.id}`}
-                name="title"
-                required
-                maxLength={160}
-                defaultValue={goal.title}
-              />
-            </Field>
-
-            <Field
-              id={`goal-baseline-${goal.id}`}
-              label="Point de départ"
-              optional
-            >
-              <Input
-                id={`goal-baseline-${goal.id}`}
-                name="baseline"
-                maxLength={160}
-                defaultValue={goal.baseline}
-              />
-            </Field>
-          </div>
+          <Field id={`goal-title-${goal.id}`} label="Objectif">
+            <Input
+              id={`goal-title-${goal.id}`}
+              name="title"
+              required
+              maxLength={160}
+              defaultValue={goal.title}
+            />
+          </Field>
 
           <div className="flex flex-wrap items-center gap-2">
             <Button type="submit" size="sm">
@@ -134,18 +121,17 @@ export const GoalItem = ({
         <Typography as="h4" size="sm" weight="medium">
           {goal.title}
         </Typography>
+        {rank === 1 ? (
+          <Badge variant="info" tone="subtle" size="sm">
+            objectif principal
+          </Badge>
+        ) : null}
         {archived ? (
           <Badge variant="neutral" tone="subtle" size="sm">
-            archivé
+            désactivé
           </Badge>
         ) : null}
       </div>
-
-      {goal.baseline ? (
-        <Typography size="sm" tone="muted">
-          {`Départ : ${goal.baseline}`}
-        </Typography>
-      ) : null}
 
       {latest ? (
         <GoalTrail
@@ -226,7 +212,7 @@ export const GoalItem = ({
             ) : (
               <ArchiveX aria-hidden="true" />
             )}
-            {archived ? "Réactiver" : "Archiver"}
+            {archived ? "Réactiver" : "Désactiver"}
           </Button>
         </form>
 
@@ -263,7 +249,7 @@ export const GoalItem = ({
 
       {archived && goal.archivedAt ? (
         <Typography size="sm" tone="muted">
-          {`Archivé le ${formatDate(goal.archivedAt)}`}
+          {`Désactivé le ${formatDate(goal.archivedAt)}`}
         </Typography>
       ) : null}
     </li>
@@ -285,7 +271,7 @@ const MoveButton = ({
     <input type="hidden" name="direction" value={direction} />
     <Button
       type="submit"
-      size="icon"
+      size="sm"
       variant="ghost"
       disabled={disabled}
       aria-label={
@@ -299,6 +285,7 @@ const MoveButton = ({
       ) : (
         <ChevronDown aria-hidden="true" />
       )}
+      {direction === "up" ? "Monter" : "Descendre"}
     </Button>
   </form>
 );

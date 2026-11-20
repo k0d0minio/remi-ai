@@ -1239,8 +1239,8 @@ export const deleteObservationAction = async (formData: FormData) => {
  * The steering — § D's priority goals with their check-ins, and § E's standing
  * consigne.
  *
- * The cap on active goals is the service's; these actions surface its refusal
- * rather than repeating the count, so the form and the rule can never disagree.
+ * A goal is one free text, and the service puts no limit on their number
+ * (story 16). The actions do not write the starting point of September.
  */
 export const addGoalAction = async (
   _previous: GoalFormState,
@@ -1254,7 +1254,6 @@ export const addGoalAction = async (
   const patientId = field(formData, "patientId");
   const result = await addPatientGoal(actor, patientId, {
     title: field(formData, "title"),
-    baseline: field(formData, "baseline"),
   });
   if (!result.ok) {
     return { error: result.message };
@@ -1280,7 +1279,6 @@ export const updateGoalAction = async (
   const id = field(formData, "id");
   const result = await updatePatientGoal(actor, id, {
     title: field(formData, "title"),
-    baseline: field(formData, "baseline"),
   });
   if (!result.ok) {
     return { error: result.message };
@@ -1314,10 +1312,10 @@ export const moveGoalAction = async (formData: FormData) => {
 };
 
 /**
- * Archiving and restoring share a form, and restoring can be refused: the cap
- * counts active goals, so a restore into a full list is the same conflict an
- * add would hit. The refusal is silent here — the list re-renders unchanged,
- * which is what the operator sees — because this form posts without a state.
+ * « Désactiver » and « Réactiver » share a form. The row stays in the data in
+ * both directions, and each one writes its audit event (D-32). The event names
+ * `goal.archived` and `goal.restored` are the names of the audit trail since
+ * September: they do not change.
  */
 export const archiveGoalAction = async (formData: FormData) => {
   const operator = await requireOperator();
