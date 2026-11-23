@@ -291,8 +291,8 @@ export type Content = {
   signupLink: {
     /** The page title in the browser tab. */
     metaTitle: string;
-    /** Holds `{name}`: the practitioner's name. */
     title: string;
+    /** Holds `{name}`: the practitioner's name. */
     intro: string;
     labels: Record<SignupField, string>;
     hints: { phone: string; password: string };

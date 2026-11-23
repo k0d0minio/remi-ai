@@ -263,9 +263,8 @@ export const fr: Content = {
   },
   signupLink: {
     metaTitle: "Inscription",
-    title: "Inscription chez {name}",
-    intro:
-      "Crée ton compte REMI. Il est rattaché à la personne qui te suit, et t'ouvre le questionnaire à remplir avant la consultation.",
+    title: "Bienvenue sur REMI",
+    intro: "Crée ton compte pour préparer ton accompagnement avec {name}.",
     labels: {
       lastName: "Nom",
       firstName: "Prénom",
@@ -318,8 +317,7 @@ export const fr: Content = {
     submitting: "Création du compte…",
     consent: {
       title: "Tes données personnelles",
-      intro:
-        "Avant de créer ton compte, lis comment REMI traite tes données. Ton compte ne peut pas être créé sans ton accord.",
+      intro: "Avant de continuer, prends connaissance des documents suivants.",
       names: {
         care: "Traitement de tes données pour ton suivi",
         genetic: "Traitement de tes données génétiques",
@@ -431,7 +429,8 @@ export const fr: Content = {
     diet: {
       proposed: "Choix proposé",
       confirm: "Confirmer ce choix",
-      noteRequired: "Précise ton type d'alimentation pour enregistrer « Autre ».",
+      noteRequired:
+        "Précise ton type d'alimentation pour enregistrer « Autre ».",
     },
     genetic: {
       intro:
@@ -460,11 +459,9 @@ export const fr: Content = {
     health: {
       pathologies:
         "As-tu des problèmes de santé ou des pathologies diagnostiquées ?",
-      pathologiesPlaceholder:
-        "Ex. : hypothyroïdie, maladie cœliaque, diabète…",
+      pathologiesPlaceholder: "Ex. : hypothyroïdie, maladie cœliaque, diabète…",
       medications: "Prends-tu actuellement des médicaments ?",
-      medicationsPlaceholder:
-        "Nom des médicaments et dosage si tu le connais…",
+      medicationsPlaceholder: "Nom des médicaments et dosage si tu le connais…",
       supplements: "Prends-tu des compléments alimentaires ?",
       supplementsPlaceholder: "Vitamines, minéraux, plantes…",
     },
@@ -669,8 +666,7 @@ export const fr: Content = {
     },
     kilograms: "{value} kg",
     dietWithNote: "{diet} : {note}",
-    weightSaved:
-      "Ton poids est enregistré. Ton praticien voit ce changement.",
+    weightSaved: "Ton poids est enregistré. Ton praticien voit ce changement.",
     dataLink: "Modifier mes autres données",
     dataLinkHint:
       "Alimentation, allergies, intolérances, activité, poids souhaité, médicaments et compléments.",
@@ -691,8 +687,7 @@ export const fr: Content = {
   patientWaiting: {
     metaTitle: "Ton accompagnement se prépare",
     title: "Ton praticien prépare ton accompagnement",
-    body:
-      "Tes réponses sont bien arrivées. Dès que ton accompagnement est prêt, ton espace REMI s'ouvre ici, avec le même compte.",
+    body: "Tes réponses sont bien arrivées. Dès que ton accompagnement est prêt, ton espace REMI s'ouvre ici, avec le même compte.",
     practitionerLabel: "Ton praticien",
     appointmentLabel: "Ton rendez-vous",
     questionnaireHint: "Tu peux encore adapter tes réponses, à ton rythme.",
@@ -843,8 +838,7 @@ export const fr: Content = {
       unavailable:
         "Ton choix n'a pas pu être enregistré. Réessaie dans un instant.",
     },
-    deletion:
-      "Pour supprimer ton compte, envoie un e-mail à info@remiai.be.",
+    deletion: "Pour supprimer ton compte, envoie un e-mail à info@remiai.be.",
     pause: {
       metaTitle: "Ton espace est en pause",
       title: "Ton espace REMI est en pause",
