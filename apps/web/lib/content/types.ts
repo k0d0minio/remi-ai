@@ -330,8 +330,6 @@ export type Content = {
       /** Holds `{name}`: the consent's name. */
       accept: string;
       reread: string;
-      /** Holds `{consents}`: the names of the unticked consents, joined. */
-      missing: string;
       continue: string;
       back: string;
     };

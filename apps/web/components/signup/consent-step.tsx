@@ -13,8 +13,13 @@ import {
   SheetTrigger,
 } from "@remi/ui";
 import { Typography } from "@remi/ui/server";
+import { cn } from "@remi/ui/utils";
 import type { Content } from "@/lib/content/types";
 import { fill } from "@/lib/content/fill";
+
+/** A link in a text is blue and underlined, with a visible focus (REM-11). */
+const documentClasses =
+  "[&_table]:block [&_table]:overflow-x-auto [&_a]:text-primary [&_a]:font-medium [&_a]:rounded-sm [&_a]:outline-none [&_a:focus-visible]:ring-[3px] [&_a:focus-visible]:ring-ring";
 
 /** One consent text as the page shows it. The server renders the body. */
 export type ConsentStepText = ShownConsent & {
@@ -49,6 +54,9 @@ type Props = {
  *
  * The type follows the charter (section 5, REM-8): the section title is 18 /
  * 24 px at weight 800, the main text 16 / 24 px, the secondary text 14 px.
+ *
+ * « Continuer » stays disabled until each box is ticked. No message repeats
+ * that under the boxes (REM-11).
  */
 export const ConsentStep = ({
   consents,
@@ -59,7 +67,6 @@ export const ConsentStep = ({
   content,
 }: Props) => {
   const missing = consents.filter((consent) => !ticked.has(consent.key));
-  const missingId = "consent-missing";
 
   return (
     <section aria-labelledby="consent-title" className="flex flex-col gap-6">
@@ -103,7 +110,10 @@ export const ConsentStep = ({
               role="region"
               aria-label={name}
               tabIndex={0}
-              className="border-border max-h-72 overflow-y-auto overflow-x-hidden rounded-lg border p-3 [&_table]:block [&_table]:overflow-x-auto"
+              className={cn(
+                "border-border focus-visible:ring-ring max-h-72 overflow-y-auto overflow-x-hidden rounded-lg border p-3 outline-none focus-visible:ring-[3px]",
+                documentClasses,
+              )}
             >
               {consent.body}
             </div>
@@ -113,8 +123,8 @@ export const ConsentStep = ({
                 <Button
                   type="button"
                   variant="outline"
-                  size="lg"
-                  className="min-h-11 self-start"
+                  size="md"
+                  className="self-start"
                 >
                   {content.reread}
                 </Button>
@@ -126,7 +136,7 @@ export const ConsentStep = ({
                 </SheetHeader>
                 <div
                   lang={consent.lang}
-                  className="px-6 pb-6 [&_table]:block [&_table]:overflow-x-auto"
+                  className={cn("px-6 pb-6", documentClasses)}
                 >
                   {consent.body}
                 </div>
@@ -134,15 +144,16 @@ export const ConsentStep = ({
             </Sheet>
 
             <div className="flex min-h-11 items-center gap-3">
+              {/* A 24 px box with a 44 × 44 px touch area (REM-11). */}
               <Checkbox
                 id={boxId}
-                className="size-6"
+                className="relative size-6 after:absolute after:-inset-2.5"
                 checked={ticked.has(consent.key)}
                 onCheckedChange={(checked) =>
                   onToggle(consent.key, checked === true)
                 }
               />
-              <Typography as="label" htmlFor={boxId}>
+              <Typography as="label" htmlFor={boxId} className="cursor-pointer">
                 {fill(content.accept, { name })}
               </Typography>
             </div>
@@ -150,22 +161,13 @@ export const ConsentStep = ({
         );
       })}
 
-      {missing.length > 0 ? (
-        <Typography id={missingId} size="sm" tone="muted">
-          {fill(content.missing, {
-            consents: missing
-              .map((consent) => content.names[consent.key])
-              .join(", "),
-          })}
-        </Typography>
-      ) : null}
-
+      {/* The primary button of the screen: a 56 px pill. Disabled, it turns
+          pale instead of a faded blue, so the patient sees it cannot act. */}
       <Button
         type="button"
         size="lg"
-        className="min-h-11 w-full"
+        className="disabled:bg-muted disabled:text-muted-foreground w-full disabled:opacity-100"
         disabled={missing.length > 0}
-        aria-describedby={missing.length > 0 ? missingId : undefined}
         onClick={onContinue}
       >
         {content.continue}
