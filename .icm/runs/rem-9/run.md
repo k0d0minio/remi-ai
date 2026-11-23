@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-9/inscription-patient-simplifier-lacceptation-des-cgv-et-de-la
 - branch: contact/rem-9-inscription-patient-simplifier-lacceptation
 - lane: tweak
-- pr: pending
+- pr: #240
 - started: 2026-11-23
