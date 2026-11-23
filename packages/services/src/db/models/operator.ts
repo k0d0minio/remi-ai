@@ -18,4 +18,9 @@ export type Operator = Entity & {
   signupLinkToken: string;
   /** The order of the patient list, remembered per practitioner (story 5). */
   patientListSort: PatientListSort;
+  /**
+   * The practitioner's own free question for their patients (REM-161). Null
+   * when they have none.
+   */
+  questionnaireQuestion: string | null;
 };

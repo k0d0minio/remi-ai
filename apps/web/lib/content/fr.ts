@@ -418,6 +418,8 @@ export const fr: Content = {
       medications:
         "Ceux que tu prends aujourd'hui, avec leur dose si tu la connais.",
       supplements: "Vitamines, minéraux, plantes…",
+      practitionerQuestion:
+        "Une question de ton praticien. Réponds librement : ta réponse s'enregistre toute seule.",
     },
     identity: {
       known:

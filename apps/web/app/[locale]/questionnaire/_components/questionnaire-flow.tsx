@@ -57,6 +57,7 @@ export type QuestionnaireValues = GeneticValues &
   desiredWeightKg: string;
   consultationReason: string;
   consultationDate: string;
+  practitionerQuestionAnswer: string;
   diet: string;
   dietNote: string;
   pathologies: string;
@@ -73,6 +74,11 @@ type Props = {
   /** The texts of a date field (REM-159). */
   dateText: Content["dateEntry"];
   values: QuestionnaireValues;
+  /**
+   * The free question of the patient's practitioner (REM-161). Null: the
+   * Consultation step shows no extra field.
+   */
+  practitionerQuestion: string | null;
   /** The genetic consent text, rendered on the server. */
   geneticConsent: ConsentStepText;
   initialMissing: readonly MandatoryQuestionnaireField[];
@@ -96,6 +102,7 @@ export const QuestionnaireFlow = ({
   text,
   dateText,
   values,
+  practitionerQuestion,
   geneticConsent,
   initialMissing,
   initialStep,
@@ -310,6 +317,16 @@ export const QuestionnaireFlow = ({
             dateText={dateText}
             initial={values.consultationDate}
           />
+          {/* The practitioner's own question, after the shared ones. */}
+          {practitionerQuestion ? (
+            <TextAnswer
+              field="practitionerQuestionAnswer"
+              multiline
+              label={<OptionalLabel label={practitionerQuestion} />}
+              hint={text.hints.practitionerQuestion}
+              initial={values.practitionerQuestionAnswer}
+            />
+          ) : null}
         </Section>
 
         <Section

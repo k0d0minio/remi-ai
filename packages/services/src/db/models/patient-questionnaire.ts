@@ -48,6 +48,11 @@ export type PatientQuestionnaire = {
   dio2: Dio2Category | null;
   amy1a: Amy1aCategory | null;
   practitionerQuestionAnswer: string | null;
+  /**
+   * The practitioner's question as the patient read it when they last changed
+   * the answer (REM-161). The service writes it, never a form.
+   */
+  practitionerQuestionText: string | null;
   noKnownAllergies: boolean | null;
   noKnownIntolerances: boolean | null;
 };

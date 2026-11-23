@@ -272,6 +272,12 @@ export const patientProfiles = pgTable("patient_profiles", {
   /** The answer to the practitioner's own free question. */
   practitionerQuestionAnswer: text("practitioner_question_answer"),
   /**
+   * The practitioner's question as the patient read it when they answered
+   * (REM-161). The practitioner can change `operators.questionnaire_question`
+   * later: the file still shows the question that this answer answers.
+   */
+  practitionerQuestionText: text("practitioner_question_text"),
+  /**
    * « Aucune allergie connue » / « Aucune intolérance connue ». `true` is the
    * declared absence, `false` means the patient declared rows, and null is no
    * answer. The story keeps the declared absence distinct from no answer.
@@ -1210,6 +1216,12 @@ export const operators = pgTable("operators", {
    * The default is Morgane's first sort and covers the existing operators.
    */
   patientListSort: text("patient_list_sort").notNull().default("appointment"),
+  /**
+   * The practitioner's own free question (REM-161). The questionnaire of each
+   * of their patients shows it in the Consultation step. Null: no question,
+   * and the step shows nothing more.
+   */
+  questionnaireQuestion: text("questionnaire_question"),
   ...timestamps,
 });
 

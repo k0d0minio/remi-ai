@@ -2,10 +2,12 @@
 
 import { useActionState } from "react";
 import { Button } from "@remi/ui";
-import { Field, Input, Typography } from "@remi/ui/server";
+import { QUESTIONNAIRE_QUESTION_MAX } from "@remi/services/shared";
+import { Field, Input, Textarea, Typography } from "@remi/ui/server";
 import {
   changePasswordAction,
   updateAccountNameAction,
+  updateQuestionnaireQuestionAction,
   type AccountFormState,
 } from "@/lib/operators/actions";
 
@@ -60,6 +62,47 @@ export const NameForm = ({ name }: { name: string }) => {
           autoComplete="name"
           required
           defaultValue={name}
+        />
+      </Field>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <Button type="submit" disabled={pending}>
+          {pending ? "Enregistrement…" : "Enregistrer"}
+        </Button>
+        <Status state={state} pending={pending} savedLabel="Enregistré." />
+      </div>
+    </form>
+  );
+};
+
+/**
+ * Your own free question for your patients (REM-161). Their questionnaire
+ * shows it in the Consultation step. An empty field removes it.
+ */
+export const QuestionnaireQuestionForm = ({
+  question,
+}: {
+  question: string;
+}) => {
+  const [state, action, pending] = useActionState(
+    updateQuestionnaireQuestionAction,
+    initial,
+  );
+
+  return (
+    <form action={action} className="flex flex-col gap-4">
+      <Field
+        id="questionnaire-question"
+        label="Ma question"
+        hint={`Facultative. Laissez le champ vide pour ne poser aucune question. ${QUESTIONNAIRE_QUESTION_MAX} caractères au plus.`}
+      >
+        <Textarea
+          id="questionnaire-question"
+          name="question"
+          rows={3}
+          maxLength={QUESTIONNAIRE_QUESTION_MAX}
+          placeholder="Par exemple : Y a-t-il un point que vous souhaitez aborder en priorité ?"
+          defaultValue={question}
         />
       </Field>
 

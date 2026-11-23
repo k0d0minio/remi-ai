@@ -194,6 +194,15 @@ export const ProfileSummary = ({
         ? geneticTestAnswerLabels[answers.geneticTest].fr
         : null,
     },
+    // The question as the patient read it, once they answered (REM-161).
+    ...(answers.practitionerQuestionAnswer
+      ? [
+          {
+            label: "Question du praticien",
+            value: answers.practitionerQuestionText,
+          },
+        ]
+      : []),
     {
       label: "Réponse à la question du praticien",
       value: answers.practitionerQuestionAnswer,

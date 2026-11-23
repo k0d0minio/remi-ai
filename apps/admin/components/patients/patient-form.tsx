@@ -361,6 +361,11 @@ export const PatientForm = ({
               <Field
                 id="practitionerQuestionAnswer"
                 label="Question du praticien : réponse du patient"
+                hint={
+                  questionnaire?.answers.practitionerQuestionText
+                    ? `Question posée : « ${questionnaire.answers.practitionerQuestionText} »`
+                    : undefined
+                }
               >
                 <Textarea
                   id="practitionerQuestionAnswer"
