@@ -323,8 +323,11 @@ export const fr: Content = {
         genetic: "Traitement de tes données génétiques",
       },
       version: "Version {version} du {date}",
-      accept: "J'ai lu et j'accepte : {name}.",
-      reread: "Relire",
+      documents: {
+        terms: "Conditions générales de vente",
+        privacy: "Politique de confidentialité",
+      },
+      accept: "J'accepte les {terms} et la {privacy}.",
       continue: "Continuer",
       back: "Revoir mes consentements",
     },

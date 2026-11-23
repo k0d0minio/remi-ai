@@ -12,7 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@remi/ui";
-import { Typography } from "@remi/ui/server";
+import { Typography, linkVariants } from "@remi/ui/server";
 import { cn } from "@remi/ui/utils";
 import type { Content } from "@/lib/content/types";
 import { fill } from "@/lib/content/fill";
@@ -21,8 +21,9 @@ import { fill } from "@/lib/content/fill";
 const documentClasses =
   "[&_table]:block [&_table]:overflow-x-auto [&_a]:text-primary [&_a]:font-medium [&_a]:rounded-sm [&_a]:outline-none [&_a:focus-visible]:ring-[3px] [&_a:focus-visible]:ring-ring";
 
-/** One consent text as the page shows it. The server renders the body. */
-export type ConsentStepText = ShownConsent & {
+/** One document as the page shows it. The server renders the body. */
+export type ConsentStepDocument = {
+  version: string;
   /** The text's date, formatted for the page's language. */
   date: string;
   /** The `lang` of the text block: the text's language, not the page's. */
@@ -30,8 +31,13 @@ export type ConsentStepText = ShownConsent & {
   body: ReactNode;
 };
 
+/** One consent text as the page shows it. */
+export type ConsentStepText = ShownConsent & ConsentStepDocument;
+
 type Props = {
   consents: readonly ConsentStepText[];
+  /** The pilot's sales terms (CGV). No row records their version (REM-9). */
+  terms: ConsentStepDocument;
   ticked: ReadonlySet<ConsentKey>;
   onToggle: (key: ConsentKey, checked: boolean) => void;
   onContinue: () => void;
@@ -40,37 +46,113 @@ type Props = {
   content: Content["signupLink"]["consent"];
 };
 
+type DocumentLinkProps = {
+  name: string;
+  document: ConsentStepDocument;
+  versionText: string;
+};
+
 /**
- * The consent step (story 3): the patient reads each mandatory text and ticks
- * one box per text before the form opens. Nothing goes to the server here. The
- * ticks travel with the final submit, and the server checks them again.
+ * A document name in the sentence of the box. It opens the document in a
+ * full-height sheet, on the same page. Closing the sheet gives the focus back
+ * to the link.
+ */
+const DocumentLink = ({ name, document, versionText }: DocumentLinkProps) => {
+  const version = fill(versionText, {
+    version: document.version,
+    date: document.date,
+  });
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            linkVariants({ variant: "primary" }),
+            "cursor-pointer font-medium underline",
+          )}
+        >
+          {name}
+        </button>
+      </SheetTrigger>
+      <SheetContent className="bg-card w-full overflow-y-auto sm:max-w-xl">
+        <SheetHeader className="pl-5 pr-12 pt-5 sm:pl-6 sm:pt-6">
+          <SheetTitle>{name}</SheetTitle>
+          <SheetDescription>{version}</SheetDescription>
+        </SheetHeader>
+        <div
+          lang={document.lang}
+          className={cn("px-5 pb-6 sm:px-6", documentClasses)}
+        >
+          {document.body}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+};
+
+/**
+ * The consent step (story 3): one box accepts the sales terms (CGV) and the
+ * privacy policy before the form opens (REM-9). Each document name is a link
+ * that opens the document in a sheet, with no change of page. Nothing goes to
+ * the server here. The tick travels with the final submit, and the server
+ * checks it again.
  *
- * Each text shows in full in a scroll block. « Relire » opens it again in a
- * full-height sheet, which reads better on a phone.
+ * The privacy policy is the text of the mandatory `care` consent. The box
+ * ticks each mandatory consent, so the form posts and the server records the
+ * same rows as before: the date, the version and the hash of that text. The
+ * CGV have no row (Jamie, 2026-11-23).
  *
- * The look follows the charter (sections 4 and 6, REM-6): each text is a white
- * card with a 24 px radius and a light border on the page's pale blue, and the
- * sheet is a white surface too.
+ * The sentence is not one `<label>`: a label may not hold the two links. The
+ * text between the links is in small labels of the box, so a tap on it ticks
+ * the box. The box takes its name from the whole sentence.
+ *
+ * The look follows the charter (sections 4 and 6, REM-6): the box is in a
+ * white card with a 24 px radius and a light border on the page's pale blue,
+ * and the sheet is a white surface too.
  *
  * The type follows the charter (section 5, REM-8): the section title is 18 /
  * 24 px at weight 800, the main text 16 / 24 px, the secondary text 14 px.
  *
- * « Continuer » stays disabled until each box is ticked. No message repeats
- * that under the boxes (REM-11).
+ * « Continuer » stays disabled until the box is ticked. No message repeats
+ * that under the box (REM-11).
  *
  * On a phone the sheet takes the full width, with the 20 px margin of the
- * page. The ticks live in the form, so opening and closing a sheet keeps
- * them (REM-12).
+ * page. The tick lives in the form, so opening and closing a sheet keeps it
+ * (REM-12).
  */
 export const ConsentStep = ({
   consents,
+  terms,
   ticked,
   onToggle,
   onContinue,
   alert,
   content,
 }: Props) => {
-  const missing = consents.filter((consent) => !ticked.has(consent.key));
+  const accepted = consents.every((consent) => ticked.has(consent.key));
+  const privacy = consents.find((consent) => consent.key === "care");
+  const boxId = "consent-accept";
+  const sentenceId = "consent-accept-text";
+
+  const links: Record<string, ReactNode> = {
+    "{terms}": (
+      <DocumentLink
+        name={content.documents.terms}
+        document={terms}
+        versionText={content.version}
+      />
+    ),
+    "{privacy}": privacy ? (
+      <DocumentLink
+        name={content.documents.privacy}
+        document={privacy}
+        versionText={content.version}
+      />
+    ) : (
+      content.documents.privacy
+    ),
+  };
 
   return (
     <section aria-labelledby="consent-title" className="flex flex-col gap-6">
@@ -87,83 +169,34 @@ export const ConsentStep = ({
         </Typography>
       ) : null}
 
-      {consents.map((consent) => {
-        const name = content.names[consent.key];
-        const version = fill(content.version, {
-          version: consent.version,
-          date: consent.date,
-        });
-        const boxId = `consent-${consent.key}`;
-        return (
-          <div
-            key={consent.key}
-            className="border-border bg-card flex flex-col gap-3 rounded-2xl border p-4"
-          >
-            <div className="flex flex-col gap-1">
-              <Typography as="h3" size="base" weight="semibold">
-                {name}
-              </Typography>
-              <Typography size="sm" tone="muted">
-                {version}
-              </Typography>
-            </div>
-
-            {/* Focusable so a keyboard can scroll it. Wide tables scroll inside it, never the page. */}
-            <div
-              lang={consent.lang}
-              role="region"
-              aria-label={name}
-              tabIndex={0}
-              className={cn(
-                "border-border focus-visible:ring-ring max-h-72 overflow-y-auto overflow-x-hidden rounded-lg border p-3 outline-none focus-visible:ring-[3px]",
-                documentClasses,
-              )}
-            >
-              {consent.body}
-            </div>
-
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="md"
-                  className="self-start"
-                >
-                  {content.reread}
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="bg-card w-full overflow-y-auto sm:max-w-xl">
-                <SheetHeader className="pl-5 pr-12 pt-5 sm:pl-6 sm:pt-6">
-                  <SheetTitle>{name}</SheetTitle>
-                  <SheetDescription>{version}</SheetDescription>
-                </SheetHeader>
-                <div
-                  lang={consent.lang}
-                  className={cn("px-5 pb-6 sm:px-6", documentClasses)}
-                >
-                  {consent.body}
-                </div>
-              </SheetContent>
-            </Sheet>
-
-            <div className="flex min-h-11 items-center gap-3">
-              {/* A 24 px box with a 44 × 44 px touch area (REM-11). */}
-              <Checkbox
-                id={boxId}
-                className="relative size-6 after:absolute after:-inset-2.5"
-                checked={ticked.has(consent.key)}
-                onCheckedChange={(checked) =>
-                  onToggle(consent.key, checked === true)
-                }
-              />
-              <Typography as="label" htmlFor={boxId} className="cursor-pointer">
-                {fill(content.accept, { name })}
-              </Typography>
-            </div>
-          </div>
-        );
-      })}
+      <div className="border-border bg-card flex min-h-11 items-start gap-3 rounded-2xl border p-4">
+        {/* A 24 px box with a 44 × 44 px touch area (REM-11). */}
+        <Checkbox
+          id={boxId}
+          aria-labelledby={sentenceId}
+          className="relative size-6 shrink-0 after:absolute after:-inset-2.5"
+          checked={accepted}
+          onCheckedChange={(checked) => {
+            for (const consent of consents) {
+              onToggle(consent.key, checked === true);
+            }
+          }}
+        />
+        <Typography id={sentenceId}>
+          {content.accept
+            .split(/(\{terms\}|\{privacy\})/)
+            .filter((part) => part !== "")
+            .map((part, index) =>
+              part in links ? (
+                <span key={part}>{links[part]}</span>
+              ) : (
+                <label key={index} htmlFor={boxId} className="cursor-pointer">
+                  {part}
+                </label>
+              ),
+            )}
+        </Typography>
+      </div>
 
       {/* The primary button of the screen: a 56 px pill. Disabled, it turns
           pale instead of a faded blue, so the patient sees it cannot act. */}
@@ -171,7 +204,7 @@ export const ConsentStep = ({
         type="button"
         size="lg"
         className="disabled:bg-muted disabled:text-muted-foreground w-full disabled:opacity-100"
-        disabled={missing.length > 0}
+        disabled={!accepted}
         onClick={onContinue}
       >
         {content.continue}

@@ -9,7 +9,7 @@ import { getContent } from "@/lib/content";
 import { fill } from "@/lib/content/fill";
 import { ensureDatabase } from "@/lib/database";
 import { SIGN_IN_PATH } from "@/lib/patient-auth/paths";
-import { consentTexts } from "@/lib/signup/consent-texts";
+import { consentTexts, salesTermsDocument } from "@/lib/signup/consent-texts";
 
 /** Reads the database on every hit — never prerendered. */
 export const dynamic = "force-dynamic";
@@ -23,7 +23,8 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const { locale } = await params;
   return {
-    title: getContent(isLocale(locale) ? locale : defaultLocale).takeover.metaTitle,
+    title: getContent(isLocale(locale) ? locale : defaultLocale).takeover
+      .metaTitle,
     // A one-time credential lives in the URL: no other site it links to reads
     // it. Not "no-referrer": that policy sends `Origin: null` on the form's
     // POST, and Next.js then refuses the server action.
@@ -86,12 +87,15 @@ const TakeoverPage = async ({ params }: { params: Promise<Params> }) => {
             content={content}
             consentContent={all.signupLink.consent}
             consents={consentTexts(locale)}
+            terms={salesTermsDocument(locale)}
           />
         </>
       ) : (
         <>
           <Typography size="sm" tone="muted">
-            {target.error === "has_account" ? content.hasAccount : content.spent}
+            {target.error === "has_account"
+              ? content.hasAccount
+              : content.spent}
           </Typography>
           {signIn}
         </>

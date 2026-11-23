@@ -1,4 +1,4 @@
-import { currentConsentText } from "@remi/services/server";
+import { currentConsentText, currentSalesTerms } from "@remi/services/server";
 import {
   consentTextLocaleFor,
   formatDate,
@@ -6,7 +6,10 @@ import {
   type Locale,
 } from "@remi/services/shared";
 import { Markdown } from "@remi/ui/server";
-import type { ConsentStepText } from "@/components/signup/consent-step";
+import type {
+  ConsentStepDocument,
+  ConsentStepText,
+} from "@/components/signup/consent-step";
 
 /**
  * The mandatory consent texts in French, the one language of the texts. The body renders here, on the server: `Markdown`
@@ -26,3 +29,15 @@ export const consentTexts = (locale: Locale): ConsentStepText[] =>
       body: <Markdown>{text.body}</Markdown>,
     };
   });
+
+/** The pilot's sales terms (CGV), the box's other link (REM-9). */
+export const salesTermsDocument = (locale: Locale): ConsentStepDocument => {
+  const text = currentSalesTerms(consentTextLocaleFor(locale));
+  return {
+    version: text.version,
+    // Noon UTC: the same calendar day in every time zone of Europe.
+    date: formatDate(`${text.date}T12:00:00Z`),
+    lang: "fr",
+    body: <Markdown>{text.body}</Markdown>,
+  };
+};

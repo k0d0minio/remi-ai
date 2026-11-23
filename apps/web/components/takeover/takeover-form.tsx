@@ -12,6 +12,7 @@ import { Button } from "@remi/ui";
 import { Field, Input, Link, Typography } from "@remi/ui/server";
 import {
   ConsentStep,
+  type ConsentStepDocument,
   type ConsentStepText,
 } from "@/components/signup/consent-step";
 import type { Content } from "@/lib/content/types";
@@ -31,6 +32,8 @@ type Props = {
   consentContent: Content["signupLink"]["consent"];
   /** The mandatory consent texts, rendered on the server (story 3). */
   consents: readonly ConsentStepText[];
+  /** The pilot's sales terms (CGV), rendered on the server (REM-9). */
+  terms: ConsentStepDocument;
 };
 
 /**
@@ -48,6 +51,7 @@ export const TakeoverForm = ({
   content,
   consentContent,
   consents,
+  terms,
 }: Props) => {
   const [state, formAction, pending] = useActionState(
     takeOverAction,
@@ -97,15 +101,14 @@ export const TakeoverForm = ({
       <div hidden={active !== "consent"}>
         <ConsentStep
           consents={consents}
+          terms={terms}
           ticked={ticked}
           onToggle={toggle}
           onContinue={() => {
             setPassed(state);
             setStep("password");
           }}
-          alert={
-            consentRefused && state.form ? content.form[state.form] : null
-          }
+          alert={consentRefused && state.form ? content.form[state.form] : null}
           content={consentContent}
         />
       </div>

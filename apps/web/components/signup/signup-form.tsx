@@ -25,7 +25,11 @@ import {
   isConsentError,
   type SignupState,
 } from "@/lib/signup/state";
-import { ConsentStep, type ConsentStepText } from "./consent-step";
+import {
+  ConsentStep,
+  type ConsentStepDocument,
+  type ConsentStepText,
+} from "./consent-step";
 
 type Props = {
   /** The practitioner's link token, from the route. */
@@ -36,6 +40,8 @@ type Props = {
   dateText: Content["dateEntry"];
   /** The mandatory consent texts, rendered on the server (story 3). */
   consents: readonly ConsentStepText[];
+  /** The pilot's sales terms (CGV), rendered on the server (REM-9). */
+  terms: ConsentStepDocument;
 };
 
 /** The control of each field: its type and what the browser may fill in. */
@@ -52,10 +58,9 @@ const controls: Record<
   password: { type: "password", autoComplete: "new-password" },
 };
 
-const empty = Object.fromEntries(signupFields.map((name) => [name, ""])) as Record<
-  SignupField,
-  string
->;
+const empty = Object.fromEntries(
+  signupFields.map((name) => [name, ""]),
+) as Record<SignupField, string>;
 
 /**
  * The sign-up form (story 2): one column, one field per row, targets of 44 px
@@ -77,6 +82,7 @@ export const SignupForm = ({
   content,
   dateText,
   consents,
+  terms,
 }: Props) => {
   const [state, formAction, pending] = useActionState(
     signUpAction,
@@ -141,15 +147,14 @@ export const SignupForm = ({
       <div hidden={active !== "consent"}>
         <ConsentStep
           consents={consents}
+          terms={terms}
           ticked={ticked}
           onToggle={toggle}
           onContinue={() => {
             setPassed(state);
             setStep("details");
           }}
-          alert={
-            consentRefused && state.form ? content.form[state.form] : null
-          }
+          alert={consentRefused && state.form ? content.form[state.form] : null}
           content={content.consent}
         />
       </div>
@@ -170,7 +175,9 @@ export const SignupForm = ({
             {formError
               ? content.form[formError]
               : fill(content.summary, {
-                  fields: refused.map((name) => content.labels[name]).join(", "),
+                  fields: refused
+                    .map((name) => content.labels[name])
+                    .join(", "),
                 })}
             {/* A known e-mail goes to sign-in, never to a second file. The
                 message names no data of that file. */}
@@ -244,17 +251,17 @@ export const SignupForm = ({
                   error={message(name)}
                 >
                   <DateInput
-                  id={id}
-                  autoComplete={control.autoComplete}
-                  required
-                  size="lg"
-                  className="min-h-11"
-                  placeholder={dateText.placeholder}
-                  invalid={Boolean(state.fields.birthDate)}
-                  value={typed}
-                  onValueChange={(next) =>
-                    setValues((current) => ({ ...current, birthDate: next }))
-                  }
+                    id={id}
+                    autoComplete={control.autoComplete}
+                    required
+                    size="lg"
+                    className="min-h-11"
+                    placeholder={dateText.placeholder}
+                    invalid={Boolean(state.fields.birthDate)}
+                    value={typed}
+                    onValueChange={(next) =>
+                      setValues((current) => ({ ...current, birthDate: next }))
+                    }
                   />
                 </Field>
               </Fragment>

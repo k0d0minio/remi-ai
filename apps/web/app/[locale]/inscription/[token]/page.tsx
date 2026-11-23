@@ -7,7 +7,7 @@ import { SignupForm } from "@/components/signup/signup-form";
 import { getContent } from "@/lib/content";
 import { fill } from "@/lib/content/fill";
 import { ensureDatabase } from "@/lib/database";
-import { consentTexts } from "@/lib/signup/consent-texts";
+import { consentTexts, salesTermsDocument } from "@/lib/signup/consent-texts";
 
 /** Reads the database on every hit — never prerendered. */
 export const dynamic = "force-dynamic";
@@ -69,6 +69,7 @@ const SignupLinkPage = async ({ params }: { params: Promise<Params> }) => {
         content={content}
         dateText={dictionary.dateEntry}
         consents={consentTexts(locale)}
+        terms={salesTermsDocument(locale)}
       />
     </main>
   );

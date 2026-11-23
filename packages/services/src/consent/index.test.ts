@@ -10,6 +10,8 @@ import {
   consentText,
   consentTexts,
   currentConsentText,
+  currentSalesTerms,
+  salesTermsTexts,
 } from "./index";
 
 /**
@@ -78,6 +80,33 @@ describe("consent texts", () => {
     const text = currentConsentText("genetic", "en");
     expect(text.locale).toBe("fr-BE");
     expect(text.version).toBe("2");
+  });
+});
+
+describe("the sales terms (REM-9)", () => {
+  it("pins the hash of every published file", () => {
+    expect(
+      Object.fromEntries(
+        salesTermsTexts.map((text) => [
+          `cgv/${text.version}/${text.locale}`,
+          text.hash,
+        ]),
+      ),
+    ).toEqual({
+      "cgv/1/fr-BE":
+        "5e17d3c76f0c744b91e46fca55269e08a7f4567a92297e06232284f75741db42",
+    });
+  });
+
+  it("shows version 1, the public site's CGV with its draft banner", () => {
+    const terms = currentSalesTerms("fr-BE");
+    expect(terms.version).toBe("1");
+    expect(terms.body).toContain("# Conditions Générales de Vente");
+    expect(terms.body).toContain("à faire valider par un juriste");
+  });
+
+  it("falls back to fr-BE when the language has no text yet", () => {
+    expect(currentSalesTerms("en").locale).toBe("fr-BE");
   });
 });
 
