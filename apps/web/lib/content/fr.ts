@@ -325,7 +325,6 @@ export const fr: Content = {
       version: "Version {version} du {date}",
       accept: "J'ai lu et j'accepte : {name}.",
       reread: "Relire",
-      missing: "Coche pour continuer : {consents}.",
       continue: "Continuer",
       back: "Revoir mes consentements",
     },
