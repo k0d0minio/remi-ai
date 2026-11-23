@@ -50,7 +50,9 @@ const SignupLinkPage = async ({ params }: { params: Promise<Params> }) => {
   const content = dictionary.signupLink;
 
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-col gap-8 px-4 py-10">
+    // One column with the 20 px side margin of the charter. A phone gets less
+    // space above and below the logo, so the documents show sooner (REM-12).
+    <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-5 py-6 sm:gap-8 sm:py-10">
       <Wordmark />
       {/* The screen title of the charter: 32 / 38 px at weight 800 (REM-8). */}
       <header className="flex flex-col gap-2">

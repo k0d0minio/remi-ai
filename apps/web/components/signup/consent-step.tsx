@@ -57,6 +57,10 @@ type Props = {
  *
  * « Continuer » stays disabled until each box is ticked. No message repeats
  * that under the boxes (REM-11).
+ *
+ * On a phone the sheet takes the full width, with the 20 px margin of the
+ * page. The ticks live in the form, so opening and closing a sheet keeps
+ * them (REM-12).
  */
 export const ConsentStep = ({
   consents,
@@ -130,13 +134,13 @@ export const ConsentStep = ({
                 </Button>
               </SheetTrigger>
               <SheetContent className="bg-card w-full overflow-y-auto sm:max-w-xl">
-                <SheetHeader className="pr-12">
+                <SheetHeader className="pl-5 pr-12 pt-5 sm:pl-6 sm:pt-6">
                   <SheetTitle>{name}</SheetTitle>
                   <SheetDescription>{version}</SheetDescription>
                 </SheetHeader>
                 <div
                   lang={consent.lang}
-                  className={cn("px-6 pb-6", documentClasses)}
+                  className={cn("px-5 pb-6 sm:px-6", documentClasses)}
                 >
                   {consent.body}
                 </div>
