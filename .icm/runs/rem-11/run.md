@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-11/inscription-patient-harmoniser-les-boutons-et-interactions
 - branch: contact/rem-11-inscription-patient-harmoniser-les-boutons-et
 - lane: tweak
-- pr: pending
+- pr: #237
 - started: 2026-11-23
