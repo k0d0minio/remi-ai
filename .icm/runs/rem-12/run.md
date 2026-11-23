@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-12/inscription-patient-adapter-laffichage-mobile
 - branch: contact/rem-12-inscription-patient-adapter-laffichage-mobile
 - lane: tweak
-- pr: pending
+- pr: #238
 - started: 2026-11-23
