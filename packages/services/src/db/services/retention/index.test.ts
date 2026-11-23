@@ -56,6 +56,7 @@ const seed = async (email = "claire@example.be") => {
       role: "admin",
       signupLinkToken: "t".repeat(32),
       patientListSort: "appointment",
+      questionnaireQuestion: null,
     });
   const patient = unwrapOk(
     await createPatient(systemActor, {
