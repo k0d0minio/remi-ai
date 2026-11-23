@@ -44,12 +44,16 @@ export const RadioCard = ({
   ...props
 }: Props) => (
   <label data-slot="radio-card" className={cn(card({ size }), className)}>
+    {/*
+     * The circle is drawn here, not by the browser (REM-205). A native radio
+     * fills its box to the edge, so a phone's sub-pixel layout cut its rim.
+     * Here the rim is a border inside a 20 px box, the dot an inset shadow.
+     * 20 px is the line height of the label, so the circle sits on its first
+     * line. In forced colours the native control comes back.
+     */}
     <input
       type="radio"
-      className={cn(
-        "accent-primary size-4 shrink-0",
-        size === "compact" ? "" : "mt-0.5",
-      )}
+      className="border-muted-foreground bg-card checked:border-primary checked:bg-primary ease-standard size-5 shrink-0 cursor-[inherit] appearance-none rounded-full border-2 outline-none transition-colors duration-[--duration-fast] checked:shadow-[inset_0_0_0_3px_var(--color-card)] forced-colors:appearance-auto"
       {...props}
     />
     <span className="flex min-w-0 flex-col gap-0.5">
