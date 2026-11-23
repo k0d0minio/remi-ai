@@ -42,6 +42,10 @@ type Props = {
  *
  * Each text shows in full in a scroll block. « Relire » opens it again in a
  * full-height sheet, which reads better on a phone.
+ *
+ * The look follows the charter (sections 4 and 6, REM-6): each text is a white
+ * card with a 24 px radius and a light border on the page's pale blue, and the
+ * sheet is a white surface too.
  */
 export const ConsentStep = ({
   consents,
@@ -79,7 +83,7 @@ export const ConsentStep = ({
         return (
           <div
             key={consent.key}
-            className="border-border flex flex-col gap-3 rounded-md border p-4"
+            className="border-border bg-card flex flex-col gap-3 rounded-2xl border p-4"
           >
             <div className="flex flex-col gap-1">
               <Typography as="h3" size="base" weight="semibold">
@@ -96,7 +100,7 @@ export const ConsentStep = ({
               role="region"
               aria-label={name}
               tabIndex={0}
-              className="border-border max-h-72 overflow-y-auto overflow-x-hidden rounded-sm border p-3 [&_table]:block [&_table]:overflow-x-auto"
+              className="border-border max-h-72 overflow-y-auto overflow-x-hidden rounded-lg border p-3 [&_table]:block [&_table]:overflow-x-auto"
             >
               {consent.body}
             </div>
@@ -112,7 +116,7 @@ export const ConsentStep = ({
                   {content.reread}
                 </Button>
               </SheetTrigger>
-              <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
+              <SheetContent className="bg-card w-full overflow-y-auto sm:max-w-xl">
                 <SheetHeader className="pr-12">
                   <SheetTitle>{name}</SheetTitle>
                   <SheetDescription>{version}</SheetDescription>
