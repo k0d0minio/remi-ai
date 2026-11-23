@@ -2,16 +2,24 @@
 
 ## Next action
 
-<What the next session, or the operator, does first.>
+Jamie lit la spec et coche **Spec approved** sur https://github.com/k0d0minio/remi-ai/pull/239.
+Puis il dit `build REM-161`.
+
+Choix à vérifier avant l'approbation :
+- Une seule question par praticien (le ticket dit « une question libre »).
+- Le praticien écrit la question sur la page « Mon compte » de la console.
+- Le dossier garde le texte de la question que le patient a lu, même si le praticien la change.
+- Longueur maximale : 500 caractères pour la question, 5 000 pour la réponse.
 
 ## How to test
 
-<1 to 3 short sentences that can be said aloud: where to go on the preview, what to do, what the operator must see.>
+À écrire au Build.
 
 ## Blockers
 
-- none
+- Spec approved n'est pas coché.
 
 ## Do not touch
 
-- none
+- La page d'inscription (REM-9 la change en parallèle).
+- La base de production.
