@@ -46,6 +46,9 @@ type Props = {
  * The look follows the charter (sections 4 and 6, REM-6): each text is a white
  * card with a 24 px radius and a light border on the page's pale blue, and the
  * sheet is a white surface too.
+ *
+ * The type follows the charter (section 5, REM-8): the section title is 18 /
+ * 24 px at weight 800, the main text 16 / 24 px, the secondary text 14 px.
  */
 export const ConsentStep = ({
   consents,
@@ -59,13 +62,13 @@ export const ConsentStep = ({
   const missingId = "consent-missing";
 
   return (
-    <section aria-labelledby="consent-title" className="flex flex-col gap-5">
-      <Typography as="h2" id="consent-title" size="xl" weight="semibold">
-        {content.title}
-      </Typography>
-      <Typography size="sm" tone="muted">
-        {content.intro}
-      </Typography>
+    <section aria-labelledby="consent-title" className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <Typography as="h2" id="consent-title" size="lg" weight="bold">
+          {content.title}
+        </Typography>
+        <Typography tone="muted">{content.intro}</Typography>
+      </div>
 
       {alert ? (
         <Typography size="sm" className="text-error-text" role="alert">
@@ -89,7 +92,7 @@ export const ConsentStep = ({
               <Typography as="h3" size="base" weight="semibold">
                 {name}
               </Typography>
-              <Typography size="xs" tone="muted">
+              <Typography size="sm" tone="muted">
                 {version}
               </Typography>
             </div>
@@ -139,7 +142,7 @@ export const ConsentStep = ({
                   onToggle(consent.key, checked === true)
                 }
               />
-              <Typography as="label" htmlFor={boxId} size="sm">
+              <Typography as="label" htmlFor={boxId}>
                 {fill(content.accept, { name })}
               </Typography>
             </div>
