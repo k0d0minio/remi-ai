@@ -12,7 +12,7 @@ au plus. Réponse : 5 000 caractères au plus.
 
 ## Acceptance criteria
 
-- Migration et `db:verify` : faits. Le build de la preview admin les a passés (CI GREEN à 7a50147).
+- Migration et `db:verify` : faits. Le build de la preview admin les a passés (CI GREEN à 226aa30).
 - « Mon compte » : enregistrer, changer, effacer. Les tests du service le prouvent dans CI.
   Pas vérifié sur la preview : la console demande une connexion.
 - Étape Consultation, sauvegarde automatique, pas de champ sans question, réponse facultative,
