@@ -10,12 +10,14 @@ import {
   operatorInvitationEmail,
   revokeInvitation,
   sendEmail,
+  setOperatorQuestionnaireQuestion,
   setOperatorRole,
   updateOperatorName,
 } from "@remi/services/server";
 import {
   appHref,
   operatorRoles,
+  QUESTIONNAIRE_QUESTION_MAX,
   userMessage,
   type OperatorRoleName,
 } from "@remi/services/shared";
@@ -219,6 +221,33 @@ export const updateAccountNameAction = async (
   }
   revalidatePath("/account");
   revalidatePath("/team");
+  return { error: null, saved: true };
+};
+
+/**
+ * Sets, changes or clears your own free question for your patients
+ * (REM-161). An empty field clears it.
+ */
+export const updateQuestionnaireQuestionAction = async (
+  _previous: AccountFormState,
+  formData: FormData,
+): Promise<AccountFormState> => {
+  const operator = await requireOperator();
+  ensureDatabase();
+  const result = await setOperatorQuestionnaireQuestion(
+    operator.id,
+    field(formData, "question"),
+  );
+  if (!result.ok) {
+    return {
+      error:
+        result.error === "invalid_input"
+          ? `La question compte au plus ${QUESTIONNAIRE_QUESTION_MAX} caractères.`
+          : userMessage(result),
+      saved: false,
+    };
+  }
+  revalidatePath("/account");
   return { error: null, saved: true };
 };
 

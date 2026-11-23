@@ -7,6 +7,7 @@ import {
   getPatientQuestionnaire,
   missingQuestionnaireFields,
   patientActor,
+  practitionerQuestionOf,
 } from "@remi/services/server";
 import { defaultLocale, isLocale } from "@remi/services/shared";
 import { Wordmark } from "@remi/ui/server";
@@ -62,12 +63,14 @@ const QuestionnairePage = async ({
   }
   const account = await requirePatient(locale);
   const patientId = account.patientProfileId;
-  const [patient, questionnaire, missing, consents] = await Promise.all([
-    getPatient(patientActor(patientId), patientId),
-    getPatientQuestionnaire(patientActor(patientId), patientId),
-    missingQuestionnaireFields(patientActor(patientId), patientId),
-    consentsOf(patientActor(patientId), patientId),
-  ]);
+  const [patient, questionnaire, missing, consents, practitionerQuestion] =
+    await Promise.all([
+      getPatient(patientActor(patientId), patientId),
+      getPatientQuestionnaire(patientActor(patientId), patientId),
+      missingQuestionnaireFields(patientActor(patientId), patientId),
+      consentsOf(patientActor(patientId), patientId),
+      practitionerQuestionOf(patientActor(patientId), patientId),
+    ]);
   if (!patient.ok || !questionnaire.ok || !missing.ok) {
     notFound();
   }
@@ -90,6 +93,7 @@ const QuestionnairePage = async ({
     desiredWeightKg: kilograms(answers.desiredWeightKg),
     consultationReason: answers.consultationReason ?? "",
     consultationDate: answers.consultationDate ?? "",
+    practitionerQuestionAnswer: answers.practitionerQuestionAnswer ?? "",
     diet: answers.diet ?? "",
     dietNote: answers.dietNote ?? "",
     pathologies: answers.pathologies ?? "",
@@ -113,6 +117,9 @@ const QuestionnairePage = async ({
         text={content.questionnaire}
         dateText={content.dateEntry}
         values={values}
+        practitionerQuestion={
+          practitionerQuestion.ok ? practitionerQuestion.data : null
+        }
         geneticConsent={geneticConsentText(locale)}
         initialMissing={missing.data}
         initialStep={startStep(section, lastStep, missing.data)}

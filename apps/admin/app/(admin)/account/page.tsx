@@ -9,7 +9,11 @@ import {
   CardTitle,
   Typography,
 } from "@remi/ui/server";
-import { NameForm, PasswordForm } from "@/components/operators/account-forms";
+import {
+  NameForm,
+  PasswordForm,
+  QuestionnaireQuestionForm,
+} from "@/components/operators/account-forms";
 import { SignupLink } from "@/components/operators/signup-link";
 import {
   roleDescriptions,
@@ -66,6 +70,22 @@ const Account = async () => {
               `/inscription/${operator.signupLinkToken}`,
               "fr",
             )}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Ma question pour mes patients</CardTitle>
+          <CardDescription>
+            Le questionnaire de vos patients affiche cette question dans
+            l&apos;étape Consultation, après les questions communes. Le patient
+            répond librement, et vous lisez sa réponse dans son dossier.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <QuestionnaireQuestionForm
+            question={operator.questionnaireQuestion ?? ""}
           />
         </CardContent>
       </Card>

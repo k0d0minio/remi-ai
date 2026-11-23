@@ -306,6 +306,7 @@ export {
   isPatientListSort,
   operatorRoles,
   patientListSorts,
+  QUESTIONNAIRE_QUESTION_MAX,
 } from "./operator";
 export type { OperatorRoleName, PatientListSort } from "./operator";
 export {

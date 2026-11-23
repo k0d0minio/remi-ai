@@ -23,11 +23,13 @@ import {
   macroProfileOf,
   markReadyWhenComplete,
   missingQuestionnaireFields,
+  practitionerQuestionOf,
   savePatientProfileAnswers,
   savePatientQuestionnaire,
   setPatientAllergens,
 } from "./index";
 import { systemActor } from "../../services/access";
+import { createOperator, setOperatorQuestionnaireQuestion } from "../operators";
 
 let patientId: string;
 
@@ -1097,5 +1099,84 @@ describe("the answer to « Maladie cœliaque confirmée » (REM-165)", () => {
     for (const event of all) {
       expect(event.detail).toBe("celiacDisease");
     }
+  });
+});
+
+describe("the practitioner's own question (REM-161)", () => {
+  it("reads no question when the practitioner has none", async () => {
+    const patient = await newPatient("Sans question");
+    expect(
+      unwrapOk(await practitionerQuestionOf(systemActor, patient.id)),
+    ).toBeNull();
+  });
+
+  it("keeps the question that the answer answers", async () => {
+    const practitioner = unwrapOk(
+      await createOperator({
+        email: "rem-161@example.com",
+        name: "Praticienne",
+        password: "long enough password",
+      }),
+    );
+    const created = await createPatient(systemActor, {
+      practitionerId: practitioner.id,
+      pseudonym: "Avec question",
+      sex: "other",
+    });
+    if (!created.ok) {
+      throw new Error("test patient not created");
+    }
+    const id = created.data.id;
+    unwrapOk(
+      await setOperatorQuestionnaireQuestion(
+        practitioner.id,
+        "Quel est ton objectif ?",
+      ),
+    );
+    expect(unwrapOk(await practitionerQuestionOf(systemActor, id))).toBe(
+      "Quel est ton objectif ?",
+    );
+
+    const answered = unwrapOk(
+      await savePatientQuestionnaire(systemActor, id, {
+        practitionerQuestionAnswer: "Mieux dormir",
+      }),
+    );
+    expect(answered.practitionerQuestionAnswer).toBe("Mieux dormir");
+    expect(answered.practitionerQuestionText).toBe("Quel est ton objectif ?");
+
+    // The practitioner changes the question: the stored answer keeps its own.
+    unwrapOk(
+      await setOperatorQuestionnaireQuestion(practitioner.id, "As-tu un suivi ?"),
+    );
+    const resent = unwrapOk(
+      await savePatientQuestionnaire(systemActor, id, {
+        practitionerQuestionAnswer: "Mieux dormir",
+      }),
+    );
+    expect(resent.practitionerQuestionText).toBe("Quel est ton objectif ?");
+
+    const changed = unwrapOk(
+      await savePatientQuestionnaire(systemActor, id, {
+        practitionerQuestionAnswer: "Oui, un kiné",
+      }),
+    );
+    expect(changed.practitionerQuestionText).toBe("As-tu un suivi ?");
+
+    const cleared = unwrapOk(
+      await savePatientQuestionnaire(systemActor, id, {
+        practitionerQuestionAnswer: "",
+      }),
+    );
+    expect(cleared.practitionerQuestionAnswer).toBeNull();
+    expect(cleared.practitionerQuestionText).toBeNull();
+  });
+
+  it("refuses a written question text from a form", () => {
+    expect(
+      checkQuestionnaireInput({
+        practitionerQuestionText: "Une autre question",
+      } as never).ok,
+    ).toBe(false);
   });
 });

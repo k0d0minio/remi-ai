@@ -44,5 +44,11 @@ export type PatientListSort = (typeof patientListSorts)[number];
 /** Morgane's default for the first sort (story 5, question 3). */
 export const defaultPatientListSort: PatientListSort = "appointment";
 
+/**
+ * The longest free question a practitioner may set for their patients
+ * (REM-161), in `operators.questionnaire_question`.
+ */
+export const QUESTIONNAIRE_QUESTION_MAX = 500;
+
 export const isPatientListSort = (value: unknown): value is PatientListSort =>
   (patientListSorts as readonly unknown[]).includes(value);

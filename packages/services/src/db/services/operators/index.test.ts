@@ -11,6 +11,7 @@ import {
   hasOperator,
   listOperators,
   setOperatorPatientListSort,
+  setOperatorQuestionnaireQuestion,
   setOperatorRole,
   updateOperatorName,
   verifyOperator,
@@ -343,6 +344,60 @@ describe("the remembered patient list sort", () => {
 
   it("answers not_found for a malformed id", async () => {
     const result = await setOperatorPatientListSort("not-a-uuid", "name");
+    expect(result.ok).toBe(false);
+  });
+});
+
+describe("the practitioner's own question (REM-161)", () => {
+  it("starts with no question, then sets, changes and clears it", async () => {
+    const operator = unwrapOk(
+      await createOperator({
+        email: "question@example.com",
+        name: "Question",
+        password: "long enough password",
+      }),
+    );
+    expect(operator.questionnaireQuestion).toBeNull();
+
+    const set = unwrapOk(
+      await setOperatorQuestionnaireQuestion(
+        operator.id,
+        "  Quel est ton objectif principal ?  ",
+      ),
+    );
+    expect(set.questionnaireQuestion).toBe("Quel est ton objectif principal ?");
+
+    unwrapOk(
+      await setOperatorQuestionnaireQuestion(operator.id, "As-tu un suivi ?"),
+    );
+    expect((await getOperator(operator.id))?.questionnaireQuestion).toBe(
+      "As-tu un suivi ?",
+    );
+
+    const cleared = unwrapOk(
+      await setOperatorQuestionnaireQuestion(operator.id, "   "),
+    );
+    expect(cleared.questionnaireQuestion).toBeNull();
+  });
+
+  it("refuses a question longer than 500 characters", async () => {
+    const operator = unwrapOk(
+      await createOperator({
+        email: "question-long@example.com",
+        name: "Question long",
+        password: "long enough password",
+      }),
+    );
+    const refused = await setOperatorQuestionnaireQuestion(
+      operator.id,
+      "a".repeat(501),
+    );
+    expect(refused.ok).toBe(false);
+    expect((await getOperator(operator.id))?.questionnaireQuestion).toBeNull();
+  });
+
+  it("answers not_found for a malformed id", async () => {
+    const result = await setOperatorQuestionnaireQuestion("nope", "Question ?");
     expect(result.ok).toBe(false);
   });
 });

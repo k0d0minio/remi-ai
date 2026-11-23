@@ -407,6 +407,8 @@ export type Content = {
       otherText: string;
       medications: string;
       supplements: string;
+      /** Under the practitioner's own question (REM-161). */
+      practitionerQuestion: string;
     };
     /**
      * The first step (REM-158): the personal data of the sign-up, shown as

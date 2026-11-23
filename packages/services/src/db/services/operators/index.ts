@@ -4,6 +4,7 @@ import {
   defaultPatientListSort,
   operatorRoles,
   patientListSorts,
+  QUESTIONNAIRE_QUESTION_MAX,
 } from "../../../shared/operator";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
@@ -108,6 +109,7 @@ export const createOperator = async (
     role: parsed.data.role ?? "practitioner",
     signupLinkToken: newSignupLinkToken(),
     patientListSort: defaultPatientListSort,
+    questionnaireQuestion: null,
   });
   return ok(operator);
 };
@@ -188,6 +190,35 @@ export const setOperatorPatientListSort = async (
   }
   const updated = await operators().update(id, {
     patientListSort: parsed.data,
+  });
+  return updated ? ok(updated) : err("not_found", "no such operator");
+};
+
+/**
+ * Sets, changes or clears the practitioner's own free question (REM-161). An
+ * empty text clears it: the questionnaire of their patients then shows no
+ * extra field. An answer already given keeps the question it answered.
+ */
+export const setOperatorQuestionnaireQuestion = async (
+  id: Id,
+  question: string,
+): Promise<Result<Operator>> => {
+  if (!z.uuid().safeParse(id).success) {
+    return err("not_found", "no such operator");
+  }
+  const parsed = z
+    .string()
+    .trim()
+    .max(
+      QUESTIONNAIRE_QUESTION_MAX,
+      `the question has at most ${QUESTIONNAIRE_QUESTION_MAX} characters`,
+    )
+    .safeParse(question);
+  if (!parsed.success) {
+    return err("invalid_input", parsed.error.issues[0].message);
+  }
+  const updated = await operators().update(id, {
+    questionnaireQuestion: parsed.data === "" ? null : parsed.data,
   });
   return updated ? ok(updated) : err("not_found", "no such operator");
 };

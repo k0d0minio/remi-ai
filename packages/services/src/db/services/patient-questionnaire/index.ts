@@ -19,6 +19,7 @@ import { macroProfile, type MacroProfile } from "../../../shared/macro-profile";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
+import type { Operator } from "../../models/operator";
 import type { PatientProfile } from "../../models/patient-profile";
 import type {
   AllergenKind,
@@ -68,7 +69,7 @@ type QuestionnaireRow = { id: Id } & PatientQuestionnaire;
 
 /** The same row, with the facts a change signal needs. */
 type FileRow = QuestionnaireRow &
-  Pick<PatientProfile, "pseudonym" | "fileStatus">;
+  Pick<PatientProfile, "pseudonym" | "fileStatus" | "practitionerId">;
 
 const profiles = (db: DatabaseClient = getDatabase()) =>
   db.collection<QuestionnaireRow>("patient_profiles");
@@ -103,7 +104,10 @@ const uuidSchema = z.uuid();
 
 const isValidId = (id: Id) => uuidSchema.safeParse(id).success;
 
-/** The answer columns, in the order the questionnaire asks them. */
+/**
+ * The answer columns, in the order the questionnaire asks them, and the copy
+ * of the practitioner's question that the last answer answers (REM-161).
+ */
 const answerFields = [
   "sexForCalculation",
   "activityLevel",
@@ -119,6 +123,7 @@ const answerFields = [
   "dio2",
   "amy1a",
   "practitionerQuestionAnswer",
+  "practitionerQuestionText",
   "noKnownAllergies",
   "noKnownIntolerances",
 ] as const satisfies readonly (keyof PatientQuestionnaire)[];
@@ -405,6 +410,36 @@ export const checkAllergenAnswer = (
   return cleaned.ok ? ok(null) : cleaned;
 };
 
+/** The practitioner's own free question, or null when they have none. */
+const questionOfPractitioner = async (
+  practitionerId: Id | null | undefined,
+): Promise<string | null> => {
+  if (!practitionerId || !isValidId(practitionerId)) {
+    return null;
+  }
+  const practitioner = await getDatabase()
+    .collection<Operator>("operators")
+    .findById(practitionerId);
+  return practitioner?.questionnaireQuestion?.trim() || null;
+};
+
+/**
+ * The free question of the practitioner who holds the file (REM-161). The
+ * questionnaire shows it in the Consultation step. Null: no extra field.
+ */
+const unscopedPractitionerQuestionOf = async (
+  patientId: Id,
+): Promise<Result<string | null>> => {
+  if (!isValidId(patientId)) {
+    return err("not_found", "no such patient");
+  }
+  const row = (await profiles().findById(patientId)) as FileRow | null;
+  if (!row) {
+    return err("not_found", "no such patient");
+  }
+  return ok(await questionOfPractitioner(row.practitionerId));
+};
+
 /** The questionnaire's answers and the patient's checked boxes. */
 const unscopedGetPatientQuestionnaire = async (
   patientId: Id,
@@ -468,6 +503,19 @@ const unscopedSavePatientQuestionnaire = async (
     patch.desiredWeightKg !== undefined && patch.desiredWeightKg !== null;
   if (writesDesiredWeight && !(await consentInForce(patientId, "care"))) {
     return err("not_permitted", "the desired weight needs the care consent");
+  }
+  // A changed answer keeps a copy of the question it answers (REM-161), so the
+  // file reads the right question after the practitioner changes theirs. A
+  // form that sends the same answer again leaves the copy as it is.
+  if (
+    patch.practitionerQuestionAnswer !== undefined &&
+    patch.practitionerQuestionAnswer !==
+      (current.practitionerQuestionAnswer ?? null)
+  ) {
+    patch.practitionerQuestionText =
+      patch.practitionerQuestionAnswer === null
+        ? null
+        : await questionOfPractitioner(current.practitionerId);
   }
   const written = await profiles().update(patientId, patch);
   if (!written) {
@@ -886,6 +934,11 @@ export const macroProfileOf = byPatient(
 export const missingQuestionnaireFields = byPatient(
   "read",
   unscopedMissingQuestionnaireFields,
+  noSuchPatient,
+);
+export const practitionerQuestionOf = byPatient(
+  "read",
+  unscopedPractitionerQuestionOf,
   noSuchPatient,
 );
 export const markReadyWhenComplete = byPatient(

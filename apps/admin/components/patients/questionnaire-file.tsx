@@ -26,7 +26,13 @@ type FieldKey = MandatoryQuestionnaireField | OptionalQuestionnaireField;
 /** One field as the file reads it. Null is « Non renseigné » (D-30). */
 type Field = {
   /** Anchors the missing list's link: `#field-<key>`. */
-  key: FieldKey | "firstName" | "lastName" | "email" | "practitionerAnswer";
+  key:
+    | FieldKey
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "practitionerQuestion"
+    | "practitionerAnswer";
   label: string;
   value: string | null;
 };
@@ -231,14 +237,19 @@ export const QuestionnaireFile = ({
           ? "Génotype non utilisé : la réponse au test génétique est « Non / Je ne sais pas »."
           : undefined,
     },
-    // The practitioner's own question joins with `practitioner-free-question`.
-    // Its answer shows once the patient has given one.
+    // The practitioner's own question (REM-161). It shows once the patient
+    // has answered, with the question as the patient read it.
     ...(text(answers.practitionerQuestionAnswer)
       ? [
           {
             id: "question-praticien",
             title: "Question du praticien",
             fields: [
+              {
+                key: "practitionerQuestion" as const,
+                label: "Question posée",
+                value: text(answers.practitionerQuestionText),
+              },
               {
                 key: "practitionerAnswer" as const,
                 label: "Réponse",

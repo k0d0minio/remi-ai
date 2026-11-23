@@ -24,6 +24,7 @@ export const answerFields = [
   "desiredWeightKg",
   "consultationReason",
   "consultationDate",
+  "practitionerQuestionAnswer",
   "pathologies",
   "geneticTest",
   "apoe",

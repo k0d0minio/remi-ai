@@ -88,6 +88,7 @@ export {
   macroProfileOf,
   markReadyWhenComplete,
   missingQuestionnaireFields,
+  practitionerQuestionOf,
   savePatientQuestionnaire,
   setPatientAllergens,
 } from "./services/patient-questionnaire";
