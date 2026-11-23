@@ -63,7 +63,9 @@ export const SheetContent = ({
       {...props}
     >
       {children}
-      <SheetPrimitive.Close className="focus-visible:ring-ring absolute right-4 top-4 rounded-sm opacity-70 transition-opacity duration-[--duration-fast] hover:opacity-100 focus-visible:outline-none focus-visible:ring-[3px]">
+      {/* A 44 x 44 px touch target (charter, section 6). The icon stays 16 px
+          from the corner. */}
+      <SheetPrimitive.Close className="focus-visible:ring-ring absolute right-1 top-1 inline-flex size-11 items-center justify-center rounded-full opacity-70 transition-opacity duration-[--duration-fast] hover:opacity-100 focus-visible:outline-none focus-visible:ring-[3px]">
         <X aria-hidden="true" className="size-5" />
         <span className="sr-only">Fermer</span>
       </SheetPrimitive.Close>
