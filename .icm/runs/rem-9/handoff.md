@@ -2,25 +2,31 @@
 
 ## Next action
 
-Lire les réponses avec `.icm/_system/scripts/questions.sh REM-9`. Sur `RESULT: OK`, faire le changement dans `apps/web/components/signup/consent-step.tsx` et `apps/web/lib/content/fr.ts` (et `types.ts`), puis le texte des CGV selon Q1.
+Jamie teste la prévisualisation de #240, puis coche **Ready to merge**. Ensuite : `release REM-9`.
 
-Plan du changement (ne dépend pas des réponses) :
+## Décisions
 
-- Retirer le bloc de lecture et le bouton « Relire ».
+- Q1 et Q2 : les défauts. Jamie, 2026-11-23 : « Yes, use defaults ».
+  - Q1 : les CGV du site public (02.11.2026, bandeau « à faire valider par un juriste » compris) sont copiées mot pour mot dans `packages/services/src/consent/texts/cgv/1.fr-BE.md`. `index.test.ts` fixe son empreinte.
+  - Q2 : l'enregistrement ne change pas. La case coche le consentement obligatoire `care` (la politique de confidentialité) : une ligne avec la date, la version et l'empreinte du texte. La version des CGV n'est pas enregistrée.
+
+## Le changement
+
+- Le bloc de lecture et le bouton « Relire » sont retirés.
 - Une seule case de 44 × 44 px : « J'accepte les Conditions générales de vente et la Politique de confidentialité. »
-- Chaque nom de document est un lien (style REM-11) qui ouvre le document dans le `Sheet` de `@remi/ui` (bouton de fermeture 44 × 44 px de REM-12). Le lien ne coche pas la case.
-- La case coche toutes les clés obligatoires (`care`) : le formulaire et le serveur ne changent pas. La coche vit dans le formulaire, donc elle survit à l'ouverture et à la fermeture d'un document.
+- Chaque nom de document est un lien bleu et souligné. Il ouvre le document dans le `Sheet` de `@remi/ui`, sans changer de page.
 - « Continuer » reste désactivé tant que la case n'est pas cochée.
+- Le composant sert aussi la page de reprise de dossier (`/inscription/reprendre/<token>`) : elle change de la même façon.
 
 ## How to test
 
-<À écrire après le changement.>
+Ouvre un lien d'inscription d'un praticien sur la prévisualisation, sur un téléphone. Touche « Conditions générales de vente », puis « Politique de confidentialité » : chaque document s'ouvre dans une fenêtre sur la même page et se ferme avec la croix. « Continuer » reste gris jusqu'à ce que tu coches la case, et la case reste cochée après l'ouverture d'un document.
 
 ## Blockers
 
-- Q1 et Q2 attendent la réponse de Jamie sur la carte HUD ou dans le corps de #240. L'app n'a aucun texte des CGV. Le seul document de l'inscription est la politique de confidentialité (`care`, version 3), et seule sa version est enregistrée.
+- none
 
 ## Do not touch
 
 - Le questionnaire et l'admin (REM-161 travaille en parallèle).
-- `packages/services/src/consent/texts/care/*` : un texte publié ne change jamais (empreinte vérifiée par `index.test.ts`).
+- Les textes publiés de `packages/services/src/consent/texts/` : un nouveau libellé est une nouvelle version.

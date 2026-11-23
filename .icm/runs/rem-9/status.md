@@ -1,5 +1,5 @@
 # Status rem-9
 
-- phase: build
-- blocked: yes — waits for answers (Q1, Q2 on #240)
+- phase: release
+- blocked: no
 - updated: 2026-11-23
