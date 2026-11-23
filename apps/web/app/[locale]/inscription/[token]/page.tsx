@@ -50,14 +50,17 @@ const SignupLinkPage = async ({ params }: { params: Promise<Params> }) => {
   const content = dictionary.signupLink;
 
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-10">
+    <main className="mx-auto flex w-full max-w-xl flex-col gap-8 px-4 py-10">
       <Wordmark />
-      <Typography as="h1" size="2xl" weight="semibold">
-        {content.title}
-      </Typography>
-      <Typography size="sm" tone="muted">
-        {fill(content.intro, { name: found.data.name })}
-      </Typography>
+      {/* The screen title of the charter: 32 / 38 px at weight 800 (REM-8). */}
+      <header className="flex flex-col gap-2">
+        <Typography as="h1" size="2xl" weight="bold" balance>
+          {content.title}
+        </Typography>
+        <Typography tone="muted">
+          {fill(content.intro, { name: found.data.name })}
+        </Typography>
+      </header>
       <SignupForm
         token={token}
         locale={locale}
