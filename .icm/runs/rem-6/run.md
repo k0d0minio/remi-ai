@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-6
 - branch: contact/rem-6-inscription-patient-appliquer-lidentite
 - lane: tweak
-- pr: pending
+- pr: #235
 - started: 2026-11-23
