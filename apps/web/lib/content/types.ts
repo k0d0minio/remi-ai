@@ -327,9 +327,13 @@ export type Content = {
       names: Record<ConsentKey, string>;
       /** Holds `{version}` and `{date}`: the text's version and its date. */
       version: string;
-      /** Holds `{name}`: the consent's name. */
+      /** The names of the two documents that the box accepts (REM-9). */
+      documents: { terms: string; privacy: string };
+      /**
+       * The one box. Holds `{terms}` and `{privacy}`: each becomes a link that
+       * opens its document.
+       */
       accept: string;
-      reread: string;
       continue: string;
       back: string;
     };

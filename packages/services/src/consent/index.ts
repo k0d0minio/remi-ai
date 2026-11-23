@@ -8,6 +8,7 @@ import {
 import care1FrBe from "./texts/care/1.fr-BE.md";
 import care2FrBe from "./texts/care/2.fr-BE.md";
 import care3FrBe from "./texts/care/3.fr-BE.md";
+import cgv1FrBe from "./texts/cgv/1.fr-BE.md";
 import genetic1FrBe from "./texts/genetic/1.fr-BE.md";
 import genetic2FrBe from "./texts/genetic/2.fr-BE.md";
 
@@ -115,14 +116,55 @@ export const currentConsentText = (
   key: ConsentKey,
   locale: ConsentTextLocale,
 ): ConsentText => {
-  const newestFirst = consentTexts
-    .filter((text) => text.key === key)
-    .reverse();
+  const newestFirst = consentTexts.filter((text) => text.key === key).reverse();
   const current =
     newestFirst.find((text) => text.locale === locale) ??
     newestFirst.find((text) => text.locale === "fr-BE");
   if (!current) {
     throw new Error(`no consent text for the key "${key}"`);
+  }
+  return current;
+};
+
+/**
+ * The pilot's sales terms (CGV), one link of the sign-up box beside the
+ * privacy policy (REM-9). Version 1 is the public site's CGV of 2 November
+ * 2026, with its draft banner, word for word (Jamie, 2026-11-23).
+ *
+ * The CGV are not a consent key. The patient accepts them with the box of the
+ * care consent, and no row records their version (Jamie, 2026-11-23). A
+ * published file never changes, as for the consent texts: `index.test.ts`
+ * pins its hash.
+ */
+export type SalesTermsText = Omit<ConsentText, "key">;
+
+/** Oldest first. The last line is the current version. */
+const salesTermsFiles: readonly Omit<SalesTermsText, "hash">[] = [
+  {
+    version: "1",
+    locale: "fr-BE",
+    date: "2026-11-02",
+    body: cgv1FrBe,
+  },
+];
+
+export const salesTermsTexts: readonly SalesTermsText[] = salesTermsFiles.map(
+  (file) => ({ ...file, hash: sha256(file.body) }),
+);
+
+/**
+ * The CGV a patient reads now: the newest version in their language, else the
+ * newest `fr-BE` version.
+ */
+export const currentSalesTerms = (
+  locale: ConsentTextLocale,
+): SalesTermsText => {
+  const newestFirst = [...salesTermsTexts].reverse();
+  const current =
+    newestFirst.find((text) => text.locale === locale) ??
+    newestFirst.find((text) => text.locale === "fr-BE");
+  if (!current) {
+    throw new Error("no sales terms text");
   }
   return current;
 };
