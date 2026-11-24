@@ -91,10 +91,11 @@ is the three-edit rule in [`/CONVENTIONS.md`](../../CONVENTIONS.md) § "Environm
 
 `shared/links.ts` is the one carve-out, and it is not a loophole: a `NEXT_PUBLIC_*` variable is
 inlined into the browser bundle only for a literal `process.env.NAME`, so routing it through
-`env()` would leave the browser reading `undefined`. Its **five** reads are literal and spelled out
+`env()` would leave the browser reading `undefined`. Its **seven** reads are literal and spelled out
 one per line: the four `NEXT_PUBLIC_*_URL` overrides — the file answers from its own table when they
 are unset — plus `NODE_ENV`, which selects the dev ports and which Next.js inlines on the same
-terms.
+terms, plus `NEXT_PUBLIC_VERCEL_TARGET_ENV` and `NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF`, which each
+app's `next.config` copies from Vercel so that a preview links to the previews of its own branch.
 
 ## Where the apps live
 

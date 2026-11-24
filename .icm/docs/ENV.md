@@ -26,20 +26,23 @@ that app's project.
 
 ## App configuration
 
-| Variable                    | Purpose                                                               | Where set | Public? |
-| --------------------------- | --------------------------------------------------------------------- | --------- | ------- |
-| `NODE_ENV`                  | `development` \| `test` \| `production`                               | toolchain | no      |
-| `APP_URL`                   | Absolute base URL of the app doing the reading                        | Vercel    | no      |
-| `NEXT_PUBLIC_APP_URL`       | Where `apps/web` answers                                              | Vercel    | yes     |
-| `NEXT_PUBLIC_MARKETING_URL` | Where `apps/marketing` answers                                        | Vercel    | yes     |
-| `NEXT_PUBLIC_ADMIN_URL`     | Where `apps/admin` answers                                            | Vercel    | yes     |
-| `NEXT_PUBLIC_DOCS_URL`      | Where `apps/docs` answers                                             | Vercel    | yes     |
-| `UNDER_CONSTRUCTION`        | `1`: `apps/marketing` shows its under-construction page on every page | Vercel    | no      |
+| Variable                            | Purpose                                                               | Where set | Public? |
+| ----------------------------------- | --------------------------------------------------------------------- | --------- | ------- |
+| `NODE_ENV`                          | `development` \| `test` \| `production`                               | toolchain | no      |
+| `APP_URL`                           | Absolute base URL of the app doing the reading                        | Vercel    | no      |
+| `NEXT_PUBLIC_APP_URL`               | Where `apps/web` answers                                              | Vercel    | yes     |
+| `NEXT_PUBLIC_MARKETING_URL`         | Where `apps/marketing` answers                                        | Vercel    | yes     |
+| `NEXT_PUBLIC_ADMIN_URL`             | Where `apps/admin` answers                                            | Vercel    | yes     |
+| `NEXT_PUBLIC_DOCS_URL`              | Where `apps/docs` answers                                             | Vercel    | yes     |
+| `VERCEL_GIT_COMMIT_REF`             | The git branch of a Vercel build. Set by Vercel                       | Vercel    | no      |
+| `NEXT_PUBLIC_VERCEL_TARGET_ENV`     | `VERCEL_TARGET_ENV`, copied into the bundle by each `next.config`     | toolchain | yes     |
+| `NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF` | `VERCEL_GIT_COMMIT_REF`, copied into the bundle by each `next.config` | toolchain | yes     |
+| `UNDER_CONSTRUCTION`                | `1`: `apps/marketing` shows its under-construction page on every page | Vercel    | no      |
 
 Value per target: production takes the production address of each app, uat the uat address
 (`https://uat-app.remiai.be`, `https://uat-admin.remiai.be`, `https://uat.remiai.be`; docs has no
-uat, so uat takes its production address), preview is unset today. The addresses live in
-`.icm/environments.md`.
+uat, so uat takes its production address). Preview does not read them: see "The four origin
+variables". The addresses live in `.icm/environments.md`.
 
 `UNDER_CONSTRUCTION` is `1` on the production target of the **marketing** project only, until the
 site opens. uat and preview leave it unset, so they show the full site. To open the site, delete
@@ -54,9 +57,21 @@ and the live domain. Never set it by hand.
 
 `packages/services/src/shared/links.ts` is the one file that knows where each app answers, and every
 cross-app link, canonical URL, sitemap entry, operator invitation and patient share link is built
-from it. It answers in two ways: the `NEXT_PUBLIC_*_URL` variable for that app if it is set,
-otherwise a built-in table of subdomains under one root domain (dev ports when `NODE_ENV` is
-`development`).
+from it. On a Vercel preview it answers the branch alias of the target project for the same git
+branch: `https://<project>-git-<branch>-remi21.vercel.app`, cut and hashed as Vercel does when the
+label is longer than 63 characters. The `app` and `admin` previews of a branch share the Neon branch
+`preview/<branch>`, so a link from one reaches the same data in the other. A preview with no
+`VERCEL_GIT_COMMIT_REF` takes the UAT origins (`docs` has no UAT and keeps its one address). A
+preview never takes a production origin of `app`, `admin` or `marketing`, and it ignores the
+`NEXT_PUBLIC_*_URL` variables. On `uat` and Production it answers in two ways: the
+`NEXT_PUBLIC_*_URL` variable for that app if it is set, otherwise a built-in table of subdomains
+under one root domain (dev ports when `NODE_ENV` is `development`).
+
+`VERCEL_TARGET_ENV` tells a preview from `uat`: `VERCEL_ENV` reads `preview` on both. Each app's
+`next.config` copies `VERCEL_TARGET_ENV` and `VERCEL_GIT_COMMIT_REF` into
+`NEXT_PUBLIC_VERCEL_TARGET_ENV` and `NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF` at build time, so a client
+component builds the same link as the server. All four names are in `turbo.json`'s `globalEnv`: the
+branch is part of the cache key, so a build of one branch is never served for another.
 
 **In production the variables are the answer, and the table is not.** Its `rootDomain` is
 `remiai.be` since 2026-11-17, so the table names the production addresses. Before that date it was
