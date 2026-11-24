@@ -34,6 +34,9 @@ version des CGV. Rien ne prouve donc quelle version des CGV le patient a accept�
 - [ ] Le test qui fixe l'empreinte du fichier CGV version 1 reste vert : le texte publié ne change pas. (verify: CI)
 - [ ] Après une nouvelle inscription sur UAT, « Mes consentements » montre la ligne « Conditions générales de vente », acceptées à la date du jour, version 1, avec un lien qui ouvre le texte. (verify: operator)
 - [ ] Dans la console, la section consentements du dossier de ce patient montre les CGV acceptées, la date et la version 1. (verify: operator)
+- [ ] La ligne CGV est en lecture seule : elle n'a pas de bouton « Retirer » ni « Donner » (Q1). (verify: operator)
+- [ ] Un patient sans ligne CGV (inscrit avant ce changement) ne voit pas de ligne CGV dans « Mes consentements ». Son dossier dans la console n'en montre pas non plus (Q2). (verify: CI)
+- [ ] La reprise d'inscription et la prise en main du dossier enregistrent aussi la ligne `cgv` (Q3). Un test du service le prouve. (verify: CI)
 - [ ] La ligne « politique de confidentialité » montre la même chose qu'avant ce changement. (verify: operator)
 - [ ] Tous les textes nouveaux sont en français. (verify: agent)
 
@@ -50,5 +53,7 @@ version des CGV. Rien ne prouve donc quelle version des CGV le patient a accept�
 ## Open questions
 
 - Le nom affiché est « Conditions générales de vente », comme le lien de la case.
+- Réponses de Jamie dans le chat, 2026-11-24 : Q1 lecture seule, Q2 pas de ligne CGV sans
+  acceptation enregistrée, Q3 les trois pages qui montrent la case.
 - La clé `cgv` ne rend pas les CGV obligatoires pour l'accès au service : un patient sans
   ligne CGV garde son accès.
