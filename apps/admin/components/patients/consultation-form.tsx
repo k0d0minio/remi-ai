@@ -10,7 +10,11 @@ import {
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import type { PatientGoal, PatientGoalCheckIn } from "@remi/services/shared";
-import { formatDate, goalDirections } from "@remi/services/shared";
+import {
+  consultationDraftKey,
+  formatDate,
+  goalDirections,
+} from "@remi/services/shared";
 import {
   Button,
   Select,
@@ -76,8 +80,6 @@ type Draft = {
 
 const initial: ConsultationFormState = { error: null, saved: false };
 
-const draftKey = (patientId: string) => `remi:consultation:${patientId}`;
-
 const emptyCheckIn: CheckInDraft = { direction: NONE, measure: "", note: "" };
 
 /** Long enough that typing never queues a write per keystroke, short enough
@@ -98,7 +100,7 @@ const DRAFT_TTL_MS = 12 * 60 * 60 * 1000;
 
 const readDraft = (patientId: string) => {
   try {
-    return window.localStorage.getItem(draftKey(patientId));
+    return window.localStorage.getItem(consultationDraftKey(patientId));
   } catch {
     // A disabled or blocked store costs the safety net, not the screen.
     return null;
@@ -107,7 +109,7 @@ const readDraft = (patientId: string) => {
 
 const clearDraft = (patientId: string) => {
   try {
-    window.localStorage.removeItem(draftKey(patientId));
+    window.localStorage.removeItem(consultationDraftKey(patientId));
   } catch {
     // As above — nothing here is worth failing a save over.
   }
@@ -231,7 +233,7 @@ export const ConsultationForm = ({
     pendingWrite.current = setTimeout(() => {
       try {
         window.localStorage.setItem(
-          draftKey(patientId),
+          consultationDraftKey(patientId),
           JSON.stringify({ ...next, savedAt: Date.now() }),
         );
       } catch {
