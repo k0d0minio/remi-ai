@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-112/note-a-preparer-pas-dancien-texte-apres-un-enregistrement-un-envoi-par
 - branch: contact/rem-112-note-a-preparer-pas-dancien-texte-apres-un
 - lane: tweak
-- pr: pending
+- pr: #244
 - started: 2026-11-24
