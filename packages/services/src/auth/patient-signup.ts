@@ -214,7 +214,8 @@ export type PatientSignupInput = {
 /**
  * Creates the patient's file and account under the link's practitioner, signs
  * the patient in, and writes one `patient.signed_up` event. Then one
- * `patient_consents` row and one `consent.given` event per mandatory consent.
+ * `patient_consents` row and one `consent.given` event per text of the
+ * sign-up box: `care` and `cgv` (REM-207).
  *
  * - `invalid_input`: a mandatory consent is missing, or names a text that is
  *   not current. The page checks this first. Nothing is written, not even the

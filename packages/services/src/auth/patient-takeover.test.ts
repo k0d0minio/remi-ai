@@ -143,6 +143,15 @@ const care = (): ShownConsent => {
   return { key: "care", version: text.version, locale: text.locale };
 };
 
+/** The CGV text the box shows now (REM-207). */
+const cgv = (): ShownConsent => {
+  const text = currentConsentText("cgv", "fr-BE");
+  return { key: "cgv", version: text.version, locale: text.locale };
+};
+
+/** The two texts that the one box of the page posts. */
+const box = () => [care(), cgv()];
+
 const activationToken = async (patientId: string) => {
   const link = await issueActivationLink(patientId, linkFor);
   if (!link.ok) {
@@ -158,7 +167,7 @@ const takeOver = (
   takeOverPatientFile({
     token,
     password: overrides.password ?? "correct horse",
-    consents: overrides.consents ?? [care()],
+    consents: overrides.consents ?? box(),
     callbackPath: "/fr/questionnaire",
   });
 
@@ -189,7 +198,9 @@ describe("the activation link (path 1)", () => {
     const file = await practitionerFile();
     await takeOver(await activationToken(file.id));
 
-    const events = await listAuditEvents(systemActor, { action: "patient.file_taken_over" });
+    const events = await listAuditEvents(systemActor, {
+      action: "patient.file_taken_over",
+    });
     expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({
       actorKind: "patient",
@@ -198,6 +209,13 @@ describe("the activation link (path 1)", () => {
     });
     const consents = await consentsOf(systemActor, file.id);
     expect(consents.care?.decision).toBe("given");
+    // REM-207: the takeover records the CGV that the box accepted.
+    expect(consents.cgv).toMatchObject({
+      decision: "given",
+      textVersion: "1",
+      textLocale: "fr-BE",
+      textHash: currentConsentText("cgv", "fr-BE").hash,
+    });
   });
 
   it("writes nothing without the mandatory consent, not even the identity", async () => {
@@ -324,7 +342,7 @@ describe("the sign-up with the e-mail of a practitioner-created file (path 2)", 
       locale: "fr",
       data: checked.data,
       callbackPath: "/fr/questionnaire",
-      consents: [care()],
+      consents: box(),
     });
   };
 
@@ -340,7 +358,10 @@ describe("the sign-up with the e-mail of a practitioner-created file (path 2)", 
 
   it("keeps another practitioner's link out of this file", async () => {
     await practitionerFile();
-    const result = await signUp("marie.dupont@example.be", otherPractitionerToken);
+    const result = await signUp(
+      "marie.dupont@example.be",
+      otherPractitionerToken,
+    );
     expect(result.ok).toBe(true);
     expect(await profiles()).toHaveLength(2);
   });
@@ -358,14 +379,20 @@ describe("the sign-up with the e-mail of a practitioner-created file (path 2)", 
     expect(sent).toHaveLength(1);
     expect(sent[0].to).toBe("Marie.Dupont@Example.be");
     expect(sent[0].subject).toBe("Reprends ton dossier REMI");
-    const url = sent[0].text.split("\n").find((line) => line.startsWith("https://"));
+    const url = sent[0].text
+      .split("\n")
+      .find((line) => line.startsWith("https://"));
     expect(url).toBeDefined();
-    const events = await listAuditEvents(systemActor, { action: "patient.file_claim_sent" });
+    const events = await listAuditEvents(systemActor, {
+      action: "patient.file_claim_sent",
+    });
     expect(events).toHaveLength(1);
 
     const result = await takeOver(tokenOf(url ?? ""));
     expect(result).toEqual({ ok: true, data: { patientId: file.id } });
-    const taken = await listAuditEvents(systemActor, { action: "patient.file_taken_over" });
+    const taken = await listAuditEvents(systemActor, {
+      action: "patient.file_taken_over",
+    });
     expect(taken[0].detail).toBe("claim");
     expect(await profiles()).toHaveLength(1);
   });
@@ -382,7 +409,11 @@ describe("the sign-up with the e-mail of a practitioner-created file (path 2)", 
 
   it("sends at most one claim e-mail per five minutes", async () => {
     await practitionerFile();
-    const input = { practitionerToken, email: "marie.dupont@example.be", linkFor };
+    const input = {
+      practitionerToken,
+      email: "marie.dupont@example.be",
+      linkFor,
+    };
     expect((await requestFileClaim(input)).ok).toBe(true);
 
     const again = await requestFileClaim(input);

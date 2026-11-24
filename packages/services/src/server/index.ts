@@ -564,14 +564,8 @@ export {
   consentText,
   consentTexts,
   currentConsentText,
-  currentSalesTerms,
-  salesTermsTexts,
 } from "../consent";
-export type {
-  ConsentText,
-  SalesTermsText,
-  SignupConsentCheck,
-} from "../consent";
+export type { ConsentText, SignupConsentCheck } from "../consent";
 export {
   careConsentInForce,
   consentsOf,

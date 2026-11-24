@@ -1,4 +1,4 @@
-import type { Locale } from "@remi/services/shared";
+import { isTermsConsentKey, type Locale } from "@remi/services/shared";
 import { Typography } from "@remi/ui/server";
 import { ConsentControls } from "@/components/patient-consents/consent-controls";
 import type { ConsentEntry, ConsentEntryText } from "@/lib/consents/entries";
@@ -20,6 +20,10 @@ type Props = {
  * and the version of its text. The Profil tab shows it, and so does the
  * consent screen of a patient whose care consent is not in force. One column,
  * for a phone screen.
+ *
+ * The CGV are accepted terms, not a consent (REM-207): their line says
+ * « Acceptées le … » and has only « Relire ». A patient with no CGV row has
+ * no CGV line (`consentSummaries`).
  */
 export const ConsentList = ({
   locale,
@@ -43,7 +47,12 @@ export const ConsentList = ({
         const decision =
           entry.state === "none" || !entry.decidedOn
             ? text.states.none
-            : fill(text.states[entry.state], { date: entry.decidedOn });
+            : fill(
+                isTermsConsentKey(entry.key)
+                  ? text.accepted
+                  : text.states[entry.state],
+                { date: entry.decidedOn },
+              );
         return (
           <li
             key={entry.key}

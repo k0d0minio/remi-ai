@@ -91,7 +91,11 @@ const openTarget = async (
       : err("spent", claim.message);
   }
   // The token is the credential: the takeover reads its file as REMI itself.
-  const patient = await getPatient(systemActor, claim.data.patientProfileId, db);
+  const patient = await getPatient(
+    systemActor,
+    claim.data.patientProfileId,
+    db,
+  );
   if (!patient.ok) {
     return err("not_found", "the file of this link is gone");
   }
@@ -149,7 +153,10 @@ const identityFor = async (
     return err("upstream_failed", created.message);
   }
   const signedIn = await auth.signIn({ email, password });
-  if (!signedIn.ok || (await getPatientAccountBySubject(signedIn.data.subject))) {
+  if (
+    !signedIn.ok ||
+    (await getPatientAccountBySubject(signedIn.data.subject))
+  ) {
     return err("has_account", "this e-mail already has an account");
   }
   return signedIn;
@@ -174,8 +181,8 @@ export type TakeoverInput = {
 
 /**
  * Attaches a new account to the link's file and signs the patient in. One
- * transaction writes the account, one consent row per mandatory consent and
- * the link's `used_at`. After the commit: one `patient.file_taken_over` event,
+ * transaction writes the account, one consent row per text of the sign-up box
+ * (`care`, `cgv`, REM-207) and the link's `used_at`. After the commit: one `patient.file_taken_over` event,
  * with the link's purpose as its detail, and one `consent.given` per consent.
  *
  * The consents come first. With one missing, nothing is written, not even the
@@ -220,7 +227,11 @@ export const takeOverPatientFile = async ({
         throw new RollbackSignal(err("spent", still.message));
       }
       const account = await createPatientAccount(
-        { patientProfileId: patient.id, email, authSubject: identity.data.subject },
+        {
+          patientProfileId: patient.id,
+          email,
+          authSubject: identity.data.subject,
+        },
         tx,
       );
       if (!account.ok) {

@@ -25,11 +25,7 @@ import {
   isConsentError,
   type SignupState,
 } from "@/lib/signup/state";
-import {
-  ConsentStep,
-  type ConsentStepDocument,
-  type ConsentStepText,
-} from "./consent-step";
+import { ConsentStep, type ConsentStepText } from "./consent-step";
 
 type Props = {
   /** The practitioner's link token, from the route. */
@@ -38,10 +34,8 @@ type Props = {
   content: Content["signupLink"];
   /** The texts of the birth date field (REM-159). */
   dateText: Content["dateEntry"];
-  /** The mandatory consent texts, rendered on the server (story 3). */
+  /** The texts of the box: the care consent and the CGV (story 3, REM-207). */
   consents: readonly ConsentStepText[];
-  /** The pilot's sales terms (CGV), rendered on the server (REM-9). */
-  terms: ConsentStepDocument;
 };
 
 /** The control of each field: its type and what the browser may fill in. */
@@ -82,7 +76,6 @@ export const SignupForm = ({
   content,
   dateText,
   consents,
-  terms,
 }: Props) => {
   const [state, formAction, pending] = useActionState(
     signUpAction,
@@ -147,7 +140,6 @@ export const SignupForm = ({
       <div hidden={active !== "consent"}>
         <ConsentStep
           consents={consents}
-          terms={terms}
           ticked={ticked}
           onToggle={toggle}
           onContinue={() => {

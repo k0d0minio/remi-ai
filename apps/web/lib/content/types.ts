@@ -809,6 +809,11 @@ export type Content = {
     intro: string;
     /** `{date}` is the day of the decision. `none`: no decision recorded. */
     states: Record<ConsentDecision, string> & { none: string };
+    /**
+     * The decision line of accepted terms, the CGV (REM-207). `{date}` is the
+     * day of the acceptance.
+     */
+    accepted: string;
     /** `{version}` is the version of the text of the decision. */
     version: string;
     /** A consent that the practitioner recorded: no text is stored. */
@@ -820,8 +825,11 @@ export type Content = {
     /** For a screen reader. Holds `{name}`. */
     withdrawLabel: string;
     confirmTitle: string;
-    /** The consequence of a withdrawal, in one sentence. */
-    consequences: Record<ConsentKey, string>;
+    /**
+     * The consequence of a withdrawal, in one sentence. Accepted terms (the
+     * CGV) are not withdrawn, so they have none (REM-207).
+     */
+    consequences: Record<Exclude<ConsentKey, "cgv">, string>;
     /** The withdrawal does not change what was done before. */
     past: string;
     confirm: string;

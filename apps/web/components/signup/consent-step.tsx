@@ -35,9 +35,8 @@ export type ConsentStepDocument = {
 export type ConsentStepText = ShownConsent & ConsentStepDocument;
 
 type Props = {
+  /** The texts of the box: the care consent and the CGV (REM-207). */
   consents: readonly ConsentStepText[];
-  /** The pilot's sales terms (CGV). No row records their version (REM-9). */
-  terms: ConsentStepDocument;
   ticked: ReadonlySet<ConsentKey>;
   onToggle: (key: ConsentKey, checked: boolean) => void;
   onContinue: () => void;
@@ -98,10 +97,10 @@ const DocumentLink = ({ name, document, versionText }: DocumentLinkProps) => {
  * the server here. The tick travels with the final submit, and the server
  * checks it again.
  *
- * The privacy policy is the text of the mandatory `care` consent. The box
- * ticks each mandatory consent, so the form posts and the server records the
- * same rows as before: the date, the version and the hash of that text. The
- * CGV have no row (Jamie, 2026-11-23).
+ * The privacy policy is the text of the mandatory `care` consent, and the CGV
+ * are the text of the `cgv` key. The box ticks both, so the form posts both
+ * and the server records one row for each: the date, the version and the hash
+ * of the text (REM-207).
  *
  * The sentence is not one `<label>`: a label may not hold the two links. The
  * text between the links is in small labels of the box, so a tap on it ticks
@@ -123,7 +122,6 @@ const DocumentLink = ({ name, document, versionText }: DocumentLinkProps) => {
  */
 export const ConsentStep = ({
   consents,
-  terms,
   ticked,
   onToggle,
   onContinue,
@@ -132,16 +130,19 @@ export const ConsentStep = ({
 }: Props) => {
   const accepted = consents.every((consent) => ticked.has(consent.key));
   const privacy = consents.find((consent) => consent.key === "care");
+  const terms = consents.find((consent) => consent.key === "cgv");
   const boxId = "consent-accept";
   const sentenceId = "consent-accept-text";
 
   const links: Record<string, ReactNode> = {
-    "{terms}": (
+    "{terms}": terms ? (
       <DocumentLink
         name={content.documents.terms}
         document={terms}
         versionText={content.version}
       />
+    ) : (
+      content.documents.terms
     ),
     "{privacy}": privacy ? (
       <DocumentLink

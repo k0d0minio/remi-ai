@@ -236,7 +236,10 @@ export {
   consentTextLocaleFor,
   consentTextLocales,
   legacyConsentVersion,
+  isTermsConsentKey,
   mandatoryConsentKeys,
+  signupConsentKeys,
+  termsConsentKeys,
   parseShownConsent,
   shownConsentValue,
 } from "./consent";

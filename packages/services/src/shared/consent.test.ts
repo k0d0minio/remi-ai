@@ -18,9 +18,33 @@ const row = (
 
 describe("consentSummaries", () => {
   it("lists every key in the order of the vocabulary", () => {
+    expect(
+      consentSummaries({ cgv: row("given", "1") }).map(
+        (summary) => summary.key,
+      ),
+    ).toEqual([...consentKeys]);
+  });
+
+  it("shows no CGV line for a patient with no CGV row (REM-207)", () => {
     expect(consentSummaries({}).map((summary) => summary.key)).toEqual([
-      ...consentKeys,
+      "care",
+      "genetic",
     ]);
+  });
+
+  it("shows accepted CGV read-only: no withdrawal, no new consent (REM-207)", () => {
+    const cgv = consentSummaries({ cgv: row("given", "1") }).find(
+      (summary) => summary.key === "cgv",
+    );
+    expect(cgv).toEqual({
+      key: "cgv",
+      state: "given",
+      decidedAt: new Date("2026-11-20T10:00:00Z"),
+      textVersion: "1",
+      textLocale: "fr-BE",
+      withdrawable: false,
+      canGive: false,
+    });
   });
 
   it("names a key with no row as not asked", () => {

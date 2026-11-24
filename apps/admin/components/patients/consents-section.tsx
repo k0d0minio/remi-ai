@@ -2,6 +2,7 @@ import {
   careConsentGiven,
   consentSummaries,
   formatDate,
+  isTermsConsentKey,
   legacyConsentVersion,
   type ConsentKey,
   type ConsentState,
@@ -21,6 +22,10 @@ import {
  * Morgane's question 5). Read-only: a consent and its withdrawal are the
  * patient's own acts, in the app. The page reads the rows with the actor's
  * scope (`consentsOf`, D-27) and gives them here.
+ *
+ * The CGV are accepted terms, not a consent (REM-207): their line says
+ * « Acceptées », with the date and the version of the text. A patient with no
+ * CGV row has no CGV line (`consentSummaries`).
  */
 
 type Latest = Partial<Record<ConsentKey, LatestConsent>>;
@@ -28,7 +33,11 @@ type Latest = Partial<Record<ConsentKey, LatestConsent>>;
 const consentLabels: Record<ConsentKey, string> = {
   care: "Traitement des données pour l'accompagnement",
   genetic: "Traitement des données génétiques",
+  cgv: "Conditions générales de vente",
 };
+
+/** The badge of accepted terms: the only decision they have. */
+const TERMS_ACCEPTED = "Acceptées";
 
 const stateLabels: Record<ConsentState, string> = {
   given: "Consentement donné",
@@ -107,7 +116,9 @@ export const ConsentsSection = ({ latest }: Props) => {
               </Typography>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant={stateIntents[summary.state]} tone="subtle">
-                  {stateLabels[summary.state]}
+                  {isTermsConsentKey(summary.key)
+                    ? TERMS_ACCEPTED
+                    : stateLabels[summary.state]}
                 </Badge>
                 {detail ? (
                   <Typography as="span" size="sm" tone="muted">

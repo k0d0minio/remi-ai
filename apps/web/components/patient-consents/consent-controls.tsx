@@ -23,7 +23,10 @@ import {
 import { Typography } from "@remi/ui/server";
 import { fill } from "@/lib/content/fill";
 import type { Content } from "@/lib/content/types";
-import { giveConsentAction, withdrawConsentAction } from "@/lib/consents/actions";
+import {
+  giveConsentAction,
+  withdrawConsentAction,
+} from "@/lib/consents/actions";
 import type { ConsentActionError } from "@/lib/consents/state";
 
 /** A text as the server rendered it. */
@@ -124,132 +127,132 @@ export const ConsentControls = ({
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-        {accepted ? (
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                className="min-h-11"
-                aria-label={fill(text.rereadLabel, { name })}
-              >
-                {text.reread}
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
-              <SheetHeader className="pr-12">
-                <SheetTitle>{name}</SheetTitle>
-                <SheetDescription>{accepted.line}</SheetDescription>
-              </SheetHeader>
-              <div lang={accepted.lang} className={textBlockClass}>
-                {accepted.body}
-              </div>
-            </SheetContent>
-          </Sheet>
-        ) : null}
+      {accepted ? (
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              className="min-h-11"
+              aria-label={fill(text.rereadLabel, { name })}
+            >
+              {text.reread}
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
+            <SheetHeader className="pr-12">
+              <SheetTitle>{name}</SheetTitle>
+              <SheetDescription>{accepted.line}</SheetDescription>
+            </SheetHeader>
+            <div lang={accepted.lang} className={textBlockClass}>
+              {accepted.body}
+            </div>
+          </SheetContent>
+        </Sheet>
+      ) : null}
 
-        {withdrawable ? (
-          <Dialog
-            open={confirmOpen}
-            onOpenChange={(open) => {
-              setConfirmOpen(open);
-              setError(null);
-            }}
-          >
-            <DialogTrigger asChild>
+      {withdrawable ? (
+        <Dialog
+          open={confirmOpen}
+          onOpenChange={(open) => {
+            setConfirmOpen(open);
+            setError(null);
+          }}
+        >
+          <DialogTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              className="min-h-11"
+              aria-label={fill(text.withdrawLabel, { name })}
+            >
+              {text.withdraw}
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{text.confirmTitle}</DialogTitle>
+              <DialogDescription>
+                {consentKey === "cgv" ? null : text.consequences[consentKey]}
+              </DialogDescription>
+            </DialogHeader>
+            <Typography size="sm" tone="muted">
+              {text.past}
+            </Typography>
+            {alert}
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  className="min-h-11"
+                  disabled={pending}
+                >
+                  {text.cancel}
+                </Button>
+              </DialogClose>
               <Button
                 type="button"
-                variant="outline"
+                variant="error"
                 size="lg"
                 className="min-h-11"
-                aria-label={fill(text.withdrawLabel, { name })}
+                disabled={pending}
+                onClick={withdraw}
               >
-                {text.withdraw}
+                {pending ? text.withdrawing : text.confirm}
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{text.confirmTitle}</DialogTitle>
-                <DialogDescription>
-                  {text.consequences[consentKey]}
-                </DialogDescription>
-              </DialogHeader>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      ) : null}
+
+      {current ? (
+        <Sheet
+          open={giveOpen}
+          onOpenChange={(open) => {
+            setGiveOpen(open);
+            setError(null);
+          }}
+        >
+          <SheetTrigger asChild>
+            <Button
+              type="button"
+              size="lg"
+              className="min-h-11"
+              aria-label={fill(text.giveLabel, { name })}
+            >
+              {text.give}
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
+            <SheetHeader className="pr-12">
+              <SheetTitle>{name}</SheetTitle>
+              <SheetDescription>{current.line}</SheetDescription>
+            </SheetHeader>
+            <div lang={current.lang} className={textBlockClass}>
+              {current.body}
+            </div>
+            <div className="flex flex-col gap-3 px-6 pb-8">
               <Typography size="sm" tone="muted">
-                {text.past}
+                {text.giveIntro}
               </Typography>
               {alert}
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="lg"
-                    className="min-h-11"
-                    disabled={pending}
-                  >
-                    {text.cancel}
-                  </Button>
-                </DialogClose>
-                <Button
-                  type="button"
-                  variant="error"
-                  size="lg"
-                  className="min-h-11"
-                  disabled={pending}
-                  onClick={withdraw}
-                >
-                  {pending ? text.withdrawing : text.confirm}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        ) : null}
-
-        {current ? (
-          <Sheet
-            open={giveOpen}
-            onOpenChange={(open) => {
-              setGiveOpen(open);
-              setError(null);
-            }}
-          >
-            <SheetTrigger asChild>
               <Button
                 type="button"
                 size="lg"
                 className="min-h-11"
-                aria-label={fill(text.giveLabel, { name })}
+                disabled={pending}
+                onClick={give}
               >
-                {text.give}
+                {pending ? text.giving : text.giveConfirm}
               </Button>
-            </SheetTrigger>
-            <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
-              <SheetHeader className="pr-12">
-                <SheetTitle>{name}</SheetTitle>
-                <SheetDescription>{current.line}</SheetDescription>
-              </SheetHeader>
-              <div lang={current.lang} className={textBlockClass}>
-                {current.body}
-              </div>
-              <div className="flex flex-col gap-3 px-6 pb-8">
-                <Typography size="sm" tone="muted">
-                  {text.giveIntro}
-                </Typography>
-                {alert}
-                <Button
-                  type="button"
-                  size="lg"
-                  className="min-h-11"
-                  disabled={pending}
-                  onClick={give}
-                >
-                  {pending ? text.giving : text.giveConfirm}
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
-        ) : null}
+            </div>
+          </SheetContent>
+        </Sheet>
+      ) : null}
     </div>
   );
 };

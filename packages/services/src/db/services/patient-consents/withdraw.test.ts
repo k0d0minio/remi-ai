@@ -252,3 +252,40 @@ describe("the care consent and the suggestions", () => {
     }
   });
 });
+
+describe("the accepted CGV (REM-207)", () => {
+  it("records an acceptance, and refuses a refusal or a withdrawal", async () => {
+    const louId = await newPatient("Lou");
+    const lou: AuditActor = { kind: "patient", id: louId, name: "Lou" };
+    const accepted = await recordConsent(systemActor, {
+      patientId: louId,
+      key: "cgv",
+      version: "1",
+      locale: "fr-BE",
+      decision: "given",
+      actor: lou,
+    });
+    expect(accepted.ok).toBe(true);
+
+    const refused = await recordConsent(systemActor, {
+      patientId: louId,
+      key: "cgv",
+      version: "1",
+      locale: "fr-BE",
+      decision: "refused",
+      actor: lou,
+    });
+    expect(!refused.ok && refused.error).toBe("not_permitted");
+
+    const withdrawn = await withdrawConsent(patientActor(louId), {
+      patientId: louId,
+      key: "cgv",
+      actor: lou,
+    });
+    expect(!withdrawn.ok && withdrawn.error).toBe("not_permitted");
+
+    const all = await rowsOf(louId);
+    expect(all).toHaveLength(1);
+    expect(all[0]?.decision).toBe("given");
+  });
+});
