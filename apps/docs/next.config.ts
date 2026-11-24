@@ -15,6 +15,13 @@ export default withNextra({
   // is catalogued once in `@remi/services/shared` → `links.ts`. `@remi/ui` stays
   // out — that is the dependency the paragraph above is about.
   transpilePackages: ["@remi/services"],
+  // `@remi/services/shared` → `links.ts` builds a preview's cross-app links
+  // from the Vercel environment and the git branch of the build. Copy both
+  // into the bundle so that the browser reads the same values as the server.
+  env: {
+    NEXT_PUBLIC_VERCEL_TARGET_ENV: process.env.VERCEL_TARGET_ENV ?? "",
+    NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF: process.env.VERCEL_GIT_COMMIT_REF ?? "",
+  },
   turbopack: {
     // Unrelated to this app's own config: Nextra 4.6 points this alias at
     // `@vercel/turbopack-next/mdx-import-source`, a Next internal that no longer
