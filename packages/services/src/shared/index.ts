@@ -38,6 +38,10 @@ export {
   PLANNED_MEALS_PER_DAY,
 } from "./planned-meal";
 export type { PlannedMealTextError } from "./planned-meal";
+export {
+  clearConsultationDrafts,
+  consultationDraftKey,
+} from "./consultation-draft";
 export type {
   MealAlert,
   MealAnswer,

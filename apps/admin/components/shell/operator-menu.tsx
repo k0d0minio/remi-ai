@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@remi/ui";
 import { Badge, Typography } from "@remi/ui/server";
+import { clearConsultationDrafts } from "@remi/services/shared";
 import { signOutAction } from "@/lib/auth/actions";
 
 type Props = {
@@ -21,6 +22,17 @@ type Props = {
   email: string;
   /** Already translated by the caller — this island holds no vocabulary. */
   roleLabel: string;
+};
+
+/**
+ * The drafts go first, on the client, in the same click: the server action
+ * cannot reach `localStorage`, and a shared workstation must not keep a draft
+ * for the next person (REM-117). The helper never throws, so the sign-out
+ * always runs.
+ */
+const signOut = () => {
+  clearConsultationDrafts();
+  void signOutAction();
 };
 
 /**
@@ -65,7 +77,7 @@ export const OperatorMenu = ({ name, initials, email, roleLabel }: Props) => (
       </DropdownMenuItem>
 
       <DropdownMenuSeparator />
-      <DropdownMenuItem destructive onSelect={() => void signOutAction()}>
+      <DropdownMenuItem destructive onSelect={signOut}>
         <LogOut aria-hidden="true" />
         Se déconnecter
       </DropdownMenuItem>
