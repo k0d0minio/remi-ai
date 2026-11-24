@@ -137,6 +137,7 @@ const unscopedRecordConsultation = async (
               // through their link — the same default the single-row path uses.
               await addGoalCheckIn(
                 systemActor,
+                patientId,
                 entry.goalId,
                 checkIn,
                 "practitioner",

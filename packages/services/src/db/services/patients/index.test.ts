@@ -1012,7 +1012,7 @@ describe("the care relationship", () => {
       }),
     );
     const checkIn = unwrapOk(
-      await addGoalCheckIn(systemActor, goal.id, {
+      await addGoalCheckIn(systemActor, mine.id, goal.id, {
         checkedOn: "2026-11-01",
         direction: "better",
       }),
