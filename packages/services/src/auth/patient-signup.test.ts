@@ -120,10 +120,16 @@ const care = (): ShownConsent => {
   return { key: "care", version: text.version, locale: text.locale };
 };
 
+/** The CGV text the box shows now (REM-207). */
+const cgv = (): ShownConsent => {
+  const text = currentConsentText("cgv", "fr-BE");
+  return { key: "cgv", version: text.version, locale: text.locale };
+};
+
 const signUp = (
   overrides: Partial<typeof valid> = {},
   link = token,
-  consents: readonly ShownConsent[] = [care()],
+  consents: readonly ShownConsent[] = [care(), cgv()],
 ) =>
   signUpPatient({
     token: link,
@@ -310,10 +316,49 @@ describe("the sign-up", () => {
     const before = (await profiles()).length;
     const result = await signUp({ email: "ines@example.be" }, token, [
       { ...care(), version: "0" },
+      cgv(),
     ]);
     expect(result).toMatchObject({ ok: false, error: "invalid_input" });
     expect(await profiles()).toHaveLength(before);
     expect(users.size).toBe(0);
+  });
+
+  it("writes nothing without the CGV or with a CGV version that is not current", async () => {
+    const before = (await profiles()).length;
+    for (const consents of [[care()], [care(), { ...cgv(), version: "0" }]]) {
+      const result = await signUp(
+        { email: "ines@example.be" },
+        token,
+        consents,
+      );
+      expect(result).toMatchObject({ ok: false, error: "invalid_input" });
+    }
+    expect(await profiles()).toHaveLength(before);
+    expect(users.size).toBe(0);
+  });
+
+  it("writes one CGV row with the version shown, and its event (REM-207)", async () => {
+    const result = await signUp({ email: "lou@example.be" });
+    if (!result.ok) {
+      throw new Error(result.message);
+    }
+    const consents = await consentsOf(systemActor, result.data.patientId);
+    expect(consents.cgv).toMatchObject({
+      decision: "given",
+      textVersion: "1",
+      textLocale: "fr-BE",
+      textHash: currentConsentText("cgv", "fr-BE").hash,
+      channel: "app",
+      actorKind: "patient",
+    });
+    const events = await listAuditEvents(systemActor, {
+      action: "consent.given",
+      targetId: result.data.patientId,
+    });
+    expect(events.map((event) => event.detail).sort()).toEqual([
+      `care v${care().version} fr-BE`,
+      "cgv v1 fr-BE",
+    ]);
   });
 
   it("writes one care row with the version shown, and its event", async () => {
@@ -322,7 +367,7 @@ describe("the sign-up", () => {
       throw new Error(result.message);
     }
     const consents = await consentsOf(systemActor, result.data.patientId);
-    expect(Object.keys(consents)).toEqual(["care"]);
+    expect(Object.keys(consents).sort()).toEqual(["care", "cgv"]);
     expect(consents.care).toMatchObject({
       decision: "given",
       textVersion: care().version,
@@ -336,8 +381,10 @@ describe("the sign-up", () => {
       action: "consent.given",
       targetId: result.data.patientId,
     });
-    expect(events).toHaveLength(1);
-    expect(events[0]).toMatchObject({
+    expect(events).toHaveLength(2);
+    expect(
+      events.find((event) => event.detail.startsWith("care")),
+    ).toMatchObject({
       actorKind: "patient",
       actorId: result.data.patientId,
       detail: `care v${care().version} fr-BE`,

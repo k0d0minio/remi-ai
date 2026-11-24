@@ -4,6 +4,7 @@ import {
   consentDecisions,
   consentKeys,
   consentTextLocales,
+  isTermsConsentKey,
   type ConsentKey,
 } from "../../../shared/consent";
 import { err, ok, type Result } from "../../../shared/result";
@@ -119,6 +120,11 @@ export const insertConsent = async (
     const name = `${key} v${version} ${locale}`;
     return err("invalid_input", `no consent text ${name}`);
   }
+  // An accepted text of terms is never refused or withdrawn in the app
+  // (REM-207, Jamie, 2026-11-24).
+  if (isTermsConsentKey(key) && decision !== "given") {
+    return err("not_permitted", `the ${key} terms are only accepted`);
+  }
   const actor = input.actor;
   // The genetic consent is the patient's own act, in the app. An operator
   // cannot record it for them, not even from paper (Jamie, 2026-11-03).
@@ -225,9 +231,15 @@ const insertWithdrawal = async (
 ): Promise<Result<ConsentWrite>> => {
   const parsed = withdrawalInput.safeParse(input);
   if (!parsed.success) {
-    return err("invalid_input", "a withdrawal needs a patient and a consent key");
+    return err(
+      "invalid_input",
+      "a withdrawal needs a patient and a consent key",
+    );
   }
   const { patientId, key } = parsed.data;
+  if (isTermsConsentKey(key)) {
+    return err("not_permitted", `the ${key} terms are not withdrawn`);
+  }
   const actor = input.actor;
   // A withdrawal is the patient's own act (REM-43). An operator and a job
   // cannot take a consent back for them.

@@ -10,8 +10,6 @@ import {
   consentText,
   consentTexts,
   currentConsentText,
-  currentSalesTerms,
-  salesTermsTexts,
 } from "./index";
 
 /**
@@ -30,6 +28,8 @@ const publishedHashes: Record<string, string> = {
     "f4fc3aa65bfc4081c77801a4ffc400c4bb29de30addc979707e7c8d252a4920b",
   "genetic/2/fr-BE":
     "c22213ee66e298c34fc91ba77cbede7078746eb7183fc96bd9061e747bae0d5a",
+  "cgv/1/fr-BE":
+    "5e17d3c76f0c744b91e46fca55269e08a7f4567a92297e06232284f75741db42",
 };
 
 const idOf = (text: { key: string; version: string; locale: string }) =>
@@ -83,61 +83,58 @@ describe("consent texts", () => {
   });
 });
 
-describe("the sales terms (REM-9)", () => {
-  it("pins the hash of every published file", () => {
-    expect(
-      Object.fromEntries(
-        salesTermsTexts.map((text) => [
-          `cgv/${text.version}/${text.locale}`,
-          text.hash,
-        ]),
-      ),
-    ).toEqual({
-      "cgv/1/fr-BE":
-        "5e17d3c76f0c744b91e46fca55269e08a7f4567a92297e06232284f75741db42",
-    });
-  });
-
+describe("the sales terms (REM-9, REM-207)", () => {
   it("shows version 1, the public site's CGV with its draft banner", () => {
-    const terms = currentSalesTerms("fr-BE");
+    const terms = currentConsentText("cgv", "fr-BE");
     expect(terms.version).toBe("1");
     expect(terms.body).toContain("# Conditions Générales de Vente");
     expect(terms.body).toContain("à faire valider par un juriste");
   });
 
   it("falls back to fr-BE when the language has no text yet", () => {
-    expect(currentSalesTerms("en").locale).toBe("fr-BE");
+    expect(currentConsentText("cgv", "en").locale).toBe("fr-BE");
   });
 });
 
 describe("the sign-up consent check", () => {
   const care = currentConsentText("care", "fr-BE");
+  const terms = currentConsentText("cgv", "fr-BE");
   const shown = {
     key: "care",
     version: care.version,
     locale: care.locale,
   } as const;
+  const cgv = {
+    key: "cgv",
+    version: terms.version,
+    locale: terms.locale,
+  } as const;
 
-  it("accepts the current care text", () => {
-    expect(checkSignupConsents([shown])).toEqual({
+  it("accepts the current care text and the current CGV", () => {
+    expect(checkSignupConsents([shown, cgv])).toEqual({
       ok: true,
-      consents: [shown],
+      consents: [shown, cgv],
     });
   });
 
-  it("names a mandatory key with no tick as missing", () => {
+  it("names each key of the box with no tick as missing", () => {
     expect(checkSignupConsents([])).toEqual({
       ok: false,
-      missing: ["care"],
+      missing: ["care", "cgv"],
+      stale: [],
+    });
+    expect(checkSignupConsents([shown])).toEqual({
+      ok: false,
+      missing: ["cgv"],
       stale: [],
     });
   });
 
   it("names an old version, a text in another language and a duplicate as stale", () => {
     for (const consents of [
-      [{ ...shown, version: "0" }],
-      [{ ...shown, locale: "en" as const }],
-      [shown, shown],
+      [{ ...shown, version: "0" }, cgv],
+      [{ ...shown, locale: "en" as const }, cgv],
+      [shown, shown, cgv],
     ]) {
       expect(checkSignupConsents(consents)).toEqual({
         ok: false,
@@ -147,11 +144,20 @@ describe("the sign-up consent check", () => {
     }
   });
 
+  it("names a CGV version that is not current as stale (REM-207)", () => {
+    expect(checkSignupConsents([shown, { ...cgv, version: "0" }])).toEqual({
+      ok: false,
+      missing: [],
+      stale: ["cgv"],
+    });
+  });
+
   it("refuses a key the sign-up does not ask", () => {
     const genetic = currentConsentText("genetic", "fr-BE");
     expect(
       checkSignupConsents([
         shown,
+        cgv,
         { key: "genetic", version: genetic.version, locale: genetic.locale },
       ]),
     ).toEqual({ ok: false, missing: [], stale: ["genetic"] });

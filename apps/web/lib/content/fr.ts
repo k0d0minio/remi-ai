@@ -321,6 +321,7 @@ export const fr: Content = {
       names: {
         care: "Traitement de tes données pour ton suivi",
         genetic: "Traitement de tes données génétiques",
+        cgv: "Conditions générales de vente",
       },
       version: "Version {version} du {date}",
       documents: {
@@ -814,6 +815,7 @@ export const fr: Content = {
       withdrawn: "Consentement retiré le {date}",
       none: "Ce consentement ne t'a pas encore été demandé.",
     },
+    accepted: "Acceptées le {date}",
     version: "Version {version} du texte",
     legacyVersion:
       "Ton praticien a recueilli ce consentement avant ton inscription. Le texte n'est pas enregistré dans REMI.",

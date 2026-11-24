@@ -9,12 +9,33 @@ import { consentChannels } from "./patient";
  * mandatory. `genetic` is the genotype, and it is optional (Morgane, call of
  * 2026-10-23). The policy's two other consents, feedback and cookies, have no
  * key because no feature uses them yet (Jamie, 2026-11-01).
+ *
+ * `cgv` is the acceptance of the pilot's sales terms (REM-207). The sign-up
+ * box records it beside `care`. It is not a consent of the policy: the
+ * patient cannot refuse or withdraw it in the app (Jamie, 2026-11-24).
  */
-export const consentKeys = ["care", "genetic"] as const;
+export const consentKeys = ["care", "genetic", "cgv"] as const;
 
 export type ConsentKey = (typeof consentKeys)[number];
 
+/** The keys the service needs in force. The patient space pauses without them. */
 export const mandatoryConsentKeys: readonly ConsentKey[] = ["care"];
+
+/**
+ * The keys that the sign-up box records, one row each (REM-9, REM-207). The
+ * sign-up, its resume page and the file takeover show the same box.
+ */
+export const signupConsentKeys: readonly ConsentKey[] = ["care", "cgv"];
+
+/**
+ * The keys of an accepted text of terms (REM-207). The only decision is
+ * `given`: the settings show the acceptance read-only, and show no line for a
+ * patient with no row (Jamie, 2026-11-24).
+ */
+export const termsConsentKeys: readonly ConsentKey[] = ["cgv"];
+
+export const isTermsConsentKey = (key: ConsentKey): boolean =>
+  termsConsentKeys.includes(key);
 
 /** Append-only: a change of mind is a new row, never an edit of the old one. */
 export const consentDecisions = ["given", "refused", "withdrawn"] as const;
@@ -123,25 +144,34 @@ export type ConsentSummary = {
 };
 
 /**
- * Every key of the vocabulary, in its order, with the patient's answer. A key
- * with no row is in the list too: the screen says that it was not asked.
+ * Every key of the vocabulary, in its order, with the patient's answer. A
+ * consent key with no row is in the list too: the screen says that it was not
+ * asked. A terms key with no row is not in the list, and a terms key is never
+ * withdrawn or given again from the settings (REM-207).
  */
 export const consentSummaries = (
   latest: Partial<Record<ConsentKey, LatestConsent>>,
 ): ConsentSummary[] =>
-  consentKeys.map((key) => {
+  consentKeys.flatMap((key) => {
     const row = latest[key];
-    return {
-      key,
-      state: row?.decision ?? "none",
-      decidedAt: row?.decidedAt ?? null,
-      textVersion: row?.textVersion ?? null,
-      textLocale: row?.textLocale ?? null,
-      withdrawable: row?.decision === "given",
-      canGive:
-        row?.decision === "withdrawn" ||
-        (mandatoryConsentKeys.includes(key) && row?.decision !== "given"),
-    };
+    const terms = isTermsConsentKey(key);
+    if (terms && !row) {
+      return [];
+    }
+    return [
+      {
+        key,
+        state: row?.decision ?? "none",
+        decidedAt: row?.decidedAt ?? null,
+        textVersion: row?.textVersion ?? null,
+        textLocale: row?.textLocale ?? null,
+        withdrawable: !terms && row?.decision === "given",
+        canGive:
+          !terms &&
+          (row?.decision === "withdrawn" ||
+            (mandatoryConsentKeys.includes(key) && row?.decision !== "given")),
+      },
+    ];
   });
 
 /**

@@ -14,7 +14,7 @@ import type { PatientConsent } from "../../models/patient-consent";
 export const consentRows = (db: DatabaseClient = getDatabase()) =>
   db.collection<PatientConsent>("patient_consents");
 
-/** Above any history a patient can build: one row per decision, two keys. */
+/** Above any history a patient can build: one row per decision, three keys. */
 const HISTORY_LIMIT = 500;
 
 /** Latest first. A tie on `decidedAt` falls to `createdAt`. */
