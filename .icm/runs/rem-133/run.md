@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-133/supprimer-un-patient-supprime-aussi-son-utilisateur-neon-auth
 - branch: contact/rem-133-supprimer-un-patient-supprime-aussi-son
 - lane: bug
-- pr: pending
+- pr: #247
 - started: 2026-11-24
