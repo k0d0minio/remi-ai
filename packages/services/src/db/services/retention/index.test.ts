@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import {
   afterEach,
   beforeAll,
@@ -8,8 +7,10 @@ import {
   it,
   vi,
 } from "vitest";
-import { registerAuthProvider } from "../../../auth/provider";
-import { neonAuthProviderFrom } from "../../../auth/adapters/neon-auth";
+import {
+  registerAuthProvider,
+  type AuthProvider,
+} from "../../../auth/provider";
 import {
   consoleMailer,
   registerMailer,
@@ -19,6 +20,7 @@ import { getDatabase, registerDatabase } from "../../client";
 import type { AuditEvent } from "../../models/audit-event";
 import type { Operator } from "../../models/operator";
 import type { PatientAccount } from "../../models/patient-account";
+import { err, ok } from "../../../shared/result";
 import { createMemoryDatabase } from "../../test-helpers";
 import { listAuditEvents, recordAuditEvent } from "../audit";
 import {
@@ -76,7 +78,7 @@ const seed = async (email = "claire@example.be") => {
     await createPatientAccount({
       patientProfileId: patient.id,
       email,
-      authSubject: randomUUID(),
+      authSubject: `subject-${email}`,
     }),
   );
   return { practitioner, patient, account };
@@ -99,21 +101,30 @@ const sweptTables = [
   "operators",
 ];
 
+/** The auth store: the sweep calls `deleteUser` only (REM-133). */
+const fakeAuth: AuthProvider = {
+  name: "fake",
+  signUp: async () => err("upstream_failed", "not used"),
+  signIn: async () => err("upstream_failed", "not used"),
+  requestMagicLink: async () => ok(null),
+  signOut: async () => ok(null),
+  readIdentity: async () => null,
+  renewSessionCache: async () => null,
+  requestPasswordReset: async () => ok(null),
+  resetPassword: async () => ok(null),
+  completeRedirectSignIn: async () => null,
+  deleteUser: async (subject) => {
+    removedUsers.push(subject);
+    return ok(null);
+  },
+  routeHandlers: () => {
+    throw new Error("not used");
+  },
+};
+
 beforeAll(() => {
   registerDatabase(createMemoryDatabase());
-  // The adapter over a client that no test reaches: only `deleteUser` runs.
-  registerAuthProvider(
-    neonAuthProviderFrom(
-      () => {
-        throw new Error("the SDK is not used here");
-      },
-      {
-        removeUser: async (subject) => {
-          removedUsers.push(subject);
-        },
-      },
-    ),
-  );
+  registerAuthProvider(fakeAuth);
 });
 
 beforeEach(async () => {
