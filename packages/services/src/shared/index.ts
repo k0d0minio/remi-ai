@@ -32,6 +32,7 @@ export { dishRoleLabels, dishRoles } from "./food-record";
 export type { FoodRecordStatus } from "./food-record";
 export { FOOD_UNITS_MAX, kitchenQuantityText } from "./kitchen-units";
 export type { FoodUnit } from "./kitchen-units";
+export { mealIntentLabels } from "./meal-intent";
 export {
   checkPlannedMealText,
   PLANNED_MEAL_MAX_LENGTH,
