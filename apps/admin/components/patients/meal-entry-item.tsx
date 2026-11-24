@@ -2,7 +2,11 @@
 
 import { ArchiveRestore, ArchiveX, MessageSquare, Pencil } from "lucide-react";
 import { useState } from "react";
-import { formatDate, type MealEntry } from "@remi/services/shared";
+import {
+  formatDate,
+  mealIntentLabels,
+  type MealEntry,
+} from "@remi/services/shared";
 import { Badge, Field, Input, Textarea, Typography } from "@remi/ui/server";
 import { Button } from "@remi/ui";
 import { MealSlotField } from "@/components/patients/meal-slot-field";
@@ -139,6 +143,15 @@ export const MealEntryItem = ({ entry }: Props) => {
             {mealSlotLabels[entry.slot]}
           </Badge>
         ) : null}
+        {/* Planned or eaten (§ 8): an answer to a planned meal is worth most
+            before the meal, so the card says which one she reads. */}
+        <Badge
+          variant={entry.intent === "planned" ? "outline" : "neutral"}
+          tone="subtle"
+          size="sm"
+        >
+          {mealIntentLabels[entry.intent]}
+        </Badge>
         {/* Named by the act, not the person: a role label has to read right
             for everyone who will ever hold it (apps/admin/AGENTS.md). Only the
             patient writes through the link, so this says the same thing
