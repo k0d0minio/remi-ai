@@ -304,20 +304,40 @@ const parseCheckIn = (input: GoalCheckInInput) =>
       direction: input.direction === "" ? null : (input.direction ?? null),
     });
 
+/**
+ * The goal of a check-in, when it belongs to this patient.
+ *
+ * The goal id arrives from a form. The access check passes on the patient of
+ * the page, so the goal must belong to that patient: else a tampered form
+ * hangs a check-in off another patient's goal while the audit row names this
+ * one. A goal of another patient and a missing goal give the same answer.
+ */
+const goalOfPatient = async (
+  patientId: Id,
+  goalId: Id,
+  db?: DatabaseClient,
+): Promise<Result<PatientGoal>> => {
+  const goal = uuidSchema.safeParse(goalId).success
+    ? await goals(db).findById(goalId)
+    : null;
+  return goal && goal.patientId === patientId
+    ? ok(goal)
+    : err("not_found", "no such goal for this patient");
+};
+
 /** `writtenBy` is set by the code path, never by the payload — see `addMealEntry`. */
 const unscopedAddGoalCheckIn = async (
+  patientId: Id,
   goalId: Id,
   input: GoalCheckInInput,
   writtenBy: WrittenBy = "practitioner",
   db?: DatabaseClient,
 ): Promise<Result<PatientGoalCheckIn>> => {
-  if (!uuidSchema.safeParse(goalId).success) {
-    return err("not_found", "no such goal");
+  const owned = await goalOfPatient(patientId, goalId, db);
+  if (!owned.ok) {
+    return owned;
   }
-  const goal = await goals(db).findById(goalId);
-  if (!goal) {
-    return err("not_found", "no such goal");
-  }
+  const goal = owned.data;
   const parsed = parseCheckIn(input);
   if (!parsed.success) {
     return err("invalid_input", parsed.error.issues[0].message);
@@ -346,6 +366,7 @@ const unscopedAddGoalCheckIn = async (
 };
 
 const unscopedUpdateGoalCheckIn = async (
+  patientId: Id,
   id: Id,
   input: GoalCheckInInput,
 ): Promise<Result<PatientGoalCheckIn>> => {
@@ -355,6 +376,10 @@ const unscopedUpdateGoalCheckIn = async (
   const existing = await checkIns().findById(id);
   if (!existing) {
     return err("not_found", "no such check-in");
+  }
+  const owned = await goalOfPatient(patientId, existing.goalId);
+  if (!owned.ok) {
+    return owned;
   }
   const parsed = checkInFields.partial().safeParse(
     supplied({
@@ -378,10 +403,7 @@ const unscopedUpdateGoalCheckIn = async (
   if (!updated) {
     return err("not_found", "no such check-in");
   }
-  const goal = await goals().findById(existing.goalId);
-  if (goal) {
-    await touchPatient(goal.patientId);
-  }
+  await touchPatient(owned.data.patientId);
   return ok(updated);
 };
 
@@ -678,14 +700,14 @@ export const listGoalCheckIns = byRecord(
   unscopedListGoalCheckIns,
   () => [],
 );
-export const addGoalCheckIn = byRecord(
-  "goal",
+/** Takes the patient of the page, and refuses a goal of another patient. */
+export const addGoalCheckIn = byPatient(
   "write",
   unscopedAddGoalCheckIn,
   noSuchPatient,
 );
-export const updateGoalCheckIn = byRecord(
-  "goalCheckIn",
+/** Takes the patient of the page, and refuses a check-in of another patient. */
+export const updateGoalCheckIn = byPatient(
   "write",
   unscopedUpdateGoalCheckIn,
   noSuchPatient,

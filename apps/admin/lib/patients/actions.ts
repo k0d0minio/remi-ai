@@ -1284,8 +1284,10 @@ export const addCheckInAction = async (
     return { error: NO_SUCH_FILE };
   }
   const goalId = field(formData, "goalId");
+  const patientId = field(formData, "patientId");
   const direction = asGoalDirection(field(formData, "direction"));
-  const result = await addGoalCheckIn(actor, goalId, {
+  // The service refuses a goal that is not this patient's.
+  const result = await addGoalCheckIn(actor, patientId, goalId, {
     checkedOn: field(formData, "checkedOn"),
     direction: direction === "" ? null : direction,
     measure: field(formData, "measure"),
@@ -1300,7 +1302,7 @@ export const addCheckInAction = async (
     label: field(formData, "title"),
     detail: result.data.checkedOn,
   });
-  revalidatePatient(field(formData, "patientId"));
+  revalidatePatient(patientId);
   return { error: null };
 };
 
@@ -1314,8 +1316,10 @@ export const updateCheckInAction = async (
     return { error: NO_SUCH_FILE };
   }
   const id = field(formData, "id");
+  const patientId = field(formData, "patientId");
   const direction = asGoalDirection(field(formData, "direction"));
-  const result = await updateGoalCheckIn(actor, id, {
+  // The service refuses a check-in whose goal is not this patient's.
+  const result = await updateGoalCheckIn(actor, patientId, id, {
     checkedOn: field(formData, "checkedOn"),
     direction: direction === "" ? null : direction,
     measure: field(formData, "measure"),
@@ -1330,7 +1334,7 @@ export const updateCheckInAction = async (
     label: field(formData, "title"),
     detail: result.data.checkedOn,
   });
-  revalidatePatient(field(formData, "patientId"));
+  revalidatePatient(patientId);
   return { error: null };
 };
 

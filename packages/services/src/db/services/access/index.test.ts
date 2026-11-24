@@ -179,6 +179,7 @@ beforeAll(async () => {
   unwrapOk(
     await addGoalCheckIn(
       systemActor,
+      id,
       goal.id,
       { checkedOn: "2026-11-01", direction: "better" },
       "patient",

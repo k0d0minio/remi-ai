@@ -21,6 +21,7 @@ import {
   updatePatientGoal,
 } from "./index";
 import { systemActor } from "../../services/access";
+import { listAuditEvents } from "../audit";
 
 let patientId: string;
 
@@ -247,16 +248,16 @@ describe("goal check-ins", () => {
     await clearActive();
     const goal = await add("Énergie", "3/10");
 
-    await addGoalCheckIn(systemActor, goal.id, {
+    await addGoalCheckIn(systemActor, patientId, goal.id, {
       checkedOn: "2026-09-01",
       direction: "stable",
     });
-    await addGoalCheckIn(systemActor, goal.id, {
+    await addGoalCheckIn(systemActor, patientId, goal.id, {
       checkedOn: "2026-10-01",
       direction: "better",
       measure: "6/10",
     });
-    await addGoalCheckIn(systemActor, goal.id, {
+    await addGoalCheckIn(systemActor, patientId, goal.id, {
       checkedOn: "2026-08-01",
       note: "point de départ",
     });
@@ -280,7 +281,7 @@ describe("goal check-ins", () => {
     await clearActive();
     const goal = await add("Énergie");
 
-    const empty = await addGoalCheckIn(systemActor, goal.id, {
+    const empty = await addGoalCheckIn(systemActor, patientId, goal.id, {
       checkedOn: "2026-09-01",
     });
     expect(empty.ok).toBe(false);
@@ -294,7 +295,7 @@ describe("goal check-ins", () => {
     await clearActive();
     const goal = await add("Énergie");
 
-    const bogus = await addGoalCheckIn(systemActor, goal.id, {
+    const bogus = await addGoalCheckIn(systemActor, patientId, goal.id, {
       checkedOn: "2026-09-01",
       direction: "excellent",
     });
@@ -308,6 +309,7 @@ describe("goal check-ins", () => {
   it("refuses a check-in on a goal that does not exist", async () => {
     const orphan = await addGoalCheckIn(
       systemActor,
+      patientId,
       "00000000-0000-4000-8000-000000000000",
       { checkedOn: "2026-09-01", direction: "better" },
     );
@@ -317,7 +319,7 @@ describe("goal check-ins", () => {
   it("edits and deletes one entry of the trail", async () => {
     await clearActive();
     const goal = await add("Énergie");
-    const entry = await addGoalCheckIn(systemActor, goal.id, {
+    const entry = await addGoalCheckIn(systemActor, patientId, goal.id, {
       checkedOn: "2026-09-01",
       measure: "4/10",
     });
@@ -325,7 +327,7 @@ describe("goal check-ins", () => {
       throw new Error("check-in refused");
     }
 
-    const corrected = await updateGoalCheckIn(systemActor, entry.data.id, {
+    const corrected = await updateGoalCheckIn(systemActor, patientId, entry.data.id, {
       measure: "5/10",
     });
     expect(corrected.ok).toBe(true);
@@ -335,7 +337,7 @@ describe("goal check-ins", () => {
     }
 
     // Clearing the last thing an entry says would leave a dated empty row.
-    const emptied = await updateGoalCheckIn(systemActor, entry.data.id, {
+    const emptied = await updateGoalCheckIn(systemActor, patientId, entry.data.id, {
       measure: "",
     });
     expect(emptied.ok).toBe(false);
@@ -347,7 +349,7 @@ describe("goal check-ins", () => {
   it("takes the trail with the goal when the goal is deleted", async () => {
     await clearActive();
     const goal = await add("Énergie");
-    await addGoalCheckIn(systemActor, goal.id, {
+    await addGoalCheckIn(systemActor, patientId, goal.id, {
       checkedOn: "2026-09-01",
       direction: "better",
     });
@@ -355,6 +357,83 @@ describe("goal check-ins", () => {
 
     expect((await deletePatientGoal(systemActor, goal.id)).ok).toBe(true);
     expect(await listGoalCheckIns(systemActor, goal.id)).toHaveLength(0);
+  });
+});
+
+/**
+ * The goal id comes from a form, and the access check passes on the patient
+ * of the page (REM-114). The system actor reaches every file, so these tests
+ * show that access alone is not enough: the goal must belong to the patient.
+ */
+describe("a check-in on another patient's goal", () => {
+  const otherPatientGoal = async () => {
+    const other = await createPatient(systemActor, {
+      practitionerId: testPractitionerId,
+      pseudonym: "Lucie",
+    });
+    if (!other.ok) {
+      throw new Error("other patient not created");
+    }
+    const goal = await addPatientGoal(systemActor, other.data.id, {
+      title: "Sommeil",
+    });
+    if (!goal.ok) {
+      throw new Error("other patient's goal refused");
+    }
+    return { patientId: other.data.id, goal: goal.data };
+  };
+
+  it("refuses to add it, and writes nothing", async () => {
+    await clearActive();
+    const own = await add("Énergie");
+    const other = await otherPatientGoal();
+    const auditBefore = await listAuditEvents(systemActor);
+
+    const added = await addGoalCheckIn(systemActor, patientId, other.goal.id, {
+      checkedOn: "2026-09-01",
+      direction: "better",
+    });
+
+    expect(added.ok).toBe(false);
+    if (!added.ok) {
+      expect(added.error).toBe("not_found");
+      expect(added.message).toBe("no such goal for this patient");
+    }
+    expect(await listGoalCheckIns(systemActor, other.goal.id)).toHaveLength(0);
+    expect(await listGoalCheckIns(systemActor, own.id)).toHaveLength(0);
+    expect(await listAuditEvents(systemActor)).toEqual(auditBefore);
+  });
+
+  it("refuses to update it, and writes nothing", async () => {
+    await clearActive();
+    await add("Énergie");
+    const other = await otherPatientGoal();
+    const theirs = await addGoalCheckIn(
+      systemActor,
+      other.patientId,
+      other.goal.id,
+      { checkedOn: "2026-09-01", measure: "4/10" },
+    );
+    if (!theirs.ok) {
+      throw new Error("other patient's check-in refused");
+    }
+    const auditBefore = await listAuditEvents(systemActor);
+
+    const updated = await updateGoalCheckIn(
+      systemActor,
+      patientId,
+      theirs.data.id,
+      { measure: "9/10" },
+    );
+
+    expect(updated.ok).toBe(false);
+    if (!updated.ok) {
+      expect(updated.error).toBe("not_found");
+      expect(updated.message).toBe("no such goal for this patient");
+    }
+    const trail = await listGoalCheckIns(systemActor, other.goal.id);
+    expect(trail.map((entry) => entry.measure)).toEqual(["4/10"]);
+    expect(await listAuditEvents(systemActor)).toEqual(auditBefore);
   });
 });
 
@@ -516,7 +595,7 @@ describe("the weekly check-in", () => {
     const patient = await freshPatient(["Énergie"]);
     const goalId = patient.goals[0].id;
     // Her consultation row carries no score, so it is never the baseline.
-    await addGoalCheckIn(systemActor, goalId, {
+    await addGoalCheckIn(systemActor, patient.id, goalId, {
       checkedOn: "2026-10-02",
       measure: "4/10",
     });
@@ -588,7 +667,7 @@ describe("the weekly check-in", () => {
       "2026-10-08",
     );
     // Her own row saying "worse" is hers — it never waits for her.
-    await addGoalCheckIn(systemActor, goalId, {
+    await addGoalCheckIn(systemActor, patient.id, goalId, {
       checkedOn: "2026-10-09",
       direction: "worse",
     });
@@ -612,7 +691,7 @@ describe("the weekly check-in", () => {
 
   it("leaves her consultation check-ins without a score", async () => {
     const patient = await freshPatient(["Énergie"]);
-    const created = await addGoalCheckIn(systemActor, patient.goals[0].id, {
+    const created = await addGoalCheckIn(systemActor, patient.id, patient.goals[0].id, {
       checkedOn: "2026-10-01",
       direction: "better",
     });
