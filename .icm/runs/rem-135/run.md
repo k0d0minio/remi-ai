@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-135/les-liens-entre-applications-dune-preview-ne-pointent-plus-vers-la
 - branch: contact/rem-135-les-liens-entre-applications-dune-preview-ne
 - lane: bug
-- pr: pending
+- pr: #241
 - started: 2026-11-24
