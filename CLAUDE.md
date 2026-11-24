@@ -72,4 +72,6 @@ the production database moves to Postgres 18 at the next promotion (Jamie, 2026-
 - A ticket's merge reaches the UAT environment, where the client tests the batch. Production
   moves only on Jamie's word, after the client's sign-off (`.icm/_system/features/uat.md`).
 - Linear: BAXTER makes the tickets and moves their states. GitHub is not connected to Linear,
-  and this repo has no Linear key. A session in this repo does not write to Linear.
+  and this repo has no Linear key. A session makes its own ticket acts in Linear with the
+  BAXTER Linear tool: a comment on its ticket, a new issue in Triage, a relation
+  (`.icm/_system/features/linear-writes.md`). Jamie, 2026-11-24: "Yes, all".
