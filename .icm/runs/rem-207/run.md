@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-207/inscription-patient-enregistrer-la-version-des-cgv-acceptee
 - branch: contact/rem-207-inscription-patient-enregistrer-la-version
 - lane: spine
-- pr: pending
+- pr: #246
 - started: 2026-11-24
