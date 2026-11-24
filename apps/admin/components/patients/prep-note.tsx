@@ -2,6 +2,11 @@
 
 import { useActionState, useRef, useState } from "react";
 import { Pencil } from "lucide-react";
+import {
+  shownAfterSave,
+  singleFlight,
+  type ConfirmedSave,
+} from "@remi/services/shared";
 import { Input, Typography } from "@remi/ui/server";
 import { Button } from "@remi/ui";
 import {
@@ -17,7 +22,7 @@ type Props = {
 
 const EMPTY_PROMPT = "Ajouter une note pour la prochaine consultation.";
 
-const initial: PrepFormState = { error: null, saved: false };
+const initial: PrepFormState = { error: null, saved: false, stored: null };
 
 /**
  * The "à préparer pour la prochaine consultation" note — a nullable free-text
@@ -25,37 +30,58 @@ const initial: PrepFormState = { error: null, saved: false };
  * the next one. The working view gives it a place: a single text block with an
  * inline edit affordance that saves on blur or Enter and cancels on Escape.
  * `NULL` (not set) and "" (explicitly cleared) both render the empty prompt.
+ *
+ * After a save, the note shows the text that the action stored, not the server
+ * prop from before the save (`shownAfterSave`). A blur and then a click on
+ * « Enregistrer » send one save (`singleFlight`), REM-112.
  */
 export const PrepNote = ({ patientId, pseudonym, value }: Props) => {
   const [editing, setEditing] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
   const [draft, setDraft] = useState(value ?? "");
+  // The last save that the action confirmed. Opening the editor clears it,
+  // so « Enregistré. » belongs to the last save only.
+  const [confirmed, setConfirmed] = useState<ConfirmedSave | null>(null);
+  const [flight] = useState(singleFlight);
+  // The server prop when the save started.
+  const before = useRef(value);
   const [state, formAction, pending] = useActionState(
-    updateNextConsultationPrepAction,
+    async (previous: PrepFormState, formData: FormData) => {
+      try {
+        const next = await updateNextConsultationPrepAction(previous, formData);
+        if (next.saved) {
+          setConfirmed({ stored: next.stored, before: before.current });
+          setEditing(false);
+        }
+        return next;
+      } finally {
+        flight.end();
+      }
+    },
     initial,
   );
   const formRef = useRef<HTMLFormElement>(null);
 
-  const saved = state.saved && !state.error && !dismissed;
+  const note = shownAfterSave(value, confirmed);
 
   const cancel = () => {
-    setDraft(value ?? "");
+    setDraft(note ?? "");
     setEditing(false);
   };
 
   const submit = () => {
-    if (!pending && formRef.current) {
+    if (formRef.current && flight.start()) {
+      before.current = value;
       formRef.current.requestSubmit();
     }
   };
 
   const open = () => {
-    setDismissed(true);
-    setDraft(value ?? "");
+    setConfirmed(null);
+    setDraft(note ?? "");
     setEditing(true);
   };
 
-  if (editing && !saved) {
+  if (editing) {
     return (
       <form ref={formRef} action={formAction} className="flex flex-col gap-2">
         <input type="hidden" name="patientId" value={patientId} />
@@ -69,6 +95,8 @@ export const PrepNote = ({ patientId, pseudonym, value }: Props) => {
             if (event.key === "Escape") {
               cancel();
             } else if (event.key === "Enter") {
+              // The browser would submit the form too: one send only.
+              event.preventDefault();
               submit();
             }
           }}
@@ -93,8 +121,6 @@ export const PrepNote = ({ patientId, pseudonym, value }: Props) => {
     );
   }
 
-  const note = value ?? draft;
-
   return (
     <div className="flex flex-col gap-1">
       {note ? (
@@ -117,7 +143,7 @@ export const PrepNote = ({ patientId, pseudonym, value }: Props) => {
           {EMPTY_PROMPT}
         </Button>
       )}
-      {saved ? (
+      {confirmed ? (
         <Typography size="sm" tone="muted" role="status">
           Enregistré.
         </Typography>

@@ -157,7 +157,12 @@ export type InstructionFormState = { error: string | null; saved: boolean };
 export type ChallengeFormState = { error: string | null; saved: boolean };
 export type MessageFormState = { error: string | null; saved: boolean };
 export type SummaryFormState = { error: string | null; saved: boolean };
-export type PrepFormState = { error: string | null; saved: boolean };
+/** `stored` is the note that the save wrote. Null when it is empty or on an error. */
+export type PrepFormState = {
+  error: string | null;
+  saved: boolean;
+  stored: string | null;
+};
 export type ConsultationFormState = { error: string | null; saved: boolean };
 export type DocumentFormState = { error: string | null; saved: boolean };
 export type DeletePatientState = { error: string | null };
@@ -1654,7 +1659,7 @@ export const updateNextConsultationPrepAction = async (
   const operator = await requireOperator();
   const actor = await requireActor();
   if (!(await holdsPatient(actor, field(formData, "patientId")))) {
-    return { error: NO_SUCH_FILE, saved: false };
+    return { error: NO_SUCH_FILE, saved: false, stored: null };
   }
   const patientId = field(formData, "patientId");
   const before = await getPatient(actor, patientId);
@@ -1664,7 +1669,7 @@ export const updateNextConsultationPrepAction = async (
     field(formData, "body"),
   );
   if (!result.ok) {
-    return { error: userMessage(result), saved: false };
+    return { error: userMessage(result), saved: false, stored: null };
   }
   const changed =
     !before.ok ||
@@ -1677,7 +1682,11 @@ export const updateNextConsultationPrepAction = async (
     });
   }
   revalidatePatient(patientId);
-  return { error: null, saved: true };
+  return {
+    error: null,
+    saved: true,
+    stored: result.data.nextConsultationPrep,
+  };
 };
 
 export type ConsultationDateFormState = {
