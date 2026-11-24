@@ -25,6 +25,14 @@ de production.
   `admin-git-…` de la branche dans ses origines de confiance (lu le 2026-11-24). Jamie n'a rien à
   faire dans la console Neon.
 
+## Vérifié sur les previews (2026-11-24)
+
+- La navigation de la preview `documentation` lie
+  `https://app-git-contact-rem-135-les-liens-entre-applicati-f22013-remi21.vercel.app/fr` et
+  `https://marketing-git-contact-rem-135-les-liens-entre-app-b3010e-remi21.vercel.app/fr`.
+- Le `metadataBase` de la preview `marketing` est son propre alias de branche.
+- Non vérifié : la page Patients de la preview admin demande une connexion d'opérateur.
+
 ## Next action
 
 L'opérateur teste la preview, puis coche **Ready to merge**.
