@@ -292,6 +292,8 @@ export {
   isFileStatus,
 } from "./file-status";
 export type { FileOrigin, FileStatus } from "./file-status";
+export { shownAfterSave, singleFlight } from "./inline-save";
+export type { ConfirmedSave, SingleFlight } from "./inline-save";
 export { patientFileLayout } from "./patient-file-layout";
 export type {
   PatientFileAction,
