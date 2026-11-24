@@ -113,6 +113,7 @@ import {
   type RecommendationCategory,
 } from "@remi/services/shared";
 import { audit } from "@/lib/audit";
+import { authProviderReady } from "@/lib/auth/provider";
 import { requireActor, requireOperator } from "@/lib/auth/session";
 import { fileStoreReady } from "@/lib/files";
 import {
@@ -543,10 +544,10 @@ export const savePatientAction = async (
 };
 
 /**
- * Deletes the patient — and first their files in the store, which is why the
- * file store is registered before the call: `deletePatient` refuses to leave a
- * patient's files behind, and a refusal is shown in the dialog rather than
- * lost in a redirect.
+ * Deletes the patient — and first their files in the store and their user in
+ * the auth store, which is why both seams are registered before the call:
+ * `deletePatient` refuses to leave a patient's files or sign-in behind, and a
+ * refusal is shown in the dialog rather than lost in a redirect.
  */
 export const deletePatientAction = async (
   _previous: DeletePatientState,
@@ -559,6 +560,7 @@ export const deletePatientAction = async (
   }
   const id = field(formData, "id");
   fileStoreReady();
+  authProviderReady();
   const existing = await getPatient(actor, id);
   const removed = await deletePatient(actor, id);
   if (!removed.ok && removed.error !== "not_found") {

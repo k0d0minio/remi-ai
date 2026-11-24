@@ -39,6 +39,9 @@ it is one POST to one endpoint, so it uses `fetch` and the package stays at a si
 The AI Gateway adapter uses the AI SDK (`ai`): the SDK does the structured output and the retries.
 The Neon Auth SDK reads cookies through `next/headers`, so `next` is a peer dependency of this
 package. Apps are lint-blocked from `@neon/auth`.
+The Neon Auth adapter builds the SDK at the first sign-in call. Its `deleteUser` needs only
+`DATABASE_URL`, so `apps/admin` registers the adapter for that call alone. Unregistered,
+`deletePatient` refuses a patient who has an account (REM-133).
 
 ## Entrypoints — pick the one that matches where the code runs
 

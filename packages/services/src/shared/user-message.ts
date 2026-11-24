@@ -269,6 +269,12 @@ const sentences: Readonly<Record<string, string>> = {
     "Trop de modifications aujourd'hui. Réessayez demain.",
 
   // upstream_failed
+  "no auth provider is configured, so the patient's sign-in cannot be removed — nothing was deleted":
+    "Aucun service de connexion n'est configuré : l'accès du patient ne peut pas être supprimé. Rien n'a été supprimé.",
+  "the patient's sign-in could not be removed from the auth store — the profile was kept; try the deletion again":
+    "L'accès du patient n'a pas pu être supprimé. Le dossier est conservé. Réessayez la suppression.",
+  "the auth store did not delete the user":
+    "Le service de connexion n'a pas supprimé l'utilisateur. Réessayez dans un instant.",
   "no file store is configured, so the patient's files cannot be removed — nothing was deleted":
     "Aucun stockage de fichiers n'est configuré : les fichiers du dossier ne peuvent pas être retirés. Rien n'a été supprimé.",
   "no mailer is registered, so no notice can go out: the sweep did nothing":

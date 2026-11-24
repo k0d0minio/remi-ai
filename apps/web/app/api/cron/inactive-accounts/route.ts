@@ -1,6 +1,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { env, runInactivitySweep } from "@remi/services/server";
 import { appHref } from "@remi/services/shared";
+import { ensureAuthProvider } from "@/lib/auth/provider";
 import { ensureDatabase } from "@/lib/database";
 import { fileStoreReady } from "@/lib/files";
 import { mailerReady } from "@/lib/mailer";
@@ -46,6 +47,9 @@ export const GET = async (request: Request) => {
   // `deletePatient` removes the files first, and refuses when a file is left
   // with no store to remove it from. The log already names the variable.
   fileStoreReady();
+  // It then removes the patient's auth user, and refuses to delete a patient
+  // with an account when no auth adapter is registered (REM-133).
+  ensureAuthProvider();
 
   const result = await runInactivitySweep({
     signInUrl: (locale) => appHref("web", SIGN_IN_PATH, locale),

@@ -8,6 +8,10 @@ import {
   vi,
 } from "vitest";
 import {
+  registerAuthProvider,
+  type AuthProvider,
+} from "../../../auth/provider";
+import {
   consoleMailer,
   registerMailer,
   type EmailMessage,
@@ -16,6 +20,7 @@ import { getDatabase, registerDatabase } from "../../client";
 import type { AuditEvent } from "../../models/audit-event";
 import type { Operator } from "../../models/operator";
 import type { PatientAccount } from "../../models/patient-account";
+import { err, ok } from "../../../shared/result";
 import { createMemoryDatabase } from "../../test-helpers";
 import { listAuditEvents, recordAuditEvent } from "../audit";
 import {
@@ -34,6 +39,9 @@ import { systemActor } from "../../services/access";
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 let sent: EmailMessage[] = [];
+
+/** The auth users the sweep deleted (REM-133). */
+const removedUsers: string[] = [];
 
 const signInUrl = (locale: string) => `https://app.test/${locale}/connexion`;
 
@@ -93,8 +101,30 @@ const sweptTables = [
   "operators",
 ];
 
+/** The auth store: the sweep calls `deleteUser` only (REM-133). */
+const fakeAuth: AuthProvider = {
+  name: "fake",
+  signUp: async () => err("upstream_failed", "not used"),
+  signIn: async () => err("upstream_failed", "not used"),
+  requestMagicLink: async () => ok(null),
+  signOut: async () => ok(null),
+  readIdentity: async () => null,
+  renewSessionCache: async () => null,
+  requestPasswordReset: async () => ok(null),
+  resetPassword: async () => ok(null),
+  completeRedirectSignIn: async () => null,
+  deleteUser: async (subject) => {
+    removedUsers.push(subject);
+    return ok(null);
+  },
+  routeHandlers: () => {
+    throw new Error("not used");
+  },
+};
+
 beforeAll(() => {
   registerDatabase(createMemoryDatabase());
+  registerAuthProvider(fakeAuth);
 });
 
 beforeEach(async () => {
@@ -263,6 +293,7 @@ describe("the deletion at twelve months", () => {
     const counts = await sweepAt(hourAfter(due));
     expect(counts.deleted).toBe(1);
     expect((await getPatient(systemActor, patient.id)).ok).toBe(false);
+    expect(removedUsers).toContain(account.authSubject);
     const deletions = await listAuditEvents(systemActor, {
       action: "patient.deleted",
     });

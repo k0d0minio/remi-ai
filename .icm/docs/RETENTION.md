@@ -172,12 +172,23 @@ Deleting a patient from the console removes, permanently and in one operation:
   are removed from the store **before** the profile, and if the store refuses (or no store is
   configured while the patient has files), nothing is deleted and the console says why;
 - the write ledger behind the rate limit, which is timestamps and nothing else;
+- the patient's sign-in, when the patient has an account (REM-133). The auth store is the
+  `neon_auth` schema of the same Neon branch (Neon Auth). It holds the user's e-mail and name
+  (`neon_auth."user"`), the password hash and the sign-in methods (`neon_auth.account`) and the
+  sessions (`neon_auth.session`). The delete path: `deletePatient` reads the account's
+  `auth_subject` and calls `deleteUser` of the auth seam. The Neon Auth adapter deletes the row
+  `neon_auth."user"` with that id, and the schema's cascades delete its `account`, `session` and
+  `member` rows. This happens after the files and before the profile. If no auth adapter is
+  registered, or the auth store refuses, nothing more is deleted: the profile stays, the console
+  says why, and a second try finishes the deletion. The `neon_auth.verification` rows of a magic
+  link or a password reset are not deleted: they hold the e-mail and expire after a few minutes;
 - the share link — the token goes with the row, so the URL stops resolving. Anyone still holding it
   gets a not-found page.
 
 This is a database cascade (`onDelete: "cascade"` on every child table, the write ledger
 included) — plus the file store's sweep of the patient's prefix just before it, since no database
-cascade reaches outside the database — not a status flag: there
+cascade reaches outside the database, and the deletion of the auth user, since `patient_accounts`
+keeps the auth user's id as text and not as a foreign key — not a status flag: there
 is no soft-deleted copy, no recycle bin, and nothing to undo it with. The console asks for
 confirmation first for that reason.
 
@@ -256,9 +267,9 @@ records the notice, and the audit trail gets a `patient.inactivity_notice_sent` 
 back to null and the clock starts again. The next notice comes eleven months later.
 
 **Twelve months after it**, and never sooner than thirty days after the notice, the route deletes
-the file through `deletePatient`: the same cascade as the console, files first (§ What deleting a
-patient removes). The audit trail gets a `patient.deleted` row with actor kind `system` and the
-detail `inactivity`. When the file store refuses, nothing is deleted and the next run tries again.
+the file through `deletePatient`: the same cascade as the console, files first, then the auth
+user (§ What deleting a patient removes). The audit trail gets a `patient.deleted` row with actor kind `system` and the
+detail `inactivity`. When the file store or the auth store refuses, the profile stays and the next run tries again.
 
 **The retention hold.** An admin of the console can set a hold on a file, in the « Zone sensible »
 of the file page (`patient_profiles.retention_hold_at`). While it stands, the route sends no notice
