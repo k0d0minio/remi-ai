@@ -2,11 +2,11 @@
 
 ## Next action
 
-<What the next session, or the operator, does first.>
+L'opérateur teste la déconnexion sur l'aperçu de la console (`admin`), coche **Ready to merge** sur la pull request #242, puis lance `release REM-117`.
 
 ## How to test
 
-<1 to 3 short sentences that can be said aloud: where to go on the preview, what to do, what the operator must see.>
+Ouvrez « Nouvelle consultation » d'un patient, tapez une note, puis déconnectez-vous avec « Se déconnecter » dans le menu du compte. Dans les outils de développement, onglet Application, `localStorage` ne contient plus aucune clé `remi:consultation:`. La déconnexion mène à la page de connexion comme avant.
 
 ## Blockers
 
@@ -14,4 +14,4 @@
 
 ## Do not touch
 
-- none
+- Le TTL de 12 h du brouillon (`DRAFT_TTL_MS`, #99) reste en place.
