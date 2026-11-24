@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-114/les-actions-de-suivi-refusent-un-objectif-qui-appartient-a-un-autre
 - branch: contact/rem-114-les-actions-de-suivi-refusent-un-objectif
 - lane: bug
-- pr: pending
+- pr: #245
 - started: 2026-11-24
