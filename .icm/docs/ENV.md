@@ -180,7 +180,9 @@ Patients sign in through the auth seam in `packages/services/src/auth/` (D-28). 
 is Neon Auth, managed Better Auth, at `packages/services/src/auth/adapters/neon-auth.ts`. The users
 live in the `neon_auth` schema of the same Neon branch, so each preview branch has its own users.
 `apps/web` registers the adapter at first use (`apps/web/lib/auth/provider.ts`) and mounts the
-auth API at `/api/auth/[...path]`. Neon Auth's own settings (sign-in methods, the magic link, the
+auth API at `/api/auth/[...path]`. `apps/admin` registers it too (`apps/admin/lib/auth/provider.ts`),
+for one call only: `deleteUser`, when a patient with an account is deleted (REM-133). That call
+deletes the row of `neon_auth."user"` through `DATABASE_URL` and needs no `NEON_AUTH_*` variable. Neon Auth's own settings (sign-in methods, the magic link, the
 SMTP sender, the trusted origins) live in the Neon console, per project, not in a variable.
 
 `require_email_verification` is `false` in `remi-ai` and in `uat-remi-ai` (Jamie, 2026-11-05).

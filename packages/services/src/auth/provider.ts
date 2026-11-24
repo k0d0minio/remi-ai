@@ -152,6 +152,14 @@ export type AuthProvider = {
    * The caller is the route where the link lands, with that route's request.
    */
   completeRedirectSignIn: (request: Request) => Promise<Response | null>;
+  /**
+   * Deletes one user of the identity store by its subject, with its sessions
+   * and its sign-in methods. The caller is `deletePatient`: the patient file
+   * and the user go together (REM-133). A subject that the store does not
+   * know is a success: the user is already gone, so a second try succeeds.
+   * It answers `upstream_failed` when the store did not delete the user.
+   */
+  deleteUser: (subject: string) => Promise<AuthResult<null>>;
   routeHandlers: () => AuthRouteHandlers;
 };
 

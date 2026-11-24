@@ -1,4 +1,5 @@
 import { createNeonAuth } from "@neon/auth/next/server";
+import { neon } from "@neondatabase/serverless";
 import { err, ok } from "../../shared/result";
 import type { ServiceErrorCode } from "../../shared/result";
 import { requireEnv } from "../../server/env";
@@ -202,17 +203,61 @@ const signedIn = async (
 };
 
 /**
- * Build the provider over any client of the SDK's shape. The tests pass a
- * fake, and a `wait` that does not wait.
+ * Removes one row of `neon_auth."user"`. The cascades of the schema remove
+ * the user's sessions, sign-in methods (`account`) and organisation
+ * memberships. It throws when the database refuses the statement.
+ */
+export type RemoveUser = (subject: string) => Promise<void>;
+
+/** The shape of a Neon Auth user id. No other value can match a row. */
+const USER_ID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * The users live in the `neon_auth` schema of the database that
+ * `DATABASE_URL` names: the Neon integration sets that variable and
+ * `NEON_AUTH_BASE_URL` from the same branch. The SDK has no call that deletes
+ * another user without an admin session, and the operator console does not
+ * sign in through Neon Auth. Thus the adapter deletes the row itself. The
+ * owner role of the database is a member of the role `neon_auth`, which owns
+ * the table.
+ */
+const removeUserByQuery = (): RemoveUser => {
+  let remove: RemoveUser | null = null;
+  return async (subject) => {
+    if (!remove) {
+      const sql = neon(
+        requireEnv("DATABASE_URL", "the Neon Auth adapter's user deletion"),
+      );
+      remove = async (id) => {
+        await sql.query('delete from neon_auth."user" where id = $1', [id]);
+      };
+    }
+    await remove(subject);
+  };
+};
+
+/**
+ * Build the provider over any client of the SDK's shape, or over a function
+ * that builds the client. The function runs once, at the first call that
+ * uses the client. The tests pass a fake, a `wait` that does not wait and a
+ * fake `removeUser`.
  */
 export const neonAuthProviderFrom = (
-  client: NeonAuthClient,
-  options: { wait?: (ms: number) => Promise<void> } = {},
+  client: NeonAuthClient | (() => NeonAuthClient),
+  options: {
+    wait?: (ms: number) => Promise<void>;
+    removeUser?: RemoveUser;
+  } = {},
 ): AuthProvider => {
+  let built: NeonAuthClient | null = null;
+  const sdk = () =>
+    (built ??= typeof client === "function" ? client() : client);
   const pause = options.wait ?? wait;
+  const removeUser = options.removeUser ?? removeUserByQuery();
   let handlers: AuthRouteHandlers | null = null;
   const routeHandlers = () => {
-    handlers ??= client.handler();
+    handlers ??= sdk().handler();
     return handlers;
   };
 
@@ -223,7 +268,7 @@ export const neonAuthProviderFrom = (
    */
   const readOnce = async (): Promise<SessionRead> => {
     try {
-      return sortSessionAnswer(await client.getSession());
+      return sortSessionAnswer(await sdk().getSession());
     } catch (cause) {
       return {
         kind: "failed",
@@ -238,7 +283,7 @@ export const neonAuthProviderFrom = (
     name: "neon-auth",
     signUp: async ({ email, password, name, callbackPath }) =>
       signedIn(
-        client.signUp.email({
+        sdk().signUp.email({
           email,
           password,
           name,
@@ -246,10 +291,10 @@ export const neonAuthProviderFrom = (
         }),
       ),
     signIn: async ({ email, password }) =>
-      signedIn(client.signIn.email({ email, password })),
+      signedIn(sdk().signIn.email({ email, password })),
     requestMagicLink: async ({ email, name, callbackPath }) =>
-      done(client.signIn.magicLink({ email, name, callbackURL: callbackPath })),
-    signOut: async () => done(client.signOut()),
+      done(sdk().signIn.magicLink({ email, name, callbackURL: callbackPath })),
+    signOut: async () => done(sdk().signOut()),
     // A failed read is read again, twice at most. Then it is an error for
     // the caller, never "nobody is signed in". The check itself stays as it
     // was: an identity comes only from an answer that has a user.
@@ -316,9 +361,9 @@ export const neonAuthProviderFrom = (
       }
     },
     requestPasswordReset: async ({ email, redirectPath }) =>
-      done(client.requestPasswordReset({ email, redirectTo: redirectPath })),
+      done(sdk().requestPasswordReset({ email, redirectTo: redirectPath })),
     resetPassword: async ({ token, newPassword }) =>
-      done(client.resetPassword({ token, newPassword })),
+      done(sdk().resetPassword({ token, newPassword })),
     // The link lands on the auth server's host, and the server redirects back
     // with the verifier. The auth handler sends it to `get-session`, as the
     // browser SDK does, and answers the session cookies for this app's host.
@@ -346,21 +391,45 @@ export const neonAuthProviderFrom = (
       }
       return new Response(null, { status: 303, headers });
     },
+    // A subject that is not a Neon Auth user id matches no row: the user is
+    // already gone. A refused statement is logged with the error's name only:
+    // a message can quote the subject.
+    deleteUser: async (subject) => {
+      if (!USER_ID.test(subject)) {
+        return ok(null);
+      }
+      try {
+        await removeUser(subject);
+        return ok(null);
+      } catch (cause) {
+        console.error("[auth] the user was not deleted", {
+          name: cause instanceof Error ? cause.name : "unknown error",
+        });
+        return err("upstream_failed", "the auth store did not delete the user");
+      }
+    },
     routeHandlers,
   };
 };
 
 /**
- * The provider over Neon Auth. It needs `NEON_AUTH_BASE_URL`, which the Neon
- * integration sets per target, and `NEON_AUTH_COOKIE_SECRET`, set by hand
- * (`.icm/docs/ENV.md` § Auth).
+ * The provider over Neon Auth. The SDK needs `NEON_AUTH_BASE_URL`, which the
+ * Neon integration sets per target, and `NEON_AUTH_COOKIE_SECRET`, set by hand
+ * (`.icm/docs/ENV.md` § Auth). The adapter builds the SDK at the first call
+ * that uses it. `deleteUser` does not use it: it needs `DATABASE_URL` only.
+ * Thus the admin app, which has no `NEON_AUTH_*` variable, registers this
+ * adapter to delete a patient's user.
  */
 export const createNeonAuthProvider = (): AuthProvider =>
   neonAuthProviderFrom(
-    createNeonAuth({
-      baseUrl: requireEnv("NEON_AUTH_BASE_URL", "the Neon Auth adapter"),
-      cookies: {
-        secret: requireEnv("NEON_AUTH_COOKIE_SECRET", "the Neon Auth adapter"),
-      },
-    }) as unknown as NeonAuthClient,
+    () =>
+      createNeonAuth({
+        baseUrl: requireEnv("NEON_AUTH_BASE_URL", "the Neon Auth adapter"),
+        cookies: {
+          secret: requireEnv(
+            "NEON_AUTH_COOKIE_SECRET",
+            "the Neon Auth adapter",
+          ),
+        },
+      }) as unknown as NeonAuthClient,
   );

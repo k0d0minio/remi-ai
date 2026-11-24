@@ -1,4 +1,9 @@
 import { beforeAll, describe, expect, it } from "vitest";
+import {
+  registerAuthProvider,
+  type AuthProvider,
+} from "../../../auth/provider";
+import { err, ok } from "../../../shared/result";
 import { getDatabase, registerDatabase } from "../../client";
 import type { PatientProfile } from "../../models/patient-profile";
 import {
@@ -1672,5 +1677,90 @@ describe("which files the practitioner's list shows", () => {
     expect(rows.find((row) => row.id === file.id)?.createdBy).toBe(
       "practitioner",
     );
+  });
+});
+
+describe("the patient's auth user (REM-133)", () => {
+  /** The subjects the fake auth store deleted, and whether it refuses. */
+  const deleted: string[] = [];
+  let refuse = false;
+
+  const fakeAuth: AuthProvider = {
+    name: "fake",
+    signUp: async () => err("upstream_failed", "not used"),
+    signIn: async () => err("upstream_failed", "not used"),
+    requestMagicLink: async () => ok(null),
+    signOut: async () => ok(null),
+    readIdentity: async () => null,
+    renewSessionCache: async () => null,
+    requestPasswordReset: async () => ok(null),
+    resetPassword: async () => ok(null),
+    completeRedirectSignIn: async () => null,
+    deleteUser: async (subject) => {
+      if (refuse) {
+        return err("upstream_failed", "the auth store did not delete the user");
+      }
+      deleted.push(subject);
+      return ok(null);
+    },
+    routeHandlers: () => {
+      throw new Error("not used");
+    },
+  };
+
+  const fileWithAccount = async (name: string) => {
+    const file = unwrapOk(
+      await createPatient(systemActor, {
+        practitionerId: testPractitionerId,
+        pseudonym: name,
+      }),
+    );
+    unwrapOk(
+      await createPatientAccount({
+        patientProfileId: file.id,
+        email: `${name}@example.test`,
+        authSubject: `subject-${name}`,
+      }),
+    );
+    return file;
+  };
+
+  // First, before the fake is registered: this file registers it once.
+  it("refuses a patient with an account when no auth provider is registered", async () => {
+    const file = await fileWithAccount("no-provider");
+    const result = await deletePatient(systemActor, file.id);
+    expect(result.ok ? null : result.error).toBe("upstream_failed");
+    expect((await getPatient(systemActor, file.id)).ok).toBe(true);
+  });
+
+  it("deletes the auth user, then the file", async () => {
+    registerAuthProvider(fakeAuth);
+    const file = await fileWithAccount("with-account");
+    expect(unwrapOk(await deletePatient(systemActor, file.id))).toBe(true);
+    expect(deleted).toContain("subject-with-account");
+    expect((await getPatient(systemActor, file.id)).ok).toBe(false);
+  });
+
+  it("keeps the file when the auth store refuses, and a retry deletes it", async () => {
+    const file = await fileWithAccount("refused");
+    refuse = true;
+    const refused = await deletePatient(systemActor, file.id);
+    expect(refused.ok ? null : refused.error).toBe("upstream_failed");
+    expect((await getPatient(systemActor, file.id)).ok).toBe(true);
+    refuse = false;
+    expect(unwrapOk(await deletePatient(systemActor, file.id))).toBe(true);
+    expect(deleted).toContain("subject-refused");
+  });
+
+  it("asks nothing of the auth store for a file without an account", async () => {
+    const file = unwrapOk(
+      await createPatient(systemActor, {
+        practitionerId: testPractitionerId,
+        pseudonym: "no-account",
+      }),
+    );
+    const before = deleted.length;
+    expect(unwrapOk(await deletePatient(systemActor, file.id))).toBe(true);
+    expect(deleted).toHaveLength(before);
   });
 });

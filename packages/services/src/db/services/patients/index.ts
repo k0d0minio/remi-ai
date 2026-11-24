@@ -1,5 +1,9 @@
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
+import {
+  getAuthProvider,
+  isAuthProviderRegistered,
+} from "../../../auth/provider";
 import { getFileStore, isFileStoreConfigured } from "../../../files";
 import {
   appearsInPatientList,
@@ -26,6 +30,7 @@ import {
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
+import type { PatientAccount } from "../../models/patient-account";
 import type { PatientDocument } from "../../models/patient-document";
 import type { PatientQuestionnaire } from "../../models/patient-questionnaire";
 import { recordAuditEvent, type AuditActor } from "../audit";
@@ -991,14 +996,30 @@ const unscopedSetPatientNextConsultationPrep = async (
 
 /**
  * Removes the profile and, by cascade, everything that hangs off it — and,
- * first, the patient's files in the store, which no database cascade reaches.
+ * first, the patient's files in the store and the patient's user in the auth
+ * store, which no database cascade reaches.
  * A store that refuses stops the deletion: a patient is never deleted while
  * their files stay behind. Without a configured store, a patient who has
  * files is refused for the same reason; one who has none is deleted as ever.
+ * The auth store follows the same rule (REM-133): a patient with an account
+ * is refused when no auth provider is registered, and kept when the provider
+ * did not delete the user. The account is read here, not through
+ * `patient-accounts`, which imports this module.
  */
 const unscopedDeletePatient = async (id: Id): Promise<Result<true>> => {
   if (!isValidId(id)) {
     return err("not_found", "no such patient");
+  }
+  const account = (
+    await getDatabase()
+      .collection<PatientAccount>("patient_accounts")
+      .findMany({ patientProfileId: id }, { limit: 1 })
+  ).items[0];
+  if (account && !isAuthProviderRegistered()) {
+    return err(
+      "upstream_failed",
+      "no auth provider is configured, so the patient's sign-in cannot be removed — nothing was deleted",
+    );
   }
   if (isFileStoreConfigured()) {
     try {
@@ -1020,6 +1041,17 @@ const unscopedDeletePatient = async (id: Id): Promise<Result<true>> => {
       return err(
         "upstream_failed",
         "no file store is configured, so the patient's files cannot be removed — nothing was deleted",
+      );
+    }
+  }
+  // After the files, before the profile: a retry after a refusal finds no
+  // user and goes on, because a user that is already gone is a success.
+  if (account) {
+    const signIn = await getAuthProvider().deleteUser(account.authSubject);
+    if (!signIn.ok) {
+      return err(
+        "upstream_failed",
+        "the patient's sign-in could not be removed from the auth store — the profile was kept; try the deletion again",
       );
     }
   }

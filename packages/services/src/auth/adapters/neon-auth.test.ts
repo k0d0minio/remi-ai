@@ -468,3 +468,57 @@ describe("the session cache renewal of the Neon Auth adapter", () => {
     ).toBeNull();
   });
 });
+
+describe("the deletion of a user (REM-133)", () => {
+  const subject = "0b6f1c3e-8a52-4f0e-9d3a-2c7b5e1f4a90";
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("removes the user by its subject", async () => {
+    const removeUser = vi.fn(async () => undefined);
+    const provider = neonAuthProviderFrom(fakeClient(), { removeUser });
+    expect(await provider.deleteUser(subject)).toEqual({
+      ok: true,
+      data: null,
+    });
+    expect(removeUser).toHaveBeenCalledWith(subject);
+  });
+
+  it("does not build the SDK to delete a user", async () => {
+    const build = vi.fn(fakeClient);
+    const provider = neonAuthProviderFrom(build, {
+      removeUser: vi.fn(async () => undefined),
+    });
+    expect((await provider.deleteUser(subject)).ok).toBe(true);
+    expect(build).not.toHaveBeenCalled();
+  });
+
+  it("builds the SDK once, at the first call that uses it", async () => {
+    const build = vi.fn(fakeClient);
+    const provider = neonAuthProviderFrom(build);
+    await provider.signOut();
+    await provider.signOut();
+    expect(build).toHaveBeenCalledTimes(1);
+  });
+
+  it("answers a success for a subject that no user can have", async () => {
+    const removeUser = vi.fn(async () => undefined);
+    const provider = neonAuthProviderFrom(fakeClient(), { removeUser });
+    expect((await provider.deleteUser("subject-claire")).ok).toBe(true);
+    expect(removeUser).not.toHaveBeenCalled();
+  });
+
+  it("answers upstream_failed when the database refuses, and logs no subject", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const provider = neonAuthProviderFrom(fakeClient(), {
+      removeUser: vi.fn(async () => {
+        throw new Error(`permission denied for ${subject}`);
+      }),
+    });
+    const result = await provider.deleteUser(subject);
+    expect(result.ok ? null : result.error).toBe("upstream_failed");
+    expect(JSON.stringify(error.mock.calls)).not.toContain(subject);
+  });
+});

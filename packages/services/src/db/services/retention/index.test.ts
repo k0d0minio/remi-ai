@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import {
   afterEach,
   beforeAll,
@@ -7,6 +8,8 @@ import {
   it,
   vi,
 } from "vitest";
+import { registerAuthProvider } from "../../../auth/provider";
+import { neonAuthProviderFrom } from "../../../auth/adapters/neon-auth";
 import {
   consoleMailer,
   registerMailer,
@@ -34,6 +37,9 @@ import { systemActor } from "../../services/access";
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 let sent: EmailMessage[] = [];
+
+/** The auth users the sweep deleted (REM-133). */
+const removedUsers: string[] = [];
 
 const signInUrl = (locale: string) => `https://app.test/${locale}/connexion`;
 
@@ -70,7 +76,7 @@ const seed = async (email = "claire@example.be") => {
     await createPatientAccount({
       patientProfileId: patient.id,
       email,
-      authSubject: `subject-${email}`,
+      authSubject: randomUUID(),
     }),
   );
   return { practitioner, patient, account };
@@ -95,6 +101,19 @@ const sweptTables = [
 
 beforeAll(() => {
   registerDatabase(createMemoryDatabase());
+  // The adapter over a client that no test reaches: only `deleteUser` runs.
+  registerAuthProvider(
+    neonAuthProviderFrom(
+      () => {
+        throw new Error("the SDK is not used here");
+      },
+      {
+        removeUser: async (subject) => {
+          removedUsers.push(subject);
+        },
+      },
+    ),
+  );
 });
 
 beforeEach(async () => {
@@ -263,6 +282,7 @@ describe("the deletion at twelve months", () => {
     const counts = await sweepAt(hourAfter(due));
     expect(counts.deleted).toBe(1);
     expect((await getPatient(systemActor, patient.id)).ok).toBe(false);
+    expect(removedUsers).toContain(account.authSubject);
     const deletions = await listAuditEvents(systemActor, {
       action: "patient.deleted",
     });

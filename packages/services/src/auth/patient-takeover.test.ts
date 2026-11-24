@@ -71,6 +71,7 @@ beforeAll(async () => {
     resetPassword: async () => ok(null),
     completeRedirectSignIn: async () => null,
     renewSessionCache: async () => null,
+    deleteUser: async () => ok(null),
     routeHandlers: () => {
       throw new Error("not used");
     },
