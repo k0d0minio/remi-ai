@@ -60,7 +60,8 @@ J, 2026-11-27: "i don't want to have to do this manually". A session ticks a box
 
 - [x] (S) The seed script `seed:test-roles` of the contract in `checktest-accounts.md`. (`checktest-accounts.md`) `ct.seed`
 - [ ] (B) The test passwords are in the data of BAXTER, never in this repo. Storyboards exist for this repo. (`checktest-accounts.md`) `ct.baxter`
-- [ ] (J) After the checktest signs up the admin account on UAT, run the seed one time. The UAT database address comes from the keyring of BAXTER for that one command. Never write it in a file. (`checktest-accounts.md`) `ct.seed-run`
+- [x] (J) After the checktest signs up the admin account on UAT, run the seed one time. The UAT database address comes from the keyring of BAXTER for that one command. Never write it in a file. (`checktest-accounts.md`) `ct.seed-run`
+  J, 2026-11-27: the seed gave `admin` to `test+remi-ai-admin@jamienisbet.com` on UAT (exit 0).
 
 ## Linear
 
