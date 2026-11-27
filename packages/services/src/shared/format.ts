@@ -85,6 +85,17 @@ export const formatDate = (value: Date | string, locale = DEFAULT_LOCALE) =>
     typeof value === "string" ? new Date(value) : value,
   );
 
+/**
+ * A `YYYY-MM-DD` day in words (« 3 décembre 2026 »). The day has no timezone,
+ * so it is read and written in UTC: the clock of the server or of the browser
+ * cannot move it to the day before.
+ */
+export const formatDayInWords = (day: string, locale = DEFAULT_LOCALE) =>
+  new Intl.DateTimeFormat(locale, {
+    dateStyle: "long",
+    timeZone: "UTC",
+  }).format(new Date(`${day}T00:00:00Z`));
+
 export const formatDateTime = (value: Date | string, locale = DEFAULT_LOCALE) =>
   new Intl.DateTimeFormat(locale, {
     dateStyle: "medium",

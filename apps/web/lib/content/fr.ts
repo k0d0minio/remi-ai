@@ -357,9 +357,26 @@ export const fr: Content = {
     saved: "Enregistré",
     retry: "Réessayer",
     end: {
-      readyTitle: "Ton questionnaire est prêt !",
+      readyTitle: "Tout est prêt pour ta consultation !",
       readyBody:
-        "Tes réponses ont bien été enregistrées et permettront à ton praticien de préparer votre consultation.",
+        "Merci d'avoir complété ton questionnaire. Tes réponses ont bien été enregistrées et permettront à ton praticien de préparer ton accompagnement personnalisé.",
+      nextTitle: "Et maintenant, quelles sont les prochaines étapes ?",
+      steps: {
+        consultation: {
+          title: "Ta consultation",
+          body: "Un moment d'échange pour mieux comprendre tes besoins, tes habitudes et définir tes objectifs.",
+        },
+        recommendations: {
+          title: "Tes recommandations personnalisées",
+          body: "À la suite de ta consultation, ton praticien définira tes recommandations personnalisées en matière d'alimentation, d'hygiène de vie et, si nécessaire, de complémentation.",
+        },
+        activation: {
+          title: "Ton aventure avec REMI commence !",
+          body: "Une fois ton compte activé par ton praticien, tu pourras découvrir tes recettes 100 % personnalisées, adaptées à ton profil, à tes besoins, à tes objectifs et aux recommandations de ton praticien.",
+        },
+      },
+      withPractitioner: "Avec ton praticien",
+      closing: "À très bientôt pour une alimentation qui te ressemble !",
       finish: "Terminer",
       edit: "Modifier mes réponses",
       incompleteTitle: "Il reste quelques informations à compléter.",

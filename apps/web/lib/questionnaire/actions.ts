@@ -2,6 +2,7 @@
 
 import {
   getPatient,
+  getPatientWaitingView,
   markReadyWhenComplete,
   missingQuestionnaireFields,
   recordConsent,
@@ -287,6 +288,21 @@ export const checkCompletionAction = async (): Promise<SaveResult> => {
     return failed("signed_out");
   }
   return settle(account.patientProfileId);
+};
+
+/**
+ * The consultation day that the end screen shows (REM-168), as `YYYY-MM-DD`.
+ * Read after the last saves, so it is the day the patient typed last. Null:
+ * no day is set, or the read failed. The screen then shows no day.
+ */
+export const consultationDayAction = async (): Promise<string | null> => {
+  const account = await currentPatient();
+  if (!account) {
+    return null;
+  }
+  const patientId = account.patientProfileId;
+  const view = await getPatientWaitingView(patientActor(patientId), patientId);
+  return view.ok ? view.data.appointmentDate : null;
 };
 
 const isKind = (kind: unknown): kind is (typeof allergenKinds)[number] =>

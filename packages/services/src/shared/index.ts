@@ -13,6 +13,7 @@ export {
   addDays,
   formatDate,
   formatDateTime,
+  formatDayInWords,
   formatNumber,
   initials,
   todayAtPractice,
