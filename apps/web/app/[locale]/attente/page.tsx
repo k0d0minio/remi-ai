@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { getPatientWaitingView, patientActor } from "@remi/services/server";
 import {
   defaultLocale,
+  formatDayInWords,
   isLocale,
   localePath,
 } from "@remi/services/shared";
@@ -30,16 +31,6 @@ export const generateMetadata = async ({
       .metaTitle,
   };
 };
-
-/**
- * A `YYYY-MM-DD` day in words. The day has no timezone, so it is read and
- * written in UTC: the server's clock cannot move it to the day before.
- */
-const dayInWords = (day: string) =>
-  new Intl.DateTimeFormat("fr-BE", {
-    dateStyle: "long",
-    timeZone: "UTC",
-  }).format(new Date(`${day}T00:00:00Z`));
 
 /**
  * The waiting screen (story 22, REM-81): what a signed-in patient sees from a
@@ -104,7 +95,7 @@ const WaitingPage = async ({ params }: { params: Promise<Params> }) => {
                     {text.appointmentLabel}
                   </Typography>
                   <Typography as="dd" size="base" weight="semibold">
-                    {dayInWords(appointmentDate)}
+                    {formatDayInWords(appointmentDate)}
                   </Typography>
                 </div>
               ) : null}

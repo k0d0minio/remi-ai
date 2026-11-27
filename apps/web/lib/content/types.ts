@@ -370,6 +370,19 @@ export type Content = {
     end: {
       readyTitle: string;
       readyBody: string;
+      /** The heading of the three next steps of the care. */
+      nextTitle: string;
+      steps: {
+        consultation: { title: string; body: string };
+        recommendations: { title: string; body: string };
+        activation: { title: string; body: string };
+      };
+      /**
+       * Beside the consultation day. The file holds no first name of the
+       * practitioner yet, so the text names no one (Jamie, 2026-11-27).
+       */
+      withPractitioner: string;
+      closing: string;
       finish: string;
       /** On the ready screen: returns to the questions. */
       edit: string;
