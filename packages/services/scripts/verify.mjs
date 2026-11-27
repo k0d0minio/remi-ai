@@ -44,14 +44,20 @@ const expected = Object.values(snapshot.tables)
   .map((table) => table.name);
 
 // Imported here rather than at the top so the skip path above never needs the
-// driver resolved.
-const { neon } = await import("@neondatabase/serverless");
-const sql = neon(process.env.DATABASE_URL);
-const present = new Set(
-  (
-    await sql`select table_name from information_schema.tables where table_schema = 'public'`
-  ).map((row) => row.table_name),
-);
+// driver resolved. `pg` speaks plain TCP: it reaches Neon and the empty
+// Postgres of the CI job alike (the Neon HTTP driver reaches only Neon).
+const { default: pg } = await import("pg");
+const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+await client.connect();
+let rows;
+try {
+  ({ rows } = await client.query(
+    "select table_name from information_schema.tables where table_schema = 'public'",
+  ));
+} finally {
+  await client.end();
+}
+const present = new Set(rows.map((row) => row.table_name));
 const missing = expected.filter((name) => !present.has(name));
 
 if (missing.length > 0) {
