@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-215/inscription-patient-corrections-uat-2411-de-laffichage-mobile
 - branch: contact/rem-215-inscription-patient-corrections-uat-2411-de
 - lane: tweak
-- pr: pending
+- pr: #257
 - started: 2026-11-27
