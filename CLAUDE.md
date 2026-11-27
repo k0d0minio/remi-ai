@@ -40,7 +40,7 @@ The router has the commands, the stages and the lanes. A ticket is a Linear key 
 | add or change an environment variable                                    | `.icm/docs/ENV.md`, the one catalogue of names. Values never enter git                                                          |
 | read where the build runs                                                | `.icm/environments.md`, the one home of the addresses                                                                           |
 | read the UAT batch, record the client's sign-off, promote, roll back     | `.icm/_system/features/uat.md`, then `.icm/_system/scripts/promote.sh`                                                          |
-| change the database, or read where a preview's database comes from       | `.icm/local/database.md`, then `.icm/local/vercel-build.sh`                                                                     |
+| change the database, or read where a preview's database comes from       | `.icm/_system/features/database.md`, then `.icm/setup/databases.md`                                                             |
 | do a setup act in Vercel, GitHub or the database provider                | `.icm/setup/`: one file for each act. A person ticks its boxes                                                                  |
 | change what CI checks or how a release is cut                            | The blueprint (`~/jarvis_workspace/blueprint/`). `ci.yml`, `promote.yml` and `icm.yml` come from it                             |
 
@@ -50,9 +50,10 @@ The router has the commands, the stages and the lanes. A ticket is a Linear key 
 release-please pull request open on `main`, and that pull request is the batch. Every merge to
 `main` deploys UAT and builds a production deployment that stays staged. Production moves on a
 promotion, as `.icm/_system/features/uat.md` says. `admin` and `app` have `uat`. `marketing`
-has `uat` and follows `main` (D-37). `documentation` follows `main`. The admin `uat` build
-migrates the UAT database (`.icm/local/vercel-build.sh`). No workflow migrates production now:
-the production database moves to Postgres 18 at the next promotion (Jamie, 2026-11-17).
+has `uat` and follows `main` (D-37). `documentation` follows `main`. The admin `uat` and
+preview builds migrate their database (`db.sh build`). `promote.yml` migrates production at a
+promotion, before the code moves. The production database moves to Postgres 18 at the next
+promotion (Jamie, 2026-11-17).
 
 ## Rules
 
