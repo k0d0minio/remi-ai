@@ -15,7 +15,7 @@ when it is done. A session does not tick a box of (J) or (B).
 - [ ] (S) Run `bin/update-repo.sh <repo>` of the blueprint on a clean tree at `origin/main`. The script does not commit. `render.update`
 - [ ] (S) Read `.icm/project.json`. The update adds each missing key and keeps each value. Write each empty value that this repo needs. `render.project-json`
 - [ ] (S) Write `.icm/environments.md`: one row for each environment (the address, the Vercel project, the database, what moves it). `render.environments`
-- [ ] (S) Write `.icm/project-rules.md`: the stack, the names, the code conventions. When the script `dev` is not the correct command, add `- dev server: <command with {port}>`. `render.project-rules`
+- [x] (S) Write `.icm/project-rules.md`: the stack, the names, the code conventions. When the script `dev` is not the correct command, add `- dev server: <command with {port}>`. `render.project-rules`
 - [ ] (S) `CLAUDE.md` imports `.icm/_system/ROUTER.md` and routes the files of this repo. `render.claude-md`
 
 ## GitHub
@@ -23,6 +23,7 @@ when it is done. A session does not tick a box of (J) or (B).
 - [ ] (J) A ruleset on `main` makes these checks necessary: `secrets`, `workflows`, `icm-check` and `code`. (`github-checks.md`) `gh.ruleset`
 - [ ] (S) No workflow calls `legible-consulting/.github`. `gh.legacy`
 - [ ] (J) Code security: Dependabot alerts on, and Dependabot security updates on. (`dependabot-security.md`) `gh.dependabot`
+      J, 2026-11-27: no. Dependabot stays off.
 - [ ] (J) The Actions secret `VERCEL_TOKEN` and the Actions variable `VERCEL_TEAM`. (`actions-promote.md`) `gh.vercel-token`
 - [ ] (J) The same token in the keyring of BAXTER, key `vercel_token`, account = the team (step 4). (`actions-promote.md`) `gh.keyring-token`
 - [ ] (J) Settings, Actions, General: "Allow GitHub Actions to create and approve pull requests" is on. (`actions-promote.md`) `gh.pr-permission`
@@ -42,14 +43,14 @@ when it is done. A session does not tick a box of (J) or (B).
 
 ## Request button
 
-- [ ] (S) The root layout has `<RequestButton />` after `{children}`. The form has the language of `.icm/project.json`. (`request-button.md`) `rb.layout`
-- [ ] (S) The route `app/api/baxter-request/route.ts` (or below `src/`) exports `POST` again. (`request-button.md`) `rb.route`
-- [ ] (S) Optional `user`. The Content-Security-Policy permits a POST to the same origin. TypeScript and ESLint accept `.icm/_system/request-button/`. On a local dev server the button shows, and an empty POST to the route gets 400. (`request-button.md`) `rb.config`
+- [x] (S) The root layout has `<RequestButton />` after `{children}`. The form has the language of `.icm/project.json`. (`request-button.md`) `rb.layout`
+- [x] (S) The route `app/api/baxter-request/route.ts` (or below `src/`) exports `POST` again. (`request-button.md`) `rb.route`
+- [x] (S) Optional `user`. The Content-Security-Policy permits a POST to the same origin. TypeScript and ESLint accept `.icm/_system/request-button/`. On a local dev server the button shows, and an empty POST to the route gets 400. (`request-button.md`) `rb.config`
 - [ ] (J) Vercel `uat`: `BAXTER_REQUEST_ENV` = `uat` (not on production), and `BAXTER_REQUEST_LINEAR_API_KEY`. The label `requests.linear_label` exists in the team `REM`. (`request-button.md`) `rb.env`
 
 ## Checktest
 
-- [ ] (S) The seed script `seed:test-roles` of the contract in `checktest-accounts.md`. (`checktest-accounts.md`) `ct.seed`
+- [x] (S) The seed script `seed:test-roles` of the contract in `checktest-accounts.md`. (`checktest-accounts.md`) `ct.seed`
 - [ ] (B) The test passwords are in the data of BAXTER, never in this repo. Storyboards exist for this repo. (`checktest-accounts.md`) `ct.baxter`
 - [ ] (J) After the checktest signs up the admin account on UAT, run the seed one time. The UAT database address comes from the keyring of BAXTER for that one command. Never write it in a file. (`checktest-accounts.md`) `ct.seed-run`
 
@@ -57,7 +58,7 @@ when it is done. A session does not tick a box of (J) or (B).
 
 - [ ] (B) The org `remi-ai` is in the keyring of BAXTER. `li.org`
 - [ ] (S) `linear.writes` of `.icm/project.json` is `session`. `li.writes`
-- [ ] (S) `linear.states` of `.icm/project.json`: the state names of the team `REM`. An empty name: no state move at that event. `li.states`
+- [x] (S) `linear.states` of `.icm/project.json`: the state names of the team `REM`. An empty name: no state move at that event. `li.states`
 
 ## Close
 
