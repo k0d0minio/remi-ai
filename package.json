@@ -13,6 +13,7 @@
     "check:migrations": "node packages/services/scripts/check-migration-order.mjs",
     "db:migrate": "pnpm --filter @remi/services db:migrate",
     "db:verify": "pnpm --filter @remi/services db:verify",
+    "seed:test-roles": "node packages/services/scripts/seed-test-roles.mjs",
     "clean": "turbo run clean",
     "env:pull": "turbo run env:pull",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
@@ -42,6 +43,8 @@
   "packageManager": "pnpm@10.33.0",
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
     "eslint": "^9.39.1",
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-react": "^7.37.5",
@@ -52,6 +55,7 @@
     "lint-staged": "^16.4.0",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.6.14",
+    "react": "catalog:",
     "turbo": "^2.9.16",
     "typescript": "catalog:",
     "typescript-eslint": "^8.44.1"

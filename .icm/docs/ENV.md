@@ -300,6 +300,23 @@ keyless — Vercel identifies the project from the deployment. There was a
 `NEXT_PUBLIC_ANALYTICS_KEY` row here that nothing ever read; it is gone. Don't reintroduce one
 unless a second analytics vendor arrives with a reader to go with it.
 
+## Request button (BAXTER)
+
+The request button of BAXTER is in `apps/web` (`.icm/setup/request-button.md`). Its code is in
+`.icm/_system/request-button/`: the blueprint owns it, so it reads `process.env` directly and not
+through `env()`. `turbo.json` passes each name through, because the root layout renders at build.
+
+| Variable                        | Purpose                                                                                    | Where set | Public? |
+| ------------------------------- | ------------------------------------------------------------------------------------------ | --------- | ------- |
+| `BAXTER_REQUEST_ENV`            | `uat` on the UAT environment of the **app** project: the button shows. Unset on production | Vercel    | no      |
+| `BAXTER_REQUEST_PRODUCTION`     | `on` with `BAXTER_REQUEST_ENV=production`: the button shows on production. Unset today     | Vercel    | no      |
+| `BAXTER_REQUEST_LINEAR_API_KEY` | A Linear API key of the client workspace. It creates the request issue in the team `REM`   | Vercel    | no      |
+| `BAXTER_REQUEST_LINEAR_TEAM`    | Optional. A team key in place of `requests.linear_team` of `.icm/project.json`             | Vercel    | no      |
+| `BAXTER_REQUEST_LINEAR_PROJECT` | Optional. A Linear project in place of `requests.linear_project`, or `none`                | Vercel    | no      |
+| `BAXTER_REQUEST_LINEAR_LABELS`  | Optional. Label names, with commas, in place of `requests.linear_label`                    | Vercel    | no      |
+
+Value per target: `uat` only. A local dev server shows the button with no value.
+
 ## CI and the two scripts (GitHub Actions, `gh`)
 
 | Variable                    | Purpose                                                                                                                                    | Where set | Public? |

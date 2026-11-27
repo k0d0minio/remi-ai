@@ -6,3 +6,18 @@
 @source "../../../packages/ui/src";
 @source "../components";
 @source "../lib";
+
+/* The request button of BAXTER (.icm/setup/request-button.md) reads these
+   variables. They map it to the tokens of the charter. */
+:root {
+  --baxter-accent: var(--primary);
+  --baxter-accent-text: var(--primary-foreground);
+  --baxter-surface: var(--card);
+  --baxter-text: var(--foreground);
+  --baxter-muted: var(--muted-foreground);
+  --baxter-border: var(--border);
+  --baxter-font: var(--font-family-sans);
+  --baxter-heading-font: var(--font-family-display);
+  --baxter-radius: var(--radius);
+  --baxter-focus: var(--ring);
+}
