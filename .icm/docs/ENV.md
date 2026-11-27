@@ -302,13 +302,13 @@ unless a second analytics vendor arrives with a reader to go with it.
 
 ## Request button (BAXTER)
 
-The request button of BAXTER is in `apps/web` (`.icm/setup/request-button.md`). Its code is in
+The request button of BAXTER is in `apps/web` and `apps/admin` (`.icm/setup/request-button.md`). Its code is in
 `.icm/_system/request-button/`: the blueprint owns it, so it reads `process.env` directly and not
 through `env()`. `turbo.json` passes each name through, because the root layout renders at build.
 
 | Variable                        | Purpose                                                                                    | Where set | Public? |
 | ------------------------------- | ------------------------------------------------------------------------------------------ | --------- | ------- |
-| `BAXTER_REQUEST_ENV`            | `uat` on the UAT environment of the **app** project: the button shows. Unset on production | Vercel    | no      |
+| `BAXTER_REQUEST_ENV`            | `uat` on the UAT environment of the **app** and **admin** projects: the button shows. Unset on production | Vercel    | no      |
 | `BAXTER_REQUEST_PRODUCTION`     | `on` with `BAXTER_REQUEST_ENV=production`: the button shows on production. Unset today     | Vercel    | no      |
 | `BAXTER_REQUEST_LINEAR_API_KEY` | A Linear API key of the client workspace. It creates the request issue in the team `REM`   | Vercel    | no      |
 | `BAXTER_REQUEST_LINEAR_TEAM`    | Optional. A team key in place of `requests.linear_team` of `.icm/project.json`             | Vercel    | no      |

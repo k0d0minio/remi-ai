@@ -30,7 +30,7 @@ points at them.
 ## Names
 
 - The Linear team is `REM`. The Vercel team is `remi21`.
-- The request button of BAXTER is in `apps/web` only. Its CSS variables are in
-  `apps/web/app/globals.css`.
+- The request button of BAXTER is in `apps/web` and `apps/admin`. Their CSS variables are
+  in `app/globals.css` of each app.
 - The test accounts of the checktest are `test+remi-ai-<role>@jamienisbet.com`. The seed
   `pnpm seed:test-roles` gives a role of `operators` (`admin` or `practitioner`).

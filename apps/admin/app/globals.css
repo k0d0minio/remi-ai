@@ -5,6 +5,21 @@
    this app's tree, so without this the primitives ship unstyled. */
 @source "../../../packages/ui/src";
 
+/* The request button of BAXTER (.icm/setup/request-button.md) reads these
+   variables. They map it to the tokens of the charter. */
+:root {
+  --baxter-accent: var(--primary);
+  --baxter-accent-text: var(--primary-foreground);
+  --baxter-surface: var(--card);
+  --baxter-text: var(--foreground);
+  --baxter-muted: var(--muted-foreground);
+  --baxter-border: var(--border);
+  --baxter-font: var(--font-family-sans);
+  --baxter-heading-font: var(--font-family-display);
+  --baxter-radius: var(--radius);
+  --baxter-focus: var(--ring);
+}
+
 /* The patient page's phone layout: four segments, one DOM order. Switching a
    segment (from the segmented control, the URL, or a quick action) flips the
    `data-segment` attribute on the page root; this media query turns that
