@@ -302,6 +302,8 @@ export type Content = {
     required: string;
     invalid: Record<SignupField, string>;
     tooShort: string;
+    /** A birth date of a person under 18: REMI is not for minors. */
+    minor: string;
     form: Record<SignupFormError, string>;
     /**
      * The link after `form.already_registered`, to the sign-in page. The two
@@ -390,7 +392,6 @@ export type Content = {
        */
       mandatory: Record<MandatoryQuestionnaireField, string>;
       desiredWeight: string;
-      consultationDate: string;
       /** The diet question (REM-162). */
       diet: string;
       /** Shown after « Autre », where it is mandatory. */
@@ -483,6 +484,10 @@ export type Content = {
     invalid: string;
     /** A birth date of today or later. */
     notPast: string;
+    /** A birth date of a person under 18. */
+    minor: string;
+    /** A consultation date before today. */
+    beforeToday: string;
   };
   /**
    * The patient's sign-in at `/connexion` (story 2): the password form, the

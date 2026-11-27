@@ -174,6 +174,14 @@ describe("the sign-up fields", () => {
     }
   });
 
+  it("refuses the birth date of a minor (REM-159)", () => {
+    const tenYearsAgo = `${new Date().getUTCFullYear() - 10}-01-15`;
+    expect(validateSignup({ ...valid, birthDate: tenYearsAgo })).toEqual({
+      ok: false,
+      fields: { birthDate: "minor" },
+    });
+  });
+
   it("accepts digits, spaces and one leading +, and stores the digits", () => {
     expect(data({ phone: " 0470 12 34 56 " }).phone).toBe("0470123456");
     for (const phone of ["0470-12-34", "+32 4", "++32470123456", "abc"]) {

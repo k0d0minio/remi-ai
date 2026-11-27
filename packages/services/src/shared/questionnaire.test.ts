@@ -19,6 +19,7 @@ const complete: QuestionnaireCompleteness = {
   weightKg: 60,
   activityLevel: "moderate",
   consultationReason: "Fatigue",
+  consultationDate: "2026-12-01",
   noKnownAllergies: true,
   noKnownIntolerances: false,
   allergyCount: 0,
@@ -40,6 +41,22 @@ describe("the mandatory questionnaire fields", () => {
     expect(
       missingMandatoryFields({ ...complete, consultationReason: "  " }),
     ).toEqual(["consultationReason"]);
+  });
+
+  it("needs a consultation date, today or later for the patient (REM-159)", () => {
+    expect(
+      missingMandatoryFields({ ...complete, consultationDate: null }),
+    ).toEqual(["consultationDate"]);
+    expect(
+      missingMandatoryFields({ ...complete, today: "2026-12-01" }),
+    ).toEqual([]);
+    expect(
+      missingMandatoryFields({ ...complete, today: "2026-12-02" }),
+    ).toEqual(["consultationDate"]);
+    // The console reads no today: a past consultation stays filled.
+    expect(
+      missingMandatoryFields({ ...complete, consultationDate: "2020-01-01" }),
+    ).toEqual([]);
   });
 
   it("needs an explicit answer per list", () => {
@@ -76,7 +93,6 @@ const emptyOptional: OptionalQuestionnaireAnswers = {
   birthDate: null,
   phone: null,
   desiredWeightKg: null,
-  consultationDate: null,
   diet: null,
   dietNote: null,
   celiacDisease: null,
@@ -109,7 +125,6 @@ describe("the optional questionnaire fields", () => {
       "birthDate",
       "phone",
       "desiredWeightKg",
-      "consultationDate",
       "diet",
       "celiacDisease",
       "pathologies",

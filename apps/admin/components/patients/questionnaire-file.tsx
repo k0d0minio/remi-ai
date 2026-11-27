@@ -145,7 +145,7 @@ export const QuestionnaireFile = ({
         },
         {
           key: "consultationDate",
-          label: optionalLabel("consultationDate"),
+          label: mandatoryLabel("consultationDate"),
           value: answers.consultationDate
             ? formatDate(answers.consultationDate)
             : null,

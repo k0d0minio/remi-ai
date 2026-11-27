@@ -180,6 +180,7 @@ export const completenessFrom = (
     weightKg: filledNumber(formData, "weightKg"),
     activityLevel: text(formData, "activityLevel") || null,
     consultationReason: text(formData, "consultationReason") ?? null,
+    consultationDate: text(formData, "consultationDate") || null,
     noKnownAllergies: allergy.noneKnown,
     noKnownIntolerances: intolerance.noneKnown,
     allergyCount: allergy.count,

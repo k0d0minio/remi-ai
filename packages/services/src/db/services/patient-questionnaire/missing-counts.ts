@@ -56,6 +56,7 @@ export const countMissingMandatoryFields = async (
         weightKg: row.weightKg ?? null,
         activityLevel: row.activityLevel ?? null,
         consultationReason: row.consultationReason ?? null,
+        consultationDate: row.consultationDate ?? null,
         noKnownAllergies: row.noKnownAllergies ?? null,
         noKnownIntolerances: row.noKnownIntolerances ?? null,
         allergyCount: declared.get(row.id)?.allergy ?? 0,

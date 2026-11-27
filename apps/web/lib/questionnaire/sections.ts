@@ -51,6 +51,7 @@ export const anchorOfField = {
   weightKg: "questionnaire-weightKg",
   activityLevel: "questionnaire-activityLevel",
   consultationReason: "questionnaire-consultationReason",
+  consultationDate: "questionnaire-consultationDate",
   allergies: "questionnaire-allergy",
   intolerances: "questionnaire-intolerance",
 } as const satisfies Record<MandatoryQuestionnaireField, string>;

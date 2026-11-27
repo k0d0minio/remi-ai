@@ -553,6 +553,7 @@ describe("the missing fields and the move to « Prêt pour consultation »", () 
       "weightKg",
       "activityLevel",
       "consultationReason",
+      "consultationDate",
       "allergies",
       "intolerances",
     ]);
@@ -573,6 +574,7 @@ describe("the missing fields and the move to « Prêt pour consultation »", () 
       "heightCm",
       "weightKg",
       "consultationReason",
+      "consultationDate",
       "allergies",
       "intolerances",
     ]);
@@ -585,6 +587,7 @@ describe("the missing fields and the move to « Prêt pour consultation »", () 
       sexForCalculation: "female",
       activityLevel: "moderate",
       consultationReason: "Fatigue",
+      consultationDate: "2999-01-15",
     });
     await setPatientAllergens(systemActor, file.id, "allergy", {
       state: "none_known",
@@ -619,6 +622,7 @@ describe("the missing fields and the move to « Prêt pour consultation »", () 
       sexForCalculation: "male",
       activityLevel: "low",
       consultationReason: "Sommeil",
+      consultationDate: "2999-01-15",
     });
     await setPatientAllergens(systemActor, file.id, "allergy", {
       state: "none_known",
@@ -638,6 +642,36 @@ describe("the missing fields and the move to « Prêt pour consultation »", () 
     expect(
       unwrapOk(await missingQuestionnaireFields(systemActor, file.id)),
     ).toEqual(["consultationReason"]);
+  });
+
+  it("counts a past consultation date as missing for the patient only (REM-159)", async () => {
+    const file = await newFile("Past date");
+    await updatePatient(systemActor, file.id, { heightCm: 170, weightKg: 70 });
+    await savePatientQuestionnaire(systemActor, file.id, {
+      sexForCalculation: "female",
+      activityLevel: "low",
+      consultationReason: "Sommeil",
+      consultationDate: "2020-01-15",
+    });
+    await setPatientAllergens(systemActor, file.id, "allergy", {
+      state: "none_known",
+    });
+    await setPatientAllergens(systemActor, file.id, "intolerance", {
+      state: "none_known",
+    });
+    expect(
+      unwrapOk(
+        await missingQuestionnaireFields(systemActor, file.id, {
+          today: "2026-11-27",
+        }),
+      ),
+    ).toEqual(["consultationDate"]);
+    expect(
+      unwrapOk(await missingQuestionnaireFields(systemActor, file.id)),
+    ).toEqual([]);
+    expect(
+      unwrapOk(await markReadyWhenComplete(systemActor, file.id, null)),
+    ).toBe("to_complete");
   });
 
   it("answers not found for a missing file", async () => {

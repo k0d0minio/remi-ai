@@ -139,6 +139,7 @@ const storedMissing = (
     weightKg: patient?.weightKg ?? null,
     activityLevel: answers?.activityLevel ?? null,
     consultationReason: answers?.consultationReason ?? null,
+    consultationDate: answers?.consultationDate ?? null,
     noKnownAllergies: answers?.noKnownAllergies ?? null,
     noKnownIntolerances: answers?.noKnownIntolerances ?? null,
     allergyCount: rows.filter((row) => row.kind === "allergy").length,

@@ -9,7 +9,11 @@ import {
   patientActor,
   practitionerQuestionOf,
 } from "@remi/services/server";
-import { defaultLocale, isLocale } from "@remi/services/shared";
+import {
+  defaultLocale,
+  isLocale,
+  todayAtPractice,
+} from "@remi/services/shared";
 import { Wordmark } from "@remi/ui/server";
 import { SignOutButton } from "@/components/patient-auth/sign-out-button";
 import { getContent } from "@/lib/content";
@@ -67,7 +71,9 @@ const QuestionnairePage = async ({
     await Promise.all([
       getPatient(patientActor(patientId), patientId),
       getPatientQuestionnaire(patientActor(patientId), patientId),
-      missingQuestionnaireFields(patientActor(patientId), patientId),
+      missingQuestionnaireFields(patientActor(patientId), patientId, {
+        today: todayAtPractice(),
+      }),
       consentsOf(patientActor(patientId), patientId),
       practitionerQuestionOf(patientActor(patientId), patientId),
     ]);

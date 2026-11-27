@@ -395,7 +395,10 @@ export {
 } from "./celiac-mention";
 export {
   dateEntryFromIso,
+  ADULT_AGE,
+  isAdultOn,
   isCalendarDay,
+  isTodayOrLater,
   maskDateEntry,
   maskNumberEntry,
   parseDateEntry,

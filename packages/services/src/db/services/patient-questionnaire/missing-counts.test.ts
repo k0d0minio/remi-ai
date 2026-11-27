@@ -43,6 +43,7 @@ const complete = async (patientId: string) => {
     sexForCalculation: "female",
     activityLevel: "moderate",
     consultationReason: "fatigue",
+    consultationDate: "2999-01-15",
   });
   await setPatientAllergens(systemActor, patientId, "allergy", {
     state: "declared",

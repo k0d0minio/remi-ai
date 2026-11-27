@@ -3,6 +3,8 @@
 import { useState, type ReactNode } from "react";
 import {
   dateEntryFromIso,
+  isAdultOn,
+  isTodayOrLater,
   parseDateEntry,
   todayAtPractice,
 } from "@remi/services/shared";
@@ -18,7 +20,25 @@ import {
   useQuestionnaire,
 } from "./questionnaire-context";
 
-type Problem = "invalid" | "notPast";
+type Problem = "invalid" | "notPast" | "minor" | "beforeToday";
+
+/**
+ * The rule of the day, after the calendar check (REM-159). A birth date is
+ * before today and of a person of 18 or older. A consultation date is today or
+ * a later day.
+ */
+type Rule = "birth" | "consultation";
+
+/** The problem of a real day under the rule, null when the day is valid. */
+const problemOf = (rule: Rule, iso: string, today: string): Problem | null => {
+  if (rule === "consultation") {
+    return isTodayOrLater(iso, today) ? null : "beforeToday";
+  }
+  if (iso >= today) {
+    return "notPast";
+  }
+  return isAdultOn(iso, today) ? null : "minor";
+};
 
 type Props = {
   field: Extract<AnswerField, "birthDate" | "consultationDate">;
@@ -27,28 +47,32 @@ type Props = {
   dateText: Content["dateEntry"];
   /** The saved day as `YYYY-MM-DD`, `""` when the file holds none. */
   initial: string;
-  /** A birth date: today and every later day are refused. */
-  past?: boolean;
+  rule: Rule;
   autoComplete?: string;
 };
 
 /**
  * One date answer, typed as « JJ/MM/AAAA » (REM-159). The field opens with
- * the saved day or empty, never with today. It saves a complete, real day and
- * an emptied field, and nothing else: a date half typed or impossible stays on
- * screen with its error and is not sent.
+ * the saved day or empty, never with today. It saves a complete, real day
+ * that its rule accepts, and an emptied field. A date half typed, impossible
+ * or refused by the rule stays on screen with its error. The questionnaire
+ * does not stop on it: its end counts a missing consultation date (Jamie,
+ * 2026-11-27). So a refused consultation date clears the saved one.
  */
 export const DateAnswer = ({
   field,
   label,
   dateText,
   initial,
-  past,
+  rule,
   autoComplete,
 }: Props) => {
   const { text } = useQuestionnaire();
   const [value, setValue] = useState(dateEntryFromIso(initial));
-  const [problem, setProblem] = useState<Problem | null>(null);
+  // A saved consultation date that is now past shows its error at once.
+  const [problem, setProblem] = useState<Problem | null>(() =>
+    initial === "" ? null : problemOf(rule, initial, todayAtPractice()),
+  );
   const { state, commit, schedule, retry } = useAutosave(
     (next) => saveAnswerAction(field, next),
     initial,
@@ -64,12 +88,14 @@ export const DateAnswer = ({
       return { save: "" };
     }
     if (entry.state === "valid") {
-      return past && entry.iso >= todayAtPractice()
-        ? { problem: "notPast" }
-        : { save: entry.iso };
+      const refused = problemOf(rule, entry.iso, todayAtPractice());
+      return refused ? { problem: refused } : { save: entry.iso };
     }
     return entry.state === "incomplete" ? {} : { problem: "invalid" };
   };
+
+  /** A consultation date with a problem is no date: the saved one goes. */
+  const clears = rule === "consultation";
 
   const onChange = (typed: string) => {
     setValue(typed);
@@ -77,6 +103,8 @@ export const DateAnswer = ({
     setProblem(result.problem ?? null);
     if (result.save !== undefined) {
       schedule(result.save);
+    } else if (result.problem && clears) {
+      schedule("");
     }
   };
   const onBlur = () => {
@@ -84,6 +112,9 @@ export const DateAnswer = ({
     if (result.save === undefined) {
       // A date left half typed is an error once the patient leaves the field.
       setProblem(result.problem ?? "invalid");
+      if (clears) {
+        void commit("");
+      }
       return;
     }
     setProblem(null);

@@ -21,6 +21,7 @@ import {
   diets,
   heightCmRange,
   isCalendarDay,
+  todayAtPractice,
   weightKgRange,
   type Result,
 } from "@remi/services/shared";
@@ -126,8 +127,8 @@ const writeAnswer = async (
     const checked = validateSignup({ [field]: value });
     const code = checked.ok ? undefined : checked.fields[field];
     if (code) {
-      if (code === "required") {
-        return failed("required");
+      if (code === "required" || code === "minor") {
+        return failed(code);
       }
       return failed(field === "phone" ? "phone" : "invalid");
     }
@@ -170,9 +171,16 @@ const writeAnswer = async (
     );
   }
   // The service's floor takes `2026-02-31`. A day that no calendar has is
-  // refused here (REM-159). A future consultation date is a valid answer.
-  if (field === "consultationDate" && value !== "" && !isCalendarDay(value)) {
-    return failed("invalid");
+  // refused here (REM-159). Today and a later day are valid answers. A day
+  // before today is refused. An empty field clears the date: the questionnaire
+  // then counts it as missing at its end.
+  if (field === "consultationDate" && value !== "") {
+    if (!isCalendarDay(value)) {
+      return failed("invalid");
+    }
+    if (value < todayAtPractice()) {
+      return failed("before_today");
+    }
   }
   const input = { [field]: value } as QuestionnaireInput;
   // The service writes the audit events of this save (a genotype change, the
@@ -203,9 +211,11 @@ const settle = async (patientId: string): Promise<SaveResult> => {
       name: patient.data.pseudonym,
     },
   );
+  // The patient's view: a consultation date before today is missing.
   const missing = await missingQuestionnaireFields(
     patientActor(patientId),
     patientId,
+    { today: todayAtPractice() },
   );
   if (!status.ok || !missing.ok) {
     return failed("unavailable");

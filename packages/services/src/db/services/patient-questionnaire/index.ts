@@ -15,6 +15,7 @@ import {
   sexesForCalculation,
   type MandatoryQuestionnaireField,
 } from "../../../shared/questionnaire";
+import { todayAtPractice } from "../../../shared/format";
 import { macroProfile, type MacroProfile } from "../../../shared/macro-profile";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
@@ -842,6 +843,7 @@ type CompletenessRow = PatientProfile & PatientQuestionnaire;
  */
 const unscopedMissingQuestionnaireFields = async (
   patientId: Id,
+  options: { today?: string } = {},
 ): Promise<Result<MandatoryQuestionnaireField[]>> => {
   if (!isValidId(patientId)) {
     return err("not_found", "no such patient");
@@ -862,6 +864,8 @@ const unscopedMissingQuestionnaireFields = async (
       weightKg: row.weightKg ?? null,
       activityLevel: row.activityLevel ?? null,
       consultationReason: row.consultationReason ?? null,
+      consultationDate: row.consultationDate ?? null,
+      today: options.today,
       noKnownAllergies: row.noKnownAllergies ?? null,
       noKnownIntolerances: row.noKnownIntolerances ?? null,
       allergyCount: countOf("allergy"),
@@ -881,7 +885,10 @@ const unscopedMarkReadyWhenComplete = async (
   patientId: Id,
   actor: AuditActor | null,
 ): Promise<Result<PatientProfile["fileStatus"]>> => {
-  const missing = await unscopedMissingQuestionnaireFields(patientId);
+  // A past consultation date does not make a file ready (REM-159).
+  const missing = await unscopedMissingQuestionnaireFields(patientId, {
+    today: todayAtPractice(),
+  });
   if (!missing.ok) {
     return missing;
   }

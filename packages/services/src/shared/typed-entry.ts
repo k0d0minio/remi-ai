@@ -26,6 +26,22 @@ export const isCalendarDay = (value: string): boolean => {
   );
 };
 
+/** The age from which a person can use REMI (REM-159): no minors. */
+export const ADULT_AGE = 18;
+
+/**
+ * True when a person born on `birthDate` is 18 or older on `today`. Both are
+ * `YYYY-MM-DD`. A person born on 29 February is 18 on 1 March of a common year.
+ */
+export const isAdultOn = (birthDate: string, today: string): boolean => {
+  const year = Number(today.slice(0, 4)) - ADULT_AGE;
+  return birthDate <= `${String(year).padStart(4, "0")}${today.slice(4)}`;
+};
+
+/** True when `day` is `today` or a later day. Both are `YYYY-MM-DD`. */
+export const isTodayOrLater = (day: string, today: string): boolean =>
+  day >= today;
+
 /** `1990-05-12` as « 12/05/1990 ». Empty for no date, or for a text that is not a day. */
 export const dateEntryFromIso = (value: string | null | undefined): string => {
   const match = value ? isoDay.exec(value) : null;
