@@ -32,9 +32,12 @@ any work (1.0.0-rc36).
    `RESULT: STOP setup gap <id>: <fix>`. Tell the operator that line, and stop. A pass is
    kept one hour. The CI job `icm-check` prints each gap that a file shows as a warning.
 4. **What blocks.** Only a gap that breaks the work: the router pointer of `CLAUDE.md`, a
-   check that the ruleset does not require, a secret that a workflow of the template needs
-   for each push, and with Postgres the script `vercel-build`. Each other gap is flagged.
-5. **Not checked.** A probe that cannot run (no `gh`, no network, no right to read, no
+   secret that a workflow of the template needs for each push, and with Postgres the script
+   `vercel-build`. Each other gap is flagged.
+5. **The ruleset is optional** (1.0.0-rc38). The operator decides for each repo if a
+   ruleset requires the checks of CI. The item `gh.ruleset` is flagged with its fix, and
+   never stops a run.
+6. **Not checked.** A probe that cannot run (no `gh`, no network, no right to read, no
    keyring) says "not checked". It never blocks. The operator checks the item by hand.
 
 ## Outputs

@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { defaultLocale, isLocale, locales } from "@remi/services/shared";
 import { BRAND_NAME } from "@remi/ui/server";
 import { getContent } from "@/lib/content";
+import { RequestButton } from "../../../../.icm/_system/request-button/RequestButton";
 import "../globals.css";
 
 /**
@@ -67,6 +68,7 @@ const RootLayout = async ({
     <html lang={locale} className={jakarta.variable}>
       <body className="min-h-dvh antialiased">
         {children}
+        <RequestButton />
         <Analytics />
       </body>
     </html>

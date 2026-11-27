@@ -36,4 +36,4 @@ The contract of the seed script. This repo writes it; the blueprint does not.
    the key and the account of the UAT database. The address is in the environment of that
    one command only.
 
-- [ ] The seed script exists, and the admin test account has its role on UAT.
+- [x] The seed script exists, and the admin test account has its role on UAT.

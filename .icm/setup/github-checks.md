@@ -14,5 +14,6 @@
 
 ## Done when
 
-- [ ] `grep -r legible-consulting .github` finds nothing.
+- [x] `grep -r legible-consulting .github` finds nothing.
 - [ ] The ruleset requires the four checks.
+  J, 2026-11-27: none. No ruleset on `main`.

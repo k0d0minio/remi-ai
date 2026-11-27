@@ -38,6 +38,6 @@ made by hand. Each act that writes to a service is the operator's.
 ## Done when
 
 - [ ] The build log of a preview has "db.sh: the migration of the preview database, before the build".
-- [ ] The job `code` of the workflow `ci` is green.
-- [ ] A preview reads the shared preview database.
-- [ ] No database branch for a pull request exists.
+- [x] The job `code` of the workflow `ci` is green.
+- [x] A preview reads the shared preview database.
+- [x] No database branch for a pull request exists.

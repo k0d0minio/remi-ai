@@ -11,3 +11,4 @@
 ## Done when
 
 - [ ] Dependabot opens a pull request for a dependency with a known vulnerability.
+  J, 2026-11-27: no. Dependabot stays off.

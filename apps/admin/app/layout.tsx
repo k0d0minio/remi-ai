@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { BRAND_NAME } from "@remi/ui/server";
+import { RequestButton } from "../../../.icm/_system/request-button/RequestButton";
 import "./globals.css";
 
 /**
@@ -35,6 +36,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => (
   <html lang="fr" className={jakarta.variable}>
     <body className="min-h-dvh antialiased">
       {children}
+      <RequestButton />
       <Analytics />
     </body>
   </html>
