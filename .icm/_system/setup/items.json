@@ -66,7 +66,7 @@
  },
  {
   "act": "github-checks.md",
-  "block": true,
+  "block": false,
   "fix": "GitHub \u2192 the repo \u2192 Settings \u2192 Rules \u2192 Rulesets: a ruleset on main with the required checks",
   "id": "gh.ruleset",
   "owner": "J",
@@ -78,7 +78,7 @@
    "code"
   ],
   "sec": "GitHub",
-  "text": "A ruleset on `main` makes these checks necessary: `secrets`, `workflows`, `icm-check` and `code`."
+  "text": "Optional (J decides for each repo, 1.0.0-rc38): a ruleset on `main` makes these checks necessary: `secrets`, `workflows`, `icm-check` and `code`."
  },
  {
   "act": "",
