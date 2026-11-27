@@ -2,7 +2,11 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { maskNumberEntry } from "@remi/services/shared";
+import {
+  maskNumberEntry,
+  maskPhoneEntry,
+  normalizePhone,
+} from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Field, Input, Typography, VisuallyHidden } from "@remi/ui/server";
 import { fill } from "@/lib/content/fill";
@@ -17,6 +21,8 @@ type Props = {
   /** The label of the input: the questionnaire's name of the field. */
   inputLabel: string;
   hint?: string;
+  /** An example in the empty field. Never a value. */
+  placeholder?: string;
   /** The saved value as the patient types it, `""` when the file holds none. */
   initial: string;
   /** How the row shows the value. `{value}` is the saved value. */
@@ -46,6 +52,7 @@ export const EditableField = ({
   label,
   inputLabel,
   hint,
+  placeholder,
   initial,
   valueTemplate,
   decimal,
@@ -73,11 +80,16 @@ export const EditableField = ({
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // The server stores a phone with no space and shows a weight with a comma.
+    if (draft.trim() === "") {
+      setError("required");
+      return;
+    }
+    // A phone is checked here first, with the server's own rule (REM-158).
     const next = decimal
       ? draft.trim().replace(".", ",")
-      : draft.replace(/\s/g, "");
-    if (next === "") {
-      setError("required");
+      : normalizePhone(draft);
+    if (next === null) {
+      setError("phone");
       return;
     }
     if (next === saved) {
@@ -129,12 +141,13 @@ export const EditableField = ({
                 autoComplete={autoComplete}
                 autoFocus
                 value={draft}
+                placeholder={placeholder}
                 invalid={error !== null}
                 onChange={(event) =>
                   setDraft(
                     decimal
                       ? maskNumberEntry(event.target.value, "decimal")
-                      : event.target.value,
+                      : maskPhoneEntry(event.target.value),
                   )
                 }
               />

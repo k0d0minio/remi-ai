@@ -4,6 +4,8 @@ import NextLink from "next/link";
 import { Fragment, useActionState, useState } from "react";
 import {
   localePath,
+  maskPhoneEntry,
+  normalizePhone,
   parseDateEntry,
   shownConsentValue,
   signupFields,
@@ -34,6 +36,8 @@ type Props = {
   content: Content["signupLink"];
   /** The texts of the birth date field (REM-159). */
   dateText: Content["dateEntry"];
+  /** The texts of the phone field (REM-158). */
+  phoneText: Content["phoneEntry"];
   /** The texts of the box: the care consent and the CGV (story 3, REM-207). */
   consents: readonly ConsentStepText[];
 };
@@ -75,6 +79,7 @@ export const SignupForm = ({
   locale,
   content,
   dateText,
+  phoneText,
   consents,
 }: Props) => {
   const [state, formAction, pending] = useActionState(
@@ -90,6 +95,9 @@ export const SignupForm = ({
   const [values, setValues] = useState(empty);
   const [step, setStep] = useState<"consent" | "details">("consent");
   const [ticked, setTicked] = useState<ReadonlySet<ConsentKey>>(new Set());
+  // The phone is checked on blur with the server's own rule (REM-158). The
+  // server checks it again at the submit.
+  const [phoneRefused, setPhoneRefused] = useState(false);
 
   // A server answer that refuses the consents opens their step again, until
   // the patient continues past it. Derived, so no effect and no extra render.
@@ -109,6 +117,9 @@ export const SignupForm = ({
     });
 
   const message = (name: SignupField) => {
+    if (name === "phone" && phoneRefused) {
+      return content.invalid.phone;
+    }
     const error = state.fields[name];
     if (error === "required") {
       return fill(content.required, { field: content.labels[name] });
@@ -220,9 +231,11 @@ export const SignupForm = ({
           const id = `signup-${name}`;
           const control = controls[name];
           const hint =
-            name === "phone" || name === "password"
-              ? content.hints[name]
-              : undefined;
+            name === "phone"
+              ? phoneText.hint
+              : name === "password"
+                ? content.hints.password
+                : undefined;
           if (name === "birthDate") {
             // The field shows « JJ/MM/AAAA » and starts empty. The form posts
             // the day as `YYYY-MM-DD`. A text that is not a real day is posted
@@ -276,13 +289,32 @@ export const SignupForm = ({
                 required
                 size="lg"
                 className="min-h-11"
-                invalid={Boolean(state.fields[name])}
+                placeholder={
+                  name === "phone" ? phoneText.placeholder : undefined
+                }
+                invalid={
+                  Boolean(state.fields[name]) ||
+                  (name === "phone" && phoneRefused)
+                }
                 value={values[name]}
-                onChange={(event) =>
-                  setValues((current) => ({
-                    ...current,
-                    [name]: event.target.value,
-                  }))
+                onChange={(event) => {
+                  const typed =
+                    name === "phone"
+                      ? maskPhoneEntry(event.target.value)
+                      : event.target.value;
+                  if (name === "phone" && normalizePhone(typed) !== null) {
+                    setPhoneRefused(false);
+                  }
+                  setValues((current) => ({ ...current, [name]: typed }));
+                }}
+                onBlur={
+                  name === "phone"
+                    ? (event) =>
+                        setPhoneRefused(
+                          event.target.value.trim() !== "" &&
+                            normalizePhone(event.target.value) === null,
+                        )
+                    : undefined
                 }
               />
             </Field>

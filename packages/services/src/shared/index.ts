@@ -25,6 +25,7 @@ export {
   locales,
 } from "./i18n";
 export type { Locale } from "./i18n";
+export { maskPhoneEntry, normalizePhone } from "./phone";
 export { userMessage } from "./user-message";
 export type { ServiceFailure } from "./user-message";
 export { auditActions } from "./audit";

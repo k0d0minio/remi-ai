@@ -75,6 +75,8 @@ type Props = {
   text: Content["questionnaire"];
   /** The texts of a date field (REM-159). */
   dateText: Content["dateEntry"];
+  /** The texts of the phone field (REM-158). */
+  phoneText: Content["phoneEntry"];
   values: QuestionnaireValues;
   /**
    * The free question of the patient's practitioner (REM-161). Null: the
@@ -103,6 +105,7 @@ export const QuestionnaireFlow = ({
   locale,
   text,
   dateText,
+  phoneText,
   values,
   practitionerQuestion,
   geneticConsent,
@@ -255,7 +258,11 @@ export const QuestionnaireFlow = ({
           name="identite"
           title={text.sections.identite}
         >
-          <IdentitySection values={values} dateText={dateText} />
+          <IdentitySection
+            values={values}
+            dateText={dateText}
+            phoneText={phoneText}
+          />
         </Section>
 
         <Section current={section} name="profil" title={text.sections.profil}>

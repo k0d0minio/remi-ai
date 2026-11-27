@@ -16,6 +16,7 @@ import { insertConsent } from "../db/services/patient-consents";
 import { createPatient, findPatientByEmail } from "../db/services/patients";
 import type { ShownConsent } from "../shared/consent";
 import type { Locale } from "../shared/i18n";
+import { normalizePhone } from "../shared/phone";
 import { err, ok, type Result, type ServiceErrorCode } from "../shared/result";
 import {
   minPasswordLength,
@@ -63,8 +64,6 @@ const isPastDay = (value: string) => {
   return value >= "1900-01-01" && value < today;
 };
 
-/** Digits and spaces, one leading `+`, 8 to 15 digits (default of Morgane's question 3). */
-const phoneShape = /^\+?[\d ]+$/;
 
 const signupSchema = z.object({
   lastName: required(100),
@@ -81,16 +80,13 @@ const signupSchema = z.object({
     .toLowerCase()
     .min(1, "required")
     .pipe(z.email("invalid")),
+  // An international number with its country code (`shared/phone.ts`).
   phone: z
     .string()
     .trim()
     .min(1, "required")
-    .regex(phoneShape, "invalid")
-    .transform((value) => value.replace(/ /g, ""))
-    .refine((value) => {
-      const digits = value.replace("+", "").length;
-      return digits >= 8 && digits <= 15;
-    }, "invalid"),
+    .refine((value) => normalizePhone(value) !== null, "invalid")
+    .transform((value) => normalizePhone(value) ?? value),
   // Never trimmed: a space is a character of the password.
   password: z
     .string()

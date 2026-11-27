@@ -116,6 +116,7 @@ const QuestionnairePage = async ({
         locale={locale}
         text={content.questionnaire}
         dateText={content.dateEntry}
+        phoneText={content.phoneEntry}
         values={values}
         practitionerQuestion={
           practitionerQuestion.ok ? practitionerQuestion.data : null

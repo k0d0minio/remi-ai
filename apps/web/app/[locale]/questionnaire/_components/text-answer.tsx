@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { maskNumberEntry } from "@remi/services/shared";
+import { maskNumberEntry, maskPhoneEntry } from "@remi/services/shared";
 import { Field, Input, Textarea } from "@remi/ui/server";
 import { saveAnswerAction } from "@/lib/questionnaire/actions";
 import type { AnswerField } from "@/lib/questionnaire/state";
@@ -21,6 +21,7 @@ type Props = {
   /** The saved value, `""` when « Non renseigné ». */
   initial: string;
   multiline?: boolean;
+  /** `tel`: the field keeps only `+`, digits and spaces (REM-158). */
   type?: "text" | "tel";
   inputMode?: "text" | "tel";
   /**
@@ -58,7 +59,11 @@ export const TextAnswer = ({
   const refusal = refusalOf(state, text);
   const invalid = refusal !== undefined;
   const onChange = (typed: string) => {
-    const next = numeric ? maskNumberEntry(typed, numeric) : typed;
+    const next = numeric
+      ? maskNumberEntry(typed, numeric)
+      : type === "tel"
+        ? maskPhoneEntry(typed)
+        : typed;
     setValue(next);
     schedule(next);
   };

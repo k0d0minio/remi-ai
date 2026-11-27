@@ -16,6 +16,7 @@ import {
   type MandatoryQuestionnaireField,
 } from "../../../shared/questionnaire";
 import { macroProfile, type MacroProfile } from "../../../shared/macro-profile";
+import { normalizePhone } from "../../../shared/phone";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
@@ -637,12 +638,14 @@ const profileAnswerSchema = z
     firstName: z.string().trim().min(1, "required").max(100),
     lastName: z.string().trim().min(1, "required").max(100),
     birthDate: calendarDate,
+    // An international number with its country code (`shared/phone.ts`).
     phone: z
       .string()
-      .transform((value) => value.replace(/\s/g, ""))
-      .pipe(
-        z.string().regex(/^\+?\d{8,15}$/, "that phone number is not valid"),
-      ),
+      .refine(
+        (value) => normalizePhone(value) !== null,
+        "that phone number is not valid",
+      )
+      .transform((value) => normalizePhone(value) ?? value),
     // The column is an integer.
     heightCm: z.union([z.null(), z.number().int().positive().max(300)]),
     weightKg: z.union([z.null(), weightKg]),

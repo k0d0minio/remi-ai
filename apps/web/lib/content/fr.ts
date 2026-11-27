@@ -1,5 +1,9 @@
 import type { Content } from "./types";
 
+/** The phone field's error, in the sign-up, the questionnaire and the profile (REM-158). */
+const phoneInvalid =
+  "Veuillez saisir un numéro de téléphone valide, avec l'indicatif de votre pays.";
+
 export const fr: Content = {
   meta: {
     title: "Le copilote bien-être entre deux consultations",
@@ -270,11 +274,10 @@ export const fr: Content = {
       firstName: "Prénom",
       birthDate: "Date de naissance",
       email: "Adresse e-mail",
-      phone: "Téléphone",
+      phone: "Numéro de téléphone",
       password: "Mot de passe",
     },
     hints: {
-      phone: "Des chiffres, avec un + au début si besoin.",
       password: "Au moins 8 caractères.",
     },
     summary: "À corriger : {fields}.",
@@ -284,8 +287,7 @@ export const fr: Content = {
       firstName: "Ce prénom est trop long.",
       birthDate: "Cette date n'est pas valide.",
       email: "Cette adresse e-mail n'est pas valide.",
-      phone:
-        "Ce numéro n'est pas valide. Utilise 8 à 15 chiffres, avec un + au début si besoin.",
+      phone: phoneInvalid,
       password: "Ce mot de passe est trop long.",
     },
     tooShort: "Le mot de passe compte au moins 8 caractères.",
@@ -370,8 +372,7 @@ export const fr: Content = {
     errors: {
       required: "Ce champ ne peut pas rester vide.",
       invalid: "Cette valeur n'est pas valide.",
-      phone:
-        "Ce numéro n'est pas valide. Utilise 8 à 15 chiffres, avec un + au début si besoin.",
+      phone: phoneInvalid,
       height_range: "Indique une taille entre 100 et 250 cm, sans décimale.",
       weight_range:
         "Indique un poids entre 25 et 300 kg, avec une décimale au plus.",
@@ -387,7 +388,7 @@ export const fr: Content = {
       lastName: "Nom",
       birthDate: "Date de naissance",
       email: "Adresse e-mail",
-      phone: "Téléphone",
+      phone: "Numéro de téléphone",
       mandatory: {
         sexForCalculation:
           "Sexe biologique utilisé pour les calculs nutritionnels",
@@ -410,7 +411,6 @@ export const fr: Content = {
     },
     hints: {
       email: "Pour modifier ton e-mail, contacte ton praticien.",
-      phone: "Des chiffres, avec un + au début si besoin.",
       height: "Entre 100 et 250 cm.",
       weight: "Entre 25 et 300 kg.",
       desiredWeight: "Laisse vide si tu n'en as pas.",
@@ -476,6 +476,11 @@ export const fr: Content = {
     hint: "Format : JJ/MM/AAAA.",
     invalid: "Cette date n'est pas valide. Utilise le format JJ/MM/AAAA.",
     notPast: "La date de naissance doit être dans le passé.",
+  },
+  phoneEntry: {
+    placeholder: "+32 470 12 34 56",
+    hint:
+      "Indiquez votre numéro de téléphone avec l'indicatif de votre pays (ex. : +32 pour la Belgique).",
   },
   patientSignIn: {
     metaTitle: "Connexion",
