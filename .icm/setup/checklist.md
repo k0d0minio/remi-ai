@@ -53,7 +53,8 @@ J, 2026-11-27: "i don't want to have to do this manually". A session ticks a box
 - [x] (S) The root layout has `<RequestButton />` after `{children}`. The form has the language of `.icm/project.json`. (`request-button.md`) `rb.layout`
 - [x] (S) The route `app/api/baxter-request/route.ts` (or below `src/`) exports `POST` again. (`request-button.md`) `rb.route`
 - [x] (S) Optional `user`. The Content-Security-Policy permits a POST to the same origin. TypeScript and ESLint accept `.icm/_system/request-button/`. On a local dev server the button shows, and an empty POST to the route gets 400. (`request-button.md`) `rb.config`
-- [ ] (J) Vercel `uat`: `BAXTER_REQUEST_ENV` = `uat` (not on production), and `BAXTER_REQUEST_LINEAR_API_KEY`. The label `requests.linear_label` exists in the team `REM`. (`request-button.md`) `rb.env`
+- [x] (J) Vercel `uat`: `BAXTER_REQUEST_ENV` = `uat` (not on production), and `BAXTER_REQUEST_LINEAR_API_KEY`. The label `requests.linear_label` exists in the team `REM`. (`request-button.md`) `rb.env`
+  J, 2026-11-27: pushed both names to Vercel `app`, `uat`. The label `source/client` exists in REM. The next UAT build reads them.
 
 ## Checktest
 
