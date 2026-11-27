@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-159/questionnaire-patient-ameliorer-les-champs-de-date
 - branch: contact/rem-159-questionnaire-patient-ameliorer-les-champs
 - lane: bug
-- pr: pending
+- pr: #256
 - started: 2026-11-27
