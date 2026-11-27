@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm -w exec turbo run build --filter=@remi/admin^... && pnpm run vercel-build",
   "ignoreCommand": "npx turbo-ignore @remi/admin --fallback=HEAD^1",
   "regions": ["fra1"]
 }

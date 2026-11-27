@@ -22,6 +22,8 @@ A ticket is now a Linear key of the team `REM`. A stub is not a ticket.
 
 ## The database
 
-`.icm/local/database.md` has the rule for the databases of today: one Neon branch for each
-preview, and a migration at the build of `admin`. `.icm/local/vercel-build.sh` is that build
-step. The two files leave when the repo answers `database: postgres` to the blueprint.
+The repo answers `database: postgres` to the blueprint since REM-154 (2026-11-27). The rule
+is `.icm/_system/features/database.md`, and the setup is `.icm/setup/databases.md`. The
+admin app migrates: its `vercel.json` builds the packages with turbo, then its script
+`vercel-build` runs `db.sh build` (the migration, then `next build`). The other apps only
+build.

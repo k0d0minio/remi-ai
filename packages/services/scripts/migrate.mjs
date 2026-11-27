@@ -5,18 +5,18 @@ import { fileURLToPath } from "node:url";
 /**
  * Applies the checked-in migrations (src/db/migrations/) with drizzle-kit.
  * `verify.mjs` (`db:verify`) then checks the database carries the schema they
- * describe. `.icm/local/vercel-build.sh` runs both at the front of the admin
- * app's build, and `promote.yml` runs both against production before a
- * promotion. The rule is `.icm/local/database.md` § The migration rule.
- * Without DATABASE_URL it skips loudly and succeeds — CI and a developer
- * without a database must still build.
+ * describe. The blueprint's `.icm/_system/scripts/db.sh` runs both: `db.sh
+ * build` at the front of the admin app's Vercel build, `db.sh migrate` in
+ * `promote.yml` against production before a promotion, and the job `code` of
+ * `ci` on an empty Postgres. The rule is `.icm/_system/features/database.md`.
+ * Without DATABASE_URL it skips loudly and succeeds.
  *
- * On Vercel it migrates the `uat` build and a `preview` build. Each one owns
- * its database: `uat` reads the default branch of the UAT project, and a
- * preview reads the branch `preview/<git branch>` that the Neon integration
- * makes before the build. `MIGRATE_AT_BUILD=1` is the escape hatch for any
- * other target. A `production` build on Vercel fails here: promote.yml
- * migrates production. The guard is the second lock after vercel-build.sh,
+ * On Vercel it migrates the `uat` build and a `preview` build: `uat` reads the
+ * default branch of the UAT project, and each preview reads the one shared
+ * preview database (the branch `preview` of `uat-remi-ai`).
+ * `MIGRATE_AT_BUILD=1` is the escape hatch for any other target. A
+ * `production` build on Vercel fails here: promote.yml migrates production.
+ * The guard is the second lock after `db.sh build`,
  * and it fails closed because the cost of a wrong migration is silent: on
  * 2026-09-02 a preview created a table in the live database, which pushed
  * drizzle's high-water mark past an older migration on `main` and made that
@@ -53,10 +53,10 @@ if (onVercel && !ownsDatabase) {
     `[db:migrate] VERCEL_TARGET_ENV=${target ?? "unset"} MIGRATE_AT_BUILD=${process.env.MIGRATE_AT_BUILD ?? "unset"} — refusing to migrate.`,
   );
   console.error(
-    "[db:migrate] On Vercel only the uat build and a preview build migrate. Each one owns its database.",
+    "[db:migrate] On Vercel only the uat build and a preview build migrate.",
   );
   console.error(
-    "[db:migrate] Production migrates in promote.yml. See .icm/local/database.md § The migration rule.",
+    "[db:migrate] Production migrates in promote.yml. See .icm/_system/features/database.md.",
   );
   process.exit(1);
 }

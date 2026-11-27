@@ -26,8 +26,8 @@ Storage's vendor is **Neon Postgres** (owner decision, 27 Aug 2026 — supersede
 Supabase leaning), queried with Drizzle against `src/db/schema.ts`. The schema is the single
 definition the checked-in migrations under `src/db/migrations/` are generated from
 (`pnpm db:generate`); `pnpm db:migrate` applies them and `pnpm db:verify` checks the result. The
-admin app's `uat` build runs both first, and `promote.yml` runs both against production
-(`.icm/local/database.md` § The migration rule).
+admin app's `uat` and preview builds run both first (`db.sh build`), CI runs both on an empty
+Postgres, and `promote.yml` runs both against production (`.icm/_system/features/database.md`).
 Never change the live schema any other way. Services under `src/db/services/` still speak only to
 the seam — the tests run them against an in-memory client (`src/db/test-helpers.ts`), which is the
 proof.
