@@ -2,8 +2,7 @@
 
 ## Next action
 
-L'opérateur fait les étapes de « Blockers », puis relance la preview `admin` de cette branche.
-Il lit son journal de build, teste, puis coche **Ready to merge**.
+L'opérateur teste, puis coche **Ready to merge** sur la pull request 251.
 
 ## Ce qui a changé, et pourquoi aucun utilisateur ne le voit
 
@@ -26,10 +25,9 @@ of the preview database, before the build », puis « schema verified ». La pre
 
 ## Blockers
 
-- La preview `admin` n'a pas encore construit : turbo-ignore l'a annulée (le défaut de
-  REM-152). L'opérateur la relance dans Vercel (Redeploy), après la mise en place de la base
-  de preview.
-- La base de preview fixe n'existe pas encore (`.icm/setup/databases.md`, étapes 1 à 5).
+- none. Le 2026-11-27, la base de preview fixe existe, avec ses secrets GitHub et ses
+  variables Vercel. Le Redeploy de la preview `admin` (`dpl_HN4ddvZEHBXhs3phfesRGVWvfnqy`) est
+  READY : son journal finit par « RESULT: OK built » de `db.sh build`.
 
 ## Do not touch
 
