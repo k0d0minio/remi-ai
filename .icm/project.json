@@ -9,8 +9,8 @@
     "writes": "session",
     "states": {
       "draft": "En cours de développement",
-      "ready": "Vérification interne",
-      "merged": "À tester par vous",
+      "ready": "Vérification par Jamie",
+      "merged": "À tester par Morgane",
       "changes": "Corrections demandées",
       "approved": "Validée - bientôt en ligne",
       "live": "En ligne"

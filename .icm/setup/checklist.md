@@ -66,6 +66,7 @@ J, 2026-11-27: "i don't want to have to do this manually". A session ticks a box
 - [x] (B) The org `remi-ai` is in the keyring of BAXTER. `li.org`
 - [x] (S) `linear.writes` of `.icm/project.json` is `session`. `li.writes`
 - [x] (S) `linear.states` of `.icm/project.json`: the state names of the team `REM`. An empty name: no state move at that event. `li.states`
+  J, 2026-11-27: "Use the live names". The names are the states of REM on that date.
 
 ## Close
 
