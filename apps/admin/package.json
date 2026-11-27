@@ -5,9 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "next dev -p 3002",
-    "build": "bash ../../.icm/local/vercel-build.sh next build",
-    "db:migrate": "pnpm --filter @remi/services db:migrate",
-    "db:verify": "pnpm --filter @remi/services db:verify",
+    "build": "next build",
+    "vercel-build": "bash ../../.icm/_system/scripts/db.sh build",
     "start": "next start -p 3002",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

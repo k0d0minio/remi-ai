@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 
 /**
  * Checks the database actually looks like the migrations say it does. Runs
- * after `db:migrate`, in `.icm/local/vercel-build.sh` and in `promote.yml`.
+ * after `db:migrate`, in `.icm/_system/scripts/db.sh` (Vercel build, CI, promotion).
  * Without DATABASE_URL it skips loudly and succeeds. It only reads, so it
  * carries no environment guard.
  *
