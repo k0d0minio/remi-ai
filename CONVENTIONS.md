@@ -208,12 +208,12 @@ file list.
 
 ## The factory owns the checks — you do not
 
-Format, lint, typecheck and build are deterministic work. They belong to Husky, CI and the Vercel
+Format, lint, typecheck and build are deterministic work. They belong to CI and the Vercel
 preview, not to a session's context window:
 
 | Check           | Runs where                                                    |
 | --------------- | ------------------------------------------------------------- |
-| Format          | Husky pre-commit (lint-staged)                                |
+| Format          | No hook since 2026-11-27 (`.icm/setup/remove-husky.md`)       |
 | Lint, typecheck | CI — `ci.yml` (`check-client.yml`), on **every** PR           |
 | Migration order | No CI job since 2026-10-27 (see below)                        |
 | Build           | The Vercel preview deploy                                     |
