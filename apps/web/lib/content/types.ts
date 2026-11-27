@@ -295,7 +295,7 @@ export type Content = {
     /** Holds `{name}`: the practitioner's name. */
     intro: string;
     labels: Record<SignupField, string>;
-    hints: { phone: string; password: string };
+    hints: { password: string };
     /** Holds `{fields}`: the refused fields' labels, joined. */
     summary: string;
     /** Holds `{field}`: the field's label. */
@@ -402,7 +402,6 @@ export type Content = {
     };
     hints: {
       email: string;
-      phone: string;
       height: string;
       weight: string;
       desiredWeight: string;
@@ -483,6 +482,14 @@ export type Content = {
     invalid: string;
     /** A birth date of today or later. */
     notPast: string;
+  };
+  /**
+   * The phone field of the sign-up, the questionnaire and the profile
+   * (REM-158): an international number with its country code.
+   */
+  phoneEntry: {
+    placeholder: string;
+    hint: string;
   };
   /**
    * The patient's sign-in at `/connexion` (story 2): the password form, the

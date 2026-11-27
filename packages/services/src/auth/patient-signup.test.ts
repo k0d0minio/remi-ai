@@ -174,9 +174,18 @@ describe("the sign-up fields", () => {
     }
   });
 
-  it("accepts digits, spaces and one leading +, and stores the digits", () => {
-    expect(data({ phone: " 0470 12 34 56 " }).phone).toBe("0470123456");
-    for (const phone of ["0470-12-34", "+32 4", "++32470123456", "abc"]) {
+  it("accepts an international number and stores it with no space", () => {
+    expect(data({ phone: " +32 470 12 34 56 " }).phone).toBe("+32470123456");
+    expect(data({ phone: "+33 6 12 34 56 78" }).phone).toBe("+33612345678");
+    const refused = [
+      "0470 12 34 56",
+      "+32 0470 12 34 56",
+      "0470-12-34",
+      "+32 4",
+      "++32470123456",
+      "abc",
+    ];
+    for (const phone of refused) {
       const checked = validateSignup({ ...valid, phone });
       expect(checked).toEqual({ ok: false, fields: { phone: "invalid" } });
     }

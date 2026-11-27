@@ -27,6 +27,7 @@ import {
   patientSexes,
   patientStatuses,
 } from "../../../shared/patient";
+import { normalizePhone } from "../../../shared/phone";
 import { err, ok, type Result } from "../../../shared/result";
 import type { Id } from "../../../types";
 import { getDatabase, type DatabaseClient } from "../../client";
@@ -114,21 +115,19 @@ const calendarDate = z.union([
 ]);
 
 /**
- * « Téléphone »: digits and spaces, one leading `+`, 8 to 15 digits, stored
- * without the spaces. The sign-up page's rule, so a number reads the same
- * whoever typed it. `""` clears it.
+ * « Numéro de téléphone »: an international number with its country code,
+ * stored without the spaces (`shared/phone.ts`). The sign-up page's rule, so a
+ * number reads the same whoever typed it. `""` clears it.
  */
 const phone = z.union([
   z.literal(""),
   z
     .string()
-    .trim()
-    .regex(/^\+?[\d ]+$/, "that phone number is not valid")
-    .transform((value) => value.replace(/ /g, ""))
-    .refine((value) => {
-      const digits = value.replace("+", "").length;
-      return digits >= 8 && digits <= 15;
-    }, "that phone number is not valid"),
+    .refine(
+      (value) => normalizePhone(value) !== null,
+      "that phone number is not valid",
+    )
+    .transform((value) => normalizePhone(value) ?? value),
 ]);
 
 /**
@@ -613,6 +612,32 @@ const withoutEdits = (
   return kept;
 };
 
+/**
+ * A number stored before REM-158 can lack the country code. The console form
+ * posts it back unchanged with each save: that value passes and stays as it
+ * is. A new value follows the rule.
+ */
+const withoutStoredPhone = async (
+  id: Id,
+  input: PatientInput,
+): Promise<PatientInput> => {
+  const typed = input.phone;
+  if (
+    typeof typed !== "string" ||
+    typed.trim() === "" ||
+    normalizePhone(typed) !== null
+  ) {
+    return input;
+  }
+  const current = await patients().findById(id);
+  if (!current?.phone || current.phone !== typed.replace(/\s/g, "")) {
+    return input;
+  }
+  const kept = { ...input };
+  delete kept.phone;
+  return kept;
+};
+
 const unscopedUpdatePatient = async (
   id: Id,
   input: PatientInput,
@@ -620,7 +645,9 @@ const unscopedUpdatePatient = async (
   if (!isValidId(id)) {
     return err("not_found", "no such patient");
   }
-  const parsed = patientFields.partial().safeParse(input);
+  const parsed = patientFields
+    .partial()
+    .safeParse(await withoutStoredPhone(id, input));
   if (!parsed.success) {
     return invalid(parsed.error.issues[0]);
   }

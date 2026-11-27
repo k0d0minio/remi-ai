@@ -68,6 +68,7 @@ const SignupLinkPage = async ({ params }: { params: Promise<Params> }) => {
         locale={locale}
         content={content}
         dateText={dictionary.dateEntry}
+        phoneText={dictionary.phoneEntry}
         consents={consentTexts(locale)}
       />
     </main>

@@ -1447,6 +1447,35 @@ describe("the console's identity fields and the e-mail lookup", () => {
       phone: "123",
     });
     expect(tooShort.ok).toBe(false);
+    const noCountryCode = await updatePatient(systemActor, file.id, {
+      phone: "0470 12 34 56",
+    });
+    expect(noCountryCode.ok).toBe(false);
+  });
+
+  it("keeps an earlier number that the form sends back unchanged", async () => {
+    const file = unwrapOk(
+      await createPatient(systemActor, {
+        practitionerId: testPractitionerId,
+        pseudonym: "Old phone",
+      }),
+    );
+    // The sign-up stored a number with no country code before REM-158.
+    await getDatabase()
+      .collection<PatientProfile>("patient_profiles")
+      .update(file.id, { phone: "0470123456" });
+    const saved = unwrapOk(
+      await updatePatient(systemActor, file.id, {
+        firstName: "Léa",
+        phone: "0470123456",
+      }),
+    );
+    expect(saved.firstName).toBe("Léa");
+    expect(saved.phone).toBe("0470123456");
+    const changed = await updatePatient(systemActor, file.id, {
+      phone: "0470999999",
+    });
+    expect(changed.ok).toBe(false);
   });
 });
 

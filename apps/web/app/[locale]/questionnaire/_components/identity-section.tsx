@@ -22,6 +22,7 @@ export type IdentityValues = {
 type Props = {
   values: IdentityValues;
   dateText: Content["dateEntry"];
+  phoneText: Content["phoneEntry"];
 };
 
 /**
@@ -35,7 +36,7 @@ type Props = {
  * created can lack a birth date or a phone. The e-mail is the sign-in
  * identity, so it stays read-only here.
  */
-export const IdentitySection = ({ values, dateText }: Props) => {
+export const IdentitySection = ({ values, dateText, phoneText }: Props) => {
   const { text } = useQuestionnaire();
   const complete =
     values.firstName !== "" &&
@@ -132,7 +133,8 @@ export const IdentitySection = ({ values, dateText }: Props) => {
         type="tel"
         inputMode="tel"
         label={text.labels.phone}
-        hint={text.hints.phone}
+        hint={phoneText.hint}
+        placeholder={phoneText.placeholder}
         initial={values.phone}
         autoComplete="tel"
       />
