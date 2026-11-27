@@ -71,5 +71,6 @@ J, 2026-11-27: "i don't want to have to do this manually". A session ticks a box
 
 ## Close
 
-- [ ] (S) CI is green on the setup pull request, and the Vercel preview builds. `close.ci`
+- [x] (S) CI is green on the setup pull request, and the Vercel preview builds. `close.ci`
+  CI green and the four Vercel previews built on #252 at 6c55221 (2026-11-27).
 - [ ] (J) Tick each box of the other files of `.icm/setup/` when its act is done. `close.acts`
