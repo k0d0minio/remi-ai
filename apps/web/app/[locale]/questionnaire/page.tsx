@@ -110,7 +110,7 @@ const QuestionnairePage = async ({
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-col gap-8 px-4 py-10">
+    <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-6">
       <Wordmark />
       <QuestionnaireFlow
         locale={locale}
@@ -124,7 +124,14 @@ const QuestionnairePage = async ({
         initialMissing={missing.data}
         initialStep={startStep(section, lastStep, missing.data)}
       />
-      <SignOutButton locale={locale} label={content.signOut} />
+      {/* A discreet link at the page's foot (REM-156), on every step and on
+          the end screen. */}
+      <SignOutButton
+        locale={locale}
+        label={content.signOut}
+        appearance="link"
+        className="self-center"
+      />
     </main>
   );
 };
