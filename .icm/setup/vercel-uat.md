@@ -23,6 +23,7 @@ A project that the client does not test gets no `uat`. It keeps Auto-assign on a
 
 ## Done when
 
-- [ ] `.icm/_system/scripts/promote.sh status` lists each project that the client tests.
+- [x] `.icm/_system/scripts/promote.sh status` lists each project that the client tests.
 - [ ] It prints no line `SETUP:`.
-- [ ] The UAT address opens the newest build of `main`.
+  It prints one for `marketing`: it follows `main` (D-37), so its auto-assign stays on.
+- [x] The UAT address opens the newest build of `main`.
