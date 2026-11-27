@@ -15,7 +15,7 @@ export const signupFields = [
 export type SignupField = (typeof signupFields)[number];
 
 /** Why a field was refused. The page turns each code into a sentence. */
-export type SignupFieldError = "required" | "invalid" | "too_short";
+export type SignupFieldError = "required" | "invalid" | "too_short" | "minor";
 
 export type SignupFieldErrors = Partial<Record<SignupField, SignupFieldError>>;
 

@@ -24,6 +24,8 @@ import {
   type SignupFieldError,
   type SignupFieldErrors,
 } from "../shared/signup";
+import { todayAtPractice } from "../shared/format";
+import { isAdultOn } from "../shared/typed-entry";
 import type { Id } from "../types";
 import {
   getAuthProvider,
@@ -74,7 +76,9 @@ const signupSchema = z.object({
     .trim()
     .min(1, "required")
     .regex(isoDate, "invalid")
-    .refine(isPastDay, "invalid"),
+    .refine(isPastDay, "invalid")
+    // REMI is not for minors (REM-159): the day of the 18th birthday passes.
+    .refine((value) => isAdultOn(value, todayAtPractice()), "minor"),
   email: z
     .string()
     .trim()
@@ -105,7 +109,10 @@ export type SignupValidation =
   { ok: true; data: SignupData } | { ok: false; fields: SignupFieldErrors };
 
 const isFieldError = (code: string): code is SignupFieldError =>
-  code === "required" || code === "invalid" || code === "too_short";
+  code === "required" ||
+  code === "invalid" ||
+  code === "too_short" ||
+  code === "minor";
 
 /**
  * Checks the six fields. Each refused field gets one code: the first rule it

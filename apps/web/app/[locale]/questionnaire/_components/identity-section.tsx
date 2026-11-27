@@ -111,7 +111,7 @@ export const IdentitySection = ({ values, dateText }: Props) => {
         label={text.labels.birthDate}
         dateText={dateText}
         initial={values.birthDate}
-        past
+        rule="birth"
         autoComplete="bday"
       />
       <Field

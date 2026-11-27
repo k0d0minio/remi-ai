@@ -355,7 +355,8 @@ export const amy1aCategories = ["A", "H", "M"] as const;
  * (story 4, criterion 1): « Sexe, taille, poids actuel, niveau d'activité
  * physique et motif de consultation sont obligatoires », plus an explicit
  * answer on allergies and on intolerances. Jamie accepted the list on
- * 2026-11-03.
+ * 2026-11-03. The consultation date is mandatory since REM-159 (Morgane's UAT
+ * correction of 2026-11-26).
  *
  * One list for both sides: the console's « Champs manquants » and the
  * patient's questionnaire read it, so the two never disagree on what makes a
@@ -367,6 +368,7 @@ export const mandatoryQuestionnaireFields = [
   "weightKg",
   "activityLevel",
   "consultationReason",
+  "consultationDate",
   "allergies",
   "intolerances",
 ] as const;
@@ -386,6 +388,7 @@ export const mandatoryQuestionnaireFieldLabels = {
   consultationReason: {
     fr: "Motif de consultation"
   },
+  consultationDate: { fr: "Date de consultation"},
   allergies: { fr: "Allergies"},
   intolerances: { fr: "Intolérances"},
 } as const satisfies Record<MandatoryQuestionnaireField, QuestionnaireLabel>;
@@ -414,6 +417,7 @@ export const sectionOfMandatoryField = {
   weightKg: "profil",
   activityLevel: "profil",
   consultationReason: "consultation",
+  consultationDate: "consultation",
   allergies: "alimentation",
   intolerances: "alimentation",
 } as const satisfies Record<MandatoryQuestionnaireField, QuestionnaireSection>;
@@ -449,6 +453,15 @@ export type QuestionnaireCompleteness = {
   weightKg: number | null;
   activityLevel: string | null;
   consultationReason: string | null;
+  /** `YYYY-MM-DD`, null when the file holds no consultation date (REM-159). */
+  consultationDate: string | null;
+  /**
+   * The patient's today as `YYYY-MM-DD`. With it, a consultation date before
+   * today counts as missing: the patient's questionnaire cannot finish on a
+   * past date (REM-159). Without it, a stored date counts as filled: the
+   * console keeps the date of a consultation that took place.
+   */
+  today?: string;
   /** True for « Aucune allergie connue », false for declared rows, null unanswered. */
   noKnownAllergies: boolean | null;
   noKnownIntolerances: boolean | null;
@@ -476,6 +489,10 @@ export const missingMandatoryFields = (
     consultationReason:
       input.consultationReason !== null &&
       input.consultationReason.trim() !== "",
+    consultationDate:
+      input.consultationDate !== null &&
+      input.consultationDate !== "" &&
+      (input.today === undefined || input.consultationDate >= input.today),
     allergies: listAnswered(input.noKnownAllergies, input.allergyCount),
     intolerances: listAnswered(
       input.noKnownIntolerances,
@@ -500,7 +517,6 @@ export const optionalQuestionnaireFields = [
   "birthDate",
   "phone",
   "desiredWeightKg",
-  "consultationDate",
   "diet",
   "dietNote",
   "celiacDisease",
@@ -520,7 +536,6 @@ export const optionalQuestionnaireFieldLabels = {
   birthDate: { fr: "Date de naissance"},
   phone: { fr: "Téléphone"},
   desiredWeightKg: { fr: "Poids souhaité"},
-  consultationDate: { fr: "Date de consultation"},
   diet: { fr: "Régime / type d'alimentation"},
   dietNote: { fr: "Précision du régime"},
   celiacDisease: { fr: "Maladie cœliaque"},

@@ -3,6 +3,7 @@
 import NextLink from "next/link";
 import { Fragment, useActionState, useState } from "react";
 import {
+  isAdultOn,
   localePath,
   parseDateEntry,
   shownConsentValue,
@@ -10,6 +11,7 @@ import {
   type ConsentKey,
   type Locale,
   type SignupField,
+  todayAtPractice,
 } from "@remi/services/shared";
 import { Button } from "@remi/ui";
 import { Field, Input, Link, Typography } from "@remi/ui/server";
@@ -115,6 +117,9 @@ export const SignupForm = ({
     }
     if (error === "too_short") {
       return content.tooShort;
+    }
+    if (error === "minor") {
+      return content.minor;
     }
     return error ? content.invalid[name] : undefined;
   };
@@ -229,6 +234,12 @@ export const SignupForm = ({
             // as typed, so the server refuses it and names the field.
             const typed = values.birthDate;
             const entry = parseDateEntry(typed);
+            // REMI is not for minors (REM-159). The field says so as soon as
+            // the day is complete. The server checks the age again.
+            const minor =
+              entry.state === "valid" &&
+              !isAdultOn(entry.iso, todayAtPractice());
+            const error = minor ? content.minor : message(name);
             return (
               <Fragment key={name}>
                 <input
@@ -240,7 +251,7 @@ export const SignupForm = ({
                   id={id}
                   label={content.labels.birthDate}
                   hint={dateText.hint}
-                  error={message(name)}
+                  error={error}
                 >
                   <DateInput
                     id={id}
@@ -249,7 +260,7 @@ export const SignupForm = ({
                     size="lg"
                     className="min-h-11"
                     placeholder={dateText.placeholder}
-                    invalid={Boolean(state.fields.birthDate)}
+                    invalid={error !== undefined}
                     value={typed}
                     onValueChange={(next) =>
                       setValues((current) => ({ ...current, birthDate: next }))

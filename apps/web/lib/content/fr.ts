@@ -289,6 +289,7 @@ export const fr: Content = {
       password: "Ce mot de passe est trop long.",
     },
     tooShort: "Le mot de passe compte au moins 8 caractères.",
+    minor: "Tu dois avoir au moins 18 ans pour utiliser REMI.",
     form: {
       invalid_link:
         "Ce lien n'est pas valide. Demandes-en un nouveau à la personne qui te suit.",
@@ -381,6 +382,9 @@ export const fr: Content = {
         "Tes génotypes demandent ton consentement génétique. Donne-le plus haut pour les enregistrer.",
       signed_out: "Ta session a expiré. Reconnecte-toi pour continuer.",
       unavailable: "Impossible d'enregistrer.",
+      minor: "Tu dois avoir au moins 18 ans pour utiliser REMI.",
+      before_today:
+        "La date de consultation ne peut pas être antérieure à la date du jour.",
     },
     labels: {
       firstName: "Prénom",
@@ -395,11 +399,11 @@ export const fr: Content = {
         weightKg: "Poids actuel (kg)",
         activityLevel: "Niveau d'activité physique",
         consultationReason: "Motif de consultation",
+        consultationDate: "Date de consultation",
         allergies: "Allergies",
         intolerances: "Intolérances",
       },
       desiredWeight: "Poids souhaité (kg)",
-      consultationDate: "Date de consultation",
       diet: "Quel type d'alimentation suis-tu ?",
       dietNote: "Précise ton type d'alimentation",
       medications: "Médicaments",
@@ -476,6 +480,9 @@ export const fr: Content = {
     hint: "Format : JJ/MM/AAAA.",
     invalid: "Cette date n'est pas valide. Utilise le format JJ/MM/AAAA.",
     notPast: "La date de naissance doit être dans le passé.",
+    minor: "Tu dois avoir au moins 18 ans pour utiliser REMI.",
+    beforeToday:
+      "La date de consultation ne peut pas être antérieure à la date du jour.",
   },
   patientSignIn: {
     metaTitle: "Connexion",

@@ -261,7 +261,6 @@ const PatientDetail = async ({ params, searchParams }: PageProps) => {
     birthDate: patient.birthDate,
     phone: patient.phone,
     desiredWeightKg: answers.desiredWeightKg,
-    consultationDate,
     diet: answers.diet,
     dietNote: answers.dietNote,
     celiacDisease: answers.celiacDisease,

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   dateEntryFromIso,
+  isAdultOn,
   isCalendarDay,
+  isTodayOrLater,
   maskDateEntry,
   maskNumberEntry,
   parseDateEntry,
@@ -24,6 +26,25 @@ describe("a calendar day", () => {
     expect(isCalendarDay("0199-05-12")).toBe(false);
     expect(isCalendarDay("12/05/1990")).toBe(false);
     expect(isCalendarDay("")).toBe(false);
+  });
+});
+
+describe("the age and the day rules (REM-159)", () => {
+  it("accepts a person of 18 from the day of the 18th birthday", () => {
+    expect(isAdultOn("2008-11-27", "2026-11-27")).toBe(true);
+    expect(isAdultOn("2008-11-28", "2026-11-27")).toBe(false);
+    expect(isAdultOn("1985-04-12", "2026-11-27")).toBe(true);
+  });
+
+  it("makes a person born on 29 February 18 on 1 March", () => {
+    expect(isAdultOn("2008-02-29", "2026-02-28")).toBe(false);
+    expect(isAdultOn("2008-02-29", "2026-03-01")).toBe(true);
+  });
+
+  it("accepts today and a later day, and refuses an earlier day", () => {
+    expect(isTodayOrLater("2026-11-27", "2026-11-27")).toBe(true);
+    expect(isTodayOrLater("2026-12-01", "2026-11-27")).toBe(true);
+    expect(isTodayOrLater("2026-11-26", "2026-11-27")).toBe(false);
   });
 });
 

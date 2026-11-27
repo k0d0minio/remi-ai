@@ -255,7 +255,9 @@ export const QuestionnaireFields = ({
 
       <Field
         id="consultationDate"
-        label="Date de consultation"
+        label={
+          <MandatoryLabel>{mandatory.consultationDate.fr}</MandatoryLabel>
+        }
         className="@xl:max-w-[calc(50%-0.5rem)]"
       >
         <Input

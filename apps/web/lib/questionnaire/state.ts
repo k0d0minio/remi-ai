@@ -43,7 +43,9 @@ export type SaveError =
   | "consent"
   | "genetic_consent"
   | "signed_out"
-  | "unavailable";
+  | "unavailable"
+  | "minor"
+  | "before_today";
 
 /**
  * A save's answer. On success it carries the file's status and the missing

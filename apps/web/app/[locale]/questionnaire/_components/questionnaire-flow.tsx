@@ -312,12 +312,14 @@ export const QuestionnaireFlow = ({
             label={<MandatoryLabel label={label("consultationReason")} />}
             initial={values.consultationReason}
           />
-          {/* The practitioner's date when the file holds one, empty if not. */}
+          {/* The practitioner's date when the file holds one, empty if not.
+              Mandatory since REM-159: today or a later day. */}
           <DateAnswer
             field="consultationDate"
-            label={text.labels.consultationDate}
+            label={<MandatoryLabel label={label("consultationDate")} />}
             dateText={dateText}
             initial={values.consultationDate}
+            rule="consultation"
           />
           {/* The practitioner's own question, after the shared ones. */}
           {practitionerQuestion ? (
