@@ -17,9 +17,12 @@ import { cn } from "@remi/ui/utils";
 import type { Content } from "@/lib/content/types";
 import { fill } from "@/lib/content/fill";
 
-/** A link in a text is blue and underlined, with a visible focus (REM-11). */
+/**
+ * A link in a text is blue and underlined, with a visible focus (REM-11). A
+ * long address breaks at any character, so it stays in the sheet (REM-12).
+ */
 const documentClasses =
-  "[&_table]:block [&_table]:overflow-x-auto [&_a]:text-primary [&_a]:font-medium [&_a]:rounded-sm [&_a]:outline-none [&_a:focus-visible]:ring-[3px] [&_a:focus-visible]:ring-ring";
+  "[&_table]:block [&_table]:overflow-x-auto [&_a]:wrap-anywhere [&_a]:text-primary [&_a]:font-medium [&_a]:rounded-sm [&_a]:outline-none [&_a:focus-visible]:ring-[3px] [&_a:focus-visible]:ring-ring";
 
 /** One document as the page shows it. The server renders the body. */
 export type ConsentStepDocument = {
@@ -55,6 +58,10 @@ type DocumentLinkProps = {
  * A document name in the sentence of the box. It opens the document in a
  * full-height sheet, on the same page. Closing the sheet gives the focus back
  * to the link.
+ *
+ * The text line is 24 px high. A transparent layer adds 10 px above and below
+ * the name, so the touch area is 44 px high and the sentence keeps its layout
+ * (REM-12).
  */
 const DocumentLink = ({ name, document, versionText }: DocumentLinkProps) => {
   const version = fill(versionText, {
@@ -68,7 +75,7 @@ const DocumentLink = ({ name, document, versionText }: DocumentLinkProps) => {
           type="button"
           className={cn(
             linkVariants({ variant: "primary" }),
-            "cursor-pointer font-medium underline",
+            "relative cursor-pointer font-medium underline after:absolute after:inset-x-0 after:-inset-y-2.5",
           )}
         >
           {name}
