@@ -5,5 +5,5 @@
 - link: https://linear.app/remi-ai/issue/REM-158/questionnaire-patient-reutiliser-les-donnees-personnelles-de
 - branch: contact/rem-158-questionnaire-patient-reutiliser-les-donnees
 - lane: bug
-- pr: pending
+- pr: #255
 - started: 2026-11-27
