@@ -351,7 +351,7 @@ export const fr: Content = {
       sante: "Santé",
       genetique: "Tes informations génétiques",
     },
-    previous: "Précédent",
+    previous: "Retour",
     next: "Continuer",
     saving: "Enregistrement…",
     saved: "Enregistré",
@@ -428,7 +428,7 @@ export const fr: Content = {
     identity: {
       known:
         "Ces informations viennent de ton inscription. Vérifie-les : tu peux les corriger si besoin.",
-      edit: "Modifier mes informations",
+      edit: "Modifier",
       empty: "Non renseigné",
     },
     diet: {

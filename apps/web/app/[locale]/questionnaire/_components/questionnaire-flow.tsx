@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import {
   activityLevelDetails,
   activityLevels,
@@ -44,6 +45,7 @@ import {
   QuestionnaireProvider,
   type Saver,
 } from "./questionnaire-context";
+import { QuestionnaireActions } from "./questionnaire-actions";
 import { QuestionnaireEnd, type EndState } from "./questionnaire-end";
 import { TextAnswer } from "./text-answer";
 
@@ -91,9 +93,9 @@ const STEP_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 /**
  * The preparatory questionnaire (story 4), as a guided journey (REM-156): a
- * progress bar, « Étape X sur 6 », one step at a time, and « Précédent » and
- * « Continuer » under each step. The URL names the step, but every step stays
- * mounted: what the patient typed stays on screen when they move. No step
+ * progress bar, « Étape X sur 6 », one step at a time, and « Continuer » and
+ * « Retour » at the same place under each step (`QuestionnaireActions`). The
+ * URL names the step, but every step stays mounted:what the patient typed stays on screen when they move. No step
  * blocks the next one. The mandatory fields count only on the end screen
  * (REM-168), which the last « Continuer » opens.
  */
@@ -212,9 +214,9 @@ export const QuestionnaireFlow = ({
 
   return (
     <QuestionnaireProvider value={{ locale, text, onSettled, register }}>
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-5">
         {section ? (
-          <header className="flex flex-col gap-4">
+          <header className="flex flex-col gap-3">
             <Typography as="h1" size="2xl" weight="semibold">
               {text.title}
             </Typography>
@@ -409,27 +411,30 @@ export const QuestionnaireFlow = ({
         ) : null}
 
         {section ? (
-          <div className="flex justify-between gap-3">
-            {previous ? (
+          <QuestionnaireActions
+            primary={
               <Button
                 type="button"
-                variant="outline"
                 size="lg"
-                onClick={() => open(previous)}
+                onClick={next ? () => open(next) : finish}
               >
-                {text.previous}
+                {text.next}
               </Button>
-            ) : (
-              <span />
-            )}
-            <Button
-              type="button"
-              size="lg"
-              onClick={next ? () => open(next) : finish}
-            >
-              {text.next}
-            </Button>
-          </div>
+            }
+            links={
+              previous ? (
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  onClick={() => open(previous)}
+                >
+                  <ArrowLeft aria-hidden />
+                  {text.previous}
+                </Button>
+              ) : null
+            }
+          />
         ) : null}
       </div>
     </QuestionnaireProvider>
@@ -449,7 +454,7 @@ const Section = ({ current, name, title, children }: SectionProps) => (
   <section
     hidden={current !== name}
     aria-labelledby={`questionnaire-section-${name}`}
-    className={current === name ? "flex flex-col gap-6" : "hidden"}
+    className={current === name ? "flex flex-col gap-5" : "hidden"}
   >
     <Typography
       as="h2"
